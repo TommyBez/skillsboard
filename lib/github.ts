@@ -7,6 +7,7 @@ interface GitHubRepo {
 }
 
 export interface GitHubMetadata {
+  githubUrl: string
   description: string | null
   repoOwner: string
   repoName: string

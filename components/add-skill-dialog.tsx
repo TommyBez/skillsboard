@@ -19,7 +19,10 @@ export function AddSkillDialog({ defaultUrl = "", defaultName = "", triggerLabel
     setIsPending(true)
     try {
       const result = await addSkill({ githubUrl: String(formData.get("githubUrl")), skillName: String(formData.get("skillName")), tags: String(formData.get("tags") ?? "").split(",").map((tag) => tag.trim()).filter(Boolean) })
-      if (!result.ok) return toast.error(result.error)
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
       toast.success("Skill saved to your team library")
       setIsOpen(false)
     } catch (error) { toast.error(error instanceof Error ? error.message : "Could not save skill") }
