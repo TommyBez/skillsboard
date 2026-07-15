@@ -15,5 +15,25 @@ export function ConsentForm() {
     if (result.data?.url) window.location.href = result.data.url
     else { setIsPending(false); router.refresh() }
   }
-  return <div className="flex gap-3"><Button variant="outline" disabled={isPending} onClick={() => decide(false)}>Deny</Button><Button disabled={isPending} onClick={() => decide(true)}>{isPending ? "Authorizing..." : "Allow access"}</Button></div>
+  return (
+    <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
+      <Button
+        type="button"
+        variant="outline"
+        className="h-12 rounded-[16px] px-6"
+        disabled={isPending}
+        onClick={() => decide(false)}
+      >
+        Deny
+      </Button>
+      <Button
+        type="button"
+        className="h-12 rounded-[16px] px-6"
+        disabled={isPending}
+        onClick={() => decide(true)}
+      >
+        {isPending ? "Authorizing..." : "Allow access"}
+      </Button>
+    </div>
+  )
 }

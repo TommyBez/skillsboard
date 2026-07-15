@@ -1,9 +1,15 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { LazyMotion, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 
 const EASE = [0.16, 1, 0.3, 1] as const
+const loadFeatures = () => import("@/components/motion/features").then((module) => module.default)
+
+export function MotionRuntime({ children }: { children: ReactNode }) {
+  return <LazyMotion features={loadFeatures} strict>{children}</LazyMotion>
+}
 
 interface RevealProps {
   children: ReactNode
@@ -14,15 +20,16 @@ interface RevealProps {
 export function Reveal({ children, delay = 0, className }: RevealProps) {
   const reduce = useReducedMotion()
   return (
-    <motion.div
+    <m.div
+      data-motion-reveal
       className={className}
-      initial={reduce ? false : { opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay, ease: EASE }}
+      transition={reduce ? { duration: 0, delay: 0 } : { duration: 0.6, delay, ease: EASE }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
@@ -34,30 +41,33 @@ interface HeroEntranceProps {
 export function HeroEntrance({ children, className }: HeroEntranceProps) {
   const reduce = useReducedMotion()
   return (
-    <motion.div
+    <m.div
       className={className}
-      initial={reduce ? false : "hidden"}
+      initial="hidden"
       animate="visible"
       variants={{
         hidden: {},
-        visible: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+        visible: { transition: reduce ? { staggerChildren: 0, delayChildren: 0 } : { staggerChildren: 0.08, delayChildren: 0.05 } },
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }
 
 export function HeroItem({ children, className }: HeroEntranceProps) {
+  const reduce = useReducedMotion()
+
   return (
-    <motion.div
+    <m.div
+      data-motion-hero-item
       className={className}
       variants={{
         hidden: { opacity: 0, y: 20 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+        visible: { opacity: 1, y: 0, transition: reduce ? { duration: 0 } : { duration: 0.7, ease: EASE } },
       }}
     >
       {children}
-    </motion.div>
+    </m.div>
   )
 }

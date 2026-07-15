@@ -1,5 +1,9 @@
 import "server-only"
 
+import { cacheLife, cacheTag } from "next/cache"
+
+import { cacheTags } from "@/lib/cache-tags"
+
 interface GitHubRepo {
   description: string | null
   stargazers_count: number
@@ -25,10 +29,13 @@ export function parseGitHubUrl(value: string) {
 }
 
 export async function getGitHubMetadata(value: string): Promise<GitHubMetadata> {
+  "use cache"
+  cacheLife("hours")
+
   const parsed = parseGitHubUrl(value)
+  cacheTag(cacheTags.githubRepository(parsed.repoOwner, parsed.repoName))
   const response = await fetch(`https://api.github.com/repos/${parsed.repoOwner}/${parsed.repoName}`, {
     headers: { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" },
-    next: { revalidate: 3600 },
   })
   if (!response.ok) throw new Error("GitHub repository not found or unavailable")
   const repo = (await response.json()) as GitHubRepo

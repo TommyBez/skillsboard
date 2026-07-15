@@ -1,4 +1,11 @@
 import { oauthProviderAuthServerMetadata } from "@better-auth/oauth-provider"
+import { connection } from "next/server"
+
 import { auth } from "@/lib/auth"
 
-export const GET = oauthProviderAuthServerMetadata(auth)
+const getMetadata = oauthProviderAuthServerMetadata(auth)
+
+export async function GET(request: Request) {
+  await connection()
+  return getMetadata(request)
+}

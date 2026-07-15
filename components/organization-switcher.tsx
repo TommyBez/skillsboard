@@ -15,5 +15,5 @@ export function OrganizationSwitcher({ organizations, activeId }: OrganizationSw
     await setActiveOrganization(value)
     router.refresh()
   }
-  return <Select value={activeId} onValueChange={handleValueChange}><SelectTrigger className="w-44"><SelectValue /></SelectTrigger><SelectContent><SelectGroup>{organizations.map((organization) => <SelectItem key={organization.id} value={organization.id}>{organization.name}</SelectItem>)}</SelectGroup></SelectContent></Select>
+  return <Select value={activeId} onValueChange={handleValueChange}><SelectTrigger aria-label="Switch active organization" className="h-10 w-32 rounded-xl bg-card/65 sm:w-44"><SelectValue /></SelectTrigger><SelectContent><SelectGroup>{organizations.map((organization) => <SelectItem key={organization.id} value={organization.id}>{organization.name}</SelectItem>)}</SelectGroup></SelectContent></Select>
 }

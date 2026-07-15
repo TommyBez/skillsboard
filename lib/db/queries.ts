@@ -1,9 +1,15 @@
 import { and, desc, eq, inArray } from "drizzle-orm"
+import { cacheLife, cacheTag } from "next/cache"
 
+import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
 import { member, organization, skill } from "@/lib/db/schema"
 
 export async function listOrganizationSkills(organizationId: string) {
+  "use cache"
+  cacheLife("hours")
+  cacheTag(cacheTags.organizationSkills(organizationId))
+
   return db.select().from(skill).where(eq(skill.organizationId, organizationId)).orderBy(desc(skill.createdAt))
 }
 

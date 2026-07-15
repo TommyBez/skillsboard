@@ -1,6 +1,9 @@
 import "server-only"
 
 import { getVercelOidcToken } from "@vercel/oidc"
+import { cacheLife, cacheTag } from "next/cache"
+
+import { cacheTags } from "@/lib/cache-tags"
 
 export interface CatalogSkill {
   id: string
@@ -46,7 +49,6 @@ async function catalogFetch(path: string) {
   const token = await getVercelOidcToken()
   const response = await fetch(`https://skills.sh${path}`, {
     headers: { Authorization: `Bearer ${token}` },
-    next: { revalidate: 60 },
   })
   if (!response.ok) throw new Error(response.status === 401 ? "Skills discovery requires Vercel OIDC Federation" : "Skills catalog is temporarily unavailable")
   const payload = (await response.json()) as CatalogResponse | unknown[]
@@ -55,6 +57,10 @@ async function catalogFetch(path: string) {
 }
 
 export async function getLeaderboard(view: "all-time" | "trending" | "hot" = "trending") {
+  "use cache"
+  cacheLife("catalog")
+  cacheTag(cacheTags.catalog, cacheTags.catalogView(view))
+
   return catalogFetch(`/api/v1/skills?view=${view}&page=1&perPage=24`)
 }
 
@@ -63,5 +69,9 @@ export async function searchCatalog(query: string) {
 }
 
 export async function getCuratedSkills() {
+  "use cache"
+  cacheLife("catalog")
+  cacheTag(cacheTags.catalog, cacheTags.catalogView("curated"))
+
   return catalogFetch("/api/v1/skills/curated")
 }

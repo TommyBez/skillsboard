@@ -1,5 +1,3 @@
-"use client"
-
 const ROW = [
   "find-skills",
   "design-taste-frontend",
@@ -15,12 +13,13 @@ const ROW = [
 
 export function KineticMarquee() {
   return (
-    <div aria-hidden className="overflow-hidden border-y border-border/60 bg-card py-4">
-      <div className="animate-marquee flex w-max">
+    <div className="overflow-hidden border-b border-border/70 bg-card/65 py-4">
+      <span className="sr-only">Popular skills: {ROW.join(", ")}</span>
+      <div aria-hidden className="animate-marquee flex w-max">
         {[0, 1].map((half) => (
           <div key={half} className="flex shrink-0 items-center">
             {ROW.map((name) => (
-              <span key={`${half}-${name}`} className="flex items-center gap-6 pr-6 font-mono text-sm text-muted-foreground">
+              <span key={`${half}-${name}`} className="flex items-center gap-6 pr-6 font-mono text-xs font-medium text-muted-foreground md:text-sm">
                 <span>{name}</span>
                 <span className="text-primary">/</span>
               </span>
