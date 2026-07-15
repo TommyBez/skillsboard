@@ -1,18 +1,12 @@
 import { cache } from "react"
 import { redirect } from "next/navigation"
 
-import { listUserOrganizations } from "@/lib/db/queries"
-import { requireSession } from "@/lib/session"
+import { resolveActiveOrganization } from "@/lib/session"
 
 export const getAppContext = cache(async () => {
-  const session = await requireSession()
-  const organizations = await listUserOrganizations(session.user.id)
+  const { session, organizations, activeOrganization } = await resolveActiveOrganization()
 
-  if (!organizations.length) redirect("/onboarding")
-
-  const activeOrganization = organizations.find(
-    (organization) => organization.id === session.session.activeOrganizationId,
-  ) ?? organizations[0]
+  if (!activeOrganization) redirect("/onboarding")
 
   return {
     session,

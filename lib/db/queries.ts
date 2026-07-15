@@ -60,11 +60,6 @@ export async function getUserSkill(userId: string, skillId: string) {
   return savedSkill ?? null
 }
 
-export async function canAccessOrganization(userId: string, organizationId: string) {
-  const rows = await db.select({ id: member.id }).from(member).where(and(eq(member.userId, userId), eq(member.organizationId, organizationId))).limit(1)
-  return rows.length > 0
-}
-
 export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }

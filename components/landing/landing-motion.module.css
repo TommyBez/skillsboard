@@ -1,0 +1,327 @@
+.root {
+  --landing-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --landing-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.heroEyebrow {
+  animation: hero-eyebrow-enter 360ms var(--landing-ease-out) both;
+}
+
+.heroLine {
+  animation: hero-line-enter 560ms var(--landing-ease-out) both;
+}
+
+.heroLineFirst {
+  animation-delay: 70ms;
+}
+
+.heroLineSecond {
+  animation-delay: 140ms;
+}
+
+.heroCopy {
+  animation: hero-copy-enter 440ms var(--landing-ease-out) 170ms both;
+}
+
+.heroCta {
+  animation: hero-cta-enter 360ms var(--landing-ease-out) 230ms both;
+}
+
+@keyframes hero-eyebrow-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-line-enter {
+  from {
+    transform: translate3d(0, 22px, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-copy-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-cta-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes hero-fade-enter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .librarySource {
+  transition:
+    opacity 420ms var(--landing-ease-out),
+    transform 420ms var(--landing-ease-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .libraryArrow {
+  transition:
+    opacity 420ms var(--landing-ease-in-out) 90ms,
+    transform 420ms var(--landing-ease-in-out) 90ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentsLabel,
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentItem {
+  transition:
+    opacity 360ms var(--landing-ease-out),
+    transform 360ms var(--landing-ease-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentsLabel,
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentItem:nth-child(1) {
+  transition-delay: 150ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentItem:nth-child(2) {
+  transition-delay: 195ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentItem:nth-child(3) {
+  transition-delay: 240ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .agentItem:nth-child(4) {
+  transition-delay: 285ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="visible"]
+  .libraryCaption {
+  transition:
+    opacity 320ms var(--landing-ease-out) 340ms,
+    transform 320ms var(--landing-ease-out) 340ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="pending"]
+  .librarySource {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="pending"]
+  .libraryArrow {
+  opacity: 0;
+  transform: translate3d(0, -12px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="pending"]
+  .agentsLabel,
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="pending"]
+  .agentItem {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="library"][data-motion-state="pending"]
+  .libraryCaption {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingZero {
+  transition:
+    opacity 650ms var(--landing-ease-out),
+    transform 650ms var(--landing-ease-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingMessage {
+  transition:
+    opacity 480ms var(--landing-ease-out) 100ms,
+    transform 480ms var(--landing-ease-out) 100ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingNote {
+  transition:
+    opacity 360ms var(--landing-ease-out) 210ms,
+    transform 360ms var(--landing-ease-out) 210ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZero {
+  opacity: 0.35;
+  transform: translate3d(-24px, 0, 0) scale(0.96);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingMessage {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingNote {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingHeading {
+  transition:
+    opacity 520ms var(--landing-ease-out),
+    transform 520ms var(--landing-ease-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCopy {
+  transition:
+    opacity 420ms var(--landing-ease-out) 80ms,
+    transform 420ms var(--landing-ease-out) 80ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCta {
+  transition:
+    opacity 360ms var(--landing-ease-out) 150ms,
+    transform 360ms var(--landing-ease-out) 150ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingHeading {
+  opacity: 0;
+  transform: translate3d(0, 20px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCopy {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCta {
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+}
+
+@media (min-width: 40rem) {
+  .root[data-motion-enabled="true"]
+    [data-motion-group="library"][data-motion-state="pending"]
+    .libraryArrow {
+    transform: translate3d(-16px, 0, 0);
+  }
+
+  .root[data-motion-enabled="true"]
+    [data-motion-group="pricing"][data-motion-state="pending"]
+    .pricingZero {
+    transform: translate3d(-6%, 0, 0) scale(0.96);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaArrow {
+    transition: transform 160ms var(--landing-ease-out);
+  }
+
+  .ctaButton:hover .ctaArrow {
+    transform: translate3d(3px, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroEyebrow,
+  .heroCopy,
+  .heroCta {
+    animation: hero-fade-enter 140ms var(--landing-ease-out) both;
+    transform: none;
+  }
+
+  .heroLine {
+    animation: none;
+    transform: none;
+  }
+
+  .root[data-motion-enabled="true"] .librarySource,
+  .root[data-motion-enabled="true"] .libraryArrow,
+  .root[data-motion-enabled="true"] .agentsLabel,
+  .root[data-motion-enabled="true"] .agentItem,
+  .root[data-motion-enabled="true"] .libraryCaption,
+  .root[data-motion-enabled="true"] .pricingZero,
+  .root[data-motion-enabled="true"] .pricingMessage,
+  .root[data-motion-enabled="true"] .pricingNote,
+  .root[data-motion-enabled="true"] .closingHeading,
+  .root[data-motion-enabled="true"] .closingCopy,
+  .root[data-motion-enabled="true"] .closingCta,
+  .ctaArrow {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .ctaButton:active {
+    scale: 1 !important;
+    transform: none;
+  }
+}

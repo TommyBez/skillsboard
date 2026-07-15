@@ -47,7 +47,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const allSkills = await listOrganizationSkills(activeId)
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
-    (!query || `${item.title} ${item.description} ${item.tags.join(" ")}`.toLowerCase().includes(query))
+    (!query || `${item.title} ${item.description ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
     && (!params.tag || item.tags.includes(params.tag))
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()

@@ -3,6 +3,8 @@ import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
+import { LandingMotionController } from "@/components/landing/landing-motion-controller"
+import styles from "@/components/landing/landing-motion.module.css"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/session"
 
@@ -30,13 +32,16 @@ function HomeHeaderActionsView({ signedIn = false }: { signedIn?: boolean }) {
       ) : null}
       <Button
         size="sm"
-        className="sm:h-10 sm:px-4"
+        className={`${styles.ctaButton} sm:h-10 sm:px-4`}
         nativeButton={false}
         render={<Link href={primary.href} />}
       >
         <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
         <span className="hidden sm:inline">{primary.label}</span>
-        <ArrowRightIcon className="hidden sm:block" data-icon="inline-end" />
+        <ArrowRightIcon
+          className={`${styles.ctaArrow} hidden sm:block`}
+          data-icon="inline-end"
+        />
       </Button>
     </nav>
   )
@@ -51,9 +56,14 @@ function HomeHeroActionsView({ signedIn = false }: { signedIn?: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <Button size="lg" nativeButton={false} render={<Link href={primary.href} />}>
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={<Link href={primary.href} />}
+    >
       {primary.label}
-      <ArrowRightIcon data-icon="inline-end" />
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
     </Button>
   )
 }
@@ -67,9 +77,14 @@ function HomeFinalActionsView({ signedIn = false }: { signedIn?: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <Button size="lg" nativeButton={false} render={<Link href={primary.href} />}>
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={<Link href={primary.href} />}
+    >
       {primary.label}
-      <ArrowRightIcon data-icon="inline-end" />
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
     </Button>
   )
 }
@@ -83,7 +98,11 @@ const agents = ["Claude", "Codex", "Cursor", "Other agents"]
 
 export default function HomePage() {
   return (
-    <main className="app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground">
+    <main
+      className={`${styles.root} app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
+      data-landing-motion-root
+    >
+      <LandingMotionController />
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
@@ -96,20 +115,24 @@ export default function HomePage() {
       <section className="border-b border-border/70">
         <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-4 py-16 md:px-8 md:py-20 lg:min-h-[min(40rem,calc(100dvh-4.5rem))] lg:grid-cols-12 lg:content-center lg:items-end lg:gap-x-10 lg:py-20">
           <div className="flex w-full min-w-0 flex-col items-start lg:col-span-8">
-            <p className="mb-5 text-sm font-semibold text-primary">
+            <p className={`${styles.heroEyebrow} mb-5 text-sm font-semibold text-primary`}>
               Skills selected by your team
             </p>
             <h1 className="text-balance text-[clamp(2.75rem,7vw,7rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
-              <span className="block">One shared library.</span>
-              <span className="block text-primary">Different agents.</span>
+              <span className={`${styles.heroLine} ${styles.heroLineFirst} block`}>
+                One shared library.
+              </span>
+              <span className={`${styles.heroLine} ${styles.heroLineSecond} block text-primary`}>
+                Different agents.
+              </span>
             </h1>
           </div>
 
           <div className="flex w-full flex-col items-start lg:col-span-4 lg:pb-1">
-            <p className="max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
               Keep your team&apos;s recommended skills in one place, so everyone knows where to find and use them.
             </p>
-            <div className="mt-7">
+            <div className={`${styles.heroCta} mt-7`}>
               <Suspense fallback={<HomeHeroActionsView />}>
                 <HomeHeroActions />
               </Suspense>
@@ -135,9 +158,10 @@ export default function HomePage() {
           <figure
             className="w-full"
             aria-label="One team library can support different agents"
+            data-motion-group="library"
           >
             <div className="grid border-y border-border py-7 sm:grid-cols-[minmax(0,0.9fr)_auto_minmax(0,1.1fr)] sm:items-center sm:gap-8 sm:py-9">
-              <div>
+              <div className={styles.librarySource}>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
                   One team recommendation
                 </p>
@@ -147,12 +171,12 @@ export default function HomePage() {
               </div>
 
               <ArrowRightIcon
-                className="my-6 size-7 rotate-90 text-primary sm:my-0 sm:rotate-0"
+                className={`${styles.libraryArrow} my-6 size-7 rotate-90 text-primary sm:my-0 sm:rotate-0`}
                 aria-hidden="true"
               />
 
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                <p className={`${styles.agentsLabel} text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground`}>
                   Wherever people work
                 </p>
                 <ul
@@ -162,7 +186,7 @@ export default function HomePage() {
                   {agents.map((agent) => (
                     <li
                       key={agent}
-                      className="text-xl font-semibold tracking-[-0.03em]"
+                      className={`${styles.agentItem} text-xl font-semibold tracking-[-0.03em]`}
                     >
                       {agent}
                     </li>
@@ -170,7 +194,7 @@ export default function HomePage() {
                 </ul>
               </div>
             </div>
-            <figcaption className="mt-5 text-sm leading-relaxed text-muted-foreground">
+            <figcaption className={`${styles.libraryCaption} mt-5 text-sm leading-relaxed text-muted-foreground`}>
               Open the source <span aria-hidden="true">·</span> Copy the command{" "}
               <span aria-hidden="true">·</span> Download the latest ZIP
             </figcaption>
@@ -183,9 +207,12 @@ export default function HomePage() {
         aria-labelledby="pricing-heading"
         className="border-b border-primary/30 bg-primary text-primary-foreground"
       >
-        <div className="mx-auto grid w-full max-w-[1440px] gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20">
+        <div
+          className="mx-auto grid w-full max-w-[1440px] gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20"
+          data-motion-group="pricing"
+        >
           <p
-            className="select-none text-[clamp(9rem,25vw,22rem)] font-semibold leading-[0.68] tracking-[-0.09em]"
+            className={`${styles.pricingZero} select-none text-[clamp(9rem,25vw,22rem)] font-semibold leading-[0.68] tracking-[-0.09em]`}
             aria-hidden="true"
           >
             0
@@ -194,14 +221,14 @@ export default function HomePage() {
           <div className="max-w-lg lg:pb-2">
             <h2
               id="pricing-heading"
-              className="text-balance text-5xl font-semibold leading-[0.94] tracking-[-0.055em] md:text-7xl"
+              className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-[-0.055em] md:text-7xl`}
             >
               Free. Forever.
             </h2>
-            <p className="mt-6 text-xl leading-relaxed md:text-2xl">
+            <p className={`${styles.pricingMessage} mt-6 text-xl leading-relaxed md:text-2xl`}>
               Skills Board is free to use and open source.
             </p>
-            <p className="mt-8 border-t border-primary-foreground/30 pt-5 text-sm font-semibold">
+            <p className={`${styles.pricingNote} mt-8 border-t border-primary-foreground/30 pt-5 text-sm font-semibold`}>
               No trial. No credit card. No paid tier.
             </p>
           </div>
@@ -209,14 +236,17 @@ export default function HomePage() {
       </section>
 
       <section>
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28">
-          <h2 className="max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.055em]">
+        <div
+          className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
+          data-motion-group="closing"
+        >
+          <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.055em]`}>
             Answer “which skill should I use?” once.
           </h2>
-          <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
+          <p className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}>
             Save the recommendation where the whole team can find it. The next person can get started without asking where to look.
           </p>
-          <div className="mt-8">
+          <div className={`${styles.closingCta} mt-8`}>
             <Suspense fallback={<HomeFinalActionsView />}>
               <HomeFinalActions />
             </Suspense>

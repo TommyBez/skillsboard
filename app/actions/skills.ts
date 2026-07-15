@@ -62,6 +62,7 @@ export async function refreshSkill(id: string) {
   const { organizationId } = await requireActiveOrganization(session)
   const [savedSkill] = await db.select().from(skill).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId))).limit(1)
   if (!savedSkill) throw new Error("Skill not found")
+  updateTag(cacheTags.githubRepository(savedSkill.repoOwner, savedSkill.repoName))
   const metadata = await getGitHubMetadata(savedSkill.githubUrl)
   await db.update(skill).set({ description: metadata.description, repoStars: metadata.repoStars, repoUpdatedAt: metadata.repoUpdatedAt, metadataRefreshedAt: new Date(), updatedAt: new Date() }).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
