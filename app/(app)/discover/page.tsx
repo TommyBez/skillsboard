@@ -1,13 +1,18 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { ArrowLeftIcon, SearchIcon, SparklesIcon } from "lucide-react"
+import { ArrowLeftIcon, SparklesIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { CatalogEmptyState, CatalogResults } from "@/components/catalog-results"
 import { DiscoverFilters, DiscoverFiltersFallback } from "@/components/discover-filters"
-import { SkillDossier } from "@/components/skill-dossier"
+import {
+  DiscoverPendingProvider,
+  DiscoverResultsFallback,
+  DiscoverResultsSlot,
+} from "@/components/discover-pending"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
+import type { CatalogPage } from "@/lib/catalog"
 import { listOrganizationSkills } from "@/lib/db/queries"
 import { getCuratedSkills, getLeaderboard, searchCatalog } from "@/lib/skills-sh"
 
@@ -15,23 +20,22 @@ interface DiscoverPageProps {
   searchParams: Promise<{ q?: string; view?: "trending" | "hot" | "all-time" | "curated" }>
 }
 
-function installCount(count: number) {
-  return `${count.toLocaleString()} ${count === 1 ? "install" : "installs"}`
-}
-
-async function loadCatalog(params: Awaited<DiscoverPageProps["searchParams"]>) {
+async function loadCatalog(params: Awaited<DiscoverPageProps["searchParams"]>): Promise<
+  | { page: CatalogPage; unavailable: false }
+  | { page: null; unavailable: true }
+> {
   const view = params.view ?? "trending"
 
   try {
-    const skills = params.q && params.q.length >= 2
+    const page = params.q && params.q.length >= 2
       ? await searchCatalog(params.q)
       : view === "curated"
         ? await getCuratedSkills()
         : await getLeaderboard(view)
-    return { skills, unavailable: false }
+    return { page, unavailable: false }
   } catch (error) {
     console.error("Unable to load the skills.sh catalog", error)
-    return { skills: [] as Awaited<ReturnType<typeof getLeaderboard>>, unavailable: true }
+    return { page: null, unavailable: true }
   }
 }
 
@@ -41,9 +45,8 @@ async function DiscoverResults({ searchParams }: DiscoverPageProps) {
     listOrganizationSkills(activeId),
     loadCatalog(params),
   ])
-  const savedKeys = new Set(saved.map((item) => `${item.githubUrl}:${item.skillName}`))
 
-  if (catalog.unavailable) {
+  if (catalog.unavailable || !catalog.page) {
     return (
       <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
         <SparklesIcon className="size-9 text-primary" aria-hidden="true" />
@@ -61,58 +64,13 @@ async function DiscoverResults({ searchParams }: DiscoverPageProps) {
     )
   }
 
-  if (!catalog.skills.length) {
-    return (
-      <section className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
-        <SearchIcon className="size-9 text-primary" aria-hidden="true" />
-        <div>
-          <h2 className="text-3xl font-semibold tracking-[-0.04em]">No skills found</h2>
-          <p className="mt-3 max-w-xl text-muted-foreground">Try a broader search or return to the current trending catalog.</p>
-        </div>
-        <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>View trending</Button>
-      </section>
-    )
+  if (!catalog.page.skills.length) {
+    return <CatalogEmptyState />
   }
 
-  return (
-    <section aria-label="Catalog results" className="grid gap-4 md:grid-cols-2">
-      {catalog.skills.map((item, index) => {
-        const isSaved = savedKeys.has(`${item.installUrl}:${item.slug}`)
-        const command = `npx skills add ${item.installUrl} --skill ${item.slug}`
-        return (
-          <SkillDossier
-            key={item.id}
-            featured={index === 0 && catalog.skills.length > 2}
-            className={index === 0 && catalog.skills.length > 2 ? "md:col-span-2" : undefined}
-            headingLevel="h2"
-            name={item.name}
-            description={item.description}
-            source={item.source}
-            command={command}
-            metric={installCount(item.installs)}
-            status={isSaved ? "Saved" : undefined}
-            href={`https://skills.sh/${item.source}/${item.slug}`}
-            hrefLabel="Skill details"
-            actions={
-              isSaved
-                ? <Button aria-label={`${item.name} is already in library`} variant="outline" size="sm" disabled>In library</Button>
-                : <AddSkillDialog defaultUrl={item.installUrl} defaultName={item.slug} triggerLabel="Save to library" triggerAriaLabel={`Save ${item.name} to library`} />
-            }
-          />
-        )
-      })}
-    </section>
-  )
-}
+  const savedKeys = saved.map((item) => `${item.githubUrl}:${item.skillName}`)
 
-function DiscoverResultsFallback() {
-  return (
-    <div className="grid gap-4 md:grid-cols-2" aria-label="Loading public skills">
-      <Skeleton className="h-80 rounded-2xl md:col-span-2" />
-      <Skeleton className="h-72 rounded-2xl" />
-      <Skeleton className="h-72 rounded-2xl" />
-    </div>
-  )
+  return <CatalogResults initialPage={catalog.page} savedKeys={savedKeys} />
 }
 
 export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
@@ -133,13 +91,17 @@ export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
         </div>
       </section>
 
-      <Suspense fallback={<DiscoverFiltersFallback />}>
-        <DiscoverFilters />
-      </Suspense>
+      <DiscoverPendingProvider>
+        <Suspense fallback={<DiscoverFiltersFallback />}>
+          <DiscoverFilters />
+        </Suspense>
 
-      <Suspense fallback={<DiscoverResultsFallback />}>
-        <DiscoverResults searchParams={searchParams} />
-      </Suspense>
+        <DiscoverResultsSlot>
+          <Suspense fallback={<DiscoverResultsFallback />}>
+            <DiscoverResults searchParams={searchParams} />
+          </Suspense>
+        </DiscoverResultsSlot>
+      </DiscoverPendingProvider>
     </main>
   )
 }

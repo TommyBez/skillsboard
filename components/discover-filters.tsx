@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { SearchIcon } from "lucide-react"
 
+import { useDiscoverPending } from "@/components/discover-pending"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -57,24 +58,41 @@ function CatalogViewTabs({
   activeView: (typeof catalogViews)[number]["value"]
   hasQuery: boolean
 }) {
+  const router = useRouter()
+  const { startTransition } = useDiscoverPending()
+
   return (
     <nav aria-label="Catalog views" className="mt-4 flex gap-2 overflow-x-auto border-t border-border pt-4 pb-1">
-      {catalogViews.map((item) => (
-        <Button
-          key={item.value}
-          size="sm"
-          variant={!hasQuery && activeView === item.value ? "default" : "outline"}
-          nativeButton={false}
-          render={
-            <Link
-              href={`/discover?view=${item.value}`}
-              aria-current={!hasQuery && activeView === item.value ? "page" : undefined}
-            />
-          }
-        >
-          {item.label}
-        </Button>
-      ))}
+      {catalogViews.map((item) => {
+        const href = `/discover?view=${item.value}`
+        const isActive = !hasQuery && activeView === item.value
+
+        return (
+          <Button
+            key={item.value}
+            size="sm"
+            variant={isActive ? "default" : "outline"}
+            nativeButton={false}
+            render={
+              <Link
+                href={href}
+                aria-current={isActive ? "page" : undefined}
+                onClick={(event) => {
+                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+                    return
+                  }
+                  event.preventDefault()
+                  startTransition(() => {
+                    router.push(href, { scroll: false })
+                  })
+                }}
+              />
+            }
+          >
+            {item.label}
+          </Button>
+        )
+      })}
     </nav>
   )
 }
@@ -84,7 +102,19 @@ export function DiscoverFiltersFallback() {
   return (
     <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
       <SearchField value="" />
-      <CatalogViewTabs activeView="trending" hasQuery={false} />
+      <nav aria-label="Catalog views" className="mt-4 flex gap-2 overflow-x-auto border-t border-border pt-4 pb-1">
+        {catalogViews.map((item) => (
+          <Button
+            key={item.value}
+            size="sm"
+            variant={item.value === "trending" ? "default" : "outline"}
+            nativeButton={false}
+            render={<Link href={`/discover?view=${item.value}`} />}
+          >
+            {item.label}
+          </Button>
+        ))}
+      </nav>
     </section>
   )
 }
@@ -92,6 +122,7 @@ export function DiscoverFiltersFallback() {
 export function DiscoverFilters() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { startTransition } = useDiscoverPending()
   const qFromUrl = searchParams.get("q") ?? ""
   const viewParam = searchParams.get("view")
   const activeView = catalogViews.some((item) => item.value === viewParam)
@@ -118,11 +149,15 @@ export function DiscoverFilters() {
       }
 
       const query = params.toString()
-      router.replace(query ? `/discover?${query}` : "/discover", { scroll: false })
+      const href = query ? `/discover?${query}` : "/discover"
+
+      startTransition(() => {
+        router.replace(href, { scroll: false })
+      })
     }, DEBOUNCE_MS)
 
     return () => window.clearTimeout(timeoutId)
-  }, [value, qFromUrl, router, searchParams])
+  }, [value, qFromUrl, router, searchParams, startTransition])
 
   return (
     <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
