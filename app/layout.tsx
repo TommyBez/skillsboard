@@ -16,5 +16,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#101711", userScalable: true }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en" data-scroll-behavior="smooth" className={`${bricolage.variable} ${geistMono.variable} bg-background`}><body className="font-sans antialiased">{children}<Toaster />{process.env.NODE_ENV === "production" ? <Analytics /> : null}</body></html>
+  return <html lang="en" data-scroll-behavior="smooth" className={`${bricolage.variable} ${geistMono.variable} bg-background`}><body className="font-sans antialiased">{children}<Toaster />{process.env.VERCEL === "1" ? <Analytics /> : null}</body></html>
 }
