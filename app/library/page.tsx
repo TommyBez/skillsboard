@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
+import { DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { SkillDossier } from "@/components/skill-dossier"
@@ -23,7 +23,7 @@ async function LibraryStats() {
     <div className="flex flex-wrap items-center gap-5 lg:justify-end">
       <div className="min-w-20">
         <p className="font-mono text-3xl font-semibold tabular-nums tracking-[-0.04em]">{skills.length}</p>
-        <p className="text-sm text-muted-foreground">saved {skills.length === 1 ? "skill" : "skills"}</p>
+        <p className="text-sm text-muted-foreground">team {skills.length === 1 ? "skill" : "skills"}</p>
       </div>
       <div className="min-w-20 border-l border-border pl-5">
         <p className="font-mono text-3xl font-semibold tabular-nums tracking-[-0.04em]">{tags.size}</p>
@@ -58,7 +58,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
       <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
         <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div className="grid gap-2">
-            <label htmlFor="library-search" className="text-sm font-semibold">Search saved skills</label>
+            <label htmlFor="library-search" className="text-sm font-semibold">Search team library</label>
             <div className="relative">
               <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, or tag" className="pl-10" />
@@ -83,7 +83,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
       </section>
 
       {skills.length ? (
-        <section aria-label="Saved skills" className="grid gap-4 md:grid-cols-2">
+        <section aria-label="Team skill recommendations" className="grid gap-4 md:grid-cols-2">
           {skills.map((item, index) => {
             const command = `npx skills add ${item.githubUrl} --skill ${item.skillName}`
             return (
@@ -99,7 +99,24 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 metric={`${item.repoStars.toLocaleString()} ${item.repoStars === 1 ? "star" : "stars"}`}
                 tags={item.tags}
                 href={item.githubUrl}
-                hrefLabel="GitHub"
+                hrefLabel="Open source"
+                actions={(
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    nativeButton={false}
+                    render={(
+                      <a
+                        href={`/api/skills/${item.id}/download`}
+                        aria-label={`Download the latest version of ${item.title} as a ZIP`}
+                        title="Download the latest version from the repository"
+                      />
+                    )}
+                  >
+                    <DownloadIcon data-icon="inline-start" />
+                    Download ZIP
+                  </Button>
+                )}
               />
             )
           })}
@@ -108,14 +125,14 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <LibraryBigIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
-            <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{hasFilters ? "No matching skills" : "Save your first skill"}</h2>
+            <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{hasFilters ? "No matching skills" : "Add your first skill"}</h2>
             <p className="mt-3 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              {hasFilters ? "Try another search or clear the active filters." : "Add a GitHub-backed skill, or browse skills.sh to choose one for your team."}
+              {hasFilters ? "Try another search or clear the active filters." : "Add a skill your team recommends, or browse the public catalog to find one."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
-            {hasFilters ? <Button variant="outline" nativeButton={false} render={<Link href="/library" />}>Clear filters</Button> : <AddSkillDialog triggerLabel="Save from GitHub" />}
-            <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Browse skills.sh</Button>
+            {hasFilters ? <Button variant="outline" nativeButton={false} render={<Link href="/library" />}>Clear filters</Button> : <AddSkillDialog triggerLabel="Add a skill" />}
+            <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Find skills</Button>
           </div>
         </section>
       )}
@@ -143,10 +160,10 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
         <div>
           <p className="font-mono text-sm text-primary">Library</p>
           <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] md:text-6xl">
-            Your team’s saved skills.
+            Skills your team recommends.
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            One trusted library of GitHub-backed skills, ready to install or retrieve through MCP.
+            Find the right one, then open the source, copy the command, or download the latest ZIP.
           </p>
         </div>
 

@@ -41,6 +41,25 @@ export async function listUserSkills(userId: string) {
     .orderBy(desc(skill.createdAt))
 }
 
+export async function getUserSkill(userId: string, skillId: string) {
+  const [savedSkill] = await db
+    .select({
+      id: skill.id,
+      githubUrl: skill.githubUrl,
+      skillName: skill.skillName,
+      skillPath: skill.skillPath,
+    })
+    .from(skill)
+    .innerJoin(member, and(
+      eq(member.organizationId, skill.organizationId),
+      eq(member.userId, userId),
+    ))
+    .where(eq(skill.id, skillId))
+    .limit(1)
+
+  return savedSkill ?? null
+}
+
 export async function canAccessOrganization(userId: string, organizationId: string) {
   const rows = await db.select({ id: member.id }).from(member).where(and(eq(member.userId, userId), eq(member.organizationId, organizationId))).limit(1)
   return rows.length > 0

@@ -66,9 +66,9 @@ export function AddSkillDialog({
             <span className="mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <GitBranchIcon className="size-5" aria-hidden="true" />
             </span>
-            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Save a GitHub skill</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Save a skill</DialogTitle>
             <DialogDescription className="max-w-md leading-relaxed">
-              Add the repository and skill name. Skills Board fetches repository details and builds the install command.
+              Add its repository and skill name. Skills Board keeps the latest source, install command, and ZIP together.
             </DialogDescription>
           </DialogHeader>
 

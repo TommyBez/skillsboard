@@ -12,9 +12,9 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
     <AccessShell
       marker="Sign in"
       title="Welcome back"
-      description="Open your team’s saved skills and install commands."
-      editorialTitle="Pick up where your team left off."
-      editorialBody="Return to the GitHub-backed skills your team has chosen to save, install, and share with its agents."
+      description="Open the shared library of skills your team recommends."
+      editorialTitle="Your team’s recommendations, ready when you need them."
+      editorialBody="Find a skill a colleague has already added, then choose the source, install command, or ZIP that suits your setup."
     >
       <Suspense fallback={<AuthEntryFallback mode="sign-in" />}>
         <AuthEntry mode="sign-in" searchParams={searchParams} />

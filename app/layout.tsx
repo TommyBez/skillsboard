@@ -8,8 +8,8 @@ const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-br
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: { default: "Skills Board, the shared library for your team’s skills", template: "%s | Skills Board" },
-  description: "Save GitHub-backed skills in one team library. Copy install commands or let authenticated agents retrieve them through MCP.",
+  title: { default: "Skills Board, your team’s recommended AI skills", template: "%s | Skills Board" },
+  description: "Build a shared library of AI skills your team recommends. Give teammates the source, command, or ZIP so they can choose what fits their setup.",
 }
 
 export const viewport: Viewport = { themeColor: "#101711", userScalable: true }

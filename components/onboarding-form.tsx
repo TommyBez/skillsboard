@@ -36,7 +36,7 @@ export function OnboardingForm() {
           <Input
             id="name"
             name="name"
-            placeholder="Your product team"
+            placeholder="Your team"
             className="h-12 rounded-[16px] border-border bg-background px-4 text-base shadow-none focus-visible:border-primary"
             required
           />

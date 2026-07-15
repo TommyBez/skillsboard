@@ -29,10 +29,10 @@ export default function OnboardingPage() {
   return (
     <AccessShell
       marker="Set up library"
-      title="Name your team library"
-      description="Create the shared space where your team will save skills. You can add your first skill next."
-      editorialTitle="One library for the whole team."
-      editorialBody="Keep membership and saved skills together, then connect your agents through read-only MCP access."
+      title="Create your team library"
+      description="Name the shared place where your team will collect the skills it recommends."
+      editorialTitle="Share what works. Let everyone choose how to use it."
+      editorialBody="Your team can find recommended skills in one place and choose the source, command, or ZIP that best fits each setup."
     >
       <Suspense fallback={<OnboardingFormFallback />}>
         <OnboardingGate />

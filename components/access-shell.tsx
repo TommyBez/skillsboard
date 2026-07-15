@@ -28,7 +28,7 @@ export function AccessShell({
           <div className="relative flex items-center justify-between gap-6">
             <Brand />
             <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--surface-ink-foreground)] opacity-50">
-              Team skill registry
+              Shared skill library
             </span>
           </div>
 
@@ -43,7 +43,7 @@ export function AccessShell({
 
           <div className="relative border-t border-white/15 pt-5">
             <p className="max-w-lg text-sm leading-6 text-[var(--surface-ink-foreground)] opacity-55">
-              GitHub-backed skills, team libraries, and authenticated read-only MCP access.
+              Team recommendations, ready for different agent setups.
             </p>
           </div>
         </aside>

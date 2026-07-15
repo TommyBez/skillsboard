@@ -56,7 +56,7 @@ async function DiscoverContent({ searchParams }: DiscoverPageProps) {
       <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
         <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div className="grid gap-2">
-            <label htmlFor="catalog-search" className="text-sm font-semibold">Search skills.sh</label>
+            <label htmlFor="catalog-search" className="text-sm font-semibold">Search public skills</label>
             <div className="relative">
               <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
               <Input id="catalog-search" name="q" defaultValue={params.q} minLength={2} placeholder="Search the public catalog" className="pl-10" />
@@ -78,14 +78,14 @@ async function DiscoverContent({ searchParams }: DiscoverPageProps) {
         <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <SparklesIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
-            <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">Skills.sh is unavailable right now</h2>
+            <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">The public catalog is unavailable</h2>
             <p className="mt-3 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-              We couldn’t load the public catalog. Try again in a moment, or save a GitHub skill directly.
+              Try again in a moment, or add a skill directly from its repository.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
             <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Try again</Button>
-            <AddSkillDialog triggerLabel="Save from GitHub" />
+            <AddSkillDialog triggerLabel="Add from source" />
           </div>
         </section>
       ) : catalog.skills.length ? (
@@ -151,12 +151,12 @@ export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
           <ArrowLeftIcon data-icon="inline-start" />Back to library
         </Button>
         <div className="mt-6">
-          <p className="font-mono text-sm text-primary">Discover</p>
+          <p className="font-mono text-sm text-primary">Find skills</p>
           <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] md:text-6xl">
-            Find the next skill worth keeping.
+            Find a skill to recommend.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
-            Search the public skills.sh catalog, inspect the source, then save the useful work to your team library.
+            Browse the public catalog, inspect the source, then add the useful skills to your team library.
           </p>
         </div>
       </section>
