@@ -6,6 +6,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  uuid,
 } from "drizzle-orm/pg-core"
 
 export const user = pgTable("user", {
@@ -135,18 +136,20 @@ export const oauthConsent = pgTable("oauthConsent", {
 })
 
 export const skill = pgTable("skill", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey().defaultRandom(),
   organizationId: text("organizationId").notNull(),
-  createdByUserId: text("createdByUserId").notNull(),
+  createdBy: text("createdBy").notNull(),
   githubUrl: text("githubUrl").notNull(),
-  githubOwner: text("githubOwner").notNull(),
-  githubRepo: text("githubRepo").notNull(),
   skillName: text("skillName").notNull(),
+  title: text("title").notNull(),
   description: text("description"),
-  repoStars: integer("repoStars"),
-  repoDefaultBranch: text("repoDefaultBranch"),
-  tags: jsonb("tags").$type<string[]>().notNull().default([]),
-  metadataRefreshedAt: timestamp("metadataRefreshedAt"),
+  repoOwner: text("repoOwner").notNull(),
+  repoName: text("repoName").notNull(),
+  repoStars: integer("repoStars").notNull().default(0),
+  repoUpdatedAt: timestamp("repoUpdatedAt"),
+  skillPath: text("skillPath"),
+  tags: text("tags").array().notNull().default([]),
+  metadataRefreshedAt: timestamp("metadataRefreshedAt").notNull().defaultNow(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),
 }, (table) => [
