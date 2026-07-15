@@ -1,36 +1,214 @@
 import Link from "next/link"
-import { ArrowRightIcon, CheckIcon, CopyIcon, GitBranchIcon, SearchIcon, ServerIcon, UsersIcon } from "lucide-react"
+import { ArrowRightIcon, ArrowUpRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
+import { CopyButton } from "@/components/copy-button"
+import { KineticMarquee } from "@/components/landing/kinetic-marquee"
+import { SpotlightCard } from "@/components/landing/spotlight-card"
+import { StickyStack } from "@/components/landing/sticky-stack"
+import { HeroEntrance, HeroItem, Reveal } from "@/components/motion/reveal"
 import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { getSession } from "@/lib/session"
+import { getLeaderboard, type CatalogSkill } from "@/lib/skills-sh"
 
-const features = [
-  { icon: UsersIcon, title: "One library, every teammate", description: "Organize skills by team with roles, invitations, and shared access." },
-  { icon: GitBranchIcon, title: "GitHub is the source of truth", description: "Save repository locations, not stale copies. Install the latest version every time." },
-  { icon: SearchIcon, title: "Discover what works", description: "Browse trending, hot, curated, and all-time skills from the skills.sh catalog." },
-  { icon: ServerIcon, title: "Available to your agents", description: "Connect through an authenticated MCP server and retrieve team-approved skills." },
-]
+const exampleCommand = "npx skills add https://github.com/vercel-labs/skills --skill find-skills"
 
-export default async function HomePage() {
-  const session = await getSession()
-  return (
-    <main className="min-h-svh overflow-hidden">
-      <header className="border-b bg-background"><div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6"><Brand /><nav className="flex items-center gap-2" aria-label="Main navigation">{session?.user ? <Button nativeButton={false} render={<Link href="/library" />}>Open library <ArrowRightIcon data-icon="inline-end" /></Button> : <><Button variant="ghost" nativeButton={false} render={<Link href="/sign-in" />}>Sign in</Button><Button nativeButton={false} render={<Link href="/sign-up" />}>Get started</Button></>}</nav></div></header>
-      <section className="border-b bg-muted/30"><div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 md:grid-cols-[1.15fr_.85fr] md:px-6 md:py-28">
-        <div className="flex flex-col items-start gap-6"><div className="rounded-full border bg-background px-3 py-1 font-mono text-xs text-muted-foreground">The shared skill registry for agent teams</div><h1 className="max-w-3xl text-balance text-5xl font-semibold tracking-[-0.04em] md:text-7xl">Your team&apos;s best skills, always within reach.</h1><p className="max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">Save trusted skills from GitHub, discover what&apos;s trending, and make your curated library available to every teammate and AI agent.</p><div className="flex flex-wrap gap-3"><Button size="lg" nativeButton={false} render={<Link href={session?.user ? "/library" : "/sign-up"} />}>{session?.user ? "Go to library" : "Create your library"}<ArrowRightIcon data-icon="inline-end" /></Button><Button size="lg" variant="outline" nativeButton={false} render={<Link href="/sign-in" />}>Sign in</Button></div><div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">{["GitHub-native", "Team-scoped", "MCP-ready"].map((item) => <span key={item} className="flex items-center gap-1.5"><CheckIcon className="size-4 text-primary" />{item}</span>)}</div></div>
-        <div className="overflow-hidden rounded-2xl border bg-card shadow-xl shadow-foreground/5"><div className="flex items-center justify-between border-b px-4 py-3"><span className="font-mono text-xs text-muted-foreground">team-library.sh</span><span className="flex gap-1.5"><i className="size-2 rounded-full bg-muted-foreground/30"/><i className="size-2 rounded-full bg-muted-foreground/30"/><i className="size-2 rounded-full bg-primary"/></span></div><div className="flex flex-col gap-5 p-5 font-mono text-sm"><p><span className="text-primary">$</span> npx skills add https://github.com/vercel-labs/skills --skill find-skills</p><div className="rounded-lg bg-muted p-4 text-muted-foreground"><p>✓ Resolving <span className="text-foreground">find-skills</span></p><p>✓ Installing latest from GitHub</p><p className="text-primary">✓ Ready for your agent</p></div><div className="flex items-center justify-between rounded-lg border px-3 py-2"><span className="truncate text-xs">npx skills add ... --skill find-skills</span><CopyIcon className="size-4 text-muted-foreground" /></div></div></div>
-      </div></section>
-      <section className="mx-auto max-w-6xl px-4 py-20 md:px-6 md:py-28"><div className="mb-12 flex max-w-2xl flex-col gap-3"><p className="font-mono text-xs font-semibold uppercase tracking-widest text-primary">From discovery to deployment</p><h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">A durable home for reusable agent knowledge.</h2></div><div className="grid gap-4 md:grid-cols-2">{features.map(({ icon: Icon, title, description }) => <Card key={title}><CardHeader><span className="mb-3 flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon className="size-5" /></span><CardTitle>{title}</CardTitle><CardDescription className="leading-relaxed">{description}</CardDescription></CardHeader></Card>)}</div></section>
-      <section className="border-y bg-foreground text-background"><div className="mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-2 md:px-6 md:py-24"><div className="flex flex-col items-start gap-4"><p className="font-mono text-xs uppercase tracking-widest text-primary">MCP access included</p><h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">Give your agents the same trusted library.</h2><p className="max-w-lg text-pretty leading-relaxed text-background/70">OAuth 2.1 keeps access secure while MCP tools let agents list, search, and retrieve install commands for approved skills.</p></div><pre className="overflow-x-auto rounded-xl border border-background/15 bg-background/5 p-5 font-mono text-sm leading-relaxed"><code>{`{
+const mcpConfig = `{
   "mcpServers": {
     "skillbase": {
       "url": "https://your-app.vercel.app/api/mcp"
     }
   }
-}`}</code></pre></div></section>
-      <footer className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6"><Brand /><p>GitHub-native skills for teams and agents.</p></footer>
+}`
+
+function formatInstalls(count: number) {
+  if (count >= 1000) return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`
+  return String(count)
+}
+
+export default async function HomePage() {
+  const session = await getSession()
+  const primaryHref = session?.user ? "/library" : "/sign-up"
+  const primaryLabel = session?.user ? "Open library" : "Get started"
+
+  let trending: CatalogSkill[] = []
+  try {
+    trending = (await getLeaderboard("trending")).slice(0, 6)
+  } catch {
+    trending = []
+  }
+
+  const stackCards = [
+    {
+      index: "01",
+      verb: "Save",
+      copy: "A skill is a pointer to its GitHub repository, never a stale copy. Save it once and every install pulls the current version.",
+      artifact: (
+        <div className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-4 py-3">
+          <code className="truncate font-mono text-xs text-muted-foreground md:text-sm">{exampleCommand}</code>
+          <CopyButton value={exampleCommand} />
+        </div>
+      ),
+    },
+    {
+      index: "02",
+      verb: "Sync",
+      copy: "Your library belongs to the organization, not one laptop. Invite teammates, assign roles, and everyone sees the same approved set.",
+      artifact: (
+        <div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-background/60 p-4">
+          {[
+            ["ana@team.dev", "owner"],
+            ["luca@team.dev", "member"],
+            ["mei@team.dev", "member"],
+          ].map(([email, role]) => (
+            <div key={email} className="flex items-center justify-between font-mono text-xs md:text-sm">
+              <span className="text-foreground">{email}</span>
+              <span className="text-muted-foreground">{role}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      index: "03",
+      verb: "Serve",
+      copy: "Agents connect over an OAuth-secured MCP server. They list, search, and install the exact skills your team approved.",
+      artifact: (
+        <div className="w-full rounded-lg border border-border bg-background/60 p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="font-mono text-xs text-muted-foreground">mcp.json</span>
+            <CopyButton value={mcpConfig} />
+          </div>
+          <pre className="overflow-x-auto font-mono text-xs leading-relaxed"><code>{mcpConfig}</code></pre>
+        </div>
+      ),
+    },
+  ]
+
+  return (
+    <main className="dark min-h-[100dvh] bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-4 md:px-8">
+          <Brand />
+          <nav className="flex items-center gap-2" aria-label="Main navigation">
+            {!session?.user && (
+              <Button variant="ghost" nativeButton={false} render={<Link href="/sign-in" />}>
+                Sign in
+              </Button>
+            )}
+            <Button nativeButton={false} render={<Link href={primaryHref} />}>
+              {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
+            </Button>
+          </nav>
+        </div>
+      </header>
+
+      {/* Editorial manifesto hero */}
+      <section className="relative border-b border-border/60">
+        <div className="mx-auto flex max-w-[1360px] flex-col gap-10 px-4 pb-16 pt-16 md:px-8 md:pb-24 md:pt-24">
+          <HeroEntrance className="flex flex-col gap-8">
+            <HeroItem>
+              <h1 className="max-w-[14ch] text-balance text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.98] tracking-tight">
+                One registry. Every agent.
+              </h1>
+            </HeroItem>
+            <HeroItem>
+              <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+                <p className="max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
+                  Skillbase is the shared library of GitHub-native skills your team curates and your agents pull from.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
+                    {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
+                  </Button>
+                  <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/discover" />}>
+                    Browse skills
+                  </Button>
+                </div>
+              </div>
+            </HeroItem>
+          </HeroEntrance>
+        </div>
+      </section>
+
+      <KineticMarquee />
+
+      {/* Sticky-stack scrolltelling: Save / Sync / Serve */}
+      <section aria-label="How Skillbase works">
+        <StickyStack
+          cards={stackCards.map((card) => (
+            <div key={card.index} className="w-full border-b border-border/60 bg-background">
+              <div className="mx-auto grid min-h-[100dvh] max-w-[1360px] content-center gap-10 px-4 py-20 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:px-8">
+                <div className="flex min-w-0 flex-col gap-5">
+                  <span className="font-mono text-sm text-primary">{card.index}</span>
+                  <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-none tracking-tight">
+                    {card.verb}
+                  </h2>
+                  <p className="max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">{card.copy}</p>
+                </div>
+                <div className="flex min-w-0 items-center">{card.artifact}</div>
+              </div>
+            </div>
+          ))}
+        />
+      </section>
+
+      {/* Live registry index with real skills.sh data */}
+      <section className="border-b border-border/60">
+        <div className="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-16 md:px-8 md:py-24">
+          <Reveal className="flex items-end justify-between gap-4">
+            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">Trending this week</h2>
+            <Button variant="ghost" nativeButton={false} render={<Link href="/discover" />}>
+              View all <ArrowUpRightIcon data-icon="inline-end" />
+            </Button>
+          </Reveal>
+          {trending.length > 0 ? (
+            <div className="grid gap-3 md:grid-cols-2">
+              {trending.map((skill, i) => (
+                <Reveal key={skill.id} delay={Math.min(i * 0.05, 0.2)}>
+                  <SpotlightCard className="h-full">
+                    <div className="flex h-full flex-col gap-3 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="font-mono text-sm text-foreground">{skill.name}</span>
+                        <span className="font-mono text-xs text-muted-foreground">
+                          {formatInstalls(skill.installs)} installs
+                        </span>
+                      </div>
+                      <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{skill.description}</p>
+                      <span className="mt-auto font-mono text-xs text-primary">{skill.source}</span>
+                    </div>
+                  </SpotlightCard>
+                </Reveal>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground">
+              Live catalog data appears here once discovery is connected. Browse the registry inside the app.
+            </p>
+          )}
+        </div>
+      </section>
+
+      {/* Closing CTA */}
+      <section>
+        <div className="mx-auto flex max-w-[1360px] flex-col items-start gap-8 px-4 py-20 md:px-8 md:py-32">
+          <Reveal className="flex flex-col items-start gap-8">
+            <h2 className="max-w-[16ch] text-balance text-[clamp(2.5rem,7vw,6rem)] font-semibold leading-[1.02] tracking-tight">
+              Stop pasting the same instructions into every agent.
+            </h2>
+            <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
+              {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
+            </Button>
+          </Reveal>
+        </div>
+      </section>
+
+      <footer className="border-t border-border/60">
+        <div className="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 py-8 font-mono text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+          <Brand />
+          <p>github-native skills for teams and agents</p>
+        </div>
+      </footer>
     </main>
   )
 }
