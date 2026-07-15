@@ -69,8 +69,13 @@ async function DiscoverResults({ searchParams }: DiscoverPageProps) {
   }
 
   const savedKeys = saved.map((item) => `${item.githubUrl}:${item.skillName}`)
+  const resultsKey = [
+    catalog.page.source,
+    catalog.page.query ?? "",
+    catalog.page.view ?? "",
+  ].join(":")
 
-  return <CatalogResults initialPage={catalog.page} savedKeys={savedKeys} />
+  return <CatalogResults key={resultsKey} initialPage={catalog.page} savedKeys={savedKeys} />
 }
 
 export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
