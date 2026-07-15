@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useEffectEvent, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { SearchIcon } from "lucide-react"
 
@@ -53,6 +53,12 @@ function SkillCard({
   )
 }
 
+function canFetchMore(page: CatalogPage) {
+  if (!page.hasMore || page.source === "curated") return false
+  if (page.source === "search" && page.perPage >= SEARCH_MAX_LIMIT) return false
+  return true
+}
+
 interface CatalogResultsProps {
   initialPage: CatalogPage
   savedKeys: string[]
@@ -64,56 +70,66 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
   const [error, setError] = useState<string | null>(null)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
   const sentinelRef = useRef<HTMLDivElement>(null)
+  const pageRef = useRef(page)
+  const loadingRef = useRef(false)
   const saved = new Set(savedKeys)
 
+  pageRef.current = page
+
   const atSearchCap = page.source === "search" && page.perPage >= SEARCH_MAX_LIMIT && page.hasMore
-  const canLoadMore = page.hasMore && page.source !== "curated" && !atSearchCap
+  const canLoadMore = canFetchMore(page)
   const searchTruncated = page.source === "search" && page.hasMore
 
-  const loadMore = useEffectEvent(async () => {
-    if (isLoadingMore || error || !canLoadMore) return
+  const loadMore = useCallback(async () => {
+    if (loadingRef.current) return
+    const current = pageRef.current
+    if (!canFetchMore(current)) return
 
     const params = new URLSearchParams()
-    if (page.source === "search" && page.query) {
-      const nextLimit = Math.min(SEARCH_MAX_LIMIT, page.perPage + SEARCH_PAGE_SIZE)
-      if (nextLimit <= page.perPage) return
-      params.set("q", page.query)
+    if (current.source === "search" && current.query) {
+      const nextLimit = Math.min(SEARCH_MAX_LIMIT, current.perPage + SEARCH_PAGE_SIZE)
+      if (nextLimit <= current.perPage) return
+      params.set("q", current.query)
       params.set("limit", String(nextLimit))
-    } else if (page.source === "leaderboard" && page.view) {
-      params.set("view", page.view)
-      params.set("page", String(page.page + 1))
-      params.set("perPage", String(page.perPage || CATALOG_PAGE_SIZE))
+    } else if (current.source === "leaderboard" && current.view) {
+      params.set("view", current.view)
+      params.set("page", String(current.page + 1))
+      params.set("perPage", String(current.perPage || CATALOG_PAGE_SIZE))
     } else {
       return
     }
 
+    loadingRef.current = true
     setIsLoadingMore(true)
+    setError(null)
+
     try {
       const response = await fetch(`/api/catalog?${params}`)
       if (!response.ok) throw new Error("Could not load more skills")
       const nextPage = (await response.json()) as CatalogPage
 
-      if (page.source === "search") {
+      if (current.source === "search") {
         setSkills(nextPage.skills)
       } else {
-        setSkills((current) => {
-          const seen = new Set(current.map((skill) => skill.id))
-          return [...current, ...nextPage.skills.filter((skill) => !seen.has(skill.id))]
+        setSkills((existing) => {
+          const seen = new Set(existing.map((skill) => skill.id))
+          return [...existing, ...nextPage.skills.filter((skill) => !seen.has(skill.id))]
         })
       }
       setPage(nextPage)
-      setError(null)
+      pageRef.current = nextPage
     } catch (loadError) {
       console.error(loadError)
       setError("Couldn’t load more skills. Try again.")
     } finally {
+      loadingRef.current = false
       setIsLoadingMore(false)
     }
-  })
+  }, [])
 
   useEffect(() => {
     const node = sentinelRef.current
-    if (!node || !canLoadMore) return
+    if (!node || !canLoadMore || error) return
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -126,7 +142,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
     observer.observe(node)
     return () => observer.disconnect()
-  }, [canLoadMore, skills.length, error])
+  }, [canLoadMore, skills.length, error, loadMore])
 
   return (
     <div className="grid gap-6">
@@ -161,21 +177,13 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       {error ? (
         <div className="flex flex-col items-center gap-3">
           <p className="text-sm text-destructive" role="alert">{error}</p>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setError(null)
-              void loadMore()
-            }}
-          >
+          <Button type="button" variant="outline" size="sm" onClick={() => void loadMore()}>
             Try again
           </Button>
         </div>
       ) : null}
 
-      {canLoadMore ? (
+      {canLoadMore && !error ? (
         <div
           ref={sentinelRef}
           className="grid gap-4 md:grid-cols-2"

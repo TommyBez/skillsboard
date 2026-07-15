@@ -139,7 +139,7 @@ async function searchCatalogCached(query: string, limit: number): Promise<Catalo
         ? payload.data
         : []
   const normalized = normalizeSkills(rows)
-  const hasMore = normalized.length > limit
+  const hasMore = rows.length > limit
   const skills = hasMore ? normalized.slice(0, limit) : normalized
 
   return {
