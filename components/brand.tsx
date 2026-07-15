@@ -7,7 +7,7 @@ export function Brand() {
       <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
         <BracesIcon className="size-4" aria-hidden="true" />
       </span>
-      Skillbase
+      Skills Board
     </Link>
   )
 }

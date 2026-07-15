@@ -21,7 +21,7 @@ async function route(request: Request) {
       server.registerTool("search_skills", { title: "Search team skills", description: "Search saved team skills by name, description, repository, or tag", inputSchema: { query: z.string().min(1) } }, async ({ query }) => { const skills = await listUserSkills(jwt.sub!); const normalized = query.toLowerCase(); return { content: [{ type: "text", text: JSON.stringify(skills.filter((skill) => `${skill.title} ${skill.description} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`.toLowerCase().includes(normalized)), null, 2) }] } })
       server.registerTool("get_skill_command", { title: "Get install command", description: "Return the skills.sh CLI command for a saved skill", inputSchema: { skillId: z.string().uuid() } }, async ({ skillId }) => { const found = (await listUserSkills(jwt.sub!)).find((skill) => skill.id === skillId); return { content: [{ type: "text", text: found ? `npx skills add ${found.githubUrl} --skill ${found.skillName}` : "Skill not found" }], isError: !found } })
       server.registerTool("discover_skills", { title: "Discover public skills", description: "Search skills.sh or browse a leaderboard", inputSchema: { query: z.string().optional(), view: z.enum(["trending", "hot", "all-time"]).optional() } }, async ({ query, view }) => ({ content: [{ type: "text", text: JSON.stringify(query ? await searchCatalog(query) : await getLeaderboard(view ?? "trending"), null, 2) }] }))
-    }, { serverInfo: { name: "skillbase", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
+    }, { serverInfo: { name: "skills-board", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
   })(request)
 }
 

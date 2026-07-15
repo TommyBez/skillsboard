@@ -9,8 +9,8 @@ const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-br
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: { default: "Skillbase, the shared skill registry for agent teams", template: "%s · Skillbase" },
-  description: "Discover, save, and share GitHub-native agent skills with your team and MCP clients.",
+  title: { default: "Skills Board, one trusted skill library for your product team", template: "%s · Skills Board" },
+  description: "Curate the skills your product, design, and engineering teams use with AI agents. Free, open source, and connected to GitHub.",
 }
 
 export const viewport: Viewport = { themeColor: "#101711", userScalable: true }

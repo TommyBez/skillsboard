@@ -56,9 +56,9 @@ export function AuthForm({ mode }: AuthFormProps) {
         </Field>
       </FieldGroup>
       {error ? <p className="text-sm text-destructive" role="alert">{error}</p> : null}
-      <Button type="submit" size="lg" disabled={isPending}>{isPending ? "Please wait..." : isSignUp ? "Create account" : "Sign in"}</Button>
+      <Button type="submit" size="lg" disabled={isPending}>        {isPending ? "Please wait..." : isSignUp ? "Create your team library" : "Sign in"}</Button>
       <p className="text-center text-sm text-muted-foreground">
-        {isSignUp ? "Already have an account?" : "New to Skillbase?"}{" "}
+        {isSignUp ? "Already have an account?" : "New to Skills Board?"}{" "}
         <Link className="font-medium text-foreground underline-offset-4 hover:underline" href={isSignUp ? "/sign-in" : "/sign-up"}>{isSignUp ? "Sign in" : "Create an account"}</Link>
       </p>
     </form>
