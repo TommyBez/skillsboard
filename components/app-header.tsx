@@ -1,20 +1,10 @@
 import Link from "next/link"
 import { LibraryBigIcon, LogOutIcon, SearchIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
 
+import { signOut } from "@/app/actions/auth"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 
 interface AppHeaderProps {
   user: { name: string; email: string }
@@ -38,34 +28,37 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
 
           <div className="ml-auto flex min-w-0 items-center gap-2">
             <OrganizationSwitcher organizations={organizations} activeId={activeId} />
-            <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="outline" size="icon" aria-label="User menu" />}>
-                <Avatar className="size-8">
-                  <AvatarFallback className="bg-foreground font-mono text-[0.7rem] text-background">{initials}</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="min-w-64">
-                <DropdownMenuLabel className="p-3">
+            <details className="group relative">
+              <summary
+                aria-label="User menu"
+                className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-border bg-card/65 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring group-open:bg-muted [&::-webkit-details-marker]:hidden"
+              >
+                <span className="flex size-8 items-center justify-center rounded-lg bg-foreground font-mono text-[0.7rem] text-background">
+                  {initials}
+                </span>
+              </summary>
+              <div className="absolute right-0 top-12 z-40 min-w-64 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_18px_48px_hsl(var(--shadow-color)/0.18)]">
+                <div className="p-3">
                   <span className="block font-semibold">{user.name}</span>
                   <span className="mt-0.5 block truncate font-normal text-muted-foreground">{user.email}</span>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem nativeButton={false} render={<Link href="/settings/organization" />}>
-                    <SettingsIcon />Team settings
-                  </DropdownMenuItem>
-                  <DropdownMenuItem nativeButton={false} render={<Link href="/settings/mcp" />}>
-                    <SlidersHorizontalIcon />MCP setup
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem nativeButton={false} render={<Link href="/api/auth/sign-out" aria-label="Sign out" />}>
-                    <LogOutIcon />Sign out
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </div>
+                <nav className="border-t border-border p-1" aria-label="Account settings">
+                  <Link className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" href="/settings/organization">
+                    <SettingsIcon className="size-4" aria-hidden="true" />Team access
+                  </Link>
+                  <Link className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" href="/settings/mcp">
+                    <SlidersHorizontalIcon className="size-4" aria-hidden="true" />MCP setup
+                  </Link>
+                </nav>
+                <div className="border-t border-border p-1">
+                  <form action={signOut}>
+                    <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" type="submit">
+                      <LogOutIcon className="size-4" aria-hidden="true" />Sign out
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </details>
           </div>
         </div>
       </header>

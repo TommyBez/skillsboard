@@ -19,25 +19,35 @@ const skillSchema = z.object({
 export async function addSkill(input: z.input<typeof skillSchema>) {
   const session = await requireSession()
   const { organizationId, userId } = await requireActiveOrganization(session)
-  const parsed = skillSchema.parse(input)
-  const metadata = await getGitHubMetadata(parsed.githubUrl)
-  const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, metadata.githubUrl), eq(skill.skillName, parsed.skillName))).limit(1)
-  if (existing.length) return { ok: false as const, error: "This skill is already in your team library" }
-  await db.insert(skill).values({
-    organizationId,
-    createdBy: userId,
-    githubUrl: metadata.githubUrl,
-    skillName: parsed.skillName,
-    title: parsed.skillName.replaceAll("-", " "),
-    description: metadata.description,
-    repoOwner: metadata.repoOwner,
-    repoName: metadata.repoName,
-    repoStars: metadata.repoStars,
-    repoUpdatedAt: metadata.repoUpdatedAt,
-    tags: [...new Set(parsed.tags.map((tag) => tag.toLowerCase()))],
-  })
-  updateTag(cacheTags.organizationSkills(organizationId))
-  return { ok: true as const }
+  const parsed = skillSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false as const, error: "Check the repository URL, skill name, and tags, then try again." }
+  }
+
+  try {
+    const metadata = await getGitHubMetadata(parsed.data.githubUrl)
+    const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, metadata.githubUrl), eq(skill.skillName, parsed.data.skillName))).limit(1)
+    if (existing.length) return { ok: false as const, error: "This skill is already in your team library" }
+    await db.insert(skill).values({
+      organizationId,
+      createdBy: userId,
+      githubUrl: metadata.githubUrl,
+      skillName: parsed.data.skillName,
+      title: parsed.data.skillName.replaceAll("-", " "),
+      description: metadata.description,
+      repoOwner: metadata.repoOwner,
+      repoName: metadata.repoName,
+      repoStars: metadata.repoStars,
+      repoUpdatedAt: metadata.repoUpdatedAt,
+      tags: [...new Set(parsed.data.tags.map((tag) => tag.toLowerCase()))],
+    })
+    updateTag(cacheTags.organizationSkills(organizationId))
+    return { ok: true as const }
+  } catch (error) {
+    console.error("Unable to save skill", error)
+    return { ok: false as const, error: "We couldn’t fetch this repository or save the skill. Check the URL and try again." }
+  }
 }
 
 export async function deleteSkill(id: string) {

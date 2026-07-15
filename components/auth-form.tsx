@@ -12,9 +12,10 @@ import { Input } from "@/components/ui/input"
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up"
+  returnTo?: string
 }
 
-export function AuthForm({ mode }: AuthFormProps) {
+export function AuthForm({ mode, returnTo = "/library" }: AuthFormProps) {
   const router = useRouter()
   const [error, setError] = useState("")
   const [isPending, setIsPending] = useState(false)
@@ -25,28 +26,44 @@ export function AuthForm({ mode }: AuthFormProps) {
     setError("")
     const email = String(formData.get("email"))
     const password = String(formData.get("password"))
-    const result = isSignUp
-      ? await authClient.signUp.email({ email, password, name: String(formData.get("name")) })
-      : await authClient.signIn.email({ email, password })
-    if (result.error) {
-      setError(result.error.message ?? "Authentication failed")
+    const fallbackError = isSignUp
+        ? "We couldn’t create your account. Check your details and try again."
+        : "We couldn’t sign you in. Check your email and password, then try again."
+
+    try {
+      const result = isSignUp
+        ? await authClient.signUp.email({ email, password, name: String(formData.get("name")) })
+        : await authClient.signIn.email({ email, password })
+      if (result.error) {
+        setError(result.error.message ?? fallbackError)
+        return
+      }
+      const redirectUrl = result.data && "url" in result.data && typeof result.data.url === "string"
+        ? result.data.url
+        : null
+      if (redirectUrl) {
+        window.location.assign(redirectUrl)
+        return
+      }
+      router.push(returnTo)
+      router.refresh()
+    } catch {
+      setError(fallbackError)
+    } finally {
       setIsPending(false)
-      return
     }
-    router.push("/library")
-    router.refresh()
   }
 
   return (
-    <form action={handleSubmit} className="flex flex-col gap-7">
-      <FieldGroup className="gap-5">
+    <form action={handleSubmit} className="flex flex-col gap-5">
+      <FieldGroup className="gap-4">
         {isSignUp ? (
           <Field>
             <FieldLabel
               htmlFor="name"
               className="font-mono text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground"
             >
-              Name
+              Your name
             </FieldLabel>
             <Input
               id="name"
@@ -98,14 +115,15 @@ export function AuthForm({ mode }: AuthFormProps) {
         </p>
       ) : null}
       <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending}>
-        {isPending ? "Please wait..." : isSignUp ? "Create your team library" : "Sign in"}
+        {isPending ? (isSignUp ? "Creating account…" : "Signing in…") : isSignUp ? "Create free account" : "Sign in"}
         {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
       </Button>
-      <p className="border-t border-border pt-5 text-center text-sm text-muted-foreground">
+      {isSignUp ? <p className="-mt-2 text-center text-xs text-muted-foreground">No credit card required.</p> : null}
+      <p className="border-t border-border pt-4 text-center text-sm text-muted-foreground">
         {isSignUp ? "Already have an account?" : "New to Skills Board?"}{" "}
         <Link
           className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary"
-          href={isSignUp ? "/sign-in" : "/sign-up"}
+          href={`${isSignUp ? "/sign-in" : "/sign-up"}${returnTo !== "/library" ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
         >
           {isSignUp ? "Sign in" : "Create an account"}
         </Link>

@@ -15,7 +15,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
           <AlertTriangleIcon className="size-9 text-primary" aria-hidden="true" />
           <h1 className="mt-10 max-w-[13ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] md:text-6xl">This page could not load.</h1>
           <p className="mt-5 max-w-xl text-lg leading-relaxed text-[color:color-mix(in_oklch,var(--surface-ink-foreground)_68%,transparent)]">
-            Try the request again. If the problem continues, return to the home page.
+            Try again. If this page still doesn’t load, go back home.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button onClick={reset}><RefreshCwIcon data-icon="inline-start" />Try again</Button>

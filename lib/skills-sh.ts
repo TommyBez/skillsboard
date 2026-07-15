@@ -64,8 +64,18 @@ export async function getLeaderboard(view: "all-time" | "trending" | "hot" = "tr
   return catalogFetch(`/api/v1/skills?view=${view}&page=1&perPage=24`)
 }
 
-export async function searchCatalog(query: string) {
+async function searchCatalogCached(query: string) {
+  "use cache"
+  cacheLife("catalog")
+  cacheTag(cacheTags.catalog)
+
   return catalogFetch(`/api/v1/skills/search?q=${encodeURIComponent(query)}&limit=24`)
+}
+
+export async function searchCatalog(query: string) {
+  const normalizedQuery = query.trim().toLowerCase().slice(0, 100)
+  if (normalizedQuery.length < 2) return []
+  return searchCatalogCached(normalizedQuery)
 }
 
 export async function getCuratedSkills() {

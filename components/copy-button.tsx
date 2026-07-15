@@ -7,12 +7,44 @@ import { Button } from "@/components/ui/button"
 
 interface CopyButtonProps { value: string; label?: string; compact?: boolean; ariaLabel?: string; copiedAriaLabel?: string }
 
-export function CopyButton({ value, label = "Copy", compact = false, ariaLabel, copiedAriaLabel }: CopyButtonProps) {
-  const [hasCopied, setHasCopied] = useState(false)
-  async function copy() {
+async function writeToClipboard(value: string) {
+  try {
     await navigator.clipboard.writeText(value)
-    setHasCopied(true)
-    window.setTimeout(() => setHasCopied(false), 1600)
+    return
+  } catch {
+    const textarea = document.createElement("textarea")
+    textarea.value = value
+    textarea.setAttribute("readonly", "")
+    textarea.style.position = "fixed"
+    textarea.style.opacity = "0"
+    document.body.append(textarea)
+    textarea.select()
+    const copied = document.execCommand("copy")
+    textarea.remove()
+    if (!copied) throw new Error("Clipboard access is unavailable")
   }
-  return <Button aria-label={hasCopied ? copiedAriaLabel : ariaLabel} variant="outline" size="sm" className={compact ? "h-7 border-transparent bg-card px-2" : undefined} onClick={copy}>{hasCopied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}{hasCopied ? "Copied" : label}</Button>
+}
+
+export function CopyButton({ value, label = "Copy", compact = false, ariaLabel, copiedAriaLabel }: CopyButtonProps) {
+  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
+
+  async function copy() {
+    try {
+      await writeToClipboard(value)
+      setStatus("copied")
+    } catch {
+      setStatus("failed")
+    }
+    window.setTimeout(() => setStatus("idle"), 1600)
+  }
+
+  const hasCopied = status === "copied"
+  const hasFailed = status === "failed"
+  const currentAriaLabel = hasCopied
+    ? copiedAriaLabel
+    : hasFailed
+      ? "Copy failed. Select and copy the text manually."
+      : ariaLabel
+
+  return <Button aria-label={currentAriaLabel} variant="outline" size="sm" className={compact ? "h-7 border-transparent bg-card px-2" : undefined} onClick={copy}>{hasCopied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}{hasCopied ? "Copied" : hasFailed ? "Copy failed" : label}</Button>
 }

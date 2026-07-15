@@ -20,9 +20,9 @@ export async function requireActiveOrganization(
 ) {
   const activeSession = session ?? await requireSession()
   const organizationId = activeSession.session.activeOrganizationId
-  if (!organizationId) throw new Error("Select an organization first")
+  if (!organizationId) throw new Error("Select a team library first")
   if (!await canAccessOrganization(activeSession.user.id, organizationId)) {
-    throw new Error("You no longer have access to this organization")
+    throw new Error("You no longer have access to this team library")
   }
   return { organizationId, userId: activeSession.user.id }
 }

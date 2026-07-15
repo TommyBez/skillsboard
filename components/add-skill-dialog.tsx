@@ -27,7 +27,7 @@ interface AddSkillDialogProps {
 export function AddSkillDialog({
   defaultUrl = "",
   defaultName = "",
-  triggerLabel = "Add skill",
+  triggerLabel = "Save a skill",
   triggerAriaLabel,
 }: AddSkillDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -48,7 +48,8 @@ export function AddSkillDialog({
       toast.success("Skill saved to your team library")
       setIsOpen(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Could not save skill")
+      console.error("Unable to save skill", error)
+      toast.error("We couldn’t save this skill. Check the repository URL and skill name, then try again.")
     } finally {
       setIsPending(false)
     }
@@ -65,30 +66,31 @@ export function AddSkillDialog({
             <span className="mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <GitBranchIcon className="size-5" aria-hidden="true" />
             </span>
-            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Add a GitHub skill</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Save a GitHub skill</DialogTitle>
             <DialogDescription className="max-w-md leading-relaxed">
-              Save the source location so your team always installs from the current repository.
+              Add the repository and skill name. Skills Board fetches repository details and builds the install command.
             </DialogDescription>
           </DialogHeader>
 
           <FieldGroup className="gap-5 p-6">
             <Field>
-              <FieldLabel htmlFor="githubUrl">GitHub repository</FieldLabel>
+              <FieldLabel htmlFor="githubUrl">GitHub repository URL</FieldLabel>
               <Input id="githubUrl" name="githubUrl" type="url" defaultValue={defaultUrl} placeholder="https://github.com/vercel-labs/skills" required />
             </Field>
             <Field>
               <FieldLabel htmlFor="skillName">Skill name</FieldLabel>
               <Input id="skillName" name="skillName" defaultValue={defaultName} placeholder="find-skills" required />
+              <FieldDescription>This becomes the value after --skill in the install command.</FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="tags">Tags</FieldLabel>
+              <FieldLabel htmlFor="tags">Tags (optional)</FieldLabel>
               <Input id="tags" name="tags" placeholder="research, productivity" />
               <FieldDescription>Comma-separated, up to 10 tags.</FieldDescription>
             </Field>
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending}>{isPending ? "Fetching GitHub metadata..." : "Save skill"}</Button>
+            <Button type="submit" disabled={isPending}>{isPending ? "Fetching repository…" : "Save to library"}</Button>
           </div>
         </form>
       </DialogContent>

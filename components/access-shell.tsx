@@ -43,7 +43,7 @@ export function AccessShell({
 
           <div className="relative border-t border-white/15 pt-5">
             <p className="max-w-lg text-sm leading-6 text-[var(--surface-ink-foreground)] opacity-55">
-              Connected to GitHub, scoped to your organization, and available through authenticated MCP.
+              GitHub-backed skills, team libraries, and authenticated read-only MCP access.
             </p>
           </div>
         </aside>
@@ -56,16 +56,13 @@ export function AccessShell({
             </span>
           </div>
 
-          <div className="flex flex-1 items-center px-5 py-10 sm:px-9 sm:py-14 lg:px-14 xl:px-20">
+          <div className="flex flex-1 items-center px-5 py-8 sm:px-9 sm:py-10 lg:px-14 xl:px-20">
             <div className="mx-auto w-full max-w-[520px]">
-              <div className="mb-9 border-l-2 border-primary pl-5">
-                <p className="font-mono text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-primary">
-                  {marker}
-                </p>
-                <h1 className="mt-3 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.035em] sm:text-5xl">
+              <div className="mb-7 border-l-2 border-primary pl-5">
+                <h1 className="text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.035em] sm:text-5xl">
                   {title}
                 </h1>
-                <p className="mt-4 max-w-md text-pretty text-base leading-7 text-muted-foreground">
+                <p className="mt-3 max-w-md text-pretty text-base leading-7 text-muted-foreground">
                   {description}
                 </p>
               </div>
@@ -76,7 +73,7 @@ export function AccessShell({
 
           <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-5 py-4 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground sm:px-9 lg:px-14 xl:px-20">
             <span>Skills Board</span>
-            <span>Free hosted. Open source.</span>
+            <span>Hosted for free. Open source.</span>
           </footer>
         </section>
       </div>

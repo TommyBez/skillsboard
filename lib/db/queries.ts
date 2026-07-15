@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import { cacheLife, cacheTag } from "next/cache"
 
 import { cacheTags } from "@/lib/cache-tags"
@@ -14,9 +14,31 @@ export async function listOrganizationSkills(organizationId: string) {
 }
 
 export async function listUserSkills(userId: string) {
-  const memberships = await db.select({ organizationId: member.organizationId }).from(member).where(eq(member.userId, userId))
-  if (!memberships.length) return []
-  return db.select().from(skill).where(inArray(skill.organizationId, memberships.map((item) => item.organizationId))).orderBy(desc(skill.createdAt))
+  return db
+    .select({
+      id: skill.id,
+      organizationId: skill.organizationId,
+      organizationName: organization.name,
+      githubUrl: skill.githubUrl,
+      skillName: skill.skillName,
+      title: skill.title,
+      description: skill.description,
+      repoOwner: skill.repoOwner,
+      repoName: skill.repoName,
+      repoStars: skill.repoStars,
+      repoUpdatedAt: skill.repoUpdatedAt,
+      skillPath: skill.skillPath,
+      tags: skill.tags,
+      createdAt: skill.createdAt,
+      updatedAt: skill.updatedAt,
+    })
+    .from(skill)
+    .innerJoin(member, and(
+      eq(member.organizationId, skill.organizationId),
+      eq(member.userId, userId),
+    ))
+    .innerJoin(organization, eq(organization.id, skill.organizationId))
+    .orderBy(desc(skill.createdAt))
 }
 
 export async function canAccessOrganization(userId: string, organizationId: string) {

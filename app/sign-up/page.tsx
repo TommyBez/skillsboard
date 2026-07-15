@@ -1,31 +1,24 @@
 import { Suspense } from "react"
-import { redirect } from "next/navigation"
 
-import { AuthForm } from "@/components/auth-form"
 import { AccessShell } from "@/components/access-shell"
-import { getSession } from "@/lib/session"
+import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
-async function RedirectAuthenticatedUser() {
-  const session = await getSession()
-  if (session?.user) redirect("/library")
-  return null
+interface SignUpPageProps {
+  searchParams: Promise<{ returnTo?: string }>
 }
 
-export default function SignUpPage() {
+export default function SignUpPage({ searchParams }: SignUpPageProps) {
   return (
-    <>
-      <Suspense fallback={null}>
-        <RedirectAuthenticatedUser />
+    <AccessShell
+      marker="Create account"
+      title="Create your free account"
+      description="Create your account, then start a team library or join one you’ve been invited to."
+      editorialTitle="One trusted library for the skills your team uses."
+      editorialBody="Keep GitHub-backed skills searchable, ready to install, and available to teammates and agents."
+    >
+      <Suspense fallback={<AuthEntryFallback mode="sign-up" />}>
+        <AuthEntry mode="sign-up" searchParams={searchParams} />
       </Suspense>
-      <AccessShell
-        marker="Access / new library"
-        title="Build your skill library"
-        description="Create an account, then invite your team."
-        editorialTitle="Keep the skills worth using again."
-        editorialBody="Turn scattered GitHub links and useful discoveries into one searchable, installable library for your whole product team."
-      >
-        <AuthForm mode="sign-up" />
-      </AccessShell>
-    </>
+    </AccessShell>
   )
 }

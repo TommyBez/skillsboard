@@ -8,32 +8,48 @@ import { Button } from "@/components/ui/button"
 
 export function ConsentForm() {
   const router = useRouter()
-  const [isPending, setIsPending] = useState(false)
+  const [pendingChoice, setPendingChoice] = useState<"accept" | "deny" | null>(null)
+  const [error, setError] = useState("")
+
   async function decide(accept: boolean) {
-    setIsPending(true)
-    const result = await authClient.oauth2.consent({ accept })
-    if (result.data?.url) window.location.href = result.data.url
-    else { setIsPending(false); router.refresh() }
+    setPendingChoice(accept ? "accept" : "deny")
+    setError("")
+    try {
+      const result = await authClient.oauth2.consent({ accept })
+      if (result.data?.url) {
+        window.location.assign(result.data.url)
+        return
+      }
+      setError(result.error?.message ?? "We couldn’t complete the connection. Try again or return to your MCP client.")
+    } catch {
+      setError("We couldn’t complete the connection. Try again or return to your MCP client.")
+    }
+    setPendingChoice(null)
+    router.refresh()
   }
+
   return (
-    <div className="flex flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:justify-end">
-      <Button
-        type="button"
-        variant="outline"
-        className="h-12 rounded-[16px] px-6"
-        disabled={isPending}
-        onClick={() => decide(false)}
-      >
-        Deny
-      </Button>
-      <Button
-        type="button"
-        className="h-12 rounded-[16px] px-6"
-        disabled={isPending}
-        onClick={() => decide(true)}
-      >
-        {isPending ? "Authorizing..." : "Allow access"}
-      </Button>
+    <div className="border-t border-border pt-6">
+      {error ? <p className="mb-4 rounded-[16px] border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">{error}</p> : null}
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          className="h-12 rounded-[16px] px-6"
+          disabled={pendingChoice !== null}
+          onClick={() => decide(false)}
+        >
+          {pendingChoice === "deny" ? "Denying…" : "Deny access"}
+        </Button>
+        <Button
+          type="button"
+          className="h-12 rounded-[16px] px-6"
+          disabled={pendingChoice !== null}
+          onClick={() => decide(true)}
+        >
+          {pendingChoice === "accept" ? "Allowing…" : "Allow read-only access"}
+        </Button>
+      </div>
     </div>
   )
 }

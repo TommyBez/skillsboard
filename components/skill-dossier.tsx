@@ -84,7 +84,7 @@ export function SkillDossier({
           <code className="min-w-0 flex-1 truncate font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
           <CopyButton
             value={command}
-            label="Copy"
+            label="Copy command"
             ariaLabel={`Copy install command for ${name}`}
             copiedAriaLabel={`Copied install command for ${name}`}
             compact

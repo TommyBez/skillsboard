@@ -37,22 +37,17 @@ const exampleSkills = [
   },
 ]
 
-const filters = ["all", "frontend", "workflow"] as const
-
 export function TeamLibraryDemo() {
   const [query, setQuery] = useState("")
-  const [filter, setFilter] = useState<(typeof filters)[number]>("all")
 
   const normalizedQuery = query.trim().toLowerCase()
   const visibleSkills = exampleSkills.filter((skill) => {
-    const matchesFilter = filter === "all" || skill.tags.includes(filter)
-    const matchesQuery =
+    return (
       !normalizedQuery ||
       `${skill.name} ${skill.source} ${skill.description} ${skill.tags.join(" ")}`
         .toLowerCase()
         .includes(normalizedQuery)
-
-    return matchesFilter && matchesQuery
+    )
   })
 
   return (
@@ -63,9 +58,9 @@ export function TeamLibraryDemo() {
       <div className="flex flex-col gap-4 border-b border-border p-4 sm:p-5">
         <div className="flex items-baseline justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold">Example team library</p>
+            <p className="text-sm font-semibold">Team library demo</p>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Search, filter, and copy a real command.
+              Search saved skills and copy a real install command.
             </p>
           </div>
           <p className="font-mono text-xs tabular-nums text-muted-foreground" aria-live="polite">
@@ -73,10 +68,9 @@ export function TeamLibraryDemo() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-          <div className="grid gap-2">
+        <div className="grid gap-2">
             <label htmlFor="example-library-search" className="text-xs font-medium text-muted-foreground">
-              Search example library
+              Search saved skills
             </label>
             <div className="relative">
               <SearchIcon
@@ -87,27 +81,10 @@ export function TeamLibraryDemo() {
                 id="example-library-search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Try design or browser"
+                placeholder="Try “design” or “browser”"
                 className="bg-background pl-10"
               />
             </div>
-          </div>
-
-          <div className="flex gap-1.5" role="group" aria-label="Filter example skills">
-            {filters.map((item) => (
-              <Button
-                key={item}
-                type="button"
-                size="sm"
-                variant={filter === item ? "default" : "outline"}
-                aria-pressed={filter === item}
-                onClick={() => setFilter(item)}
-                className="capitalize"
-              >
-                {item}
-              </Button>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -164,18 +141,15 @@ export function TeamLibraryDemo() {
         </ul>
       ) : (
         <div className="flex min-h-44 flex-col items-start justify-center gap-3 px-5 py-8">
-          <p className="font-semibold">No example skills match.</p>
-          <p className="text-sm text-muted-foreground">Clear the search or show every saved skill.</p>
+          <p className="font-semibold">No saved skills match.</p>
+          <p className="text-sm text-muted-foreground">Try another search or clear the field.</p>
           <Button
             type="button"
             size="sm"
             variant="outline"
-            onClick={() => {
-              setQuery("")
-              setFilter("all")
-            }}
+            onClick={() => setQuery("")}
           >
-            Reset example
+            Clear search
           </Button>
         </div>
       )}

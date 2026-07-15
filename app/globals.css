@@ -184,20 +184,6 @@
   }
 }
 
-@keyframes marquee {
-  from { transform: translate3d(0, 0, 0); }
-  to { transform: translate3d(-50%, 0, 0); }
-}
-
-@keyframes soft-rise {
-  from { opacity: 0; transform: translate3d(0, 12px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-}
-
-.animate-marquee {
-  animation: marquee 42s linear infinite;
-}
-
 .surface-shadow {
   box-shadow: 0 24px 70px hsl(var(--shadow-color) / 0.11), 0 2px 8px hsl(var(--shadow-color) / 0.06);
 }
@@ -205,6 +191,14 @@
 .ink-panel {
   background: var(--surface-ink);
   color: var(--surface-ink-foreground);
+}
+
+.brand-mark {
+  color: var(--primary);
+}
+
+.ink-panel .brand-mark {
+  color: oklch(0.72 0.145 148);
 }
 
 .app-canvas {
@@ -239,13 +233,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .animate-marquee { animation: none; }
   .lift-on-hover { transition: none; }
   .lift-on-hover:hover { transform: none; }
-  [data-motion-reveal],
-  [data-motion-hero-item] {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
 }
