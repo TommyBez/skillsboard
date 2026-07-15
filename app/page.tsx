@@ -15,7 +15,7 @@ const exampleCommand = "npx skills add https://github.com/vercel-labs/skills --s
 
 const mcpConfig = `{
   "mcpServers": {
-    "skillbase": {
+    "skills-board": {
       "url": "https://your-app.vercel.app/api/mcp"
     }
   }
@@ -29,7 +29,7 @@ function formatInstalls(count: number) {
 export default async function HomePage() {
   const session = await getSession()
   const primaryHref = session?.user ? "/library" : "/sign-up"
-  const primaryLabel = session?.user ? "Open library" : "Get started"
+  const primaryLabel = session?.user ? "Open team library" : "Create your team library"
 
   let trending: CatalogSkill[] = []
   try {
@@ -41,8 +41,8 @@ export default async function HomePage() {
   const stackCards = [
     {
       index: "01",
-      verb: "Save",
-      copy: "A skill is a pointer to its GitHub repository, never a stale copy. Save it once and every install pulls the current version.",
+      verb: "Collect",
+      copy: "Move the skills worth keeping out of bookmarks, Slack threads, and local config files. Every saved skill stays linked to its GitHub source.",
       artifact: (
         <div className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-4 py-3">
           <code className="truncate font-mono text-xs text-muted-foreground md:text-sm">{exampleCommand}</code>
@@ -52,8 +52,8 @@ export default async function HomePage() {
     },
     {
       index: "02",
-      verb: "Sync",
-      copy: "Your library belongs to the organization, not one laptop. Invite teammates, assign roles, and everyone sees the same approved set.",
+      verb: "Share",
+      copy: "Give product, design, and engineering the same trusted collection. Teammates can find the right skill and copy the install command without asking around.",
       artifact: (
         <div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-background/60 p-4">
           {[
@@ -71,8 +71,8 @@ export default async function HomePage() {
     },
     {
       index: "03",
-      verb: "Serve",
-      copy: "Agents connect over an OAuth-secured MCP server. They list, search, and install the exact skills your team approved.",
+      verb: "Connect",
+      copy: "Let MCP-compatible agents search the same library your team uses. OAuth keeps organization access scoped without adding another API key.",
       artifact: (
         <div className="w-full rounded-lg border border-border bg-background/60 p-4">
           <div className="mb-2 flex items-center justify-between">
@@ -108,21 +108,21 @@ export default async function HomePage() {
         <div className="mx-auto flex max-w-[1360px] flex-col gap-10 px-4 pb-16 pt-16 md:px-8 md:pb-24 md:pt-24">
           <HeroEntrance className="flex flex-col gap-8">
             <HeroItem>
-              <h1 className="max-w-[14ch] text-balance text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.98] tracking-tight">
-                One registry. Every agent.
+              <h1 className="max-w-[16ch] text-balance text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.98] tracking-tight">
+                One trusted skill library for your whole product team.
               </h1>
             </HeroItem>
             <HeroItem>
               <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
                 <p className="max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
-                  Skillbase is the shared library of GitHub-native skills your team curates and your agents pull from.
+                  Curate the skills your product, design, and engineering teams use with AI agents. Keep each one connected to GitHub, ready to install, and available through MCP.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
                     {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
                   </Button>
                   <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/discover" />}>
-                    Browse skills
+                    Explore skills
                   </Button>
                 </div>
               </div>
@@ -133,8 +133,8 @@ export default async function HomePage() {
 
       <KineticMarquee />
 
-      {/* Sticky-stack scrolltelling: Save / Sync / Serve */}
-      <section aria-label="How Skillbase works">
+      {/* Sticky-stack scrolltelling: Collect / Share / Connect */}
+      <section aria-label="How Skills Board works">
         <StickyStack
           cards={stackCards.map((card) => (
             <div key={card.index} className="w-full border-b border-border/60 bg-background">
@@ -193,8 +193,9 @@ export default async function HomePage() {
       <section>
         <div className="mx-auto flex max-w-[1360px] flex-col items-start gap-8 px-4 py-20 md:px-8 md:py-32">
           <Reveal className="flex flex-col items-start gap-8">
+            <p className="font-mono text-sm text-primary">Free to use. Open source by default.</p>
             <h2 className="max-w-[16ch] text-balance text-[clamp(2.5rem,7vw,6rem)] font-semibold leading-[1.02] tracking-tight">
-              Stop pasting the same instructions into every agent.
+              Give your team one place for the skills you actually use.
             </h2>
             <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
               {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
@@ -206,7 +207,7 @@ export default async function HomePage() {
       <footer className="border-t border-border/60">
         <div className="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 py-8 font-mono text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
           <Brand />
-          <p>github-native skills for teams and agents</p>
+          <p>one trusted skill library for product teams and their agents</p>
         </div>
       </footer>
     </main>
