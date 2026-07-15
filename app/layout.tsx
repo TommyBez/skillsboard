@@ -9,7 +9,7 @@ const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: { default: "Skillbase — Team skills, always current", template: "%s · Skillbase" },
+  title: { default: "Skillbase, the shared skill registry for agent teams", template: "%s · Skillbase" },
   description: "Discover, save, and share GitHub-native agent skills with your team and MCP clients.",
 }
 
