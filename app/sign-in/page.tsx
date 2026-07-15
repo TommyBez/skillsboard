@@ -1,22 +1,24 @@
-import { redirect } from "next/navigation"
+import { Suspense } from "react"
 
-import { AuthForm } from "@/components/auth-form"
-import { Brand } from "@/components/brand"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSession } from "@/lib/session"
+import { AccessShell } from "@/components/access-shell"
+import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
-export default async function SignInPage() {
-  const session = await getSession()
-  if (session?.user) redirect("/library")
+interface SignInPageProps {
+  searchParams: Promise<{ returnTo?: string }>
+}
+
+export default function SignInPage({ searchParams }: SignInPageProps) {
   return (
-    <main className="flex min-h-svh flex-col bg-muted/30 p-4">
-      <div className="mx-auto flex w-full max-w-6xl py-4"><Brand /></div>
-      <div className="flex flex-1 items-center justify-center py-12">
-        <Card className="w-full max-w-md shadow-sm">
-          <CardHeader><CardTitle className="text-2xl">Welcome back</CardTitle><CardDescription>Sign in to open your team skills library.</CardDescription></CardHeader>
-          <CardContent><AuthForm mode="sign-in" /></CardContent>
-        </Card>
-      </div>
-    </main>
+    <AccessShell
+      marker="Sign in"
+      title="Welcome back"
+      description="Open the shared library of skills your team recommends."
+      editorialTitle="Your team’s recommendations, ready when you need them."
+      editorialBody="Find a skill a colleague has already added, then choose the source, install command, or ZIP that suits your setup."
+    >
+      <Suspense fallback={<AuthEntryFallback mode="sign-in" />}>
+        <AuthEntry mode="sign-in" searchParams={searchParams} />
+      </Suspense>
+    </AccessShell>
   )
 }

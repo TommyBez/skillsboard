@@ -1,213 +1,265 @@
+import { Suspense } from "react"
 import Link from "next/link"
-import { ArrowRightIcon, ArrowUpRightIcon } from "lucide-react"
+import { ArrowRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
-import { CopyButton } from "@/components/copy-button"
-import { KineticMarquee } from "@/components/landing/kinetic-marquee"
-import { SpotlightCard } from "@/components/landing/spotlight-card"
-import { StickyStack } from "@/components/landing/sticky-stack"
-import { HeroEntrance, HeroItem, Reveal } from "@/components/motion/reveal"
+import { LandingMotionController } from "@/components/landing/landing-motion-controller"
+import styles from "@/components/landing/landing-motion.module.css"
 import { Button } from "@/components/ui/button"
 import { getSession } from "@/lib/session"
-import { getLeaderboard, type CatalogSkill } from "@/lib/skills-sh"
 
-const exampleCommand = "npx skills add https://github.com/vercel-labs/skills --skill find-skills"
-
-const mcpConfig = `{
-  "mcpServers": {
-    "skills-board": {
-      "url": "https://your-app.vercel.app/api/mcp"
-    }
-  }
-}`
-
-function formatInstalls(count: number) {
-  if (count >= 1000) return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}k`
-  return String(count)
+function primaryAction(signedIn: boolean) {
+  return signedIn
+    ? { href: "/library", label: "Open your library" }
+    : { href: "/sign-up", label: "Create your team library" }
 }
 
-export default async function HomePage() {
-  const session = await getSession()
-  const primaryHref = session?.user ? "/library" : "/sign-up"
-  const primaryLabel = session?.user ? "Open team library" : "Create your team library"
-
-  let trending: CatalogSkill[] = []
-  try {
-    trending = (await getLeaderboard("trending")).slice(0, 6)
-  } catch {
-    trending = []
-  }
-
-  const stackCards = [
-    {
-      index: "01",
-      verb: "Collect",
-      copy: "Move the skills worth keeping out of bookmarks, Slack threads, and local config files. Every saved skill stays linked to its GitHub source.",
-      artifact: (
-        <div className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-background/60 px-4 py-3">
-          <code className="truncate font-mono text-xs text-muted-foreground md:text-sm">{exampleCommand}</code>
-          <CopyButton value={exampleCommand} />
-        </div>
-      ),
-    },
-    {
-      index: "02",
-      verb: "Share",
-      copy: "Give product, design, and engineering the same trusted collection. Teammates can find the right skill and copy the install command without asking around.",
-      artifact: (
-        <div className="flex w-full flex-col gap-2 rounded-lg border border-border bg-background/60 p-4">
-          {[
-            ["ana@team.dev", "owner"],
-            ["luca@team.dev", "member"],
-            ["mei@team.dev", "member"],
-          ].map(([email, role]) => (
-            <div key={email} className="flex items-center justify-between font-mono text-xs md:text-sm">
-              <span className="text-foreground">{email}</span>
-              <span className="text-muted-foreground">{role}</span>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      index: "03",
-      verb: "Connect",
-      copy: "Let MCP-compatible agents search the same library your team uses. OAuth keeps organization access scoped without adding another API key.",
-      artifact: (
-        <div className="w-full rounded-lg border border-border bg-background/60 p-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="font-mono text-xs text-muted-foreground">mcp.json</span>
-            <CopyButton value={mcpConfig} />
-          </div>
-          <pre className="overflow-x-auto font-mono text-xs leading-relaxed"><code>{mcpConfig}</code></pre>
-        </div>
-      ),
-    },
-  ]
+function HomeHeaderActionsView({ signedIn = false }: { signedIn?: boolean }) {
+  const primary = primaryAction(signedIn)
 
   return (
-    <main className="dark min-h-[100dvh] bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-[1360px] items-center justify-between px-4 md:px-8">
+    <nav className="flex items-center gap-1.5" aria-label="Main navigation">
+      {!signedIn ? (
+        <Button
+          size="sm"
+          variant="ghost"
+          className="hidden sm:inline-flex"
+          nativeButton={false}
+          render={<Link href="/sign-in" />}
+        >
+          Sign in
+        </Button>
+      ) : null}
+      <Button
+        size="sm"
+        className={`${styles.ctaButton} sm:h-10 sm:px-4`}
+        nativeButton={false}
+        render={<Link href={primary.href} />}
+      >
+        <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
+        <span className="hidden sm:inline">{primary.label}</span>
+        <ArrowRightIcon
+          className={`${styles.ctaArrow} hidden sm:block`}
+          data-icon="inline-end"
+        />
+      </Button>
+    </nav>
+  )
+}
+
+async function HomeHeaderActions() {
+  const session = await getSession()
+  return <HomeHeaderActionsView signedIn={Boolean(session?.user)} />
+}
+
+function HomeHeroActionsView({ signedIn = false }: { signedIn?: boolean }) {
+  const primary = primaryAction(signedIn)
+
+  return (
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={<Link href={primary.href} />}
+    >
+      {primary.label}
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+    </Button>
+  )
+}
+
+async function HomeHeroActions() {
+  const session = await getSession()
+  return <HomeHeroActionsView signedIn={Boolean(session?.user)} />
+}
+
+function HomeFinalActionsView({ signedIn = false }: { signedIn?: boolean }) {
+  const primary = primaryAction(signedIn)
+
+  return (
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={<Link href={primary.href} />}
+    >
+      {primary.label}
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+    </Button>
+  )
+}
+
+async function HomeFinalActions() {
+  const session = await getSession()
+  return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
+}
+
+const agents = ["Claude", "Codex", "Cursor", "Other agents"]
+
+export default function HomePage() {
+  return (
+    <main
+      className={`${styles.root} app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
+      data-landing-motion-root
+    >
+      <LandingMotionController />
+      <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
+        <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
-          <nav className="flex items-center gap-2" aria-label="Main navigation">
-            {!session?.user && (
-              <Button variant="ghost" nativeButton={false} render={<Link href="/sign-in" />}>
-                Sign in
-              </Button>
-            )}
-            <Button nativeButton={false} render={<Link href={primaryHref} />}>
-              {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
-            </Button>
-          </nav>
+          <Suspense fallback={<HomeHeaderActionsView />}>
+            <HomeHeaderActions />
+          </Suspense>
         </div>
       </header>
 
-      {/* Editorial manifesto hero */}
-      <section className="relative border-b border-border/60">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-10 px-4 pb-16 pt-16 md:px-8 md:pb-24 md:pt-24">
-          <HeroEntrance className="flex flex-col gap-8">
-            <HeroItem>
-              <h1 className="max-w-[16ch] text-balance text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.98] tracking-tight">
-                One trusted skill library for your whole product team.
-              </h1>
-            </HeroItem>
-            <HeroItem>
-              <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-                <p className="max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
-                  Curate the skills your product, design, and engineering teams use with AI agents. Keep each one connected to GitHub, ready to install, and available through MCP.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
-                    {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
-                  </Button>
-                  <Button size="lg" variant="outline" nativeButton={false} render={<Link href="/discover" />}>
-                    Explore skills
-                  </Button>
-                </div>
-              </div>
-            </HeroItem>
-          </HeroEntrance>
-        </div>
-      </section>
-
-      <KineticMarquee />
-
-      {/* Sticky-stack scrolltelling: Collect / Share / Connect */}
-      <section aria-label="How Skills Board works">
-        <StickyStack
-          cards={stackCards.map((card) => (
-            <div key={card.index} className="w-full border-b border-border/60 bg-background">
-              <div className="mx-auto grid min-h-[100dvh] max-w-[1360px] content-center gap-10 px-4 py-20 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-center md:px-8">
-                <div className="flex min-w-0 flex-col gap-5">
-                  <span className="font-mono text-sm text-primary">{card.index}</span>
-                  <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-semibold leading-none tracking-tight">
-                    {card.verb}
-                  </h2>
-                  <p className="max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">{card.copy}</p>
-                </div>
-                <div className="flex min-w-0 items-center">{card.artifact}</div>
-              </div>
-            </div>
-          ))}
-        />
-      </section>
-
-      {/* Live registry index with real skills.sh data */}
-      <section className="border-b border-border/60">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-8 px-4 py-16 md:px-8 md:py-24">
-          <Reveal className="flex items-end justify-between gap-4">
-            <h2 className="text-balance text-3xl font-semibold tracking-tight md:text-5xl">Trending this week</h2>
-            <Button variant="ghost" nativeButton={false} render={<Link href="/discover" />}>
-              View all <ArrowUpRightIcon data-icon="inline-end" />
-            </Button>
-          </Reveal>
-          {trending.length > 0 ? (
-            <div className="grid gap-3 md:grid-cols-2">
-              {trending.map((skill, i) => (
-                <Reveal key={skill.id} delay={Math.min(i * 0.05, 0.2)}>
-                  <SpotlightCard className="h-full">
-                    <div className="flex h-full flex-col gap-3 p-5">
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="font-mono text-sm text-foreground">{skill.name}</span>
-                        <span className="font-mono text-xs text-muted-foreground">
-                          {formatInstalls(skill.installs)} installs
-                        </span>
-                      </div>
-                      <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">{skill.description}</p>
-                      <span className="mt-auto font-mono text-xs text-primary">{skill.source}</span>
-                    </div>
-                  </SpotlightCard>
-                </Reveal>
-              ))}
-            </div>
-          ) : (
-            <p className="text-muted-foreground">
-              Live catalog data appears here once discovery is connected. Browse the registry inside the app.
+      <section className="border-b border-border/70">
+        <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-4 py-16 md:px-8 md:py-20 lg:min-h-[min(40rem,calc(100dvh-4.5rem))] lg:grid-cols-12 lg:content-center lg:items-end lg:gap-x-10 lg:py-20">
+          <div className="flex w-full min-w-0 flex-col items-start lg:col-span-8">
+            <p className={`${styles.heroEyebrow} mb-5 text-sm font-semibold text-primary`}>
+              Skills selected by your team
             </p>
-          )}
+            <h1 className="text-balance text-[clamp(2.75rem,7vw,7rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
+              <span className={`${styles.heroLine} ${styles.heroLineFirst} block`}>
+                One shared library.
+              </span>
+              <span className={`${styles.heroLine} ${styles.heroLineSecond} block text-primary`}>
+                Different agents.
+              </span>
+            </h1>
+          </div>
+
+          <div className="flex w-full flex-col items-start lg:col-span-4 lg:pb-1">
+            <p className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
+              Keep your team&apos;s recommended skills in one place, so everyone knows where to find and use them.
+            </p>
+            <div className={`${styles.heroCta} mt-7`}>
+              <Suspense fallback={<HomeHeroActionsView />}>
+                <HomeHeroActions />
+              </Suspense>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Closing CTA */}
-      <section>
-        <div className="mx-auto flex max-w-[1360px] flex-col items-start gap-8 px-4 py-20 md:px-8 md:py-32">
-          <Reveal className="flex flex-col items-start gap-8">
-            <p className="font-mono text-sm text-primary">Free to use. Open source by default.</p>
-            <h2 className="max-w-[16ch] text-balance text-[clamp(2.5rem,7vw,6rem)] font-semibold leading-[1.02] tracking-tight">
-              Give your team one place for the skills you actually use.
+      <section className="border-y border-border/70 bg-accent/30">
+        <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
+          <div className="w-full">
+            <h2 className="max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-6xl">
+              The library belongs to your team, not one agent.
             </h2>
-            <Button size="lg" nativeButton={false} render={<Link href={primaryHref} />}>
-              {primaryLabel} <ArrowRightIcon data-icon="inline-end" />
-            </Button>
-          </Reveal>
+            <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
+              Everyone starts from the same recommendation, then chooses the source, command, or ZIP that fits their setup.
+            </p>
+            <p className="mt-6 max-w-md border-l-2 border-primary/40 pl-4 text-sm leading-relaxed text-muted-foreground">
+              Compatible agents can optionally access the same library through authenticated, read-only MCP.
+            </p>
+          </div>
+
+          <figure
+            className="w-full"
+            aria-label="One team library can support different agents"
+            data-motion-group="library"
+          >
+            <div className="grid border-y border-border py-7 sm:grid-cols-[minmax(0,0.9fr)_auto_minmax(0,1.1fr)] sm:items-center sm:gap-8 sm:py-9">
+              <div className={styles.librarySource}>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  One team recommendation
+                </p>
+                <p className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-4xl">
+                  Shared library
+                </p>
+              </div>
+
+              <ArrowRightIcon
+                className={`${styles.libraryArrow} my-6 size-7 rotate-90 text-primary sm:my-0 sm:rotate-0`}
+                aria-hidden="true"
+              />
+
+              <div>
+                <p className={`${styles.agentsLabel} text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground`}>
+                  Wherever people work
+                </p>
+                <ul
+                  className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 sm:flex sm:flex-wrap"
+                  aria-label="Supported agent choices"
+                >
+                  {agents.map((agent) => (
+                    <li
+                      key={agent}
+                      className={`${styles.agentItem} text-xl font-semibold tracking-[-0.03em]`}
+                    >
+                      {agent}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <figcaption className={`${styles.libraryCaption} mt-5 text-sm leading-relaxed text-muted-foreground`}>
+              Open the source <span aria-hidden="true">·</span> Copy the command{" "}
+              <span aria-hidden="true">·</span> Download the latest ZIP
+            </figcaption>
+          </figure>
         </div>
       </section>
 
-      <footer className="border-t border-border/60">
-        <div className="mx-auto flex max-w-[1360px] flex-col gap-4 px-4 py-8 font-mono text-xs text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
+      <section
+        id="pricing"
+        aria-labelledby="pricing-heading"
+        className="border-b border-primary/30 bg-primary text-primary-foreground"
+      >
+        <div
+          className="mx-auto grid w-full max-w-[1440px] gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20"
+          data-motion-group="pricing"
+        >
+          <p
+            className={`${styles.pricingZero} select-none text-[clamp(9rem,25vw,22rem)] font-semibold leading-[0.68] tracking-[-0.09em]`}
+            aria-hidden="true"
+          >
+            0
+          </p>
+
+          <div className="max-w-lg lg:pb-2">
+            <h2
+              id="pricing-heading"
+              className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-[-0.055em] md:text-7xl`}
+            >
+              Free. Forever.
+            </h2>
+            <p className={`${styles.pricingMessage} mt-6 text-xl leading-relaxed md:text-2xl`}>
+              Skills Board is free to use and open source.
+            </p>
+            <p className={`${styles.pricingNote} mt-8 border-t border-primary-foreground/30 pt-5 text-sm font-semibold`}>
+              No trial. No credit card. No paid tier.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div
+          className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
+          data-motion-group="closing"
+        >
+          <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.055em]`}>
+            Answer “which skill should I use?” once.
+          </h2>
+          <p className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}>
+            Save the recommendation where the whole team can find it. The next person can get started without asking where to look.
+          </p>
+          <div className={`${styles.closingCta} mt-8`}>
+            <Suspense fallback={<HomeFinalActionsView />}>
+              <HomeFinalActions />
+            </Suspense>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-border/70">
+        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
           <Brand />
-          <p>one trusted skill library for product teams and their agents</p>
+          <p className="max-w-md text-sm text-muted-foreground md:text-right">
+            Built for teams that work across different agents.
+          </p>
         </div>
       </footer>
     </main>

@@ -1,22 +1,24 @@
-import { redirect } from "next/navigation"
+import { Suspense } from "react"
 
-import { AuthForm } from "@/components/auth-form"
-import { Brand } from "@/components/brand"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { getSession } from "@/lib/session"
+import { AccessShell } from "@/components/access-shell"
+import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
-export default async function SignUpPage() {
-  const session = await getSession()
-  if (session?.user) redirect("/library")
+interface SignUpPageProps {
+  searchParams: Promise<{ returnTo?: string }>
+}
+
+export default function SignUpPage({ searchParams }: SignUpPageProps) {
   return (
-    <main className="flex min-h-svh flex-col bg-muted/30 p-4">
-      <div className="mx-auto flex w-full max-w-6xl py-4"><Brand /></div>
-      <div className="flex flex-1 items-center justify-center py-12">
-        <Card className="w-full max-w-md shadow-sm">
-          <CardHeader><CardTitle className="text-2xl">Build your skill library</CardTitle><CardDescription>Create an account, then invite your team.</CardDescription></CardHeader>
-          <CardContent><AuthForm mode="sign-up" /></CardContent>
-        </Card>
-      </div>
-    </main>
+    <AccessShell
+      marker="Create account"
+      title="Create your free account"
+      description="Start a shared skill library for your team, or join one you’ve been invited to."
+      editorialTitle="Stop answering the same “which skill?” question."
+      editorialBody="Collect the skills your team recommends so colleagues can find them and choose the source, compatible command, or ZIP that fits their setup."
+    >
+      <Suspense fallback={<AuthEntryFallback mode="sign-up" />}>
+        <AuthEntry mode="sign-up" searchParams={searchParams} />
+      </Suspense>
+    </AccessShell>
   )
 }

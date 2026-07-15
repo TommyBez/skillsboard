@@ -4,14 +4,22 @@ import { jwt, organization } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
 
 import { pool } from "@/lib/db"
+import { oauthScopes } from "@/lib/oauth-scopes"
 
 function getBaseUrl() {
-  return process.env.BETTER_AUTH_URL ??
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.V0_RUNTIME_URL)
+  const explicitUrl = process.env.BETTER_AUTH_URL?.trim()
+  if (explicitUrl) return explicitUrl
+
+  const productionHost = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim()
+  if (productionHost) return `https://${productionHost}`
+
+  const deploymentHost = process.env.VERCEL_URL?.trim()
+  if (deploymentHost) return `https://${deploymentHost}`
+
+  const v0Url = process.env.V0_RUNTIME_URL?.trim()
+  if (v0Url) return v0Url
+
+  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : undefined
 }
 
 export const auth = betterAuth({
@@ -29,14 +37,15 @@ export const auth = betterAuth({
   ],
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   plugins: [
-    organization(),
+    organization({ cancelPendingInvitationsOnReInvite: true }),
     jwt(),
     oauthProvider({
       loginPage: "/sign-in",
       consentPage: "/consent",
       allowDynamicClientRegistration: true,
       allowUnauthenticatedClientRegistration: true,
-      scopes: ["openid", "profile", "email", "skills:read"],
+      allowPublicClientPrelogin: true,
+      scopes: [...oauthScopes],
     }),
     nextCookies(),
   ],
