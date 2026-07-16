@@ -2,6 +2,7 @@ import "server-only"
 
 import { parseDocument } from "yaml"
 
+import { isValidAgentSkillName } from "@/lib/agent-skill-name"
 import { parseGitHubUrl } from "@/lib/github"
 import {
   parseGitHubSkillLink,
@@ -552,12 +553,11 @@ function parseSkillDescriptor(bytes: Uint8Array, path: string): DiscoveredGitHub
     const { name, description } = metadata as Record<string, unknown>
     if (typeof name !== "string" || typeof description !== "string") return null
 
-    const sanitizedName = sanitizeMetadataString(name)
     const sanitizedDescription = sanitizeMetadataString(description)
-    if (!sanitizedName || !sanitizedDescription) return null
+    if (!isValidAgentSkillName(name) || !sanitizedDescription) return null
 
     return {
-      name: sanitizedName,
+      name,
       description: sanitizedDescription,
       path,
     }
