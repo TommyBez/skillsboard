@@ -24,6 +24,10 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## MCP server
+
+SkillsBoard exposes a built-in MCP server that gives AI agents read-only access to your team's saved skills and the public skills.sh catalog. See the [MCP installation guide](docs/mcp-installation.md) to connect it to Claude Code, Claude Desktop, Cursor, VS Code, or any other MCP client.
+
 ## Learn More
 
 To learn more, take a look at the following resources:
