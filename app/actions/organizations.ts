@@ -7,6 +7,7 @@ import { z } from "zod"
 import { auth, getAuthBaseUrl } from "@/lib/auth"
 import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
 import { resolveUniqueOrganizationSlug } from "@/lib/organization-slug"
+import { getPostHogClient } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
@@ -56,6 +57,16 @@ export async function createOrganization(
       headers: await headers(),
       body: { organizationId: created.id },
     })
+    const session = await getSession()
+    if (session?.user) {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: session.user.id,
+        event: "team_created",
+        properties: { team_name: parsed.data.name },
+      })
+      await posthog.shutdown()
+    }
   } catch (error) {
     console.error("Unable to create team library", error)
     return { error: "We couldn’t create your team library. Please try again." }
@@ -123,6 +134,19 @@ export async function createInvitationLink(
         "The invitation was created, but the email could not be sent. Share the invite link below instead."
     }
 
+    const currentSession = await getSession()
+    if (currentSession?.user) {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: currentSession.user.id,
+        event: "team_member_invited",
+        properties: {
+          role: parsed.data.role,
+          email_sent: !emailError,
+        },
+      })
+      await posthog.shutdown()
+    }
     return {
       emailError,
       error: "",
@@ -158,6 +182,14 @@ export async function acceptInvitation(
       headers: await headers(),
       body: { invitationId: invitationId.data },
     })
+    if (session?.user) {
+      const posthog = getPostHogClient()
+      posthog.capture({
+        distinctId: session.user.id,
+        event: "invitation_accepted",
+      })
+      await posthog.shutdown()
+    }
   } catch (error) {
     console.error("Unable to accept invitation", error)
     return { error: "This invitation may have expired or can no longer be accepted. Ask a team admin for a new link." }
