@@ -3,6 +3,7 @@ import Link from "next/link"
 import { DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { SkillDossier } from "@/components/skill-dossier"
 import { Button } from "@/components/ui/button"
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
 import { listOrganizationSkills } from "@/lib/db/queries"
+import { isOrganizationAdmin } from "@/lib/session"
 
 interface LibraryPageProps {
   searchParams: Promise<{ q?: string; tag?: string }>
@@ -44,8 +46,9 @@ function LibraryStatsFallback() {
 }
 
 async function LibraryResults({ searchParams }: LibraryPageProps) {
-  const [{ activeId, session }, params] = await Promise.all([getAppContext(), searchParams])
+  const [{ activeId, session, role }, params] = await Promise.all([getAppContext(), searchParams])
   const userId = session.user.id
+  const canManageLibrary = isOrganizationAdmin(role)
   const allSkills = await listOrganizationSkills(activeId)
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
@@ -99,6 +102,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
           {skills.map((item, index) => {
             const command = `npx skills add ${item.githubUrl} --skill ${item.skillName}`
             const canEditNote = item.createdBy === userId
+            const canDelete = canEditNote || canManageLibrary
             return (
               <SkillDossier
                 key={item.id}
@@ -121,6 +125,12 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                         skillId={item.id}
                         skillName={item.title}
                         note={item.note}
+                      />
+                    ) : null}
+                    {canDelete ? (
+                      <DeleteSkillDialog
+                        skillId={item.id}
+                        skillName={item.title}
                       />
                     ) : null}
                     <Button

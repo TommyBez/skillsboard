@@ -12,5 +12,6 @@ export const getAppContext = cache(async () => {
     session,
     organizations,
     activeId: activeOrganization.id,
+    role: activeOrganization.role,
   }
 })
