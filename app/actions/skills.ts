@@ -53,6 +53,46 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
   }
 }
 
+const updateSkillNoteSchema = z.object({
+  skillId: z.uuid(),
+  note: z.string().trim().max(500),
+})
+
+export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchema>) {
+  const session = await requireSession()
+  const { organizationId, userId } = await requireActiveOrganization(session)
+  const parsed = updateSkillNoteSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false as const, error: "Check the note and try again." }
+  }
+
+  const [savedSkill] = await db
+    .select({ id: skill.id, createdBy: skill.createdBy })
+    .from(skill)
+    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
+    .limit(1)
+
+  if (!savedSkill) {
+    return { ok: false as const, error: "Skill not found" }
+  }
+
+  if (savedSkill.createdBy !== userId) {
+    return { ok: false as const, error: "Only the person who added this skill can edit its note." }
+  }
+
+  await db
+    .update(skill)
+    .set({
+      note: parsed.data.note || null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId), eq(skill.createdBy, userId)))
+
+  updateTag(cacheTags.organizationSkills(organizationId))
+  return { ok: true as const }
+}
+
 export async function deleteSkill(id: string) {
   const session = await requireSession()
   const { organizationId } = await requireActiveOrganization(session)
