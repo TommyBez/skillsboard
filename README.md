@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  A shared library for the AI skills your team recommends, without forcing everyone onto the same agent.
+  Keep your team’s recommended AI skills in one place, so everyone knows where to find and use them.
 </p>
 
 <p align="center">
