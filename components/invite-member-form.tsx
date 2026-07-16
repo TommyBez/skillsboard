@@ -2,7 +2,7 @@
 
 import { useActionState } from "react"
 import { useFormStatus } from "react-dom"
-import { LinkIcon } from "lucide-react"
+import { ChevronDownIcon, MailIcon } from "lucide-react"
 
 import { createInvitationLink } from "@/app/actions/organizations"
 import { CopyButton } from "@/components/copy-button"
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-const initialState = { error: "", expiresAt: "", invitedEmail: "", inviteUrl: "", role: "" as const }
+const initialState = { emailError: "", error: "", expiresAt: "", invitedEmail: "", inviteUrl: "", role: "" as const }
 const expiryFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   hour: "numeric",
@@ -21,13 +21,13 @@ const expiryFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 })
 
-function CreateLinkButton() {
+function SendInviteButton() {
   const { pending } = useFormStatus()
 
   return (
     <Button type="submit" className="h-11 rounded-[12px] px-4" disabled={pending}>
-      <LinkIcon data-icon="inline-start" />
-      {pending ? "Creating link…" : "Create invite link"}
+      <MailIcon data-icon="inline-start" />
+      {pending ? "Sending invitation…" : "Send invitation"}
     </Button>
   )
 }
@@ -52,19 +52,25 @@ export function InviteMemberForm() {
 
         <Field>
           <FieldLabel htmlFor="invite-role">Role</FieldLabel>
-          <select
-            id="invite-role"
-            name="role"
-            aria-label="Role"
-            defaultValue="member"
-            className="h-11 w-full rounded-[12px] border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-          >
-            <option value="member">Member</option>
-            <option value="admin">Admin</option>
-          </select>
+          <div className="relative">
+            <select
+              id="invite-role"
+              name="role"
+              aria-label="Role"
+              defaultValue="member"
+              className="h-11 w-full appearance-none rounded-[12px] border border-input bg-background pl-3 pr-9 text-sm outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+            >
+              <option value="member">Member</option>
+              <option value="admin">Admin</option>
+            </select>
+            <ChevronDownIcon
+              aria-hidden="true"
+              className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+            />
+          </div>
         </Field>
 
-        <CreateLinkButton />
+        <SendInviteButton />
       </form>
 
       {state.error ? (
@@ -73,11 +79,21 @@ export function InviteMemberForm() {
         </p>
       ) : null}
 
+      {state.emailError ? (
+        <p className="mt-4 rounded-[12px] border border-amber-500/25 bg-amber-500/5 px-4 py-3 text-sm text-amber-900 dark:text-amber-200" role="status">
+          {state.emailError}
+        </p>
+      ) : null}
+
       {state.inviteUrl ? (
         <div className="mt-4 rounded-[12px] border border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm font-semibold">Invite link ready</p>
+          <p className="text-sm font-semibold">
+            {state.emailError ? "Invite link ready" : `Invitation sent to ${state.invitedEmail}`}
+          </p>
           <FieldDescription className="mt-1">
-            Send this link to {state.invitedEmail}. It grants {state.role} access and expires {expiryFormatter.format(new Date(state.expiresAt))}.
+            {state.emailError
+              ? `This link grants ${state.role} access and expires ${expiryFormatter.format(new Date(state.expiresAt))}.`
+              : `We emailed ${state.invitedEmail} with a link to join as ${state.role}. It expires ${expiryFormatter.format(new Date(state.expiresAt))}. Copy the link below if you need a backup.`}
           </FieldDescription>
           <div className="mt-3 flex min-w-0 items-center gap-2 rounded-[10px] border bg-background p-1.5 pl-3">
             <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">{state.inviteUrl}</code>

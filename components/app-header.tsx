@@ -4,6 +4,7 @@ import { LibraryBigIcon, LogOutIcon, SearchIcon, SettingsIcon, SlidersHorizontal
 import { signOut } from "@/app/actions/auth"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
+import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
 
 interface AppHeaderProps {
@@ -27,7 +28,10 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
           </nav>
 
           <div className="ml-auto flex min-w-0 items-center gap-2">
-            <OrganizationSwitcher organizations={organizations} activeId={activeId} />
+            <div className="flex items-center gap-1.5">
+              <OrganizationSwitcher organizations={organizations} activeId={activeId} />
+              <CreateOrganizationDialog />
+            </div>
             <details className="group relative">
               <summary
                 aria-label="User menu"
