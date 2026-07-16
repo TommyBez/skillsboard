@@ -51,6 +51,10 @@ export async function resolveActiveOrganization(
   }
 }
 
+export function isOrganizationAdmin(role: string) {
+  return role === "owner" || role === "admin"
+}
+
 export async function requireActiveOrganization(
   session?: Awaited<ReturnType<typeof requireSession>>,
 ) {
@@ -59,5 +63,6 @@ export async function requireActiveOrganization(
   return {
     organizationId: resolved.activeOrganization.id,
     userId: resolved.session.user.id,
+    role: resolved.activeOrganization.role,
   }
 }
