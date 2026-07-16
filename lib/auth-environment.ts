@@ -155,10 +155,14 @@ function withWwwApexVariants(origins: string[]): string[] {
         const url = new URL(origin)
         if (isLoopbackOrigin(origin)) return [origin]
         if (url.hostname.startsWith("www.")) {
-          return [origin, `${url.protocol}//${url.hostname.slice(4)}`]
+          const apex = new URL(origin)
+          apex.hostname = apex.hostname.slice(4)
+          return [origin, apex.origin]
         }
         if (url.hostname.includes(".")) {
-          return [origin, `${url.protocol}//www.${url.hostname}`]
+          const www = new URL(origin)
+          www.hostname = `www.${www.hostname}`
+          return [origin, www.origin]
         }
       } catch {
         // ignore malformed origins
