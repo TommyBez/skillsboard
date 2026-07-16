@@ -313,6 +313,12 @@
       "skillPath": "skills/seo-audit/SKILL.md",
       "computedHash": "f2dc52130189068981f21e1c0bdc4471ac7cd9b08d8a1320604411aa0f950385"
     },
+    "shieldcn-badges": {
+      "source": "jal-co/shieldcn",
+      "sourceType": "github",
+      "skillPath": "skills/shieldcn-badges/SKILL.md",
+      "computedHash": "c648afab8625680b4ea68907162afdd63be5d051f6840551dc39456fb613c1ea"
+    },
     "signup": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
