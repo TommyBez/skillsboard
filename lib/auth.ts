@@ -6,6 +6,7 @@ import { nextCookies } from "better-auth/next-js"
 import {
   getAuthBaseUrl as resolveAuthBaseUrl,
   getDeploymentEnvironment,
+  getOAuthValidAudiences,
   getTrustedOrigins,
 } from "@/lib/auth-environment"
 import { pool } from "@/lib/db"
@@ -30,6 +31,7 @@ export const auth = betterAuth({
       allowUnauthenticatedClientRegistration: true,
       allowPublicClientPrelogin: true,
       scopes: [...oauthScopes],
+      validAudiences: getOAuthValidAudiences(),
     }),
     nextCookies(),
   ],

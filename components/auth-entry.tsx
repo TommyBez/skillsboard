@@ -4,18 +4,23 @@ import { redirect } from "next/navigation"
 import { AuthForm } from "@/components/auth-form"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
 import { safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
 
 interface AuthEntryProps {
   mode: "sign-in" | "sign-up"
-  searchParams: Promise<{ returnTo?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
   const [session, params] = await Promise.all([getSession(), searchParams])
-  const returnTo = safeReturnTo(params.returnTo)
+  const oauthContinue = getOAuthAuthorizeContinuePath(params)
+  const oauthQuery = getOAuthQueryString(params)
+  const returnTo = safeReturnTo(typeof params.returnTo === "string" ? params.returnTo : undefined)
+
   if (session?.user) {
+    if (oauthContinue) redirect(oauthContinue)
     if (returnTo === "/library") redirect("/library")
     return (
       <div className="grid gap-5 border-t border-border pt-6">
@@ -28,7 +33,15 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
       </div>
     )
   }
-  return <AuthForm mode={mode} returnTo={returnTo} />
+
+  return (
+    <AuthForm
+      mode={mode}
+      returnTo={returnTo}
+      continueHref={oauthContinue}
+      preserveQuery={oauthQuery}
+    />
+  )
 }
 
 export function AuthEntryFallback({ mode }: Pick<AuthEntryProps, "mode">) {

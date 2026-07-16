@@ -147,3 +147,40 @@ export function getTrustedOrigins():
     return staticOrigins
   }
 }
+
+function withWwwApexVariants(origins: string[]): string[] {
+  return uniqueOrigins(
+    origins.flatMap((origin) => {
+      try {
+        const url = new URL(origin)
+        if (isLoopbackOrigin(origin)) return [origin]
+        if (url.hostname.startsWith("www.")) {
+          return [origin, `${url.protocol}//${url.hostname.slice(4)}`]
+        }
+        if (url.hostname.includes(".")) {
+          return [origin, `${url.protocol}//www.${url.hostname}`]
+        }
+      } catch {
+        // ignore malformed origins
+      }
+      return [origin]
+    }),
+  )
+}
+
+/**
+ * Audiences accepted for RFC 8707 `resource` on the token endpoint.
+ * MCP clients request `{origin}/api/mcp`; without this list the provider
+ * rejects that resource and issues tokens the MCP handler cannot verify.
+ */
+export function getOAuthValidAudiences(): string[] | undefined {
+  const bases = withWwwApexVariants(
+    uniqueOrigins([
+      toOrigin(process.env.BETTER_AUTH_URL),
+      getAuthBaseUrl(),
+      ...environmentOrigins(getDeploymentEnvironment()),
+    ]),
+  )
+  if (bases.length === 0) return undefined
+  return bases.flatMap((base) => [base, `${base}/api/mcp`])
+}
