@@ -21,7 +21,7 @@ const getMcpDetails = cache(async () => {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "https"
   const mcpUrl = `${protocol}://${host}/api/mcp`
   const config = JSON.stringify(
-    { mcpServers: { "skills-board": { url: mcpUrl } } },
+    { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
     null,
     2,
   )
@@ -83,7 +83,7 @@ async function McpGuide() {
 }
 
 function McpConfigurationFallback() {
-  return <Skeleton className="h-[28rem] rounded-[16px]" aria-label="Loading MCP configuration" />
+  return <Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading MCP configuration" />
 }
 
 export default function McpSettingsPage() {
@@ -133,7 +133,7 @@ export default function McpSettingsPage() {
       </div>
 
       <div className="mt-6">
-        <Suspense fallback={<Skeleton className="h-[32rem] rounded-[16px]" aria-label="Loading setup guide" />}>
+        <Suspense fallback={<Skeleton className="h-[32rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}>
           <McpGuide />
         </Suspense>
       </div>
