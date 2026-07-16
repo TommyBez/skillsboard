@@ -9,7 +9,7 @@ import { db } from "@/lib/db"
 import { skill } from "@/lib/db/schema"
 import { getGitHubMetadata } from "@/lib/github"
 import { getPostHogClient } from "@/lib/posthog-server"
-import { requireActiveOrganization, requireSession } from "@/lib/session"
+import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
 const skillSchema = z.object({
   githubUrl: z.url(),
@@ -117,18 +117,49 @@ export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchem
   return { ok: true as const }
 }
 
-export async function deleteSkill(id: string) {
+const deleteSkillSchema = z.object({
+  skillId: z.uuid(),
+})
+
+export async function deleteSkill(input: z.input<typeof deleteSkillSchema>) {
   const session = await requireSession()
-  const { organizationId, userId } = await requireActiveOrganization(session)
-  await db.delete(skill).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
+  const { organizationId, userId, role } = await requireActiveOrganization(session)
+  const parsed = deleteSkillSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false as const, error: "Skill not found" }
+  }
+
+  const [savedSkill] = await db
+    .select({ id: skill.id, createdBy: skill.createdBy })
+    .from(skill)
+    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
+    .limit(1)
+
+  if (!savedSkill) {
+    return { ok: false as const, error: "Skill not found" }
+  }
+
+  const canDelete = savedSkill.createdBy === userId || isOrganizationAdmin(role)
+  if (!canDelete) {
+    return {
+      ok: false as const,
+      error: "Only the person who added this skill, or a team admin, can delete it.",
+    }
+  }
+
+  await db
+    .delete(skill)
+    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
   const posthog = getPostHogClient()
   posthog.capture({
     distinctId: userId,
     event: "skill_deleted",
-    properties: { skill_id: id },
+    properties: { skill_id: parsed.data.skillId },
   })
   await posthog.shutdown()
+  return { ok: true as const }
 }
 
 export async function refreshSkill(id: string) {
