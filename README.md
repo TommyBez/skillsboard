@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/header/grid.svg?title=Skills%20Board&amp;subtitle=One%20shared%20library.%20Different%20agents.&amp;theme=green&amp;font=geist&amp;align=left&amp;mode=dark" />
-    <img alt="Skills Board — One shared library. Different agents." src="https://shieldcn.dev/header/grid.svg?title=Skills%20Board&amp;subtitle=One%20shared%20library.%20Different%20agents.&amp;theme=green&amp;font=geist&amp;align=left&amp;mode=light" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/header/surface.svg?title=Skills%20Board&amp;subtitle=One%20shared%20library.%20Different%20agents.&amp;size=wide&amp;align=left&amp;font=space-grotesk&amp;border=true&amp;radius=18&amp;watermark=false&amp;logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI%2BPHBhdGggZmlsbD0iIzZiZDU4ZiIgZD0iTTMgM2gyNnY3SDExdjRoMTRsNCA0djExSDN2LTdoMTh2LTRIN2wtNC00VjNaIi8%2BPC9zdmc%2B&amp;logoColor=6bd58f&amp;bg=111a14&amp;accent=6bd58f&amp;titleColor=f7f8f4&amp;subtitleColor=aab5aa&amp;mode=dark" />
+    <img alt="Skills Board — One shared library. Different agents." src="https://shieldcn.dev/header/surface.svg?title=Skills%20Board&amp;subtitle=One%20shared%20library.%20Different%20agents.&amp;size=wide&amp;align=left&amp;font=space-grotesk&amp;border=true&amp;radius=18&amp;watermark=false&amp;logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI%2BPHBhdGggZmlsbD0iIzAwODQzZCIgZD0iTTMgM2gyNnY3SDExdjRoMTRsNCA0djExSDN2LTdoMTh2LTRIN2wtNC00VjNaIi8%2BPC9zdmc%2B&amp;logoColor=00843d&amp;bg=f7f8f4&amp;accent=00843d&amp;titleColor=17231b&amp;subtitleColor=5e6b61&amp;mode=light" />
   </picture>
 </p>
 
@@ -12,26 +12,20 @@
 <p align="center">
   <a href="https://github.com/TommyBez/skillsboard/stargazers">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/stars/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=dark" />
-      <img alt="GitHub stars" src="https://shieldcn.dev/github/stars/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=light" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/stars/TommyBez/skillsboard.svg?variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=dark" />
+      <img alt="GitHub stars" src="https://shieldcn.dev/github/stars/TommyBez/skillsboard.svg?variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=light" />
     </picture>
   </a>
   <a href="./LICENSE">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/license/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=dark" />
-      <img alt="MIT license" src="https://shieldcn.dev/github/license/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=light" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT-27272a.svg?variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=dark&amp;logo=false" />
+      <img alt="MIT license" src="https://shieldcn.dev/badge/license-MIT-27272a.svg?variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=light&amp;logo=false" />
     </picture>
   </a>
   <a href="https://github.com/TommyBez/skillsboard/actions/workflows/ci.yml">
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/TommyBez/skillsboard.svg?workflow=CI&amp;branch=main&amp;variant=secondary&amp;theme=green&amp;font=geist&amp;mode=dark" />
-      <img alt="CI status" src="https://shieldcn.dev/github/ci/TommyBez/skillsboard.svg?workflow=CI&amp;branch=main&amp;variant=secondary&amp;theme=green&amp;font=geist&amp;mode=light" />
-    </picture>
-  </a>
-  <a href="https://github.com/TommyBez/skillsboard/graphs/contributors">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/contributors/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=dark" />
-      <img alt="GitHub contributors" src="https://shieldcn.dev/github/contributors/TommyBez/skillsboard.svg?variant=secondary&amp;theme=green&amp;font=geist&amp;mode=light" />
+      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/TommyBez/skillsboard.svg?workflow=ci.yml&amp;branch=main&amp;variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=dark" />
+      <img alt="CI status" src="https://shieldcn.dev/github/ci/TommyBez/skillsboard.svg?workflow=ci.yml&amp;branch=main&amp;variant=outline&amp;size=xs&amp;theme=zinc&amp;font=geist&amp;mode=light" />
     </picture>
   </a>
 </p>
@@ -148,14 +142,7 @@ Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signin
 
 Issues and pull requests are welcome. Read [CONTRIBUTING.md](./CONTRIBUTING.md) before making a substantial change, follow the [Code of Conduct](./CODE_OF_CONDUCT.md), and report vulnerabilities through the process in [SECURITY.md](./SECURITY.md).
 
-<p align="center">
-  <a href="https://github.com/TommyBez/skillsboard/graphs/contributors">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/contributors/TommyBez/skillsboard.svg?limit=24&amp;theme=green&amp;font=geist&amp;mode=dark" />
-      <img alt="Skills Board contributors" src="https://shieldcn.dev/contributors/TommyBez/skillsboard.svg?limit=24&amp;theme=green&amp;font=geist&amp;mode=light" />
-    </picture>
-  </a>
-</p>
+See the people who have helped build Skills Board on the [contributors page](https://github.com/TommyBez/skillsboard/graphs/contributors).
 
 ## License
 
