@@ -13,13 +13,28 @@ import { Input } from "@/components/ui/input"
 interface AuthFormProps {
   mode: "sign-in" | "sign-up"
   returnTo?: string
+  /** Resume OAuth/MCP authorize after login (full-page navigation). */
+  continueHref?: string | null
+  /** Query string preserved when switching between sign-in and sign-up. */
+  preserveQuery?: string | null
 }
 
-export function AuthForm({ mode, returnTo = "/library" }: AuthFormProps) {
+export function AuthForm({
+  mode,
+  returnTo = "/library",
+  continueHref = null,
+  preserveQuery = null,
+}: AuthFormProps) {
   const router = useRouter()
   const [error, setError] = useState("")
   const [isPending, setIsPending] = useState(false)
   const isSignUp = mode === "sign-up"
+  const alternateHref = (() => {
+    const path = isSignUp ? "/sign-in" : "/sign-up"
+    if (preserveQuery) return `${path}?${preserveQuery}`
+    if (returnTo !== "/library") return `${path}?returnTo=${encodeURIComponent(returnTo)}`
+    return path
+  })()
 
   async function handleSubmit(formData: FormData) {
     setIsPending(true)
@@ -43,6 +58,10 @@ export function AuthForm({ mode, returnTo = "/library" }: AuthFormProps) {
         : null
       if (redirectUrl) {
         window.location.assign(redirectUrl)
+        return
+      }
+      if (continueHref) {
+        window.location.assign(continueHref)
         return
       }
       router.push(returnTo)
@@ -123,7 +142,7 @@ export function AuthForm({ mode, returnTo = "/library" }: AuthFormProps) {
         {isSignUp ? "Already have an account?" : "New to Skills Board?"}{" "}
         <Link
           className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary"
-          href={`${isSignUp ? "/sign-in" : "/sign-up"}${returnTo !== "/library" ? `?returnTo=${encodeURIComponent(returnTo)}` : ""}`}
+          href={alternateHref}
         >
           {isSignUp ? "Sign in" : "Create an account"}
         </Link>

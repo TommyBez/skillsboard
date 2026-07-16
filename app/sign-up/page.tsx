@@ -4,7 +4,7 @@ import { AccessShell } from "@/components/access-shell"
 import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
 interface SignUpPageProps {
-  searchParams: Promise<{ returnTo?: string }>
+  searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
 export default function SignUpPage({ searchParams }: SignUpPageProps) {

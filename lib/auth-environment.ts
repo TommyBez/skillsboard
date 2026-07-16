@@ -147,3 +147,18 @@ export function getTrustedOrigins():
     return staticOrigins
   }
 }
+
+/**
+ * Single audience for RFC 8707 `resource` on the token endpoint.
+ *
+ * On `@better-auth/oauth-provider` 1.6.x, a multi-entry `validAudiences`
+ * allowlist is unsafe (GHSA-p2fr-6hmx-4528): clients can mint a JWT for any
+ * allow-listed resource without binding it to the authorization grant.
+ * Keep exactly one audience — the MCP resource URL — until upgrading to a
+ * release that binds resources to the grant.
+ */
+export function getOAuthValidAudiences(): string[] | undefined {
+  const base = getAuthBaseUrl()?.replace(/\/$/, "")
+  if (!base) return undefined
+  return [`${base}/api/mcp`]
+}
