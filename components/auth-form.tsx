@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRightIcon } from "lucide-react"
+import posthog from "posthog-js"
 
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
@@ -52,6 +53,17 @@ export function AuthForm({
       if (result.error) {
         setError(result.error.message ?? fallbackError)
         return
+      }
+      const userId = result.data && "user" in result.data && result.data.user && typeof result.data.user === "object" && "id" in result.data.user
+        ? String(result.data.user.id)
+        : null
+      if (userId) {
+        posthog.identify(userId)
+      }
+      if (isSignUp) {
+        posthog.capture("user_signed_up")
+      } else {
+        posthog.capture("user_signed_in")
       }
       const redirectUrl = result.data && "url" in result.data && typeof result.data.url === "string"
         ? result.data.url

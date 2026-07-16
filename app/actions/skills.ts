@@ -8,6 +8,7 @@ import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
 import { skill } from "@/lib/db/schema"
 import { getGitHubMetadata } from "@/lib/github"
+import { getPostHogClient } from "@/lib/posthog-server"
 import { requireActiveOrganization, requireSession } from "@/lib/session"
 
 const skillSchema = z.object({
@@ -46,6 +47,19 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
       note,
     })
     updateTag(cacheTags.organizationSkills(organizationId))
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: userId,
+      event: "skill_saved",
+      properties: {
+        skill_name: parsed.data.skillName,
+        repo_owner: metadata.repoOwner,
+        repo_name: metadata.repoName,
+        tag_count: parsed.data.tags.length,
+        has_note: Boolean(note),
+      },
+    })
+    await posthog.shutdown()
     return { ok: true as const }
   } catch (error) {
     console.error("Unable to save skill", error)
@@ -90,23 +104,51 @@ export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchem
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId), eq(skill.createdBy, userId)))
 
   updateTag(cacheTags.organizationSkills(organizationId))
+  const posthog = getPostHogClient()
+  posthog.capture({
+    distinctId: userId,
+    event: "skill_note_updated",
+    properties: {
+      skill_id: parsed.data.skillId,
+      has_note: Boolean(parsed.data.note),
+    },
+  })
+  await posthog.shutdown()
   return { ok: true as const }
 }
 
 export async function deleteSkill(id: string) {
   const session = await requireSession()
-  const { organizationId } = await requireActiveOrganization(session)
+  const { organizationId, userId } = await requireActiveOrganization(session)
   await db.delete(skill).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
+  const posthog = getPostHogClient()
+  posthog.capture({
+    distinctId: userId,
+    event: "skill_deleted",
+    properties: { skill_id: id },
+  })
+  await posthog.shutdown()
 }
 
 export async function refreshSkill(id: string) {
   const session = await requireSession()
-  const { organizationId } = await requireActiveOrganization(session)
+  const { organizationId, userId } = await requireActiveOrganization(session)
   const [savedSkill] = await db.select().from(skill).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId))).limit(1)
   if (!savedSkill) throw new Error("Skill not found")
   updateTag(cacheTags.githubRepository(savedSkill.repoOwner, savedSkill.repoName))
   const metadata = await getGitHubMetadata(savedSkill.githubUrl)
   await db.update(skill).set({ description: metadata.description, repoStars: metadata.repoStars, repoUpdatedAt: metadata.repoUpdatedAt, metadataRefreshedAt: new Date(), updatedAt: new Date() }).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
+  const posthog = getPostHogClient()
+  posthog.capture({
+    distinctId: userId,
+    event: "skill_refreshed",
+    properties: {
+      skill_id: id,
+      repo_owner: savedSkill.repoOwner,
+      repo_name: savedSkill.repoName,
+    },
+  })
+  await posthog.shutdown()
 }
