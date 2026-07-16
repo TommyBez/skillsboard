@@ -26,15 +26,21 @@ export const auth = betterAuth({
     organization({
       cancelPendingInvitationsOnReInvite: true,
       async sendInvitationEmail(data) {
-        await sendTeamInvitation({
-          invitationId: data.id,
-          email: data.email,
-          role: data.role,
-          teamName: data.organization.name,
-          inviterName: data.inviter.user.name,
-          inviterEmail: data.inviter.user.email,
-          expiresAt: data.invitation.expiresAt,
-        })
+        // Never throw: invitation creation must succeed so callers can return
+        // the invite URL even when Resend is down. UI send path surfaces failures.
+        try {
+          await sendTeamInvitation({
+            invitationId: data.id,
+            email: data.email,
+            role: data.role,
+            teamName: data.organization.name,
+            inviterName: data.inviter.user.name,
+            inviterEmail: data.inviter.user.email,
+            expiresAt: data.invitation.expiresAt,
+          })
+        } catch (error) {
+          console.error("Unable to send invitation email from auth hook", error)
+        }
       },
     }),
     jwt(),
