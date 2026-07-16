@@ -13,7 +13,7 @@
 - After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 
 ### Database schema
-The Neon dev database is already migrated, so no schema work is normally required. Note there is **no drizzle-kit or migration pipeline**: Better Auth tables come from `npx @better-auth/cli@latest migrate` (reads `lib/auth.ts`), the custom `skill` table is created manually to match `lib/db/schema.ts` (drizzle is ORM-only here), and `scripts/fix-oauth-client-schema.sql` is an idempotent OAuth column alignment.
+The Neon dev database is already migrated, so no schema work is normally required. For a new database, `pnpm db:push` reads `.env.local` through `drizzle.config.ts` and pushes every table defined in `lib/db/schema.ts`, including Better Auth and the custom `skill` table. The SQL files under `scripts/` are idempotent alignment fixes retained for older databases; they are not part of a fresh setup.
 
 ### Gotchas
 - `pnpm lint` runs `eslint .`, but ESLint is **not** a declared dependency and there is no ESLint config, so it fails out of the box (not a code problem). For type checking use `npx tsc --noEmit`.
