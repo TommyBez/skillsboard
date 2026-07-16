@@ -52,6 +52,15 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
   const hasFilters = Boolean(query || params.tag)
+  const libraryHref = (next: { q?: string; tag?: string | null }) => {
+    const search = new URLSearchParams()
+    const nextQuery = next.q === undefined ? params.q : next.q
+    const nextTag = next.tag === undefined ? params.tag : next.tag
+    if (nextQuery) search.set("q", nextQuery)
+    if (nextTag) search.set("tag", nextTag)
+    const value = search.toString()
+    return value ? `/library?${value}` : "/library"
+  }
 
   return (
     <>
@@ -64,6 +73,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
               <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, or tag" className="pl-10" />
             </div>
           </div>
+          {params.tag ? <input type="hidden" name="tag" value={params.tag} /> : null}
           <Button type="submit" variant="outline">Search</Button>
         </form>
 
@@ -71,9 +81,9 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
           <nav aria-label="Filter library by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
             <TagsIcon className="mt-2 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
-              <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<Link href="/library" aria-current={!params.tag ? "page" : undefined} />}>All</Button>
+              <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<Link href={libraryHref({ tag: null })} aria-current={!params.tag ? "page" : undefined} />}>All</Button>
               {tags.map((tag) => (
-                <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<Link href={`/library?tag=${encodeURIComponent(tag)}`} aria-current={params.tag === tag ? "page" : undefined} />}>
+                <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<Link href={libraryHref({ tag })} aria-current={params.tag === tag ? "page" : undefined} />}>
                   {tag}
                 </Button>
               ))}

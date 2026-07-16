@@ -2,6 +2,7 @@
 
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
+import { ChevronDownIcon } from "lucide-react"
 
 import { setActiveOrganization } from "@/app/actions/organizations"
 
@@ -21,16 +22,22 @@ export function OrganizationSwitcher({ organizations, activeId }: OrganizationSw
   }
 
   return (
-    <select
-      aria-label="Switch team library"
-      className="h-10 w-32 truncate rounded-xl border border-border bg-card/65 px-3 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-60 sm:w-44"
-      value={activeId}
-      disabled={isPending}
-      onChange={(event) => handleValueChange(event.target.value)}
-    >
-      {organizations.map((organization) => (
-        <option key={organization.id} value={organization.id}>{organization.name}</option>
-      ))}
-    </select>
+    <div className="relative w-32 sm:w-44">
+      <select
+        aria-label="Switch team library"
+        className="h-10 w-full appearance-none truncate rounded-xl border border-border bg-card/65 pl-3 pr-9 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-60"
+        value={activeId}
+        disabled={isPending}
+        onChange={(event) => handleValueChange(event.target.value)}
+      >
+        {organizations.map((organization) => (
+          <option key={organization.id} value={organization.id}>{organization.name}</option>
+        ))}
+      </select>
+      <ChevronDownIcon
+        aria-hidden="true"
+        className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+    </div>
   )
 }
