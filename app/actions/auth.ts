@@ -10,12 +10,16 @@ import { requireSession } from "@/lib/session"
 
 export async function signOut(formData?: FormData) {
   const session = await requireSession()
-  const posthog = getPostHogClient()
-  posthog.capture({
-    distinctId: session.user.id,
-    event: "user_signed_out",
-  })
-  await posthog.shutdown()
   await auth.api.signOut({ headers: await headers() })
+  try {
+    const posthog = getPostHogClient()
+    posthog.capture({
+      distinctId: session.user.id,
+      event: "user_signed_out",
+    })
+    await posthog.shutdown()
+  } catch {
+    // Analytics must not delay or break clearing the session.
+  }
   redirect(safeReturnTo(formData?.get("returnTo"), "/"))
 }

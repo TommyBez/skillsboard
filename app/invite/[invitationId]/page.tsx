@@ -3,9 +3,9 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
-import { signOut } from "@/app/actions/auth"
 import { AcceptInvitationForm } from "@/components/accept-invitation-form"
 import { AccessShell } from "@/components/access-shell"
+import { SignOutForm } from "@/components/sign-out-form"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
@@ -54,12 +54,11 @@ async function InvitationDetails({ params }: InvitationPageProps) {
           <Button variant="outline" size="lg" className="h-12 rounded-[16px] px-6" nativeButton={false} render={<Link href="/library" />}>
             Open your library
           </Button>
-          <form action={signOut}>
-            <input type="hidden" name="returnTo" value={returnTo} />
+          <SignOutForm returnTo={returnTo}>
             <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6">
               Try another account
             </Button>
-          </form>
+          </SignOutForm>
         </div>
       </AccessShell>
     )

@@ -1,11 +1,11 @@
 import Link from "next/link"
 import { LibraryBigIcon, LogOutIcon, SearchIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
 
-import { signOut } from "@/app/actions/auth"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
 import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
+import { SignOutForm } from "@/components/sign-out-form"
 
 interface AppHeaderProps {
   user: { name: string; email: string }
@@ -55,11 +55,11 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
                   </Link>
                 </nav>
                 <div className="border-t border-border p-1">
-                  <form action={signOut}>
+                  <SignOutForm>
                     <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" type="submit">
                       <LogOutIcon className="size-4" aria-hidden="true" />Sign out
                     </button>
-                  </form>
+                  </SignOutForm>
                 </div>
               </div>
             </details>
