@@ -54,6 +54,8 @@ function environmentOrigins(environment: DeploymentEnvironment): string[] {
         // The generated per-deployment URL still serves production traffic
         // when visited directly.
         toOrigin(process.env.VERCEL_URL),
+        // v0/self-hosted runtimes expose only this var, even in production.
+        toOrigin(process.env.V0_RUNTIME_URL),
       ])
     case "preview":
       return uniqueOrigins([
@@ -88,12 +90,14 @@ export function getAuthBaseUrl(): string | undefined {
     case "production":
       return (
         toOrigin(process.env.VERCEL_PROJECT_PRODUCTION_URL) ??
-        toOrigin(process.env.VERCEL_URL)
+        toOrigin(process.env.VERCEL_URL) ??
+        toOrigin(process.env.V0_RUNTIME_URL)
       )
     case "preview":
       return (
         toOrigin(process.env.VERCEL_URL) ??
-        toOrigin(process.env.VERCEL_BRANCH_URL)
+        toOrigin(process.env.VERCEL_BRANCH_URL) ??
+        toOrigin(process.env.V0_RUNTIME_URL)
       )
     case "development":
       return (
