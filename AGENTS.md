@@ -3,30 +3,17 @@
 ## Cursor Cloud specific instructions
 
 ### What this is
-`skillsboard` is a single Next.js 16 (App Router, Turbopack) app — UI + API routes in one process. It has one required backing service: **PostgreSQL**. Auth is Better Auth (email/password + organizations + OAuth/MCP provider). There is no separate backend to run.
+`skillsboard` is a single Next.js 16 (App Router, Turbopack) app — UI + API routes in one process. Its backing store is a **Neon PostgreSQL** database (pulled from Vercel; see below). Auth is Better Auth (email/password + organizations + OAuth/MCP provider). There is no separate backend to run.
 
 ### Running locally
-- PostgreSQL is installed but is **not started automatically** on a fresh VM. Start it before running the app or tests:
-  `sudo pg_ctlcluster 16 main start`
+- Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the development variables (Neon Postgres `DATABASE_URL`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
+  `npx vercel env pull .env.local --environment=development --yes`
+  (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the shared Neon dev database, which is reachable from the VM and already migrated — no local database or schema setup is needed. Set `BETTER_AUTH_URL=http://localhost:3000` in `.env.local` for local auth callbacks.
 - Dev server: `pnpm dev` (serves `http://localhost:3000`). Standard scripts live in `package.json`.
-- Environment lives in `.env.local` (gitignored, so it is not in the repo). Two ways to populate it:
-  - **From Vercel (preferred when `VERCEL_TOKEN` is set):** the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the real development variables (Neon Postgres `DATABASE_URL`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
-    `npx vercel env pull .env.local --environment=development --yes`
-    (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the shared Neon dev database, which is reachable from the VM and already migrated.
-  - **Fully local fallback:** recreate `.env.local` with a local Postgres:
-    ```
-    DATABASE_URL=postgres://skillsboard:skillsboard@127.0.0.1:5432/skillsboard
-    BETTER_AUTH_SECRET=<any 32-byte base64 string, e.g. `openssl rand -base64 32`>
-    BETTER_AUTH_URL=http://localhost:3000
-    ```
-    The local dev database is `skillsboard` owned by role `skillsboard` (password `skillsboard`); start it with `sudo pg_ctlcluster 16 main start`.
 - After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 
-### Database schema (only needed for a brand-new/empty database)
-There is **no drizzle-kit or migration pipeline**. Tables were created once and persist in the DB. To rebuild on a fresh database:
-1. Better Auth tables: `npx @better-auth/cli@latest migrate` (reads `lib/auth.ts`; needs the env vars loaded).
-2. Custom `skill` table: create it manually to match `lib/db/schema.ts` (drizzle is ORM-only here).
-3. Then apply `scripts/fix-oauth-client-schema.sql` (idempotent OAuth column alignment).
+### Database schema
+The Neon dev database is already migrated, so no schema work is normally required. Note there is **no drizzle-kit or migration pipeline**: Better Auth tables come from `npx @better-auth/cli@latest migrate` (reads `lib/auth.ts`), the custom `skill` table is created manually to match `lib/db/schema.ts` (drizzle is ORM-only here), and `scripts/fix-oauth-client-schema.sql` is an idempotent OAuth column alignment.
 
 ### Gotchas
 - `pnpm lint` runs `eslint .`, but ESLint is **not** a declared dependency and there is no ESLint config, so it fails out of the box (not a code problem). For type checking use `npx tsc --noEmit`.
