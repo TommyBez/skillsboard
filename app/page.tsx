@@ -6,6 +6,7 @@ import { Brand } from "@/components/brand"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/session"
 
 function primaryAction(signedIn: boolean) {
@@ -14,7 +15,20 @@ function primaryAction(signedIn: boolean) {
     : { href: "/sign-up", label: "Create your team library" }
 }
 
-function HomeHeaderActionsView({ signedIn = false }: { signedIn?: boolean }) {
+function HomeHeaderActionsFallback() {
+  return (
+    <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
+      <Skeleton className="hidden h-8 w-16 rounded-lg sm:block" />
+      <Skeleton className="h-8 w-28 rounded-lg sm:h-10 sm:w-40" />
+    </nav>
+  )
+}
+
+function HomeCtaFallback() {
+  return <Skeleton className="h-12 w-56 rounded-lg" aria-busy="true" />
+}
+
+function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
@@ -52,7 +66,7 @@ async function HomeHeaderActions() {
   return <HomeHeaderActionsView signedIn={Boolean(session?.user)} />
 }
 
-function HomeHeroActionsView({ signedIn = false }: { signedIn?: boolean }) {
+function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
@@ -73,7 +87,7 @@ async function HomeHeroActions() {
   return <HomeHeroActionsView signedIn={Boolean(session?.user)} />
 }
 
-function HomeFinalActionsView({ signedIn = false }: { signedIn?: boolean }) {
+function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
@@ -119,7 +133,7 @@ export default function HomePage() {
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
-          <Suspense fallback={<HomeHeaderActionsView />}>
+          <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
         </div>
@@ -146,7 +160,7 @@ export default function HomePage() {
               Keep your team&apos;s recommended skills in one place, so everyone knows where to find and use them.
             </p>
             <div className={`${styles.heroCta} mt-7`}>
-              <Suspense fallback={<HomeHeroActionsView />}>
+              <Suspense fallback={<HomeCtaFallback />}>
                 <HomeHeroActions />
               </Suspense>
             </div>
@@ -260,7 +274,7 @@ export default function HomePage() {
             Save the recommendation where the whole team can find it. The next person can get started without asking where to look.
           </p>
           <div className={`${styles.closingCta} mt-8`}>
-            <Suspense fallback={<HomeFinalActionsView />}>
+            <Suspense fallback={<HomeCtaFallback />}>
               <HomeFinalActions />
             </Suspense>
           </div>
