@@ -19,7 +19,6 @@ function OnboardingFormFallback() {
   return (
     <div className="grid gap-5" aria-label="Loading team library setup">
       <Skeleton className="h-20 rounded-2xl" />
-      <Skeleton className="h-20 rounded-2xl" />
       <Skeleton className="mt-2 h-12 w-48 rounded-2xl" />
     </div>
   )

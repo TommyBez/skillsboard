@@ -9,6 +9,7 @@ import {
   getOAuthValidAudiences,
   getTrustedOrigins,
 } from "@/lib/auth-environment"
+import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
 import { pool } from "@/lib/db"
 import { oauthScopes } from "@/lib/oauth-scopes"
 
@@ -22,7 +23,20 @@ export const auth = betterAuth({
   trustedOrigins: getTrustedOrigins(),
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
   plugins: [
-    organization({ cancelPendingInvitationsOnReInvite: true }),
+    organization({
+      cancelPendingInvitationsOnReInvite: true,
+      async sendInvitationEmail(data) {
+        await sendTeamInvitation({
+          invitationId: data.id,
+          email: data.email,
+          role: data.role,
+          teamName: data.organization.name,
+          inviterName: data.inviter.user.name,
+          inviterEmail: data.inviter.user.email,
+          expiresAt: data.invitation.expiresAt,
+        })
+      },
+    }),
     jwt(),
     oauthProvider({
       loginPage: "/sign-in",

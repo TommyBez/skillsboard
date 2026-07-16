@@ -63,3 +63,13 @@ export async function getUserSkill(userId: string, skillId: string) {
 export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }
+
+export async function organizationSlugExists(slug: string) {
+  const [existing] = await db
+    .select({ id: organization.id })
+    .from(organization)
+    .where(eq(organization.slug, slug))
+    .limit(1)
+
+  return Boolean(existing)
+}

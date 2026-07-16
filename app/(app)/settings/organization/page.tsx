@@ -91,13 +91,13 @@ async function InvitationPanel() {
         <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Invitation</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">Invite a teammate</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Create a private invite link and share it yourself. Skills Board does not send an email.
+          Enter a teammate&apos;s email and we&apos;ll send an invitation. You can also copy the invite link as a backup.
         </p>
       </div>
       {canInvite ? (
         <InviteMemberForm />
       ) : (
-        <p className="mt-6 border-t pt-5 text-sm text-muted-foreground">Only team owners and admins can create invite links.</p>
+        <p className="mt-6 border-t pt-5 text-sm text-muted-foreground">Only team owners and admins can send invitations.</p>
       )}
     </section>
   )

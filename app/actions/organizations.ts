@@ -5,6 +5,8 @@ import { redirect } from "next/navigation"
 import { z } from "zod"
 
 import { auth, getAuthBaseUrl } from "@/lib/auth"
+import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
+import { resolveUniqueOrganizationSlug } from "@/lib/organization-slug"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
@@ -12,6 +14,7 @@ export interface CreateOrganizationState {
 }
 
 export interface CreateInvitationLinkState {
+  emailError: string
   error: string
   expiresAt: string
   invitedEmail: string
@@ -23,9 +26,8 @@ export interface AcceptInvitationState {
   error: string
 }
 
-const organizationSchema = z.object({
-  name: z.string().trim().min(2).max(80),
-  slug: z.string().trim().min(2).max(80).regex(/^[a-z0-9-]+$/),
+const organizationNameSchema = z.object({
+  name: z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less."),
 })
 
 export async function createOrganization(
@@ -33,21 +35,30 @@ export async function createOrganization(
   formData: FormData,
 ): Promise<CreateOrganizationState> {
   await requireSession()
-  const parsed = organizationSchema.safeParse({
+  const parsed = organizationNameSchema.safeParse({
     name: formData.get("name"),
-    slug: formData.get("slug"),
   })
 
   if (!parsed.success) {
-    return { error: "Check the team name and choose a unique ID using lowercase letters, numbers, or dashes." }
+    return { error: parsed.error.issues[0]?.message ?? "Enter a valid team name." }
   }
 
+  const slug = await resolveUniqueOrganizationSlug(parsed.data.name)
+
   try {
-    const created = await auth.api.createOrganization({ headers: await headers(), body: parsed.data })
-    if (!created) return { error: "We couldn’t create your team library. Try a different team ID." }
+    const created = await auth.api.createOrganization({
+      headers: await headers(),
+      body: { name: parsed.data.name, slug },
+    })
+    if (!created?.id) return { error: "We couldn’t create your team library. Please try again." }
+
+    await auth.api.setActiveOrganization({
+      headers: await headers(),
+      body: { organizationId: created.id },
+    })
   } catch (error) {
     console.error("Unable to create team library", error)
-    return { error: "We couldn’t create your team library. Try a different team ID or try again." }
+    return { error: "We couldn’t create your team library. Please try again." }
   }
 
   redirect("/library")
@@ -71,24 +82,60 @@ export async function createInvitationLink(
     role: formData.get("role") ?? "member",
   })
 
-  if (!parsed.success) return { error: "Enter a valid email address and role.", expiresAt: "", invitedEmail: "", inviteUrl: "", role: "" }
+  if (!parsed.success) {
+    return {
+      emailError: "",
+      error: "Enter a valid email address and role.",
+      expiresAt: "",
+      invitedEmail: "",
+      inviteUrl: "",
+      role: "",
+    }
+  }
 
   try {
+    const requestHeaders = await headers()
     const invitation = await auth.api.createInvitation({
-      headers: await headers(),
+      headers: requestHeaders,
       body: parsed.data,
     })
+    const inviteUrl = new URL(`/invite/${invitation.id}`, getAuthBaseUrl()).toString()
+    const session = await getSession()
+    const inviterName = session?.user.name ?? "A team admin"
+    const inviterEmail = session?.user.email ?? ""
+    const organization = await auth.api.getFullOrganization({ headers: requestHeaders })
+    const teamName = organization?.name ?? "your team"
+
+    let emailError = ""
+    try {
+      await sendTeamInvitation({
+        invitationId: invitation.id,
+        email: invitation.email,
+        role: parsed.data.role,
+        teamName,
+        inviterName,
+        inviterEmail,
+        expiresAt: invitation.expiresAt,
+      })
+    } catch (sendError) {
+      console.error("Unable to send invitation email", sendError)
+      emailError =
+        "The invitation was created, but the email could not be sent. Share the invite link below instead."
+    }
+
     return {
+      emailError,
       error: "",
       expiresAt: invitation.expiresAt.toISOString(),
       invitedEmail: invitation.email,
-      inviteUrl: new URL(`/invite/${invitation.id}`, getAuthBaseUrl()).toString(),
+      inviteUrl,
       role: parsed.data.role,
     }
   } catch (error) {
     console.error("Unable to create invitation link", error)
     return {
-      error: "We couldn’t create the invite link. Check the email and your team permissions, then try again.",
+      emailError: "",
+      error: "We couldn’t create the invite. Check the email and your team permissions, then try again.",
       expiresAt: "",
       invitedEmail: "",
       inviteUrl: "",
