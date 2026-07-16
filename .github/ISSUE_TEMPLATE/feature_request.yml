@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose a focused improvement to Skills Board.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the team workflow or repeated friction, not only the proposed UI.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed direction
+      description: Explain the smallest change that would solve the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Share current workarounds or other approaches you evaluated.
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add public examples, mockups, or relevant constraints.
+
+  - type: checkboxes
+    id: product-contract
+    attributes:
+      label: Product fit
+      options:
+        - label: This keeps saved skills as team recommendations rather than security or compatibility certifications.
+          required: true

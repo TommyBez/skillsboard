@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible problem in Skills Board.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for taking the time to report a problem. Do not include secrets, private skill content, or personal data.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the actual behavior and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: How can we reproduce it?
+      description: Provide the smallest safe sequence of steps, sample repository, or public reproduction.
+      placeholder: |
+        1. Go to …
+        2. Choose …
+        3. See …
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Hosted or self-hosted, commit/version, browser, OS, Node.js, and database where relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Additional evidence
+      description: Add sanitized logs, screenshots, or links to public examples.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I removed secrets, personal data, and private repository content.
+          required: true
+        - label: This is not a security vulnerability.
+          required: true

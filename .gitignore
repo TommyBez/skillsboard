@@ -8,6 +8,7 @@ __v0_jsx-dev-runtime.ts
 
 # Environment variables
 .env*.local
+!.env.example
 
 # Common ignores
 node_modules
@@ -17,3 +18,4 @@ next-env.d.ts
 .DS_Store
 .vercel
 .env*
+!.env.example
