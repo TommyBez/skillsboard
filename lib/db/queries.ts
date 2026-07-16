@@ -29,6 +29,7 @@ export async function listUserSkills(userId: string) {
       repoUpdatedAt: skill.repoUpdatedAt,
       skillPath: skill.skillPath,
       tags: skill.tags,
+      note: skill.note,
       createdAt: skill.createdAt,
       updatedAt: skill.updatedAt,
     })
