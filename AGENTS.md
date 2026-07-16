@@ -9,13 +9,18 @@
 - PostgreSQL is installed but is **not started automatically** on a fresh VM. Start it before running the app or tests:
   `sudo pg_ctlcluster 16 main start`
 - Dev server: `pnpm dev` (serves `http://localhost:3000`). Standard scripts live in `package.json`.
-- Environment lives in `.env.local` (gitignored, so it is not in the repo). If it is missing, recreate it with:
-  ```
-  DATABASE_URL=postgres://skillsboard:skillsboard@127.0.0.1:5432/skillsboard
-  BETTER_AUTH_SECRET=<any 32-byte base64 string, e.g. `openssl rand -base64 32`>
-  BETTER_AUTH_URL=http://localhost:3000
-  ```
-  The local dev database is `skillsboard` owned by role `skillsboard` (password `skillsboard`).
+- Environment lives in `.env.local` (gitignored, so it is not in the repo). Two ways to populate it:
+  - **From Vercel (preferred when `VERCEL_TOKEN` is set):** the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the real development variables (Neon Postgres `DATABASE_URL`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
+    `npx vercel env pull .env.local --environment=development --yes`
+    (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the shared Neon dev database, which is reachable from the VM and already migrated.
+  - **Fully local fallback:** recreate `.env.local` with a local Postgres:
+    ```
+    DATABASE_URL=postgres://skillsboard:skillsboard@127.0.0.1:5432/skillsboard
+    BETTER_AUTH_SECRET=<any 32-byte base64 string, e.g. `openssl rand -base64 32`>
+    BETTER_AUTH_URL=http://localhost:3000
+    ```
+    The local dev database is `skillsboard` owned by role `skillsboard` (password `skillsboard`); start it with `sudo pg_ctlcluster 16 main start`.
+- After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 
 ### Database schema (only needed for a brand-new/empty database)
 There is **no drizzle-kit or migration pipeline**. Tables were created once and persist in the DB. To rebuild on a fresh database:
