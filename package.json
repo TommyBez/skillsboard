@@ -4,7 +4,7 @@
   "description": "A shared library for the AI skills your team recommends.",
   "private": true,
   "license": "MIT",
-  "homepage": "https://skillstack-beta.vercel.app",
+  "homepage": "https://skillsboard.sh",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TommyBez/skillsboard.git"

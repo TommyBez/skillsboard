@@ -10,6 +10,17 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 export const metadata: Metadata = {
   title: { default: "Skills Board, your team’s recommended AI skills", template: "%s | Skills Board" },
   description: "Build a shared library of AI skills your team recommends. Give teammates the source, command, or ZIP so they can choose what fits their setup.",
+  openGraph: {
+    type: "website",
+    title: "Skills Board — One shared library. Different agents.",
+    description: "Keep your team’s recommended AI skills in one searchable place.",
+    siteName: "Skills Board",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Skills Board — One shared library. Different agents.",
+    description: "Keep your team’s recommended AI skills in one searchable place.",
+  },
 }
 
 export const viewport: Viewport = { themeColor: "#101711", userScalable: true }

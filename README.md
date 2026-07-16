@@ -31,7 +31,7 @@
 </p>
 
 <p align="center">
-  <a href="https://skillstack-beta.vercel.app"><strong>Try the hosted app</strong></a>
+  <a href="https://skillsboard.sh"><strong>Try the hosted app</strong></a>
   ·
   <a href="#run-locally">Run it locally</a>
   ·
