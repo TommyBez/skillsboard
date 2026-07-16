@@ -148,43 +148,17 @@ export function getTrustedOrigins():
   }
 }
 
-function withWwwApexVariants(origins: string[]): string[] {
-  return uniqueOrigins(
-    origins.flatMap((origin) => {
-      try {
-        const url = new URL(origin)
-        if (isLoopbackOrigin(origin)) return [origin]
-        if (url.hostname.startsWith("www.")) {
-          const apex = new URL(origin)
-          apex.hostname = apex.hostname.slice(4)
-          return [origin, apex.origin]
-        }
-        if (url.hostname.includes(".")) {
-          const www = new URL(origin)
-          www.hostname = `www.${www.hostname}`
-          return [origin, www.origin]
-        }
-      } catch {
-        // ignore malformed origins
-      }
-      return [origin]
-    }),
-  )
-}
-
 /**
- * Audiences accepted for RFC 8707 `resource` on the token endpoint.
- * MCP clients request `{origin}/api/mcp`; without this list the provider
- * rejects that resource and issues tokens the MCP handler cannot verify.
+ * Single audience for RFC 8707 `resource` on the token endpoint.
+ *
+ * On `@better-auth/oauth-provider` 1.6.x, a multi-entry `validAudiences`
+ * allowlist is unsafe (GHSA-p2fr-6hmx-4528): clients can mint a JWT for any
+ * allow-listed resource without binding it to the authorization grant.
+ * Keep exactly one audience — the MCP resource URL — until upgrading to a
+ * release that binds resources to the grant.
  */
 export function getOAuthValidAudiences(): string[] | undefined {
-  const bases = withWwwApexVariants(
-    uniqueOrigins([
-      toOrigin(process.env.BETTER_AUTH_URL),
-      getAuthBaseUrl(),
-      ...environmentOrigins(getDeploymentEnvironment()),
-    ]),
-  )
-  if (bases.length === 0) return undefined
-  return bases.flatMap((base) => [base, `${base}/api/mcp`])
+  const base = getAuthBaseUrl()?.replace(/\/$/, "")
+  if (!base) return undefined
+  return [`${base}/api/mcp`]
 }
