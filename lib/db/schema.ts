@@ -175,6 +175,7 @@ export const skill = pgTable("skill", {
   repoUpdatedAt: timestamp("repoUpdatedAt"),
   skillPath: text("skillPath"),
   tags: text("tags").array().notNull().default([]),
+  note: text("note"),
   metadataRefreshedAt: timestamp("metadataRefreshedAt").notNull().defaultNow(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),

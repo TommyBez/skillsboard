@@ -47,7 +47,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const allSkills = await listOrganizationSkills(activeId)
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
-    (!query || `${item.title} ${item.description ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
+    (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
     && (!params.tag || item.tags.includes(params.tag))
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
@@ -70,7 +70,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
             <label htmlFor="library-search" className="text-sm font-semibold">Search team library</label>
             <div className="relative">
               <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, or tag" className="pl-10" />
+              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, note, or tag" className="pl-10" />
             </div>
           </div>
           {params.tag ? <input type="hidden" name="tag" value={params.tag} /> : null}
@@ -104,6 +104,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 headingLevel="h2"
                 name={item.title}
                 description={item.description ?? `${item.repoOwner}/${item.repoName}`}
+                note={item.note}
                 source={`${item.repoOwner}/${item.repoName}`}
                 command={command}
                 metric={`${item.repoStars.toLocaleString()} ${item.repoStars === 1 ? "star" : "stars"}`}

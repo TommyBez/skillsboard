@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 interface SkillDossierProps {
   name: string
   description?: string | null
+  note?: string | null
   source: string
   command: string
   metric?: string
@@ -25,6 +26,7 @@ interface SkillDossierProps {
 export function SkillDossier({
   name,
   description,
+  note,
   source,
   command,
   metric,
@@ -67,6 +69,11 @@ export function SkillDossier({
           {description ? (
             <p className={cn("text-pretty leading-relaxed text-muted-foreground", compact ? "line-clamp-2 text-sm" : "line-clamp-3 text-sm md:text-base")}>
               {description}
+            </p>
+          ) : null}
+          {note ? (
+            <p className={cn("border-l-2 border-primary/50 pl-3 text-pretty leading-relaxed text-foreground/90", compact ? "line-clamp-2 text-sm" : "line-clamp-4 text-sm md:text-base")}>
+              {note}
             </p>
           ) : null}
         </div>

@@ -14,6 +14,7 @@ const skillSchema = z.object({
   githubUrl: z.url(),
   skillName: z.string().trim().min(1).max(100),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).default([]),
+  note: z.string().trim().max(500).optional(),
 })
 
 export async function addSkill(input: z.input<typeof skillSchema>) {
@@ -22,13 +23,14 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
   const parsed = skillSchema.safeParse(input)
 
   if (!parsed.success) {
-    return { ok: false as const, error: "Check the repository URL, skill name, and tags, then try again." }
+    return { ok: false as const, error: "Check the repository URL, skill name, tags, and note, then try again." }
   }
 
   try {
     const metadata = await getGitHubMetadata(parsed.data.githubUrl)
     const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, metadata.githubUrl), eq(skill.skillName, parsed.data.skillName))).limit(1)
     if (existing.length) return { ok: false as const, error: "This skill is already in your team library" }
+    const note = parsed.data.note || null
     await db.insert(skill).values({
       organizationId,
       createdBy: userId,
@@ -41,6 +43,7 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
       repoStars: metadata.repoStars,
       repoUpdatedAt: metadata.repoUpdatedAt,
       tags: [...new Set(parsed.data.tags.map((tag) => tag.toLowerCase()))],
+      note,
     })
     updateTag(cacheTags.organizationSkills(organizationId))
     return { ok: true as const }

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 
 interface AddSkillDialogProps {
   defaultUrl?: string
@@ -36,10 +37,12 @@ export function AddSkillDialog({
   async function handleSubmit(formData: FormData) {
     setIsPending(true)
     try {
+      const note = String(formData.get("note") ?? "").trim()
       const result = await addSkill({
         githubUrl: String(formData.get("githubUrl")),
         skillName: String(formData.get("skillName")),
         tags: String(formData.get("tags") ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
+        ...(note ? { note } : {}),
       })
       if (!result.ok) {
         toast.error(result.error)
@@ -68,7 +71,7 @@ export function AddSkillDialog({
             </span>
             <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Save a skill</DialogTitle>
             <DialogDescription className="max-w-md leading-relaxed">
-              Add its repository and skill name. Skills Board keeps the latest source, install command, and ZIP together.
+              Add its repository, skill name, and an optional note for your team. Skills Board keeps the latest source, install command, and ZIP together.
             </DialogDescription>
           </DialogHeader>
 
@@ -81,6 +84,11 @@ export function AddSkillDialog({
               <FieldLabel htmlFor="skillName">Skill name</FieldLabel>
               <Input id="skillName" name="skillName" defaultValue={defaultName} placeholder="find-skills" required />
               <FieldDescription>This becomes the value after --skill in the install command.</FieldDescription>
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="note">Note (optional)</FieldLabel>
+              <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />
+              <FieldDescription>Shared with your team in the library. Up to 500 characters.</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="tags">Tags (optional)</FieldLabel>
