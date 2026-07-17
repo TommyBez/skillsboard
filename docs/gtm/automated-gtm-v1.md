@@ -232,14 +232,22 @@ The automation is not live merely because it is scheduled. The production creden
 ### Loop 0 — Full-funnel router and tracking QA
 
 - **Check cadence:** Monday 09:00 Europe/Rome and after relevant analytics changes.
-- **Acts when:** Always refreshes the scorecard; opens a diagnostic only when data is trustworthy, a decision threshold is met, and no diagnostic or experiment is already open.
+- **Acts when:** Always refreshes the scorecard; opens a diagnostic only when data is trustworthy, a decision threshold is met, and no diagnostic, implementation, experiment, or overlapping PR is already open. A directly evidenced repository-fixable Tracking QA defect may route only a tracking-repair PR.
 - **Purpose:** Show the whole growth system and choose the single highest-leverage evidenced constraint.
 - **Skills used:** analytics, marketing-plan, marketing-loops, plus the selected stage skill only after routing.
 - **Body:** run `pnpm gtm:pulse:data`; validate and consume only the generated JSON; calculate all five scorecard rows and `ΔAAT` from `available` values; exclude unavailable, broken, or immature stages; apply downstream health gates before any Acquisition scaling action; then select the largest eligible constraint by absolute teams affected and strength of evidence.
 - **Self-check:** environment and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
-- **State / idempotency:** schema version, last successful run, metric snapshots, per-stage status, one open diagnostic, one in-flight experiment, pending human decisions, signal hashes, and cooldowns.
+- **State / idempotency:** schema version, last successful run, metric snapshots, per-stage status, one open diagnostic, one in-flight experiment, one open pulse PR, pending human decisions, signal hashes, and cooldowns.
 - **Stop / bail-out:** broken or stale data makes Tracking QA the only action. No owner means no experiment. Four unanswered weekly recommendations pause action modules; the heartbeat may continue monthly.
-- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, data quality, one routed constraint, its owner, and the next success check.
+- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, data quality, one routed constraint, its owner, the next success check, and—when implementation qualifies—the draft PR URL plus verification and revert checks.
+
+### Controlled implementation and PR gate
+
+The pulse may implement only its single routed constraint. Eligible work is either a repository-fixable product or Tracking QA defect proven by source inspection plus a reproducible check, or one bounded experiment whose data, maturity, threshold, ownership, and concurrency gates all pass. Broken Tracking QA blocks growth implementations and permits only a directly evidenced tracking repair.
+
+Before editing, the pulse requires a clean checkout on the synchronized repository default branch and no overlapping local-state or GitHub PR. It creates a `codex/gtm-<slug>` branch, makes one small reversible change, adds focused tests, and runs relevant tests, typecheck, and proportionate build or browser verification. A different base branch, failed verification, unrelated changes, or suspected secrets stop the workflow before push.
+
+After verification it may commit, push, and open a **draft** PR containing the aggregate evidence, routed metric and window, root cause, scope, tests, observation window, success check, and kill/revert check. It records the PR in non-PII state so later runs update instead of duplicate it. The pulse never marks its PR ready, approves, merges, deploys, or directly changes production configuration. Auth, authorization, billing, secrets, destructive migrations, pricing, the free-forever promise, outbound communication, spend, and production configuration remain human-gated.
 
 ### Diagnostic modules — dormant until routed
 
@@ -254,7 +262,7 @@ These are one-shot branches of Loop 0, not independent scheduled loops. They inh
 | Revenue / sustainability | Weekly digest shows the latest monthly snapshot with `as_of`; route only on a cost-cap breach or during the quarterly review. | Separate cash coverage, fully loaded cost, acquisition cost, and explicit economic-demand signals. | Incomplete costs; it never competes by “teams affected”; any pricing, spend, or free-forever change always escalates. |
 | Experiment / learning | Only after a human accepts the routed diagnostic. | One hypothesis, owner, success check, result, and postmortem. | Never start while another experiment is in flight. |
 
-No module sends, publishes, spends, changes production, or stores raw PII. A loop earns continued operation only when its output produces a decision and a verifiable learning.
+No module sends, publishes, spends, merges, deploys, changes production directly, or stores raw PII. An eligible module may prepare one reviewable draft PR; a loop earns continued operation only when its output produces a decision and a verifiable learning.
 
 ## 8. 30 / 60 / 90 day roadmap
 
@@ -270,9 +278,10 @@ No module sends, publishes, spends, changes production, or stores raw PII. A loo
 |---|---|---|
 | Full-funnel read, QA, score, draft, and report | Responsible | Accountable |
 | Select one diagnostic from evidenced constraints | Recommends | Approves priority and owner |
+| Bounded repository implementation | Creates tested branch, commit, and draft PR when gates pass | Reviews, marks ready, merges, and deploys |
 | Positioning and creative direction | Support | Responsible and accountable |
 | Public replies, outreach, publishing | Draft only | Approves and sends |
-| Product nudges | Eligible after QA and bounded rules | Approves experiment |
+| Product nudges | May prepare a draft PR after QA and bounded rules | Approves experiment, merge, and deployment |
 | Email sends | Disabled until compliance foundation | Approves audience, copy, and send |
 | Spend or budget movement | Disabled | Responsible and accountable |
 | Pricing, monetization, or free-forever changes | Disabled | Responsible and accountable |

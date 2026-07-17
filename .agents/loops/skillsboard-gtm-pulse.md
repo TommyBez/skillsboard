@@ -12,13 +12,15 @@ Monday 09:00 Europe/Rome. Run an additional Tracking QA check after changes to a
 
 ## Acts when
 
-Always refresh the scorecard when sources are available. Recommend an action only when:
+Always refresh the scorecard when sources are available. Recommend or implement a growth action only when:
 
 - Tracking QA passes;
 - the stage has a mature cohort and a valid denominator;
 - a verified defect exists, at least three teams share the issue, or the pattern repeats in two comparable windows;
 - an owner is assigned;
 - no diagnostic, experiment, or unanswered human decision is already open.
+
+A repository-fixable Tracking QA defect is the only exception to the first gate: the pulse may open a draft repair PR when source inspection plus a reproducible check proves the defect. It must not use broken tracking to justify a growth experiment.
 
 With fewer than 30 eligible teams, use absolute counts and qualitative evidence. A single team is a case to understand, not a percentage trend.
 
@@ -51,8 +53,9 @@ The pulse is not live until those query credentials are present, the runner has 
 6. Exclude stages without instrumentation, mature cohorts, a valid denominator, or `available` required inputs.
 7. If a verified product defect exists, route it before marketing work. Before routing an Acquisition scaling action, require Activation and Retention health gates to pass; if they fail, the failing downstream stage owns the constraint. Among the remaining eligible stages, select the issue with the strongest evidence and largest absolute number of teams affected. Sustainability enters routing only on a cost-cap breach or during its quarterly review.
 8. Run only the selected diagnostic module. Public demand-signal scanning is Acquisition work and runs only when Acquisition is selected or during a monthly research refresh.
-9. Recommend one action with owner, expected metric, observation window, and success/kill check. If none qualifies, report `no action`.
-10. Update state only after a successful run and append a minimal non-PII run log.
+9. If the single routed constraint is a verified repository-fixable defect, or a bounded experiment passes every data, maturity, threshold, ownership, and concurrency gate, implement one coherent change on a `codex/gtm-<slug>` branch. Add focused tests, run proportionate verification, inspect the final diff, then commit, push, and open a draft PR. Never push when verification fails.
+10. Otherwise recommend one action with owner, expected metric, observation window, and success/kill check. If none qualifies, report `no action`.
+11. Update state only after a successful run, record any open PR so later runs update rather than duplicate it, and append a minimal non-PII run log.
 
 ## Full-funnel scorecard output
 
@@ -82,6 +85,7 @@ The modules are one-shot branches of this router, not separately scheduled loops
 
 - Read repository, read-only analytics, aggregate infrastructure cost data, and permitted public sources.
 - Verify, reconcile, calculate, diff, score, deduplicate, draft, and stage work.
+- Implement one small, reversible, repository-scoped change after its gates pass; create a branch, run tests, commit, push, and open a draft PR.
 - Create at most five qualified public signals when Acquisition is routed.
 - Persist non-PII state in `.agents/loops/skillsboard-gtm-pulse.json` and append one run line to `.agents/loops/skillsboard-gtm-pulse.log`.
 
@@ -89,7 +93,8 @@ The modules are one-shot branches of this router, not separately scheduled loops
 
 - Sending outreach, lifecycle email, or referral asks.
 - Posting publicly, replying in a community, opening third-party issues, or publishing content.
-- Changing production configuration or product nudges.
+- Marking a pulse-created PR ready, approving it, merging it, deploying it, or changing production configuration directly.
+- Implementing changes to auth, authorization, billing, secrets, destructive database migrations, pricing, the free-forever promise, outbound communication, or spend without an explicit human decision.
 - Spending money, moving budget, changing pricing, or changing the free-forever promise.
 - Using testimonials, case studies, or personal data.
 
@@ -116,6 +121,7 @@ State schema version 2 contains:
 - data-health results and metric snapshots;
 - per-stage status for all five stages;
 - at most one `open_diagnostic` and one `in_flight_experiment`;
+- at most one `open_pull_request` with number, URL, branch, diagnostic key, and status;
 - pending human decisions;
 - handled public-signal hashes plus per-module attempts and cooldowns for Activation, Retention research, Referral, and Acquisition sources.
 
@@ -129,6 +135,7 @@ The diagnostic key is `stage + metric + cohort/window`; update it rather than cr
 - Missing internal/test exclusion keeps quantitative conclusions report-only.
 - No mature cohort, no qualified signal, no operational Acquisition contract, or no threshold breach means `no action`.
 - No owner means no experiment.
+- A dirty worktree, a checkout that is not the synchronized default branch, an overlapping PR, unrelated diff, secret exposure, or failed verification blocks edits, commit, push, and PR creation.
 - Four runs without a human decision pause action modules; keep only a monthly heartbeat.
 - Retire a module after six to eight unused outputs or repeated `acted=0` runs.
 - Any uncertainty about consent, privacy, platform terms, spend, public voice, or business-model changes stops action and escalates to a human.
@@ -140,8 +147,9 @@ The diagnostic key is `stage + metric + cohort/window`; update it rather than cr
 3. `AAT-28` decomposition and `ΔAAT` when trustworthy.
 4. The single routed constraint, or `no action`, with evidence and threshold.
 5. One recommended action with owner, observation window, success check, and kill check.
-6. Acquisition signals only when that module ran, at most five with source, score, reason, and dedupe status.
-7. `checked`, `acted`, and a short non-PII run note.
+6. When implementation qualified: branch, commit, draft PR URL, verification run, and revert check; otherwise the exact gate that prevented implementation.
+7. Acquisition signals only when that module ran, at most five with source, score, reason, and dedupe status.
+8. `checked`, `acted`, and a short non-PII run note.
 
 ## Kill switch
 
