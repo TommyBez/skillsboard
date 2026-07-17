@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { ArrowUpRightIcon, BracesIcon, GitForkIcon } from "lucide-react"
+import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
 import { Badge } from "@/components/ui/badge"
@@ -97,15 +97,18 @@ export function SkillDossier({
 
       <div className="border-t border-border bg-muted/40 p-3 md:p-4">
         <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-background/75 p-2 pl-3">
-          <BracesIcon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
-          <code className="min-w-0 flex-1 truncate font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
-          <CopyButton
-            value={command}
-            ariaLabel={`Copy install command for ${name}`}
-            copiedAriaLabel={`Copied install command for ${name}`}
-            compact
-            iconOnly
-          />
+          <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <code className="block whitespace-nowrap font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
+          </div>
+          <div className="shrink-0">
+            <CopyButton
+              value={command}
+              ariaLabel={`Copy install command for ${name}`}
+              copiedAriaLabel={`Copied install command for ${name}`}
+              compact
+              iconOnly
+            />
+          </div>
         </div>
         {href || actions ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
