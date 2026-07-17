@@ -103,12 +103,12 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `DATABASE_URL` | Yes | PostgreSQL connection string used by Better Auth and Drizzle. |
 | `BETTER_AUTH_SECRET` | Yes | Secret used to sign and encrypt authentication data. |
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
-| `RESEND_API_KEY` | No | Sends team invitation emails through Resend. |
-| `EMAIL_FROM` | No | Verified sender used for invitation emails. |
+| `RESEND_API_KEY` | Yes for email auth | Sends sign-in OTP and team invitation emails through Resend. |
+| `EMAIL_FROM` | Recommended | Verified sender used for OTP and invitation emails. |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
-Without Resend, invitations can still be created and their links copied manually. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
+Sign-in and sign-up use email one-time codes (no passwords). Without Resend, OTP delivery fails and invitations can still be created with links copied manually. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
 
 ## MCP access
 
@@ -120,7 +120,7 @@ Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signin
 | --- | --- |
 | Application | Next.js 16 App Router, React 19, TypeScript |
 | UI | Tailwind CSS 4, shadcn/ui, Base UI |
-| Authentication | Better Auth with organizations and OAuth provider support |
+| Authentication | Better Auth (email OTP) with organizations and OAuth provider support |
 | Data | PostgreSQL, Drizzle ORM |
 | Email | Resend and React Email |
 | Agent access | Model Context Protocol via `mcp-handler` |

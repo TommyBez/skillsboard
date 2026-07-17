@@ -6,7 +6,7 @@ import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to open the shared library of skills your team recommends.",
+  description: "Sign in with a one-time email code to open the shared library of skills your team recommends.",
   robots: {
     index: false,
     follow: false,
@@ -22,7 +22,7 @@ export default function SignInPage({ searchParams }: SignInPageProps) {
     <AccessShell
       marker="Sign in"
       title="Welcome back"
-      description="Open the shared library of skills your team recommends."
+      description="We’ll email you a one-time code to open your team’s shared skill library."
       editorialTitle="Your team’s recommendations, ready when you need them."
       editorialBody="Find a skill a colleague has already added, then choose the source, install command, or ZIP that suits your setup."
     >

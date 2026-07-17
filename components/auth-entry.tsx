@@ -49,7 +49,6 @@ export function AuthEntryFallback({ mode }: Pick<AuthEntryProps, "mode">) {
     <div className="grid gap-4" aria-label={mode === "sign-up" ? "Loading account creation form" : "Loading sign in form"}>
       {mode === "sign-up" ? <Skeleton className="h-20 rounded-[16px]" /> : null}
       <Skeleton className="h-20 rounded-[16px]" />
-      <Skeleton className="h-20 rounded-[16px]" />
       <Skeleton className="h-12 rounded-[16px]" />
     </div>
   )
