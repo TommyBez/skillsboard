@@ -3,7 +3,7 @@
 
 The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. PostHog is initialized on the client via `instrumentation-client.ts`, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. A shared `lib/posthog-server.ts` helper provides the `posthog-node` client for server-side captures. User identification is performed client-side after successful auth and for returning protected-app visitors, while sign-out resets the client identity. Server events use `flushAt: 1` and `flushInterval: 0` so events flush before short-lived handlers exit.
 
-The full-funnel hardening pass adds a global allowlist-based URL and property sanitizer, drops pageviews on invite/auth/consent routes in both PostHog and Vercel Analytics, disables generic autocapture, exception capture, and session replay, respects Do Not Track, and adds `analytics_schema_version` plus one build-time `deployment_environment` value to client and server events. Automatic PostHog pageviews remain enabled on non-sensitive routes.
+The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Client and server events also receive `analytics_schema_version` plus one build-time `deployment_environment` value.
 
 The client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host only send events; they do not authorize analytics queries. GTM pulse reads require a separate server/local-only Personal API Key with minimum `Query Read`, the PostHog project ID, and the regional API host.
 
@@ -72,8 +72,8 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [ ] Add `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example` and any bootstrap scripts so collaborators know what to set.
 - [ ] Wire source-map upload (`posthog-cli sourcemap` or your bundler's upload step) into CI so production stack traces de-minify in PostHog Error Tracking.
 - [x] Returning signed-in visitors call `posthog.identify()` from the protected app shell.
-- [x] Sensitive route pageviews are dropped and remaining URLs/properties are allowlist-sanitized before client analytics events are sent.
-- [x] Generic autocapture and session replay are disabled; explicit semantic events remain.
+- [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.
+- [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating the production scorecard as launch-ready.
 - [x] Define, live-parse, and API-execute versioned team-level HogQL for Activation and `AAT-28` state transitions; Retention now fails closed as `unavailable` until historical activation milestones are reconciled.
 - [x] Configure server/local-only PostHog query access, validate `pnpm gtm:pulse:data` against production, and complete an artifact-only dry run; it correctly remains in Tracking QA until schema-v2 events are deployed and healthy.

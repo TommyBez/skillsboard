@@ -8,97 +8,66 @@ const ALLOWED_MARKETING_QUERY_PARAMETERS = new Set([
   "utm_term",
 ])
 
-const SENSITIVE_PROPERTY_KEYS = new Set([
-  "accesstoken",
-  "authorization",
-  "code",
-  "codechallenge",
-  "email",
-  "githuburl",
-  "invitationid",
-  "invitationtoken",
-  "nonce",
-  "password",
-  "redirecturi",
-  "refreshtoken",
-  "repositoryurl",
-  "returnto",
-  "secret",
-  "state",
-  "teamname",
-  "token",
+const POSTHOG_URL_PROPERTY_KEYS = new Set([
+  "$current_url",
+  "$external_click_url",
+  "$initial_current_url",
+  "$initial_pathname",
+  "$initial_referrer",
+  "$pathname",
+  "$prev_pageview_pathname",
+  "$referrer",
+  "$sentry_url",
+  "$session_entry_current_url",
+  "$session_entry_pathname",
+  "$session_entry_url",
 ])
 
-const SENSITIVE_PATH_PREFIXES = [
-  "/api/auth",
-  "/consent",
-  "/invite",
-  "/sign-in",
-  "/sign-up",
-]
-
-function analyticsPathname(value: string) {
+function redactInvitationPath(pathname: string) {
+  let decodedPathname = pathname
   try {
-    const url = new URL(value, "https://analytics.invalid")
-    try {
-      return decodeURIComponent(url.pathname).toLowerCase()
-    } catch {
-      return url.pathname.toLowerCase()
-    }
+    decodedPathname = decodeURIComponent(pathname)
   } catch {
-    return value.toLowerCase()
+    // Keep the original pathname if it is not valid percent-encoded text.
   }
-}
 
-export function isSensitiveAnalyticsUrl(value: string) {
-  const pathname = analyticsPathname(value)
-  return SENSITIVE_PATH_PREFIXES.some((prefix) => (
-    pathname === prefix || pathname.startsWith(`${prefix}/`)
-  ))
+  if (!/\/invite\/[^/]+/i.test(decodedPathname)) return pathname
+  return decodedPathname.replace(/\/invite\/[^/]+/gi, REDACTED_INVITATION_PATH)
 }
 
 export function sanitizeAnalyticsUrl(value: string) {
-  const invitationRedacted = value
-    .replace(/\/invite\/[^/?#]+/gi, REDACTED_INVITATION_PATH)
-    .replace(/%2finvite%2f[^&#]+/gi, "%2Finvite%2F%5Bredacted%5D")
-
-  const looksLikeUrl = invitationRedacted.startsWith("/")
-    || /^[a-z][a-z\d+.-]*:\/\//i.test(invitationRedacted)
-
-  if (!looksLikeUrl) {
-    return invitationRedacted.replace(
-      /([?&](?:code|code_challenge|email|invitationid|nonce|redirect_uri|returnto|state|token)=)[^&#\s]*/gi,
-      "$1[redacted]",
-    )
-  }
+  const isAbsolute = /^[a-z][a-z\d+.-]*:\/\//i.test(value)
+  if (!isAbsolute && !value.startsWith("/")) return value
 
   try {
-    const isAbsolute = /^[a-z][a-z\d+.-]*:\/\//i.test(invitationRedacted)
-    const url = new URL(invitationRedacted, "https://analytics.invalid")
+    const url = new URL(value, "https://analytics.invalid")
     for (const key of [...url.searchParams.keys()]) {
       if (!ALLOWED_MARKETING_QUERY_PARAMETERS.has(key.toLowerCase())) {
         url.searchParams.delete(key)
       }
     }
-    if (isSensitiveAnalyticsUrl(url.pathname)) url.search = ""
-    url.hash = ""
-    return isAbsolute ? url.toString() : `${url.pathname}${url.search}`
+
+    const pathname = redactInvitationPath(url.pathname)
+    const search = url.searchParams.toString()
+    const sanitizedPath = `${pathname}${search ? `?${search}` : ""}`
+    return isAbsolute ? `${url.origin}${sanitizedPath}` : sanitizedPath
   } catch {
-    return invitationRedacted
+    return value
   }
 }
 
-export function sanitizeAnalyticsValue<T>(value: T): T {
-  if (typeof value === "string") return sanitizeAnalyticsUrl(value) as T
-  if (Array.isArray(value)) return value.map(sanitizeAnalyticsValue) as T
-  if (!value || typeof value !== "object") return value
-  const prototype = Object.getPrototypeOf(value)
-  if (prototype !== Object.prototype && prototype !== null) return value
+export function sanitizePostHogUrlProperties<T extends Record<string, unknown> | undefined>(
+  properties: T,
+) {
+  if (!properties) return properties
 
   return Object.fromEntries(
-    Object.entries(value)
-      .filter(([key]) => !SENSITIVE_PROPERTY_KEYS.has(key.toLowerCase().replace(/[^a-z\d]/g, "")))
-      .map(([key, child]) => [key, sanitizeAnalyticsValue(child)]),
+    Object.entries(properties).map(([key, value]) => [
+      key,
+      POSTHOG_URL_PROPERTY_KEYS.has(key) && typeof value === "string"
+        ? sanitizeAnalyticsUrl(value)
+        : value,
+    ]),
   ) as T
 }
 

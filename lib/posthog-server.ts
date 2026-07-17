@@ -1,9 +1,6 @@
 import { PostHog } from "posthog-node"
 
-import {
-  getAnalyticsDeploymentEnvironment,
-  sanitizeAnalyticsValue,
-} from "@/lib/posthog-client-privacy"
+import { getAnalyticsDeploymentEnvironment } from "@/lib/posthog-client-privacy"
 
 interface PostHogEvent {
   distinctId: string
@@ -40,14 +37,17 @@ export async function capturePostHogEvent({
       distinctId,
       event,
       properties: {
-        ...sanitizeAnalyticsValue(properties ?? {}),
+        ...properties,
         analytics_schema_version: 2,
         deployment_environment: getAnalyticsDeploymentEnvironment(),
       },
     })
     await posthog.shutdown()
   } catch (error) {
-    console.error("Unable to capture PostHog event", { event, error })
+    console.error("Unable to capture PostHog event", {
+      event,
+      message: error instanceof Error ? error.message : String(error),
+    })
   }
 }
 

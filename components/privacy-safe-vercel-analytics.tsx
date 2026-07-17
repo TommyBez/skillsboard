@@ -2,14 +2,9 @@
 
 import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next"
 
-import {
-  isSensitiveAnalyticsUrl,
-  sanitizeAnalyticsUrl,
-} from "@/lib/posthog-client-privacy"
+import { sanitizeAnalyticsUrl } from "@/lib/posthog-client-privacy"
 
 function beforeSend(event: BeforeSendEvent) {
-  if (isSensitiveAnalyticsUrl(event.url)) return null
-
   return {
     ...event,
     url: sanitizeAnalyticsUrl(event.url),

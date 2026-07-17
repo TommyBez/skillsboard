@@ -49,8 +49,7 @@ export async function sendTeamInvitation(input: SendTeamInvitationInput): Promis
 
   if (error) {
     console.error("Failed to send team invitation email", {
-      invitationId: input.invitationId,
-      email: input.email,
+      name: error.name,
       message: error.message,
     })
     throw new Error(`Failed to send invitation email: ${error.message}`)

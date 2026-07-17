@@ -312,7 +312,7 @@ Instrumentation status is not query availability. The browser-safe project token
 
 | Stage | Event or derived metric | Required properties / rule | Status |
 |---|---|---|---|
-| Acquisition | `$pageview` | PostHog automatic pageview on non-sensitive routes with a sanitized URL; only allowlisted UTMs remain. Invite, auth, and consent pageviews are dropped in both PostHog and Vercel Analytics. | Implemented |
+| Acquisition | `$pageview` | PostHog automatic pageview with a canonical URL; only allowlisted UTMs remain and invitation capability paths become `/invite/[redacted]`. Signup, sign-in, consent, and invitation pageviews remain measurable in both PostHog and Vercel Analytics. | Implemented |
 | Acquisition | `landing_cta_clicked` | `location`, `destination`, `visitor_state`; Acquisition filters `visitor_state=anonymous`. | Implemented |
 | Acquisition | `signup_form_submitted` | `method`, `signup_context=new_team\|team_invitation`; invitation signup is not new-team acquisition. | Implemented |
 | Activation | `user_signed_up` | `method`, `signup_context=new_team\|team_invitation`; measures completion after signup intent. | Implemented |
@@ -326,7 +326,7 @@ Instrumentation status is not query availability. The browser-safe project token
 | Referral | ask/copy/create/activate events | Add only after a referral surface exists; optimize for `referred_team_activated`. | Planned, gated |
 | Revenue / sustainability | cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28` | Aggregate Vercel, Neon, Resend, GTM spend, and founder-time inputs; not user events. | Data connection required |
 
-Client analytics drops pageviews for invite, auth, consent, and Better Auth routes; recursively removes sensitive property keys; retains only allowlisted UTM query parameters elsewhere; disables exception capture, session replay, and generic autocapture; and respects Do Not Track. Vercel Analytics applies the same sensitive-route exclusion and URL sanitizer. Client and server events share the build-time `NEXT_PUBLIC_ANALYTICS_ENVIRONMENT` value. Server-side analytics is fail-open so analytics failure cannot convert a successful product mutation into a user-visible error. Consent, retention, and internal-user policy remain launch blockers rather than assumptions.
+Client analytics sanitizes only automatic URL properties: hashes and non-UTM query parameters are removed, and invitation capability paths are canonicalized without dropping the pageview. SDK-owned properties and explicit custom-event properties remain intact. Autocapture and exception capture are restored to the original PostHog integration behavior, Session Replay remains controlled by the PostHog project, and Do Not Track is honored. Replay page and network URLs receive the same sanitizer; network bodies, headers, and the rendered invitation-link result are excluded because they can contain live credentials. Vercel Analytics applies the same canonical URL rule. Client and server events share the build-time `NEXT_PUBLIC_ANALYTICS_ENVIRONMENT` value. Server-side analytics is fail-open so analytics failure cannot convert a successful product mutation into a user-visible error. Consent, retention, and internal-user policy remain launch blockers rather than assumptions.
 
 ## 11. Open decisions
 

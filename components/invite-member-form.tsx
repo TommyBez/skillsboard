@@ -86,7 +86,7 @@ export function InviteMemberForm() {
       ) : null}
 
       {state.inviteUrl ? (
-        <div className="mt-4 rounded-[12px] border border-primary/20 bg-primary/5 p-4">
+        <div className="ph-no-capture mt-4 rounded-[12px] border border-primary/20 bg-primary/5 p-4">
           <p className="text-sm font-semibold">
             {state.emailError ? "Invite link ready" : `Invitation sent to ${state.invitedEmail}`}
           </p>
