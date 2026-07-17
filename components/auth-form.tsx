@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ArrowRightIcon } from "lucide-react"
 import posthog from "posthog-js"
 
@@ -191,6 +192,8 @@ export function AuthForm({
               id="otp"
               name="otp"
               maxLength={OTP_LENGTH}
+              pattern={REGEXP_ONLY_DIGITS}
+              inputMode="numeric"
               value={otp}
               onChange={setOtp}
               disabled={isPending}
