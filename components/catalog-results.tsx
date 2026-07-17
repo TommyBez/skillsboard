@@ -5,6 +5,7 @@ import Link from "next/link"
 import { SearchIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { CatalogSkillDetailsDialog } from "@/components/catalog-skill-details-dialog"
 import { SkillDossier } from "@/components/skill-dossier"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -39,8 +40,7 @@ function SkillCard({
       command={command}
       metric={installCount(item.installs)}
       status={isSaved ? "Saved" : undefined}
-      href={`https://skills.sh/${item.source}/${item.slug}`}
-      hrefLabel="Skill details"
+      details={<CatalogSkillDetailsDialog item={item} isSaved={isSaved} />}
       actions={
         isSaved
           ? <Button aria-label={`${item.name} is already in library`} variant="outline" size="sm" disabled>In library</Button>

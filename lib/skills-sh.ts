@@ -3,18 +3,25 @@ import "server-only"
 import { getVercelOidcToken } from "@vercel/oidc"
 import { cacheLife, cacheTag } from "next/cache"
 
+import { parseDocument } from "yaml"
+
 import {
   CATALOG_PAGE_SIZE,
   SEARCH_MAX_LIMIT,
   SEARCH_PAGE_SIZE,
+  catalogSkillDetailId,
+  isCatalogSkillId,
   type CatalogPage,
   type CatalogSkill,
+  type CatalogSkillDetail,
   type CatalogView,
 } from "@/lib/catalog"
 import { cacheTags } from "@/lib/cache-tags"
 
-export type { CatalogPage, CatalogSkill, CatalogView }
-export { CATALOG_PAGE_SIZE, SEARCH_MAX_LIMIT, SEARCH_PAGE_SIZE }
+export type { CatalogPage, CatalogSkill, CatalogSkillDetail, CatalogView }
+export { CATALOG_PAGE_SIZE, SEARCH_MAX_LIMIT, SEARCH_PAGE_SIZE, isCatalogSkillId }
+
+const DEFAULT_DESCRIPTION = "A reusable agent skill."
 
 interface CatalogResponse {
   skills?: unknown[]
@@ -35,13 +42,19 @@ function normalizeSkill(value: unknown): CatalogSkill | null {
   const [owner = "", repo = ""] = source.replace("https://github.com/", "").split("/")
   const slug = String(item.slug ?? item.name ?? "")
   if (!slug || (!source && !item.installUrl)) return null
+  const resolvedSource = source || `${owner}/${repo}`
+  const fallbackId = catalogSkillDetailId(resolvedSource, slug)
+  const id = typeof item.id === "string" && isCatalogSkillId(item.id)
+    ? item.id
+    : fallbackId
+  if (!isCatalogSkillId(id)) return null
   const installUrl = String(item.installUrl ?? `https://github.com/${owner}/${repo}`)
   return {
-    id: String(item.id ?? `${source}:${slug}`),
+    id,
     name: String(item.name ?? slug),
     slug,
-    description: String(item.description ?? "A reusable agent skill."),
-    source: source || `${owner}/${repo}`,
+    description: String(item.description ?? DEFAULT_DESCRIPTION),
+    source: resolvedSource,
     owner: String(item.owner ?? owner),
     repo: String(item.repo ?? repo),
     installUrl,
@@ -185,4 +198,92 @@ export async function getCuratedSkills(): Promise<CatalogPage> {
     hasMore: false,
     source: "curated",
   }
+}
+
+function parseSkillMdMeta(contents: string): { name?: string; description?: string } {
+  const lines = contents.replace(/\r\n?/g, "\n").split("\n")
+  if (lines[0]?.trim() !== "---") return {}
+
+  const closingIndex = lines.findIndex((line, index) => (
+    index > 0 && (line.trim() === "---" || line.trim() === "...")
+  ))
+  if (closingIndex < 0) return {}
+
+  try {
+    const document = parseDocument(lines.slice(1, closingIndex).join("\n"), {
+      strict: true,
+      uniqueKeys: true,
+    })
+    if (document.errors.length > 0) return {}
+
+    const metadata = document.toJS({ maxAliasCount: 20 }) as unknown
+    if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) return {}
+
+    const { name, description } = metadata as Record<string, unknown>
+    return {
+      name: typeof name === "string" ? name.trim() : undefined,
+      description: typeof description === "string"
+        ? description.replace(/[\r\n]+/g, " ").trim()
+        : undefined,
+    }
+  } catch {
+    return {}
+  }
+}
+
+function readNonEmptyString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : null
+}
+
+function readNonNegativeCount(value: unknown) {
+  const count = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN
+  return Number.isFinite(count) && count >= 0 ? count : null
+}
+
+async function getSkillDetailCached(id: string): Promise<CatalogSkillDetail> {
+  "use cache"
+  cacheLife("catalog")
+  cacheTag(cacheTags.catalog, cacheTags.catalogSkill(id))
+
+  const path = id.split("/").map(encodeURIComponent).join("/")
+  const payload = await catalogRequest(`/api/v1/skills/${path}`)
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Skill details unavailable")
+  }
+
+  const item = payload as Record<string, unknown>
+  const source = readNonEmptyString(item.source)
+  const slug = readNonEmptyString(item.slug)
+  const installs = readNonNegativeCount(item.installs ?? 0)
+  if (!source || !slug || installs === null) {
+    throw new Error("Skill details unavailable")
+  }
+
+  const files = Array.isArray(item.files) ? item.files : []
+  const skillMd = files.find((file) => {
+    if (!file || typeof file !== "object") return false
+    const pathValue = String((file as { path?: unknown }).path ?? "")
+    return pathValue === "SKILL.md" || pathValue.endsWith("/SKILL.md")
+  }) as { contents?: unknown } | undefined
+
+  const meta = typeof skillMd?.contents === "string"
+    ? parseSkillMdMeta(skillMd.contents)
+    : {}
+
+  const detailId = readNonEmptyString(item.id)
+  return {
+    id: detailId && isCatalogSkillId(detailId) ? detailId : catalogSkillDetailId(source, slug),
+    source,
+    slug,
+    name: meta.name || slug,
+    description: meta.description || DEFAULT_DESCRIPTION,
+    installs,
+  }
+}
+
+export async function getSkillDetail(id: string): Promise<CatalogSkillDetail> {
+  if (!isCatalogSkillId(id)) {
+    throw new Error("Invalid skill id")
+  }
+  return getSkillDetailCached(id)
 }
