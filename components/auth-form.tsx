@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRightIcon } from "lucide-react"
@@ -10,6 +10,7 @@ import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up"
@@ -18,15 +19,22 @@ interface AuthFormProps {
   continueHref?: string | null
   /** Query string preserved when switching between sign-in and sign-up. */
   preserveQuery?: string | null
+  /** Development-only: any 6-digit code is accepted and no email is sent. */
+  acceptAnyOtp?: boolean
 }
 
 const RESEND_COOLDOWN_SECONDS = 60
+const OTP_LENGTH = 6
+
+const otpSlotClassName =
+  "size-11 rounded-[14px] border border-border bg-background text-base first:rounded-[14px] first:border-l last:rounded-[14px] data-[active=true]:border-primary data-[active=true]:ring-primary/30 sm:size-12"
 
 export function AuthForm({
   mode,
   returnTo = "/library",
   continueHref = null,
   preserveQuery = null,
+  acceptAnyOtp = false,
 }: AuthFormProps) {
   const router = useRouter()
   const [step, setStep] = useState<"email" | "otp">("email")
@@ -56,7 +64,12 @@ export function AuthForm({
       type: "sign-in",
     })
     if (result.error) {
-      throw new Error(result.error.message ?? "We couldn’t send a sign-in code. Try again.")
+      throw new Error(
+        result.error.message ??
+          (acceptAnyOtp
+            ? "We couldn’t start sign-in. Try again."
+            : "We couldn’t send a sign-in code. Try again."),
+      )
     }
     setResendIn(RESEND_COOLDOWN_SECONDS)
   }
@@ -74,16 +87,21 @@ export function AuthForm({
       setOtp("")
       setStep("otp")
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : "We couldn’t send a sign-in code. Try again.")
+      setError(
+        sendError instanceof Error
+          ? sendError.message
+          : acceptAnyOtp
+            ? "We couldn’t start sign-in. Try again."
+            : "We couldn’t send a sign-in code. Try again.",
+      )
     } finally {
       setIsPending(false)
     }
   }
 
-  async function handleOtpSubmit(formData: FormData) {
+  async function verifyOtp(nextOtp: string) {
     setIsPending(true)
     setError("")
-    const nextOtp = String(formData.get("otp")).replace(/\s+/g, "")
 
     try {
       const result = await authClient.signIn.emailOtp({
@@ -116,6 +134,12 @@ export function AuthForm({
     }
   }
 
+  async function handleOtpSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (otp.length !== OTP_LENGTH || isPending) return
+    await verifyOtp(otp)
+  }
+
   async function handleResend() {
     if (resendIn > 0 || isPending) return
     setIsPending(true)
@@ -124,7 +148,13 @@ export function AuthForm({
       await sendOtp(email)
       setOtp("")
     } catch (sendError) {
-      setError(sendError instanceof Error ? sendError.message : "We couldn’t send a sign-in code. Try again.")
+      setError(
+        sendError instanceof Error
+          ? sendError.message
+          : acceptAnyOtp
+            ? "We couldn’t start sign-in. Try again."
+            : "We couldn’t send a sign-in code. Try again.",
+      )
     } finally {
       setIsPending(false)
     }
@@ -132,7 +162,7 @@ export function AuthForm({
 
   if (step === "otp") {
     return (
-      <form action={handleOtpSubmit} className="flex flex-col gap-5">
+      <form onSubmit={handleOtpSubmit} className="flex flex-col gap-5">
         <FieldGroup className="gap-4">
           <Field>
             <FieldLabel
@@ -141,23 +171,34 @@ export function AuthForm({
             >
               One-time code
             </FieldLabel>
-            <Input
+            <InputOTP
               id="otp"
               name="otp"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              pattern="[0-9]*"
-              maxLength={6}
-              minLength={6}
+              maxLength={OTP_LENGTH}
               value={otp}
-              onChange={(event) => setOtp(event.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="h-12 rounded-[16px] border-border bg-background px-4 font-mono text-center text-xl tracking-[0.35em] shadow-none focus-visible:border-primary"
-              placeholder="000000"
-              required
+              onChange={setOtp}
+              disabled={isPending}
               autoFocus
-            />
+              containerClassName="w-full justify-between gap-1.5 sm:gap-2"
+            >
+              <InputOTPGroup className="w-full justify-between gap-1.5 sm:gap-2">
+                {Array.from({ length: OTP_LENGTH }, (_, index) => (
+                  <InputOTPSlot key={index} index={index} className={otpSlotClassName} />
+                ))}
+              </InputOTPGroup>
+            </InputOTP>
             <FieldDescription className="text-xs">
-              Enter the 6-digit code we sent to <span className="font-medium text-foreground">{email}</span>.
+              {acceptAnyOtp ? (
+                <>
+                  Development mode: enter any {OTP_LENGTH}-digit code for{" "}
+                  <span className="font-medium text-foreground">{email}</span>. No email is sent.
+                </>
+              ) : (
+                <>
+                  Enter the {OTP_LENGTH}-digit code we sent to{" "}
+                  <span className="font-medium text-foreground">{email}</span>.
+                </>
+              )}
             </FieldDescription>
           </Field>
         </FieldGroup>
@@ -166,19 +207,21 @@ export function AuthForm({
             {error}
           </p>
         ) : null}
-        <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending || otp.length !== 6}>
+        <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending || otp.length !== OTP_LENGTH}>
           {isPending ? "Verifying…" : isSignUp ? "Verify and create account" : "Verify and sign in"}
           {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
         </Button>
         <div className="flex flex-col gap-2 border-t border-border pt-4 text-center text-sm text-muted-foreground">
-          <button
-            type="button"
-            className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
-            onClick={handleResend}
-            disabled={isPending || resendIn > 0}
-          >
-            {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
-          </button>
+          {!acceptAnyOtp ? (
+            <button
+              type="button"
+              className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+              onClick={handleResend}
+              disabled={isPending || resendIn > 0}
+            >
+              {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
+            </button>
+          ) : null}
           <button
             type="button"
             className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary"
@@ -234,7 +277,11 @@ export function AuthForm({
             className="h-12 rounded-[16px] border-border bg-background px-4 text-base shadow-none focus-visible:border-primary"
             required
           />
-          <FieldDescription className="text-xs">We’ll email you a one-time code. No password needed.</FieldDescription>
+          <FieldDescription className="text-xs">
+            {acceptAnyOtp
+              ? "Development mode: continue with any 6-digit code. No email is sent."
+              : "We’ll email you a one-time code. No password needed."}
+          </FieldDescription>
         </Field>
       </FieldGroup>
       {error ? (
@@ -243,7 +290,7 @@ export function AuthForm({
         </p>
       ) : null}
       <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending}>
-        {isPending ? "Sending code…" : "Email me a code"}
+        {isPending ? "Starting…" : acceptAnyOtp ? "Continue" : "Email me a code"}
         {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
       </Button>
       {isSignUp ? <p className="-mt-2 text-center text-xs text-muted-foreground">No credit card required.</p> : null}

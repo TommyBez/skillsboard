@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { AuthForm } from "@/components/auth-form"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getDeploymentEnvironment } from "@/lib/auth-environment"
 import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
 import { safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
@@ -40,6 +41,7 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
       returnTo={returnTo}
       continueHref={oauthContinue}
       preserveQuery={oauthQuery}
+      acceptAnyOtp={getDeploymentEnvironment() === "development"}
     />
   )
 }

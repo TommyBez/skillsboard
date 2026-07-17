@@ -29,14 +29,21 @@ export const auth = betterAuth({
       otpLength: 6,
       expiresIn: otpExpiresInSeconds,
       allowedAttempts: 3,
-      storeOTP: "hashed",
+      // In development, any submitted code verifies so local auth works without Resend.
+      storeOTP: isDevelopment
+        ? { hash: async () => "dev-otp-bypass" }
+        : "hashed",
       async sendVerificationOTP({ email, otp, type }) {
-        // Better Auth may background this call; still await delivery work so
-        // serverless runtimes keep the promise alive when awaited upstream.
         if (type !== "sign-in") {
           console.warn("Ignoring unsupported OTP email type", { type, email })
           return
         }
+        if (isDevelopment) {
+          console.info("Skipping sign-in OTP email in development", { email })
+          return
+        }
+        // Better Auth may background this call; still await delivery work so
+        // serverless runtimes keep the promise alive when awaited upstream.
         try {
           await sendSignInOtp({ email, otp, expiresInSeconds: otpExpiresInSeconds })
         } catch (error) {
