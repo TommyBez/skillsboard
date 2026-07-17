@@ -5,6 +5,8 @@ The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 
 
 The full-funnel hardening pass adds a global allowlist-based URL and property sanitizer, drops pageviews on invite/auth/consent routes in both PostHog and Vercel Analytics, disables generic autocapture, exception capture, and session replay, respects Do Not Track, and adds `analytics_schema_version` plus one build-time `deployment_environment` value to client and server events. Automatic PostHog pageviews remain enabled on non-sensitive routes.
 
+The client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host only send events; they do not authorize analytics queries. GTM pulse reads require a separate server/local-only Personal API Key with minimum `Query Read`, the PostHog project ID, and the regional API host.
+
 ## Events instrumented
 
 | Event name | Description | File |
@@ -39,6 +41,17 @@ All team-scoped events include a stable `team_id` property. Usage-path events al
 - Activation, `AAT-28`, retained, reactivated, and lost are cross-user metrics. Query them with HogQL grouped by `properties.team_id`; do not use a standard PostHog funnel grouped by `distinct_id`.
 - Revenue is not instrumented because the hosted product is free forever. Sustainability combines aggregate infrastructure cost and founder-time inputs outside user-event analytics.
 
+## GTM pulse read contract
+
+1. Run `pnpm gtm:pulse:data` before the weekly pulse.
+2. Consume only `.agents/loops/skillsboard-gtm-pulse-data.json`; never reconstruct metrics from dashboard screenshots, repository state, or ad hoc queries.
+3. Require a fresh, schema-valid artifact with top-level `status=ready`. Otherwise emit only Tracking QA and do not route an action.
+4. Preserve `data_status=available|unavailable|broken` per query. A valid zero is `available`; missing credentials, definitions, or sources are `unavailable`; a failed, stale, partial, or malformed result is `broken`. Never infer a missing value.
+
+The runner requires `POSTHOG_PERSONAL_API_KEY` (`Query Read` only), `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`. Optional `POSTHOG_DEPLOYMENT_ENVIRONMENT` selects `production` (default), `preview`, or `development`. These values are server/local-only: do not prefix them with `NEXT_PUBLIC_`, expose them to browser code, print the key, or write it to the JSON artifact.
+
+The pulse must not be described as live until these credentials target the intended production project, the runner succeeds, the artifact schema and freshness checks pass, and a dry run consumes the artifact without inference.
+
 ## Next steps
 
 We've built some insights and a dashboard to keep an eye on user behavior, based on the events we just instrumented:
@@ -60,7 +73,8 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Sensitive route pageviews are dropped and remaining URLs/properties are allowlist-sanitized before client analytics events are sent.
 - [x] Generic autocapture and session replay are disabled; explicit semantic events remain.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating the production scorecard as launch-ready.
-- [ ] Create team-level HogQL insights for Activation and `AAT-28` state transitions.
+- [x] Define and live-parse versioned team-level HogQL for Activation and `AAT-28` state transitions; API execution still waits on the read-only key.
+- [ ] Configure the server/local-only PostHog query variables, validate `pnpm gtm:pulse:data` against production, and complete one artifact-only dry run before calling the GTM pulse live.
 
 ### Agent skill
 

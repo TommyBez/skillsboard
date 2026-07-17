@@ -28,17 +28,31 @@ With fewer than 30 eligible teams, use absolute counts and qualitative evidence.
 - Only after routing: the skill for the selected stage, such as `onboarding`, `churn-prevention`, `referrals`, `pricing`, `content-strategy`, or `customer-research`.
 - Experiments converge on one backlog and use `ab-testing`; stage modules do not launch competing tests.
 
+## Executable data contract
+
+The pulse must use this sequence on every run:
+
+1. Execute `pnpm gtm:pulse:data` before reading or calculating any metric.
+2. Read only the generated `.agents/loops/skillsboard-gtm-pulse-data.json`. Do not query PostHog ad hoc, reuse dashboard screenshots, or reconstruct missing values from repository or database clues.
+3. Continue only when the artifact exists, matches the expected schema, is fresh for the current run, and has top-level `status=ready`. If any check fails, the only allowed output is Tracking QA with the dependency marked `unavailable` or `broken`.
+4. Preserve each query's data status exactly: `available` means the query succeeded and returned a valid result, including a valid zero; `unavailable` means a required credential, definition, query, or source does not exist; `broken` means an expected query failed, returned an invalid shape, or is stale. Never infer, estimate, or substitute a proxy for an unavailable or broken value.
+
+PostHog capture and PostHog query access are separate capabilities. `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` send events only and cannot make the pulse readable. The runner requires `POSTHOG_PERSONAL_API_KEY` with the minimum `Query Read` permission, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; `POSTHOG_DEPLOYMENT_ENVIRONMENT` optionally selects `production` (default), `preview`, or `development`. These values are server/local-only and must never use a `NEXT_PUBLIC_` prefix, enter client bundles, logs, state, or generated artifacts.
+
+The pulse is not live until those query credentials are present, the runner has completed successfully against the intended production project, the artifact schema and freshness have been validated, and a dry run has consumed that artifact without inference.
+
 ## Loop body
 
 1. Read the strategy and this contract completely.
-2. Run Tracking QA: verify event semantics, schema version, environment, sensitive-URL sanitization, duplicates, `team_id` coverage, internal/test exclusion, source freshness, and DB/PostHog reconciliation where possible.
-3. Build the full-funnel scorecard. Every row must be one of `trustworthy`, `immature`, `unavailable`, `not monetized`, or `broken`. Acquisition is `unavailable` for qualification and source-to-activation decisions until a written qualification rule, internal/test exclusion, source taxonomy, and team-level attribution query all exist; raw traffic and intent counts remain descriptive only.
-4. Calculate `AAT-28 = new activated + retained + reactivated` and `ΔAAT = new activated + reactivated - lost`, grouped by `team_id` rather than `distinct_id`.
-5. Exclude stages without instrumentation, mature cohorts, or a valid denominator.
-6. If a verified product defect exists, route it before marketing work. Before routing an Acquisition scaling action, require Activation and Retention health gates to pass; if they fail, the failing downstream stage owns the constraint. Among the remaining eligible stages, select the issue with the strongest evidence and largest absolute number of teams affected. Sustainability enters routing only on a cost-cap breach or during its quarterly review.
-7. Run only the selected diagnostic module. Public demand-signal scanning is Acquisition work and runs only when Acquisition is selected or during a monthly research refresh.
-8. Recommend one action with owner, expected metric, observation window, and success/kill check. If none qualifies, report `no action`.
-9. Update state only after a successful run and append a minimal non-PII run log.
+2. Execute `pnpm gtm:pulse:data`, then load only `.agents/loops/skillsboard-gtm-pulse-data.json` under the executable data contract above.
+3. Run Tracking QA over the artifact: verify event semantics, schema version, environment, sensitive-URL sanitization, duplicates, `team_id` coverage, internal/test exclusion, source freshness, and DB/PostHog reconciliation results.
+4. Build the full-funnel scorecard. Every data-bearing row has `data_status=available|unavailable|broken`; maturity and monetization are separate fields, not data-status values. Acquisition remains `unavailable` for qualification and source-to-activation decisions until a written qualification rule, internal/test exclusion, source taxonomy, and team-level attribution query all exist; raw traffic and intent counts remain descriptive only.
+5. Calculate `AAT-28 = new activated + retained + reactivated` and `ΔAAT = new activated + reactivated - lost`, grouped by `team_id` rather than `distinct_id`, only from `available` artifact values.
+6. Exclude stages without instrumentation, mature cohorts, a valid denominator, or `available` required inputs.
+7. If a verified product defect exists, route it before marketing work. Before routing an Acquisition scaling action, require Activation and Retention health gates to pass; if they fail, the failing downstream stage owns the constraint. Among the remaining eligible stages, select the issue with the strongest evidence and largest absolute number of teams affected. Sustainability enters routing only on a cost-cap breach or during its quarterly review.
+8. Run only the selected diagnostic module. Public demand-signal scanning is Acquisition work and runs only when Acquisition is selected or during a monthly research refresh.
+9. Recommend one action with owner, expected metric, observation window, and success/kill check. If none qualifies, report `no action`.
+10. Update state only after a successful run and append a minimal non-PII run log.
 
 ## Full-funnel scorecard output
 
@@ -50,7 +64,7 @@ With fewer than 30 eligible teams, use absolute counts and qualitative evidence.
 | Referral | Eligible happy teams and explicitly attributed referral asks/copies/visits plus `referred_team_activated`. Report `organic_champion_replication` separately as correlation. |
 | Revenue / sustainability | Latest monthly snapshot with `as_of`: current revenue state, cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28`, and explicit economic-demand signals. Revenue is `not monetized` until real money exists. |
 
-Each row includes absolute count, denominator, window, comparison period, cohort maturity, data-quality status, confidence, owner, and open dependency. Never substitute a proxy for unavailable data.
+Each row includes absolute count, denominator, window, comparison period, cohort maturity, `data_status`, confidence, owner, and open dependency. Never substitute a proxy for `unavailable` or `broken` data.
 
 ## Diagnostic module contracts
 
@@ -111,6 +125,7 @@ The diagnostic key is `stage + metric + cohort/window`; update it rather than cr
 
 - Broken, stale, or privacy-unsafe tracking makes Tracking QA the only recommendation.
 - Missing analytics access reports the dependency; it does not invent metrics or automatically default to Acquisition work.
+- A missing artifact or any top-level state other than `status=ready` permits only a Tracking QA output; no stage is routed.
 - Missing internal/test exclusion keeps quantitative conclusions report-only.
 - No mature cohort, no qualified signal, no operational Acquisition contract, or no threshold breach means `no action`.
 - No owner means no experiment.
@@ -121,7 +136,7 @@ The diagnostic key is `stage + metric + cohort/window`; update it rather than cr
 ## Required digest
 
 1. Data quality and blockers.
-2. Five-row scorecard with `n`, denominator, window, maturity, and status.
+2. Five-row scorecard with `n`, denominator, window, maturity, and `data_status=available|unavailable|broken`.
 3. `AAT-28` decomposition and `ΔAAT` when trustworthy.
 4. The single routed constraint, or `no action`, with evidence and threshold.
 5. One recommended action with owner, observation window, success check, and kill check.
