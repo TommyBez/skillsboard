@@ -9,6 +9,8 @@ import {
   CATALOG_PAGE_SIZE,
   SEARCH_MAX_LIMIT,
   SEARCH_PAGE_SIZE,
+  catalogSkillDetailId,
+  isCatalogSkillId,
   type CatalogPage,
   type CatalogSkill,
   type CatalogSkillDetail,
@@ -17,9 +19,8 @@ import {
 import { cacheTags } from "@/lib/cache-tags"
 
 export type { CatalogPage, CatalogSkill, CatalogSkillDetail, CatalogView }
-export { CATALOG_PAGE_SIZE, SEARCH_MAX_LIMIT, SEARCH_PAGE_SIZE }
+export { CATALOG_PAGE_SIZE, SEARCH_MAX_LIMIT, SEARCH_PAGE_SIZE, isCatalogSkillId }
 
-const SKILL_ID_PATTERN = /^(?!.*(?:^|\/)\.\.?(?:\/|$))[\w.-]+(?:\/[\w.-]+)+$/
 const DEFAULT_DESCRIPTION = "A reusable agent skill."
 
 interface CatalogResponse {
@@ -41,13 +42,19 @@ function normalizeSkill(value: unknown): CatalogSkill | null {
   const [owner = "", repo = ""] = source.replace("https://github.com/", "").split("/")
   const slug = String(item.slug ?? item.name ?? "")
   if (!slug || (!source && !item.installUrl)) return null
+  const resolvedSource = source || `${owner}/${repo}`
+  const fallbackId = catalogSkillDetailId(resolvedSource, slug)
+  const id = typeof item.id === "string" && isCatalogSkillId(item.id)
+    ? item.id
+    : fallbackId
+  if (!isCatalogSkillId(id)) return null
   const installUrl = String(item.installUrl ?? `https://github.com/${owner}/${repo}`)
   return {
-    id: String(item.id ?? `${source}:${slug}`),
+    id,
     name: String(item.name ?? slug),
     slug,
     description: String(item.description ?? DEFAULT_DESCRIPTION),
-    source: source || `${owner}/${repo}`,
+    source: resolvedSource,
     owner: String(item.owner ?? owner),
     repo: String(item.repo ?? repo),
     installUrl,
@@ -224,8 +231,13 @@ function parseSkillMdMeta(contents: string): { name?: string; description?: stri
   }
 }
 
-export function isCatalogSkillId(value: string) {
-  return value.length <= 200 && SKILL_ID_PATTERN.test(value)
+function readNonEmptyString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : null
+}
+
+function readNonNegativeCount(value: unknown) {
+  const count = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN
+  return Number.isFinite(count) && count >= 0 ? count : null
 }
 
 async function getSkillDetailCached(id: string): Promise<CatalogSkillDetail> {
@@ -240,9 +252,10 @@ async function getSkillDetailCached(id: string): Promise<CatalogSkillDetail> {
   }
 
   const item = payload as Record<string, unknown>
-  const source = String(item.source ?? "")
-  const slug = String(item.slug ?? "")
-  if (!source || !slug) {
+  const source = readNonEmptyString(item.source)
+  const slug = readNonEmptyString(item.slug)
+  const installs = readNonNegativeCount(item.installs ?? 0)
+  if (!source || !slug || installs === null) {
     throw new Error("Skill details unavailable")
   }
 
@@ -257,13 +270,14 @@ async function getSkillDetailCached(id: string): Promise<CatalogSkillDetail> {
     ? parseSkillMdMeta(skillMd.contents)
     : {}
 
+  const detailId = readNonEmptyString(item.id)
   return {
-    id: String(item.id ?? `${source}/${slug}`),
+    id: detailId && isCatalogSkillId(detailId) ? detailId : catalogSkillDetailId(source, slug),
     source,
     slug,
     name: meta.name || slug,
     description: meta.description || DEFAULT_DESCRIPTION,
-    installs: Number(item.installs ?? 0),
+    installs,
   }
 }
 
