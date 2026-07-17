@@ -3,14 +3,38 @@ import { cacheLife, cacheTag } from "next/cache"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
-import { member, organization, skill } from "@/lib/db/schema"
+import { member, organization, skill, user } from "@/lib/db/schema"
 
 export async function listOrganizationSkills(organizationId: string) {
   "use cache"
   cacheLife("hours")
   cacheTag(cacheTags.organizationSkills(organizationId))
 
-  return db.select().from(skill).where(eq(skill.organizationId, organizationId)).orderBy(desc(skill.createdAt))
+  return db
+    .select({
+      id: skill.id,
+      organizationId: skill.organizationId,
+      createdBy: skill.createdBy,
+      githubUrl: skill.githubUrl,
+      skillName: skill.skillName,
+      title: skill.title,
+      description: skill.description,
+      repoOwner: skill.repoOwner,
+      repoName: skill.repoName,
+      repoStars: skill.repoStars,
+      repoUpdatedAt: skill.repoUpdatedAt,
+      skillPath: skill.skillPath,
+      tags: skill.tags,
+      note: skill.note,
+      metadataRefreshedAt: skill.metadataRefreshedAt,
+      createdAt: skill.createdAt,
+      updatedAt: skill.updatedAt,
+      addedByName: user.name,
+    })
+    .from(skill)
+    .leftJoin(user, eq(skill.createdBy, user.id))
+    .where(eq(skill.organizationId, organizationId))
+    .orderBy(desc(skill.createdAt))
 }
 
 export async function listUserSkills(userId: string) {

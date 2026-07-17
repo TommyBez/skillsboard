@@ -27,6 +27,7 @@ interface SkillDossierProps {
   metric?: string
   tags?: string[]
   status?: string
+  addedBy?: string | null
   href?: string
   hrefLabel?: string
   compact?: boolean
@@ -44,6 +45,7 @@ export function SkillDossier({
   metric,
   tags = [],
   status,
+  addedBy,
   href,
   hrefLabel = "View source",
   compact = false,
@@ -52,6 +54,14 @@ export function SkillDossier({
   headingLevel = "h3",
 }: SkillDossierProps) {
   const Heading = headingLevel
+  const addedByInitials = addedBy
+    ? addedBy
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : null
 
   return (
     <article
@@ -91,6 +101,20 @@ export function SkillDossier({
         {tags.length ? (
           <div className="flex flex-wrap gap-1.5">
             {tags.map((tag) => <Badge key={tag} variant="outline">{tag}</Badge>)}
+          </div>
+        ) : null}
+
+        {addedBy ? (
+          <div className="mt-auto flex min-w-0 items-center gap-2 pt-1 text-sm text-muted-foreground">
+            <span
+              className="flex size-6 shrink-0 items-center justify-center rounded-md bg-accent font-mono text-[0.65rem] font-semibold text-accent-foreground"
+              aria-hidden="true"
+            >
+              {addedByInitials}
+            </span>
+            <p className="truncate">
+              Added by <span className="font-medium text-foreground">{addedBy}</span>
+            </p>
           </div>
         ) : null}
       </div>

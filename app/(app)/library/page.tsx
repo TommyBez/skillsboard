@@ -115,6 +115,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 command={command}
                 metric={`${item.repoStars.toLocaleString()} ${item.repoStars === 1 ? "star" : "stars"}`}
                 tags={item.tags}
+                addedBy={item.addedByName ?? "Unknown"}
                 href={item.githubUrl}
                 hrefLabel="Open source"
                 actions={(
