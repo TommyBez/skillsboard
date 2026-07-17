@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
@@ -6,6 +7,11 @@ import { OnboardingForm } from "@/components/onboarding-form"
 import { Skeleton } from "@/components/ui/skeleton"
 import { listUserOrganizations } from "@/lib/db/queries"
 import { requireSession } from "@/lib/session"
+
+export const metadata: Metadata = {
+  title: "Create your team library",
+  robots: { index: false, follow: false },
+}
 
 async function OnboardingGate() {
   const session = await requireSession()

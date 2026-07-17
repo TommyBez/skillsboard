@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
@@ -10,6 +11,11 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
 import { getSession } from "@/lib/session"
+
+export const metadata: Metadata = {
+  title: "Team invitation",
+  robots: { index: false, follow: false },
+}
 
 interface InvitationPageProps {
   params: Promise<{ invitationId: string }>

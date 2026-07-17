@@ -1,14 +1,30 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
+import { JsonLd } from "@/components/json-ld"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { landingFaqs } from "@/lib/seo/landing-faq"
+import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
+import { siteConfig } from "@/lib/site"
+
+export const metadata: Metadata = {
+  title: { absolute: "Skills Board, your team’s recommended AI skills" },
+  description: siteConfig.description,
+  alternates: { canonical: "/" },
+  openGraph: {
+    url: "/",
+    title: "Skills Board — One shared library. Different agents.",
+    description: siteConfig.ogDescription,
+  },
+}
 
 function primaryAction(signedIn: boolean) {
   return signedIn
@@ -136,6 +152,7 @@ export default function HomePage() {
       className={`${styles.root} app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
       data-landing-motion-root
     >
+      <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
@@ -182,7 +199,7 @@ export default function HomePage() {
               The library belongs to your team, not one agent.
             </h2>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Everyone starts from the same recommendation, then chooses the source, command, or ZIP that fits their setup.
+              Skills Board is a shared AI skill library for teams. Everyone starts from the same recommendation, then chooses the source, command, or ZIP that fits their setup.
             </p>
             <p className="mt-6 max-w-md border-l-2 border-primary/40 pl-4 text-sm leading-relaxed text-muted-foreground">
               Compatible agents can optionally access the same library through authenticated, read-only MCP.
@@ -269,6 +286,47 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section
+        id="faq"
+        aria-labelledby="faq-heading"
+        className="border-b border-border/70"
+      >
+        <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(16rem,0.75fr)_minmax(28rem,1.25fr)] lg:gap-20">
+          <div>
+            <h2
+              id="faq-heading"
+              className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-6xl"
+            >
+              Common questions
+            </h2>
+            <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
+              Straight answers about what Skills Board is, how it fits mixed agent setups, and what “recommended” means.
+            </p>
+          </div>
+
+          <div className="divide-y divide-border/80 border-y border-border/80">
+            {landingFaqs.map((faq) => (
+              <details key={faq.question} className="group py-6">
+                <summary className="cursor-pointer list-none text-xl font-semibold tracking-[-0.03em] marker:content-none [&::-webkit-details-marker]:hidden">
+                  <span className="flex items-start justify-between gap-6">
+                    <span>{faq.question}</span>
+                    <span
+                      aria-hidden="true"
+                      className="mt-1 shrink-0 text-primary transition-transform duration-150 group-open:rotate-45"
+                    >
+                      +
+                    </span>
+                  </span>
+                </summary>
+                <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+                  {faq.answer}
+                </p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section>
         <div
           className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
@@ -291,7 +349,15 @@ export default function HomePage() {
       <footer className="border-t border-border/70">
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
           <Brand />
-          <div className="flex items-center gap-3 md:justify-end">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 md:justify-end">
+            <nav aria-label="Footer" className="flex items-center gap-4 text-sm text-muted-foreground">
+              <a href="#pricing" className="transition-colors hover:text-foreground">
+                Pricing
+              </a>
+              <a href="#faq" className="transition-colors hover:text-foreground">
+                FAQ
+              </a>
+            </nav>
             <p className="max-w-md text-sm text-muted-foreground md:text-right">
               Built for teams that work across different agents.
             </p>

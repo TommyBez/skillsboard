@@ -1,7 +1,17 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 
 import { AccessShell } from "@/components/access-shell"
 import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
+
+export const metadata: Metadata = {
+  title: "Sign in",
+  description: "Sign in to open the shared library of skills your team recommends.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+}
 
 interface SignInPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
