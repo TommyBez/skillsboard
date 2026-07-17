@@ -8,15 +8,58 @@ import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
 import { skill } from "@/lib/db/schema"
 import { getGitHubMetadata } from "@/lib/github"
+import {
+  discoverGitHubSkills,
+  GitHubSkillDiscoveryError,
+  resolveGitHubSkill,
+} from "@/lib/github-skill-discovery"
 import { getPostHogClient } from "@/lib/posthog-server"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
+const githubRepositorySchema = z.object({
+  githubUrl: z.url(),
+})
+
 const skillSchema = z.object({
   githubUrl: z.url(),
-  skillName: z.string().trim().min(1).max(100),
+  skillPath: z.string().max(512),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).default([]),
   note: z.string().trim().max(500).optional(),
 })
+
+export async function discoverRepositorySkills(input: z.input<typeof githubRepositorySchema>) {
+  await requireSession()
+  const parsed = githubRepositorySchema.safeParse(input)
+
+  if (!parsed.success) {
+    return { ok: false as const, error: "Enter a valid GitHub repository URL." }
+  }
+
+  try {
+    const repository = await discoverGitHubSkills(parsed.data.githubUrl)
+    if (!repository.skills.length) {
+      return {
+        ok: false as const,
+        error: "We couldn’t find a valid SKILL.md in this repository.",
+      }
+    }
+
+    return {
+      ok: true as const,
+      githubUrl: repository.githubUrl,
+      skills: repository.skills,
+      linkedSkillPath: repository.linkedSkillPath,
+    }
+  } catch (error) {
+    console.error("Unable to discover repository skills", error)
+    return {
+      ok: false as const,
+      error: error instanceof GitHubSkillDiscoveryError
+        ? error.message
+        : "We couldn’t inspect this repository. Check the URL and try again.",
+    }
+  }
+}
 
 export async function addSkill(input: z.input<typeof skillSchema>) {
   const session = await requireSession()
@@ -24,25 +67,31 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
   const parsed = skillSchema.safeParse(input)
 
   if (!parsed.success) {
-    return { ok: false as const, error: "Check the repository URL, skill name, tags, and note, then try again." }
+    return { ok: false as const, error: "Check the repository, selected skill, tags, and note, then try again." }
   }
 
   try {
-    const metadata = await getGitHubMetadata(parsed.data.githubUrl)
-    const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, metadata.githubUrl), eq(skill.skillName, parsed.data.skillName))).limit(1)
+    const repository = await resolveGitHubSkill(
+      parsed.data.githubUrl,
+      parsed.data.skillPath,
+    )
+    const selectedSkill = repository.skill
+
+    const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, repository.githubUrl), eq(skill.skillName, selectedSkill.name))).limit(1)
     if (existing.length) return { ok: false as const, error: "This skill is already in your team library" }
     const note = parsed.data.note || null
     await db.insert(skill).values({
       organizationId,
       createdBy: userId,
-      githubUrl: metadata.githubUrl,
-      skillName: parsed.data.skillName,
-      title: parsed.data.skillName.replaceAll("-", " "),
-      description: metadata.description,
-      repoOwner: metadata.repoOwner,
-      repoName: metadata.repoName,
-      repoStars: metadata.repoStars,
-      repoUpdatedAt: metadata.repoUpdatedAt,
+      githubUrl: repository.githubUrl,
+      skillName: selectedSkill.name,
+      title: selectedSkill.name.replaceAll("-", " "),
+      description: selectedSkill.description,
+      repoOwner: repository.repoOwner,
+      repoName: repository.repoName,
+      repoStars: repository.repoStars,
+      repoUpdatedAt: repository.repoUpdatedAt,
+      skillPath: selectedSkill.path,
       tags: [...new Set(parsed.data.tags.map((tag) => tag.toLowerCase()))],
       note,
     })
@@ -52,9 +101,9 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
       distinctId: userId,
       event: "skill_saved",
       properties: {
-        skill_name: parsed.data.skillName,
-        repo_owner: metadata.repoOwner,
-        repo_name: metadata.repoName,
+        skill_name: selectedSkill.name,
+        repo_owner: repository.repoOwner,
+        repo_name: repository.repoName,
         tag_count: parsed.data.tags.length,
         has_note: Boolean(note),
       },
@@ -63,7 +112,12 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
     return { ok: true as const }
   } catch (error) {
     console.error("Unable to save skill", error)
-    return { ok: false as const, error: "We couldn’t fetch this repository or save the skill. Check the URL and try again." }
+    return {
+      ok: false as const,
+      error: error instanceof GitHubSkillDiscoveryError
+        ? error.message
+        : "We couldn’t fetch this repository or save the skill. Check the URL and try again.",
+    }
   }
 }
 

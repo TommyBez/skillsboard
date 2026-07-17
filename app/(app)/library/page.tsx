@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
 import { listOrganizationSkills } from "@/lib/db/queries"
+import { buildInstallCommand } from "@/lib/install-command"
 import { isOrganizationAdmin } from "@/lib/session"
 
 interface LibraryPageProps {
@@ -100,7 +101,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
       {skills.length ? (
         <section aria-label="Team skill recommendations" className="grid gap-4 md:grid-cols-2">
           {skills.map((item, index) => {
-            const command = `npx skills add ${item.githubUrl} --skill ${item.skillName}`
+            const command = buildInstallCommand(item.githubUrl, item.skillName)
             const canEditNote = item.createdBy === userId
             const canDelete = canEditNote || canManageLibrary
             return (

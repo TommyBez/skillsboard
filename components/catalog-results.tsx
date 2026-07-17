@@ -15,6 +15,7 @@ import {
   type CatalogPage,
   type CatalogSkill,
 } from "@/lib/catalog"
+import { buildInstallCommand } from "@/lib/install-command"
 
 function installCount(count: number) {
   return `${count.toLocaleString()} ${count === 1 ? "install" : "installs"}`
@@ -29,7 +30,7 @@ function SkillCard({
   featured?: boolean
   isSaved: boolean
 }) {
-  const command = `npx skills add ${item.installUrl} --skill ${item.slug}`
+  const command = buildInstallCommand(item.installUrl, item.slug)
 
   return (
     <SkillDossier
