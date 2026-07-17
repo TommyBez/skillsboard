@@ -11,7 +11,10 @@ export const DEFAULT_TIMEOUT_MS = 15_000;
 
 const SCRIPT_DIRECTORY = dirname(fileURLToPath(import.meta.url));
 const REPOSITORY_ROOT = resolve(SCRIPT_DIRECTORY, "../..");
-export const DEFAULT_QUERY_DIRECTORY = resolve(SCRIPT_DIRECTORY, "queries");
+export const DEFAULT_QUERY_DIRECTORY = resolve(
+  REPOSITORY_ROOT,
+  "analytics/posthog/queries",
+);
 export const DEFAULT_OUTPUT_PATH = resolve(
   REPOSITORY_ROOT,
   ".agents/loops/skillsboard-gtm-pulse-data.json",
@@ -42,6 +45,185 @@ const SENSITIVE_COLUMN_PATTERN =
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const IP_ADDRESS_PATTERN = /^(?:\d{1,3}\.){3}\d{1,3}$/;
+const ISO_UTC_TIMESTAMP_PATTERN =
+  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,9})?Z$/;
+
+const NON_NEGATIVE_INTEGER = Object.freeze({ type: "integer", minimum: 0 });
+const NULLABLE_NON_NEGATIVE_NUMBER = Object.freeze({
+  type: "number",
+  minimum: 0,
+  nullable: true,
+});
+const NULLABLE_RATE = Object.freeze({
+  type: "number",
+  minimum: 0,
+  maximum: 1,
+  nullable: true,
+});
+const NULL_ONLY = Object.freeze({ type: "null" });
+const TIMESTAMP = Object.freeze({ type: "timestamp" });
+const NULLABLE_TIMESTAMP = Object.freeze({ type: "timestamp", nullable: true });
+
+const QUERY_RESULT_SCHEMAS = Object.freeze({
+  readiness: defineResultSchema({
+    exactRows: 1,
+    columns: [["ready", { type: "integer", allowedValues: [1] }]],
+  }),
+  acquisition_v1: defineResultSchema({
+    exactRows: 1,
+    columns: [
+      ["stage", { type: "string", allowedValues: ["acquisition"] }],
+      ["decision_status", { type: "string", allowedValues: ["unavailable"] }],
+      [
+        "unavailable_reason",
+        {
+          type: "string",
+          allowedValues: [
+            "qualified_visitor_and_source_attribution_not_instrumented",
+          ],
+        },
+      ],
+      ["current_window_start", TIMESTAMP],
+      ["current_window_end", TIMESTAMP],
+      ["previous_window_start", TIMESTAMP],
+      ["previous_window_end", TIMESTAMP],
+      ["current_public_pageviews", NON_NEGATIVE_INTEGER],
+      ["current_public_visitors", NON_NEGATIVE_INTEGER],
+      ["current_anonymous_cta_clicks", NON_NEGATIVE_INTEGER],
+      ["current_new_team_signup_intents", NON_NEGATIVE_INTEGER],
+      ["current_new_team_signups", NON_NEGATIVE_INTEGER],
+      ["current_team_starts", NON_NEGATIVE_INTEGER],
+      ["current_raw_signup_intent_rate", NULLABLE_NON_NEGATIVE_NUMBER],
+      ["current_signup_completion_rate", NULLABLE_NON_NEGATIVE_NUMBER],
+      ["current_team_start_rate", NULLABLE_NON_NEGATIVE_NUMBER],
+      ["previous_public_pageviews", NON_NEGATIVE_INTEGER],
+      ["previous_public_visitors", NON_NEGATIVE_INTEGER],
+      ["previous_anonymous_cta_clicks", NON_NEGATIVE_INTEGER],
+      ["previous_new_team_signup_intents", NON_NEGATIVE_INTEGER],
+      ["previous_new_team_signups", NON_NEGATIVE_INTEGER],
+      ["previous_team_starts", NON_NEGATIVE_INTEGER],
+    ],
+  }),
+  activation_v1: defineResultSchema({
+    exactRows: 2,
+    columns: [
+      ["cohort_period", { type: "string", allowedValues: ["current", "previous"] }],
+      ["cohort_start", TIMESTAMP],
+      ["cohort_end", TIMESTAMP],
+      ["observation_days", { type: "integer", allowedValues: [14] }],
+      ["teams_created", NON_NEGATIVE_INTEGER],
+      ["teams_with_first_skill_24h", NON_NEGATIVE_INTEGER],
+      ["teams_with_invite_72h", NON_NEGATIVE_INTEGER],
+      ["teams_with_acceptance_7d", NON_NEGATIVE_INTEGER],
+      ["teams_activated_14d", NON_NEGATIVE_INTEGER],
+      ["stalled_before_first_skill", NON_NEGATIVE_INTEGER],
+      ["stalled_before_invite", NON_NEGATIVE_INTEGER],
+      ["stalled_before_acceptance", NON_NEGATIVE_INTEGER],
+      ["stalled_before_noncreator_value", NON_NEGATIVE_INTEGER],
+      ["activation_rate_14d", NULLABLE_RATE],
+      ["median_minutes_to_activation", NULLABLE_NON_NEGATIVE_NUMBER],
+      ["cohort_maturity", { type: "string", allowedValues: ["empty", "mature"] }],
+    ],
+    requiredValues: {
+      cohort_period: ["current", "previous"],
+    },
+  }),
+  retention_v1: defineResultSchema({
+    exactRows: 1,
+    allowSourceFreeConstantRow: true,
+    columns: [
+      ["stage", { type: "string", allowedValues: ["retention"] }],
+      ["measurement_status", { type: "string", allowedValues: ["unavailable"] }],
+      [
+        "unavailable_reason",
+        {
+          type: "string",
+          allowedValues: ["historical_activation_milestones_not_backfilled"],
+        },
+      ],
+      ["rolling_window_start", TIMESTAMP],
+      ["rolling_window_end", TIMESTAMP],
+      ["current_period_start", TIMESTAMP],
+      ["current_period_end", TIMESTAMP],
+      ["previous_period_start", TIMESTAMP],
+      ["previous_period_end", TIMESTAMP],
+      ["aat_28", NULL_ONLY],
+      ["previous_aat_28", NULL_ONLY],
+      ["new_activated", NULL_ONLY],
+      ["retained", NULL_ONLY],
+      ["reactivated", NULL_ONLY],
+      ["lost", NULL_ONLY],
+      ["delta_aat", NULL_ONLY],
+      ["period_1_cohort_start", TIMESTAMP],
+      ["period_1_cohort_end", TIMESTAMP],
+      ["period_1_mature_activated", NULL_ONLY],
+      ["period_1_retained", NULL_ONLY],
+      ["period_1_retention_rate", NULL_ONLY],
+    ],
+  }),
+  tracking_health_v1: defineResultSchema({
+    exactRows: 11,
+    columns: [
+      [
+        "event_name",
+        {
+          type: "string",
+          allowedValues: [
+            "$pageview",
+            "landing_cta_clicked",
+            "signup_form_submitted",
+            "user_signed_up",
+            "team_created",
+            "skill_saved",
+            "team_member_invited",
+            "invitation_accepted",
+            "skill_usage_path_selected",
+            "skill_downloaded",
+            "team_library_viewed",
+          ],
+        },
+      ],
+      ["team_scoped_required", { type: "integer", allowedValues: [0, 1] }],
+      ["window_start", TIMESTAMP],
+      ["window_end", TIMESTAMP],
+      ["event_count", NON_NEGATIVE_INTEGER],
+      ["unique_teams", NON_NEGATIVE_INTEGER],
+      ["missing_team_scope_count", NON_NEGATIVE_INTEGER],
+      ["invalid_schema_count", NON_NEGATIVE_INTEGER],
+      ["missing_environment_count", NON_NEGATIVE_INTEGER],
+      ["first_seen_at", NULLABLE_TIMESTAMP],
+      ["last_seen_at", NULLABLE_TIMESTAMP],
+      [
+        "health_status",
+        {
+          type: "string",
+          allowedValues: [
+            "missing",
+            "schema_mismatch",
+            "missing_environment",
+            "missing_team_scope",
+            "healthy",
+          ],
+        },
+      ],
+    ],
+    requiredValues: {
+      event_name: [
+        "$pageview",
+        "landing_cta_clicked",
+        "signup_form_submitted",
+        "user_signed_up",
+        "team_created",
+        "skill_saved",
+        "team_member_invited",
+        "invitation_accepted",
+        "skill_usage_path_selected",
+        "skill_downloaded",
+        "team_library_viewed",
+      ],
+    },
+  }),
+});
 
 class ScorecardError extends Error {
   constructor(code, message, dataStatus = "broken") {
@@ -50,6 +232,38 @@ class ScorecardError extends Error {
     this.code = code;
     this.dataStatus = dataStatus;
   }
+}
+
+function defineResultSchema({
+  exactRows,
+  columns,
+  requiredValues = {},
+  allowSourceFreeConstantRow = false,
+}) {
+  return Object.freeze({
+    exactRows,
+    allowSourceFreeConstantRow,
+    columns: Object.freeze(
+      columns.map(([name, valueSchema]) => {
+        const normalizedValueSchema = {
+          ...valueSchema,
+          ...(Array.isArray(valueSchema.allowedValues)
+            ? { allowedValues: Object.freeze([...valueSchema.allowedValues]) }
+            : {}),
+        };
+
+        return Object.freeze([name, Object.freeze(normalizedValueSchema)]);
+      }),
+    ),
+    requiredValues: Object.freeze(
+      Object.fromEntries(
+        Object.entries(requiredValues).map(([column, values]) => [
+          column,
+          Object.freeze([...values]),
+        ]),
+      ),
+    ),
+  });
 }
 
 function statusError(code, message) {
@@ -201,7 +415,21 @@ function parseQueryName(sql, fileName) {
   return queryName;
 }
 
-function validateQuerySql(sql, fileName) {
+function queryResultSchema(queryName) {
+  const schema = QUERY_RESULT_SCHEMAS[queryName];
+
+  if (!schema) {
+    throw new ScorecardError(
+      "query_schema_missing",
+      `Query ${queryName} does not have an explicit result schema.`,
+      "unavailable",
+    );
+  }
+
+  return schema;
+}
+
+function validateQuerySql(sql, fileName, queryName) {
   const normalizedSql = sql.trim();
 
   if (normalizedSql === "") {
@@ -215,11 +443,16 @@ function validateQuerySql(sql, fileName) {
     );
   }
 
-  if (
-    !/\b(count(?:if)?|sum(?:if)?|avg(?:if)?|min(?:if)?|max(?:if)?|uniq\w*|quantile\w*|median\w*|group\s+by)\s*\(?/i.test(
+  const resultSchema = queryResultSchema(queryName);
+  const hasAggregate =
+    /\b(count(?:if)?|sum(?:if)?|avg(?:if)?|min(?:if)?|max(?:if)?|uniq\w*|quantile\w*|median\w*|group\s+by)\s*\(?/i.test(
       normalizedSql,
-    )
-  ) {
+    );
+  const isAllowedSourceFreeConstant =
+    resultSchema.allowSourceFreeConstantRow &&
+    !/\b(from|join)\b/i.test(normalizedSql);
+
+  if (!hasAggregate && !isAllowedSourceFreeConstant) {
     throw new ScorecardError(
       "non_aggregate_query",
       `Query file ${fileName} must return aggregate metrics rather than raw events.`,
@@ -274,7 +507,7 @@ export async function loadQueries(queryDirectory = DEFAULT_QUERY_DIRECTORY) {
     }
 
     names.add(name);
-    queries.push({ name, sql: validateQuerySql(sql, fileName) });
+    queries.push({ name, sql: validateQuerySql(sql, fileName, name) });
   }
 
   return queries;
@@ -419,7 +652,118 @@ function validateAggregateScalar(value) {
   );
 }
 
-export function normalizeAggregateResult(payload) {
+function inferResultSchema(columns) {
+  const matches = Object.entries(QUERY_RESULT_SCHEMAS).filter(([, schema]) => {
+    const expectedColumns = schema.columns.map(([name]) => name);
+    return (
+      expectedColumns.length === columns.length &&
+      expectedColumns.every((column, index) => column === columns[index])
+    );
+  });
+
+  if (matches.length !== 1) {
+    throw new ScorecardError(
+      "query_schema_missing",
+      "The scorecard result does not match exactly one explicit query schema.",
+      "unavailable",
+    );
+  }
+
+  return matches[0][1];
+}
+
+function validateSchemaValue(value, valueSchema) {
+  const scalar = validateAggregateScalar(value);
+
+  if (scalar === null) {
+    if (valueSchema.type === "null" || valueSchema.nullable) {
+      return scalar;
+    }
+
+    throw new ScorecardError(
+      "unsafe_result_value",
+      "A scorecard result contained null where its query schema requires a value.",
+    );
+  }
+
+  if (valueSchema.type === "null") {
+    throw new ScorecardError(
+      "unsafe_result_value",
+      "A scorecard result contained a value where its query schema requires null.",
+    );
+  } else if (valueSchema.type === "integer") {
+    if (typeof scalar !== "number" || !Number.isSafeInteger(scalar)) {
+      throw new ScorecardError(
+        "unsafe_result_value",
+        "A scorecard result did not match its required integer type.",
+      );
+    }
+  } else if (valueSchema.type === "number") {
+    if (typeof scalar !== "number") {
+      throw new ScorecardError(
+        "unsafe_result_value",
+        "A scorecard result did not match its required numeric type.",
+      );
+    }
+  } else if (valueSchema.type === "string") {
+    if (typeof scalar !== "string") {
+      throw new ScorecardError(
+        "unsafe_result_value",
+        "A scorecard result did not match its required string type.",
+      );
+    }
+  } else if (valueSchema.type === "timestamp") {
+    if (
+      typeof scalar !== "string" ||
+      !ISO_UTC_TIMESTAMP_PATTERN.test(scalar) ||
+      !Number.isFinite(Date.parse(scalar))
+    ) {
+      throw new ScorecardError(
+        "unsafe_result_value",
+        "A scorecard result did not match its required UTC timestamp format.",
+      );
+    }
+  } else {
+    throw new ScorecardError(
+      "unsafe_result_schema",
+      "A scorecard query has an unsupported result value schema.",
+    );
+  }
+
+  if (
+    typeof valueSchema.minimum === "number" &&
+    scalar < valueSchema.minimum
+  ) {
+    throw new ScorecardError(
+      "unsafe_result_value",
+      "A scorecard result was below its allowed minimum.",
+    );
+  }
+
+  if (
+    typeof valueSchema.maximum === "number" &&
+    scalar > valueSchema.maximum
+  ) {
+    throw new ScorecardError(
+      "unsafe_result_value",
+      "A scorecard result was above its allowed maximum.",
+    );
+  }
+
+  if (
+    Array.isArray(valueSchema.allowedValues) &&
+    !valueSchema.allowedValues.includes(scalar)
+  ) {
+    throw new ScorecardError(
+      "unsafe_result_value",
+      "A scorecard result was outside the values allowed by its query schema.",
+    );
+  }
+
+  return scalar;
+}
+
+export function normalizeAggregateResult(payload, queryName) {
   if (
     !payload ||
     typeof payload !== "object" ||
@@ -468,6 +812,26 @@ export function normalizeAggregateResult(payload) {
     );
   }
 
+  const schema = queryName ? queryResultSchema(queryName) : inferResultSchema(columns);
+  const expectedColumns = schema.columns.map(([column]) => column);
+
+  if (
+    columns.length !== expectedColumns.length ||
+    columns.some((column, index) => column !== expectedColumns[index])
+  ) {
+    throw new ScorecardError(
+      "unsafe_result_schema",
+      "The scorecard result columns do not match the explicit schema for its query.",
+    );
+  }
+
+  if (payload.results.length !== schema.exactRows) {
+    throw new ScorecardError(
+      "unsafe_result_shape",
+      "The scorecard result row count does not match the explicit schema for its query.",
+    );
+  }
+
   const records = payload.results.map((row) => {
     if (!Array.isArray(row) || row.length !== columns.length) {
       throw new ScorecardError(
@@ -477,9 +841,25 @@ export function normalizeAggregateResult(payload) {
     }
 
     return Object.fromEntries(
-      columns.map((column, index) => [column, validateAggregateScalar(row[index])]),
+      schema.columns.map(([column, valueSchema], index) => [
+        column,
+        validateSchemaValue(row[index], valueSchema),
+      ]),
     );
   });
+
+  for (const [column, requiredValues] of Object.entries(schema.requiredValues)) {
+    const observedValues = new Set(records.map((record) => record[column]));
+    if (
+      observedValues.size !== requiredValues.length ||
+      requiredValues.some((requiredValue) => !observedValues.has(requiredValue))
+    ) {
+      throw new ScorecardError(
+        "unsafe_result_value",
+        "The scorecard result did not contain the required unique values for its query.",
+      );
+    }
+  }
 
   if (records.length === 1) {
     return { metrics: records[0], rowCount: 1 };
@@ -612,7 +992,7 @@ export async function runScorecard({
         fetchImpl,
         timeoutMs,
       });
-      const result = normalizeAggregateResult(payload);
+      const result = normalizeAggregateResult(payload, query.name);
 
       snapshot.queries.push({
         name: query.name,

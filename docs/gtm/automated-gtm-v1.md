@@ -94,6 +94,8 @@ An organization counts when it has at least two members, at least one saved skil
 
 **Current Acquisition availability:** raw public visits, CTA intent, signup intent, and signup context are instrumented. The qualified-visitor denominator and source-to-activation attribution are `unavailable` until the qualification rule, internal/test exclusions, source taxonomy, and team-level attribution query in §11 are implemented. Until then, the router may report raw counts but must not apply source kill/scale thresholds or route an Acquisition experiment from those metrics.
 
+**Current Retention availability:** the versioned query executes and its output schema is validated, but schema-v2 events cannot reconstruct activation milestones for teams that existed before deployment. It therefore returns `measurement_status=unavailable` and null decision metrics until a trustworthy database reconciliation, state snapshot, or backfill exists. Query execution `data_status=available` never overrides that stage-level status: the router must not calculate `AAT-28`, route Retention, or use dependent sustainability ratios from those nulls, while independent stages may still report.
+
 ### Activation milestone: `team_activated_14d`
 
 A new team activates when, within 14 days of `team_created`, it completes:
@@ -237,7 +239,7 @@ Keep one scheduled automation. It is a full-funnel sensing and routing layer, no
 
 ### Executable read contract
 
-Every pulse must first run `pnpm gtm:pulse:data`, then consume only `.agents/loops/skillsboard-gtm-pulse-data.json`. The router may proceed only when the file is fresh, schema-valid, and has top-level `status=ready`. Each query carries `data_status=available|unavailable|broken`: a valid zero is `available`; missing credentials, definitions, or sources are `unavailable`; failed, stale, partial, or malformed results are `broken`. The router never estimates missing values, queries PostHog ad hoc, or substitutes DB or dashboard proxies.
+Every pulse must first run `pnpm gtm:pulse:data`, then consume only `.agents/loops/skillsboard-gtm-pulse-data.json`. The router may proceed only when the file is fresh, schema-valid, and has top-level `status=ready`. Each query carries `data_status=available|unavailable|broken`: a valid zero is `available`; missing credentials, definitions, or sources are `unavailable`; failed, stale, partial, or malformed results are `broken`. Query availability covers execution and schema validation only; stage-level `decision_status` and `measurement_status` still determine whether a metric may enter routing. The router never estimates missing values, queries PostHog ad hoc, or substitutes DB or dashboard proxies.
 
 Event ingestion and metric reading use different PostHog credentials. `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` with `NEXT_PUBLIC_POSTHOG_HOST` only sends events. Read-only execution requires server/local-only `POSTHOG_PERSONAL_API_KEY` with minimum `Query Read`, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; optional `POSTHOG_DEPLOYMENT_ENVIRONMENT` is allowlisted to `production` (default), `preview`, or `development`. The Personal API Key must never be exposed to the client, stored in the generated JSON, or committed.
 
@@ -249,7 +251,7 @@ The automation is not live merely because it is scheduled. The production creden
 - **Acts when:** Always refreshes the scorecard; opens a diagnostic only when data is trustworthy, a decision threshold is met, and no diagnostic, implementation, experiment, or overlapping PR is already open. A directly evidenced repository-fixable Tracking QA defect may route only a tracking-repair PR.
 - **Purpose:** Show the whole growth system and choose the single highest-leverage evidenced constraint.
 - **Skills used:** analytics, marketing-plan, marketing-loops, plus the selected stage skill only after routing.
-- **Body:** run `pnpm gtm:pulse:data`; validate and consume only the generated JSON; calculate all five scorecard rows and `ΔAAT` from `available` values; exclude unavailable, broken, or immature stages; apply downstream health gates before any Acquisition scaling action; then select the largest eligible constraint by absolute teams affected and strength of evidence.
+- **Body:** run `pnpm gtm:pulse:data`; validate and consume only the generated JSON; calculate all five scorecard rows and `ΔAAT` from `available` values; exclude unavailable, broken, or immature stages; route a verified product defect first; route Revenue/sustainability next only for a proven cost-cap breach or due quarterly review after its self-check passes; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Revenue/sustainability never enters the team-count comparator.
 - **Self-check:** environment and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
 - **State / idempotency:** schema version, last successful run, metric snapshots, per-stage status, one open diagnostic, one in-flight experiment, one open pulse PR, pending human decisions, signal hashes, and cooldowns.
 - **Stop / bail-out:** broken or stale data makes Tracking QA the only action. No owner means no experiment. Four unanswered weekly recommendations pause action modules; the heartbeat may continue monthly.
@@ -312,14 +314,14 @@ Instrumentation status is not query availability. The browser-safe project token
 |---|---|---|---|
 | Acquisition | `$pageview` | PostHog automatic pageview on non-sensitive routes with a sanitized URL; only allowlisted UTMs remain. Invite, auth, and consent pageviews are dropped in both PostHog and Vercel Analytics. | Implemented |
 | Acquisition | `landing_cta_clicked` | `location`, `destination`, `visitor_state`; Acquisition filters `visitor_state=anonymous`. | Implemented |
-| Acquisition | `signup_form_submitted` | `method`, `signup_context=new_team|team_invitation`; invitation signup is not new-team acquisition. | Implemented |
-| Activation | `user_signed_up` | `method`, `signup_context=new_team|team_invitation`; measures completion after signup intent. | Implemented |
+| Acquisition | `signup_form_submitted` | `method`, `signup_context=new_team\|team_invitation`; invitation signup is not new-team acquisition. | Implemented |
+| Activation | `user_signed_up` | `method`, `signup_context=new_team\|team_invitation`; measures completion after signup intent. | Implemented |
 | Acquisition | qualified visitors and activated teams by source | Written qualification rule, internal/test exclusion, normalized source taxonomy, 30d first-touch/last-non-direct query, and referral override. | Unavailable until §11 |
-| Activation | `team_created` | `team_id`, `creation_surface=onboarding|in_app`. | Implemented |
+| Activation | `team_created` | `team_id`, `creation_surface=onboarding\|in_app`. | Implemented |
 | Activation | `skill_saved`, invite prompt, `team_member_invited`, `invitation_accepted` | Existing semantic properties plus stable `team_id`. | Implemented |
 | Activation / Retention | `skill_usage_path_selected`, `skill_downloaded` | `team_id`, skill metadata, `method`, `surface`, `actor_is_skill_creator`; union as the `team_value_action` access proxy, not proof of installation. | Implemented |
 | Retention | `team_library_viewed` | `team_id`, `skill_count`, `has_skills`, `filter_state`; one event per mounted route-state transition, including search/tag navigation, with same-route skill mutations deduplicated while mounted. | Implemented |
-| Retention | `AAT-28` states | HogQL grouped by `team_id`, never a person funnel. | Query required |
+| Retention | `AAT-28` states | HogQL grouped by `team_id`, never a person funnel; fail closed until historical activation is reconciled. | Query implemented; measurement unavailable |
 | Referral research | `organic_champion_replication` | Invited user later creates and activates a different `team_id`; correlation only, not referral attribution. | Query required |
 | Referral | ask/copy/create/activate events | Add only after a referral surface exists; optimize for `referred_team_activated`. | Planned, gated |
 | Revenue / sustainability | cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28` | Aggregate Vercel, Neon, Resend, GTM spend, and founder-time inputs; not user events. | Data connection required |

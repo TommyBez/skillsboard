@@ -35,15 +35,27 @@ async function makeQueryDirectory(files) {
 
 test("loadQueries uses -- name metadata and falls back to the basename", async () => {
   const queryDirectory = await makeQueryDirectory({
-    "01-first.sql": "-- name: activation\nSELECT count() AS activated_teams FROM events",
-    "retention.sql": "SELECT count() AS retained_teams FROM events",
+    "01-first.sql": "-- name: readiness\nSELECT count() AS ready FROM events",
+    "retention_v1.sql": "SELECT count() AS aat_28 FROM events",
   });
 
   const queries = await loadQueries(queryDirectory);
 
   assert.deepEqual(
     queries.map(({ name }) => name),
-    ["activation", "retention"],
+    ["readiness", "retention_v1"],
+  );
+});
+
+test("loadQueries rejects a query without an explicit result schema", async () => {
+  const queryDirectory = await makeQueryDirectory({
+    "leaky.sql":
+      "SELECT properties.team_id AS segment, count() AS total FROM events GROUP BY segment",
+  });
+
+  await assert.rejects(
+    loadQueries(queryDirectory),
+    /does not have an explicit result schema/,
   );
 });
 
@@ -57,6 +69,36 @@ test("the versioned full-funnel PostHog query set is complete", async () => {
   for (const query of queries) {
     const resolved = resolveQueryPlaceholders(query.sql, "production");
     assert.doesNotMatch(resolved, /\{\{[^{}]+\}\}/);
+  }
+});
+
+test("retention fails closed without scanning partial event history", async () => {
+  const sql = await readFile(
+    join(DEFAULT_QUERY_DIRECTORY, "retention_v1.sql"),
+    "utf8",
+  );
+
+  assert.match(sql, /'unavailable' AS measurement_status/);
+  assert.match(
+    sql,
+    /'historical_activation_milestones_not_backfilled' AS unavailable_reason/,
+  );
+  assert.doesNotMatch(sql, /\b(FROM|JOIN)\b/i);
+  assert.doesNotMatch(sql, /\bproperties\.team_id\b/i);
+
+  for (const metric of [
+    "aat_28",
+    "previous_aat_28",
+    "new_activated",
+    "retained",
+    "reactivated",
+    "lost",
+    "delta_aat",
+    "period_1_mature_activated",
+    "period_1_retained",
+    "period_1_retention_rate",
+  ]) {
+    assert.match(sql, new RegExp(`NULL AS ${metric}\\b`));
   }
 });
 
@@ -101,7 +143,7 @@ test("resolveQueryPlaceholders replaces only an allowlisted environment", () => 
 
 test("runScorecard fails closed when credentials are missing", async () => {
   const queryDirectory = await makeQueryDirectory({
-    "activation.sql": "SELECT count() AS activated_teams FROM events",
+    "readiness.sql": "SELECT count() AS ready FROM events",
   });
   let fetchCalled = false;
 
@@ -152,28 +194,26 @@ test("executeHogQlQuery sends the documented HogQLQuery request", async () => {
 
 test("runScorecard emits only aggregate named metrics", async () => {
   const queryDirectory = await makeQueryDirectory({
-    "activation.sql": "SELECT count() AS activated_teams FROM events",
+    "readiness.sql": "SELECT count() AS ready FROM events",
   });
 
   const snapshot = await runScorecard({
     environment: VALID_ENVIRONMENT,
     fetchImpl: async () =>
-      new Response(
-        JSON.stringify({ columns: ["activated_teams"], results: [[7]] }),
-      ),
+      new Response(JSON.stringify({ columns: ["ready"], results: [[1]] })),
     generatedAt: "2026-07-17T12:00:00.000Z",
     queryDirectory,
   });
 
   assert.equal(snapshot.status, "ready");
-  assert.deepEqual(snapshot.metrics, { activation: { activated_teams: 7 } });
+  assert.deepEqual(snapshot.metrics, { readiness: { ready: 1 } });
   assert.equal(snapshot.queries[0].rowCount, 1);
 });
 
 test("runScorecard resolves the environment before sending HogQL", async () => {
   const queryDirectory = await makeQueryDirectory({
-    "activation.sql":
-      "SELECT count() AS activated_teams FROM events WHERE env = '{{environment}}'",
+    "readiness.sql":
+      "SELECT count() AS ready FROM events WHERE env = '{{environment}}'",
   });
   let submittedSql;
 
@@ -184,9 +224,7 @@ test("runScorecard resolves the environment before sending HogQL", async () => {
     },
     fetchImpl: async (_url, options) => {
       submittedSql = JSON.parse(options.body).query.query;
-      return new Response(
-        JSON.stringify({ columns: ["activated_teams"], results: [[2]] }),
-      );
+      return new Response(JSON.stringify({ columns: ["ready"], results: [[1]] }));
     },
     queryDirectory,
   });
@@ -198,7 +236,7 @@ test("runScorecard resolves the environment before sending HogQL", async () => {
 
 test("runScorecard marks an expected API failure as broken", async () => {
   const queryDirectory = await makeQueryDirectory({
-    "activation.sql": "SELECT count() AS activated_teams FROM events",
+    "readiness.sql": "SELECT count() AS ready FROM events",
   });
 
   const snapshot = await runScorecard({
@@ -214,13 +252,43 @@ test("runScorecard marks an expected API failure as broken", async () => {
 
 test("normalizeAggregateResult rejects identifiers and PII-like values", () => {
   assert.throws(
-    () => normalizeAggregateResult({ columns: ["team_id"], results: [["team-1"]] }),
+    () =>
+      normalizeAggregateResult(
+        { columns: ["team_id"], results: [["team-1"]] },
+        "readiness",
+      ),
     /raw or sensitive column/,
   );
   assert.throws(
-    () => normalizeAggregateResult({ columns: ["source"], results: [["a@example.com"]] }),
+    () =>
+      normalizeAggregateResult(
+        { columns: ["ready"], results: [["a@example.com"]] },
+        "readiness",
+      ),
     /may identify a person or raw event/,
   );
+});
+
+test("runScorecard rejects a team identifier hidden behind an allowed alias", async () => {
+  const queryDirectory = await makeQueryDirectory({
+    "readiness.sql":
+      "SELECT max(properties.team_id) AS ready FROM events",
+  });
+
+  const snapshot = await runScorecard({
+    environment: VALID_ENVIRONMENT,
+    fetchImpl: async () =>
+      new Response(
+        JSON.stringify({ columns: ["ready"], results: [["team_123"]] }),
+      ),
+    generatedAt: "2026-07-17T12:00:00.000Z",
+    queryDirectory,
+  });
+
+  assert.equal(snapshot.status, "broken");
+  assert.equal(snapshot.queries[0].error.code, "unsafe_result_value");
+  assert.deepEqual(snapshot.metrics, {});
+  assert.doesNotMatch(JSON.stringify(snapshot), /team_123/);
 });
 
 test("check mode probes API readiness without executing scorecard SQL", async () => {
