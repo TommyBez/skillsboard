@@ -177,7 +177,21 @@ The repository score below predates the first production PostHog API run. On 202
 
 **Current bets:** problem-led pages for cross-agent team workflows; founder/maintainer distribution; a conditional public-signal scan; consultants and AI enablement champions as a multiplier ICP.
 
-**Measurement target:** normalized UTMs, anonymous landing CTA intent, signup context, and eventual activated teams by source. Raw intent is available now; qualified visitors and source-to-activation attribution remain unavailable until §11 is resolved. Scan public demand only when the router selects Acquisition or during a monthly research refresh.
+#### Problem-led programmatic SEO
+
+Programmatic SEO is a bounded Acquisition diagnostic, not an automatic page factory. It targets adjacent team problems with a direct path to creating a shared library: sharing skills across different agents, standardizing reusable AI workflows, moving beyond scattered prompt libraries, capturing repeatable AI use cases, function-specific playbooks, and lightweight skill inventory or source-review practices. It does not default to individual-skill profiles, generic "AI tools" pages, generic AI news, or enterprise-governance claims.
+
+The module has two mutually exclusive modes. A monthly read-only research appendix may run only after the router returns `no action` and while no diagnostic, experiment, PR, or human decision is open; it is not a second diagnostic and cannot edit code or open a PR. The operational diagnostic runs only when Acquisition is the single routed constraint. It uses `programmatic-seo` and `content-strategy`, with `seo-audit` before any draft PR. Inputs are the product-marketing contract, current routes and canonical intents, public SERPs, official vendor documentation, primary research, attributable public problem signals, Search Console when connected, downstream PostHog outcomes, and optionally DataForSEO.
+
+DataForSEO is a future optional enrichment source, not a prerequisite for qualitative research. Until a bounded runner, server-only Basic Auth API login and API password, target market/language, explicit request and spend caps, and human approval for paid use exist, the DataForSEO source remains `unavailable` and no paid call is made. Quantitative fields are `search_volume`, source `monthly_searches`, `keyword_difficulty`, `google_ads_competition`, and `cpc`, each with status, source, market/language, and `as_of`; missing values are never zero or inferred. A `trend` is not derived until its formula, window, and series-completeness rule are versioned. Categorical `search_intent` is stored separately with evidence and confidence and may be inferred qualitatively from a current SERP; provider probabilities are optional enrichment, not demand evidence. Google Ads competition and organic keyword difficulty remain separate metrics.
+
+Field availability is not proof of demand. Store `demand_gate=pass|fail|unavailable|broken` separately: a valid zero is available but cannot pass, and CPC, keyword difficulty, Google Ads competition, or search-intent classification never satisfy the gate. Only a human-approved, versioned rule over demand measures such as search volume, its monthly source series, or target-query Search Console impressions can pass. Until market/language, formula, comparison window, minimum completeness, and threshold are approved and versioned, the gate is `unavailable`; credentials alone do not enable autonomous pSEO PRs.
+
+Each research run keeps at most 30 deduplicated seed queries and shortlists at most five opportunities. A `canonical_intent_id` combines normalized locale, audience/problem, and intent independently of format; candidates, existing canonical URLs, and open PRs are deduplicated on that ID before shortlisting. Every candidate must have a distinct intent, a natural `create a team library` conversion path, current attributable sources, differentiated utility such as an original comparison, workflow, checklist, template, or decision framework, product-contract-safe claims, no canonical overlap, and complete metadata, internal-link, sitemap, indexation, and supported-schema handling.
+
+Qualitative evidence alone produces a report and one specifically named pilot recommendation, not an autonomous PR. Bind a human approval to `approval_key = canonical_intent_id + candidate_url + source_snapshot_hash`; any change invalidates it, and opening the PR consumes it. The approval overrides only the quantitative-demand requirement; every other global and module gate still applies. Autonomous implementation requires the operational Acquisition contract, every global routing/PR gate, and `demand_gate=pass`. It defaults to one page and has a hard maximum of three new indexable pages in one intent cluster. Merge and publication remain human-gated. After publication, evaluate a page over a complete eight-week window using indexation and Search Console query/page impressions for the target intent when available. Use page-specific CTA/signup intent only after a stable landing identifier such as `landing_path` and its query are implemented and validated; the current `landing_cta_clicked.location` describes the CTA surface, not the landing page. Use activated teams only after attribution is operational, and apply success or kill checks only to available page-attributable measures. Pause a pattern after two mature comparable misses and diagnose it before producing more.
+
+**Measurement target:** normalized UTMs, anonymous landing CTA intent, signup context, and eventual activated teams by source. Raw intent is available now; qualified visitors and source-to-activation attribution remain unavailable until §11 is resolved. Scan public demand when the router selects Acquisition; the monthly pSEO appendix is allowed only after `no action` and with no open work.
 
 **Not now:** broad paid acquisition, mass cold email, unsolicited commercial GitHub issues, or generic “AI tools” content.
 
@@ -243,7 +257,7 @@ The automation is not live merely because it is scheduled. The production creden
 
 ### Controlled implementation and PR gate
 
-The pulse may implement only its single routed constraint. Eligible work is either a repository-fixable product or Tracking QA defect proven by source inspection plus a reproducible check, or one bounded experiment whose data, maturity, threshold, ownership, and concurrency gates all pass. Broken Tracking QA blocks growth implementations and permits only a directly evidenced tracking repair.
+The pulse may implement only its single routed constraint. Eligible work is a repository-fixable product or Tracking QA defect proven by source inspection plus a reproducible check, one bounded experiment whose data, maturity, threshold, ownership, and concurrency gates all pass, or one routed problem-led pSEO candidate with `demand_gate=pass` that passes every global and dedicated gate. A specifically named one-page qualitative pSEO pilot is eligible only while its exact, unconsumed approval key is recorded in state; that approval overrides only the quantitative-demand gate. Broken Tracking QA blocks growth implementations and permits only a directly evidenced tracking repair.
 
 Before editing, the pulse requires a clean checkout on the synchronized repository default branch and no overlapping local-state or GitHub PR. It creates a `codex/gtm-<slug>` branch, makes one small reversible change, adds focused tests, and runs relevant tests, typecheck, and proportionate build or browser verification. A different base branch, failed verification, unrelated changes, or suspected secrets stop the workflow before push.
 
@@ -255,7 +269,7 @@ These are one-shot branches of Loop 0, not independent scheduled loops. They inh
 
 | Module | Check and trigger | Output | Key stop condition |
 |---|---|---|---|
-| Acquisition | Weekly scorecard; public scan only when Acquisition is selected or during monthly research. | One channel/content hypothesis and at most five evidence-backed signals or drafts. | Qualification or attribution contract unavailable, insufficient volume, or no qualified signal. |
+| Acquisition | Weekly scorecard; public scan only when Acquisition is selected. A monthly pSEO research appendix may run only after `no action` with no open work. The pSEO branch may maintain 30 deduplicated seeds and shortlist at most five opportunities. | One channel/content hypothesis; one named pSEO pilot recommendation when demand is unproven; or one pSEO draft PR with one page by default and at most three pages after the implementation gates pass. | Qualification or attribution gaps block growth conclusions; any `demand_gate` other than `pass` blocks autonomous pSEO implementation but not qualitative research; no unique value, intent overlap, thin content, or failed SEO/verification gates block the PR. |
 | Activation | Weekly at current volume; stalled mature cohorts or a verified product defect. | One step-level diagnosis and one bounded in-product experiment. | Tracking gap, active cooldown, unresolved bug, or two failed nudges. |
 | Retention | Weekly snapshot, monthly diagnosis after a mature cohort exists. | One cause candidate supported by usage and an interview/research plan. | Cohort not mature, normal low-frequency behavior not ruled out, or outage/event change. |
 | Referral | Monthly and dormant until happy moments exist. | One in-product ask or case-study draft for human review. | Team not healthy, no referral attribution, no consent, or 60d cooldown. |
@@ -323,11 +337,14 @@ Client analytics drops pageviews for invite, auth, consent, and Better Auth rout
 7. Whether the primary acquisition surface is English only or also Italian.
 8. Whether consultant-created libraries are the primary multiplier ICP or a separate use case.
 9. Sustainability mode for the next 12 months: intentional public good, sponsorship/grants, services, or optional add-ons that preserve the free core.
+10. Whether to connect Search Console and optional DataForSEO server-only API credentials, target market/language, and approved per-run spend cap; until then quantitative pSEO fields remain `unavailable`.
 
 ## 12. Reference points
 
 - [GitHub Agent Skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
 - [GitHub CLI skill management](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/)
+- [DataForSEO API authentication](https://docs.dataforseo.com/v3/auth/)
+- [DataForSEO Google Ads keyword data](https://docs.dataforseo.com/v3/keywords_data-google_ads-overview/)
 - [OpenAI workspace skill sharing](https://help.openai.com/en/articles/20001066-skills-in-chatgpt)
 - [Claude organization skill provisioning](https://support.claude.com/en/articles/13119606-provision-and-manage-skills-for-your-organization)
 - [Cursor team product and marketplace](https://cursor.com/pricing)
