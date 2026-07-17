@@ -103,12 +103,12 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `DATABASE_URL` | Yes | PostgreSQL connection string used by Better Auth and Drizzle. |
 | `BETTER_AUTH_SECRET` | Yes | Secret used to sign and encrypt authentication data. |
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
-| `RESEND_API_KEY` | Yes for email auth | Sends sign-in OTP and team invitation emails through Resend. |
-| `EMAIL_FROM` | Recommended | Verified sender used for OTP and invitation emails. |
+| `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
+| `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain>`). |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
-Sign-in and sign-up use email one-time codes (no passwords). Without Resend, OTP delivery fails and invitations can still be created with links copied manually. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
+Sign-in and sign-up use email one-time codes (no passwords). Outside development, configure both `RESEND_API_KEY` and a domain-verified `EMAIL_FROM`; the fallback Resend test sender only works for Resend’s own test recipients. In development, OTP emails are skipped and any 6-digit code works. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
 
 ## MCP access
 

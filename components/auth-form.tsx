@@ -25,9 +25,22 @@ interface AuthFormProps {
 
 const RESEND_COOLDOWN_SECONDS = 60
 const OTP_LENGTH = 6
+const NEW_USER_WINDOW_MS = 2 * 60 * 1000
 
 const otpSlotClassName =
   "size-11 rounded-[14px] border border-border bg-background text-base first:rounded-[14px] first:border-l last:rounded-[14px] data-[active=true]:border-primary data-[active=true]:ring-primary/30 sm:size-12"
+
+function emailLocalPart(value: string): string {
+  const local = value.split("@")[0]?.trim()
+  return local || value
+}
+
+function isNewlyCreatedUser(user: { createdAt?: unknown } | null | undefined): boolean {
+  if (!user?.createdAt) return false
+  const createdAtMs = new Date(user.createdAt as string | Date).getTime()
+  if (Number.isNaN(createdAtMs)) return false
+  return Date.now() - createdAtMs < NEW_USER_WINDOW_MS
+}
 
 export function AuthForm({
   mode,
@@ -104,23 +117,26 @@ export function AuthForm({
     setError("")
 
     try {
+      const displayName = name.trim() || emailLocalPart(email)
       const result = await authClient.signIn.emailOtp({
         email,
         otp: nextOtp,
-        ...(isSignUp && name ? { name } : {}),
+        name: displayName,
       })
       if (result.error) {
         setError(result.error.message ?? "That code didn’t work. Request a new one and try again.")
         return
       }
-      const userId =
-        result.data && "user" in result.data && result.data.user && typeof result.data.user === "object" && "id" in result.data.user
-          ? String(result.data.user.id)
+      const user =
+        result.data && "user" in result.data && result.data.user && typeof result.data.user === "object"
+          ? result.data.user
           : null
+      const userId = user && "id" in user ? String(user.id) : null
       if (userId) {
         posthog.identify(userId)
       }
-      posthog.capture(isSignUp ? "user_signed_up" : "user_signed_in")
+      // Both pages share signIn.emailOtp; emit based on whether the account was just created.
+      posthog.capture(isNewlyCreatedUser(user) ? "user_signed_up" : "user_signed_in")
       if (continueHref) {
         window.location.assign(continueHref)
         return
