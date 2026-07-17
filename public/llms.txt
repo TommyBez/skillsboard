@@ -10,6 +10,7 @@ Key facts:
 - MCP is an optional authenticated read-only access method, not the primary product narrative
 
 ## Pages
+- [Sitemap](https://skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://skillsboard.sh/): Product overview, pricing, and common questions
 - [Pricing](https://skillsboard.sh/pricing.md): Machine-readable pricing details
 - [Create account](https://skillsboard.sh/sign-up): Start a free team library
