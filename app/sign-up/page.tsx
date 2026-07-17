@@ -26,7 +26,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
     <AccessShell
       marker="Create account"
       title="Create your free account"
-      description="Start a shared skill library for your team, or join one you’ve been invited to."
+      description="Enter your email for a one-time code, then start a shared skill library for your team."
       editorialTitle="Stop answering the same “which skill?” question."
       editorialBody="Collect the skills your team recommends so colleagues can find them and choose the source, compatible command, or ZIP that fits their setup."
     >

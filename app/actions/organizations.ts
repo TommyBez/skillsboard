@@ -175,7 +175,7 @@ export async function acceptInvitation(
   const invitationId = z.string().regex(/^[A-Za-z0-9_-]{1,200}$/).safeParse(formData.get("invitationId"))
   if (!invitationId.success) return { error: "This invitation link is invalid." }
   const session = await getSession()
-  if (!session?.user) redirect(`/sign-in?returnTo=${encodeURIComponent(`/invite/${invitationId.data}`)}`)
+  if (!session?.user) redirect(`/sign-up?returnTo=${encodeURIComponent(`/invite/${invitationId.data}`)}`)
 
   try {
     await auth.api.acceptInvitation({

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import { AuthForm } from "@/components/auth-form"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getDeploymentEnvironment } from "@/lib/auth-environment"
 import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
 import { safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
@@ -40,6 +41,7 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
       returnTo={returnTo}
       continueHref={oauthContinue}
       preserveQuery={oauthQuery}
+      acceptAnyOtp={getDeploymentEnvironment() === "development"}
     />
   )
 }
@@ -48,7 +50,6 @@ export function AuthEntryFallback({ mode }: Pick<AuthEntryProps, "mode">) {
   return (
     <div className="grid gap-4" aria-label={mode === "sign-up" ? "Loading account creation form" : "Loading sign in form"}>
       {mode === "sign-up" ? <Skeleton className="h-20 rounded-[16px]" /> : null}
-      <Skeleton className="h-20 rounded-[16px]" />
       <Skeleton className="h-20 rounded-[16px]" />
       <Skeleton className="h-12 rounded-[16px]" />
     </div>
