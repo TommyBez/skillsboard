@@ -19,7 +19,7 @@ import { cacheTags } from "@/lib/cache-tags"
 export type { CatalogPage, CatalogSkill, CatalogSkillDetail, CatalogView }
 export { CATALOG_PAGE_SIZE, SEARCH_MAX_LIMIT, SEARCH_PAGE_SIZE }
 
-const SKILL_ID_PATTERN = /^[\w.-]+(?:\/[\w.-]+)+$/
+const SKILL_ID_PATTERN = /^(?!.*(?:^|\/)\.\.?(?:\/|$))[\w.-]+(?:\/[\w.-]+)+$/
 const DEFAULT_DESCRIPTION = "A reusable agent skill."
 
 interface CatalogResponse {
