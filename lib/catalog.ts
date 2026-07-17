@@ -11,6 +11,15 @@ export interface CatalogSkill {
   isDuplicate?: boolean
 }
 
+export interface CatalogSkillDetail {
+  id: string
+  source: string
+  slug: string
+  name: string
+  description: string
+  installs: number
+}
+
 export type CatalogView = "trending" | "hot" | "all-time" | "curated"
 
 export interface CatalogPage {

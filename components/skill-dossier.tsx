@@ -30,6 +30,7 @@ interface SkillDossierProps {
   addedBy?: string | null
   href?: string
   hrefLabel?: string
+  details?: ReactNode
   compact?: boolean
   actions?: ReactNode
   className?: string
@@ -48,6 +49,7 @@ export function SkillDossier({
   addedBy,
   href,
   hrefLabel = "View source",
+  details,
   compact = false,
   actions,
   className,
@@ -134,9 +136,9 @@ export function SkillDossier({
             />
           </div>
         </div>
-        {href || actions ? (
+        {details || href || actions ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            {href ? (
+            {details ? details : href ? (
               <a aria-label={`${hrefLabel} for ${name}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary" href={href} target="_blank" rel="noreferrer">
                 {href.includes("github.com") ? (
                   <GitHubMark className="size-4" />
