@@ -1,7 +1,21 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 
 import { AccessShell } from "@/components/access-shell"
 import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
+
+export const metadata: Metadata = {
+  title: "Create your team library",
+  description:
+    "Create a free Skills Board account and start a shared library of AI skills your team recommends.",
+  alternates: { canonical: "/sign-up" },
+  openGraph: {
+    url: "/sign-up",
+    title: "Create your team library | Skills Board",
+    description:
+      "Start a shared skill library for your team. Free forever, open source, built for mixed agent setups.",
+  },
+}
 
 interface SignUpPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>

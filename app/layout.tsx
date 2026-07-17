@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { siteConfig } from "@/lib/site"
 
 import "./globals.css"
 
@@ -10,18 +11,50 @@ const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-br
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
-  title: { default: "Skills Board, your team’s recommended AI skills", template: "%s | Skills Board" },
-  description: "Build a shared library of AI skills your team recommends. Give teammates the source, command, or ZIP so they can choose what fits their setup.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: "Skills Board, your team’s recommended AI skills",
+    template: "%s | Skills Board",
+  },
+  description: siteConfig.description,
+  applicationName: siteConfig.name,
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
+  creator: siteConfig.name,
+  publisher: siteConfig.name,
+  category: "technology",
+  keywords: [
+    "AI skills",
+    "team skill library",
+    "shared AI skills",
+    "Claude skills",
+    "Cursor skills",
+    "Codex skills",
+    "agent skills",
+    "skill recommendations",
+  ],
   openGraph: {
     type: "website",
+    locale: siteConfig.locale,
+    url: siteConfig.url,
     title: "Skills Board — One shared library. Different agents.",
-    description: "Keep your team’s recommended AI skills in one searchable place.",
-    siteName: "Skills Board",
+    description: siteConfig.ogDescription,
+    siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
     title: "Skills Board — One shared library. Different agents.",
-    description: "Keep your team’s recommended AI skills in one searchable place.",
+    description: siteConfig.ogDescription,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
 }
 

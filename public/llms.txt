@@ -1,0 +1,19 @@
+# Skills Board
+> Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find them and choose the usage path that fits their agent setup.
+
+Skills Board is free hosted SaaS with open-source code. A saved skill is a team recommendation, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
+
+Key facts:
+- Product category: shared AI skill library for teams
+- Primary audience: small and mid-sized teams using a mix of Claude, Codex, Cursor, and other agents
+- Usage paths per skill: original source, install command, or ZIP download of the latest source files
+- MCP is an optional authenticated read-only access method, not the primary product narrative
+
+## Pages
+- [Home](https://skillsboard.sh/): Product overview, pricing, and common questions
+- [Pricing](https://skillsboard.sh/pricing.md): Machine-readable pricing details
+- [Create account](https://skillsboard.sh/sign-up): Start a free team library
+- [GitHub repository](https://github.com/TommyBez/skillsboard): Open-source code
+
+## Optional
+- [Product homepage with FAQ](https://skillsboard.sh/#faq): Extractable answers about compatibility, catalogs, and free pricing

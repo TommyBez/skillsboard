@@ -1,4 +1,5 @@
 import { Suspense } from "react"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { headers } from "next/headers"
 import { CheckIcon, ShieldCheckIcon } from "lucide-react"
@@ -11,6 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
 import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
 import { getSession } from "@/lib/session"
+
+export const metadata: Metadata = {
+  title: "Authorize access",
+  robots: { index: false, follow: false },
+}
 
 interface ConsentPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
