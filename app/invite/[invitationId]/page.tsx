@@ -26,7 +26,9 @@ async function InvitationDetails({ params }: InvitationPageProps) {
   const returnTo = `/invite/${encodeURIComponent(invitationId)}`
 
   if (!session?.user) {
-    redirect(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`)
+    // New invitees need the sign-up name field; OTP sign-in can create accounts
+    // without a name when registration is left enabled.
+    redirect(`/sign-up?returnTo=${encodeURIComponent(returnTo)}`)
   }
 
   try {

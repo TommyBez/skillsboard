@@ -103,12 +103,12 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `DATABASE_URL` | Yes | PostgreSQL connection string used by Better Auth and Drizzle. |
 | `BETTER_AUTH_SECRET` | Yes | Secret used to sign and encrypt authentication data. |
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
-| `RESEND_API_KEY` | No | Sends team invitation emails through Resend. |
-| `EMAIL_FROM` | No | Verified sender used for invitation emails. |
+| `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
+| `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain.com>`). |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
-Without Resend, invitations can still be created and their links copied manually. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
+Sign-in and sign-up use email one-time codes (no passwords). Outside development, configure both `RESEND_API_KEY` and a domain-verified `EMAIL_FROM`; the fallback Resend test sender only works for Resend’s own test recipients. In development, OTP emails are skipped and any 6-digit code works. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
 
 ## MCP access
 
@@ -120,7 +120,7 @@ Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signin
 | --- | --- |
 | Application | Next.js 16 App Router, React 19, TypeScript |
 | UI | Tailwind CSS 4, shadcn/ui, Base UI |
-| Authentication | Better Auth with organizations and OAuth provider support |
+| Authentication | Better Auth (email OTP) with organizations and OAuth provider support |
 | Data | PostgreSQL, Drizzle ORM |
 | Email | Resend and React Email |
 | Agent access | Model Context Protocol via `mcp-handler` |
