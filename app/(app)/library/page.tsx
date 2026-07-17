@@ -100,15 +100,13 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
 
       {skills.length ? (
         <section aria-label="Team skill recommendations" className="grid gap-4 md:grid-cols-2">
-          {skills.map((item, index) => {
+          {skills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             const canEditNote = item.createdBy === userId
             const canDelete = canEditNote || canManageLibrary
             return (
               <SkillDossier
                 key={item.id}
-                featured={index === 0 && skills.length > 2}
-                className={index === 0 && skills.length > 2 ? "md:col-span-2" : undefined}
                 headingLevel="h2"
                 name={item.title}
                 description={item.description ?? `${item.repoOwner}/${item.repoName}`}
@@ -179,7 +177,8 @@ function LibraryResultsFallback() {
     <div className="grid gap-8" aria-label="Loading saved skills">
       <Skeleton className="h-28 rounded-2xl" />
       <div className="grid gap-4 md:grid-cols-2">
-        <Skeleton className="h-80 rounded-2xl md:col-span-2" />
+        <Skeleton className="h-72 rounded-2xl" />
+        <Skeleton className="h-72 rounded-2xl" />
         <Skeleton className="h-72 rounded-2xl" />
         <Skeleton className="h-72 rounded-2xl" />
       </div>

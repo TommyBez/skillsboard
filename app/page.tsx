@@ -5,6 +5,7 @@ import { ArrowRightIcon } from "lucide-react"
 import { Brand } from "@/components/brand"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getSession } from "@/lib/session"
@@ -17,10 +18,13 @@ function primaryAction(signedIn: boolean) {
 
 function HomeHeaderActionsFallback() {
   return (
-    <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
-      <Skeleton className="hidden h-8 w-16 rounded-lg sm:block" />
-      <Skeleton className="h-8 w-28 rounded-lg sm:h-10 sm:w-40" />
-    </nav>
+    <div className="flex items-center gap-1.5">
+      <ThemeToggle />
+      <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
+        <Skeleton className="hidden h-8 w-16 rounded-lg sm:block" />
+        <Skeleton className="h-8 w-28 rounded-lg sm:h-10 sm:w-40" />
+      </nav>
+    </div>
   )
 }
 
@@ -32,32 +36,35 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <nav className="flex items-center gap-1.5" aria-label="Main navigation">
-      {!signedIn ? (
+    <div className="flex items-center gap-1.5">
+      <ThemeToggle />
+      <nav className="flex items-center gap-1.5" aria-label="Main navigation">
+        {!signedIn ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            className="hidden sm:inline-flex"
+            nativeButton={false}
+            render={<Link href="/sign-in" />}
+          >
+            Sign in
+          </Button>
+        ) : null}
         <Button
           size="sm"
-          variant="ghost"
-          className="hidden sm:inline-flex"
+          className={`${styles.ctaButton} sm:h-10 sm:px-4`}
           nativeButton={false}
-          render={<Link href="/sign-in" />}
+          render={<Link href={primary.href} />}
         >
-          Sign in
+          <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
+          <span className="hidden sm:inline">{primary.label}</span>
+          <ArrowRightIcon
+            className={`${styles.ctaArrow} hidden sm:block`}
+            data-icon="inline-end"
+          />
         </Button>
-      ) : null}
-      <Button
-        size="sm"
-        className={`${styles.ctaButton} sm:h-10 sm:px-4`}
-        nativeButton={false}
-        render={<Link href={primary.href} />}
-      >
-        <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
-        <span className="hidden sm:inline">{primary.label}</span>
-        <ArrowRightIcon
-          className={`${styles.ctaArrow} hidden sm:block`}
-          data-icon="inline-end"
-        />
-      </Button>
-    </nav>
+      </nav>
+    </div>
   )
 }
 

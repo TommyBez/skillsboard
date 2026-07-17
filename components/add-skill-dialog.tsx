@@ -190,7 +190,7 @@ export function AddSkillDialog({
             </Field>
 
             {skills.length > 1 ? (
-              <Field>
+              <Field className="reveal-enter">
                 <FieldLabel htmlFor="skillPath">Skill</FieldLabel>
                 <Select
                   id="skillPath"
@@ -212,7 +212,7 @@ export function AddSkillDialog({
                 <FieldDescription>{selectedSkill?.description ?? `${skills.length} installable skills found.`}</FieldDescription>
               </Field>
             ) : selectedSkill ? (
-              <Field>
+              <Field className="reveal-enter">
                 <FieldLabel>Skill found</FieldLabel>
                 <div className="rounded-xl border border-border bg-muted/35 p-4">
                   <p className="font-mono text-sm font-semibold text-foreground">{selectedSkill.name}</p>
@@ -222,7 +222,7 @@ export function AddSkillDialog({
             ) : null}
 
             {selectedSkill ? (
-              <>
+              <div className="reveal-enter flex flex-col gap-5">
                 <Field>
                   <FieldLabel htmlFor="note">Note (optional)</FieldLabel>
                   <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />
@@ -233,7 +233,7 @@ export function AddSkillDialog({
                   <Input id="tags" name="tags" placeholder="research, productivity" />
                   <FieldDescription>Comma-separated, up to 10 tags.</FieldDescription>
                 </Field>
-              </>
+              </div>
             ) : null}
           </FieldGroup>
 

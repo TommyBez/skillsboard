@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 
 import { Brand } from "@/components/brand"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface AccessShellProps {
   marker: string
@@ -27,9 +28,12 @@ export function AccessShell({
 
           <div className="relative flex items-center justify-between gap-6">
             <Brand />
-            <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--surface-ink-foreground)] opacity-50">
-              Shared skill library
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--surface-ink-foreground)] opacity-50">
+                Shared skill library
+              </span>
+              <ThemeToggle className="border-white/15 bg-white/5 text-[var(--surface-ink-foreground)] hover:bg-white/10 hover:text-[var(--surface-ink-foreground)]" />
+            </div>
           </div>
 
           <div className="relative my-auto max-w-2xl py-16">
@@ -49,11 +53,14 @@ export function AccessShell({
         </aside>
 
         <section className="flex min-w-0 flex-col bg-card">
-          <div className="flex items-center justify-between border-b border-border px-5 py-4 lg:hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 lg:hidden">
             <Brand />
-            <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">
-              {marker}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[0.6rem] uppercase tracking-[0.18em] text-muted-foreground">
+                {marker}
+              </span>
+              <ThemeToggle />
+            </div>
           </div>
 
           <div className="flex flex-1 items-center px-5 py-8 sm:px-9 sm:py-10 lg:px-14 xl:px-20">

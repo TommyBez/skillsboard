@@ -1,11 +1,11 @@
-import Link from "next/link"
-import { LibraryBigIcon, LogOutIcon, SearchIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
+import { LibraryBigIcon, SearchIcon } from "lucide-react"
 
+import { AccountMenu } from "@/components/account-menu"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
 import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
-import { SignOutForm } from "@/components/sign-out-form"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface AppHeaderProps {
   user: { name: string; email: string }
@@ -14,8 +14,6 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
-  const initials = user.name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase()
-
   return (
     <>
       <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-xl">
@@ -32,37 +30,8 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
               <OrganizationSwitcher organizations={organizations} activeId={activeId} />
               <CreateOrganizationDialog />
             </div>
-            <details className="group relative">
-              <summary
-                aria-label="User menu"
-                className="flex size-10 cursor-pointer list-none items-center justify-center rounded-xl border border-border bg-card/65 transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring group-open:bg-muted [&::-webkit-details-marker]:hidden"
-              >
-                <span className="flex size-8 items-center justify-center rounded-lg bg-foreground font-mono text-[0.7rem] text-background">
-                  {initials}
-                </span>
-              </summary>
-              <div className="absolute right-0 top-12 z-40 min-w-64 overflow-hidden rounded-xl border border-border bg-popover text-popover-foreground shadow-[0_18px_48px_hsl(var(--shadow-color)/0.18)]">
-                <div className="p-3">
-                  <span className="block font-semibold">{user.name}</span>
-                  <span className="mt-0.5 block truncate font-normal text-muted-foreground">{user.email}</span>
-                </div>
-                <nav className="border-t border-border p-1" aria-label="Account settings">
-                  <Link className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" href="/settings/organization">
-                    <SettingsIcon className="size-4" aria-hidden="true" />Team access
-                  </Link>
-                  <Link className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" href="/settings/mcp">
-                    <SlidersHorizontalIcon className="size-4" aria-hidden="true" />MCP setup
-                  </Link>
-                </nav>
-                <div className="border-t border-border p-1">
-                  <SignOutForm>
-                    <button className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted" type="submit">
-                      <LogOutIcon className="size-4" aria-hidden="true" />Sign out
-                    </button>
-                  </SignOutForm>
-                </div>
-              </div>
-            </details>
+            <ThemeToggle />
+            <AccountMenu user={user} />
           </div>
         </div>
       </header>
