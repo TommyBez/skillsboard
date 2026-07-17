@@ -7,6 +7,8 @@ The full-funnel hardening pass adds a global allowlist-based URL and property sa
 
 The client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host only send events; they do not authorize analytics queries. GTM pulse reads require a separate server/local-only Personal API Key with minimum `Query Read`, the PostHog project ID, and the regional API host.
 
+On 2026-07-17, a project-restricted `Query Read` key was configured locally and `pnpm gtm:pulse:data` completed against production project `225645`. All four aggregate queries returned `data_status=available`; the generated artifact passed schema, freshness, and secret-leak checks. The artifact-only dry run correctly routed Tracking QA rather than a growth action because the current production sample still contains pre-v2 analytics: five required event types report `schema_mismatch` and six are missing.
+
 ## Events instrumented
 
 | Event name | Description | File |
@@ -50,7 +52,7 @@ All team-scoped events include a stable `team_id` property. Usage-path events al
 
 The runner requires `POSTHOG_PERSONAL_API_KEY` (`Query Read` only), `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`. Optional `POSTHOG_DEPLOYMENT_ENVIRONMENT` selects `production` (default), `preview`, or `development`. These values are server/local-only: do not prefix them with `NEXT_PUBLIC_`, expose them to browser code, print the key, or write it to the JSON artifact.
 
-The pulse must not be described as live until these credentials target the intended production project, the runner succeeds, the artifact schema and freshness checks pass, and a dry run consumes the artifact without inference.
+The PostHog read path is API-validated. The operational GTM router must not be described as ready to route growth actions until the schema-v2 instrumentation in this branch is deployed and a later production run passes Tracking QA, including internal/test exclusion.
 
 ## Next steps
 
@@ -73,8 +75,8 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Sensitive route pageviews are dropped and remaining URLs/properties are allowlist-sanitized before client analytics events are sent.
 - [x] Generic autocapture and session replay are disabled; explicit semantic events remain.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating the production scorecard as launch-ready.
-- [x] Define and live-parse versioned team-level HogQL for Activation and `AAT-28` state transitions; API execution still waits on the read-only key.
-- [ ] Configure the server/local-only PostHog query variables, validate `pnpm gtm:pulse:data` against production, and complete one artifact-only dry run before calling the GTM pulse live.
+- [x] Define, live-parse, and API-execute versioned team-level HogQL for Activation and `AAT-28` state transitions.
+- [x] Configure server/local-only PostHog query access, validate `pnpm gtm:pulse:data` against production, and complete an artifact-only dry run; it correctly remains in Tracking QA until schema-v2 events are deployed and healthy.
 
 ### Agent skill
 

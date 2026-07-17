@@ -1,7 +1,7 @@
 # Skills Board — automated full-funnel GTM v1
 
 **Date:** 2026-07-17
-**Status:** Foundation and executable read contract implemented locally; not live until production query credentials and a validated dry run exist
+**Status:** Production PostHog read path API-validated; the router remains in Tracking QA until schema-v2 instrumentation is deployed and production data quality passes
 **Primary outcome:** Grow retained teams by finding and removing the largest evidenced constraint across the whole funnel, not by optimizing one stage in isolation.
 
 ## 1. Executive decision
@@ -145,7 +145,7 @@ This tiny development sample may contain internal or test activity. It validates
 
 ## 5. Current state — scored from repository materials
 
-No live PostHog export, budget, customer interviews, or retention data were available for this score. The development database snapshot above is aggregate and directional only. The shape matters more than the total.
+The repository score below predates the first production PostHog API run. On 2026-07-17, all four aggregate pulse queries executed successfully, but the artifact-only dry run found five required event types with `schema_mismatch` and six missing event types in the current production sample. There is therefore still no trustworthy production growth baseline, budget, customer-interview corpus, or mature retention read. The development database snapshot above remains aggregate and directional only.
 
 | Area | Score / 5 | Evidence-based note |
 |---|---:|---|
@@ -227,7 +227,7 @@ Every pulse must first run `pnpm gtm:pulse:data`, then consume only `.agents/loo
 
 Event ingestion and metric reading use different PostHog credentials. `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` with `NEXT_PUBLIC_POSTHOG_HOST` only sends events. Read-only execution requires server/local-only `POSTHOG_PERSONAL_API_KEY` with minimum `Query Read`, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; optional `POSTHOG_DEPLOYMENT_ENVIRONMENT` is allowlisted to `production` (default), `preview`, or `development`. The Personal API Key must never be exposed to the client, stored in the generated JSON, or committed.
 
-The automation is not live merely because it is scheduled. Live status requires credentials for the intended production project, a successful runner call, validated artifact schema and freshness, and a completed dry run that consumed only that artifact. Until then its only valid result is Tracking QA with unavailable/broken dependencies and no routed growth action.
+The automation is not live merely because it is scheduled. The production credentials, runner call, artifact validation, and first artifact-only dry run were completed on 2026-07-17. That dry run correctly produced Tracking QA only: the deployed production events do not yet satisfy the schema-v2 and semantic coverage contract in this branch. Growth routing remains gated until a post-deploy run passes those checks and internal/test exclusion exists.
 
 ### Loop 0 — Full-funnel router and tracking QA
 
@@ -260,7 +260,7 @@ No module sends, publishes, spends, changes production, or stores raw PII. A loo
 
 | Window | Outcome | Work |
 |---|---|---|
-| Days 0–30 | Trust the full-funnel board | Already shipped locally: URL sanitization plus acquisition-intent and team-return events. Remaining: deploy, validate production payloads, configure read-only PostHog query access, define attribution and internal/test exclusion, emit `available|unavailable|broken` for every query, and validate a router dry run against the generated artifact. |
+| Days 0–30 | Trust the full-funnel board | Already shipped locally: URL sanitization, acquisition-intent and team-return events, read-only PostHog query access, per-query availability states, and an artifact-only router dry run. Remaining: deploy schema v2, validate production payloads until Tracking QA passes, and define attribution plus internal/test exclusion. |
 | Days 31–60 | Diagnose the real constraint | Observe mature cohorts; interview target users, stalled teams, or lost teams according to the routed stage; run exactly one report-only diagnostic; instrument Referral or sustainability only if its prerequisite signal exists. |
 | Days 61–90 | Prove one intervention and one learning | Ship one bounded experiment on the selected stage; measure the stage-appropriate leading result and schedule its mature read; keep, revise, or kill only when the observation window closes; publish a postmortem; make an explicit sustainability-model decision without changing the free product by default. |
 
@@ -283,7 +283,7 @@ Global kill switch: pause the scheduled Codex automation. Product lifecycle auto
 
 Every PostHog event includes `analytics_schema_version` and `deployment_environment`. Team-scoped events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
 
-Instrumentation status is not query availability. The browser-safe project token proves only that the app can ingest events. The weekly scorecard becomes readable only through the executable read contract in §7; until its credentials, query results, and artifact validation pass, no PostHog-derived metric is declared live.
+Instrumentation status is not query availability. The browser-safe project token proves only that the app can ingest events. The executable read contract in §7 is API-validated, but its initial production artifact exposes legacy and missing event semantics. No PostHog-derived growth metric is decision-ready until Tracking QA passes after schema-v2 deployment.
 
 | Stage | Event or derived metric | Required properties / rule | Status |
 |---|---|---|---|
@@ -310,7 +310,7 @@ Client analytics drops pageviews for invite, auth, consent, and Better Auth rout
 3. Qualified-visitor rule plus first-touch, last non-direct, referral override, normalized UTM source taxonomy, and team-level attribution query.
 4. Consent, opt-out, data-retention, deletion, and internal-user policy for product analytics; unsubscribe/suppression before lifecycle email.
 5. Marketing cash budget, founder-time valuation/cap, and explicit owner for the weekly review.
-6. Validate server/local-only PostHog query access (`POSTHOG_PERSONAL_API_KEY`, `POSTHOG_PROJECT_ID`, `POSTHOG_API_HOST`) and team-level HogQL definitions for activation and `AAT-28` states against the generated pulse artifact.
+6. Deploy schema-v2 analytics, then repeat the production artifact dry run until semantic coverage, environment, `team_id`, freshness, and internal/test exclusion checks pass.
 7. Whether the primary acquisition surface is English only or also Italian.
 8. Whether consultant-created libraries are the primary multiplier ICP or a separate use case.
 9. Sustainability mode for the next 12 months: intentional public good, sponsorship/grants, services, or optional add-ons that preserve the free core.
