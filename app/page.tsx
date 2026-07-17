@@ -357,14 +357,6 @@ export default function HomePage() {
               <a href="#faq" className="transition-colors hover:text-foreground">
                 FAQ
               </a>
-              <a
-                href="https://github.com/TommyBez/skillsboard"
-                target="_blank"
-                rel="noreferrer"
-                className="transition-colors hover:text-foreground"
-              >
-                GitHub
-              </a>
             </nav>
             <p className="max-w-md text-sm text-muted-foreground md:text-right">
               Built for teams that work across different agents.
