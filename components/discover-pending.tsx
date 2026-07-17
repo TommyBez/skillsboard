@@ -36,7 +36,8 @@ export function useDiscoverPending() {
 export function DiscoverResultsFallback() {
   return (
     <div className="grid gap-4 md:grid-cols-2" aria-label="Loading public skills" aria-busy="true">
-      <Skeleton className="h-80 rounded-2xl md:col-span-2" />
+      <Skeleton className="h-72 rounded-2xl" />
+      <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />
     </div>

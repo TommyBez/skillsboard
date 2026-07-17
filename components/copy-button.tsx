@@ -5,7 +5,14 @@ import { CheckIcon, CopyIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
-interface CopyButtonProps { value: string; label?: string; compact?: boolean; ariaLabel?: string; copiedAriaLabel?: string }
+interface CopyButtonProps {
+  value: string
+  label?: string
+  compact?: boolean
+  iconOnly?: boolean
+  ariaLabel?: string
+  copiedAriaLabel?: string
+}
 
 async function writeToClipboard(value: string) {
   try {
@@ -25,7 +32,14 @@ async function writeToClipboard(value: string) {
   }
 }
 
-export function CopyButton({ value, label = "Copy", compact = false, ariaLabel, copiedAriaLabel }: CopyButtonProps) {
+export function CopyButton({
+  value,
+  label = "Copy",
+  compact = false,
+  iconOnly = false,
+  ariaLabel,
+  copiedAriaLabel,
+}: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
 
   async function copy() {
@@ -41,10 +55,25 @@ export function CopyButton({ value, label = "Copy", compact = false, ariaLabel, 
   const hasCopied = status === "copied"
   const hasFailed = status === "failed"
   const currentAriaLabel = hasCopied
-    ? copiedAriaLabel
+    ? copiedAriaLabel ?? ariaLabel ?? "Copied"
     : hasFailed
       ? "Copy failed. Select and copy the text manually."
-      : ariaLabel
+      : ariaLabel ?? label
 
-  return <Button aria-label={currentAriaLabel} variant="outline" size="sm" className={compact ? "h-7 border-transparent bg-card px-2" : undefined} onClick={copy}>{hasCopied ? <CheckIcon data-icon="inline-start" /> : <CopyIcon data-icon="inline-start" />}{hasCopied ? "Copied" : hasFailed ? "Copy failed" : label}</Button>
+  return (
+    <Button
+      aria-label={currentAriaLabel}
+      variant="outline"
+      size={iconOnly ? "icon-sm" : "sm"}
+      className={compact ? "h-7 border-transparent bg-card px-2" : undefined}
+      onClick={copy}
+    >
+      {hasCopied ? (
+        <CheckIcon key="copied" data-icon="inline-start" className="copy-success-icon" />
+      ) : (
+        <CopyIcon key="idle" data-icon="inline-start" />
+      )}
+      {iconOnly ? null : hasCopied ? "Copied" : hasFailed ? "Copy failed" : label}
+    </Button>
+  )
 }

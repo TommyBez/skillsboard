@@ -23,19 +23,15 @@ function installCount(count: number) {
 
 function SkillCard({
   item,
-  featured,
   isSaved,
 }: {
   item: CatalogSkill
-  featured?: boolean
   isSaved: boolean
 }) {
   const command = buildInstallCommand(item.installUrl, item.slug)
 
   return (
     <SkillDossier
-      featured={featured}
-      className={featured ? "md:col-span-2" : undefined}
       headingLevel="h2"
       name={item.name}
       description={item.description}
@@ -165,11 +161,10 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       )}
 
       <section aria-label="Catalog results" className="grid gap-4 md:grid-cols-2">
-        {skills.map((item, index) => (
+        {skills.map((item) => (
           <SkillCard
             key={item.id}
             item={item}
-            featured={index === 0 && skills.length > 2}
             isSaved={saved.has(`${item.installUrl}:${item.slug}`)}
           />
         ))}

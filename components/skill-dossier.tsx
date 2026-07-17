@@ -5,6 +5,19 @@ import { CopyButton } from "@/components/copy-button"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
+function GitHubMark({ className }: { className?: string }) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.866-.013-1.7-2.782.605-3.369-1.343-3.369-1.343-.455-1.159-1.11-1.468-1.11-1.468-.908-.62.069-.608.069-.608 1.003.071 1.531 1.031 1.531 1.031.892 1.53 2.341 1.088 2.91.832.091-.647.349-1.088.635-1.338-2.221-.253-4.555-1.112-4.555-4.947 0-1.093.39-1.987 1.029-2.686-.103-.253-.446-1.27.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.026 2.747-1.026.546 1.38.203 2.397.1 2.65.64.699 1.028 1.593 1.028 2.686 0 3.844-2.337 4.691-4.566 4.94.359.31.679.923.679 1.86 0 1.343-.012 2.426-.012 2.757 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.523 2 12 2Z" />
+    </svg>
+  )
+}
+
 interface SkillDossierProps {
   name: string
   description?: string | null
@@ -16,7 +29,6 @@ interface SkillDossierProps {
   status?: string
   href?: string
   hrefLabel?: string
-  featured?: boolean
   compact?: boolean
   actions?: ReactNode
   className?: string
@@ -34,7 +46,6 @@ export function SkillDossier({
   status,
   href,
   hrefLabel = "View source",
-  featured = false,
   compact = false,
   actions,
   className,
@@ -46,7 +57,6 @@ export function SkillDossier({
     <article
       className={cn(
         "lift-on-hover focus-frame flex h-full min-w-0 max-w-full flex-col overflow-hidden rounded-2xl border border-border bg-card",
-        featured && "surface-shadow md:min-h-80",
         className,
       )}
     >
@@ -63,7 +73,7 @@ export function SkillDossier({
         </div>
 
         <div className="flex flex-1 flex-col gap-2">
-          <Heading className={cn("font-semibold tracking-[-0.035em]", featured ? "text-3xl md:text-4xl" : compact ? "text-lg" : "text-2xl")}>
+          <Heading className={cn("font-semibold tracking-[-0.035em]", compact ? "text-lg" : "text-2xl")}>
             {name}
           </Heading>
           {description ? (
@@ -91,17 +101,22 @@ export function SkillDossier({
           <code className="min-w-0 flex-1 truncate font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
           <CopyButton
             value={command}
-            label="Copy command"
             ariaLabel={`Copy install command for ${name}`}
             copiedAriaLabel={`Copied install command for ${name}`}
             compact
+            iconOnly
           />
         </div>
         {href || actions ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             {href ? (
               <a aria-label={`${hrefLabel} for ${name}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary" href={href} target="_blank" rel="noreferrer">
-                {hrefLabel}<ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
+                {href.includes("github.com") ? (
+                  <GitHubMark className="size-4" />
+                ) : (
+                  hrefLabel
+                )}
+                <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
               </a>
             ) : <span />}
             {actions}

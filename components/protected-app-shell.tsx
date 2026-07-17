@@ -2,6 +2,7 @@ import { Suspense, type ReactNode } from "react"
 
 import { AppHeader } from "@/components/app-header"
 import { Brand } from "@/components/brand"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toaster } from "@/components/ui/sonner"
 import { getAppContext } from "@/lib/app-context"
@@ -17,6 +18,7 @@ function AppHeaderFallback() {
       <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center gap-3 px-4 md:px-6 lg:px-8">
         <Brand />
         <Skeleton className="ml-auto h-10 w-32 rounded-xl sm:w-44" />
+        <ThemeToggle />
         <Skeleton className="size-10 rounded-xl" />
       </div>
     </header>
