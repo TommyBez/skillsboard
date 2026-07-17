@@ -2,6 +2,7 @@ import { Suspense, type ReactNode } from "react"
 
 import { AppHeader } from "@/components/app-header"
 import { Brand } from "@/components/brand"
+import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Toaster } from "@/components/ui/sonner"
@@ -9,7 +10,12 @@ import { getAppContext } from "@/lib/app-context"
 
 async function AuthenticatedHeader() {
   const { session, organizations, activeId } = await getAppContext()
-  return <AppHeader user={session.user} organizations={organizations} activeId={activeId} />
+  return (
+    <>
+      <PostHogIdentity userId={session.user.id} />
+      <AppHeader user={session.user} organizations={organizations} activeId={activeId} />
+    </>
+  )
 }
 
 function AppHeaderFallback() {

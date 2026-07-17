@@ -2,6 +2,9 @@ import type { NextConfig } from 'next'
 
 const nextConfig = {
   cacheComponents: true,
+  env: {
+    NEXT_PUBLIC_ANALYTICS_ENVIRONMENT: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
+  },
   cacheLife: {
     catalog: {
       stale: 60,

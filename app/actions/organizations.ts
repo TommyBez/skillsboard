@@ -7,7 +7,7 @@ import { z } from "zod"
 import { auth, getAuthBaseUrl } from "@/lib/auth"
 import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
 import { resolveUniqueOrganizationSlug } from "@/lib/organization-slug"
-import { getPostHogClient } from "@/lib/posthog-server"
+import { captureTeamEvent } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
@@ -28,6 +28,7 @@ export interface AcceptInvitationState {
 }
 
 const organizationNameSchema = z.object({
+  creationSurface: z.enum(["onboarding", "in_app"]),
   name: z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less."),
 })
 
@@ -37,6 +38,7 @@ export async function createOrganization(
 ): Promise<CreateOrganizationState> {
   await requireSession()
   const parsed = organizationNameSchema.safeParse({
+    creationSurface: formData.get("creationSurface"),
     name: formData.get("name"),
   })
 
@@ -59,13 +61,12 @@ export async function createOrganization(
     })
     const session = await getSession()
     if (session?.user) {
-      const posthog = getPostHogClient()
-      posthog.capture({
+      await captureTeamEvent({
         distinctId: session.user.id,
         event: "team_created",
-        properties: { team_name: parsed.data.name },
+        properties: { creation_surface: parsed.data.creationSurface },
+        teamId: created.id,
       })
-      await posthog.shutdown()
     }
   } catch (error) {
     console.error("Unable to create team library", error)
@@ -136,16 +137,15 @@ export async function createInvitationLink(
 
     const currentSession = await getSession()
     if (currentSession?.user) {
-      const posthog = getPostHogClient()
-      posthog.capture({
+      await captureTeamEvent({
         distinctId: currentSession.user.id,
         event: "team_member_invited",
         properties: {
           role: parsed.data.role,
           email_sent: !emailError,
         },
+        teamId: invitation.organizationId,
       })
-      await posthog.shutdown()
     }
     return {
       emailError,
@@ -178,17 +178,16 @@ export async function acceptInvitation(
   if (!session?.user) redirect(`/sign-up?returnTo=${encodeURIComponent(`/invite/${invitationId.data}`)}`)
 
   try {
-    await auth.api.acceptInvitation({
+    const accepted = await auth.api.acceptInvitation({
       headers: await headers(),
       body: { invitationId: invitationId.data },
     })
     if (session?.user) {
-      const posthog = getPostHogClient()
-      posthog.capture({
+      await captureTeamEvent({
         distinctId: session.user.id,
         event: "invitation_accepted",
+        teamId: accepted.invitation.organizationId,
       })
-      await posthog.shutdown()
     }
   } catch (error) {
     console.error("Unable to accept invitation", error)

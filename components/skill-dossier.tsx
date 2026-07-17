@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { TrackedAnchor } from "@/components/tracked-anchor"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
@@ -35,6 +36,12 @@ interface SkillDossierProps {
   actions?: ReactNode
   className?: string
   headingLevel?: "h2" | "h3"
+  tracking?: {
+    actorIsSkillCreator: boolean
+    skillId: string
+    skillName: string
+    teamId: string
+  }
 }
 
 export function SkillDossier({
@@ -54,6 +61,7 @@ export function SkillDossier({
   actions,
   className,
   headingLevel = "h3",
+  tracking,
 }: SkillDossierProps) {
   const Heading = headingLevel
   const addedByInitials = addedBy
@@ -131,6 +139,15 @@ export function SkillDossier({
               value={command}
               ariaLabel={`Copy install command for ${name}`}
               copiedAriaLabel={`Copied install command for ${name}`}
+              analyticsEvent={tracking ? "skill_usage_path_selected" : undefined}
+              analyticsProperties={tracking ? {
+                actor_is_skill_creator: tracking.actorIsSkillCreator,
+                method: "command",
+                skill_id: tracking.skillId,
+                skill_name: tracking.skillName,
+                surface: "library",
+                team_id: tracking.teamId,
+              } : undefined}
               compact
               iconOnly
             />
@@ -139,14 +156,32 @@ export function SkillDossier({
         {details || href || actions ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             {details ? details : href ? (
-              <a aria-label={`${hrefLabel} for ${name}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary" href={href} target="_blank" rel="noreferrer">
-                {href.includes("github.com") ? (
-                  <GitHubMark className="size-4" />
-                ) : (
-                  hrefLabel
-                )}
-                <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
-              </a>
+              tracking ? (
+                <TrackedAnchor
+                  aria-label={`${hrefLabel} for ${name}`}
+                  className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  eventName="skill_usage_path_selected"
+                  eventProperties={{
+                    actor_is_skill_creator: tracking.actorIsSkillCreator,
+                    method: "source",
+                    skill_id: tracking.skillId,
+                    skill_name: tracking.skillName,
+                    surface: "library",
+                    team_id: tracking.teamId,
+                  }}
+                >
+                  {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
+                  <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
+                </TrackedAnchor>
+              ) : (
+                <a aria-label={`${hrefLabel} for ${name}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary" href={href} target="_blank" rel="noreferrer">
+                  {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
+                  <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
+                </a>
+              )
             ) : <span />}
             {actions}
           </div>

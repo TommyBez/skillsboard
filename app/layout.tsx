@@ -1,7 +1,7 @@
-import { Analytics } from "@vercel/analytics/next"
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 
+import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
 import { siteConfig } from "@/lib/site"
 
@@ -77,7 +77,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          {process.env.VERCEL === "1" ? <Analytics /> : null}
+          {process.env.VERCEL === "1" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>
       </body>
     </html>

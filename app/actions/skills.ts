@@ -13,7 +13,7 @@ import {
   GitHubSkillDiscoveryError,
   resolveGitHubSkill,
 } from "@/lib/github-skill-discovery"
-import { getPostHogClient } from "@/lib/posthog-server"
+import { captureTeamEvent } from "@/lib/posthog-server"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
 const githubRepositorySchema = z.object({
@@ -96,8 +96,7 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
       note,
     })
     updateTag(cacheTags.organizationSkills(organizationId))
-    const posthog = getPostHogClient()
-    posthog.capture({
+    await captureTeamEvent({
       distinctId: userId,
       event: "skill_saved",
       properties: {
@@ -107,8 +106,8 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
         tag_count: parsed.data.tags.length,
         has_note: Boolean(note),
       },
+      teamId: organizationId,
     })
-    await posthog.shutdown()
     return { ok: true as const }
   } catch (error) {
     console.error("Unable to save skill", error)
@@ -158,16 +157,15 @@ export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchem
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId), eq(skill.createdBy, userId)))
 
   updateTag(cacheTags.organizationSkills(organizationId))
-  const posthog = getPostHogClient()
-  posthog.capture({
+  await captureTeamEvent({
     distinctId: userId,
     event: "skill_note_updated",
     properties: {
       skill_id: parsed.data.skillId,
       has_note: Boolean(parsed.data.note),
     },
+    teamId: organizationId,
   })
-  await posthog.shutdown()
   return { ok: true as const }
 }
 
@@ -206,13 +204,12 @@ export async function deleteSkill(input: z.input<typeof deleteSkillSchema>) {
     .delete(skill)
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
-  const posthog = getPostHogClient()
-  posthog.capture({
+  await captureTeamEvent({
     distinctId: userId,
     event: "skill_deleted",
     properties: { skill_id: parsed.data.skillId },
+    teamId: organizationId,
   })
-  await posthog.shutdown()
   return { ok: true as const }
 }
 
@@ -225,8 +222,7 @@ export async function refreshSkill(id: string) {
   const metadata = await getGitHubMetadata(savedSkill.githubUrl)
   await db.update(skill).set({ description: metadata.description, repoStars: metadata.repoStars, repoUpdatedAt: metadata.repoUpdatedAt, metadataRefreshedAt: new Date(), updatedAt: new Date() }).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
-  const posthog = getPostHogClient()
-  posthog.capture({
+  await captureTeamEvent({
     distinctId: userId,
     event: "skill_refreshed",
     properties: {
@@ -234,6 +230,6 @@ export async function refreshSkill(id: string) {
       repo_owner: savedSkill.repoOwner,
       repo_name: savedSkill.repoName,
     },
+    teamId: organizationId,
   })
-  await posthog.shutdown()
 }

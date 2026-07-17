@@ -42,7 +42,7 @@ export function CreateOrganizationDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="p-6">
-          <CreateOrganizationForm idPrefix="dialog-create-org" />
+          <CreateOrganizationForm creationSurface="in_app" idPrefix="dialog-create-org" />
         </div>
       </DialogContent>
     </Dialog>
