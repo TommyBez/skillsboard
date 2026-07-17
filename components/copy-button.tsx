@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckIcon, CopyIcon } from "lucide-react"
+import { CheckIcon, CircleXIcon, CopyIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 
@@ -70,6 +70,8 @@ export function CopyButton({
     >
       {hasCopied ? (
         <CheckIcon key="copied" data-icon="inline-start" className="copy-success-icon" />
+      ) : hasFailed ? (
+        <CircleXIcon key="failed" data-icon="inline-start" className="text-destructive" />
       ) : (
         <CopyIcon key="idle" data-icon="inline-start" />
       )}
