@@ -24,15 +24,8 @@ const POSTHOG_URL_PROPERTY_KEYS = new Set([
 ])
 
 function redactInvitationPath(pathname: string) {
-  let decodedPathname = pathname
-  try {
-    decodedPathname = decodeURIComponent(pathname)
-  } catch {
-    // Keep the original pathname if it is not valid percent-encoded text.
-  }
-
-  if (!/\/invite\/[^/]+/i.test(decodedPathname)) return pathname
-  return decodedPathname.replace(/\/invite\/[^/]+/gi, REDACTED_INVITATION_PATH)
+  if (!/\/invite\/[^/]+/i.test(pathname)) return pathname
+  return pathname.replace(/\/invite\/[^/]+/gi, REDACTED_INVITATION_PATH)
 }
 
 export function sanitizeAnalyticsUrl(value: string) {

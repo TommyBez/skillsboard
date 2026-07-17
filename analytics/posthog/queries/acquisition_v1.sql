@@ -38,6 +38,7 @@ current_period AS (
         uniqIf(
             properties.team_id,
             event = 'team_created'
+            AND properties.creation_surface = 'onboarding'
             AND properties.team_id IS NOT NULL
             AND properties.team_id != ''
         ) AS team_starts
@@ -64,6 +65,7 @@ previous_period AS (
         uniqIf(
             properties.team_id,
             event = 'team_created'
+            AND properties.creation_surface = 'onboarding'
             AND properties.team_id IS NOT NULL
             AND properties.team_id != ''
         ) AS team_starts
