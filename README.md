@@ -104,7 +104,7 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `BETTER_AUTH_SECRET` | Yes | Secret used to sign and encrypt authentication data. |
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
 | `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
-| `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain>`). |
+| `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain.com>`). |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
