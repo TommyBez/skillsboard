@@ -1,10 +1,12 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import posthog from "posthog-js"
+
+import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import type { LibraryFilterState } from "@/lib/library-view-state"
 
 interface TeamLibraryAnalyticsProps {
-  filterState: "none" | "search" | "tag" | "search_and_tag"
+  filterState: LibraryFilterState
   navigationKey: string
   skillCount: number
   teamId: string
@@ -23,7 +25,7 @@ export function TeamLibraryAnalytics({
     if (lastCapturedRouteState.current === routeState) return
     lastCapturedRouteState.current = routeState
 
-    posthog.capture("team_library_viewed", {
+    captureAnalyticsEvent("team_library_viewed", {
       filter_state: filterState,
       has_skills: skillCount > 0,
       skill_count: skillCount,

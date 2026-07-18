@@ -1,26 +1,25 @@
 "use client"
 
 import type { AnchorHTMLAttributes } from "react"
-import posthog from "posthog-js"
+
+import {
+  createAnalyticsClickHandler,
+  type ClientAnalyticsEvent,
+} from "@/lib/analytics-client"
 
 interface TrackedAnchorProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  eventName: string
-  eventProperties?: Record<string, string | number | boolean | null>
+  analytics?: ClientAnalyticsEvent
 }
 
 export function TrackedAnchor({
-  eventName,
-  eventProperties,
+  analytics,
   onClick,
   ...props
 }: TrackedAnchorProps) {
   return (
     <a
       {...props}
-      onClick={(event) => {
-        posthog.capture(eventName, eventProperties)
-        onClick?.(event)
-      }}
+      onClick={createAnalyticsClickHandler(analytics, onClick)}
     />
   )
 }

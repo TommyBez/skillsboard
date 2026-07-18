@@ -2,9 +2,11 @@
 
 import { useState } from "react"
 import { CheckIcon, CircleXIcon, CopyIcon } from "lucide-react"
-import posthog from "posthog-js"
-
 import { Button } from "@/components/ui/button"
+import {
+  captureClientAnalyticsEvent,
+  type ClientAnalyticsEvent,
+} from "@/lib/analytics-client"
 
 interface CopyButtonProps {
   value: string
@@ -13,8 +15,7 @@ interface CopyButtonProps {
   iconOnly?: boolean
   ariaLabel?: string
   copiedAriaLabel?: string
-  analyticsEvent?: string
-  analyticsProperties?: Record<string, string | number | boolean | null>
+  analytics?: ClientAnalyticsEvent
 }
 
 async function writeToClipboard(value: string) {
@@ -42,8 +43,7 @@ export function CopyButton({
   iconOnly = false,
   ariaLabel,
   copiedAriaLabel,
-  analyticsEvent,
-  analyticsProperties,
+  analytics,
 }: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
 
@@ -51,7 +51,7 @@ export function CopyButton({
     try {
       await writeToClipboard(value)
       setStatus("copied")
-      if (analyticsEvent) posthog.capture(analyticsEvent, analyticsProperties)
+      if (analytics) captureClientAnalyticsEvent(analytics)
     } catch {
       setStatus("failed")
     }

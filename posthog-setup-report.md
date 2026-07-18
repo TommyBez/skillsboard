@@ -1,7 +1,7 @@
 <wizard-report>
 # PostHog post-wizard report
 
-The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. PostHog is initialized on the client via `instrumentation-client.ts`, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. A shared `lib/posthog-server.ts` helper provides the `posthog-node` client for server-side captures. User identification is performed client-side after successful auth and for returning protected-app visitors, while sign-out resets the client identity. Server events use `flushAt: 1` and `flushInterval: 0` so events flush before short-lived handlers exit.
+The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. PostHog is initialized on the client via `instrumentation-client.ts`, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. A shared lazy singleton in `lib/posthog-server.ts` queues server-side captures and gives their background flushes to Next.js `after`, so mutations and MCP responses do not wait for analytics. User identification is performed client-side after successful auth and for returning protected-app visitors, while sign-out resets the client identity. The canonical event and property contract lives in `analytics/posthog/event-manifest.mjs` and drives TypeScript capture types plus scorecard validation.
 
 The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Client and server events also receive `analytics_schema_version` plus one build-time `deployment_environment` value.
 
@@ -15,8 +15,8 @@ On 2026-07-17, a project-restricted `Query Read` key was configured locally and 
 |---|---|---|
 | `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
 | `signup_form_submitted` | A signup form was submitted, distinguished between a new-team path and a team invitation. | `components/auth-form.tsx` |
-| `user_signed_up` | User successfully created a new account via email and password. | `components/auth-form.tsx` |
-| `user_signed_in` | User successfully signed in to an existing account via email and password. | `components/auth-form.tsx` |
+| `user_signed_up` | User successfully created a new account via email OTP. | `components/auth-form.tsx` |
+| `user_signed_in` | User successfully signed in to an existing account via email OTP. | `components/auth-form.tsx` |
 | `user_signed_out` | User signed out of the app. | `app/actions/auth.ts` |
 | `team_created` | User created a new team library, distinguished by `creation_surface=onboarding\|in_app`. | `app/actions/organizations.ts` |
 | `team_member_invited` | Admin or owner generated a team invitation link and triggered an invitation email. | `app/actions/organizations.ts` |

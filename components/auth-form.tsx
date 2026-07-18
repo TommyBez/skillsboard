@@ -8,6 +8,7 @@ import { ArrowRightIcon } from "lucide-react"
 import posthog from "posthog-js"
 
 import { authClient } from "@/lib/auth-client"
+import { captureAnalyticsEvent } from "@/lib/analytics-client"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -95,7 +96,7 @@ export function AuthForm({
     const nextName = isSignUp ? String(formData.get("name")).trim() : name
 
     if (isSignUp) {
-      posthog.capture("signup_form_submitted", {
+      captureAnalyticsEvent("signup_form_submitted", {
         method: "email_otp",
         signup_context: returnTo.startsWith("/invite/") ? "team_invitation" : "new_team",
       })
@@ -145,12 +146,12 @@ export function AuthForm({
       }
       // Both pages share signIn.emailOtp; emit based on whether the account was just created.
       if (isNewlyCreatedUser(user)) {
-        posthog.capture("user_signed_up", {
+        captureAnalyticsEvent("user_signed_up", {
           method: "email_otp",
           signup_context: returnTo.startsWith("/invite/") ? "team_invitation" : "new_team",
         })
       } else {
-        posthog.capture("user_signed_in", { method: "email_otp" })
+        captureAnalyticsEvent("user_signed_in", { method: "email_otp" })
       }
       if (continueHref) {
         window.location.assign(continueHref)

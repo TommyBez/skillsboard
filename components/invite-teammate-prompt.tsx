@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { UserPlusIcon } from "lucide-react"
-import posthog from "posthog-js"
 import { useEffect } from "react"
 
 import { Button } from "@/components/ui/button"
+import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 export function InviteTeammatePrompt({ teamId }: { teamId: string }) {
   useEffect(() => {
-    posthog.capture("team_invite_prompt_viewed", {
+    captureAnalyticsEvent("team_invite_prompt_viewed", {
       surface: "library_after_first_skill",
       team_id: teamId,
     })
@@ -34,7 +34,7 @@ export function InviteTeammatePrompt({ teamId }: { teamId: string }) {
           <Link
             href="/settings/organization#invite"
             onClick={() => {
-              posthog.capture("team_invite_prompt_clicked", {
+              captureAnalyticsEvent("team_invite_prompt_clicked", {
                 surface: "library_after_first_skill",
                 team_id: teamId,
               })

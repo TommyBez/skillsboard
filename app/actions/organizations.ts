@@ -27,31 +27,27 @@ export interface AcceptInvitationState {
   error: string
 }
 
-const organizationNameSchema = z.object({
-  creationSurface: z.enum(["onboarding", "in_app"]),
-  name: z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less."),
-})
+const organizationNameSchema = z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less.")
+const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
 
 export async function createOrganization(
   _state: CreateOrganizationState,
   formData: FormData,
 ): Promise<CreateOrganizationState> {
   await requireSession()
-  const parsed = organizationNameSchema.safeParse({
-    creationSurface: formData.get("creationSurface"),
-    name: formData.get("name"),
-  })
+  const parsed = organizationNameSchema.safeParse(formData.get("name"))
+  const creationSurface = creationSurfaceSchema.parse(formData.get("creationSurface"))
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Enter a valid team name." }
   }
 
-  const slug = await resolveUniqueOrganizationSlug(parsed.data.name)
+  const slug = await resolveUniqueOrganizationSlug(parsed.data)
 
   try {
     const created = await auth.api.createOrganization({
       headers: await headers(),
-      body: { name: parsed.data.name, slug },
+      body: { name: parsed.data, slug },
     })
     if (!created?.id) return { error: "We couldn’t create your team library. Please try again." }
 
@@ -61,10 +57,10 @@ export async function createOrganization(
     })
     const session = await getSession()
     if (session?.user) {
-      await captureTeamEvent({
+      captureTeamEvent({
         distinctId: session.user.id,
         event: "team_created",
-        properties: { creation_surface: parsed.data.creationSurface },
+        properties: { creation_surface: creationSurface },
         teamId: created.id,
       })
     }
@@ -137,7 +133,7 @@ export async function createInvitationLink(
 
     const currentSession = await getSession()
     if (currentSession?.user) {
-      await captureTeamEvent({
+      captureTeamEvent({
         distinctId: currentSession.user.id,
         event: "team_member_invited",
         properties: {
@@ -183,7 +179,7 @@ export async function acceptInvitation(
       body: { invitationId: invitationId.data },
     })
     if (session?.user) {
-      await captureTeamEvent({
+      captureTeamEvent({
         distinctId: session.user.id,
         event: "invitation_accepted",
         teamId: accepted.invitation.organizationId,

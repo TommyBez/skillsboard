@@ -40,7 +40,18 @@ export async function GET(
     const archive = await buildLatestSkillArchive(savedSkill)
     const bytes = new Uint8Array(archive.bytes)
 
-    await captureTeamEvent({
+    const response = new Response(bytes, {
+      status: 200,
+      headers: {
+        "Cache-Control": "private, no-store",
+        "Content-Disposition": contentDisposition(archive.filename),
+        "Content-Length": String(bytes.byteLength),
+        "Content-Type": "application/zip",
+        "X-Content-Type-Options": "nosniff",
+      },
+    })
+
+    captureTeamEvent({
       distinctId: session.user.id,
       event: "skill_downloaded",
       properties: {
@@ -53,16 +64,7 @@ export async function GET(
       teamId: savedSkill.organizationId,
     })
 
-    return new Response(bytes, {
-      status: 200,
-      headers: {
-        "Cache-Control": "private, no-store",
-        "Content-Disposition": contentDisposition(archive.filename),
-        "Content-Length": String(bytes.byteLength),
-        "Content-Type": "application/zip",
-        "X-Content-Type-Options": "nosniff",
-      },
-    })
+    return response
   } catch (error) {
     if (error instanceof SkillArchiveError) {
       return errorResponse(error.message, error.status)

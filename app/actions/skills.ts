@@ -96,7 +96,7 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
       note,
     })
     updateTag(cacheTags.organizationSkills(organizationId))
-    await captureTeamEvent({
+    captureTeamEvent({
       distinctId: userId,
       event: "skill_saved",
       properties: {
@@ -157,7 +157,7 @@ export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchem
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId), eq(skill.createdBy, userId)))
 
   updateTag(cacheTags.organizationSkills(organizationId))
-  await captureTeamEvent({
+  captureTeamEvent({
     distinctId: userId,
     event: "skill_note_updated",
     properties: {
@@ -204,7 +204,7 @@ export async function deleteSkill(input: z.input<typeof deleteSkillSchema>) {
     .delete(skill)
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
-  await captureTeamEvent({
+  captureTeamEvent({
     distinctId: userId,
     event: "skill_deleted",
     properties: { skill_id: parsed.data.skillId },
@@ -222,7 +222,7 @@ export async function refreshSkill(id: string) {
   const metadata = await getGitHubMetadata(savedSkill.githubUrl)
   await db.update(skill).set({ description: metadata.description, repoStars: metadata.repoStars, repoUpdatedAt: metadata.repoUpdatedAt, metadataRefreshedAt: new Date(), updatedAt: new Date() }).where(and(eq(skill.id, id), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
-  await captureTeamEvent({
+  captureTeamEvent({
     distinctId: userId,
     event: "skill_refreshed",
     properties: {

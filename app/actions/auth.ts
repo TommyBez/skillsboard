@@ -11,7 +11,7 @@ import { requireSession } from "@/lib/session"
 export async function signOut(formData?: FormData) {
   const session = await requireSession()
   await auth.api.signOut({ headers: await headers() })
-  await capturePostHogEvent({
+  capturePostHogEvent({
     distinctId: session.user.id,
     event: "user_signed_out",
   })

@@ -1,36 +1,55 @@
+import "server-only"
+
+import { after } from "next/server"
 import { PostHog } from "posthog-node"
 
-import { getAnalyticsDeploymentEnvironment } from "@/lib/posthog-client-privacy"
+import {
+  ANALYTICS_SCHEMA_VERSION,
+  type AnalyticsEventCapture,
+  type NonTeamScopedCapturableAnalyticsEventName,
+  type TeamScopedCapturableAnalyticsEventName,
+} from "@/analytics/posthog/events"
+import { getAnalyticsDeploymentEnvironment } from "@/lib/analytics-environment"
 
-interface PostHogEvent {
-  distinctId: string
-  event: string
-  properties?: Record<string, unknown>
-}
+type PostHogEvent<EventName extends NonTeamScopedCapturableAnalyticsEventName> =
+  AnalyticsEventCapture<EventName> & {
+    distinctId: string
+  }
 
-interface PostHogTeamEvent extends PostHogEvent {
-  teamId: string
-}
+type PostHogTeamEvent<EventName extends TeamScopedCapturableAnalyticsEventName> =
+  AnalyticsEventCapture<EventName> & {
+    distinctId: string
+    teamId: string
+  }
 
-export function getPostHogClient() {
-  const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ?? ""
-  return new PostHog(token, {
-    host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-    flushAt: 1,
-    flushInterval: 0,
-    disabled: !token,
-  })
+let posthogClient: PostHog | undefined
+
+function getPostHogClient() {
+  if (!posthogClient) {
+    const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ?? ""
+    posthogClient = new PostHog(token, {
+      host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      disabled: !token,
+      waitUntil: after,
+    })
+  }
+
+  return posthogClient
 }
 
 /**
  * Product analytics is diagnostic and must never turn a successful mutation
  * into a user-visible failure.
  */
-export async function capturePostHogEvent({
+function captureEvent({
   distinctId,
   event,
   properties,
-}: PostHogEvent) {
+}: {
+  distinctId: string
+  event: string
+  properties?: Record<string, unknown>
+}) {
   try {
     const posthog = getPostHogClient()
     posthog.capture({
@@ -38,11 +57,10 @@ export async function capturePostHogEvent({
       event,
       properties: {
         ...properties,
-        analytics_schema_version: 2,
+        analytics_schema_version: ANALYTICS_SCHEMA_VERSION,
         deployment_environment: getAnalyticsDeploymentEnvironment(),
       },
     })
-    await posthog.shutdown()
   } catch (error) {
     console.error("Unable to capture PostHog event", {
       event,
@@ -51,17 +69,29 @@ export async function capturePostHogEvent({
   }
 }
 
+export function capturePostHogEvent<
+  EventName extends NonTeamScopedCapturableAnalyticsEventName,
+>({
+  distinctId,
+  event,
+  properties,
+}: PostHogEvent<EventName>) {
+  captureEvent({ distinctId, event, properties })
+}
+
 /**
  * Keep team-scoped events queryable without requiring PostHog's paid Groups
  * add-on. If Groups is enabled later, this stable team ID can become its key.
  */
-export function captureTeamEvent({
+export function captureTeamEvent<
+  EventName extends TeamScopedCapturableAnalyticsEventName,
+>({
   distinctId,
   event,
   properties,
   teamId,
-}: PostHogTeamEvent) {
-  return capturePostHogEvent({
+}: PostHogTeamEvent<EventName>) {
+  captureEvent({
     distinctId,
     event,
     properties: {

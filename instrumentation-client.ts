@@ -1,10 +1,11 @@
 import posthog from "posthog-js"
 
+import { ANALYTICS_SCHEMA_VERSION } from "@/analytics/posthog/events"
+import { getAnalyticsDeploymentEnvironment } from "@/lib/analytics-environment"
 import {
-  getAnalyticsDeploymentEnvironment,
   sanitizeAnalyticsUrl,
   sanitizePostHogUrlProperties,
-} from "@/lib/posthog-client-privacy"
+} from "@/lib/analytics-url-privacy"
 
 const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN
 if (token) {
@@ -18,7 +19,7 @@ if (token) {
         ...capture,
         properties: {
           ...sanitizePostHogUrlProperties(capture.properties),
-          analytics_schema_version: 2,
+          analytics_schema_version: ANALYTICS_SCHEMA_VERSION,
           deployment_environment: getAnalyticsDeploymentEnvironment(),
         },
         $set: sanitizePostHogUrlProperties(capture.$set),

@@ -2,26 +2,25 @@
 
 import type { ComponentProps } from "react"
 import Link from "next/link"
-import posthog from "posthog-js"
+
+import {
+  createAnalyticsClickHandler,
+  type ClientAnalyticsEvent,
+} from "@/lib/analytics-client"
 
 interface TrackedLinkProps extends ComponentProps<typeof Link> {
-  eventName: string
-  eventProperties?: Record<string, string | number | boolean | null>
+  analytics?: ClientAnalyticsEvent
 }
 
 export function TrackedLink({
-  eventName,
-  eventProperties,
+  analytics,
   onClick,
   ...props
 }: TrackedLinkProps) {
   return (
     <Link
       {...props}
-      onClick={(event) => {
-        posthog.capture(eventName, eventProperties)
-        onClick?.(event)
-      }}
+      onClick={createAnalyticsClickHandler(analytics, onClick)}
     />
   )
 }

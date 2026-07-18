@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
 
+import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
@@ -27,7 +28,10 @@ export const metadata: Metadata = {
   },
 }
 
-function primaryAction(signedIn: boolean) {
+function primaryAction(signedIn: boolean): {
+  href: "/library" | "/sign-up"
+  label: string
+} {
   return signedIn
     ? { href: "/library", label: "Open your library" }
     : { href: "/sign-up", label: "Create your team library" }
@@ -52,7 +56,7 @@ function HomeCtaFallback() {
 function primaryCtaEventProperties(
   signedIn: boolean,
   location: "header" | "hero" | "closing",
-) {
+): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   const primary = primaryAction(signedIn)
   return {
     destination: primary.href,
@@ -86,8 +90,10 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           render={(
             <TrackedLink
               href={primary.href}
-              eventName="landing_cta_clicked"
-              eventProperties={primaryCtaEventProperties(signedIn, "header")}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties(signedIn, "header"),
+              }}
             />
           )}
         >
@@ -119,8 +125,10 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
       render={(
         <TrackedLink
           href={primary.href}
-          eventName="landing_cta_clicked"
-          eventProperties={primaryCtaEventProperties(signedIn, "hero")}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: primaryCtaEventProperties(signedIn, "hero"),
+          }}
         />
       )}
     >
@@ -146,8 +154,10 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
       render={(
         <TrackedLink
           href={primary.href}
-          eventName="landing_cta_clicked"
-          eventProperties={primaryCtaEventProperties(signedIn, "closing")}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: primaryCtaEventProperties(signedIn, "closing"),
+          }}
         />
       )}
     >

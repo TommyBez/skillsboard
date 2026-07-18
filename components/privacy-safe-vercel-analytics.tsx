@@ -2,7 +2,7 @@
 
 import { Analytics, type BeforeSendEvent } from "@vercel/analytics/next"
 
-import { sanitizeAnalyticsUrl } from "@/lib/posthog-client-privacy"
+import { sanitizeAnalyticsUrl } from "@/lib/analytics-url-privacy"
 
 function beforeSend(event: BeforeSendEvent) {
   return {

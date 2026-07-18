@@ -18,6 +18,11 @@ import {
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
+import {
+  getLibraryFilterState,
+  getLibraryNavigationKey,
+  isInvitePromptEligible,
+} from "@/lib/library-view-state"
 import { isOrganizationAdmin } from "@/lib/session"
 
 interface LibraryPageProps {
@@ -70,14 +75,14 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
   const hasFilters = Boolean(query || params.tag)
-  const filterState = query && params.tag
-    ? "search_and_tag"
-    : query
-      ? "search"
-      : params.tag
-        ? "tag"
-        : "none"
-  const analyticsNavigationKey = `${query}\u0000${params.tag ?? ""}`
+  const filterState = getLibraryFilterState(query, params.tag)
+  const analyticsNavigationKey = getLibraryNavigationKey(query, params.tag)
+  const showInvitePrompt = isInvitePromptEligible({
+    canManageLibrary,
+    memberCount,
+    pendingInvitationCount,
+    skillCount: allSkills.length,
+  })
   const libraryHref = (next: { q?: string; tag?: string | null }) => {
     const search = new URLSearchParams()
     const nextQuery = next.q === undefined ? params.q : next.q
@@ -124,7 +129,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         ) : null}
       </section>
 
-      {allSkills.length > 0 && memberCount === 1 && pendingInvitationCount === 0 && canManageLibrary ? (
+      {showInvitePrompt ? (
         <InviteTeammatePrompt teamId={activeId} />
       ) : null}
 

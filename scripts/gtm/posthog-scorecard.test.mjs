@@ -5,7 +5,13 @@ import { join } from "node:path";
 import test from "node:test";
 
 import {
+  ANALYTICS_EVENT_MANIFEST,
+  ANALYTICS_SCHEMA_VERSION,
+  ANALYTICS_SYSTEM_PROPERTY_NAMES,
   DEFAULT_QUERY_DIRECTORY,
+  QUERY_RESULT_NAMES,
+  QUERY_RESULT_SCHEMAS,
+  TRACKING_HEALTH_EVENT_NAMES,
   executeHogQlQuery,
   loadQueries,
   normalizeAggregateResult,
@@ -20,6 +26,81 @@ const VALID_ENVIRONMENT = {
   POSTHOG_PROJECT_ID: "12345",
   POSTHOG_API_HOST: "https://eu.posthog.com",
 };
+const EXPECTED_QUERY_USAGE = Object.freeze({
+  acquisition_v1: {
+    events: [
+      "$pageview",
+      "landing_cta_clicked",
+      "signup_form_submitted",
+      "team_created",
+      "user_signed_up",
+    ],
+    properties: [
+      "$pathname",
+      "analytics_schema_version",
+      "creation_surface",
+      "deployment_environment",
+      "signup_context",
+      "team_id",
+      "visitor_state",
+    ],
+    eventPropertyBindings: [
+      {
+        property: "$pathname",
+        pattern: /\bevent\s*=\s*'\$pageview'\s+AND\s+properties\.\$pathname\b/g,
+        occurrences: 4,
+      },
+      {
+        property: "visitor_state",
+        pattern: /\bevent\s*=\s*'landing_cta_clicked'\s+AND\s+properties\.visitor_state\b/g,
+        occurrences: 2,
+      },
+      {
+        property: "signup_context",
+        pattern: /\bevent\s*=\s*'(?:signup_form_submitted|user_signed_up)'\s+AND\s+properties\.signup_context\b/g,
+        occurrences: 4,
+      },
+      {
+        property: "creation_surface",
+        pattern: /\bevent\s*=\s*'team_created'\s+AND\s+properties\.creation_surface\b/g,
+        occurrences: 2,
+      },
+    ],
+  },
+  activation_v1: {
+    events: [
+      "invitation_accepted",
+      "skill_downloaded",
+      "skill_saved",
+      "skill_usage_path_selected",
+      "team_created",
+      "team_member_invited",
+    ],
+    properties: [
+      "actor_is_skill_creator",
+      "analytics_schema_version",
+      "deployment_environment",
+      "team_id",
+    ],
+    eventPropertyBindings: [
+      {
+        property: "actor_is_skill_creator",
+        pattern: /\bcandidate\.event\s+IN\s*\(\s*'skill_usage_path_selected'\s*,\s*'skill_downloaded'\s*\)\s+AND\s+candidate\.properties\.actor_is_skill_creator\b/g,
+        occurrences: 1,
+      },
+    ],
+  },
+  retention_v1: { events: [], properties: [], eventPropertyBindings: [] },
+  tracking_health_v1: {
+    events: [...TRACKING_HEALTH_EVENT_NAMES].sort(),
+    properties: [
+      "analytics_schema_version",
+      "deployment_environment",
+      "team_id",
+    ],
+    eventPropertyBindings: [],
+  },
+});
 
 async function makeQueryDirectory(files) {
   const directory = await mkdtemp(join(tmpdir(), "skillsboard-gtm-"));
@@ -31,6 +112,33 @@ async function makeQueryDirectory(files) {
   );
 
   return directory;
+}
+
+function acquisitionResultPayload() {
+  const contract = QUERY_RESULT_SCHEMAS.acquisition_v1;
+  const timestamp = "2026-07-17T12:00:00.000Z";
+  const values = {
+    stage: "acquisition",
+    decision_status: "unavailable",
+    unavailable_reason:
+      "qualified_visitor_and_source_attribution_not_instrumented",
+    current_window_start: timestamp,
+    current_window_end: timestamp,
+    previous_window_start: timestamp,
+    previous_window_end: timestamp,
+    current_raw_signup_intent_rate: null,
+    current_signup_completion_rate: null,
+    current_team_start_rate: null,
+  };
+
+  return {
+    columns: contract.columns,
+    results: [
+      contract.columns.map((column) =>
+        Object.hasOwn(values, column) ? values[column] : 0,
+      ),
+    ],
+  };
 }
 
 test("loadQueries uses -- name metadata and falls back to the basename", async () => {
@@ -61,14 +169,184 @@ test("loadQueries rejects a query without an explicit result schema", async () =
 
 test("the versioned full-funnel PostHog query set is complete", async () => {
   const queries = await loadQueries(DEFAULT_QUERY_DIRECTORY);
+  const queryNames = queries.map(({ name }) => name);
 
   assert.deepEqual(
-    queries.map(({ name }) => name),
+    queryNames,
     ["acquisition_v1", "activation_v1", "retention_v1", "tracking_health_v1"],
+  );
+  assert.deepEqual(
+    queryNames,
+    QUERY_RESULT_NAMES.filter((queryName) => queryName !== "readiness"),
   );
   for (const query of queries) {
     const resolved = resolveQueryPlaceholders(query.sql, "production");
     assert.doesNotMatch(resolved, /\{\{[^{}]+\}\}/);
+  }
+});
+
+test("tracking health SQL stays aligned with the canonical event manifest", async () => {
+  const sql = await readFile(
+    join(DEFAULT_QUERY_DIRECTORY, "tracking_health_v1.sql"),
+    "utf8",
+  );
+  const expectedEventsBlock = sql.match(
+    /WITH expected_events AS \(([\s\S]*?)\),\s*observed_events AS/,
+  )?.[1];
+
+  assert.ok(expectedEventsBlock, "expected_events CTE should be present");
+
+  const expectedEvents = [
+    ...expectedEventsBlock.matchAll(
+      /(?:SELECT|UNION ALL SELECT)\s+'([^']+)'(?:\s+AS event_name)?\s*,\s*([01])/g,
+    ),
+  ].map((match) => ({
+    eventName: match[1],
+    teamScoped: match[2] === "1",
+  }));
+
+  assert.deepEqual(
+    expectedEvents.map(({ eventName }) => eventName),
+    [...TRACKING_HEALTH_EVENT_NAMES],
+  );
+  for (const { eventName, teamScoped } of expectedEvents) {
+    assert.equal(
+      teamScoped,
+      ANALYTICS_EVENT_MANIFEST[eventName].teamScoped,
+      `${eventName} team scope should match the manifest`,
+    );
+  }
+
+  const observedEventsBlock = sql.match(
+    /AND event IN \(([\s\S]*?)\)\s+AND \(/,
+  )?.[1];
+  assert.ok(observedEventsBlock, "observed event allowlist should be present");
+  assert.deepEqual(
+    [...observedEventsBlock.matchAll(/'([^']+)'/g)].map((match) => match[1]),
+    [...TRACKING_HEALTH_EVENT_NAMES],
+  );
+
+});
+
+test("scorecard SQL uses only events and properties declared by the analytics manifest", async () => {
+  const queries = await loadQueries(DEFAULT_QUERY_DIRECTORY);
+  const manifestEventNames = new Set(Object.keys(ANALYTICS_EVENT_MANIFEST));
+  const manifestProperties = new Set(
+    Object.values(ANALYTICS_EVENT_MANIFEST).flatMap((definition) =>
+      Object.keys(definition.properties),
+    ),
+  );
+  const declaredProperties = new Set([
+    ...manifestProperties,
+    ...ANALYTICS_SYSTEM_PROPERTY_NAMES,
+  ]);
+
+  for (const query of queries) {
+    const expectedUsage = EXPECTED_QUERY_USAGE[query.name];
+    assert.ok(expectedUsage, `${query.name} should have an explicit usage contract`);
+    for (const eventName of expectedUsage.events) {
+      assert.ok(
+        manifestEventNames.has(eventName),
+        `${query.name} expects undeclared event ${eventName}`,
+      );
+    }
+    const propertiesForExpectedEvents = new Set(
+      expectedUsage.events.flatMap((eventName) =>
+        Object.keys(ANALYTICS_EVENT_MANIFEST[eventName].properties),
+      ),
+    );
+    const propertiesAllowedByExpectedEvents = new Set([
+      ...propertiesForExpectedEvents,
+      ...ANALYTICS_SYSTEM_PROPERTY_NAMES,
+    ]);
+
+    const referencedEvents = new Set(
+      [...query.sql.matchAll(/\bevent\s*=\s*'([^']+)'/gi)].map(
+        (match) => match[1],
+      ),
+    );
+    for (const eventListMatch of query.sql.matchAll(
+      /\bevent\s+IN\s*\(([\s\S]*?)\)/gi,
+    )) {
+      for (const eventMatch of eventListMatch[1].matchAll(/'([^']+)'/g)) {
+        referencedEvents.add(eventMatch[1]);
+      }
+    }
+
+    for (const eventName of referencedEvents) {
+      assert.ok(
+        manifestEventNames.has(eventName),
+        `${query.name} references undeclared event ${eventName}`,
+      );
+    }
+    assert.deepEqual(
+      [...referencedEvents].sort(),
+      expectedUsage.events,
+      `${query.name} should use its intended event set`,
+    );
+
+    const referencedSchemaVersions = [
+      ...query.sql.matchAll(
+        /\bproperties\.analytics_schema_version\s*=\s*(\d+)\b/g,
+      ),
+    ].map((match) => Number.parseInt(match[1], 10));
+    if (query.name !== "retention_v1") {
+      assert.ok(
+        referencedSchemaVersions.length > 0,
+        `${query.name} should filter or validate the analytics schema version`,
+      );
+    }
+    for (const schemaVersion of referencedSchemaVersions) {
+      assert.equal(
+        schemaVersion,
+        ANALYTICS_SCHEMA_VERSION,
+        `${query.name} should use the manifest analytics schema version`,
+      );
+    }
+
+    const referencedProperties = new Set(
+      [...query.sql.matchAll(/\bproperties\.([A-Za-z_$][\w$]*)/g)].map(
+        (match) => match[1],
+      ),
+    );
+
+    for (const propertyName of referencedProperties) {
+      assert.ok(
+        declaredProperties.has(propertyName),
+        `${query.name} references undeclared property ${propertyName}`,
+      );
+    }
+    for (const propertyName of expectedUsage.properties) {
+      assert.ok(
+        declaredProperties.has(propertyName),
+        `${query.name} allows undeclared property ${propertyName}`,
+      );
+      assert.ok(
+        propertiesAllowedByExpectedEvents.has(propertyName),
+        `${query.name} allows property ${propertyName} outside its expected events`,
+      );
+    }
+    assert.deepEqual(
+      [...referencedProperties].sort(),
+      expectedUsage.properties,
+      `${query.name} should use only its intended property set`,
+    );
+    for (const binding of expectedUsage.eventPropertyBindings) {
+      const propertyPattern = new RegExp(
+        `(?:\\b[a-z][a-z0-9_]*\\.)?properties\\.${binding.property.replaceAll("$", "\\$")}\\b`,
+        "g",
+      );
+      assert.equal(
+        [...query.sql.matchAll(propertyPattern)].length,
+        binding.occurrences,
+        `${query.name} should use ${binding.property} only in its intended event predicates`,
+      );
+      assert.equal(
+        [...query.sql.matchAll(binding.pattern)].length,
+        binding.occurrences,
+        `${query.name} should bind ${binding.property} to the intended event`,
+      );
+    }
   }
 });
 
@@ -210,6 +488,75 @@ test("runScorecard emits only aggregate named metrics", async () => {
   assert.equal(snapshot.queries[0].rowCount, 1);
 });
 
+test("runScorecard executes independent queries concurrently and preserves query order", async () => {
+  const queryDirectory = await makeQueryDirectory({
+    "01-readiness.sql":
+      "-- name: readiness\nSELECT count() AS ready FROM events",
+    "02-acquisition.sql":
+      "-- name: acquisition_v1\nSELECT count() AS stage FROM events",
+  });
+  const pendingRequests = [];
+  const completionOrder = [];
+  let markAllStarted;
+  const allStarted = new Promise((resolve) => {
+    markAllStarted = resolve;
+  });
+
+  const snapshotPromise = runScorecard({
+    environment: VALID_ENVIRONMENT,
+    fetchImpl: (_url, options) => {
+      const submittedSql = JSON.parse(options.body).query.query;
+      const queryName = submittedSql.match(/--\s*name:\s*([^\s]+)/)?.[1];
+
+      return new Promise((resolve) => {
+        pendingRequests.push({ queryName, resolve });
+        if (pendingRequests.length === 2) {
+          markAllStarted();
+        }
+      }).then((response) => {
+        completionOrder.push(queryName);
+        return response;
+      });
+    },
+    generatedAt: "2026-07-17T12:00:00.000Z",
+    queryDirectory,
+  });
+  let concurrencyTimeout;
+
+  try {
+    await Promise.race([
+      allStarted,
+      new Promise((_, reject) => {
+        concurrencyTimeout = setTimeout(
+          () => reject(new Error("queries did not start concurrently")),
+          1_000,
+        );
+      }),
+    ]);
+  } finally {
+    clearTimeout(concurrencyTimeout);
+  }
+
+  for (const pendingRequest of [...pendingRequests].reverse()) {
+    const payload =
+      pendingRequest.queryName === "readiness"
+        ? { columns: ["ready"], results: [[1]] }
+        : acquisitionResultPayload();
+    pendingRequest.resolve(new Response(JSON.stringify(payload)));
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+
+  const snapshot = await snapshotPromise;
+
+  assert.deepEqual(completionOrder, ["acquisition_v1", "readiness"]);
+  assert.deepEqual(
+    snapshot.queries.map(({ name }) => name),
+    ["readiness", "acquisition_v1"],
+  );
+  assert.deepEqual(Object.keys(snapshot.metrics), ["readiness", "acquisition_v1"]);
+  assert.equal(snapshot.status, "ready");
+});
+
 test("runScorecard resolves the environment before sending HogQL", async () => {
   const queryDirectory = await makeQueryDirectory({
     "readiness.sql":
@@ -266,6 +613,17 @@ test("normalizeAggregateResult rejects identifiers and PII-like values", () => {
         "readiness",
       ),
     /may identify a person or raw event/,
+  );
+});
+
+test("normalizeAggregateResult requires an explicit query name", () => {
+  assert.throws(
+    () =>
+      normalizeAggregateResult({
+        columns: ["ready"],
+        results: [[1]],
+      }),
+    /requires an explicit query name/,
   );
 });
 

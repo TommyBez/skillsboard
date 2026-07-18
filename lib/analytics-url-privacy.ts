@@ -63,7 +63,3 @@ export function sanitizePostHogUrlProperties<T extends Record<string, unknown> |
     ]),
   ) as T
 }
-
-export function getAnalyticsDeploymentEnvironment() {
-  return process.env.NEXT_PUBLIC_ANALYTICS_ENVIRONMENT ?? "unknown"
-}
