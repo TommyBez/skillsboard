@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title: "Skills Board — One shared library. Different agents.",
+    title: "Skills Board: One shared library. Different agents.",
     description: siteConfig.ogDescription,
   },
 }
@@ -246,8 +246,7 @@ export default function HomePage() {
               </div>
             </div>
             <figcaption className={`${styles.libraryCaption} mt-5 text-sm leading-relaxed text-muted-foreground`}>
-              Open the source <span aria-hidden="true">·</span> Copy the command{" "}
-              <span aria-hidden="true">·</span> Download the latest ZIP
+              Open the source, copy the command, or download the latest ZIP.
             </figcaption>
           </figure>
         </div>

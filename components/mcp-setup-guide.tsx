@@ -53,12 +53,12 @@ const troubleshooting = [
   {
     title: "The sign-in screen never opens",
     description:
-      "Your client must support OAuth with dynamic client registration. Clients that only accept static API keys can't connect — there is no API key to paste.",
+      "Your client must support OAuth with dynamic client registration. Clients that only accept static API keys can't connect: there is no API key to paste.",
   },
   {
     title: "401 Unauthorized",
     description:
-      "The access token expired or was never issued. Re-run your client's sign-in flow — /mcp in Claude Code, or the login prompt in Cursor and VS Code.",
+      "The access token expired or was never issued. Re-run your client's sign-in flow: /mcp in Claude Code, or the login prompt in Cursor and VS Code.",
   },
   {
     title: "The client connects but errors on requests",
@@ -97,7 +97,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
           ),
         },
         {
-          text: "Approve read-only access. The tools are available right away — try asking Claude to list your saved skills.",
+          text: "Approve read-only access. The tools are available right away. Try asking Claude to list your saved skills.",
         },
       ],
     },
@@ -134,7 +134,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
         {
           text: (
             <>
-              Add the server to <InlineCode>.cursor/mcp.json</InlineCode> in your project — or{" "}
+              Add the server to <InlineCode>.cursor/mcp.json</InlineCode> in your project, or{" "}
               <InlineCode>~/.cursor/mcp.json</InlineCode> to use it everywhere.
             </>
           ),
@@ -175,7 +175,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
       label: "Other clients",
       steps: [
         {
-          text: "Any client that supports the streamable HTTP transport with OAuth works. Add this config — most clients accept the standard mcpServers format.",
+          text: "Any client that supports the streamable HTTP transport with OAuth works. Add this config. Most clients accept the standard mcpServers format.",
           snippet: config,
         },
         {
@@ -193,7 +193,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">Install in your client</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             Pick your client and follow the steps. Every client connects to the same endpoint and signs in through
-            your browser — no API key to create or rotate.
+            your browser, with no API key to create or rotate.
           </p>
         </div>
 

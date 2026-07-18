@@ -152,7 +152,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       ) : page.source === "leaderboard" || page.source === "curated" ? (
         <p className="text-sm text-muted-foreground" role="status">
           Showing {skills.length.toLocaleString()} skills
-          {canLoadMore ? " — scroll for more" : ""}.
+          {canLoadMore ? ". Scroll for more" : ""}.
         </p>
       ) : (
         <p className="text-sm text-muted-foreground" role="status">
