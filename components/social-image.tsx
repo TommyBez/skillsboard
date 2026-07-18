@@ -175,20 +175,10 @@ export function SocialImage({ height }: { height: number }) {
             display: "flex",
             position: "relative",
             alignItems: "center",
-            gap: 10,
             fontSize: 17,
             fontWeight: 700,
           }}
         >
-          <span
-            style={{
-              width: 9,
-              height: 9,
-              display: "flex",
-              borderRadius: 99,
-              background: "#f7f8f4",
-            }}
-          />
           Free forever · Open source
         </div>
       </div>
