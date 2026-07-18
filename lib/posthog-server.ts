@@ -4,7 +4,6 @@ import { after } from "next/server"
 import { PostHog } from "posthog-node"
 
 import {
-  ANALYTICS_SCHEMA_VERSION,
   type AnalyticsEventCapture,
   type NonTeamScopedCapturableAnalyticsEventName,
   type TeamScopedCapturableAnalyticsEventName,
@@ -57,7 +56,6 @@ function captureEvent({
       event,
       properties: {
         ...properties,
-        analytics_schema_version: ANALYTICS_SCHEMA_VERSION,
         deployment_environment: getAnalyticsDeploymentEnvironment(),
       },
     })

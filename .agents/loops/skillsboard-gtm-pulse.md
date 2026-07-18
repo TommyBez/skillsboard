@@ -10,7 +10,7 @@ The pulse is responsible and accountable for GTM sensing, diagnosis, execution, 
 
 ## Autonomy contract
 
-The pulse may autonomously read and modify connected GTM systems, including PostHog insights, dashboards, actions, feature flags, experiments, surveys, and other Pulse-owned resources. It may research, send, publish, spend, pause, roll back, and retire an action when the relevant connector exists and the automatic guardrails below pass.
+The pulse may autonomously read and modify connected GTM systems, including PostHog insights, dashboards, actions, feature flags, experiments, surveys, and other Pulse-owned resources. It may research, send, publish, spend, pause, roll back, and retire an action when the relevant integration and tools exist and the automatic guardrails below pass.
 
 The only human checkpoint is independent approval of a repository pull request:
 
@@ -19,12 +19,12 @@ The only human checkpoint is independent approval of a repository pull request:
 - After an independent human approval and green required checks, it may merge the PR and monitor deployment and outcome.
 - A pending PR locks only its `resource_key`. It does not stop analytics, research, PostHog reconciliation, independent experiments, or unrelated channels.
 
-There are no per-action approval queues. Missing consent, an absent cap, an unsupported connector action, ambiguous ownership, or an invalid metric produces `no_action`, automatic retry, pause, or rollback rather than a request for babysitting.
+There are no per-action approval queues. Missing consent, an absent cap, an unsupported tool action, ambiguous ownership, or an invalid metric produces `no_action`, automatic retry, pause, or rollback rather than a request for babysitting.
 
 ## Automatic invariants
 
 - Never invent unavailable data or relabel a proxy as an outcome.
-- Never expose secrets, invitation or OAuth capability values, or raw PII in code, prompts, state, logs, artifacts, or PRs.
+- Never expose secrets, invitation or OAuth capability values, or raw PII in code, prompts, state, logs, outputs, or PRs.
 - Honor consent, suppression, unsubscribe, data-deletion, platform terms, and product-contract constraints.
 - Require a machine-enforced cap and allowlist before any paid, outbound, or public action. Missing configuration means that action is ineligible, not pending approval.
 - Use progressive rollout, holdouts where possible, explicit success and kill thresholds, cooldowns, deduplication, and automatic rollback.
@@ -47,29 +47,24 @@ There are no per-action approval queues. Missing consent, an absent cap, an unsu
 - For problem-led pSEO: `programmatic-seo`, `content-strategy`, and `seo-audit` before a repository PR.
 - Experiments use `ab-testing` and share one experiment registry; stage modules do not launch conflicting tests.
 
-## PostHog connector contract
+## Official PostHog plugin contract
 
-The official authenticated PostHog connector is the primary analytics control plane. The pulse must discover the connector's live capabilities on every run and verify that it targets Skills Board production project `225645` before writing.
-
-The current connector exposes schema and SQL reads plus CRUD for actions, insights, dashboards, feature flags, experiments, surveys, and feature-flag scheduled changes. Cohort write, annotations, and standalone filter resources are not currently exposed; treat them as unsupported and never fall back to private APIs. Use the explicit project read for `225645`; a capability is usable only after its own low-risk read succeeds.
+The official authenticated PostHog plugin — the `posthog:posthog` skill and its tools — is authoritative for analytics control. Product SDK ingestion remains separate. The pulse never assumes a fixed capability inventory: on every run it discovers the tools currently advertised, verifies Skills Board production project `225645`, and reads live state before any write. It never uses private APIs or introduces an alternate PostHog query or control client.
 
 The pulse reconciles desired state instead of recreating assets blindly:
 
-1. Discover the real event schema and existing resources before querying or writing.
+1. Discover the available plugin capabilities, real event schema, and existing resources; stop PostHog writes on project mismatch or ambiguous identity.
 2. Maintain one canonical dashboard, `Skills Board — GTM Pulse`, plus versioned Tracking QA, Acquisition, Activation, Retention, Referral, and Sustainability insights when their source data exists.
 3. Give every managed resource a `logical_key`, `managed-by:gtm-pulse` marker where supported, semantic version, `definition_hash`, live PostHog ID, lifecycle status, and last-modified run in loop state. Display names are not identifiers.
 4. Reuse or update the registered resource when semantics are unchanged. A semantic change creates a new version and preserves the prior definition for comparable history.
-5. Create and operate supported actions, embedded filters, feature flags, experiments, surveys, and feature-flag scheduled changes when the routed hypothesis needs them. Capability discovery decides which supported primitive to use; never guess an unavailable tool.
-6. `experiment_create` owns flag creation. Pass one deterministic `feature_flag_key` and never pre-create a second flag. Before launch, verify that the exact flag is consumed by deployed product code. If it is not, open and deploy the repository PR first and keep the experiment in draft; an unused flag cannot produce an experiment.
-7. Reconcile live state before every transition so retries are idempotent. Use the resource-specific lifecycle advertised by the connector rather than inventing one shared state machine for experiments and surveys.
-8. For an experiment kill, pause exposure before ending it because ending an experiment does not disable its flag. Do not invoke connector actions that require a separate human confirmation, including irreversible winner shipping; encode a permanent winner through the repository PR checkpoint or another reversible supported path.
-9. Quarantine ambiguous duplicates. Disable an orphaned Pulse-owned resource before deleting it after a grace period. Never mutate a resource without Pulse ownership or an exact registered ID.
+5. Use only operations advertised by the plugin in the current run. Treat an unsupported operation as `unavailable`; do not guess or emulate it.
+6. Before launching any flag-backed experiment, verify that deployed product code consumes the exact flag. Otherwise open and deploy the repository PR first and leave the experiment unlaunched.
+7. Reconcile live state before every transition and obey each tool's advertised lifecycle, confirmation, and irreversibility rules. Skip an action that cannot satisfy those rules automatically.
+8. Quarantine ambiguous duplicates. Disable an orphaned Pulse-owned resource before deleting it after a grace period. Never mutate a resource without Pulse ownership or an exact registered ID.
 
-Cross-user activation and retention metrics use HogQL grouped by `properties.team_id`; a standard PostHog person funnel is invalid. The live project currently has person-on-events querying disabled, so canonical metrics do not depend on `person.properties.*`.
+Cross-user activation and retention metrics use HogQL grouped by `properties.team_id`; a standard PostHog person funnel is invalid, and canonical metrics do not depend on `person.properties.*`.
 
-If the connector is unavailable or a required operation is not exposed, the pulse may run `pnpm gtm:pulse:data` as a read-only fallback and consume the fresh schema-valid `.agents/loops/skillsboard-gtm-pulse-data.json`. The fallback is cache and audit evidence, not the primary control plane. Every metric snapshot records `metric_key`, `semantic_version`, `definition_hash`, and `source`; never compare or combine connector and runner values unless those semantic fields match exactly. A fallback read may support reporting, but it cannot authorize an action whose live monitor or rollback capability is unavailable. If neither path is trustworthy, PostHog-dependent metrics and actions are unavailable; Tracking QA may repair them while independent trustworthy sources and channels continue.
-
-Never use dashboard screenshots, repository guesses, or database proxies to fill missing PostHog values. A valid zero remains `available`; missing access or definitions are `unavailable`; failed, stale, partial, or malformed results are `broken`.
+If the official PostHog plugin is unavailable or a required operation is not exposed, only PostHog-dependent metrics and actions are `unavailable`. The pulse retries on its next run and continues with independent trustworthy sources and channels; it never substitutes screenshots, repository guesses, database proxies, or private APIs for missing PostHog data or capabilities. A valid zero remains `available`; missing access or definitions are `unavailable`; failed, stale, partial, or malformed results are `broken`.
 
 ## Acts when
 
@@ -89,13 +84,13 @@ With fewer than 30 eligible teams, use absolute counts and qualitative evidence.
 
 1. Read the strategy, product-marketing context, and this contract completely.
 2. Discover PostHog capabilities and verify production project `225645`.
-3. Reconcile canonical PostHog assets and their IDs. Use the local scorecard runner only as fallback.
+3. Reconcile canonical PostHog assets and their IDs through the official PostHog plugin.
 4. Run Tracking QA: event semantics, environment, sensitive-URL sanitization, duplicates, `team_id`, internal/test exclusion, source freshness, and DB/PostHog reconciliation.
 5. Build all five scorecard rows. Preserve `available|unavailable|broken` and stage-level measurement status; never substitute missing values.
 6. Calculate `AAT-28 = new activated + retained + reactivated` and `delta_AAT = new activated + reactivated - lost` only from valid team-level Retention inputs.
 7. Route one primary constraint: verified defect first; sustainability next only for a proven cap breach or due review; otherwise require downstream health before scaling Acquisition and select the eligible issue with the strongest evidence and largest absolute number of teams affected.
 8. Run the selected diagnostic and execute one bounded action. PostHog and channel actions may run immediately; repository work follows the PR checkpoint.
-9. Monitor active experiments and rollouts independently of the weekly router. Pause exposure immediately when a guardrail crosses its kill threshold, then end measurement when appropriate. After the observation window, make a winner permanent through the repository PR checkpoint or another reversible connector path; never call irreversible winner shipping.
+9. Monitor active experiments and rollouts independently of the weekly router. Pause exposure immediately when a guardrail crosses its kill threshold, then end measurement when appropriate. After the observation window, make a winner permanent through the repository PR checkpoint or another reversible plugin-supported path; otherwise leave the permanent transition unapplied.
 10. Persist state after each successful external transition and append a minimal non-PII run log. A crash must be recoverable by reconciling live resources on the next run.
 
 ## Full-funnel scorecard
@@ -149,7 +144,7 @@ State schema version 4 contains:
 
 ## Stop and recovery conditions
 
-- Connector or identity failure: do not write; use the validated runner fallback, retry next run, and continue only with independent trustworthy sources.
+- PostHog plugin or project-identity failure: do not write to PostHog, mark only PostHog-dependent metrics and actions `unavailable`, retry next run, and continue with independent trustworthy sources.
 - Broken, stale, or privacy-unsafe tracking: repair Tracking QA only for dependent metrics; never justify a growth action with broken data.
 - Missing mature cohort, valid denominator, evidence threshold, cap, allowlist, consent, or supported tool: record `no_action` for that resource and evaluate the next eligible action.
 - Overlapping action: retain the existing resource lock and monitor it; do not duplicate.
@@ -159,7 +154,7 @@ State schema version 4 contains:
 
 ## Required digest
 
-1. Connector/project status, Tracking QA, and automatic repairs.
+1. Official PostHog plugin/project status, Tracking QA, and automatic repairs.
 2. Five-row scorecard with count, denominator, window, maturity, and data status.
 3. `AAT-28`, its decomposition, and `delta_AAT` when trustworthy.
 4. Routed constraint, evidence, executed action or exact automatic `no_action` reason.

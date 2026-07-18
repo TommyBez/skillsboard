@@ -22,8 +22,6 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "check": "pnpm typecheck",
-    "gtm:pulse:data": "node scripts/gtm/posthog-scorecard.mjs",
-    "gtm:pulse:check": "node scripts/gtm/posthog-scorecard.mjs --check",
     "db:push": "drizzle-kit push",
     "email": "email dev --dir emails --port 3001"
   },

@@ -1,6 +1,5 @@
 import posthog from "posthog-js"
 
-import { ANALYTICS_SCHEMA_VERSION } from "@/analytics/posthog/events"
 import { getAnalyticsDeploymentEnvironment } from "@/lib/analytics-environment"
 import {
   sanitizeAnalyticsUrl,
@@ -19,7 +18,6 @@ if (token) {
         ...capture,
         properties: {
           ...sanitizePostHogUrlProperties(capture.properties),
-          analytics_schema_version: ANALYTICS_SCHEMA_VERSION,
           deployment_environment: getAnalyticsDeploymentEnvironment(),
         },
         $set: sanitizePostHogUrlProperties(capture.$set),

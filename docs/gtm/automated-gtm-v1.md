@@ -1,7 +1,7 @@
 # Skills Board — automated full-funnel GTM v1
 
 **Date:** 2026-07-17
-**Status:** Connector-first autonomous control loop; the API runner remains a validated read-only fallback while production Tracking QA is incomplete
+**Status:** Official PostHog plugin-first autonomous control loop; production Tracking QA remains incomplete
 **Primary outcome:** Grow retained teams by finding and removing the largest evidenced constraint across the whole funnel, not by optimizing one stage in isolation.
 
 ## 1. Executive decision
@@ -96,7 +96,7 @@ An organization counts when it has at least two members, at least one saved skil
 
 **Current Acquisition availability:** raw public visits, CTA intent, signup intent, and signup context are instrumented. The qualified-visitor denominator and source-to-activation attribution are `unavailable` until the qualification rule, internal/test exclusions, source taxonomy, and team-level attribution query in §11 are implemented. Until then, the router may report raw counts but must not apply source kill/scale thresholds or route an Acquisition experiment from those metrics.
 
-**Current Retention availability:** the versioned query executes and its output schema is validated, but schema-v2 events cannot reconstruct activation milestones for teams that existed before deployment. It therefore returns `measurement_status=unavailable` and null decision metrics until a trustworthy database reconciliation, state snapshot, or backfill exists. Query execution `data_status=available` never overrides that stage-level status: the router must not calculate `AAT-28`, route Retention, or use dependent sustainability ratios from those nulls, while independent stages may still report.
+**Current Retention availability:** historical events cannot reconstruct activation milestones for teams that existed before complete team-scoped instrumentation. Retention therefore remains `unavailable` until a trustworthy database reconciliation, state snapshot, or backfill exists. The router must not calculate `AAT-28`, route Retention, or use dependent sustainability ratios until that stage-level status becomes available, while independent stages may still report.
 
 ### Activation milestone: `team_activated_14d`
 
@@ -149,7 +149,7 @@ This tiny development sample may contain internal or test activity. It validates
 
 ## 5. Current state — scored from repository materials
 
-The repository score below predates the first production PostHog API run. On 2026-07-17, all four aggregate pulse queries executed successfully, but the artifact-only dry run found five required event types with `schema_mismatch` and six missing event types in the current production sample. There is therefore still no trustworthy production growth baseline, budget, customer-interview corpus, or mature retention read. The development database snapshot above remains aggregate and directional only.
+The repository evidence still does not establish a trustworthy production growth baseline, budget, customer-interview corpus, or mature retention read. The development database snapshot above remains aggregate and directional only; the official PostHog plugin must validate production event semantics and coverage before the Pulse routes dependent actions.
 
 | Area | Score / 5 | Evidence-based note |
 |---|---:|---|
@@ -239,15 +239,13 @@ The operating question is whether the free product is sustainably funded. Track 
 
 Keep one scheduled automation. It is a full-funnel sensing and routing layer, not five independent agents competing to create work.
 
-### Connector-first control contract
+### Official PostHog plugin control contract
 
-The official authenticated PostHog connector is the primary analytics control plane. Every run discovers its current capabilities, verifies production project `225645`, reads the real schema and live resources, and reconciles one Pulse-owned dashboard plus versioned stage and Tracking QA insights. Stable logical keys, ownership markers, semantic versions, definition hashes, and live PostHog IDs are persisted so retries update existing resources rather than duplicate them.
+The official authenticated PostHog plugin — the `posthog:posthog` skill and its tools — is authoritative for analytics control; product SDK ingestion remains separate. Every run discovers the tools currently advertised, verifies production project `225645`, and reads the real schema, resources, and lifecycle state before any write. The pulse manages only resources with exact Pulse ownership, fails closed on project mismatch or ambiguous identity, and never uses private APIs or introduces an alternate PostHog query or control client.
 
-The current connector exposes schema and SQL reads plus actions, insights, dashboards, feature flags, experiments, surveys, and feature-flag scheduled changes. Cohort write, annotations, and standalone filter resources are not exposed and must not be emulated through private APIs. The pulse reads before writing, never mutates an unowned resource, and fails closed on project mismatch or ambiguous identity. `experiment_create` receives a deterministic key and owns flag creation; the pulse never pre-creates a duplicate flag. Before launch, the exact flag must be consumed by deployed product code, otherwise the pulse opens and deploys its PR first and leaves the experiment in draft. It pauses exposure before ending an experiment, because ending does not disable the flag. Connector actions that demand an additional confirmation or are irreversible, including winner shipping, are not invoked autonomously; permanent promotion is encoded through the repository PR checkpoint or another reversible supported path. Team-level metrics use HogQL grouped by `team_id` and do not depend on person-on-events, which is disabled in the live project.
+The pulse reconciles one owned GTM dashboard plus versioned stage and Tracking QA insights. Stable logical keys, ownership markers, semantic versions, definition hashes, and live PostHog IDs are persisted so retries update existing resources rather than duplicate them. It uses only operations advertised in the current run and obeys each tool's lifecycle, confirmation, and irreversibility rules; unsupported or non-automatable transitions remain `unavailable`. Before launching any flag-backed experiment, it verifies that deployed product code consumes the exact flag. Otherwise it opens and deploys the repository PR first and leaves the experiment unlaunched. Team-level metrics use HogQL grouped by `team_id` and do not depend on `person.properties.*`.
 
-`pnpm gtm:pulse:data` and `.agents/loops/skillsboard-gtm-pulse-data.json` remain a read-only fallback and audit cache when the connector or one required read tool is unavailable. The fallback requires server/local-only `POSTHOG_PERSONAL_API_KEY`, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; those values never enter client code, logs, state, artifacts, or commits. Connector and runner values may be compared only when `metric_key`, semantic version, and definition hash match; fallback reporting never authorizes an action whose live monitor or rollback tool is unavailable. If neither connector nor fallback is trustworthy, only PostHog-dependent metrics and actions are unavailable; Tracking QA may repair them while independent trustworthy sources and channels continue. The router never estimates missing values or substitutes screenshots, repository guesses, or database proxies.
-
-The initial API dry run on 2026-07-17 correctly produced Tracking QA only because deployed production events did not yet satisfy the branch's semantic coverage contract. That historical result remains fallback evidence, not a reason to keep PostHog read-only.
+If the official PostHog plugin is unavailable or a required operation is not exposed, only PostHog-dependent metrics and actions are `unavailable`. The Pulse retries on its next run and continues with independent trustworthy sources and channels. It never estimates missing values or substitutes screenshots, repository guesses, database proxies, or private APIs for missing PostHog data or capabilities.
 
 ### Loop 0 — Full-funnel router and tracking QA
 
@@ -255,11 +253,11 @@ The initial API dry run on 2026-07-17 correctly produced Tracking QA only becaus
 - **Acts when:** Always reconciles PostHog and refreshes the scorecard; executes when data is trustworthy, a decision threshold is met, and no conflicting action owns the same `resource_key`. A PR blocks only overlapping repository work.
 - **Purpose:** Show the whole growth system and choose the single highest-leverage evidenced constraint.
 - **Skills used:** analytics, marketing-plan, marketing-loops, plus the selected stage skill only after routing.
-- **Body:** discover connector capabilities; verify project identity; reconcile canonical PostHog assets; use the runner only as fallback; calculate all five scorecard rows and `ΔAAT` from valid values; exclude unavailable, broken, or immature stages; route a verified defect first; route Revenue/sustainability next only for a proven cap breach or due review; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Execute one bounded action and monitor active experiments daily.
+- **Body:** discover official PostHog plugin capabilities; verify project identity; reconcile canonical PostHog assets; calculate all five scorecard rows and `ΔAAT` from valid values; exclude unavailable, broken, or immature stages; route a verified defect first; route Revenue/sustainability next only for a proven cap breach or due review; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Execute one bounded action and monitor active experiments daily.
 - **Self-check:** environment and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
 - **State / idempotency:** schema version, metric snapshots, per-stage status, PostHog resource registry, resource locks, active experiments and surveys, PR status, action-policy version, caps, ledgers, signal hashes, and cooldowns.
 - **Stop / bail-out:** broken or stale data makes Tracking QA the only action for dependent metrics. Missing caps, consent, targeting, or tools make only that action ineligible. A kill threshold pauses or rolls back immediately.
-- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, connector and data quality, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
+- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, PostHog plugin and data quality, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
 
 ### Autonomous execution and PR gate
 
@@ -290,7 +288,7 @@ Modules may send, publish, spend, and change Pulse-owned connected resources whe
 
 | Window | Outcome | Work |
 |---|---|---|
-| Days 0–30 | Trust the full-funnel board | Already shipped locally: URL sanitization, acquisition-intent and team-return events, validated API fallback, per-query availability states, and an artifact-only router dry run. Remaining: reconcile the connector-owned dashboard and insights, deploy schema v2, validate production payloads until Tracking QA passes, and define attribution plus internal/test exclusion. |
+| Days 0–30 | Trust the full-funnel board | Already shipped: URL sanitization, acquisition-intent events, and team-return events. Remaining: reconcile the plugin-owned dashboard and insights, validate production payloads until Tracking QA passes, and define attribution plus internal/test exclusion. |
 | Days 31–60 | Diagnose and act on the real constraint | Observe mature cohorts; run one diagnostic and one bounded autonomous action; instrument Referral or sustainability when its prerequisite signal exists. |
 | Days 61–90 | Prove one intervention and one learning | Run one bounded experiment on the selected stage; monitor guardrails daily; keep, revise, roll back, or kill from the versioned observation rule; publish a postmortem and update the next hypothesis automatically. |
 
@@ -310,9 +308,9 @@ Global kill switch: pause the scheduled Codex automation. Product lifecycle auto
 
 ## 10. Full-funnel measurement contract
 
-Every PostHog event includes `analytics_schema_version` and `deployment_environment`. Team-scoped events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
+Every custom PostHog event includes `deployment_environment`. Team-scoped events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
 
-Instrumentation status is not query availability. The browser-safe project token proves only that the app can ingest events. The fallback read contract in §7 is API-validated, but its initial production artifact exposes legacy and missing event semantics. Each PostHog-derived metric becomes decision-ready independently when its own events, filters, environment, freshness, `team_id`, and internal/test checks pass; one broken metric does not globally block healthy stages.
+The browser-safe project token proves only that the app can ingest events; the official PostHog plugin independently provides authenticated analytics reads and resource management. Each PostHog-derived metric becomes decision-ready when its events, filters, environment, freshness, `team_id`, and internal/test checks pass. One broken or unavailable metric does not globally block healthy stages or independent sources.
 
 | Stage | Event or derived metric | Required properties / rule | Status |
 |---|---|---|---|
@@ -325,7 +323,7 @@ Instrumentation status is not query availability. The browser-safe project token
 | Activation | `skill_saved`, invite prompt, `team_member_invited`, `invitation_accepted` | Existing semantic properties plus stable `team_id`. | Implemented |
 | Activation / Retention | `skill_usage_path_selected`, `skill_downloaded` | `team_id`, skill metadata, `method`, `surface`, `actor_is_skill_creator`; union as the `team_value_action` access proxy, not proof of installation. | Implemented |
 | Retention | `team_library_viewed` | `team_id`, `skill_count`, `has_skills`, `filter_state`; one event per mounted route-state transition, including search/tag navigation, with same-route skill mutations deduplicated while mounted. | Implemented |
-| Retention | `AAT-28` states | HogQL grouped by `team_id`, never a person funnel; fail closed until historical activation is reconciled. | Query implemented; measurement unavailable |
+| Retention | `AAT-28` states | HogQL grouped by `team_id`, never a person funnel; fail closed until historical activation is reconciled. | Definition specified; measurement unavailable |
 | Referral research | `organic_champion_replication` | Invited user later creates and activates a different `team_id`; correlation only, not referral attribution. | Query required |
 | Referral | ask/copy/create/activate events | Add when a referral surface exists; optimize for `referred_team_activated`. | Planned |
 | Revenue / sustainability | cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28` | Aggregate Vercel, Neon, Resend, GTM spend, and founder-time inputs; not user events. | Data connection required |
@@ -344,7 +342,7 @@ Pulse owns the following backlog and resolves items from evidence rather than cr
 6. Reconcile production analytics until semantic coverage, environment, `team_id`, freshness, and internal/test checks pass.
 7. Choose and record acquisition locale and multiplier ICP from current evidence, then revisit on a versioned cadence.
 8. Evaluate sustainability modes that preserve the current free core; any durable contract change starts with a PR.
-9. Use Search Console and DataForSEO automatically when their connector or server-only credentials and caps become available; until then quantitative fields remain `unavailable`.
+9. Use Search Console and DataForSEO automatically when their integrations or server-only credentials and caps become available; until then quantitative fields remain `unavailable`.
 
 ## 12. Reference points
 
