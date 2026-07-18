@@ -1,7 +1,7 @@
 # Skills Board — automated full-funnel GTM v1
 
 **Date:** 2026-07-17
-**Status:** Production PostHog read path API-validated; the router remains in Tracking QA until schema-v2 instrumentation is deployed and production data quality passes
+**Status:** Connector-first autonomous control loop; the API runner remains a validated read-only fallback while production Tracking QA is incomplete
 **Primary outcome:** Grow retained teams by finding and removing the largest evidenced constraint across the whole funnel, not by optimizing one stage in isolation.
 
 ## 1. Executive decision
@@ -15,7 +15,9 @@ The GTM system is a full-funnel control loop:
 5. A healthy team can create another team through a champion or an explicit referral path.
 6. The system measures the cost and sustainability of that growth while preserving the free-forever product promise.
 
-One weekly router reads every stage, validates the data, and selects at most one diagnostic. Acquisition scanning is conditional work, not a mandatory output when another stage is the constraint.
+One weekly router reads every stage, validates the data, selects at most one primary diagnostic, and executes the next bounded action. Acquisition scanning is conditional work, not a mandatory output when another stage is the constraint. Active experiments and rollouts receive a separate daily monitor.
+
+The system is autonomous by default. It may operate connected GTM tools, run experiments, send or publish inside configured caps, and repair its own analytics assets without per-action approval. The only human checkpoint is independent approval of a repository PR; after approval and green checks, the pulse may merge and monitor deployment.
 
 The strategy deliberately avoids competing as an enterprise registry or universal package manager. GitHub and vendor-native workspaces are strong distribution systems. Skills Board's wedge is narrower: **the team's own recommendations, visible source, and a choice of usage path across different agents.**
 
@@ -90,7 +92,7 @@ An organization counts when it has at least two members, at least one saved skil
 | Activation | Signup intent → first shared value. | Account completion, team creation, first skill ≤24h, invite ≤72h, acceptance ≤7d, non-creator usage-path selection ≤14d. | `team_activated_14d` and median time to activation. | Only cohorts with 14 full days of observation. Investigate when five mature teams produce zero activations or one step contains at least half of stalled teams in two checks. |
 | Retention | Activated team → repeated access to shared recommendations. | `team_library_viewed`, teams approaching 21d without a value-action proxy, number of active members and recommendations accessed. | `AAT-28` new, retained, reactivated, and lost; period-1 retention. | Compare non-overlapping 28d periods; 56d maturity for first retention cohort. Prioritize when `lost > new + reactivated` or at least three mature teams are lost. |
 | Referral | Healthy retained team → another team reaches shared value through an explicit referral source. | Eligible happy moments, referral ask viewed, referral link copied. Report organic champion replication separately as correlation, not referral attribution. | `referred_team_activated` and activated viral coefficient from explicit referral attribution only. | 56d from the first attributed referral visit, plus the 14d activation SLA from team creation; 60d ask cooldown. Start with five eligible teams; three activated referrals authorize the next bounded test. |
-| Revenue / sustainability | Product usage → durable economic support. | Monthly cash infrastructure/tool cost, founder hours, GTM cash/time, explicit sponsorship/service/add-on demand. | Cash coverage, fully loaded cost per current `AAT-28`, and acquisition cost per new `AAT-28`. Current product revenue is explicitly €0. | Monthly cost check, quarterly model review. Undefined denominators remain `undefined`. Never use team growth as revenue or change the free-forever promise automatically. |
+| Revenue / sustainability | Product usage → durable economic support. | Monthly cash infrastructure/tool cost, founder hours, GTM cash/time, explicit sponsorship/service/add-on demand. | Cash coverage, fully loaded cost per current `AAT-28`, and acquisition cost per new `AAT-28`. Current product revenue is explicitly €0. | Monthly cost check, quarterly model review. Undefined denominators remain `undefined`. Never use team growth as revenue. A free-forever contract change requires the repository PR checkpoint before autonomous execution. |
 
 **Current Acquisition availability:** raw public visits, CTA intent, signup intent, and signup context are instrumented. The qualified-visitor denominator and source-to-activation attribution are `unavailable` until the qualification rule, internal/test exclusions, source taxonomy, and team-level attribution query in §11 are implemented. Until then, the router may report raw counts but must not apply source kill/scale thresholds or route an Acquisition experiment from those metrics.
 
@@ -183,17 +185,17 @@ The repository score below predates the first production PostHog API run. On 202
 
 Programmatic SEO is a bounded Acquisition diagnostic, not an automatic page factory. It targets adjacent team problems with a direct path to creating a shared library: sharing skills across different agents, standardizing reusable AI workflows, moving beyond scattered prompt libraries, capturing repeatable AI use cases, function-specific playbooks, and lightweight skill inventory or source-review practices. It does not default to individual-skill profiles, generic "AI tools" pages, generic AI news, or enterprise-governance claims.
 
-The module has two mutually exclusive modes. A monthly read-only research appendix may run only after the router returns `no action` and while no diagnostic, experiment, PR, or human decision is open; it is not a second diagnostic and cannot edit code or open a PR. The operational diagnostic runs only when Acquisition is the single routed constraint. It uses `programmatic-seo` and `content-strategy`, with `seo-audit` before any draft PR. Inputs are the product-marketing contract, current routes and canonical intents, public SERPs, official vendor documentation, primary research, attributable public problem signals, Search Console when connected, downstream PostHog outcomes, and optionally DataForSEO.
+The module has two modes. A monthly research appendix may run after the router returns `no_action`; it may maintain the deduplicated backlog and open one focused experimental-page PR when its evidence and quality checks pass. The operational diagnostic runs when Acquisition is the primary routed constraint. It uses `programmatic-seo` and `content-strategy`, with `seo-audit` before any PR. Inputs are the product-marketing contract, current routes and canonical intents, public SERPs, official vendor documentation, primary research, attributable public problem signals, Search Console when connected, downstream PostHog outcomes, and optionally DataForSEO. An unrelated open PR does not block this research.
 
-DataForSEO is a future optional enrichment source, not a prerequisite for qualitative research. Until a bounded runner, server-only Basic Auth API login and API password, target market/language, explicit request and spend caps, and human approval for paid use exist, the DataForSEO source remains `unavailable` and no paid call is made. Quantitative fields are `search_volume`, source `monthly_searches`, `keyword_difficulty`, `google_ads_competition`, and `cpc`, each with status, source, market/language, and `as_of`; missing values are never zero or inferred. A `trend` is not derived until its formula, window, and series-completeness rule are versioned. Categorical `search_intent` is stored separately with evidence and confidence and may be inferred qualitatively from a current SERP; provider probabilities are optional enrichment, not demand evidence. Google Ads competition and organic keyword difficulty remain separate metrics.
+DataForSEO is optional enrichment, not a prerequisite for qualitative research. The pulse may use it automatically when server-only credentials, target market/language, request cap, and spend cap are configured. Until then the source remains `unavailable`, no paid call is made, and the pulse continues without requesting approval. Quantitative fields are `search_volume`, source `monthly_searches`, `keyword_difficulty`, `google_ads_competition`, and `cpc`, each with status, source, market/language, and `as_of`; missing values are never zero or inferred. A `trend` is not derived until its formula, window, and series-completeness rule are versioned. Categorical `search_intent` is stored separately with evidence and confidence and may be inferred qualitatively from a current SERP; provider probabilities are optional enrichment, not demand evidence. Google Ads competition and organic keyword difficulty remain separate metrics.
 
-Field availability is not proof of demand. Store `demand_gate=pass|fail|unavailable|broken` separately: a valid zero is available but cannot pass, and CPC, keyword difficulty, Google Ads competition, or search-intent classification never satisfy the gate. Only a human-approved, versioned rule over demand measures such as search volume, its monthly source series, or target-query Search Console impressions can pass. Until market/language, formula, comparison window, minimum completeness, and threshold are approved and versioned, the gate is `unavailable`; credentials alone do not enable autonomous pSEO PRs.
+Field availability is not proof of demand. Store `demand_gate=pass|fail|unavailable|broken` separately: a valid zero is available but cannot pass, and CPC, keyword difficulty, Google Ads competition, or search-intent classification never satisfy the gate. The pulse owns and versions the rule over demand measures such as search volume, its monthly source series, or target-query Search Console impressions. Until market/language, formula, comparison window, minimum completeness, and threshold are recorded, the gate is `unavailable`; credentials alone never constitute demand.
 
 Each research run keeps at most 30 deduplicated seed queries and shortlists at most five opportunities. A `canonical_intent_id` combines normalized locale, audience/problem, and intent independently of format; candidates, existing canonical URLs, and open PRs are deduplicated on that ID before shortlisting. Every candidate must have a distinct intent, a natural `create a team library` conversion path, current attributable sources, differentiated utility such as an original comparison, workflow, checklist, template, or decision framework, product-contract-safe claims, no canonical overlap, and complete metadata, internal-link, sitemap, indexation, and supported-schema handling.
 
-Qualitative evidence alone produces a report and one specifically named pilot recommendation, not an autonomous PR. Bind a human approval to `approval_key = canonical_intent_id + candidate_url + source_snapshot_hash`; any change invalidates it, and opening the PR consumes it. The approval overrides only the quantitative-demand requirement; every other global and module gate still applies. Autonomous implementation requires the operational Acquisition contract, every global routing/PR gate, and `demand_gate=pass`. It defaults to one page and has a hard maximum of three new indexable pages in one intent cluster. Merge and publication remain human-gated. After publication, evaluate a page over a complete eight-week window using indexation and Search Console query/page impressions for the target intent when available. Use page-specific CTA/signup intent only after a stable landing identifier such as `landing_path` and its query are implemented and validated; the current `landing_cta_clicked.location` describes the CTA surface, not the landing page. Use activated teams only after attribution is operational, and apply success or kill checks only to available page-attributable measures. Pause a pattern after two mature comparable misses and diagnose it before producing more.
+Qualitative evidence may justify one experimental page PR when product fit, unique value, source quality, honest claims, indexation, measurement, and rollback checks pass. Quantitative demand may justify at most three new indexable pages in one intent cluster. The PR is the sole human checkpoint: no separate pilot approval or approval key exists. After independent approval, merge, and deployment, evaluate a page over a complete eight-week window using indexation and Search Console query/page impressions for the target intent when available. Use page-specific CTA/signup intent only after a stable landing identifier such as `landing_path` and its query are implemented and validated; the current `landing_cta_clicked.location` describes the CTA surface, not the landing page. Use activated teams only after attribution is operational, and apply success or kill checks only to available page-attributable measures. Pause a pattern after two mature comparable misses and diagnose it before producing more.
 
-**Measurement target:** normalized UTMs, anonymous landing CTA intent, signup context, and eventual activated teams by source. Raw intent is available now; qualified visitors and source-to-activation attribution remain unavailable until §11 is resolved. Scan public demand when the router selects Acquisition; the monthly pSEO appendix is allowed only after `no action` and with no open work.
+**Measurement target:** normalized UTMs, anonymous landing CTA intent, signup context, and eventual activated teams by source. Raw intent is available now; qualified visitors and source-to-activation attribution remain unavailable until §11 is resolved. Scan public demand when the router selects Acquisition; the monthly pSEO appendix may run after `no_action` and ignores unrelated resource locks.
 
 **Not now:** broad paid acquisition, mass cold email, unsolicited commercial GitHub issues, or generic “AI tools” content.
 
@@ -211,11 +213,11 @@ Qualitative evidence alone produces a report and one specifically named pilot re
 
 **Outcome:** make shared skill reuse recur when new work appears.
 
-**Current bets:** team-level library views, repeated non-creator usage-path selection, and `AAT-28` state transitions. Interview lost teams before designing lifecycle messaging.
+**Current bets:** team-level library views, repeated non-creator usage-path selection, and `AAT-28` state transitions. Use targeted research before lifecycle messaging; a consented, suppressed, capped intervention may run autonomously.
 
 **Measurement:** retained, reactivated, and lost teams across non-overlapping 28d periods, plus breadth of members and recommendations accessed. `team_value_action` is a proxy for accessing or selecting a usage path, not proof of installation or agent execution.
 
-**Not now:** noisy weekly email. Any digest or win-back requires consent, suppression, an unsubscribe path, and evidence that absence represents churn rather than normal low-frequency use.
+**Guardrail:** no noisy weekly email. Any digest or win-back requires consent, suppression, an unsubscribe path, a send cap, and evidence that absence represents churn rather than normal low-frequency use. Missing prerequisites produce `no_action`, not an approval request.
 
 ### Referral
 
@@ -225,82 +227,84 @@ Qualitative evidence alone produces a report and one specifically named pilot re
 
 **Measurement:** report organic champion replication separately. For an explicit referral path, measure eligible happy teams, asks, copies, attributed teams created, and `referred_team_activated`; referral attribution overrides generic UTM attribution.
 
-**Guardrail:** ask only after activation plus later multi-member use; never inspect contacts or send to third parties automatically.
+**Guardrail:** ask only after activation plus later multi-member use. Use only product-owned, consented destinations with a 60-day cooldown and configured volume cap; never inspect unrelated contacts.
 
 ### Revenue / sustainability
 
 The hosted product remains free forever and currently has no revenue conversion. The framework must show that explicitly rather than relabeling team growth as Revenue.
 
-The operating question is whether the free product is sustainably funded. Track aggregate Vercel, Neon, Resend, and founder-time cost per `AAT-28`, alongside explicit inbound interest in sponsorship, grants, services, or optional add-ons that do not break the core promise. Any business-model or pricing decision is quarterly, founder-owned, and never automated.
+The operating question is whether the free product is sustainably funded. Track aggregate Vercel, Neon, Resend, and founder-time cost per `AAT-28`, alongside explicit inbound interest in sponsorship, grants, services, or optional add-ons that do not break the core promise. The pulse may optimize configured GTM and tool spend within machine-enforced caps. A durable change to pricing or the free-forever contract first requires a versioned repository PR; once independently approved and merged, the pulse may execute the corresponding connected-system changes.
 
 ## 7. Automation rollout
 
 Keep one scheduled automation. It is a full-funnel sensing and routing layer, not five independent agents competing to create work.
 
-### Executable read contract
+### Connector-first control contract
 
-Every pulse must first run `pnpm gtm:pulse:data`, then consume only `.agents/loops/skillsboard-gtm-pulse-data.json`. The router may proceed only when the file is fresh, schema-valid, and has top-level `status=ready`. Each query carries `data_status=available|unavailable|broken`: a valid zero is `available`; missing credentials, definitions, or sources are `unavailable`; failed, stale, partial, or malformed results are `broken`. Query availability covers execution and schema validation only; stage-level `decision_status` and `measurement_status` still determine whether a metric may enter routing. The router never estimates missing values, queries PostHog ad hoc, or substitutes DB or dashboard proxies.
+The official authenticated PostHog connector is the primary analytics control plane. Every run discovers its current capabilities, verifies production project `225645`, reads the real schema and live resources, and reconciles one Pulse-owned dashboard plus versioned stage and Tracking QA insights. Stable logical keys, ownership markers, semantic versions, definition hashes, and live PostHog IDs are persisted so retries update existing resources rather than duplicate them.
 
-Event ingestion and metric reading use different PostHog credentials. `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` with `NEXT_PUBLIC_POSTHOG_HOST` only sends events. Read-only execution requires server/local-only `POSTHOG_PERSONAL_API_KEY` with minimum `Query Read`, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; optional `POSTHOG_DEPLOYMENT_ENVIRONMENT` is allowlisted to `production` (default), `preview`, or `development`. The Personal API Key must never be exposed to the client, stored in the generated JSON, or committed.
+The current connector exposes schema and SQL reads plus actions, insights, dashboards, feature flags, experiments, surveys, and feature-flag scheduled changes. Cohort write, annotations, and standalone filter resources are not exposed and must not be emulated through private APIs. The pulse reads before writing, never mutates an unowned resource, and fails closed on project mismatch or ambiguous identity. `experiment_create` receives a deterministic key and owns flag creation; the pulse never pre-creates a duplicate flag. Before launch, the exact flag must be consumed by deployed product code, otherwise the pulse opens and deploys its PR first and leaves the experiment in draft. It pauses exposure before ending an experiment, because ending does not disable the flag. Connector actions that demand an additional confirmation or are irreversible, including winner shipping, are not invoked autonomously; permanent promotion is encoded through the repository PR checkpoint or another reversible supported path. Team-level metrics use HogQL grouped by `team_id` and do not depend on person-on-events, which is disabled in the live project.
 
-The automation is not live merely because it is scheduled. The production credentials, runner call, artifact validation, and first artifact-only dry run were completed on 2026-07-17. That dry run correctly produced Tracking QA only: the deployed production events do not yet satisfy the schema-v2 and semantic coverage contract in this branch. Growth routing remains gated until a post-deploy run passes those checks and internal/test exclusion exists.
+`pnpm gtm:pulse:data` and `.agents/loops/skillsboard-gtm-pulse-data.json` remain a read-only fallback and audit cache when the connector or one required read tool is unavailable. The fallback requires server/local-only `POSTHOG_PERSONAL_API_KEY`, `POSTHOG_PROJECT_ID`, and `POSTHOG_API_HOST`; those values never enter client code, logs, state, artifacts, or commits. Connector and runner values may be compared only when `metric_key`, semantic version, and definition hash match; fallback reporting never authorizes an action whose live monitor or rollback tool is unavailable. If neither connector nor fallback is trustworthy, only PostHog-dependent metrics and actions are unavailable; Tracking QA may repair them while independent trustworthy sources and channels continue. The router never estimates missing values or substitutes screenshots, repository guesses, or database proxies.
+
+The initial API dry run on 2026-07-17 correctly produced Tracking QA only because deployed production events did not yet satisfy the branch's semantic coverage contract. That historical result remains fallback evidence, not a reason to keep PostHog read-only.
 
 ### Loop 0 — Full-funnel router and tracking QA
 
 - **Check cadence:** Monday 09:00 Europe/Rome and after relevant analytics changes.
-- **Acts when:** Always refreshes the scorecard; opens a diagnostic only when data is trustworthy, a decision threshold is met, and no diagnostic, implementation, experiment, or overlapping PR is already open. A directly evidenced repository-fixable Tracking QA defect may route only a tracking-repair PR.
+- **Acts when:** Always reconciles PostHog and refreshes the scorecard; executes when data is trustworthy, a decision threshold is met, and no conflicting action owns the same `resource_key`. A PR blocks only overlapping repository work.
 - **Purpose:** Show the whole growth system and choose the single highest-leverage evidenced constraint.
 - **Skills used:** analytics, marketing-plan, marketing-loops, plus the selected stage skill only after routing.
-- **Body:** run `pnpm gtm:pulse:data`; validate and consume only the generated JSON; calculate all five scorecard rows and `ΔAAT` from `available` values; exclude unavailable, broken, or immature stages; route a verified product defect first; route Revenue/sustainability next only for a proven cost-cap breach or due quarterly review after its self-check passes; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Revenue/sustainability never enters the team-count comparator.
+- **Body:** discover connector capabilities; verify project identity; reconcile canonical PostHog assets; use the runner only as fallback; calculate all five scorecard rows and `ΔAAT` from valid values; exclude unavailable, broken, or immature stages; route a verified defect first; route Revenue/sustainability next only for a proven cap breach or due review; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Execute one bounded action and monitor active experiments daily.
 - **Self-check:** environment and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
-- **State / idempotency:** schema version, last successful run, metric snapshots, per-stage status, one open diagnostic, one in-flight experiment, one open pulse PR, pending human decisions, signal hashes, and cooldowns.
-- **Stop / bail-out:** broken or stale data makes Tracking QA the only action. No owner means no experiment. Four unanswered weekly recommendations pause action modules; the heartbeat may continue monthly.
-- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, data quality, one routed constraint, its owner, the next success check, and—when implementation qualifies—the draft PR URL plus verification and revert checks.
+- **State / idempotency:** schema version, metric snapshots, per-stage status, PostHog resource registry, resource locks, active experiments and surveys, PR status, action-policy version, caps, ledgers, signal hashes, and cooldowns.
+- **Stop / bail-out:** broken or stale data makes Tracking QA the only action for dependent metrics. Missing caps, consent, targeting, or tools make only that action ineligible. A kill threshold pauses or rolls back immediately.
+- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, connector and data quality, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
 
-### Controlled implementation and PR gate
+### Autonomous execution and PR gate
 
-The pulse may implement only its single routed constraint. Eligible work is a repository-fixable product or Tracking QA defect proven by source inspection plus a reproducible check, one bounded experiment whose data, maturity, threshold, ownership, and concurrency gates all pass, or one routed problem-led pSEO candidate with `demand_gate=pass` that passes every global and dedicated gate. A specifically named one-page qualitative pSEO pilot is eligible only while its exact, unconsumed approval key is recorded in state; that approval overrides only the quantitative-demand gate. Broken Tracking QA blocks growth implementations and permits only a directly evidenced tracking repair.
+The pulse executes only one primary routed action per strategic run, while existing experiments receive independent monitoring. Eligible work includes a PostHog reconciliation or experiment, a connected-channel action inside configured caps, a repository-fixable product or Tracking QA defect, and a focused pSEO PR that passes its evidence and quality checks. Broken Tracking QA blocks only dependent growth actions and permits direct repair of Pulse-owned analytics resources or an evidenced tracking PR.
 
-Before editing, the pulse requires a clean checkout on the synchronized repository default branch and no overlapping local-state or GitHub PR. It creates a `codex/gtm-<slug>` branch, makes one small reversible change, adds focused tests, and runs relevant tests, typecheck, and proportionate build or browser verification. A different base branch, failed verification, unrelated changes, or suspected secrets stop the workflow before push.
+Before repository edits, the pulse synchronizes the local default branch and requires a clean checkout plus no overlapping local-state or GitHub PR for the same `resource_key`, defined as `provider + resource_type + scope + logical_key`. It creates a `codex/gtm-<slug>` branch, makes one small reversible change, adds focused tests, and runs relevant tests, typecheck, and proportionate build or browser verification. A failed verification, unrelated changes, or suspected secrets stop that repository action before push without stopping independent GTM work.
 
-After verification it may commit, push, and open a **draft** PR containing the aggregate evidence, routed metric and window, root cause, scope, tests, observation window, success check, and kill/revert check. It records the PR in non-PII state so later runs update instead of duplicate it. The pulse never marks its PR ready, approves, merges, deploys, or directly changes production configuration. Auth, authorization, billing, secrets, destructive migrations, pricing, the free-forever promise, outbound communication, spend, and production configuration remain human-gated.
+After verification it may commit, push, and open a PR containing aggregate evidence, routed metric and window, root cause, scope, tests, observation window, success check, and kill/revert check. It may update the PR, answer review comments, and mark it ready. It never self-approves or bypasses branch protection. After an independent human approval and green required checks, it may merge and monitor deployment. The PR's `resource_key` alone remains locked; unrelated GTM work continues.
+
+Repository changes involving auth, authorization, billing, secrets, migrations, pricing, the free-forever promise, or production configuration use the same PR checkpoint. Direct connected-system actions are autonomous only when reversible, Pulse-owned, allowlisted, and bounded by machine-enforced policy. Irreversible or ambiguous actions are skipped rather than escalated into a new approval queue.
 
 ### Diagnostic modules — dormant until routed
 
-These are one-shot branches of Loop 0, not independent scheduled loops. They inherit its cadence, QA, single-open-diagnostic rule, human checkpoint, state, and stop conditions. The detailed per-module procedure and state keys live in `.agents/loops/skillsboard-gtm-pulse.md`.
+These are one-shot branches of Loop 0, not independent strategic routers. They inherit its QA, resource locks, automatic guardrails, state, and stop conditions. The detailed procedures live in `.agents/loops/skillsboard-gtm-pulse.md`.
 
 | Module | Check and trigger | Output | Key stop condition |
 |---|---|---|---|
-| Acquisition | Weekly scorecard; public scan only when Acquisition is selected. A monthly pSEO research appendix may run only after `no action` with no open work. The pSEO branch may maintain 30 deduplicated seeds and shortlist at most five opportunities. | One channel/content hypothesis; one named pSEO pilot recommendation when demand is unproven; or one pSEO draft PR with one page by default and at most three pages after the implementation gates pass. | Qualification or attribution gaps block growth conclusions; any `demand_gate` other than `pass` blocks autonomous pSEO implementation but not qualitative research; no unique value, intent overlap, thin content, or failed SEO/verification gates block the PR. |
+| Acquisition | Weekly scorecard; public scan when Acquisition is selected. A monthly pSEO appendix may run after `no_action` and ignore unrelated locks. The branch maintains at most 30 deduplicated seeds and five shortlisted opportunities. | One bounded channel/content action; one experimental-page PR from strong qualitative evidence; or at most three pages in one intent cluster when quantitative demand passes. | Qualification or attribution gaps block source-scale conclusions; weak product fit, canonical overlap, thin content, an overlapping resource lock, or failed SEO/verification blocks the action. |
 | Activation | Weekly at current volume; stalled mature cohorts or a verified product defect. | One step-level diagnosis and one bounded in-product experiment. | Tracking gap, active cooldown, unresolved bug, or two failed nudges. |
-| Retention | Weekly snapshot, monthly diagnosis after a mature cohort exists. | One cause candidate supported by usage and an interview/research plan. | Cohort not mature, normal low-frequency behavior not ruled out, or outage/event change. |
-| Referral | Monthly and dormant until happy moments exist. | One in-product ask or case-study draft for human review. | Team not healthy, no referral attribution, no consent, or 60d cooldown. |
-| Revenue / sustainability | Weekly digest shows the latest monthly snapshot with `as_of`; route only on a cost-cap breach or during the quarterly review. | Separate cash coverage, fully loaded cost, acquisition cost, and explicit economic-demand signals. | Incomplete costs; it never competes by “teams affected”; any pricing, spend, or free-forever change always escalates. |
-| Experiment / learning | Only after a human accepts the routed diagnostic. | One hypothesis, owner, success check, result, and postmortem. | Never start while another experiment is in flight. |
+| Retention | Weekly snapshot, monthly diagnosis after a mature cohort exists. | One cause candidate plus a consented, capped research or lifecycle intervention. | Cohort not mature, normal low-frequency behavior not ruled out, missing consent/suppression, or outage/event change. |
+| Referral | Monthly and dormant until happy moments exist. | One capped in-product or consented referral ask with explicit attribution. | Team not healthy, no attribution or consent, or 60d cooldown. |
+| Revenue / sustainability | Weekly digest shows the latest monthly snapshot with `as_of`; route only on a cap breach or during the quarterly review. | Separate cash coverage, fully loaded cost, acquisition cost, and an autonomous bounded optimization when eligible. | Incomplete costs, missing cap, irreversible change, or product-contract conflict. |
+| Experiment / learning | Starts automatically after the routed hypothesis passes its gates. | One hypothesis, flag or survey, owner=`pulse`, success check, kill check, result, and postmortem. | Never overlap the same population or surface; auto-pause on regression. |
 
-No module sends, publishes, spends, merges, deploys, changes production directly, or stores raw PII. An eligible module may prepare one reviewable draft PR; a loop earns continued operation only when its output produces a decision and a verifiable learning.
+Modules may send, publish, spend, and change Pulse-owned connected resources when automatic consent, cap, allowlist, ownership, and rollback checks pass. They never store raw PII. Repository changes use the single PR checkpoint; after independent approval the pulse may merge and monitor deployment.
 
 ## 8. 30 / 60 / 90 day roadmap
 
 | Window | Outcome | Work |
 |---|---|---|
-| Days 0–30 | Trust the full-funnel board | Already shipped locally: URL sanitization, acquisition-intent and team-return events, read-only PostHog query access, per-query availability states, and an artifact-only router dry run. Remaining: deploy schema v2, validate production payloads until Tracking QA passes, and define attribution plus internal/test exclusion. |
-| Days 31–60 | Diagnose the real constraint | Observe mature cohorts; interview target users, stalled teams, or lost teams according to the routed stage; run exactly one report-only diagnostic; instrument Referral or sustainability only if its prerequisite signal exists. |
-| Days 61–90 | Prove one intervention and one learning | Ship one bounded experiment on the selected stage; measure the stage-appropriate leading result and schedule its mature read; keep, revise, or kill only when the observation window closes; publish a postmortem; make an explicit sustainability-model decision without changing the free product by default. |
+| Days 0–30 | Trust the full-funnel board | Already shipped locally: URL sanitization, acquisition-intent and team-return events, validated API fallback, per-query availability states, and an artifact-only router dry run. Remaining: reconcile the connector-owned dashboard and insights, deploy schema v2, validate production payloads until Tracking QA passes, and define attribution plus internal/test exclusion. |
+| Days 31–60 | Diagnose and act on the real constraint | Observe mature cohorts; run one diagnostic and one bounded autonomous action; instrument Referral or sustainability when its prerequisite signal exists. |
+| Days 61–90 | Prove one intervention and one learning | Run one bounded experiment on the selected stage; monitor guardrails daily; keep, revise, roll back, or kill from the versioned observation rule; publish a postmortem and update the next hypothesis automatically. |
 
-## 9. RACI and operating constraints
+## 9. Operating authority
 
-| Work | Automation | Founder / human owner |
+| Work | Pulse authority | Automatic boundary |
 |---|---|---|
-| Full-funnel read, QA, score, draft, and report | Responsible | Accountable |
-| Select one diagnostic from evidenced constraints | Recommends | Approves priority and owner |
-| Bounded repository implementation | Creates tested branch, commit, and draft PR when gates pass | Reviews, marks ready, merges, and deploys |
-| Positioning and creative direction | Support | Responsible and accountable |
-| Public replies, outreach, publishing | Draft only | Approves and sends |
-| Product nudges | May prepare a draft PR after QA and bounded rules | Approves experiment, merge, and deployment |
-| Email sends | Disabled until compliance foundation | Approves audience, copy, and send |
-| Spend or budget movement | Disabled | Responsible and accountable |
-| Pricing, monetization, or free-forever changes | Disabled | Responsible and accountable |
+| Full-funnel analytics and PostHog assets | Responsible and accountable; create, update, reuse, pause, and retire Pulse-owned assets | Verified project, ownership marker, idempotency, privacy |
+| Diagnostic and experiment selection | Selects, launches, monitors, and ends | Trustworthy metric, versioned threshold, no overlap, rollback |
+| Repository implementation | Branches, verifies, commits, pushes, opens/updates PR, handles review, marks ready | Independent PR approval is required before merge |
+| Merge and deployment | Merges after independent approval and green checks; monitors and rolls back through a follow-up PR when needed | Never self-approve or bypass protection |
+| Outreach, lifecycle, referral, publishing | Executes autonomously | Consent, suppression, allowlist, volume cap, cooldown, ToS |
+| Spend and budget movement | Executes within configured machine caps | Hard ceiling, per-run delta, allowlist, outcome guardrail |
+| Product-contract changes | Authors the versioned contract and implementation PR, then executes after merge | The PR is the sole human checkpoint |
 
 Global kill switch: pause the scheduled Codex automation. Product lifecycle automation must also have its own environment-level disable flag before launch.
 
@@ -308,7 +312,7 @@ Global kill switch: pause the scheduled Codex automation. Product lifecycle auto
 
 Every PostHog event includes `analytics_schema_version` and `deployment_environment`. Team-scoped events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
 
-Instrumentation status is not query availability. The browser-safe project token proves only that the app can ingest events. The executable read contract in §7 is API-validated, but its initial production artifact exposes legacy and missing event semantics. No PostHog-derived growth metric is decision-ready until Tracking QA passes after schema-v2 deployment.
+Instrumentation status is not query availability. The browser-safe project token proves only that the app can ingest events. The fallback read contract in §7 is API-validated, but its initial production artifact exposes legacy and missing event semantics. Each PostHog-derived metric becomes decision-ready independently when its own events, filters, environment, freshness, `team_id`, and internal/test checks pass; one broken metric does not globally block healthy stages.
 
 | Stage | Event or derived metric | Required properties / rule | Status |
 |---|---|---|---|
@@ -323,23 +327,24 @@ Instrumentation status is not query availability. The browser-safe project token
 | Retention | `team_library_viewed` | `team_id`, `skill_count`, `has_skills`, `filter_state`; one event per mounted route-state transition, including search/tag navigation, with same-route skill mutations deduplicated while mounted. | Implemented |
 | Retention | `AAT-28` states | HogQL grouped by `team_id`, never a person funnel; fail closed until historical activation is reconciled. | Query implemented; measurement unavailable |
 | Referral research | `organic_champion_replication` | Invited user later creates and activates a different `team_id`; correlation only, not referral attribution. | Query required |
-| Referral | ask/copy/create/activate events | Add only after a referral surface exists; optimize for `referred_team_activated`. | Planned, gated |
+| Referral | ask/copy/create/activate events | Add when a referral surface exists; optimize for `referred_team_activated`. | Planned |
 | Revenue / sustainability | cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28` | Aggregate Vercel, Neon, Resend, GTM spend, and founder-time inputs; not user events. | Data connection required |
 
 Client analytics sanitizes only automatic URL properties: hashes and non-UTM query parameters are removed, and invitation capability paths are canonicalized without dropping the pageview. SDK-owned properties and explicit custom-event properties remain intact. Autocapture and exception capture are restored to the original PostHog integration behavior, Session Replay remains controlled by the PostHog project, and Do Not Track is honored. Replay page and network URLs receive the same sanitizer; network bodies, headers, and the rendered invitation-link result are excluded because they can contain live credentials. Vercel Analytics applies the same canonical URL rule. Client and server events share the build-time `NEXT_PUBLIC_ANALYTICS_ENVIRONMENT` value. Server-side analytics is fail-open so analytics failure cannot convert a successful product mutation into a user-visible error. Consent, retention, and internal-user policy remain launch blockers rather than assumptions.
 
-## 11. Open decisions
+## 11. Autonomous backlog and configuration dependencies
 
-1. Production scorecard baseline across Acquisition, Activation, Retention, Referral, and sustainability. The development snapshot is not sufficient.
-2. Internal/test team allowlist or property for every denominator.
-3. Qualified-visitor rule plus first-touch, last non-direct, referral override, normalized UTM source taxonomy, and team-level attribution query.
-4. Consent, opt-out, data-retention, deletion, and internal-user policy for product analytics; unsubscribe/suppression before lifecycle email.
-5. Marketing cash budget, founder-time valuation/cap, and explicit owner for the weekly review.
-6. Deploy schema-v2 analytics, then repeat the production artifact dry run until semantic coverage, environment, `team_id`, freshness, and internal/test exclusion checks pass.
-7. Whether the primary acquisition surface is English only or also Italian.
-8. Whether consultant-created libraries are the primary multiplier ICP or a separate use case.
-9. Sustainability mode for the next 12 months: intentional public good, sponsorship/grants, services, or optional add-ons that preserve the free core.
-10. Whether to connect Search Console and optional DataForSEO server-only API credentials, target market/language, and approved per-run spend cap; until then quantitative pSEO fields remain `unavailable`.
+Pulse owns the following backlog and resolves items from evidence rather than creating a human decision queue:
+
+1. Establish the production scorecard baseline across Acquisition, Activation, Retention, Referral, and sustainability.
+2. Implement and validate internal/test exclusion for every denominator.
+3. Version the qualified-visitor rule, UTM taxonomy, first-touch, last-non-direct, referral override, and team-level attribution.
+4. Enforce consent, opt-out, retention, deletion, unsubscribe, and suppression automatically before eligible actions.
+5. Record machine-readable cash, send, and spend caps. Until a cap exists, the dependent action is `unavailable` and the loop chooses another action.
+6. Reconcile production analytics until semantic coverage, environment, `team_id`, freshness, and internal/test checks pass.
+7. Choose and record acquisition locale and multiplier ICP from current evidence, then revisit on a versioned cadence.
+8. Evaluate sustainability modes that preserve the current free core; any durable contract change starts with a PR.
+9. Use Search Console and DataForSEO automatically when their connector or server-only credentials and caps become available; until then quantitative fields remain `unavailable`.
 
 ## 12. Reference points
 
