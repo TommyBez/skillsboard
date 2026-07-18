@@ -10,12 +10,12 @@ import {
 } from "@/analytics/posthog/events"
 import { getAnalyticsDeploymentEnvironment } from "@/lib/analytics-environment"
 
-type PostHogEvent<EventName extends NonTeamScopedCapturableAnalyticsEventName> =
+type ServerEvent<EventName extends NonTeamScopedCapturableAnalyticsEventName> =
   AnalyticsEventCapture<EventName> & {
     distinctId: string
   }
 
-type PostHogTeamEvent<EventName extends TeamScopedCapturableAnalyticsEventName> =
+type ServerTeamEvent<EventName extends TeamScopedCapturableAnalyticsEventName> =
   AnalyticsEventCapture<EventName> & {
     distinctId: string
     teamId: string
@@ -36,11 +36,7 @@ function getPostHogClient() {
   return posthogClient
 }
 
-/**
- * Product analytics is diagnostic and must never turn a successful mutation
- * into a user-visible failure.
- */
-function captureEvent({
+function enqueueEvent({
   distinctId,
   event,
   properties,
@@ -50,8 +46,7 @@ function captureEvent({
   properties?: Record<string, unknown>
 }) {
   try {
-    const posthog = getPostHogClient()
-    posthog.capture({
+    getPostHogClient().capture({
       distinctId,
       event,
       properties: {
@@ -69,27 +64,14 @@ function captureEvent({
 
 export function capturePostHogEvent<
   EventName extends NonTeamScopedCapturableAnalyticsEventName,
->({
-  distinctId,
-  event,
-  properties,
-}: PostHogEvent<EventName>) {
-  captureEvent({ distinctId, event, properties })
+>(capture: ServerEvent<EventName>) {
+  enqueueEvent(capture)
 }
 
-/**
- * Keep team-scoped events queryable without requiring PostHog's paid Groups
- * add-on. If Groups is enabled later, this stable team ID can become its key.
- */
 export function captureTeamEvent<
   EventName extends TeamScopedCapturableAnalyticsEventName,
->({
-  distinctId,
-  event,
-  properties,
-  teamId,
-}: PostHogTeamEvent<EventName>) {
-  captureEvent({
+>({ distinctId, event, properties, teamId }: ServerTeamEvent<EventName>) {
+  enqueueEvent({
     distinctId,
     event,
     properties: {
