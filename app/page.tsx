@@ -169,7 +169,7 @@ export default function HomePage() {
             <p className={`${styles.heroEyebrow} mb-5 text-sm font-semibold text-primary`}>
               Skills selected by your team
             </p>
-            <h1 className="text-balance text-[clamp(2.75rem,7vw,7rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
+            <h1 className="text-balance text-[clamp(2.75rem,6.5vw,6rem)] font-semibold leading-[0.92] tracking-[-0.04em]">
               <span className={`${styles.heroLine} ${styles.heroLineFirst} block`}>
                 One shared library.
               </span>
@@ -195,13 +195,13 @@ export default function HomePage() {
       <section className="border-y border-border/70 bg-accent/30">
         <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
           <div className="w-full">
-            <h2 className="max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-6xl">
+            <h2 className="max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.04em] md:text-6xl">
               The library belongs to your team, not one agent.
             </h2>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
               Skills Board is a shared AI skill library for teams. Everyone starts from the same recommendation, then chooses the source, command, or ZIP that fits their setup.
             </p>
-            <p className="mt-6 max-w-md border-l-2 border-primary/40 pl-4 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
               Compatible agents can optionally access the same library through authenticated, read-only MCP.
             </p>
           </div>
@@ -271,7 +271,7 @@ export default function HomePage() {
           <div className="max-w-lg lg:pb-2">
             <h2
               id="pricing-heading"
-              className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-[-0.055em] md:text-7xl`}
+              className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-[-0.04em] md:text-7xl`}
             >
               Free. Forever.
             </h2>
@@ -294,7 +294,7 @@ export default function HomePage() {
           <div>
             <h2
               id="faq-heading"
-              className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.045em] md:text-6xl"
+              className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.04em] md:text-6xl"
             >
               Common questions
             </h2>
@@ -305,8 +305,8 @@ export default function HomePage() {
 
           <div className="divide-y divide-border/80 border-y border-border/80">
             {landingFaqs.map((faq) => (
-              <details key={faq.question} className="group py-6">
-                <summary className="cursor-pointer list-none text-xl font-semibold tracking-[-0.03em] marker:content-none [&::-webkit-details-marker]:hidden">
+              <details key={faq.question} className="faq-disclosure group py-6">
+                <summary className="cursor-pointer list-none rounded-lg text-xl font-semibold tracking-[-0.03em] marker:content-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
                   <span className="flex items-start justify-between gap-6">
                     <span>{faq.question}</span>
                     <span
@@ -331,7 +331,7 @@ export default function HomePage() {
           className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
           data-motion-group="closing"
         >
-          <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.055em]`}>
+          <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.04em]`}>
             Answer “which skill should I use?” once.
           </h2>
           <p className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}>

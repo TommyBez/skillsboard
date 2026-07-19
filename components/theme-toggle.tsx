@@ -41,7 +41,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       disabled={!mounted}
       onClick={() => setTheme(next)}
     >
-      <Icon className="size-4" aria-hidden="true" />
+      <Icon key={current} className="theme-toggle-icon size-4" aria-hidden="true" />
     </Button>
   )
 }

@@ -267,6 +267,60 @@
   }
 }
 
+/* Animated <details> disclosure. Progressive enhancement: browsers without
+   interpolate-size / ::details-content support keep the instant toggle. */
+.faq-disclosure {
+  interpolate-size: allow-keywords;
+}
+
+.faq-disclosure::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  opacity: 0;
+  transition:
+    block-size 240ms var(--ease-out),
+    opacity 200ms var(--ease-out),
+    content-visibility 240ms allow-discrete;
+}
+
+.faq-disclosure[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-disclosure::details-content {
+    transition-duration: 0ms;
+  }
+}
+
+.theme-toggle-icon {
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@starting-style {
+  .theme-toggle-icon {
+    opacity: 0;
+    transform: scale(0.85) rotate(-30deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon {
+    transition: opacity 120ms var(--ease-out);
+    transform: none;
+  }
+
+  @starting-style {
+    .theme-toggle-icon {
+      opacity: 0;
+      transform: none;
+    }
+  }
+}
+
 .tabs-content-enter {
   transition: opacity 160ms var(--ease-out);
 }

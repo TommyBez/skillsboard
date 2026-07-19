@@ -94,7 +94,7 @@ export function SkillDossier({
             </p>
           ) : null}
           {note ? (
-            <p className={cn("border-l-2 border-primary/50 pl-3 text-pretty leading-relaxed text-foreground/90", compact ? "line-clamp-2 text-sm" : "line-clamp-4 text-sm md:text-base")}>
+            <p className={cn("rounded-lg bg-accent/50 px-3 py-2 text-pretty leading-relaxed text-foreground/90", compact ? "line-clamp-2 text-sm" : "line-clamp-4 text-sm md:text-base")}>
               {note}
             </p>
           ) : null}
