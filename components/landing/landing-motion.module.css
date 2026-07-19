@@ -288,6 +288,25 @@
   .ctaButton:hover .ctaArrow {
     transform: translate3d(3px, 0, 0);
   }
+
+  /* Hovering the agent list singles one agent out of the crowd: siblings
+     recede, the hovered name takes the accent and steps forward. */
+  .agentName {
+    transition:
+      color 180ms var(--landing-ease-out),
+      opacity 180ms var(--landing-ease-out),
+      transform 200ms var(--landing-ease-out);
+  }
+
+  .agentList:hover .agentName {
+    opacity: 0.35;
+  }
+
+  .agentList li:hover .agentName {
+    color: var(--primary);
+    opacity: 1;
+    transform: translate3d(4px, 0, 0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -322,6 +341,16 @@
 
   .ctaButton:active {
     scale: 1 !important;
+    transform: none;
+  }
+
+  .agentName {
+    transition:
+      color 180ms var(--landing-ease-out),
+      opacity 180ms var(--landing-ease-out);
+  }
+
+  .agentList li:hover .agentName {
     transform: none;
   }
 }

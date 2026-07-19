@@ -5,6 +5,7 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
+import { LandingConsoleNote } from "@/components/landing/landing-console-note"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -154,6 +155,7 @@ export default function HomePage() {
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
+      <LandingConsoleNote />
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
@@ -231,15 +233,16 @@ export default function HomePage() {
                   Wherever people work
                 </p>
                 <ul
-                  className="mt-3 grid grid-cols-2 gap-x-5 gap-y-2 sm:flex sm:flex-wrap"
+                  className={`${styles.agentList} mt-3 flex flex-col gap-1.5`}
                   aria-label="Supported agent choices"
                 >
                   {agents.map((agent) => (
-                    <li
-                      key={agent}
-                      className={`${styles.agentItem} text-xl font-semibold tracking-[-0.03em]`}
-                    >
-                      {agent}
+                    <li key={agent} className={styles.agentItem}>
+                      <span
+                        className={`${styles.agentName} inline-block text-2xl font-semibold tracking-[-0.03em] md:text-3xl lg:text-4xl`}
+                      >
+                        {agent}
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -317,7 +320,7 @@ export default function HomePage() {
                     </span>
                   </span>
                 </summary>
-                <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+                <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground">
                   {faq.answer}
                 </p>
               </details>
@@ -332,7 +335,7 @@ export default function HomePage() {
           data-motion-group="closing"
         >
           <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-[-0.04em]`}>
-            Answer “which skill should I use?” once.
+            Answer “which skill should I use?” <span className="text-primary">once.</span>
           </h2>
           <p className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}>
             Save the recommendation where the whole team can find it. The next person can get started without asking where to look.
