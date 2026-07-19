@@ -27,24 +27,24 @@ export function AccessShell({
           <div className="relative flex items-center justify-between gap-6">
             <Brand />
             <div className="flex items-center gap-3">
-              <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-[var(--surface-ink-foreground)] opacity-50">
+              <span className="font-mono text-[0.65rem] uppercase tracking-[0.22em] text-(--surface-ink-foreground) opacity-50">
                 Shared skill library
               </span>
-              <ThemeToggle className="border-white/15 bg-white/5 text-[var(--surface-ink-foreground)] hover:bg-white/10 hover:text-[var(--surface-ink-foreground)]" />
+              <ThemeToggle className="border-white/15 bg-white/5 text-(--surface-ink-foreground) hover:bg-white/10 hover:text-(--surface-ink-foreground)" />
             </div>
           </div>
 
           <div className="relative my-auto max-w-2xl py-16">
-            <p className="max-w-[13ch] text-balance text-[clamp(3.25rem,5vw,5.8rem)] font-semibold leading-[0.92] tracking-[-0.04em]">
+            <p className="max-w-[13ch] text-balance text-[clamp(3.25rem,5vw,5.8rem)] font-semibold leading-[0.92] tracking-display">
               {editorialTitle}
             </p>
-            <p className="mt-8 max-w-lg text-pretty text-base leading-7 text-[var(--surface-ink-foreground)] opacity-60 xl:text-lg">
+            <p className="mt-8 max-w-lg text-pretty text-base leading-7 text-(--surface-ink-foreground) opacity-60 xl:text-lg">
               {editorialBody}
             </p>
           </div>
 
           <div className="relative border-t border-white/15 pt-5">
-            <p className="max-w-lg text-sm leading-6 text-[var(--surface-ink-foreground)] opacity-55">
+            <p className="max-w-lg text-sm leading-6 text-(--surface-ink-foreground) opacity-55">
               Team recommendations, ready for different agent setups.
             </p>
           </div>

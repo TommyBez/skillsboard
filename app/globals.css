@@ -45,6 +45,7 @@
   --radius-4xl: calc(var(--radius) * 2.25);
   --font-sans: var(--font-bricolage), ui-sans-serif, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --tracking-display: -0.04em;
 }
 
 :root {

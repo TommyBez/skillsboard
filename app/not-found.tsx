@@ -18,17 +18,17 @@ export default function NotFound() {
         <section className="ink-panel w-full overflow-hidden rounded-2xl p-6 md:p-10 lg:p-14">
           <CompassIcon className="size-9 text-primary" aria-hidden="true" />
           <p className="mt-10 font-mono text-sm text-primary">404</p>
-          <h1 className="mt-3 max-w-[13ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.04em] md:text-6xl">
+          <h1 className="mt-3 max-w-[13ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
             This page doesn&rsquo;t exist.
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-[color:color-mix(in_oklch,var(--surface-ink-foreground)_68%,transparent)]">
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-(--surface-ink-foreground)/68">
             The address may have changed, or the link was wrong. Your library and the public catalog are still where you left them.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button nativeButton={false} render={<Link href="/library" />}>Open your library</Button>
             <Button
               variant="outline"
-              className="border-white/20 bg-white/10 text-[var(--surface-ink-foreground)] hover:border-white/30 hover:bg-white/15 hover:text-[var(--surface-ink-foreground)]"
+              className="border-white/20 bg-white/10 text-(--surface-ink-foreground) hover:border-white/30 hover:bg-white/15 hover:text-(--surface-ink-foreground)"
               nativeButton={false}
               render={<Link href="/" />}
             >

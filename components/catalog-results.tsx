@@ -219,7 +219,7 @@ export function CatalogEmptyState() {
     <section className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
       <SearchIcon className="size-9 text-primary" aria-hidden="true" />
       <div>
-        <h2 className="text-3xl font-semibold tracking-[-0.04em]">No skills found</h2>
+        <h2 className="text-3xl font-semibold tracking-display">No skills found</h2>
         <p className="mt-3 max-w-xl text-muted-foreground">Try a broader search or return to the current trending catalog.</p>
       </div>
       <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>View trending</Button>
