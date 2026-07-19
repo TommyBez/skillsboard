@@ -1,7 +1,7 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
+import { ArrowUpRightIcon, CheckIcon, GitForkIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { CopyButton } from "@/components/copy-button"
@@ -125,7 +125,7 @@ export function CatalogSkillDetailsDialog({
               </p>
             ) : null}
 
-            <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-muted/40 p-2 pl-3">
+            <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-muted/40 p-2 pl-3">
               <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 <code className="block whitespace-nowrap font-mono text-[0.7rem] text-muted-foreground md:text-xs">
                   {command}
@@ -154,9 +154,11 @@ export function CatalogSkillDetailsDialog({
                 <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
               </a>
               {isSaved ? (
-                <Button aria-label={`${name} is already in library`} variant="outline" size="sm" disabled>
+                <span className="inline-flex h-8 items-center gap-1.5 text-sm font-medium text-muted-foreground">
+                  <CheckIcon className="size-3.5 text-primary" aria-hidden="true" />
                   In library
-                </Button>
+                  <span className="sr-only">: {name} is already saved</span>
+                </span>
               ) : (
                 <AddSkillDialog
                   defaultUrl={item.installUrl}

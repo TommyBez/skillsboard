@@ -26,7 +26,8 @@ interface SkillDossierProps {
   command: string
   metric?: string
   tags?: string[]
-  status?: string
+  /** Position in a ranked list (leaderboards); rendered as a monospace ordinal. */
+  rank?: number
   addedBy?: string | null
   href?: string
   hrefLabel?: string
@@ -45,7 +46,7 @@ export function SkillDossier({
   command,
   metric,
   tags = [],
-  status,
+  rank,
   addedBy,
   href,
   hrefLabel = "View source",
@@ -75,11 +76,15 @@ export function SkillDossier({
       <div className={cn("flex flex-1 flex-col", compact ? "gap-4 p-4" : "gap-5 p-5 md:p-6")}>
         <div className="flex min-w-0 items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2 font-mono text-xs text-muted-foreground">
+            {typeof rank === "number" ? (
+              <span className="shrink-0 font-semibold tabular-nums text-primary">
+                {String(rank).padStart(2, "0")}
+              </span>
+            ) : null}
             <GitForkIcon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
             <span className="truncate">{source}</span>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            {status ? <Badge>{status}</Badge> : null}
             {metric ? <span className="font-mono text-xs tabular-nums text-muted-foreground">{metric}</span> : null}
           </div>
         </div>
@@ -122,7 +127,7 @@ export function SkillDossier({
       </div>
 
       <div className="border-t border-border bg-muted/40 p-3 md:p-4">
-        <div className="flex min-w-0 items-center gap-2 rounded-xl border border-border bg-background/75 p-2 pl-3">
+        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background/75 p-2 pl-3">
           <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <code className="block whitespace-nowrap font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
           </div>
