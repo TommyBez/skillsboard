@@ -462,9 +462,6 @@ export default function HomePage() {
                 FAQ
               </a>
             </nav>
-            <p className="max-w-md text-sm text-muted-foreground md:text-right">
-              Built for teams that work across different agents.
-            </p>
             <a
               href="https://github.com/TommyBez/skillsboard"
               target="_blank"
