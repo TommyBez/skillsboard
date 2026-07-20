@@ -5,7 +5,6 @@ import { ArrowRightIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
-import { LandingConsoleNote } from "@/components/landing/landing-console-note"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -155,7 +154,6 @@ export default function HomePage() {
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
-      <LandingConsoleNote />
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
