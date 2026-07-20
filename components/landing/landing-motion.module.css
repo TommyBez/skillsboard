@@ -456,31 +456,9 @@
 }
 
 .dossierTop {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem;
   margin-bottom: 0.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--lp-hairline);
-}
-
-.dossierRec {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--primary);
-}
-
-.dossierRecDot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--primary);
 }
 
 .dossierName {
@@ -597,14 +575,6 @@
   font-size: 0.95rem;
   font-weight: 650;
   letter-spacing: -0.02em;
-}
-
-.mobileStackRec {
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: var(--primary);
 }
 
 @media (min-width: 64rem) {
@@ -1228,73 +1198,8 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Closing — every card indexed, one final action
+   Closing — one final action
 --------------------------------------------------------------------------- */
-
-.closingRail {
-  display: flex;
-  width: 100%;
-  overflow: hidden;
-  border-block: 1px solid var(--lp-hairline-strong);
-}
-
-.closingRailChip {
-  display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding: 0.7rem 1.1rem;
-  border-right: 1px solid var(--lp-hairline);
-  white-space: nowrap;
-}
-
-.closingRailChip:last-child {
-  border-right: none;
-}
-
-.closingRailName {
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingRailChip {
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingRailChip {
-  transition:
-    opacity 340ms var(--lp-ease-out),
-    transform 340ms var(--lp-ease-out);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingRailChip:nth-child(2) {
-  transition-delay: 60ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingRailChip:nth-child(3) {
-  transition-delay: 120ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingRailChip:nth-child(4) {
-  transition-delay: 180ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingRailChip:nth-child(5) {
-  transition-delay: 240ms;
-}
 
 .closingHeading {
   font-stretch: 93%;

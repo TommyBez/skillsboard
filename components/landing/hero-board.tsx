@@ -4,16 +4,14 @@ import styles from "@/components/landing/landing-motion.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — restrained interface
- * fragments (name, source, recommendation marker, command/file reference),
- * never marketing claims. The whole board is aria-hidden; the hero copy
- * carries the message.
+ * fragments (name, source, command/file reference), never marketing claims.
+ * The whole board is aria-hidden; the hero copy carries the message.
  */
 const dossiers = [
   {
     name: "code-review",
     source: "github.com/acme/skills",
     ref: "SKILL.md",
-    rec: true,
     dir: "left",
     density: "wide",
   },
@@ -21,14 +19,12 @@ const dossiers = [
     name: "pdf-extraction",
     source: "internal / tools",
     cmd: "npx skills add pdf-extraction",
-    rec: false,
     dir: "top",
     density: "regular",
   },
   {
     name: "brand-voice",
     source: "notion export",
-    rec: true,
     dir: "right",
     density: "compact",
   },
@@ -36,7 +32,6 @@ const dossiers = [
     name: "sql-migrations",
     source: "skills/sql-migrations",
     ref: "SKILL.md",
-    rec: true,
     dir: "right",
     density: "regular",
   },
@@ -44,7 +39,6 @@ const dossiers = [
     name: "release-notes",
     source: "github.com/acme/skills",
     cmd: "npx skills add release-notes",
-    rec: false,
     dir: "bottom",
     density: "wide",
   },
@@ -57,12 +51,6 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
     <div className={styles.dossier} data-density={dossier.density}>
       <div className={styles.dossierTop}>
         <p className={styles.dossierName}>{dossier.name}</p>
-        {dossier.rec ? (
-          <span className={styles.dossierRec}>
-            <span className={styles.dossierRecDot} />
-            REC
-          </span>
-        ) : null}
       </div>
       <p className={styles.dossierSource}>{dossier.source}</p>
       {"cmd" in dossier && dossier.cmd ? (
@@ -113,9 +101,6 @@ export function HeroBoard() {
           {dossiers.map((dossier) => (
             <li key={dossier.name} className={styles.mobileStackRow}>
               <span className={styles.mobileStackName}>{dossier.name}</span>
-              {dossier.rec ? (
-                <span className={styles.mobileStackRec}>REC</span>
-              ) : null}
             </li>
           ))}
         </ul>

@@ -31,15 +31,6 @@ export const metadata: Metadata = {
   },
 }
 
-/** Decorative library rail in the closing chapter. Visual examples only. */
-const closingRailSkills = [
-  "code-review",
-  "pdf-extraction",
-  "brand-voice",
-  "sql-migrations",
-  "release-notes",
-] as const
-
 function primaryAction(signedIn: boolean): {
   href: "/library" | "/sign-up"
   label: string
@@ -434,16 +425,8 @@ export default function HomePage() {
         {/* Closing — everything indexed, one final action */}
         <section className={styles.grain} data-motion-group="closing">
           <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
-            <div className={styles.closingRail} aria-hidden="true">
-              {closingRailSkills.map((skill) => (
-                <span key={skill} className={styles.closingRailChip}>
-                  <span className={styles.closingRailName}>{skill}</span>
-                </span>
-              ))}
-            </div>
-
             <h2
-              className={`${styles.closingHeading} mt-14 max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
+              className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
             >
               Answer “which skill should I use?”{" "}
               <span className={styles.onceStamp}>once.</span>
