@@ -26,11 +26,11 @@ async function LibraryStats() {
   return (
     <div className="flex flex-wrap items-center gap-5 lg:justify-end">
       <div className="min-w-20">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-[-0.04em]">{skills.length}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{skills.length}</p>
         <p className="text-sm text-muted-foreground">team {skills.length === 1 ? "skill" : "skills"}</p>
       </div>
       <div className="min-w-20 border-l border-border pl-5">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-[-0.04em]">{tags.size}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{tags.size}</p>
         <p className="text-sm text-muted-foreground">{tags.size === 1 ? "tag" : "tags"}</p>
       </div>
     </div>
@@ -158,7 +158,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <LibraryBigIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
-            <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">{hasFilters ? "No matching skills" : "Add your first skill"}</h2>
+            <h2 className="text-3xl font-semibold tracking-display md:text-4xl">{hasFilters ? "No matching skills" : "Add your first skill"}</h2>
             <p className="mt-3 max-w-lg text-lg leading-relaxed text-muted-foreground">
               {hasFilters ? "Try another search or clear the active filters." : "Add a skill your team recommends, or browse the public catalog to find one."}
             </p>
@@ -193,7 +193,7 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
       <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="font-mono text-sm text-primary">Library</p>
-          <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] md:text-6xl">
+          <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
             Skills your team recommends.
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">

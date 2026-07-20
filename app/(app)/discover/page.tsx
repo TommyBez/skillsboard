@@ -51,7 +51,7 @@ async function DiscoverResults({ searchParams }: DiscoverPageProps) {
       <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
         <SparklesIcon className="size-9 text-primary" aria-hidden="true" />
         <div>
-          <h2 className="text-3xl font-semibold tracking-[-0.04em] md:text-4xl">The public catalog is unavailable</h2>
+          <h2 className="text-3xl font-semibold tracking-display md:text-4xl">The public catalog is unavailable</h2>
           <p className="mt-3 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Try again in a moment, or add a skill directly from its repository.
           </p>
@@ -87,7 +87,7 @@ export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
         </Button>
         <div className="mt-6">
           <p className="font-mono text-sm text-primary">Find skills</p>
-          <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-[-0.05em] md:text-6xl">
+          <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
             Find a skill to recommend.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">

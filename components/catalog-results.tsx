@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { SearchIcon } from "lucide-react"
+import { CheckIcon, SearchIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { CatalogSkillDetailsDialog } from "@/components/catalog-skill-details-dialog"
@@ -22,12 +22,24 @@ function installCount(count: number) {
   return `${count.toLocaleString()} ${count === 1 ? "install" : "installs"}`
 }
 
+function InLibraryLabel({ name }: { name: string }) {
+  return (
+    <span className="inline-flex h-8 items-center gap-1.5 text-sm font-medium text-muted-foreground">
+      <CheckIcon className="size-3.5 text-primary" aria-hidden="true" />
+      In library
+      <span className="sr-only">: {name} is already saved</span>
+    </span>
+  )
+}
+
 function SkillCard({
   item,
   isSaved,
+  rank,
 }: {
   item: CatalogSkill
   isSaved: boolean
+  rank?: number
 }) {
   const command = buildInstallCommand(item.installUrl, item.slug)
 
@@ -39,11 +51,11 @@ function SkillCard({
       source={item.source}
       command={command}
       metric={installCount(item.installs)}
-      status={isSaved ? "Saved" : undefined}
+      rank={rank}
       details={<CatalogSkillDetailsDialog item={item} isSaved={isSaved} />}
       actions={
         isSaved
-          ? <Button aria-label={`${item.name} is already in library`} variant="outline" size="sm" disabled>In library</Button>
+          ? <InLibraryLabel name={item.name} />
           : <AddSkillDialog defaultUrl={item.installUrl} defaultName={item.slug} triggerLabel="Save to library" triggerAriaLabel={`Save ${item.name} to library`} />
       }
     />
@@ -144,28 +156,29 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
   return (
     <div className="grid gap-6">
       {searchTruncated ? (
-        <p className="text-sm text-muted-foreground" role="status">
+        <p className="text-sm tabular-nums text-muted-foreground" role="status">
           {atSearchCap
             ? `Showing the top ${skills.length.toLocaleString()} matches. Narrow your query to dig further into the catalog.`
             : `Showing ${skills.length.toLocaleString()} matches. Scroll for more.`}
         </p>
       ) : page.source === "leaderboard" || page.source === "curated" ? (
-        <p className="text-sm text-muted-foreground" role="status">
+        <p className="text-sm tabular-nums text-muted-foreground" role="status">
           Showing {skills.length.toLocaleString()} skills
           {canLoadMore ? ". Scroll for more" : ""}.
         </p>
       ) : (
-        <p className="text-sm text-muted-foreground" role="status">
+        <p className="text-sm tabular-nums text-muted-foreground" role="status">
           {skills.length.toLocaleString()} {skills.length === 1 ? "match" : "matches"}.
         </p>
       )}
 
-      <section aria-label="Catalog results" className="grid gap-4 md:grid-cols-2">
-        {skills.map((item) => (
+      <section aria-label="Catalog results" className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {skills.map((item, index) => (
           <SkillCard
             key={item.id}
             item={item}
             isSaved={saved.has(`${item.installUrl}:${item.slug}`)}
+            rank={page.source === "leaderboard" ? index + 1 : undefined}
           />
         ))}
       </section>
@@ -182,7 +195,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       {canLoadMore && !error ? (
         <div
           ref={sentinelRef}
-          className="grid gap-4 md:grid-cols-2"
+          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
           aria-hidden={!isLoadingMore}
           aria-busy={isLoadingMore}
         >
@@ -190,9 +203,10 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
             <>
               <Skeleton className="h-72 rounded-2xl" />
               <Skeleton className="h-72 rounded-2xl" />
+              <Skeleton className="hidden h-72 rounded-2xl xl:block" />
             </>
           ) : (
-            <div className="h-8 md:col-span-2" />
+            <div className="h-8 md:col-span-2 xl:col-span-3" />
           )}
         </div>
       ) : null}
@@ -205,7 +219,7 @@ export function CatalogEmptyState() {
     <section className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
       <SearchIcon className="size-9 text-primary" aria-hidden="true" />
       <div>
-        <h2 className="text-3xl font-semibold tracking-[-0.04em]">No skills found</h2>
+        <h2 className="text-3xl font-semibold tracking-display">No skills found</h2>
         <p className="mt-3 max-w-xl text-muted-foreground">Try a broader search or return to the current trending catalog.</p>
       </div>
       <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>View trending</Button>

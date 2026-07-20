@@ -45,6 +45,7 @@
   --radius-4xl: calc(var(--radius) * 2.25);
   --font-sans: var(--font-bricolage), ui-sans-serif, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --tracking-display: -0.04em;
 }
 
 :root {
@@ -264,6 +265,115 @@
     transition: none;
     opacity: 1;
     transform: none;
+  }
+}
+
+/* Animated <details> disclosure. Progressive enhancement: browsers without
+   interpolate-size / ::details-content support keep the instant toggle. */
+.faq-disclosure {
+  interpolate-size: allow-keywords;
+}
+
+.faq-disclosure::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  opacity: 0;
+  transition:
+    block-size 240ms var(--ease-out),
+    opacity 200ms var(--ease-out),
+    content-visibility 240ms allow-discrete;
+}
+
+.faq-disclosure[open]::details-content {
+  block-size: auto;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-disclosure::details-content {
+    transition-duration: 0ms;
+  }
+}
+
+/* Stale-while-updating: dim the previous results during a catalog
+   transition. The delay keeps fast responses from flickering. */
+.discover-results-slot {
+  transition: opacity 180ms var(--ease-out);
+  transition-delay: 0ms;
+}
+
+.discover-results-slot[data-pending] {
+  opacity: 0.45;
+  pointer-events: none;
+  transition-delay: 150ms;
+}
+
+/* Cascade: cards fade up on mount, staggered for the first rows. Items past
+   the cap enter together; pages appended by infinite scroll animate on their
+   own mount. A keyframe animation (not a transition) so it never fights the
+   lift-on-hover transition on the same element. */
+.cascade-grid > * {
+  animation: cascade-enter 320ms var(--ease-out) both;
+}
+
+.cascade-grid > :nth-child(2) { animation-delay: 45ms; }
+.cascade-grid > :nth-child(3) { animation-delay: 90ms; }
+.cascade-grid > :nth-child(4) { animation-delay: 135ms; }
+.cascade-grid > :nth-child(5) { animation-delay: 180ms; }
+.cascade-grid > :nth-child(6) { animation-delay: 225ms; }
+
+@keyframes cascade-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes cascade-enter-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discover-results-slot {
+    transition: none;
+  }
+
+  .cascade-grid > * {
+    animation: cascade-enter-fade 120ms var(--ease-out) both;
+    animation-delay: 0ms;
+  }
+}
+
+.theme-toggle-icon {
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 160ms var(--ease-out);
+}
+
+@starting-style {
+  .theme-toggle-icon {
+    opacity: 0;
+    transform: scale(0.85) rotate(-30deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon {
+    transition: opacity 120ms var(--ease-out);
+    transform: none;
+  }
+
+  @starting-style {
+    .theme-toggle-icon {
+      opacity: 0;
+      transform: none;
+    }
   }
 }
 
