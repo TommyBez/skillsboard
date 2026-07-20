@@ -4,7 +4,7 @@ This is the operating contract for the scheduled GTM control loop. Strategy, met
 
 ## Purpose
 
-Grow retained teams by maintaining a trustworthy view of Acquisition, Activation, Retention, Referral, and Revenue/sustainability, routing the strongest evidenced constraint, and executing the next bounded action without routine human coordination.
+Grow retained teams by maintaining a trustworthy view of Acquisition, Activation, Retention, Referral, and Revenue/sustainability, protecting a weekly problem-led pSEO research lane, routing the strongest evidenced constraint, and executing the next bounded action without routine human coordination.
 
 The pulse is responsible and accountable for GTM sensing, diagnosis, execution, measurement, rollback, and learning. A correct run may still produce `no_action` when evidence or a required capability is missing.
 
@@ -35,6 +35,7 @@ There are no per-action approval queues. Missing consent, an absent cap, an unsu
 ## Cadence
 
 - Strategic full-funnel pulse: Monday 09:00 Europe/Rome.
+- Protected problem-led pSEO research: complete at least once every seven days, normally in the Monday strategic pulse. If `pseo_research.next_due_at` has passed, the first subsequent heartbeat performs the missed research pass without routing a second strategic constraint.
 - Tracking QA: every strategic run and after analytics-semantic changes.
 - Active experiment or rollout monitor: at least daily until ended, rolled back, or promoted.
 - Retention diagnosis: monthly until volume supports weekly decisions.
@@ -44,7 +45,7 @@ There are no per-action approval queues. Missing consent, an absent cap, an unsu
 
 - Always: `posthog:posthog`, `analytics`, `marketing-plan`, and `marketing-loops`.
 - After routing: the skill for the selected stage, such as `onboarding`, `churn-prevention`, `referrals`, `pricing`, `content-strategy`, or `customer-research`.
-- For problem-led pSEO: `programmatic-seo`, `content-strategy`, and `seo-audit` before a repository PR.
+- For every problem-led pSEO research pass: `programmatic-seo` and `content-strategy`; add `seo-audit` before a repository PR.
 - Experiments use `ab-testing` and share one experiment registry; stage modules do not launch conflicting tests.
 
 ## Official PostHog plugin contract
@@ -68,7 +69,7 @@ If the official PostHog plugin is unavailable or a required operation is not exp
 
 ## Acts when
 
-Always reconcile PostHog assets and refresh the scorecard when a trustworthy source is available. Execute a GTM action when:
+Always reconcile PostHog assets and refresh the scorecard when a trustworthy source is available. Run protected pSEO research whenever it is due, independently of PostHog availability or the routed stage; unavailable research sources disable only their dependent fields. Execute a GTM action when:
 
 - Tracking QA passes for the metrics the action depends on;
 - the stage has a mature cohort and valid denominator, or a reproducible product or tracking defect exists;
@@ -88,10 +89,11 @@ With fewer than 30 eligible teams, use absolute counts and qualitative evidence.
 4. Run Tracking QA: event semantics, environment, sensitive-URL sanitization, duplicates, `team_id`, internal/test exclusion, source freshness, and DB/PostHog reconciliation.
 5. Build all five scorecard rows. Preserve `available|unavailable|broken` and stage-level measurement status; never substitute missing values.
 6. Calculate `AAT-28 = new activated + retained + reactivated` and `delta_AAT = new activated + reactivated - lost` only from valid team-level Retention inputs.
-7. Route one primary constraint: verified defect first; sustainability next only for a proven cap breach or due review; otherwise require downstream health before scaling Acquisition and select the eligible issue with the strongest evidence and largest absolute number of teams affected.
-8. Run the selected diagnostic and execute one bounded action. PostHog and channel actions may run immediately; repository work follows the PR checkpoint.
-9. Monitor active experiments and rollouts independently of the weekly router. Pause exposure immediately when a guardrail crosses its kill threshold, then end measurement when appropriate. After the observation window, make a winner permanent through the repository PR checkpoint or another reversible plugin-supported path; otherwise leave the permanent transition unapplied.
-10. Persist state after each successful external transition and append a minimal non-PII run log. A crash must be recoverable by reconciling live resources on the next run.
+7. When `pseo_research.next_due_at <= now` or no successful pSEO research pass is recorded, run the protected research pass, refresh only the deduplicated evidence backlog and source statuses, set `last_completed_at`, and set `next_due_at = last_completed_at + 7 days`. This sensing pass does not open a PR, publish, or count as a second routed action.
+8. Route one primary constraint: verified defect first; sustainability next only for a proven cap breach or due review; otherwise require downstream health before scaling Acquisition and select the eligible issue with the strongest evidence and largest absolute number of teams affected. A researched pSEO candidate may be selected here, never alongside another primary action.
+9. Run the selected diagnostic and execute one bounded action. PostHog and channel actions may run immediately; repository work follows the PR checkpoint.
+10. Monitor active experiments and rollouts independently of the weekly router. Pause exposure immediately when a guardrail crosses its kill threshold, then end measurement when appropriate. After the observation window, make a winner permanent through the repository PR checkpoint or another reversible plugin-supported path; otherwise leave the permanent transition unapplied.
+11. Persist state after each successful external transition and append a minimal non-PII run log. A crash must be recoverable by reconciling live resources on the next run.
 
 ## Full-funnel scorecard
 
@@ -110,7 +112,7 @@ Each row includes absolute count, denominator, window, comparison period, maturi
 | Module | Autonomous action | Automatic stop or rollback |
 |---|---|---|
 | Tracking QA | Repair Pulse-owned PostHog assets; create missing canonical insights; open a code PR for verified instrumentation defects. | Project mismatch, privacy risk, ambiguous resource ownership, invalid schema, or failed verification. |
-| Acquisition | Run bounded channel/content tests, maintain public-signal research, and create one focused pSEO PR when evidence and quality checks pass. | Unqualified traffic, attribution gap, weak product fit, canonical overlap, missing cap, or failed downstream-health gate. |
+| Acquisition | Complete the protected weekly pSEO evidence refresh; when pSEO is routed as the single primary action, run a bounded channel/content test or create one focused PR when evidence and quality checks pass. | A missing source marks only its research fields unavailable. Unqualified traffic, attribution gap, weak product fit, canonical overlap, missing cap, or failed downstream-health gate blocks implementation. |
 | Activation | Configure a targeted survey or flag experiment, or open one product PR for the largest verified stall. | Immature cohort, missing `team_id`, overlapping exposure, or guardrail regression. |
 | Retention | Diagnose lost/reactivated teams and run a consented, capped in-product or lifecycle intervention. | Immature cohort, outage or semantic change, missing consent/suppression, or maximum two attempts. |
 | Referral | Run a capped in-product or consented referral ask after a healthy moment and measure explicit attribution. | Unhealthy team, missing attribution or consent, or 60d cooldown. |
@@ -118,12 +120,13 @@ Each row includes absolute count, denominator, window, comparison period, maturi
 
 ## Problem-led pSEO
 
-The pSEO module is a bounded Acquisition action, not a page factory. It researches adjacent team problems with a natural path to `create a team library`, maintains at most 30 deduplicated seeds, and shortlists at most five opportunities.
+The pSEO module has a protected research lane and a routed implementation lane; neither is a page factory. Research completes at least once every seven days even when another stage is the primary constraint. It investigates adjacent team problems with a natural path to `create a team library`, maintains at most 30 deduplicated seeds, and shortlists at most five opportunities. The pass updates evidence, source availability, demand status, and candidate decisions only. Opening a PR or publishing requires that exact pSEO candidate to become the run's single primary routed action.
 
 - `canonical_intent_id` is normalized locale plus audience/problem plus intent, independent of page format.
 - Quantitative fields keep their source, market/language, `as_of`, and `available|unavailable|broken` status. Missing is never zero; Google Ads competition is not organic keyword difficulty.
 - Pulse owns and versions the `demand_gate` formula, window, completeness rule, and threshold from available demand evidence. Credentials alone never constitute demand.
 - DataForSEO is used automatically when credentials, target market/language, request cap, and spend cap are configured. The base64-encoded `login:password` credential is available in `.env.local` as `DATA_FOR_SEO_LOGIN_PASSWORD`. Without credentials or caps it is `unavailable`; the pulse continues with other evidence and does not request per-run approval.
+- Public SERPs, official vendor documentation, primary research, and attributable public problem signals remain eligible qualitative inputs when paid or connected sources are unavailable. Record the exact unavailable source without skipping the rest of the weekly pass.
 - Qualitative evidence may justify one experimental page PR when product fit, unique value, current sources, honest claims, canonical/indexation handling, measurement, and rollback checks pass. Quantitative demand can justify up to three pages in one intent cluster.
 - The PR itself is the human checkpoint. No separate pilot approval or approval key exists.
 - After deployment, evaluate indexation, Search Console query/page impressions, page-attributable CTA or signup intent, and activated teams only when their attribution is operational. Pause a pattern after two comparable mature misses.
@@ -138,6 +141,7 @@ State schema version 4 contains:
 - resource locks for active diagnostics, experiments, surveys, campaigns, rollouts, and repository PRs;
 - one `open_pull_request` per resource key, including approval, checks, merge, deploy, and outcome status;
 - action-policy version, allowlists, hard caps, per-run deltas, spend/send ledger, cooldowns, attempts, and handled hashes;
+- `pseo_research` with `last_completed_at`, `next_due_at`, last run ID, source statuses, checked and shortlisted counts, and a definition hash for the research contract;
 - a deduplicated pSEO backlog keyed by `canonical_intent_id` with source hash, evidence status, candidate URL, decision, cooldown, and PR reference.
 
 `resource_key = provider + resource_type + scope + logical_key`; only the same exact key conflicts. Build `definition_hash` from canonical JSON with recursively sorted keys and no volatile fields. Write state atomically through a same-directory temporary file plus rename, then advance cursors only after completed transitions. Persist an external resource ID immediately after creation. If creation succeeds but ID persistence fails, recover by listing the deterministic Pulse name/description and adopt only one exact definition match; quarantine ambiguity. Store stable internal IDs or hashes, never raw PII. The first schema-v4 run reconciles existing resources and performs no historical outbound backfill.
@@ -147,6 +151,7 @@ State schema version 4 contains:
 - PostHog plugin or project-identity failure: do not write to PostHog, mark only PostHog-dependent metrics and actions `unavailable`, retry next run, and continue with independent trustworthy sources.
 - Broken, stale, or privacy-unsafe tracking: repair Tracking QA only for dependent metrics; never justify a growth action with broken data.
 - Missing mature cohort, valid denominator, evidence threshold, cap, allowlist, consent, or supported tool: record `no_action` for that resource and evaluate the next eligible action.
+- Missing pSEO research input: mark only that source and its dependent fields `unavailable`, complete the remaining trustworthy research, and retry the source on the next due pass. A total absence of trustworthy sources records an exact pSEO research `no_action` without creating or publishing anything.
 - Overlapping action: retain the existing resource lock and monitor it; do not duplicate.
 - Open PR: continue all non-overlapping actions. Update and review the PR until independently approved; then merge only with green checks and monitor deployment.
 - Regression, spend breach, or privacy risk during a rollout: pause or roll back immediately and record the trigger.
@@ -157,10 +162,11 @@ State schema version 4 contains:
 1. Official PostHog plugin/project status, Tracking QA, and automatic repairs.
 2. Five-row scorecard with count, denominator, window, maturity, and data status.
 3. `AAT-28`, its decomposition, and `delta_AAT` when trustworthy.
-4. Routed constraint, evidence, executed action or exact automatic `no_action` reason.
-5. Active PostHog assets, experiments, surveys, rollouts, and their next transition.
-6. Any PR URL, approval/check state, verification, merge/deploy status, and rollback check.
-7. `checked`, `acted`, spend/send counters, and a short non-PII run note.
+4. Protected pSEO research status, last completion, next due time, source availability, checked/shortlisted counts, and any backlog decision.
+5. Routed constraint, evidence, executed action or exact automatic `no_action` reason.
+6. Active PostHog assets, experiments, surveys, rollouts, and their next transition.
+7. Any PR URL, approval/check state, verification, merge/deploy status, and rollback check.
+8. `checked`, `acted`, spend/send counters, and a short non-PII run note.
 
 ## Kill switch
 
