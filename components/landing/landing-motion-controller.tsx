@@ -5,6 +5,13 @@ import { useLayoutEffect } from "react"
 const VIEWPORT_THRESHOLD = 0.25
 const PARALLAX_MAX = 1
 
+/**
+ * Fraction of min(hero height, viewport height) the user scrolls before the
+ * hero dossiers finish converging. Small on purpose: the settled library is
+ * the payoff, and it must land while the hero is still mostly on screen.
+ */
+const ROUTE_PROGRESS_TRAVEL = 0.14
+
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
 }
@@ -57,7 +64,9 @@ export function LandingMotionController() {
 
       if (hero) {
         const height = hero.offsetHeight || 1
-        const progress = clamp01(y / (height * 0.5))
+        const travel =
+          Math.min(height, window.innerHeight) * ROUTE_PROGRESS_TRAVEL
+        const progress = clamp01(y / Math.max(travel, 1))
         root.style.setProperty("--route-progress", progress.toFixed(4))
       }
 
