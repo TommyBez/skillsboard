@@ -75,36 +75,11 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
   )
 }
 
-/** The Skills Board “S” used as a large routing device with a signal spine. */
-function BoardMark() {
-  return (
-    <svg
-      className={styles.boardMark}
-      viewBox="0 0 32 32"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        d="M3 3h26v7H11v4h14l4 4v11H3v-7h18v-4H7l-4-4V3Z"
-        className={styles.boardMarkOutline}
-        pathLength={1}
-      />
-      <path
-        d="M32 6.5H7V16h18v9.5H0"
-        className={styles.boardSpine}
-        pathLength={1}
-      />
-    </svg>
-  )
-}
-
 export function HeroBoard() {
   return (
     <>
-      {/* Desktop / large tablet: scattered dossiers orbiting the mark, converging on scroll. */}
+      {/* Desktop / large tablet: scattered dossiers converging on scroll. */}
       <div className={styles.heroBoard} data-hero-board aria-hidden="true">
-        <BoardMark />
         <div className={styles.heroCards}>
           {dossiers.map((dossier, i) => (
             <div
@@ -125,8 +100,7 @@ export function HeroBoard() {
         </div>
       </div>
 
-      {/* Small screens & reduced motion: a static before/after — scattered
-          artifacts routed through the mark into an aligned stack. */}
+      {/* Small screens & reduced motion: scattered artifacts into an aligned stack. */}
       <div className={styles.heroBoardMobile} aria-hidden="true">
         <div className={styles.mobileChaos}>
           {dossiers.slice(0, 3).map((dossier) => (
@@ -134,20 +108,6 @@ export function HeroBoard() {
               <DossierCard dossier={dossier} />
             </div>
           ))}
-        </div>
-        <div className={styles.mobileRouteLine}>
-          <svg
-            viewBox="0 0 32 32"
-            fill="none"
-            className={styles.mobileRouteMark}
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path
-              d="M3 3h26v7H11v4h14l4 4v11H3v-7h18v-4H7l-4-4V3Z"
-              fill="currentColor"
-            />
-          </svg>
         </div>
         <ul className={styles.mobileStack}>
           {dossiers.map((dossier) => (

@@ -252,74 +252,6 @@
   pointer-events: none;
 }
 
-.boardMark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 84%;
-  aspect-ratio: 1;
-  transform: translate(-50%, -52%);
-  overflow: visible;
-}
-
-.boardMarkOutline {
-  stroke: color-mix(in oklch, var(--foreground) 38%, transparent);
-  stroke-width: 1.5px;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 0;
-  animation: lp-mark-draw 900ms var(--lp-ease-in-out) 100ms both;
-}
-
-@keyframes lp-mark-draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Green routing pulse traveling the S spine, ~every 7s after the entrance. */
-.boardSpine {
-  stroke: var(--primary);
-  stroke-width: 2.25px;
-  stroke-linecap: square;
-  vector-effect: non-scaling-stroke;
-  stroke-dasharray: 0.05 2;
-  stroke-dashoffset: 0.05;
-  opacity: 0;
-  animation: lp-spine-pulse 7s linear 1050ms infinite;
-}
-
-.root[data-page-hidden] .boardSpine,
-.root[data-hero-offscreen] .boardSpine {
-  animation-play-state: paused;
-}
-
-@keyframes lp-spine-pulse {
-  0% {
-    stroke-dashoffset: 0.05;
-    opacity: 0;
-  }
-
-  2% {
-    opacity: 1;
-  }
-
-  16% {
-    stroke-dashoffset: -1;
-    opacity: 1;
-  }
-
-  18%,
-  100% {
-    stroke-dashoffset: -1.05;
-    opacity: 0;
-  }
-}
-
 .heroCards {
   position: absolute;
   inset: 0;
@@ -647,36 +579,8 @@
   z-index: 3;
 }
 
-.mobileRouteLine {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0.75rem auto 0;
-  width: fit-content;
-}
-
-.mobileRouteLine::before,
-.mobileRouteLine::after {
-  content: "";
-  width: 2px;
-  height: 1.4rem;
-  background: var(--primary);
-}
-
-/* The lower segment runs all the way into the stack's top rule. */
-.mobileRouteLine::after {
-  height: 2rem;
-}
-
-.mobileRouteMark {
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: 0.4rem 0;
-  color: var(--primary);
-}
-
 .mobileStack {
-  margin-top: 0;
+  margin-top: 1.25rem;
   border-top: 1px solid var(--lp-hairline-strong);
 }
 
@@ -1470,18 +1374,10 @@
   }
 
   .heroLine,
-  .boardMarkOutline,
   .dossierEnter {
     animation: none;
     transform: none;
     opacity: 1;
-  }
-
-  .boardSpine {
-    animation: none;
-    opacity: 0.5;
-    stroke-dasharray: none;
-    stroke-dashoffset: 0;
   }
 
   /* Static “after”: the stack rests aligned and indexed. */
