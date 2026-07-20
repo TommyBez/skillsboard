@@ -1,210 +1,1263 @@
+/* ---------------------------------------------------------------------------
+   Skills Board landing — “The Living Skill Router”
+   One visual system: scattered dossiers → indexed library → MCP → agent.
+   Everything degrades to a complete static page without JS; scroll/pointer
+   choreography is layered on by LandingMotionController via CSS variables.
+--------------------------------------------------------------------------- */
+
 .root {
-  --landing-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --landing-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --lp-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --lp-hairline: color-mix(in oklch, var(--foreground) 16%, transparent);
+  --lp-hairline-strong: color-mix(in oklch, var(--foreground) 30%, transparent);
+  --lp-grid-line: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --lp-alert: oklch(0.62 0.15 55);
+  --lp-header-h: 3.5rem;
+
+  /* Routing state. Defaults are the complete, no-JS composition. */
+  --route-p: var(--route-progress, 0);
+  --mcp-p: 1;
+
+  /* Pricing monument: art-directed per theme, not mechanically inverted. */
+  --pricing-field: var(--surface-ink);
+  --pricing-ink: var(--surface-ink-foreground);
+  --pricing-zero: oklch(0.72 0.145 148);
+
+  position: relative;
+}
+
+:global(.dark) .root {
+  --lp-alert: oklch(0.74 0.14 60);
+  --pricing-field: oklch(0.945 0.011 103);
+  --pricing-ink: oklch(0.17 0.017 158);
+  --pricing-zero: oklch(0.5 0.15 148);
+}
+
+.root[data-motion-enabled="true"] {
+  --mcp-p: var(--mcp-progress, 0);
+}
+
+/* Paper grain: print texture at very low opacity, never over readability. */
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+
+:global(.dark) .grain::after {
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+}
+
+/* ---------------------------------------------------------------------------
+   Header — compact command strip
+--------------------------------------------------------------------------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--lp-hairline);
+  background-color: transparent;
+  transition:
+    background-color 240ms var(--lp-ease-out),
+    border-color 240ms var(--lp-ease-out),
+    box-shadow 240ms var(--lp-ease-out);
+}
+
+.root[data-scrolled] .header {
+  background-color: color-mix(in oklch, var(--background) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-color: var(--lp-hairline-strong);
+}
+
+.headerCellRule {
+  align-self: stretch;
+  width: 1px;
+  background: var(--lp-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+   Shared CTA language — sharp, directional, routed
+--------------------------------------------------------------------------- */
+
+.ctaButton {
+  border-radius: 3px;
+}
+
+.ctaArrow {
+  transition: transform 180ms var(--lp-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaButton:hover .ctaArrow {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.ctaButton:active .ctaArrow {
+  transform: translate3d(6px, 0, 0);
+}
+
+/* Chapter index annotations — thin technical marks, decorative only. */
+.chapterMark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--muted-foreground);
+}
+
+.chapterMark::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero — sticky chapter: dossiers file into the team library
+--------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.heroSticky {
+  position: relative;
+  /* Resting / no-JS / reduced-motion: one viewport of hero. */
+  min-height: calc(100dvh - var(--lp-header-h));
+}
+
+/* Tall sticky runway only when the controller is live; without JS or with
+   reduced motion the hero is a normal one-viewport spread. */
+@media (min-width: 64rem) {
+  .root[data-motion-enabled="true"] .hero {
+    height: 180vh;
+  }
+
+  .root[data-motion-enabled="true"] .heroSticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    display: flex;
+    align-items: stretch;
+    overflow: clip;
+  }
+}
+
+.heroGridLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to right,
+    var(--lp-grid-line) 1px,
+    transparent 1px
+  );
+  background-size: calc(100% / 6) 100%;
+  mask-image: linear-gradient(to bottom, black 55%, transparent 96%);
+  animation: lp-fade-in 700ms var(--lp-ease-out) both;
 }
 
 .heroEyebrow {
-  animation: hero-eyebrow-enter 360ms var(--landing-ease-out) both;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  animation: lp-rise-in 400ms var(--lp-ease-out) 140ms both;
+}
+
+.heroEyebrow::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--primary);
+}
+
+.heroHeadline {
+  font-stretch: 93%;
+}
+
+.heroLineMask {
+  display: block;
+  overflow: clip;
+  padding-block-end: 0.09em;
+  margin-block-end: -0.09em;
 }
 
 .heroLine {
-  animation: hero-line-enter 560ms var(--landing-ease-out) both;
+  display: block;
+  animation: lp-line-rise 720ms var(--lp-ease-out) both;
 }
 
 .heroLineFirst {
-  animation-delay: 70ms;
+  animation-delay: 230ms;
 }
 
 .heroLineSecond {
-  animation-delay: 140ms;
+  animation-delay: 330ms;
 }
 
 .heroCopy {
-  animation: hero-copy-enter 440ms var(--landing-ease-out) 170ms both;
+  animation: lp-rise-in 460ms var(--lp-ease-out) 600ms both;
 }
 
 .heroCta {
-  animation: hero-cta-enter 360ms var(--landing-ease-out) 230ms both;
+  animation: lp-rise-in 420ms var(--lp-ease-out) 690ms both;
 }
 
-@keyframes hero-eyebrow-enter {
+@keyframes lp-fade-in {
   from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lp-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-line-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Hero board: scattered dossiers filing into the team library panel
+------------------------------------------------------------------ */
+
+.heroBoard {
+  --px: 0;
+  --py: 0;
+  position: absolute;
+  top: 6%;
+  bottom: 4%;
+  right: max(-2rem, -2vw);
+  width: min(46%, 42rem);
+  display: none;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.heroCards {
+  position: absolute;
+  inset: 0;
+}
+
+/* The landing target: a quiet product-library panel that materializes
+   ahead of the cards, so the deck visibly files *into* something. */
+.libraryFrame {
+  position: absolute;
+  left: calc(18% - 1.1rem);
+  top: calc(17% - 3.6rem);
+  width: calc(16.5rem + 2.2rem);
+  height: 27.25rem;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 1rem;
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
+  --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
+  opacity: var(--frame-p);
+  transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
+}
+
+/* Without the controller (no JS), the page rests in its settled state. */
+.root:not([data-motion-enabled="true"]) .libraryFrame {
+  opacity: 1;
+  transform: none;
+}
+
+.libraryHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 1.1rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.libraryDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.libraryLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.libraryCount {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+
+/* Converged (filed) positions are the base; scatter is a transform scaled
+   by (1 - landing progress). Each slot gets its own progress window so
+   cards file into the panel one after another across the sticky runway. */
+.dossierSlot {
+  --lp: clamp(0, calc((var(--route-p) - var(--ls, 0)) / 0.72), 1);
+  position: absolute;
+  left: 18%;
+  pointer-events: auto;
+  transform: translate3d(
+      calc(var(--sx) * (1 - var(--lp))),
+      calc(var(--sy) * (1 - var(--lp))),
+      0
+    )
+    rotate(calc(var(--sr) * (1 - var(--lp))));
+}
+
+/* Taller SkillDossier-like cards: start higher and step less so the
+   converged stack overlaps and still fits a ~900px-tall viewport. */
+.dossierSlot[data-slot="1"] {
+  top: 17%;
+  z-index: 1;
+  --ls: 0.05;
+  --sx: -70px;
+  --sy: -130px;
+  --sr: -6deg;
+}
+
+.dossierSlot[data-slot="2"] {
+  top: calc(17% + 2.55rem);
+  z-index: 2;
+  --ls: 0.1;
+  --sx: 160px;
+  --sy: -150px;
+  --sr: 5deg;
+}
+
+.dossierSlot[data-slot="3"] {
+  top: calc(17% + 5.1rem);
+  z-index: 3;
+  --ls: 0.15;
+  --sx: -50px;
+  --sy: -45px;
+  --sr: -4deg;
+}
+
+.dossierSlot[data-slot="4"] {
+  top: calc(17% + 7.65rem);
+  z-index: 4;
+  --ls: 0.2;
+  --sx: 175px;
+  --sy: -55px;
+  --sr: 7deg;
+}
+
+.dossierSlot[data-slot="5"] {
+  top: calc(17% + 10.2rem);
+  z-index: 5;
+  --ls: 0.25;
+  --sx: 35px;
+  --sy: 40px;
+  --sr: -3deg;
+}
+
+.dossierEnter {
+  animation-duration: 680ms;
+  animation-timing-function: var(--lp-ease-out);
+  animation-fill-mode: both;
+}
+
+.dossierEnter[data-dir="left"] {
+  animation-name: lp-dossier-left;
+}
+
+.dossierEnter[data-dir="right"] {
+  animation-name: lp-dossier-right;
+}
+
+.dossierEnter[data-dir="top"] {
+  animation-name: lp-dossier-top;
+}
+
+.dossierEnter[data-dir="bottom"] {
+  animation-name: lp-dossier-bottom;
+}
+
+.dossierSlot[data-slot="1"] .dossierEnter {
+  animation-delay: 480ms;
+}
+
+.dossierSlot[data-slot="2"] .dossierEnter {
+  animation-delay: 550ms;
+}
+
+.dossierSlot[data-slot="3"] .dossierEnter {
+  animation-delay: 620ms;
+}
+
+.dossierSlot[data-slot="4"] .dossierEnter {
+  animation-delay: 690ms;
+}
+
+.dossierSlot[data-slot="5"] .dossierEnter {
+  animation-delay: 760ms;
+}
+
+@keyframes lp-dossier-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-72px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-right {
+  from {
+    opacity: 0;
+    transform: translate3d(72px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-top {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -64px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-bottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 64px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.dossierParallax {
+  transform: translate3d(
+    calc(var(--px) * var(--depth, 3px)),
+    calc(var(--py) * var(--depth, 3px)),
+    0
+  );
+  transition: transform 320ms var(--lp-ease-out);
+}
+
+/* ------------------------------------------------------------------
+   Skill dossier — mirrors SkillDossier (compact, decorative)
+------------------------------------------------------------------ */
+
+.dossier {
+  display: flex;
+  flex-direction: column;
+  width: 16.5rem;
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  box-shadow:
+    0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
+    0 14px 28px hsl(var(--shadow-color) / 0.1);
+  transition:
+    opacity 190ms var(--lp-ease-out),
+    box-shadow 190ms var(--lp-ease-out),
+    border-color 190ms var(--lp-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .heroCards:hover .dossier {
+    opacity: 0.55;
+  }
+
+  .dossierSlot:hover {
+    z-index: 7;
+  }
+
+  .dossierSlot:hover .dossier {
+    opacity: 1;
+    border-color: var(--primary);
+    box-shadow:
+      0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
+      0 20px 40px hsl(var(--shadow-color) / 0.16);
+  }
+}
+
+.dossierBody {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0.9rem 0.75rem;
+}
+
+.dossierMeta {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.dossierSource {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.01em;
+  color: var(--muted-foreground);
+}
+
+.dossierSource span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dossierFork {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex-shrink: 0;
+  color: var(--primary);
+}
+
+.dossierStars {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.dossierName {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.dossierDesc {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+.dossierTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+
+.dossierTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+.dossierFooter {
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklch, var(--muted) 40%, transparent);
+  padding: 0.55rem 0.65rem;
+}
+
+.dossierCmdStrip {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: color-mix(in oklch, var(--background) 75%, transparent);
+  padding: 0.35rem 0.55rem;
+}
+
+.dossierCmd {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--muted-foreground);
+}
+
+/* ------------------------------------------------------------------
+   Hero board, small screens: static before/after field manual
+------------------------------------------------------------------ */
+
+.heroBoardMobile {
+  display: block;
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.mobileChaos {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 14.5rem;
+}
+
+.mobileChaosCard {
+  position: absolute;
+  top: 0;
+}
+
+.mobileChaosCard .dossier {
+  width: 13.25rem;
+}
+
+.mobileChaosCard:nth-child(1) {
+  left: 0;
+  transform: rotate(-5deg);
+  z-index: 1;
+}
+
+.mobileChaosCard:nth-child(2) {
+  right: 0;
+  top: 1.35rem;
+  transform: rotate(4deg);
+  z-index: 2;
+}
+
+.mobileChaosCard:nth-child(3) {
+  left: 12%;
+  top: 2.9rem;
+  transform: rotate(-2deg);
+  z-index: 3;
+}
+
+/* The mobile “after” state: the same team library panel, at rest. */
+.mobileLibrary {
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 1rem;
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+}
+
+.mobileLibrary .libraryHead {
+  height: 2.75rem;
+  padding: 0 1rem;
+}
+
+.mobileStack {
+  padding: 0.25rem 1rem 0.5rem;
+}
+
+.mobileStackRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.55rem 0.15rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.mobileStackRow:last-child {
+  border-bottom: none;
+}
+
+.mobileStackName {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 64rem) {
+  .heroBoard {
+    display: block;
+  }
+
+  .heroBoardMobile {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MCP chapter — the signature routing moment
+--------------------------------------------------------------------------- */
+
+/* The tall scroll chapter only exists when the controller is live; without
+   JS or with reduced motion the section is a normal static spread. */
+@media (min-width: 64rem) {
+  .root[data-motion-enabled="true"] .mcpChapter {
+    height: 240vh;
+  }
+
+  .root[data-motion-enabled="true"] .mcpSticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    display: flex;
+    align-items: center;
+    overflow: clip;
+  }
+}
+
+.schematic {
+  width: 100%;
+}
+
+.schematicGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-block: 1px solid var(--lp-hairline-strong);
+  padding-block: 2rem;
+}
+
+.schemaEyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.schemaStackTitle {
+  margin-top: 0.6rem;
+  max-width: 14ch;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.schemaRows {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.schemaRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.5rem 0.1rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.schemaRowName {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.schemaRowTick {
+  width: 0.45rem;
+  height: 0.45rem;
+  align-self: center;
+  border: 1px solid var(--primary);
+}
+
+/* Gateway column */
+
+.schemaGateway {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 0.5rem 0.35rem;
+}
+
+/* Vertical signal route on small screens */
+.schemaGateway::before,
+.schemaGateway::after {
+  content: "";
+  width: 2px;
+  height: 2rem;
+  background: var(--primary);
+}
+
+/* One shared measure keeps wires and action rows on the same axis. */
+.schematic {
+  --wire-row-h: 4rem;
+}
+
+.schemaWires {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  /* viewBox is 108 units tall; 100 units span two row heights. */
+  height: calc(var(--wire-row-h) * 2 * 1.08);
+  width: 100%;
+  transform: translateY(-50%);
+  overflow: visible;
+}
+
+.schemaTrunk,
+.schemaBranch {
+  stroke: var(--primary);
+  stroke-width: 1.75px;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  /* Gap > pathLength so offset=1 can't leak a repeating-dash speck at the
+     path end (visible as tiny stubs right of the MCP node at progress 0). */
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+
+.schemaPulse {
+  stroke: var(--lp-alert);
+  stroke-width: 2.5px;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  /* Dash parked fully before path start; opacity stays 0 until --mcp-p > 0. */
+  stroke-dasharray: 0.06 2;
+  stroke-dashoffset: 0.07;
+  opacity: 0;
+}
+
+.schemaNode {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.6rem 0;
+  padding: 0.7rem 0.85rem 0.6rem;
+  background: var(--card);
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 2px;
+}
+
+.schemaNode::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--primary);
+  opacity: 1;
+  pointer-events: none;
+}
+
+.schemaNodeMark {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--primary);
+}
+
+.schemaNodeLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--foreground);
+}
+
+/* Agent column */
+
+.schemaAgentLabel {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  /* Small screens: the vertical route is centered, so the label centers
+     with it to keep the signal path visually continuous. */
+  text-align: center;
+}
+
+.agentActions {
+  margin-top: 0.9rem;
+}
+
+.agentAction {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding-block: 0.95rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.agentAction::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--primary);
+  transform: scaleX(var(--a, 1));
+  transform-origin: left;
+}
+
+.agentActionName {
+  font-size: clamp(1.1rem, 1.45vw, 1.5rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.schemaCaption {
+  margin-top: 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+/* Desktop schematic: horizontal wires, scroll-driven drawing. */
+@media (min-width: 64rem) {
+  .schematicGrid {
+    grid-template-columns: minmax(0, 1fr) clamp(7rem, 11vw, 10rem) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0;
+    padding-block: 2.75rem;
+  }
+
+  .schemaGateway {
+    align-self: stretch;
+    min-height: 21rem;
+    justify-content: center;
+    padding-block: 0;
+  }
+
+  .schemaGateway::before,
+  .schemaGateway::after {
+    display: none;
+  }
+
+  .schemaWires {
+    display: block;
+  }
+
+  .schemaNode {
+    margin: 0;
+  }
+
+  /* The actions list is the alignment anchor: the label is lifted out of
+     flow so the list centers on the exact axis the wires are drawn on,
+     and fixed row heights put each branch endpoint at a row center. */
+  .schemaAgent {
+    align-self: center;
+    position: relative;
+  }
+
+  .schemaAgentLabel {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 1.1rem;
+    text-align: left;
+  }
+
+  .agentActions {
+    margin-top: 0;
+  }
+
+  .agentAction {
+    height: var(--wire-row-h);
+    align-items: center;
+    padding-block: 0;
+  }
+
+  /* Scroll-driven drawing + activation, only when the controller is live. */
+  .root[data-motion-enabled="true"] .schemaTrunk {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.04) / 0.22, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchA {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.3) / 0.16, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchB {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.38) / 0.16, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchC {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.46) / 0.18, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaPulse {
+    stroke-dashoffset: calc(0.07 - var(--mcp-p) * 1.12);
+    opacity: calc(
+      min(1, var(--mcp-p) * 14) *
+        (1 - clamp(0, (var(--mcp-p) - 0.88) / 0.12, 1))
+    );
+  }
+
+  .root[data-motion-enabled="true"] .schemaNode::after {
+    opacity: clamp(0, (var(--mcp-p) - 0.24) / 0.08, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction {
+    opacity: calc(0.3 + 0.7 * var(--a, 1));
+    transform: translate3d(calc((1 - var(--a, 1)) * 14px), 0, 0);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"] {
+    --a: clamp(0, (var(--mcp-p) - 0.48) / 0.1, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"] {
+    --a: clamp(0, (var(--mcp-p) - 0.58) / 0.1, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"] {
+    --a: clamp(0, (var(--mcp-p) - 0.68) / 0.1, 1);
+  }
+}
+
+/* Small screens: reveal the vertical route when the section enters view. */
+@media (max-width: 63.9975rem) {
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaGateway::before,
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaGateway::after {
+    transform: scaleY(0);
+  }
+
+  .root[data-motion-enabled="true"] .schemaGateway::before {
+    transform-origin: top;
+    transition: transform 420ms var(--lp-ease-in-out) 80ms;
+  }
+
+  .root[data-motion-enabled="true"] .schemaGateway::after {
+    transform-origin: top;
+    transition: transform 420ms var(--lp-ease-in-out) 380ms;
+  }
+
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .agentAction {
     opacity: 0;
     transform: translate3d(0, 10px, 0);
   }
 
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+  .root[data-motion-enabled="true"] .agentAction {
+    transition:
+      opacity 380ms var(--lp-ease-out),
+      transform 380ms var(--lp-ease-out);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"] {
+    transition-delay: 560ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"] {
+    transition-delay: 660ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"] {
+    transition-delay: 760ms;
+  }
+
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .agentAction::after {
+    transform: scaleX(0);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction::after {
+    transition: transform 420ms var(--lp-ease-out);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"]::after {
+    transition-delay: 640ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"]::after {
+    transition-delay: 740ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"]::after {
+    transition-delay: 840ms;
   }
 }
 
-@keyframes hero-line-enter {
-  from {
-    transform: translate3d(0, 22px, 0);
-  }
+/* ---------------------------------------------------------------------------
+   Pricing — the zero monument
+--------------------------------------------------------------------------- */
 
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+.pricingSection {
+  position: relative;
+  overflow: clip;
+  background: var(--pricing-field);
+  color: var(--pricing-ink);
+  border-bottom: 1px solid var(--lp-hairline);
 }
 
-@keyframes hero-copy-enter {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 14px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+.pricingZeroWrap {
+  position: relative;
+  z-index: 0;
+  line-height: 0.72;
 }
 
-@keyframes hero-cta-enter {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+.pricingZero,
+.pricingZeroLayer {
+  font-size: clamp(15rem, 56vw, 50rem);
+  font-weight: 650;
+  font-stretch: 90%;
+  letter-spacing: -0.06em;
+  line-height: 0.72;
+  margin-left: -0.07em;
+  color: transparent;
+  user-select: none;
 }
 
-@keyframes hero-fade-enter {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.pricingZero {
+  -webkit-text-stroke: 2.5px var(--pricing-zero);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .librarySource {
-  transition:
-    opacity 420ms var(--landing-ease-out),
-    transform 420ms var(--landing-ease-out);
+.pricingZeroLayer {
+  position: absolute;
+  inset: 0;
+  -webkit-text-stroke: 1.25px currentColor;
+  pointer-events: none;
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .libraryArrow {
-  transition:
-    opacity 420ms var(--landing-ease-in-out) 90ms,
-    transform 420ms var(--landing-ease-in-out) 90ms;
+.pricingZeroLayer[data-layer="alert"] {
+  color: transparent;
+  -webkit-text-stroke-color: var(--lp-alert);
+  opacity: 0.5;
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem {
-  transition:
-    opacity 360ms var(--landing-ease-out),
-    transform 360ms var(--landing-ease-out);
+.pricingZeroLayer[data-layer="ink"] {
+  -webkit-text-stroke-color: var(--pricing-ink);
+  opacity: 0.35;
 }
 
+/* Offset print layers align and the counter fills once the section lands. */
 .root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(1) {
-  transition-delay: 150ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(2) {
-  transition-delay: 195ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(3) {
-  transition-delay: 240ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(4) {
-  transition-delay: 285ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .libraryCaption {
-  transition:
-    opacity 320ms var(--landing-ease-out) 340ms,
-    transform 320ms var(--landing-ease-out) 340ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .librarySource {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .libraryArrow {
-  opacity: 0;
-  transform: translate3d(0, -12px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .mcpToolItem {
-  opacity: 0;
-  transform: translate3d(0, 10px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .libraryCaption {
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingZero {
+  transition: color 850ms var(--lp-ease-out) 180ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingZero {
+  .pricingZeroLayer {
   transition:
-    opacity 650ms var(--landing-ease-out),
-    transform 650ms var(--landing-ease-out);
+    transform 720ms var(--lp-ease-in-out),
+    opacity 720ms var(--lp-ease-in-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="alert"] {
+  transform: translate3d(1.1rem, -0.8rem, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="ink"] {
+  transform: translate3d(-0.8rem, 0.7rem, 0);
+}
+
+.pricingZeroFilled,
+[data-motion-group="pricing"][data-motion-state="visible"] .pricingZero {
+  color: var(--pricing-zero);
+}
+
+/* Without the controller the monument rests solid. */
+.root:not([data-motion-enabled="true"]) .pricingZero {
+  color: var(--pricing-zero);
+}
+
+.root:not([data-motion-enabled="true"]) .pricingZeroLayer {
+  transform: none;
+  opacity: 0.22;
+}
+
+.pricingCopy {
+  position: relative;
+  z-index: 1;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
   .pricingMessage {
   transition:
-    opacity 480ms var(--landing-ease-out) 100ms,
-    transform 480ms var(--landing-ease-out) 100ms;
+    opacity 520ms var(--lp-ease-out) 120ms,
+    transform 520ms var(--lp-ease-out) 120ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
   .pricingNote {
   transition:
-    opacity 360ms var(--landing-ease-out) 210ms,
-    transform 360ms var(--landing-ease-out) 210ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingZero {
-  opacity: 0.35;
-  transform: translate3d(-24px, 0, 0) scale(0.96);
+    opacity 400ms var(--lp-ease-out) 260ms,
+    transform 400ms var(--lp-ease-out) 260ms;
 }
 
 .root[data-motion-enabled="true"]
@@ -221,122 +1274,212 @@
   transform: translate3d(0, 10px, 0);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingHeading {
+.pricingNoteRule {
+  border-top: 1px solid color-mix(in oklch, var(--pricing-ink) 32%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   FAQ — technical index
+--------------------------------------------------------------------------- */
+
+.faqItem {
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.faqSummary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding-block: 1.4rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqSummary::-webkit-details-marker {
+  display: none;
+}
+
+.faqSummary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.faqQuestion {
+  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.faqGlyph {
+  position: relative;
+  align-self: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--muted-foreground);
   transition:
-    opacity 520ms var(--landing-ease-out),
-    transform 520ms var(--landing-ease-out);
+    transform 200ms var(--lp-ease-in-out),
+    color 200ms var(--lp-ease-in-out);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCopy {
-  transition:
-    opacity 420ms var(--landing-ease-out) 80ms,
-    transform 420ms var(--landing-ease-out) 80ms;
+.faqGlyph::before,
+.faqGlyph::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta {
-  transition:
-    opacity 360ms var(--landing-ease-out) 150ms,
-    transform 360ms var(--landing-ease-out) 150ms;
+.faqGlyph::before {
+  width: 100%;
+  height: 2px;
+  transform: translate(-50%, -50%);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingHeading {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
+.faqGlyph::after {
+  width: 2px;
+  height: 100%;
+  transform: translate(-50%, -50%);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCopy {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
+.faqItem[open] .faqGlyph {
+  transform: rotate(135deg);
+  color: var(--primary);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCta {
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
+.faqAnswer {
+  padding-bottom: 1.6rem;
 }
 
 @media (min-width: 40rem) {
-  .root[data-motion-enabled="true"]
-    [data-motion-group="library"][data-motion-state="pending"]
-    .libraryArrow {
-    transform: translate3d(-16px, 0, 0);
-  }
-
-  .root[data-motion-enabled="true"]
-    [data-motion-group="pricing"][data-motion-state="pending"]
-    .pricingZero {
-    transform: translate3d(-6%, 0, 0) scale(0.96);
+  .faqAnswer {
+    padding-left: 1.1rem;
+    border-left: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
   }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .ctaArrow {
-    transition: transform 160ms var(--landing-ease-out);
-  }
+/* ---------------------------------------------------------------------------
+   Closing — one final action
+--------------------------------------------------------------------------- */
 
-  .ctaButton:hover .ctaArrow {
-    transform: translate3d(3px, 0, 0);
-  }
-
-  /* The MCP capability list keeps the existing editorial reveal, then lets
-     one concrete agent action take focus on hover. */
-  .mcpToolName {
-    transition:
-      color 180ms var(--landing-ease-out),
-      opacity 180ms var(--landing-ease-out),
-      transform 200ms var(--landing-ease-out);
-  }
-
-  .mcpToolList:hover .mcpToolName {
-    opacity: 0.35;
-  }
-
-  .mcpToolList li:hover .mcpToolName {
-    color: var(--primary);
-    opacity: 1;
-    transform: translate3d(4px, 0, 0);
-  }
+.closingHeading {
+  font-stretch: 93%;
 }
+
+.onceStamp {
+  display: inline-block;
+  padding: 0 0.16em 0.06em;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 2px;
+  transform: rotate(-1.5deg);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .onceStamp {
+  opacity: 0;
+  transform: rotate(-1.5deg) scale(1.14);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .onceStamp {
+  transition:
+    opacity 300ms var(--lp-ease-out) 340ms,
+    transform 300ms var(--lp-ease-out) 340ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingHeading,
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCopy,
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCta {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingHeading {
+  transition:
+    opacity 520ms var(--lp-ease-out) 140ms,
+    transform 520ms var(--lp-ease-out) 140ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCopy {
+  transition:
+    opacity 420ms var(--lp-ease-out) 240ms,
+    transform 420ms var(--lp-ease-out) 240ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCta {
+  transition:
+    opacity 380ms var(--lp-ease-out) 320ms,
+    transform 380ms var(--lp-ease-out) 320ms;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the page stays complete and beautiful, at rest
+--------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+  .heroGridLines,
   .heroEyebrow,
   .heroCopy,
   .heroCta {
-    animation: hero-fade-enter 140ms var(--landing-ease-out) both;
-    transform: none;
+    animation: lp-fade-in 140ms var(--lp-ease-out) both;
   }
 
-  .heroLine {
+  .heroLine,
+  .dossierEnter {
     animation: none;
     transform: none;
+    opacity: 1;
   }
 
-  .root[data-motion-enabled="true"] .librarySource,
-  .root[data-motion-enabled="true"] .libraryArrow,
-  .root[data-motion-enabled="true"] .mcpTargetLabel,
-  .root[data-motion-enabled="true"] .mcpToolItem,
-  .root[data-motion-enabled="true"] .libraryCaption,
-  .root[data-motion-enabled="true"] .pricingZero,
-  .root[data-motion-enabled="true"] .pricingMessage,
-  .root[data-motion-enabled="true"] .pricingNote,
-  .root[data-motion-enabled="true"] .closingHeading,
-  .root[data-motion-enabled="true"] .closingCopy,
-  .root[data-motion-enabled="true"] .closingCta,
-  .ctaArrow {
+  /* Static “after”: the stack rests filed inside the library panel. */
+  .dossierSlot {
+    transform: none;
+    will-change: auto;
+  }
+
+  .libraryFrame {
     opacity: 1;
     transform: none;
+  }
+
+  .dossierParallax {
+    transform: none;
     transition: none;
+  }
+
+  .dossier,
+  .heroCards:hover .dossier {
+    opacity: 1;
+    transition: none;
+  }
+
+  .header,
+  .ctaArrow,
+  .dossierParallax,
+  .faqGlyph {
+    transition: none;
+  }
+
+  .ctaButton:hover .ctaArrow,
+  .ctaButton:active .ctaArrow {
+    transform: none;
   }
 
   .ctaButton:active {
@@ -344,13 +1487,7 @@
     transform: none;
   }
 
-  .mcpToolName {
-    transition:
-      color 180ms var(--landing-ease-out),
-      opacity 180ms var(--landing-ease-out);
-  }
-
-  .mcpToolList li:hover .mcpToolName {
-    transform: none;
+  .schemaPulse {
+    opacity: 0;
   }
 }
