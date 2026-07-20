@@ -86,18 +86,6 @@
   background: var(--lp-hairline);
 }
 
-.headerTicks {
-  flex: 1;
-  align-self: center;
-  height: 7px;
-  background-image: repeating-linear-gradient(
-    to right,
-    var(--lp-hairline) 0 1px,
-    transparent 1px 14px
-  );
-  opacity: 0.8;
-}
-
 /* ---------------------------------------------------------------------------
    Shared CTA language — sharp, directional, routed
 --------------------------------------------------------------------------- */
@@ -1477,12 +1465,6 @@
   transition:
     opacity 380ms var(--lp-ease-out) 320ms,
     transform 380ms var(--lp-ease-out) 320ms;
-}
-
-.closingRoute {
-  width: 2px;
-  height: 2.4rem;
-  background: linear-gradient(to bottom, transparent, var(--primary));
 }
 
 /* ---------------------------------------------------------------------------

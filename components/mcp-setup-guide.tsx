@@ -22,7 +22,7 @@ interface ClientGuide {
 type McpClientAnalyticsId = "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
 
 function InlineCode({ children }: { children: ReactNode }) {
-  return <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
+  return <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
 }
 
 function Snippet({ code, client }: { code: string; client: McpClientAnalyticsId }) {
@@ -48,7 +48,7 @@ function StepList({ steps, client }: { steps: Step[]; client: McpClientAnalytics
     <ol className="space-y-6">
       {steps.map((step, index) => (
         <li key={index} className="flex gap-4">
-          <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-accent font-mono text-xs font-semibold text-accent-foreground">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-[10px] bg-accent font-mono text-xs font-semibold tabular-nums text-accent-foreground">
             {index + 1}
           </span>
           <div className="min-w-0 flex-1 pt-1">
@@ -117,7 +117,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     {
       id: "claude-desktop",
       analyticsId: "claude_desktop",
-      label: "Claude Desktop & claude.ai",
+      label: "Claude Desktop",
       steps: [
         {
           text: (
@@ -158,8 +158,9 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
         {
           text: (
             <>
-              Open Cursor's MCP settings and click <strong className="font-medium text-foreground">Needs login</strong>{" "}
-              next to <InlineCode>skills-board</InlineCode>.
+              Open Cursor&apos;s MCP settings and click{" "}
+              <strong className="font-medium text-foreground">Needs login</strong> next to{" "}
+              <InlineCode>skills-board</InlineCode>.
             </>
           ),
         },
@@ -189,19 +190,28 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     {
       id: "other",
       analyticsId: "other",
-      label: "Other clients",
+      label: "Other",
       steps: [
         {
-          text: "Any client that supports the streamable HTTP transport with OAuth works. Add this config. Most clients accept the standard mcpServers format.",
+          text: "Any client that supports streamable HTTP with OAuth works. Add this config — most clients accept the standard mcpServers format.",
           snippet: config,
         },
         {
-          text: "Authentication is discovered automatically from the endpoint, so there is nothing else to configure. Complete the sign-in flow when your client prompts you.",
+          text: "Authentication is discovered automatically from the endpoint. Complete the sign-in flow when your client prompts you.",
         },
       ],
     },
   ]
   const [activeClient, setActiveClient] = useState(clients[0].id)
+  const activeGuide = clients.find((item) => item.id === activeClient) ?? clients[0]
+  const headerCopyValue =
+    activeGuide.steps.find((step) => step.snippet)?.snippet ?? config
+  const headerCopyLabel =
+    activeGuide.id === "claude-desktop"
+      ? "Copy MCP URL"
+      : activeGuide.id === "claude-code"
+        ? "Copy command"
+        : "Copy MCP config"
 
   function selectClient(value: string) {
     setActiveClient(value)
@@ -210,53 +220,71 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
   }
 
   return (
-    <div className="grid gap-6">
-      <section className="overflow-hidden rounded-[16px] border bg-card">
-        <div className="px-5 py-5 sm:px-6 sm:py-6">
+    <section className="overflow-hidden rounded-[16px] border bg-card">
+      <div className="flex flex-col gap-3 border-b px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-6">
+        <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Setup guide</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">Choose your agent</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Pick a client and follow its connection steps. You&apos;ll sign in securely through your browser—there&apos;s
-            no API key to copy.
+            Pick a client and follow its connection steps.
           </p>
         </div>
+        <CopyButton
+          value={headerCopyValue}
+          label={headerCopyLabel}
+          analytics={{
+            event: "mcp_config_copied",
+            properties: { client: activeGuide.analyticsId },
+          }}
+        />
+      </div>
 
-        <div className="border-t px-5 py-5 sm:px-6 sm:py-6">
-          <Tabs value={activeClient} onValueChange={selectClient}>
-            <TabsList className="max-w-full overflow-x-auto">
-              {clients.map((client) => (
-                <TabsTrigger key={client.id} value={client.id}>
-                  {client.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-
+      <Tabs value={activeClient} onValueChange={selectClient} className="gap-0">
+        <div className="border-b px-3 py-3 sm:px-4">
+          <TabsList className="h-auto max-w-full flex-wrap justify-start">
             {clients.map((client) => (
-              <TabsContent key={client.id} value={client.id} className="pt-5">
-                <StepList steps={client.steps} client={client.analyticsId} />
-              </TabsContent>
+              <TabsTrigger key={client.id} value={client.id}>
+                {client.label}
+              </TabsTrigger>
             ))}
-          </Tabs>
-        </div>
-      </section>
-
-      <section className="overflow-hidden rounded-[16px] border bg-card">
-        <div className="px-5 py-5 sm:px-6 sm:py-6">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-            Troubleshooting
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">If something doesn't work</h2>
+          </TabsList>
         </div>
 
-        <div className="border-t">
-          {troubleshooting.map((item) => (
-            <div key={item.title} className="border-b px-5 py-4 last:border-b-0 sm:px-6">
-              <p className="text-sm font-medium text-foreground">{item.title}</p>
-              <p className="mt-1 text-sm leading-5 text-muted-foreground">{item.description}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+        {clients.map((client) => (
+          <TabsContent key={client.id} value={client.id} className="px-5 py-5 sm:px-6 sm:py-6">
+            <StepList steps={client.steps} client={client.analyticsId} />
+          </TabsContent>
+        ))}
+      </Tabs>
+    </section>
+  )
+}
+
+export function McpTroubleshooting() {
+  return (
+    <section className="overflow-hidden rounded-[16px] border bg-card">
+      <div className="px-5 py-5 sm:px-6 sm:py-6">
+        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Troubleshooting</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight">If something doesn&apos;t work</h2>
+      </div>
+
+      <div className="border-t">
+        {troubleshooting.map((item) => (
+          <details key={item.title} className="group border-b last:border-b-0">
+            <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium text-foreground marker:content-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring sm:px-6 [&::-webkit-details-marker]:hidden">
+              <span className="flex items-start justify-between gap-4">
+                <span>{item.title}</span>
+                <span className="mt-0.5 font-mono text-xs text-muted-foreground group-open:rotate-45" aria-hidden="true">
+                  +
+                </span>
+              </span>
+            </summary>
+            <p className="px-5 pb-4 text-sm leading-relaxed text-muted-foreground sm:px-6">
+              {item.description}
+            </p>
+          </details>
+        ))}
+      </div>
+    </section>
   )
 }

@@ -259,7 +259,6 @@ export default function HomePage() {
       <header className={styles.header}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
           <Brand />
-          <div className={`${styles.headerTicks} hidden md:block`} aria-hidden="true" />
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
@@ -470,7 +469,6 @@ export default function HomePage() {
               Save the recommendation where the whole team can find it. The next
               person can get started without asking where to look.
             </p>
-            <div className={`${styles.closingRoute} mt-8 ml-6`} aria-hidden="true" />
             <div className={styles.closingCta}>
               <Suspense fallback={<HomeCtaFallback />}>
                 <HomeFinalActions />
