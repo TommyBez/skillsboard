@@ -35,7 +35,6 @@ export function McpSchematic() {
             {libraryRows.map((row) => (
               <li key={row} className={styles.schemaRow}>
                 <span className={styles.schemaRowName}>{row}</span>
-                <span className={styles.schemaRowTick} />
               </li>
             ))}
           </ul>
