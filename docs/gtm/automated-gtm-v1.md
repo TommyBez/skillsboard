@@ -259,7 +259,7 @@ If the official PostHog plugin is unavailable or a required operation is not exp
 - **Self-check:** production-only ingestion and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
 - **State / idempotency:** schema version, metric snapshots, per-stage status, PostHog resource registry, resource locks, active experiments and surveys, PR status, action-policy version, caps, ledgers, signal hashes, and cooldowns.
 - **Stop / bail-out:** broken or stale data makes Tracking QA the only action for dependent metrics. Missing caps, consent, targeting, or tools make only that action ineligible. A kill threshold pauses or rolls back immediately.
-- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, PostHog plugin and data quality, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
+- **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, PostHog plugin and data quality, protected pSEO research completion status, next due time, source availability, checked and shortlisted counts, backlog decisions, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
 
 ### Autonomous execution and PR gate
 

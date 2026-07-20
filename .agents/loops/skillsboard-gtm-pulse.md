@@ -89,11 +89,11 @@ With fewer than 30 eligible teams, use absolute counts and qualitative evidence.
 4. Run Tracking QA: event semantics, environment, sensitive-URL sanitization, duplicates, `team_id`, internal/test exclusion, source freshness, and DB/PostHog reconciliation.
 5. Build all five scorecard rows. Preserve `available|unavailable|broken` and stage-level measurement status; never substitute missing values.
 6. Calculate `AAT-28 = new activated + retained + reactivated` and `delta_AAT = new activated + reactivated - lost` only from valid team-level Retention inputs.
-7. When `pseo_research.next_due_at <= now` or no successful pSEO research pass is recorded, run the protected research pass, refresh only the deduplicated evidence backlog and source statuses, set `last_completed_at`, and set `next_due_at = last_completed_at + 7 days`. This sensing pass does not open a PR, publish, or count as a second routed action.
+7. When `pseo_research.next_due_at <= now` or no completed pSEO research pass is recorded, run the protected research pass and refresh only the deduplicated evidence backlog and source statuses. Treat every attempted outcome, including `available`, `unavailable`, `broken`, and `no_action`, as cadence-complete. Atomically persist the full `pseo_research` record with its outcome, `last_completed_at`, `next_due_at = last_completed_at + 7 days`, last run ID, source statuses, checked and shortlisted counts, and definition hash. Retain missing sources as unavailable for retry on the next due pass. This sensing pass does not open a PR, publish, or count as a second routed action.
 8. Route one primary constraint: verified defect first; sustainability next only for a proven cap breach or due review; otherwise require downstream health before scaling Acquisition and select the eligible issue with the strongest evidence and largest absolute number of teams affected. A researched pSEO candidate may be selected here, never alongside another primary action.
 9. Run the selected diagnostic and execute one bounded action. PostHog and channel actions may run immediately; repository work follows the PR checkpoint.
 10. Monitor active experiments and rollouts independently of the weekly router. Pause exposure immediately when a guardrail crosses its kill threshold, then end measurement when appropriate. After the observation window, make a winner permanent through the repository PR checkpoint or another reversible plugin-supported path; otherwise leave the permanent transition unapplied.
-11. Persist state after each successful external transition and append a minimal non-PII run log. A crash must be recoverable by reconciling live resources on the next run.
+11. Persist state after each successful external transition and every attempted pSEO research outcome, then append a minimal non-PII run log. A crash must be recoverable by reconciling live resources on the next run.
 
 ## Full-funnel scorecard
 
@@ -141,7 +141,7 @@ State schema version 4 contains:
 - resource locks for active diagnostics, experiments, surveys, campaigns, rollouts, and repository PRs;
 - one `open_pull_request` per resource key, including approval, checks, merge, deploy, and outcome status;
 - action-policy version, allowlists, hard caps, per-run deltas, spend/send ledger, cooldowns, attempts, and handled hashes;
-- `pseo_research` with `last_completed_at`, `next_due_at`, last run ID, source statuses, checked and shortlisted counts, and a definition hash for the research contract;
+- `pseo_research` with outcome, `last_completed_at`, `next_due_at`, last run ID, source statuses, checked and shortlisted counts, and a definition hash for the research contract;
 - a deduplicated pSEO backlog keyed by `canonical_intent_id` with source hash, evidence status, candidate URL, decision, cooldown, and PR reference.
 
 `resource_key = provider + resource_type + scope + logical_key`; only the same exact key conflicts. Build `definition_hash` from canonical JSON with recursively sorted keys and no volatile fields. Write state atomically through a same-directory temporary file plus rename, then advance cursors only after completed transitions. Persist an external resource ID immediately after creation. If creation succeeds but ID persistence fails, recover by listing the deterministic Pulse name/description and adopt only one exact definition match; quarantine ambiguity. Store stable internal IDs or hashes, never raw PII. The first schema-v4 run reconciles existing resources and performs no historical outbound backfill.
@@ -151,7 +151,7 @@ State schema version 4 contains:
 - PostHog plugin or project-identity failure: do not write to PostHog, mark only PostHog-dependent metrics and actions `unavailable`, retry next run, and continue with independent trustworthy sources.
 - Broken, stale, or privacy-unsafe tracking: repair Tracking QA only for dependent metrics; never justify a growth action with broken data.
 - Missing mature cohort, valid denominator, evidence threshold, cap, allowlist, consent, or supported tool: record `no_action` for that resource and evaluate the next eligible action.
-- Missing pSEO research input: mark only that source and its dependent fields `unavailable`, complete the remaining trustworthy research, and retry the source on the next due pass. A total absence of trustworthy sources records an exact pSEO research `no_action` without creating or publishing anything.
+- Missing pSEO research input: mark only that source and its dependent fields `unavailable`, complete the remaining trustworthy research, and retry the source on the next due pass. A total absence of trustworthy sources records an exact pSEO research `no_action`, atomically advances `last_completed_at` and `next_due_at`, and does not create or publish anything.
 - Overlapping action: retain the existing resource lock and monitor it; do not duplicate.
 - Open PR: continue all non-overlapping actions. Update and review the PR until independently approved; then merge only with green checks and monitor deployment.
 - Regression, spend breach, or privacy risk during a rollout: pause or roll back immediately and record the trigger.
