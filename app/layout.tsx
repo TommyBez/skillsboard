@@ -77,7 +77,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          {process.env.VERCEL === "1" ? <PrivacySafeVercelAnalytics /> : null}
+          {process.env.VERCEL_ENV === "production" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>
       </body>
     </html>

@@ -254,7 +254,7 @@ If the official PostHog plugin is unavailable or a required operation is not exp
 - **Purpose:** Show the whole growth system and choose the single highest-leverage evidenced constraint.
 - **Skills used:** analytics, marketing-plan, marketing-loops, plus the selected stage skill only after routing.
 - **Body:** discover official PostHog plugin capabilities; verify project identity; reconcile canonical PostHog assets; calculate all five scorecard rows and `ΔAAT` from valid values; exclude unavailable, broken, or immature stages; route a verified defect first; route Revenue/sustainability next only for a proven cap breach or due review; otherwise apply downstream health gates before Acquisition scaling and select among eligible growth stages by absolute teams affected and strength of evidence. Execute one bounded action and monitor active experiments daily.
-- **Self-check:** environment and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
+- **Self-check:** production-only ingestion and internal/test filters, stable windows, no duplicates, cross-user metrics grouped by `team_id`, cohort maturity, source freshness, and sample size.
 - **State / idempotency:** schema version, metric snapshots, per-stage status, PostHog resource registry, resource locks, active experiments and surveys, PR status, action-policy version, caps, ledgers, signal hashes, and cooldowns.
 - **Stop / bail-out:** broken or stale data makes Tracking QA the only action for dependent metrics. Missing caps, consent, targeting, or tools make only that action ineligible. A kill threshold pauses or rolls back immediately.
 - **Output:** five AARRR rows, `ΔAAT`, cohort `n` and maturity, PostHog plugin and data quality, one routed constraint, the executed action or exact `no_action`, active rollouts, and any PR state.
@@ -308,9 +308,11 @@ Global kill switch: pause the scheduled Codex automation. Product lifecycle auto
 
 ## 10. Full-funnel measurement contract
 
-Every custom PostHog event includes `deployment_environment`. Team-scoped events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
+Only the production deployment sends PostHog or Vercel Analytics events. Team-scoped PostHog events carry `team_id`. No raw invited email, team name, invitation capability token, or full repository URL is sent in custom event properties.
 
-The browser-safe project token proves only that the app can ingest events; the official PostHog plugin independently provides authenticated analytics reads and resource management. Each PostHog-derived metric becomes decision-ready when its events, filters, environment, freshness, `team_id`, and internal/test checks pass. One broken or unavailable metric does not globally block healthy stages or independent sources.
+The browser-safe project token proves only that the app can ingest events; the official PostHog plugin independently provides authenticated analytics reads and resource management. Each PostHog-derived metric becomes decision-ready when its events, filters, production-only ingestion, freshness, `team_id`, and internal/test checks pass. One broken or unavailable metric does not globally block healthy stages or independent sources.
+
+The production baseline starts at the successful production deployment of this change. Earlier events are potentially mixed-environment history and remain excluded from decision-ready metrics until explicitly reconciled.
 
 | Stage | Event or derived metric | Required properties / rule | Status |
 |---|---|---|---|
@@ -328,7 +330,7 @@ The browser-safe project token proves only that the app can ingest events; the o
 | Referral | ask/copy/create/activate events | Add when a referral surface exists; optimize for `referred_team_activated`. | Planned |
 | Revenue / sustainability | cash coverage, fully loaded cost per current `AAT-28`, acquisition cost per new `AAT-28` | Aggregate Vercel, Neon, Resend, GTM spend, and founder-time inputs; not user events. | Data connection required |
 
-Client analytics sanitizes only automatic URL properties: hashes and non-UTM query parameters are removed, and invitation capability paths are canonicalized without dropping the pageview. SDK-owned properties and explicit custom-event properties remain intact. Autocapture and exception capture are restored to the original PostHog integration behavior, Session Replay remains controlled by the PostHog project, and Do Not Track is honored. Replay page and network URLs receive the same sanitizer; network bodies, headers, and the rendered invitation-link result are excluded because they can contain live credentials. Vercel Analytics applies the same canonical URL rule. Client and server events share the build-time `NEXT_PUBLIC_ANALYTICS_ENVIRONMENT` value. Server-side analytics is fail-open so analytics failure cannot convert a successful product mutation into a user-visible error. Consent, retention, and internal-user policy remain launch blockers rather than assumptions.
+Client analytics sanitizes only automatic URL properties: hashes and non-UTM query parameters are removed, and invitation capability paths are canonicalized without dropping the pageview. SDK-owned properties and explicit custom-event properties remain intact. Autocapture and exception capture are restored to the original PostHog integration behavior, Session Replay remains controlled by the PostHog project, and Do Not Track is honored. Replay page and network URLs receive the same sanitizer; network bodies, headers, and the rendered invitation-link result are excluded because they can contain live credentials. Vercel Analytics applies the same canonical URL rule. PostHog initialization and Vercel Analytics rendering are disabled outside Vercel production; the PostHog variables are scoped to Production as an additional configuration guard. Server-side analytics is fail-open so analytics failure cannot convert a successful product mutation into a user-visible error. Consent, retention, and internal-user policy remain launch blockers rather than assumptions.
 
 ## 11. Autonomous backlog and configuration dependencies
 
@@ -339,7 +341,7 @@ Pulse owns the following backlog and resolves items from evidence rather than cr
 3. Version the qualified-visitor rule, UTM taxonomy, first-touch, last-non-direct, referral override, and team-level attribution.
 4. Enforce consent, opt-out, retention, deletion, unsubscribe, and suppression automatically before eligible actions.
 5. Record machine-readable cash, send, and spend caps. Until a cap exists, the dependent action is `unavailable` and the loop chooses another action.
-6. Reconcile production analytics until semantic coverage, environment, `team_id`, freshness, and internal/test checks pass.
+6. Reconcile production analytics until semantic coverage, production-only ingestion, `team_id`, freshness, and internal/test checks pass.
 7. Choose and record acquisition locale and multiplier ICP from current evidence, then revisit on a versioned cadence.
 8. Evaluate sustainability modes that preserve the current free core; any durable contract change starts with a PR.
 9. Use Search Console and DataForSEO automatically when their integrations or server-only credentials and caps become available; until then quantitative fields remain `unavailable`.

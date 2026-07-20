@@ -8,7 +8,7 @@
 ### Running locally
 - Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the development variables (Neon Postgres `DATABASE_URL`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
   `npx vercel env pull .env.local --environment=development --yes`
-  (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the shared Neon dev database, which is reachable from the VM and already migrated — no local database or schema setup is needed. Set `BETTER_AUTH_URL=http://localhost:3000` in `.env.local` for local auth callbacks.
+  (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the shared Neon dev database, which is reachable from the VM and already migrated — no local database or schema setup is needed. Set `BETTER_AUTH_URL=http://localhost:3000` in `.env.local` for local auth callbacks. PostHog variables are scoped to Vercel Production and analytics is intentionally disabled in local development and Preview deployments.
 - Dev server: `pnpm dev` (serves `http://localhost:3000`). Standard scripts live in `package.json`.
 - After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 

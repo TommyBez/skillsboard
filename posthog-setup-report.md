@@ -3,9 +3,11 @@
 
 The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. PostHog is initialized on the client via `instrumentation-client.ts`, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. A shared lazy singleton in `lib/posthog-server.ts` queues server-side captures and gives their background flushes to Next.js `after`, so mutations and MCP responses do not wait for analytics. User identification is performed client-side after successful auth and for returning protected-app visitors, while sign-out resets the client identity. The canonical typed event and property contract lives in `analytics/posthog/events.ts` and drives browser and server capture types.
 
-The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Client and server events also receive one build-time `deployment_environment` value.
+The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Analytics ingestion is disabled outside Vercel production.
 
-The client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host send product events. The GTM pulse uses the official authenticated PostHog plugin — the `posthog:posthog` skill and its authenticated tools — to query production analytics and manage Pulse-owned PostHog resources.
+The production-scoped client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host send product events. The GTM pulse uses the official authenticated PostHog plugin — the `posthog:posthog` skill and its authenticated tools — to query production analytics and manage Pulse-owned PostHog resources.
+
+The production baseline starts with the successful production deployment of this change. Events captured before that cutover may include development or Preview traffic and are not decision-ready without explicit reconciliation.
 
 ## Events instrumented
 
@@ -67,7 +69,7 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 
 - [ ] Run a full production build (the wizard only verified the files it touched) and fix any lint or type errors introduced by the generated code.
 - [ ] Run the test suite — call sites that were rewritten or instrumented may need updated mocks or fixtures.
-- [ ] Add `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` to `.env.example` and any bootstrap scripts so collaborators know what to set.
+- [x] Document `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` as Production-only Vercel configuration.
 - [ ] Wire source-map upload (`posthog-cli sourcemap` or your bundler's upload step) into CI so production stack traces de-minify in PostHog Error Tracking.
 - [x] Returning signed-in visitors call `posthog.identify()` from the protected app shell.
 - [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.

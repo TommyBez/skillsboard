@@ -8,7 +8,6 @@ import {
   type NonTeamScopedCapturableAnalyticsEventName,
   type TeamScopedCapturableAnalyticsEventName,
 } from "@/analytics/posthog/events"
-import { getAnalyticsDeploymentEnvironment } from "@/lib/analytics-environment"
 
 type ServerEvent<EventName extends NonTeamScopedCapturableAnalyticsEventName> =
   AnalyticsEventCapture<EventName> & {
@@ -49,10 +48,7 @@ function enqueueEvent({
     getPostHogClient().capture({
       distinctId,
       event,
-      properties: {
-        ...properties,
-        deployment_environment: getAnalyticsDeploymentEnvironment(),
-      },
+      properties,
     })
   } catch (error) {
     console.error("Unable to capture PostHog event", {
