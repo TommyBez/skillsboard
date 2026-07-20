@@ -43,35 +43,34 @@ export function McpSchematic() {
         </div>
 
         <div className={styles.schemaGateway}>
+          {/* Wire coordinates: y=4/54/104 are the vertical centers of the three
+              fixed-height agent action rows; the box is centered on the same
+              axis as the rows, so endpoints align at every viewport width. */}
           <svg
             className={styles.schemaWires}
-            viewBox="0 0 160 320"
+            viewBox="0 0 160 108"
             preserveAspectRatio="none"
             aria-hidden="true"
             focusable="false"
           >
+            <path d="M0 54H80" className={styles.schemaTrunk} pathLength={1} />
             <path
-              d="M0 160H56"
-              className={styles.schemaTrunk}
-              pathLength={1}
-            />
-            <path
-              d="M104 160h14V100h42"
+              d="M80 54h38V4h42"
               className={`${styles.schemaBranch} ${styles.schemaBranchA}`}
               pathLength={1}
             />
             <path
-              d="M104 160h56"
+              d="M80 54H160"
               className={`${styles.schemaBranch} ${styles.schemaBranchB}`}
               pathLength={1}
             />
             <path
-              d="M104 160h14v90h42"
+              d="M80 54h38v50h42"
               className={`${styles.schemaBranch} ${styles.schemaBranchC}`}
               pathLength={1}
             />
             <path
-              d="M0 160H56M104 160h56"
+              d="M0 54H160"
               className={styles.schemaPulse}
               pathLength={1}
             />

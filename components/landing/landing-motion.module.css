@@ -663,7 +663,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 1.25rem auto 0;
+  margin: 0.75rem auto 0;
   width: fit-content;
 }
 
@@ -675,6 +675,11 @@
   background: var(--primary);
 }
 
+/* The lower segment runs all the way into the stack's top rule. */
+.mobileRouteLine::after {
+  height: 2rem;
+}
+
 .mobileRouteMark {
   width: 1.75rem;
   height: 1.75rem;
@@ -683,7 +688,7 @@
 }
 
 .mobileStack {
-  margin-top: 1.25rem;
+  margin-top: 0;
   border-top: 1px solid var(--lp-hairline-strong);
 }
 
@@ -820,7 +825,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-block: 0.5rem;
+  padding-block: 0.5rem 0.35rem;
 }
 
 /* Vertical signal route on small screens */
@@ -832,12 +837,21 @@
   background: var(--primary);
 }
 
+/* One shared measure keeps wires and action rows on the same axis. */
+.schematic {
+  --wire-row-h: 4rem;
+}
+
 .schemaWires {
   display: none;
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 50%;
+  /* viewBox is 108 units tall; 100 units span two row heights. */
+  height: calc(var(--wire-row-h) * 2 * 1.08);
   width: 100%;
-  height: 100%;
+  transform: translateY(-50%);
   overflow: visible;
 }
 
@@ -907,6 +921,9 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted-foreground);
+  /* Small screens: the vertical route is centered, so the label centers
+     with it to keep the signal path visually continuous. */
+  text-align: center;
 }
 
 .agentActions {
@@ -943,10 +960,10 @@
 }
 
 .agentActionName {
-  font-size: clamp(1.15rem, 1.8vw, 1.6rem);
+  font-size: clamp(1.1rem, 1.45vw, 1.5rem);
   font-weight: 650;
   letter-spacing: -0.03em;
-  line-height: 1.1;
+  line-height: 1.05;
 }
 
 .schemaCaption {
@@ -983,6 +1000,32 @@
 
   .schemaNode {
     margin: 0;
+  }
+
+  /* The actions list is the alignment anchor: the label is lifted out of
+     flow so the list centers on the exact axis the wires are drawn on,
+     and fixed row heights put each branch endpoint at a row center. */
+  .schemaAgent {
+    align-self: center;
+    position: relative;
+  }
+
+  .schemaAgentLabel {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 1.1rem;
+    text-align: left;
+  }
+
+  .agentActions {
+    margin-top: 0;
+  }
+
+  .agentAction {
+    height: var(--wire-row-h);
+    align-items: center;
+    padding-block: 0;
   }
 
   /* Scroll-driven drawing + activation, only when the controller is live. */

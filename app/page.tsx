@@ -469,7 +469,7 @@ export default function HomePage() {
               Save the recommendation where the whole team can find it. The next
               person can get started without asking where to look.
             </p>
-            <div className={styles.closingCta}>
+            <div className={`${styles.closingCta} mt-8`}>
               <Suspense fallback={<HomeCtaFallback />}>
                 <HomeFinalActions />
               </Suspense>
