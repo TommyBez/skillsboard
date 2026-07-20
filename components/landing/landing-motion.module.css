@@ -1,210 +1,1231 @@
+/* ---------------------------------------------------------------------------
+   Skills Board landing — “The Living Skill Router”
+   One visual system: scattered dossiers → indexed library → MCP → agent.
+   Everything degrades to a complete static page without JS; scroll/pointer
+   choreography is layered on by LandingMotionController via CSS variables.
+--------------------------------------------------------------------------- */
+
 .root {
-  --landing-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --landing-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --lp-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --lp-hairline: color-mix(in oklch, var(--foreground) 16%, transparent);
+  --lp-hairline-strong: color-mix(in oklch, var(--foreground) 30%, transparent);
+  --lp-grid-line: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --lp-alert: oklch(0.62 0.15 55);
+  --lp-header-h: 3.5rem;
+
+  /* Routing state. Defaults are the complete, no-JS composition. */
+  --route-p: var(--route-progress, 0);
+  --mcp-p: 1;
+
+  /* Pricing monument: art-directed per theme, not mechanically inverted. */
+  --pricing-field: var(--surface-ink);
+  --pricing-ink: var(--surface-ink-foreground);
+  --pricing-zero: oklch(0.72 0.145 148);
+
+  position: relative;
+}
+
+:global(.dark) .root {
+  --lp-alert: oklch(0.74 0.14 60);
+  --pricing-field: oklch(0.945 0.011 103);
+  --pricing-ink: oklch(0.17 0.017 158);
+  --pricing-zero: oklch(0.5 0.15 148);
+}
+
+.root[data-motion-enabled="true"] {
+  --mcp-p: var(--mcp-progress, 0);
+}
+
+/* Paper grain: print texture at very low opacity, never over readability. */
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+
+:global(.dark) .grain::after {
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+}
+
+/* ---------------------------------------------------------------------------
+   Header — compact command strip
+--------------------------------------------------------------------------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--lp-hairline);
+  background-color: transparent;
+  transition:
+    background-color 240ms var(--lp-ease-out),
+    border-color 240ms var(--lp-ease-out),
+    box-shadow 240ms var(--lp-ease-out);
+}
+
+.root[data-scrolled] .header {
+  background-color: color-mix(in oklch, var(--background) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-color: var(--lp-hairline-strong);
+}
+
+.headerCellRule {
+  align-self: stretch;
+  width: 1px;
+  background: var(--lp-hairline);
+}
+
+.headerTicks {
+  flex: 1;
+  align-self: center;
+  height: 7px;
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--lp-hairline) 0 1px,
+    transparent 1px 14px
+  );
+  opacity: 0.8;
+}
+
+/* ---------------------------------------------------------------------------
+   Shared CTA language — sharp, directional, routed
+--------------------------------------------------------------------------- */
+
+.ctaButton {
+  border-radius: 3px;
+}
+
+.ctaArrow {
+  transition: transform 180ms var(--lp-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaButton:hover .ctaArrow {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.ctaButton:active .ctaArrow {
+  transform: translate3d(6px, 0, 0);
+}
+
+/* Chapter index annotations — thin technical marks, decorative only. */
+.chapterMark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--muted-foreground);
+}
+
+.chapterMark::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.chapterMarkIdx {
+  color: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+   Hero — full-viewport skill routing table
+--------------------------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  overflow: clip;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.heroGridLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    to right,
+    var(--lp-grid-line) 1px,
+    transparent 1px
+  );
+  background-size: calc(100% / 6) 100%;
+  mask-image: linear-gradient(to bottom, black 55%, transparent 96%);
+  animation: lp-fade-in 700ms var(--lp-ease-out) both;
 }
 
 .heroEyebrow {
-  animation: hero-eyebrow-enter 360ms var(--landing-ease-out) both;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+  animation: lp-rise-in 400ms var(--lp-ease-out) 140ms both;
+}
+
+.heroEyebrow::before {
+  content: "";
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--primary);
+}
+
+.heroHeadline {
+  font-stretch: 93%;
+}
+
+.heroLineMask {
+  display: block;
+  overflow: clip;
+  padding-block-end: 0.09em;
+  margin-block-end: -0.09em;
 }
 
 .heroLine {
-  animation: hero-line-enter 560ms var(--landing-ease-out) both;
+  display: block;
+  animation: lp-line-rise 720ms var(--lp-ease-out) both;
 }
 
 .heroLineFirst {
-  animation-delay: 70ms;
+  animation-delay: 230ms;
 }
 
 .heroLineSecond {
-  animation-delay: 140ms;
+  animation-delay: 330ms;
 }
 
 .heroCopy {
-  animation: hero-copy-enter 440ms var(--landing-ease-out) 170ms both;
+  animation: lp-rise-in 460ms var(--lp-ease-out) 600ms both;
 }
 
 .heroCta {
-  animation: hero-cta-enter 360ms var(--landing-ease-out) 230ms both;
+  animation: lp-rise-in 420ms var(--lp-ease-out) 690ms both;
 }
 
-@keyframes hero-eyebrow-enter {
+@keyframes lp-fade-in {
   from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lp-rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 12px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-line-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* ------------------------------------------------------------------
+   Hero board: dossiers orbiting the mark, converging on scroll
+------------------------------------------------------------------ */
+
+.heroBoard {
+  --px: 0;
+  --py: 0;
+  position: absolute;
+  top: 6%;
+  bottom: 4%;
+  right: max(-2rem, -2vw);
+  width: min(46%, 42rem);
+  display: none;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.boardMark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 84%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -52%);
+  overflow: visible;
+}
+
+.boardMarkOutline {
+  stroke: color-mix(in oklch, var(--foreground) 38%, transparent);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: lp-mark-draw 900ms var(--lp-ease-in-out) 100ms both;
+}
+
+@keyframes lp-mark-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Green routing pulse traveling the S spine, ~every 7s after the entrance. */
+.boardSpine {
+  stroke: var(--primary);
+  stroke-width: 2.25px;
+  stroke-linecap: square;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 0.05 2;
+  stroke-dashoffset: 0.05;
+  opacity: 0;
+  animation: lp-spine-pulse 7s linear 1050ms infinite;
+}
+
+.root[data-page-hidden] .boardSpine {
+  animation-play-state: paused;
+}
+
+@keyframes lp-spine-pulse {
+  0% {
+    stroke-dashoffset: 0.05;
+    opacity: 0;
+  }
+
+  2% {
+    opacity: 1;
+  }
+
+  16% {
+    stroke-dashoffset: -1;
+    opacity: 1;
+  }
+
+  18%,
+  100% {
+    stroke-dashoffset: -1.05;
+    opacity: 0;
+  }
+}
+
+.heroCards {
+  position: absolute;
+  inset: 0;
+}
+
+/* Converged (indexed stack) positions are the base; scatter is a transform
+   scaled by (1 - route progress), so scrolling routes chaos into order. */
+.dossierSlot {
+  position: absolute;
+  left: 18%;
+  pointer-events: auto;
+  transform: translate3d(
+      calc(var(--sx) * (1 - var(--route-p))),
+      calc(var(--sy) * (1 - var(--route-p))),
+      0
+    )
+    rotate(calc(var(--sr) * (1 - var(--route-p))));
+  will-change: transform;
+}
+
+.dossierSlot[data-slot="1"] {
+  top: 42%;
+  z-index: 1;
+  --sx: -140px;
+  --sy: -215px;
+  --sr: -7deg;
+}
+
+.dossierSlot[data-slot="2"] {
+  top: calc(42% + 3.4rem);
+  z-index: 2;
+  --sx: 205px;
+  --sy: -265px;
+  --sr: 5deg;
+}
+
+.dossierSlot[data-slot="3"] {
+  top: calc(42% + 6.8rem);
+  z-index: 3;
+  --sx: -195px;
+  --sy: -70px;
+  --sr: -4deg;
+}
+
+.dossierSlot[data-slot="4"] {
+  top: calc(42% + 10.2rem);
+  z-index: 4;
+  --sx: 230px;
+  --sy: -100px;
+  --sr: 8deg;
+}
+
+.dossierSlot[data-slot="5"] {
+  top: calc(42% + 13.6rem);
+  z-index: 5;
+  --sx: 45px;
+  --sy: 55px;
+  --sr: -3deg;
+}
+
+.dossierEnter {
+  animation-duration: 680ms;
+  animation-timing-function: var(--lp-ease-out);
+  animation-fill-mode: both;
+}
+
+.dossierEnter[data-dir="left"] {
+  animation-name: lp-dossier-left;
+}
+
+.dossierEnter[data-dir="right"] {
+  animation-name: lp-dossier-right;
+}
+
+.dossierEnter[data-dir="top"] {
+  animation-name: lp-dossier-top;
+}
+
+.dossierEnter[data-dir="bottom"] {
+  animation-name: lp-dossier-bottom;
+}
+
+.dossierSlot[data-slot="1"] .dossierEnter {
+  animation-delay: 480ms;
+}
+
+.dossierSlot[data-slot="2"] .dossierEnter {
+  animation-delay: 550ms;
+}
+
+.dossierSlot[data-slot="3"] .dossierEnter {
+  animation-delay: 620ms;
+}
+
+.dossierSlot[data-slot="4"] .dossierEnter {
+  animation-delay: 690ms;
+}
+
+.dossierSlot[data-slot="5"] .dossierEnter {
+  animation-delay: 760ms;
+}
+
+@keyframes lp-dossier-left {
+  from {
+    opacity: 0;
+    transform: translate3d(-72px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-right {
+  from {
+    opacity: 0;
+    transform: translate3d(72px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-top {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -64px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-dossier-bottom {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 64px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.dossierParallax {
+  transform: translate3d(
+    calc(var(--px) * var(--depth, 3px)),
+    calc(var(--py) * var(--depth, 3px)),
+    0
+  );
+  transition: transform 320ms var(--lp-ease-out);
+}
+
+/* ------------------------------------------------------------------
+   Skill dossier — tactile index card
+------------------------------------------------------------------ */
+
+.dossier {
+  width: 14rem;
+  background: var(--card);
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 2px;
+  padding: 0.7rem 0.8rem 0.8rem;
+  box-shadow:
+    0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
+    0 14px 28px hsl(var(--shadow-color) / 0.1);
+  transition:
+    opacity 190ms var(--lp-ease-out),
+    box-shadow 190ms var(--lp-ease-out),
+    border-color 190ms var(--lp-ease-out);
+}
+
+.dossier[data-density="wide"] {
+  width: 15.5rem;
+}
+
+.dossier[data-density="compact"] {
+  width: 11.75rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .heroCards:hover .dossier {
+    opacity: 0.55;
+  }
+
+  .dossierSlot:hover {
+    z-index: 7;
+  }
+
+  .dossierSlot:hover .dossier {
+    opacity: 1;
+    border-color: var(--primary);
+    box-shadow:
+      0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
+      0 20px 40px hsl(var(--shadow-color) / 0.16);
+  }
+}
+
+.dossierMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.dossierIdx {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--muted-foreground);
+}
+
+.dossierRec {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+}
+
+.dossierRecDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.dossierName {
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.dossierSource {
+  margin-top: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.01em;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dossierCmd {
+  margin-top: 0.55rem;
+  padding: 0.3rem 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--accent-foreground);
+  background: color-mix(in oklch, var(--primary) 9%, transparent);
+  border-left: 2px solid var(--primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dossierRef {
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  color: var(--muted-foreground);
+}
+
+.dossierRef::before {
+  content: "";
+  display: inline-block;
+  width: 0.45rem;
+  height: 1px;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  background: var(--primary);
+}
+
+/* ------------------------------------------------------------------
+   Hero board, small screens: static before/after field manual
+------------------------------------------------------------------ */
+
+.heroBoardMobile {
+  display: block;
+  margin-top: 3rem;
+  width: 100%;
+  max-width: 24rem;
+}
+
+.mobileChaos {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 8.75rem;
+}
+
+.mobileChaosCard {
+  position: absolute;
+  top: 0;
+}
+
+.mobileChaosCard .dossier {
+  width: 12.5rem;
+}
+
+.mobileChaosCard:nth-child(1) {
+  left: 0;
+  transform: rotate(-5deg);
+  z-index: 1;
+}
+
+.mobileChaosCard:nth-child(2) {
+  right: 0;
+  top: 1.1rem;
+  transform: rotate(4deg);
+  z-index: 2;
+}
+
+.mobileChaosCard:nth-child(3) {
+  left: 14%;
+  top: 2.6rem;
+  transform: rotate(-2deg);
+  z-index: 3;
+}
+
+.mobileRouteLine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.25rem auto 0;
+  width: fit-content;
+}
+
+.mobileRouteLine::before,
+.mobileRouteLine::after {
+  content: "";
+  width: 2px;
+  height: 1.4rem;
+  background: var(--primary);
+}
+
+.mobileRouteMark {
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: 0.4rem 0;
+  color: var(--primary);
+}
+
+.mobileStack {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--lp-hairline-strong);
+}
+
+.mobileStackRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.55rem 0.15rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.mobileStackIdx {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--primary);
+}
+
+.mobileStackName {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.mobileStackRec {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--primary);
+}
+
+@media (min-width: 64rem) {
+  .heroBoard {
+    display: block;
+  }
+
+  .heroBoardMobile {
+    display: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   MCP chapter — the signature routing moment
+--------------------------------------------------------------------------- */
+
+/* The tall scroll chapter only exists when the controller is live; without
+   JS or with reduced motion the section is a normal static spread. */
+@media (min-width: 64rem) {
+  .root[data-motion-enabled="true"] .mcpChapter {
+    height: 240vh;
+  }
+
+  .root[data-motion-enabled="true"] .mcpSticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    display: flex;
+    align-items: center;
+    overflow: clip;
+  }
+}
+
+.schematic {
+  width: 100%;
+}
+
+.schematicGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  border-block: 1px solid var(--lp-hairline-strong);
+  padding-block: 2rem;
+}
+
+.schemaEyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.schemaStackTitle {
+  margin-top: 0.6rem;
+  max-width: 14ch;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
+}
+
+.schemaRows {
+  margin-top: 1.25rem;
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.schemaRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.5rem 0.1rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.schemaRowIdx {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--muted-foreground);
+}
+
+.schemaRowName {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.schemaRowTick {
+  width: 0.45rem;
+  height: 0.45rem;
+  align-self: center;
+  border: 1px solid var(--primary);
+}
+
+/* Gateway column */
+
+.schemaGateway {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 0.5rem;
+}
+
+/* Vertical signal route on small screens */
+.schemaGateway::before,
+.schemaGateway::after {
+  content: "";
+  width: 2px;
+  height: 2rem;
+  background: var(--primary);
+}
+
+.schemaWires {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.schemaTrunk,
+.schemaBranch {
+  stroke: var(--primary);
+  stroke-width: 1.75px;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 0;
+}
+
+.schemaPulse {
+  stroke: var(--lp-alert);
+  stroke-width: 2.5px;
+  fill: none;
+  vector-effect: non-scaling-stroke;
+  stroke-dasharray: 0.06 2;
+  stroke-dashoffset: 0.06;
+  opacity: 0;
+}
+
+.schemaNode {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0.6rem 0;
+  padding: 0.7rem 0.85rem 0.6rem;
+  background: var(--card);
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 2px;
+}
+
+.schemaNode::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid var(--primary);
+  opacity: 1;
+  pointer-events: none;
+}
+
+.schemaNodeMark {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--primary);
+}
+
+.schemaNodeLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--foreground);
+}
+
+/* Agent column */
+
+.schemaAgentLabel {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.agentActions {
+  margin-top: 0.9rem;
+}
+
+.agentAction {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding-block: 0.95rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.agentAction::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 1px;
+  background: var(--primary);
+  transform: scaleX(var(--a, 1));
+  transform-origin: left;
+}
+
+.agentActionIdx {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--primary);
+}
+
+.agentActionName {
+  font-size: clamp(1.15rem, 1.8vw, 1.6rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.schemaCaption {
+  margin-top: 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+
+/* Desktop schematic: horizontal wires, scroll-driven drawing. */
+@media (min-width: 64rem) {
+  .schematicGrid {
+    grid-template-columns: minmax(0, 1fr) clamp(7rem, 11vw, 10rem) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0;
+    padding-block: 2.75rem;
+  }
+
+  .schemaGateway {
+    align-self: stretch;
+    min-height: 21rem;
+    justify-content: center;
+    padding-block: 0;
+  }
+
+  .schemaGateway::before,
+  .schemaGateway::after {
+    display: none;
+  }
+
+  .schemaWires {
+    display: block;
+  }
+
+  .schemaNode {
+    margin: 0;
+  }
+
+  /* Scroll-driven drawing + activation, only when the controller is live. */
+  .root[data-motion-enabled="true"] .schemaTrunk {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.04) / 0.22, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchA {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.3) / 0.16, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchB {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.38) / 0.16, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaBranchC {
+    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.46) / 0.18, 1));
+  }
+
+  .root[data-motion-enabled="true"] .schemaPulse {
+    stroke-dashoffset: calc(0.06 - var(--mcp-p) * 1.12);
+    opacity: calc(
+      min(1, var(--mcp-p) * 14) *
+        (1 - clamp(0, (var(--mcp-p) - 0.88) / 0.12, 1))
+    );
+  }
+
+  .root[data-motion-enabled="true"] .schemaNode::after {
+    opacity: clamp(0, (var(--mcp-p) - 0.24) / 0.08, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction {
+    opacity: calc(0.3 + 0.7 * var(--a, 1));
+    transform: translate3d(calc((1 - var(--a, 1)) * 14px), 0, 0);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"] {
+    --a: clamp(0, (var(--mcp-p) - 0.48) / 0.1, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"] {
+    --a: clamp(0, (var(--mcp-p) - 0.58) / 0.1, 1);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"] {
+    --a: clamp(0, (var(--mcp-p) - 0.68) / 0.1, 1);
+  }
+}
+
+/* Small screens: reveal the vertical route when the section enters view. */
+@media (max-width: 63.9975rem) {
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaGateway::before,
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaGateway::after {
+    transform: scaleY(0);
+  }
+
+  .root[data-motion-enabled="true"] .schemaGateway::before {
+    transform-origin: top;
+    transition: transform 420ms var(--lp-ease-in-out) 80ms;
+  }
+
+  .root[data-motion-enabled="true"] .schemaGateway::after {
+    transform-origin: top;
+    transition: transform 420ms var(--lp-ease-in-out) 380ms;
+  }
+
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .agentAction {
     opacity: 0;
     transform: translate3d(0, 10px, 0);
   }
 
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
+  .root[data-motion-enabled="true"] .agentAction {
+    transition:
+      opacity 380ms var(--lp-ease-out),
+      transform 380ms var(--lp-ease-out);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"] {
+    transition-delay: 560ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"] {
+    transition-delay: 660ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"] {
+    transition-delay: 760ms;
+  }
+
+  .root[data-motion-enabled="true"]
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .agentAction::after {
+    transform: scaleX(0);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction::after {
+    transition: transform 420ms var(--lp-ease-out);
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="1"]::after {
+    transition-delay: 640ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="2"]::after {
+    transition-delay: 740ms;
+  }
+
+  .root[data-motion-enabled="true"] .agentAction[data-action="3"]::after {
+    transition-delay: 840ms;
   }
 }
 
-@keyframes hero-line-enter {
-  from {
-    transform: translate3d(0, 22px, 0);
-  }
+/* ---------------------------------------------------------------------------
+   Pricing — the zero monument
+--------------------------------------------------------------------------- */
 
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+.pricingSection {
+  position: relative;
+  overflow: clip;
+  background: var(--pricing-field);
+  color: var(--pricing-ink);
+  border-bottom: 1px solid var(--lp-hairline);
 }
 
-@keyframes hero-copy-enter {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 14px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+.pricingZeroWrap {
+  position: relative;
+  z-index: 0;
+  line-height: 0.72;
 }
 
-@keyframes hero-cta-enter {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+.pricingZero,
+.pricingZeroLayer {
+  font-size: clamp(15rem, 56vw, 50rem);
+  font-weight: 650;
+  font-stretch: 90%;
+  letter-spacing: -0.06em;
+  line-height: 0.72;
+  margin-left: -0.07em;
+  color: transparent;
+  user-select: none;
 }
 
-@keyframes hero-fade-enter {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+.pricingZero {
+  -webkit-text-stroke: 2.5px var(--pricing-zero);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .librarySource {
-  transition:
-    opacity 420ms var(--landing-ease-out),
-    transform 420ms var(--landing-ease-out);
+.pricingZeroLayer {
+  position: absolute;
+  inset: 0;
+  -webkit-text-stroke: 1.25px currentColor;
+  pointer-events: none;
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .libraryArrow {
-  transition:
-    opacity 420ms var(--landing-ease-in-out) 90ms,
-    transform 420ms var(--landing-ease-in-out) 90ms;
+.pricingZeroLayer[data-layer="alert"] {
+  color: transparent;
+  -webkit-text-stroke-color: var(--lp-alert);
+  opacity: 0.5;
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem {
-  transition:
-    opacity 360ms var(--landing-ease-out),
-    transform 360ms var(--landing-ease-out);
+.pricingZeroLayer[data-layer="ink"] {
+  -webkit-text-stroke-color: var(--pricing-ink);
+  opacity: 0.35;
 }
 
+/* Offset print layers align and the counter fills once the section lands. */
 .root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(1) {
-  transition-delay: 150ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(2) {
-  transition-delay: 195ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(3) {
-  transition-delay: 240ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .mcpToolItem:nth-child(4) {
-  transition-delay: 285ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="visible"]
-  .libraryCaption {
-  transition:
-    opacity 320ms var(--landing-ease-out) 340ms,
-    transform 320ms var(--landing-ease-out) 340ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .librarySource {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .libraryArrow {
-  opacity: 0;
-  transform: translate3d(0, -12px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .mcpTargetLabel,
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .mcpToolItem {
-  opacity: 0;
-  transform: translate3d(0, 10px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="library"][data-motion-state="pending"]
-  .libraryCaption {
-  opacity: 0;
-  transform: translate3d(0, 8px, 0);
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingZero {
+  transition: color 850ms var(--lp-ease-out) 180ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingZero {
+  .pricingZeroLayer {
   transition:
-    opacity 650ms var(--landing-ease-out),
-    transform 650ms var(--landing-ease-out);
+    transform 720ms var(--lp-ease-in-out),
+    opacity 720ms var(--lp-ease-in-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="alert"] {
+  transform: translate3d(1.1rem, -0.8rem, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="ink"] {
+  transform: translate3d(-0.8rem, 0.7rem, 0);
+}
+
+.pricingZeroFilled,
+[data-motion-group="pricing"][data-motion-state="visible"] .pricingZero {
+  color: var(--pricing-zero);
+}
+
+/* Without the controller the monument rests solid. */
+.root:not([data-motion-enabled="true"]) .pricingZero {
+  color: var(--pricing-zero);
+}
+
+.root:not([data-motion-enabled="true"]) .pricingZeroLayer {
+  transform: none;
+  opacity: 0.22;
+}
+
+.pricingCopy {
+  position: relative;
+  z-index: 1;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
   .pricingMessage {
   transition:
-    opacity 480ms var(--landing-ease-out) 100ms,
-    transform 480ms var(--landing-ease-out) 100ms;
+    opacity 520ms var(--lp-ease-out) 120ms,
+    transform 520ms var(--lp-ease-out) 120ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="visible"]
   .pricingNote {
   transition:
-    opacity 360ms var(--landing-ease-out) 210ms,
-    transform 360ms var(--landing-ease-out) 210ms;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingZero {
-  opacity: 0.35;
-  transform: translate3d(-24px, 0, 0) scale(0.96);
+    opacity 400ms var(--lp-ease-out) 260ms,
+    transform 400ms var(--lp-ease-out) 260ms;
 }
 
 .root[data-motion-enabled="true"]
@@ -221,122 +1242,303 @@
   transform: translate3d(0, 10px, 0);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingHeading {
-  transition:
-    opacity 520ms var(--landing-ease-out),
-    transform 520ms var(--landing-ease-out);
+.pricingNoteRule {
+  border-top: 1px solid color-mix(in oklch, var(--pricing-ink) 32%, transparent);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCopy {
-  transition:
-    opacity 420ms var(--landing-ease-out) 80ms,
-    transform 420ms var(--landing-ease-out) 80ms;
+/* ---------------------------------------------------------------------------
+   FAQ — technical index
+--------------------------------------------------------------------------- */
+
+.faqItem {
+  border-bottom: 1px solid var(--lp-hairline);
 }
 
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta {
+.faqSummary {
+  display: grid;
+  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0.85rem;
+  padding-block: 1.4rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faqSummary::-webkit-details-marker {
+  display: none;
+}
+
+.faqSummary:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+}
+
+.faqIdx {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--primary);
+}
+
+.faqQuestion {
+  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.faqGlyph {
+  position: relative;
+  align-self: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  color: var(--muted-foreground);
   transition:
-    opacity 360ms var(--landing-ease-out) 150ms,
-    transform 360ms var(--landing-ease-out) 150ms;
+    transform 220ms var(--lp-ease-in-out),
+    color 220ms var(--lp-ease-in-out);
+}
+
+.faqGlyph::before,
+.faqGlyph::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: currentColor;
+}
+
+.faqGlyph::before {
+  width: 100%;
+  height: 2px;
+  transform: translate(-50%, -50%);
+}
+
+.faqGlyph::after {
+  width: 2px;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.faqItem[open] .faqGlyph {
+  transform: rotate(135deg);
+  color: var(--primary);
+}
+
+.faqAnswer {
+  padding-bottom: 1.6rem;
+}
+
+@media (min-width: 40rem) {
+  .faqAnswer {
+    margin-left: 3.45rem;
+    padding-left: 1.1rem;
+    border-left: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Closing — every card indexed, one final action
+--------------------------------------------------------------------------- */
+
+.closingRail {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  border-block: 1px solid var(--lp-hairline-strong);
+}
+
+.closingRailChip {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  border-right: 1px solid var(--lp-hairline);
+  white-space: nowrap;
+}
+
+.closingRailChip:last-child {
+  border-right: none;
+}
+
+.closingRailIdx {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--primary);
+}
+
+.closingRailName {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .closingHeading {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCopy {
-  opacity: 0;
-  transform: translate3d(0, 12px, 0);
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCta {
+  .closingRailChip {
   opacity: 0;
   transform: translate3d(0, 8px, 0);
 }
 
-@media (min-width: 40rem) {
-  .root[data-motion-enabled="true"]
-    [data-motion-group="library"][data-motion-state="pending"]
-    .libraryArrow {
-    transform: translate3d(-16px, 0, 0);
-  }
-
-  .root[data-motion-enabled="true"]
-    [data-motion-group="pricing"][data-motion-state="pending"]
-    .pricingZero {
-    transform: translate3d(-6%, 0, 0) scale(0.96);
-  }
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingRailChip {
+  transition:
+    opacity 340ms var(--lp-ease-out),
+    transform 340ms var(--lp-ease-out);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .ctaArrow {
-    transition: transform 160ms var(--landing-ease-out);
-  }
-
-  .ctaButton:hover .ctaArrow {
-    transform: translate3d(3px, 0, 0);
-  }
-
-  /* The MCP capability list keeps the existing editorial reveal, then lets
-     one concrete agent action take focus on hover. */
-  .mcpToolName {
-    transition:
-      color 180ms var(--landing-ease-out),
-      opacity 180ms var(--landing-ease-out),
-      transform 200ms var(--landing-ease-out);
-  }
-
-  .mcpToolList:hover .mcpToolName {
-    opacity: 0.35;
-  }
-
-  .mcpToolList li:hover .mcpToolName {
-    color: var(--primary);
-    opacity: 1;
-    transform: translate3d(4px, 0, 0);
-  }
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingRailChip:nth-child(2) {
+  transition-delay: 60ms;
 }
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingRailChip:nth-child(3) {
+  transition-delay: 120ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingRailChip:nth-child(4) {
+  transition-delay: 180ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingRailChip:nth-child(5) {
+  transition-delay: 240ms;
+}
+
+.closingHeading {
+  font-stretch: 93%;
+}
+
+.onceStamp {
+  display: inline-block;
+  padding: 0 0.16em 0.06em;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 2px;
+  transform: rotate(-1.5deg);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .onceStamp {
+  opacity: 0;
+  transform: rotate(-1.5deg) scale(1.14);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .onceStamp {
+  transition:
+    opacity 300ms var(--lp-ease-out) 340ms,
+    transform 300ms var(--lp-ease-out) 340ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingHeading,
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCopy,
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCta {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingHeading {
+  transition:
+    opacity 520ms var(--lp-ease-out) 140ms,
+    transform 520ms var(--lp-ease-out) 140ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCopy {
+  transition:
+    opacity 420ms var(--lp-ease-out) 240ms,
+    transform 420ms var(--lp-ease-out) 240ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCta {
+  transition:
+    opacity 380ms var(--lp-ease-out) 320ms,
+    transform 380ms var(--lp-ease-out) 320ms;
+}
+
+.closingRoute {
+  width: 2px;
+  height: 2.4rem;
+  background: linear-gradient(to bottom, transparent, var(--primary));
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the page stays complete and beautiful, at rest
+--------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
+  .heroGridLines,
   .heroEyebrow,
   .heroCopy,
   .heroCta {
-    animation: hero-fade-enter 140ms var(--landing-ease-out) both;
-    transform: none;
+    animation: lp-fade-in 140ms var(--lp-ease-out) both;
   }
 
-  .heroLine {
+  .heroLine,
+  .boardMarkOutline,
+  .dossierEnter {
     animation: none;
     transform: none;
+    opacity: 1;
   }
 
-  .root[data-motion-enabled="true"] .librarySource,
-  .root[data-motion-enabled="true"] .libraryArrow,
-  .root[data-motion-enabled="true"] .mcpTargetLabel,
-  .root[data-motion-enabled="true"] .mcpToolItem,
-  .root[data-motion-enabled="true"] .libraryCaption,
-  .root[data-motion-enabled="true"] .pricingZero,
-  .root[data-motion-enabled="true"] .pricingMessage,
-  .root[data-motion-enabled="true"] .pricingNote,
-  .root[data-motion-enabled="true"] .closingHeading,
-  .root[data-motion-enabled="true"] .closingCopy,
-  .root[data-motion-enabled="true"] .closingCta,
-  .ctaArrow {
-    opacity: 1;
+  .boardSpine {
+    animation: none;
+    opacity: 0.5;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  /* Static “after”: the stack rests aligned and indexed. */
+  .dossierSlot {
+    transform: none;
+    will-change: auto;
+  }
+
+  .dossierParallax {
     transform: none;
     transition: none;
+  }
+
+  .dossier,
+  .heroCards:hover .dossier {
+    opacity: 1;
+    transition: none;
+  }
+
+  .header,
+  .ctaArrow,
+  .dossierParallax,
+  .faqGlyph {
+    transition: none;
+  }
+
+  .ctaButton:hover .ctaArrow,
+  .ctaButton:active .ctaArrow {
+    transform: none;
   }
 
   .ctaButton:active {
@@ -344,13 +1546,7 @@
     transform: none;
   }
 
-  .mcpToolName {
-    transition:
-      color 180ms var(--landing-ease-out),
-      opacity 180ms var(--landing-ease-out);
-  }
-
-  .mcpToolList li:hover .mcpToolName {
-    transform: none;
+  .schemaPulse {
+    opacity: 0;
   }
 }

@@ -6,8 +6,10 @@ import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
+import { HeroBoard } from "@/components/landing/hero-board"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
+import { McpSchematic } from "@/components/landing/mcp-schematic"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
@@ -29,6 +31,15 @@ export const metadata: Metadata = {
   },
 }
 
+/** Decorative index rail in the closing chapter. Visual examples only. */
+const closingRailSkills = [
+  { idx: "001", name: "code-review" },
+  { idx: "002", name: "pdf-extraction" },
+  { idx: "003", name: "brand-voice" },
+  { idx: "004", name: "sql-migrations" },
+  { idx: "005", name: "release-notes" },
+] as const
+
 function primaryAction(signedIn: boolean): {
   href: "/library" | "/sign-up"
   label: string
@@ -43,15 +54,15 @@ function HomeHeaderActionsFallback() {
     <div className="flex items-center gap-1.5">
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
-        <Skeleton className="hidden h-8 w-16 rounded-lg sm:block" />
-        <Skeleton className="h-8 w-28 rounded-lg sm:h-10 sm:w-40" />
+        <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
+        <Skeleton className="h-8 w-28 rounded-[3px] sm:h-10 sm:w-40" />
       </nav>
     </div>
   )
 }
 
 function HomeCtaFallback() {
-  return <Skeleton className="h-12 w-56 rounded-lg" aria-busy="true" />
+  return <Skeleton className="h-12 w-56 rounded-[3px]" aria-busy="true" />
 }
 
 function primaryCtaEventProperties(
@@ -77,7 +88,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           <Button
             size="sm"
             variant="ghost"
-            className="hidden sm:inline-flex"
+            className="hidden rounded-[3px] sm:inline-flex"
             nativeButton={false}
             render={<Link href="/sign-in" />}
           >
@@ -238,216 +249,246 @@ function GitHubMark() {
 
 export default function HomePage() {
   return (
-    <main
-      className={`${styles.root} app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
+    <div
+      className={`${styles.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
       data-landing-motion-root
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
-      <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
+
+      <header className={styles.header}>
+        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
           <Brand />
+          <div className={`${styles.headerTicks} hidden md:block`} aria-hidden="true" />
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
         </div>
       </header>
 
-      <section className="border-b border-border/70">
-        <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-4 py-16 md:px-8 md:py-20 lg:min-h-[min(40rem,calc(100dvh-4.5rem))] lg:grid-cols-12 lg:content-center lg:items-end lg:gap-x-10 lg:py-20">
-          <div className="flex w-full min-w-0 flex-col items-start lg:col-span-8">
-            <p className={`${styles.heroEyebrow} mb-5 text-sm font-semibold text-primary`}>
-              Skills selected by your team
-            </p>
-            <h1 className="text-balance text-[clamp(2.75rem,6.5vw,6rem)] font-semibold leading-[0.92] tracking-display">
-              <span className={`${styles.heroLine} ${styles.heroLineFirst} block`}>
-                Your team&apos;s skills.
-              </span>
-              <span className={`${styles.heroLine} ${styles.heroLineSecond} block text-primary`}>
-                All in one place.
-              </span>
-            </h1>
-          </div>
+      <main>
+        {/* Hero — full-viewport skill routing table */}
+        <section className={`${styles.hero} ${styles.grain}`} data-hero-scene>
+          <div className="relative mx-auto flex w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:min-h-[calc(100dvh-3.5rem)] lg:py-16">
+            <div className={styles.heroGridLines} aria-hidden="true" />
 
-          <div className="flex w-full flex-col items-start lg:col-span-4 lg:pb-1">
-            <p className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
-              Build a shared, searchable library so everyone knows which skills to use and where to find them.
-            </p>
-            <div className={`${styles.heroCta} mt-7`}>
-              <Suspense fallback={<HomeCtaFallback />}>
-                <HomeHeroActions />
-              </Suspense>
+            <div className="relative z-[1]">
+              <p className={styles.heroEyebrow}>Skills selected by your team</p>
+              <h1
+                className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
+              >
+                <span className={styles.heroLineMask}>
+                  <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
+                    Your team&apos;s skills.
+                  </span>
+                </span>
+                <span className={styles.heroLineMask}>
+                  <span
+                    className={`${styles.heroLine} ${styles.heroLineSecond} text-primary`}
+                  >
+                    All in one place.
+                  </span>
+                </span>
+              </h1>
             </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="mcp" aria-labelledby="mcp-heading" className="scroll-mt-20 border-y border-border/70 bg-accent/30">
-        <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
-          <div className="w-full">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">MCP access</p>
-            <h2 id="mcp-heading" className="mt-4 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
-              Bring your team&apos;s skills into your agent.
-            </h2>
-            <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Connect Skills Board through MCP. Your agent can search the shared library and retrieve install commands with read-only access.
-            </p>
-            <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
-              <ShieldCheckIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-              <p>Sign in securely through your browser—there&apos;s no API key to copy.</p>
-            </div>
-            <div className="mt-7">
-              <Suspense fallback={<HomeCtaFallback />}>
-                <HomeMcpActions />
-              </Suspense>
-            </div>
-          </div>
-
-          <figure
-            className="w-full"
-            aria-label="Skills Board connects a shared team library to an MCP-compatible agent"
-            data-motion-group="library"
-          >
-            <div className="grid border-y border-border py-7 sm:grid-cols-[minmax(0,0.9fr)_auto_minmax(0,1.1fr)] sm:items-center sm:gap-8 sm:py-9">
-              <div className={styles.librarySource}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                  Team library
-                </p>
-                <p className="mt-2 max-w-[12ch] text-3xl font-semibold tracking-[-0.045em] md:text-4xl">
-                  Skills your team recommends
-                </p>
+            <div className="relative z-[3] mt-9 lg:mt-12 lg:max-w-[34rem]">
+              <p
+                className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
+              >
+                Build a shared, searchable library so everyone knows which skills
+                to use and where to find them.
+              </p>
+              <div className={`${styles.heroCta} mt-7`}>
+                <Suspense fallback={<HomeCtaFallback />}>
+                  <HomeHeroActions />
+                </Suspense>
               </div>
+            </div>
 
-              <div className={`${styles.libraryArrow} my-6 flex flex-col items-center gap-2 text-primary sm:my-0`}>
-                <span className="rounded-full border border-primary/35 bg-background/70 px-2.5 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.16em]">MCP</span>
-                <ArrowRightIcon className="size-7 rotate-90 sm:rotate-0" aria-hidden="true" />
-              </div>
+            <HeroBoard />
+          </div>
+        </section>
 
-              <div>
-                <p className={`${styles.mcpTargetLabel} text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground`}>
-                  Inside your agent
+        {/* MCP — the signature routing chapter */}
+        <section
+          id="mcp"
+          aria-labelledby="mcp-heading"
+          className={`${styles.mcpChapter} scroll-mt-14 border-b border-border/70`}
+          data-mcp-chapter
+        >
+          <div className={styles.mcpSticky}>
+            <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(19rem,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16 lg:py-0">
+              <div className="w-full">
+                <p className={`${styles.chapterMark} uppercase`}>
+                  <span className={styles.chapterMarkIdx} aria-hidden="true">
+                    002
+                  </span>
+                  MCP access
                 </p>
-                <ul
-                  className={`${styles.mcpToolList} mt-3 flex flex-col gap-2`}
-                  aria-label="Available MCP actions"
+                <h2
+                  id="mcp-heading"
+                  className="mt-5 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
                 >
-                  {["Search team skills", "Find saved recommendations", "Get install commands"].map((tool) => (
-                    <li key={tool} className={styles.mcpToolItem}>
-                      <span
-                        className={`${styles.mcpToolName} inline-block text-xl font-semibold tracking-[-0.03em] md:text-2xl lg:text-3xl`}
-                      >
-                        {tool}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                  Bring your team&apos;s skills into your agent.
+                </h2>
+                <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
+                  Connect Skills Board through MCP. Your agent can search the
+                  shared library and retrieve install commands with read-only
+                  access.
+                </p>
+                <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+                  <ShieldCheckIcon
+                    className="mt-0.5 size-4 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
+                  <p>
+                    Sign in securely through your browser—there&apos;s no API key
+                    to copy.
+                  </p>
+                </div>
+                <div className="mt-7">
+                  <Suspense fallback={<HomeCtaFallback />}>
+                    <HomeMcpActions />
+                  </Suspense>
+                </div>
               </div>
-            </div>
-            <figcaption className={`${styles.libraryCaption} mt-5 text-sm leading-relaxed text-muted-foreground`}>
-              Choose Claude, Cursor, VS Code, or another MCP-compatible client. The same library remains available in Skills Board.
-            </figcaption>
-          </figure>
-        </div>
-      </section>
 
-      <section
-        id="pricing"
-        aria-labelledby="pricing-heading"
-        className="border-b border-primary/30 bg-primary text-primary-foreground"
-      >
-        <div
-          className="mx-auto grid w-full max-w-[1440px] gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20"
+              <McpSchematic />
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing — the zero monument */}
+        <section
+          id="pricing"
+          aria-labelledby="pricing-heading"
+          className={`${styles.pricingSection} ${styles.grain} scroll-mt-14`}
           data-motion-group="pricing"
         >
-          <p
-            className={`${styles.pricingZero} select-none text-[clamp(9rem,25vw,22rem)] font-semibold leading-[0.68] tracking-[-0.09em]`}
-            aria-hidden="true"
-          >
-            0
-          </p>
+          <div className="mx-auto w-full max-w-[1440px] px-5 py-20 md:px-10 md:py-28 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.65fr)] lg:items-end lg:gap-6">
+            <div className={styles.pricingZeroWrap} aria-hidden="true">
+              <p className={styles.pricingZero}>0</p>
+              <p className={styles.pricingZeroLayer} data-layer="alert">
+                0
+              </p>
+              <p className={styles.pricingZeroLayer} data-layer="ink">
+                0
+              </p>
+            </div>
 
-          <div className="max-w-lg lg:pb-2">
-            <h2
-              id="pricing-heading"
-              className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-display md:text-7xl`}
-            >
-              Free. Forever.
-            </h2>
-            <p className={`${styles.pricingMessage} mt-6 text-xl leading-relaxed md:text-2xl`}>
-              Skills Board is free to use and open source.
-            </p>
-            <p className={`${styles.pricingNote} mt-8 border-t border-primary-foreground/30 pt-5 text-sm font-semibold`}>
-              No trial. No credit card. No paid tier.
-            </p>
+            <div className={`${styles.pricingCopy} mt-12 max-w-lg lg:mt-0 lg:pb-3`}>
+              <h2
+                id="pricing-heading"
+                className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-display md:text-7xl`}
+              >
+                Free. Forever.
+              </h2>
+              <p className={`${styles.pricingMessage} mt-6 text-xl leading-relaxed md:text-2xl`}>
+                Skills Board is free to use and open source.
+              </p>
+              <p
+                className={`${styles.pricingNote} ${styles.pricingNoteRule} mt-8 pt-5 font-mono text-sm font-semibold tracking-[0.02em]`}
+              >
+                No trial. No credit card. No paid tier.
+              </p>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section
-        id="faq"
-        aria-labelledby="faq-heading"
-        className="border-b border-border/70"
-      >
-        <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(16rem,0.75fr)_minmax(28rem,1.25fr)] lg:gap-20">
-          <div>
-            <h2
-              id="faq-heading"
-              className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl"
-            >
-              Common questions
-            </h2>
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
-              Straight answers about what Skills Board is, how it fits mixed agent setups, and what “recommended” means.
-            </p>
-          </div>
-
-          <div className="divide-y divide-border/80 border-y border-border/80">
-            {landingFaqs.map((faq) => (
-              <details key={faq.question} className="faq-disclosure group py-6">
-                <summary className="cursor-pointer list-none rounded-lg text-xl font-semibold tracking-[-0.03em] marker:content-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
-                  <span className="flex items-start justify-between gap-6">
-                    <span>{faq.question}</span>
-                    <span
-                      aria-hidden="true"
-                      className="mt-1 shrink-0 text-primary transition-transform duration-150 group-open:rotate-45"
-                    >
-                      +
-                    </span>
-                  </span>
-                </summary>
-                <p className="mt-4 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground">
-                  {faq.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <div
-          className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
-          data-motion-group="closing"
+        {/* FAQ — technical index */}
+        <section
+          id="faq"
+          aria-labelledby="faq-heading"
+          className="scroll-mt-14 border-b border-border/70"
         >
-          <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}>
-            Answer “which skill should I use?” <span className="text-primary">once.</span>
-          </h2>
-          <p className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}>
-            Save the recommendation where the whole team can find it. The next person can get started without asking where to look.
-          </p>
-          <div className={`${styles.closingCta} mt-8`}>
-            <Suspense fallback={<HomeCtaFallback />}>
-              <HomeFinalActions />
-            </Suspense>
-          </div>
-        </div>
-      </section>
+          <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(16rem,0.7fr)_minmax(28rem,1.3fr)] lg:gap-20">
+            <div>
+              <p className={`${styles.chapterMark} uppercase`}>
+                <span className={styles.chapterMarkIdx} aria-hidden="true">
+                  003
+                </span>
+                Index
+              </p>
+              <h2
+                id="faq-heading"
+                className="mt-5 max-w-[14ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
+              >
+                Common questions
+              </h2>
+              <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
+                Straight answers about what Skills Board is, how it fits mixed
+                agent setups, and what “recommended” means.
+              </p>
+            </div>
 
+            <div className="border-t border-border/80">
+              {landingFaqs.map((faq, index) => (
+                <details
+                  key={faq.question}
+                  className={`faq-disclosure ${styles.faqItem}`}
+                >
+                  <summary className={styles.faqSummary}>
+                    <span className={styles.faqIdx} aria-hidden="true">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className={styles.faqQuestion}>{faq.question}</span>
+                    <span className={styles.faqGlyph} aria-hidden="true" />
+                  </summary>
+                  <p
+                    className={`${styles.faqAnswer} max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground`}
+                  >
+                    {faq.answer}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Closing — everything indexed, one final action */}
+        <section className={styles.grain} data-motion-group="closing">
+          <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
+            <div className={styles.closingRail} aria-hidden="true">
+              {closingRailSkills.map((skill) => (
+                <span key={skill.idx} className={styles.closingRailChip}>
+                  <span className={styles.closingRailIdx}>{skill.idx}</span>
+                  <span className={styles.closingRailName}>{skill.name}</span>
+                </span>
+              ))}
+            </div>
+
+            <h2
+              className={`${styles.closingHeading} mt-14 max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
+            >
+              Answer “which skill should I use?”{" "}
+              <span className={styles.onceStamp}>once.</span>
+            </h2>
+            <p
+              className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}
+            >
+              Save the recommendation where the whole team can find it. The next
+              person can get started without asking where to look.
+            </p>
+            <div className={`${styles.closingRoute} mt-8 ml-6`} aria-hidden="true" />
+            <div className={styles.closingCta}>
+              <Suspense fallback={<HomeCtaFallback />}>
+                <HomeFinalActions />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer — open-source colophon */}
       <footer className="border-t border-border/70">
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
+        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <Brand />
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-3 md:justify-end">
-            <nav aria-label="Footer" className="flex items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
+            <nav
+              aria-label="Footer"
+              className="flex items-center gap-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            >
               <a href="#pricing" className="transition-colors hover:text-foreground">
                 Pricing
               </a>
@@ -460,13 +501,13 @@ export default function HomePage() {
               target="_blank"
               rel="noreferrer"
               aria-label="Skills Board on GitHub"
-              className="inline-flex size-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="inline-flex size-9 shrink-0 items-center justify-center rounded-[3px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               <GitHubMark />
             </a>
           </div>
         </div>
       </footer>
-    </main>
+    </div>
   )
 }

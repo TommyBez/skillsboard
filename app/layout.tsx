@@ -7,7 +7,11 @@ import { siteConfig } from "@/lib/site"
 
 import "./globals.css"
 
-const bricolage = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-bricolage" })
+const bricolage = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-bricolage",
+  axes: ["opsz", "wdth"],
+})
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
 export const metadata: Metadata = {
