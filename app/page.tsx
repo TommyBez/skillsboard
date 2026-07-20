@@ -239,13 +239,13 @@ function GitHubMark() {
 export default function HomePage() {
   return (
     <main
-      className={`${styles.root} app-canvas min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
+      className={`${styles.root} app-canvas min-h-dvh overflow-x-clip bg-background text-foreground`}
       data-landing-motion-root
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
       <header className="sticky top-0 z-30 border-b border-border/75 bg-background/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center justify-between gap-4 px-4 md:px-8">
+        <div className="mx-auto flex h-18 max-w-360 items-center justify-between gap-4 px-4 md:px-8">
           <Brand />
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
@@ -254,7 +254,7 @@ export default function HomePage() {
       </header>
 
       <section className="border-b border-border/70">
-        <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-10 px-4 py-16 md:px-8 md:py-20 lg:min-h-[min(40rem,calc(100dvh-4.5rem))] lg:grid-cols-12 lg:content-center lg:items-end lg:gap-x-10 lg:py-20">
+        <div className="mx-auto grid w-full max-w-360 grid-cols-1 gap-10 px-4 py-16 md:px-8 md:py-20 lg:min-h-[min(40rem,calc(100dvh-4.5rem))] lg:grid-cols-12 lg:content-center lg:items-end lg:gap-x-10 lg:py-20">
           <div className="flex w-full min-w-0 flex-col items-start lg:col-span-8">
             <p className={`${styles.heroEyebrow} mb-5 text-sm font-semibold text-primary`}>
               Skills selected by your team
@@ -270,7 +270,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex w-full flex-col items-start lg:col-span-4 lg:pb-1">
-            <p className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
+            <p className={`${styles.heroCopy} max-w-136 text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
               Build a shared, searchable library so everyone knows which skills to use and where to find them.
             </p>
             <div className={`${styles.heroCta} mt-7`}>
@@ -283,7 +283,7 @@ export default function HomePage() {
       </section>
 
       <section id="mcp" aria-labelledby="mcp-heading" className="scroll-mt-20 border-y border-border/70 bg-accent/30">
-        <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
+        <div className="mx-auto grid w-full max-w-360 gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
           <div className="w-full">
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">MCP access</p>
             <h2 id="mcp-heading" className="mt-4 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
@@ -356,7 +356,7 @@ export default function HomePage() {
         className="border-b border-primary/30 bg-primary text-primary-foreground"
       >
         <div
-          className="mx-auto grid w-full max-w-[1440px] gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20"
+          className="mx-auto grid w-full max-w-360 gap-10 overflow-hidden px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.55fr)] lg:items-end lg:gap-20"
           data-motion-group="pricing"
         >
           <p
@@ -388,7 +388,7 @@ export default function HomePage() {
         aria-labelledby="faq-heading"
         className="border-b border-border/70"
       >
-        <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(16rem,0.75fr)_minmax(28rem,1.25fr)] lg:gap-20">
+        <div className="mx-auto grid w-full max-w-360 gap-12 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(16rem,0.75fr)_minmax(28rem,1.25fr)] lg:gap-20">
           <div>
             <h2
               id="faq-heading"
@@ -426,7 +426,7 @@ export default function HomePage() {
 
       <section>
         <div
-          className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-4 py-20 md:px-8 md:py-28"
+          className="mx-auto flex w-full max-w-360 flex-col items-start px-4 py-20 md:px-8 md:py-28"
           data-motion-group="closing"
         >
           <h2 className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.75rem,6vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}>
@@ -444,7 +444,7 @@ export default function HomePage() {
       </section>
 
       <footer className="border-t border-border/70">
-        <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
+        <div className="mx-auto flex w-full max-w-360 flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-8">
           <Brand />
           <div className="flex flex-wrap items-center gap-x-5 gap-y-3 md:justify-end">
             <nav aria-label="Footer" className="flex items-center gap-4 text-sm text-muted-foreground">
