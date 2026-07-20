@@ -11,9 +11,9 @@ import { getGitHubMetadata } from "@/lib/github"
 import {
   discoverGitHubSkills,
   GitHubSkillDiscoveryError,
-  resolveGitHubSkill,
 } from "@/lib/github-skill-discovery"
 import { captureTeamEvent } from "@/lib/posthog-server"
+import { saveSkillToLibrary } from "@/lib/save-skill"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
 const githubRepositorySchema = z.object({
@@ -70,54 +70,18 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
     return { ok: false as const, error: "Check the repository, selected skill, tags, and note, then try again." }
   }
 
-  try {
-    const repository = await resolveGitHubSkill(
-      parsed.data.githubUrl,
-      parsed.data.skillPath,
-    )
-    const selectedSkill = repository.skill
-
-    const existing = await db.select({ id: skill.id }).from(skill).where(and(eq(skill.organizationId, organizationId), eq(skill.githubUrl, repository.githubUrl), eq(skill.skillName, selectedSkill.name))).limit(1)
-    if (existing.length) return { ok: false as const, error: "This skill is already in your team library" }
-    const note = parsed.data.note || null
-    await db.insert(skill).values({
-      organizationId,
-      createdBy: userId,
-      githubUrl: repository.githubUrl,
-      skillName: selectedSkill.name,
-      title: selectedSkill.name.replaceAll("-", " "),
-      description: selectedSkill.description,
-      repoOwner: repository.repoOwner,
-      repoName: repository.repoName,
-      repoStars: repository.repoStars,
-      repoUpdatedAt: repository.repoUpdatedAt,
-      skillPath: selectedSkill.path,
-      tags: [...new Set(parsed.data.tags.map((tag) => tag.toLowerCase()))],
-      note,
-    })
-    updateTag(cacheTags.organizationSkills(organizationId))
-    captureTeamEvent({
-      distinctId: userId,
-      event: "skill_saved",
-      properties: {
-        skill_name: selectedSkill.name,
-        repo_owner: repository.repoOwner,
-        repo_name: repository.repoName,
-        tag_count: parsed.data.tags.length,
-        has_note: Boolean(note),
-      },
-      teamId: organizationId,
-    })
-    return { ok: true as const }
-  } catch (error) {
-    console.error("Unable to save skill", error)
-    return {
-      ok: false as const,
-      error: error instanceof GitHubSkillDiscoveryError
-        ? error.message
-        : "We couldn’t fetch this repository or save the skill. Check the URL and try again.",
-    }
-  }
+  const result = await saveSkillToLibrary({
+    organizationId,
+    userId,
+    githubUrl: parsed.data.githubUrl,
+    skillPath: parsed.data.skillPath,
+    tags: parsed.data.tags,
+    note: parsed.data.note,
+    surface: "web",
+  })
+  if (!result.ok) return { ok: false as const, error: result.error }
+  updateTag(cacheTags.organizationSkills(organizationId))
+  return { ok: true as const }
 }
 
 const updateSkillNoteSchema = z.object({

@@ -53,7 +53,7 @@ export function ConsentForm() {
           disabled={pendingChoice !== null}
           onClick={() => decide(true)}
         >
-          {pendingChoice === "accept" ? "Allowing…" : "Allow read-only access"}
+          {pendingChoice === "accept" ? "Allowing…" : "Allow access"}
         </Button>
       </div>
     </div>

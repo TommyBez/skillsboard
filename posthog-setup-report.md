@@ -18,7 +18,7 @@ The production baseline starts with the successful production deployment of this
 | `mcp_setup_viewed` | An identified user opened the MCP connection guide. | `components/mcp-setup-analytics.tsx` |
 | `mcp_client_selected` | User selected one of the bounded client setup guides. | `components/mcp-setup-guide.tsx` |
 | `mcp_config_copied` | User successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx`, `app/(app)/settings/mcp/page.tsx` |
-| `mcp_authorization_approved` | User approved read-only MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
+| `mcp_authorization_approved` | User approved MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_authorization_denied` | User denied MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_tool_used` | An authenticated MCP client called a Skills Board tool, with the bounded tool name and success state. | `app/api/[transport]/route.ts` |
 | `signup_form_submitted` | A signup form was submitted, distinguished between a new-team path and a team invitation. | `components/auth-form.tsx` |

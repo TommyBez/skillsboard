@@ -321,8 +321,8 @@ export default function HomePage() {
                 </h2>
                 <p className="mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
                   Connect Skills Board through MCP. Your agent can search the
-                  shared library and retrieve install commands with read-only
-                  access.
+                  shared library, retrieve install commands, and save new
+                  skills it discovers.
                 </p>
                 <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
                   <ShieldCheckIcon
