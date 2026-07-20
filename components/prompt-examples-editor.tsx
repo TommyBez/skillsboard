@@ -54,9 +54,11 @@ export function PromptExamplesEditor({
   }
 
   function removePrompt(id: number) {
+    const fallbackId = nextId.current
+    nextId.current += 1
     setPrompts((current) => {
       const next = current.filter((prompt) => prompt.id !== id)
-      return next.length ? next : [{ id: nextId.current++, value: "" }]
+      return next.length ? next : [{ id: fallbackId, value: "" }]
     })
   }
 
