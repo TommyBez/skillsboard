@@ -3,7 +3,7 @@ export const siteConfig = {
   url: "https://skillsboard.sh",
   description:
     "Build a shared library of AI skills your team recommends. Give teammates the source, command, or ZIP so they can choose what fits their setup.",
-  tagline: "One shared library. Different agents.",
+  tagline: "Your team’s skills. All in one place.",
   ogDescription: "Keep your team’s recommended AI skills in one searchable place.",
   githubUrl: "https://github.com/TommyBez/skillsboard",
   locale: "en_US",

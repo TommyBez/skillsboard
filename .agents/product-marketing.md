@@ -1,9 +1,9 @@
 # Product Marketing Context
 
-*Last updated: July 15, 2026*
+*Last updated: July 20, 2026*
 
 ## Product Overview
-**One-liner:** Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find them and choose the usage path that fits their agent setup.
+**One-liner:** Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find and reuse them.
 
 **What it does:** A team saves skills it considers useful in one searchable library. Teammates can see what the team recommends, understand where each skill comes from, and choose the most suitable way to use its latest source: open the repository, copy an install command, or download the skill as a ZIP.
 
@@ -25,7 +25,7 @@
 
 **Decision-makers:** Hands-on team leads, product leaders, design leaders, engineering leaders, AI enablement leads, and individual contributors who help their teammates adopt useful skills.
 
-**Primary use case:** Give the whole team one place to find the skills the team recommends and choose an appropriate usage path for their agent or setup.
+**Primary use case:** Give the whole team one place to collect, find, and reuse the skills it recommends.
 
 **Jobs to be done:**
 - Stop answering the same questions about which skill to use and where to find it.
@@ -123,9 +123,9 @@
 - "Un posto dove raccogliere le skills che il team ritiene valide."
 - "Tutti i membri del team possono attingere da lì per installarle negli agent che utilizzano."
 - "Ognuno può scegliere la maniera più congeniale per utilizzare la skill."
-- "One shared library. Different agents."
+- "Your team's skills. All in one place."
 
-**Words to use:** recommended by your team, shared skill library, find the right skill, use your preferred agent, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
+**Words to use:** recommended by your team, shared skill library, all in one place, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
 
 **Words to avoid:** skill champion, GitHub-backed, approved skill, verified skill, trusted skill, universal compatibility, works with every agent, automatically synchronized, agent capability platform, AI-native knowledge infrastructure, enterprise governance, unlock, supercharge, revolutionize
 
@@ -181,7 +181,7 @@
 | Open access | Hosted product free forever and open-source code |
 
 ## Goals
-**Business goal:** Make Skills Board the default place teams use to share AI skill recommendations across different agent setups.
+**Business goal:** Make Skills Board the default shared library teams use to collect and reuse their AI skill recommendations.
 
 **Conversion action:** Create a team library.
 

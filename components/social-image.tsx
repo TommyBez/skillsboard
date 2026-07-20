@@ -79,8 +79,8 @@ export function SocialImage({ height }: { height: number }) {
               letterSpacing: -4.8,
             }}
           >
-            <span>One shared library.</span>
-            <span style={{ color: "#00843d" }}>Different agents.</span>
+            <span>Your team&apos;s skills.</span>
+            <span style={{ color: "#00843d" }}>All in one place.</span>
           </div>
         </div>
 

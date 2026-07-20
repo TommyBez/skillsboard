@@ -36,13 +36,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: siteConfig.locale,
     url: siteConfig.url,
-    title: "Skills Board: One shared library. Different agents.",
+    title: "Skills Board: Your team’s skills. All in one place.",
     description: siteConfig.ogDescription,
     siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Skills Board: One shared library. Different agents.",
+    title: "Skills Board: Your team’s skills. All in one place.",
     description: siteConfig.ogDescription,
   },
   robots: {

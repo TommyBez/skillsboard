@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     url: "/",
-    title: "Skills Board: One shared library. Different agents.",
+    title: "Skills Board: Your team’s skills. All in one place.",
     description: siteConfig.ogDescription,
   },
 }
@@ -212,17 +212,17 @@ export default function HomePage() {
             </p>
             <h1 className="text-balance text-[clamp(2.75rem,6.5vw,6rem)] font-semibold leading-[0.92] tracking-display">
               <span className={`${styles.heroLine} ${styles.heroLineFirst} block`}>
-                One shared library.
+                Your team&apos;s skills.
               </span>
               <span className={`${styles.heroLine} ${styles.heroLineSecond} block text-primary`}>
-                Different agents.
+                All in one place.
               </span>
             </h1>
           </div>
 
           <div className="flex w-full flex-col items-start lg:col-span-4 lg:pb-1">
             <p className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}>
-              Keep your team&apos;s recommended skills in one place, so everyone knows where to find and use them.
+              Build a shared, searchable library so everyone knows which skills to use and where to find them.
             </p>
             <div className={`${styles.heroCta} mt-7`}>
               <Suspense fallback={<HomeCtaFallback />}>

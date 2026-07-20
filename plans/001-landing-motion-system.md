@@ -9,15 +9,15 @@
 ## Problem
 
 The landing page has a strong editorial hierarchy but almost no motion. The hero,
-the central “shared library to different agents” explanation, the pricing promise,
+the central “team-recommended skills in one place” explanation, the pricing promise,
 and the closing CTA all appear fully assembled. Runtime inspection confirmed that
 only the existing 150ms button and brand transitions are active.
 
 ```tsx
 // app/page.tsx:102 — current hero
 <h1 className="text-balance text-[clamp(2.75rem,7vw,7rem)] font-semibold leading-[0.9] tracking-[-0.065em]">
-  <span className="block">One shared library.</span>
-  <span className="block text-primary">Different agents.</span>
+  <span className="block">Your team&apos;s skills.</span>
+  <span className="block text-primary">All in one place.</span>
 </h1>
 ```
 
