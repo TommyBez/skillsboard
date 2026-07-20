@@ -18,7 +18,11 @@ export function ConsentForm() {
     try {
       const result = await authClient.oauth2.consent({ accept })
       if (result.data?.url) {
-        captureAnalyticsEvent(accept ? "mcp_authorization_approved" : "mcp_authorization_denied")
+        captureAnalyticsEvent(
+          accept ? "mcp_authorization_approved" : "mcp_authorization_denied",
+          undefined,
+          { send_instantly: true, transport: "sendBeacon" },
+        )
         window.location.assign(result.data.url)
         return
       }

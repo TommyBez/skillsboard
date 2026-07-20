@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
@@ -146,11 +147,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
             href="#mcp"
             analytics={{
               event: "mcp_entry_clicked",
-              properties: {
-                destination: "#mcp",
-                location: "landing_hero",
-                visitor_state: signedIn ? "signed_in" : "anonymous",
-              },
+              properties: mcpEntryEventProperties(signedIn, "landing_hero", "#mcp"),
             }}
           />
         )}
@@ -180,11 +177,7 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
           href={href}
           analytics={{
             event: "mcp_entry_clicked",
-            properties: {
-              destination: href,
-              location: "landing_section",
-              visitor_state: signedIn ? "signed_in" : "anonymous",
-            },
+            properties: mcpEntryEventProperties(signedIn, "landing_section", href),
           }}
         />
       )}

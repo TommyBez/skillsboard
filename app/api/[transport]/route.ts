@@ -49,7 +49,7 @@ async function route(request: Request) {
         description: "List every skill saved across the authenticated user's team libraries",
         inputSchema: {},
       }, async () => trackMcpToolCall(jwt.sub!, "list_skills", async () => ({
-        content: [{ type: "text", text: JSON.stringify(await listUserSkills(jwt.sub!), null, 2) }],
+        content: [{ type: "text" as const, text: JSON.stringify(await listUserSkills(jwt.sub!), null, 2) }],
       })))
 
       server.registerTool("search_skills", {

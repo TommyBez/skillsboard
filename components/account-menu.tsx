@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 
 interface AccountMenuProps {
   user: { name: string; email: string }
@@ -61,11 +62,7 @@ export function AccountMenu({ user }: AccountMenuProps) {
                 href="/settings/mcp"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: {
-                    destination: "/settings/mcp",
-                    location: "account_menu",
-                    visitor_state: "signed_in",
-                  },
+                  properties: mcpEntryEventProperties(true, "account_menu", "/settings/mcp"),
                 }}
               />
             )}

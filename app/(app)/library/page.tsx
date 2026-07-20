@@ -12,6 +12,7 @@ import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
+import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getAppContext } from "@/lib/app-context"
 import {
   countOrganizationMembers,
@@ -255,11 +256,7 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
                 href="/settings/mcp"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: {
-                    destination: "/settings/mcp",
-                    location: "library_header",
-                    visitor_state: "signed_in",
-                  },
+                  properties: mcpEntryEventProperties(true, "library_header", "/settings/mcp"),
                 }}
               />
             )}
