@@ -38,7 +38,7 @@ export async function sendSignInOtp(input: SendSignInOtpInput): Promise<void> {
 
   if (error) {
     console.error("Failed to send sign-in OTP email", {
-      idempotencyKey,
+      name: error.name,
       message: error.message,
     })
     throw new Error(`Failed to send sign-in OTP email: ${error.message}`)

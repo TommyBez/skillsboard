@@ -3,11 +3,13 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowRightIcon } from "lucide-react"
 
+import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { landingFaqs } from "@/lib/seo/landing-faq"
@@ -26,7 +28,10 @@ export const metadata: Metadata = {
   },
 }
 
-function primaryAction(signedIn: boolean) {
+function primaryAction(signedIn: boolean): {
+  href: "/library" | "/sign-up"
+  label: string
+} {
   return signedIn
     ? { href: "/library", label: "Open your library" }
     : { href: "/sign-up", label: "Create your team library" }
@@ -46,6 +51,18 @@ function HomeHeaderActionsFallback() {
 
 function HomeCtaFallback() {
   return <Skeleton className="h-12 w-56 rounded-lg" aria-busy="true" />
+}
+
+function primaryCtaEventProperties(
+  signedIn: boolean,
+  location: "header" | "hero" | "closing",
+): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
+  const primary = primaryAction(signedIn)
+  return {
+    destination: primary.href,
+    location,
+    visitor_state: signedIn ? "signed_in" : "anonymous",
+  }
 }
 
 function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
@@ -70,7 +87,15 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           size="sm"
           className={`${styles.ctaButton} sm:h-10 sm:px-4`}
           nativeButton={false}
-          render={<Link href={primary.href} />}
+          render={(
+            <TrackedLink
+              href={primary.href}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties(signedIn, "header"),
+              }}
+            />
+          )}
         >
           <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
           <span className="hidden sm:inline">{primary.label}</span>
@@ -97,7 +122,15 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
       size="lg"
       className={styles.ctaButton}
       nativeButton={false}
-      render={<Link href={primary.href} />}
+      render={(
+        <TrackedLink
+          href={primary.href}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: primaryCtaEventProperties(signedIn, "hero"),
+          }}
+        />
+      )}
     >
       {primary.label}
       <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
@@ -118,7 +151,15 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
       size="lg"
       className={styles.ctaButton}
       nativeButton={false}
-      render={<Link href={primary.href} />}
+      render={(
+        <TrackedLink
+          href={primary.href}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: primaryCtaEventProperties(signedIn, "closing"),
+          }}
+        />
+      )}
     >
       {primary.label}
       <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />

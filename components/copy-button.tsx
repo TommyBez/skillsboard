@@ -2,8 +2,11 @@
 
 import { useState } from "react"
 import { CheckIcon, CircleXIcon, CopyIcon } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
+import {
+  captureClientAnalyticsEvent,
+  type ClientAnalyticsEvent,
+} from "@/lib/analytics-client"
 
 interface CopyButtonProps {
   value: string
@@ -12,6 +15,7 @@ interface CopyButtonProps {
   iconOnly?: boolean
   ariaLabel?: string
   copiedAriaLabel?: string
+  analytics?: ClientAnalyticsEvent
 }
 
 async function writeToClipboard(value: string) {
@@ -39,6 +43,7 @@ export function CopyButton({
   iconOnly = false,
   ariaLabel,
   copiedAriaLabel,
+  analytics,
 }: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
 
@@ -46,6 +51,7 @@ export function CopyButton({
     try {
       await writeToClipboard(value)
       setStatus("copied")
+      if (analytics) captureClientAnalyticsEvent(analytics)
     } catch {
       setStatus("failed")
     }

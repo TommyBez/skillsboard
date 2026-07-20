@@ -86,7 +86,7 @@ async function InvitationPanel() {
   const canInvite = activeOrganization.role === "owner" || activeOrganization.role === "admin"
 
   return (
-    <section className="mt-8 rounded-[16px] border bg-card p-5 sm:p-6">
+    <section id="invite" className="mt-8 scroll-mt-24 rounded-[16px] border bg-card p-5 sm:p-6">
       <div className="max-w-2xl">
         <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Invitation</p>
         <h2 className="mt-2 text-2xl font-semibold tracking-tight">Invite a teammate</h2>

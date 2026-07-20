@@ -5,13 +5,24 @@ import { DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
+import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { SkillDossier } from "@/components/skill-dossier"
+import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
-import { listOrganizationSkills } from "@/lib/db/queries"
+import {
+  countOrganizationMembers,
+  countPendingOrganizationInvitations,
+  listOrganizationSkills,
+} from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
+import {
+  getLibraryFilterState,
+  getLibraryNavigationKey,
+  isInvitePromptEligible,
+} from "@/lib/library-view-state"
 import { isOrganizationAdmin } from "@/lib/session"
 
 interface LibraryPageProps {
@@ -51,6 +62,12 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const userId = session.user.id
   const canManageLibrary = isOrganizationAdmin(role)
   const allSkills = await listOrganizationSkills(activeId)
+  const [memberCount, pendingInvitationCount] = canManageLibrary && allSkills.length > 0
+    ? await Promise.all([
+        countOrganizationMembers(activeId),
+        countPendingOrganizationInvitations(activeId),
+      ])
+    : [0, 0]
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
     (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
@@ -58,6 +75,14 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
   const hasFilters = Boolean(query || params.tag)
+  const filterState = getLibraryFilterState(query, params.tag)
+  const analyticsNavigationKey = getLibraryNavigationKey(query, params.tag)
+  const showInvitePrompt = isInvitePromptEligible({
+    canManageLibrary,
+    memberCount,
+    pendingInvitationCount,
+    skillCount: allSkills.length,
+  })
   const libraryHref = (next: { q?: string; tag?: string | null }) => {
     const search = new URLSearchParams()
     const nextQuery = next.q === undefined ? params.q : next.q
@@ -70,6 +95,12 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
 
   return (
     <>
+      <TeamLibraryAnalytics
+        filterState={filterState}
+        navigationKey={analyticsNavigationKey}
+        skillCount={allSkills.length}
+        teamId={activeId}
+      />
       <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
         <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <div className="grid gap-2">
@@ -98,6 +129,10 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         ) : null}
       </section>
 
+      {showInvitePrompt ? (
+        <InviteTeammatePrompt teamId={activeId} />
+      ) : null}
+
       {skills.length ? (
         <section aria-label="Team skill recommendations" className="grid gap-4 md:grid-cols-2">
           {skills.map((item) => {
@@ -118,6 +153,12 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 addedBy={item.addedByName ?? "Unknown"}
                 href={item.githubUrl}
                 hrefLabel="Open source"
+                tracking={{
+                  actorIsSkillCreator: canEditNote,
+                  skillId: item.id,
+                  skillName: item.skillName,
+                  teamId: activeId,
+                }}
                 actions={(
                   <div className="flex flex-wrap items-center gap-2">
                     {canEditNote ? (

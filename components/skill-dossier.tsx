@@ -2,7 +2,9 @@ import type { ReactNode } from "react"
 import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { TrackedAnchor } from "@/components/tracked-anchor"
 import { Badge } from "@/components/ui/badge"
+import type { ClientAnalyticsEvent } from "@/lib/analytics-client"
 import { cn } from "@/lib/utils"
 
 function GitHubMark({ className }: { className?: string }) {
@@ -16,6 +18,13 @@ function GitHubMark({ className }: { className?: string }) {
       <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.009-.866-.013-1.7-2.782.605-3.369-1.343-3.369-1.343-.455-1.159-1.11-1.468-1.11-1.468-.908-.62.069-.608.069-.608 1.003.071 1.531 1.031 1.531 1.031.892 1.53 2.341 1.088 2.91.832.091-.647.349-1.088.635-1.338-2.221-.253-4.555-1.112-4.555-4.947 0-1.093.39-1.987 1.029-2.686-.103-.253-.446-1.27.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.026 2.747-1.026.546 1.38.203 2.397.1 2.65.64.699 1.028 1.593 1.028 2.686 0 3.844-2.337 4.691-4.566 4.94.359.31.679.923.679 1.86 0 1.343-.012 2.426-.012 2.757 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.523 2 12 2Z" />
     </svg>
   )
+}
+
+interface SkillUsageTracking {
+  actorIsSkillCreator: boolean
+  skillId: string
+  skillName: string
+  teamId: string
 }
 
 interface SkillDossierProps {
@@ -36,6 +45,26 @@ interface SkillDossierProps {
   actions?: ReactNode
   className?: string
   headingLevel?: "h2" | "h3"
+  tracking?: SkillUsageTracking
+}
+
+function getSkillUsageAnalytics(
+  tracking: SkillUsageTracking | undefined,
+  method: "command" | "source",
+): ClientAnalyticsEvent | undefined {
+  if (!tracking) return undefined
+
+  return {
+    event: "skill_usage_path_selected",
+    properties: {
+      actor_is_skill_creator: tracking.actorIsSkillCreator,
+      method,
+      skill_id: tracking.skillId,
+      skill_name: tracking.skillName,
+      surface: "library",
+      team_id: tracking.teamId,
+    },
+  }
 }
 
 export function SkillDossier({
@@ -55,6 +84,7 @@ export function SkillDossier({
   actions,
   className,
   headingLevel = "h3",
+  tracking,
 }: SkillDossierProps) {
   const Heading = headingLevel
   const addedByInitials = addedBy
@@ -65,6 +95,8 @@ export function SkillDossier({
         .slice(0, 2)
         .toUpperCase()
     : null
+  const commandAnalytics = getSkillUsageAnalytics(tracking, "command")
+  const sourceAnalytics = getSkillUsageAnalytics(tracking, "source")
 
   return (
     <article
@@ -136,6 +168,7 @@ export function SkillDossier({
               value={command}
               ariaLabel={`Copy install command for ${name}`}
               copiedAriaLabel={`Copied install command for ${name}`}
+              analytics={commandAnalytics}
               compact
               iconOnly
             />
@@ -144,14 +177,17 @@ export function SkillDossier({
         {details || href || actions ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
             {details ? details : href ? (
-              <a aria-label={`${hrefLabel} for ${name}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary" href={href} target="_blank" rel="noreferrer">
-                {href.includes("github.com") ? (
-                  <GitHubMark className="size-4" />
-                ) : (
-                  hrefLabel
-                )}
+              <TrackedAnchor
+                analytics={sourceAnalytics}
+                aria-label={`${hrefLabel} for ${name}`}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
                 <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
-              </a>
+              </TrackedAnchor>
             ) : <span />}
             {actions}
           </div>

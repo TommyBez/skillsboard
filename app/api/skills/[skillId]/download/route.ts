@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { getUserSkill } from "@/lib/db/queries"
 import { buildLatestSkillArchive, SkillArchiveError } from "@/lib/github-skill-archive"
-import { getPostHogClient } from "@/lib/posthog-server"
+import { captureTeamEvent } from "@/lib/posthog-server"
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
@@ -40,19 +40,7 @@ export async function GET(
     const archive = await buildLatestSkillArchive(savedSkill)
     const bytes = new Uint8Array(archive.bytes)
 
-    const posthog = getPostHogClient()
-    posthog.capture({
-      distinctId: session.user.id,
-      event: "skill_downloaded",
-      properties: {
-        skill_id: skillId,
-        skill_name: savedSkill.skillName,
-        github_url: savedSkill.githubUrl,
-      },
-    })
-    await posthog.shutdown()
-
-    return new Response(bytes, {
+    const response = new Response(bytes, {
       status: 200,
       headers: {
         "Cache-Control": "private, no-store",
@@ -62,6 +50,21 @@ export async function GET(
         "X-Content-Type-Options": "nosniff",
       },
     })
+
+    captureTeamEvent({
+      distinctId: session.user.id,
+      event: "skill_downloaded",
+      properties: {
+        actor_is_skill_creator: savedSkill.createdBy === session.user.id,
+        skill_id: skillId,
+        skill_name: savedSkill.skillName,
+        method: "zip",
+        surface: "library",
+      },
+      teamId: savedSkill.organizationId,
+    })
+
+    return response
   } catch (error) {
     if (error instanceof SkillArchiveError) {
       return errorResponse(error.message, error.status)

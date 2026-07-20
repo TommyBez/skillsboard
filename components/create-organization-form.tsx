@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 const initialState = { error: "" }
 
 interface CreateOrganizationFormProps {
+  creationSurface?: "onboarding" | "in_app"
   idPrefix?: string
   submitLabel?: string
   pendingLabel?: string
@@ -27,6 +28,7 @@ function SubmitButton({ submitLabel, pendingLabel }: { submitLabel: string; pend
 }
 
 export function CreateOrganizationForm({
+  creationSurface = "onboarding",
   idPrefix = "create-org",
   submitLabel = "Create team library",
   pendingLabel = "Creating library…",
@@ -35,6 +37,7 @@ export function CreateOrganizationForm({
 
   return (
     <form action={action} className="flex flex-col gap-7">
+      <input type="hidden" name="creationSurface" value={creationSurface} />
       <FieldGroup className="gap-5">
         <Field>
           <FieldLabel

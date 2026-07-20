@@ -163,11 +163,11 @@
 5. They follow the option that is compatible with their agent and setup.
 
 ## Proof Points
-**Metrics:** None approved yet.
+**Metrics:** No production metric is validated for public claims yet.
 
-**Customers:** None approved for public use yet.
+**Customers:** No attributable customer has recorded consent for public use yet.
 
-**Testimonials:** None approved yet.
+**Testimonials:** No testimonial has recorded publication consent yet.
 
 **Value themes:**
 | Theme | Product evidence |
