@@ -41,6 +41,7 @@ type TeamEventPropertiesMap = {
     creation_surface: "in_app" | "onboarding"
   }
   skill_saved: {
+    example_prompt_count: number
     has_note: boolean
     repo_name: string
     repo_owner: string
@@ -79,6 +80,10 @@ type TeamEventPropertiesMap = {
   }
   skill_note_updated: {
     has_note: boolean
+    skill_id: string
+  }
+  skill_example_prompts_updated: {
+    example_prompt_count: number
     skill_id: string
   }
   skill_deleted: {

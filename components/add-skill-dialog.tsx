@@ -5,6 +5,7 @@ import { GitBranchIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkill, discoverRepositorySkills } from "@/app/actions/skills"
+import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -133,11 +134,16 @@ export function AddSkillDialog({
     setPendingMode("save")
     try {
       const note = String(formData.get("note") ?? "").trim()
+      const examplePrompts = formData
+        .getAll("examplePrompts")
+        .map((prompt) => String(prompt).trim())
+        .filter(Boolean)
       const result = await addSkill({
         githubUrl: inspectedUrl,
         skillPath: selectedPath,
         tags: String(formData.get("tags") ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
         ...(note ? { note } : {}),
+        examplePrompts,
       })
       if (!result.ok) {
         toast.error(result.error)
@@ -228,6 +234,7 @@ export function AddSkillDialog({
                   <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />
                   <FieldDescription>Shared with your team in the library. Up to 500 characters.</FieldDescription>
                 </Field>
+                <PromptExamplesEditor disabled={pendingMode !== null} />
                 <Field>
                   <FieldLabel htmlFor="tags">Tags (optional)</FieldLabel>
                   <Input id="tags" name="tags" placeholder="research, productivity" />

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
+import { ArrowUpRightIcon, GitForkIcon, MessageSquareQuoteIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
 import { TrackedAnchor } from "@/components/tracked-anchor"
@@ -31,6 +31,7 @@ interface SkillDossierProps {
   name: string
   description?: string | null
   note?: string | null
+  examplePrompts?: string[]
   source: string
   command: string
   metric?: string
@@ -71,6 +72,7 @@ export function SkillDossier({
   name,
   description,
   note,
+  examplePrompts = [],
   source,
   command,
   metric,
@@ -134,6 +136,39 @@ export function SkillDossier({
             <p className={cn("rounded-lg bg-accent/50 px-3 py-2 text-pretty leading-relaxed text-foreground/90", compact ? "line-clamp-2 text-sm" : "line-clamp-4 text-sm md:text-base")}>
               {note}
             </p>
+          ) : null}
+          {examplePrompts.length ? (
+            <div className="mt-1 rounded-xl border border-primary/15 bg-primary/[0.045] p-3.5">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                  <MessageSquareQuoteIcon className="size-3.5" aria-hidden="true" />
+                  Example {examplePrompts.length === 1 ? "prompt" : "prompts"}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    {examplePrompts.length} {examplePrompts.length === 1 ? "prompt" : "prompts"}
+                  </span>
+                  <CopyButton
+                    value={examplePrompts[0]}
+                    ariaLabel={`Copy first example prompt for ${name}`}
+                    copiedAriaLabel={`Copied first example prompt for ${name}`}
+                    compact
+                    iconOnly
+                  />
+                </div>
+              </div>
+              <p className={cn(
+                "text-pretty text-sm leading-relaxed text-foreground/90",
+                compact ? "line-clamp-2" : "line-clamp-3",
+              )}>
+                “{examplePrompts[0]}”
+              </p>
+              {examplePrompts.length > 1 ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  +{examplePrompts.length - 1} more in the shared prompt list
+                </p>
+              ) : null}
+            </div>
           ) : null}
         </div>
 

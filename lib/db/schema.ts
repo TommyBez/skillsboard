@@ -176,6 +176,7 @@ export const skill = pgTable("skill", {
   skillPath: text("skillPath"),
   tags: text("tags").array().notNull().default([]),
   note: text("note"),
+  examplePrompts: text("examplePrompts").array().notNull().default([]),
   metadataRefreshedAt: timestamp("metadataRefreshedAt").notNull().defaultNow(),
   createdAt: timestamp("createdAt").notNull().defaultNow(),
   updatedAt: timestamp("updatedAt").notNull().defaultNow(),

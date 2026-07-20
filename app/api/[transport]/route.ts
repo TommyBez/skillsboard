@@ -54,7 +54,7 @@ async function route(request: Request) {
 
       server.registerTool("search_skills", {
         title: "Search team skills",
-        description: "Search saved team skills by name, description, note, repository, or tag",
+        description: "Search saved team skills by name, description, note, example prompt, repository, or tag",
         inputSchema: { query: z.string().min(1) },
       }, async ({ query }) => trackMcpToolCall(jwt.sub!, "search_skills", async () => {
         const skills = await listUserSkills(jwt.sub!)
@@ -63,7 +63,7 @@ async function route(request: Request) {
           content: [{
             type: "text" as const,
             text: JSON.stringify(skills.filter((skill) => (
-              `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`
+              `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.examplePrompts.join(" ")} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`
                 .toLowerCase()
                 .includes(normalized)
             )), null, 2),
