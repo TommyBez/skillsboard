@@ -123,7 +123,7 @@ The pSEO module is a bounded Acquisition action, not a page factory. It research
 - `canonical_intent_id` is normalized locale plus audience/problem plus intent, independent of page format.
 - Quantitative fields keep their source, market/language, `as_of`, and `available|unavailable|broken` status. Missing is never zero; Google Ads competition is not organic keyword difficulty.
 - Pulse owns and versions the `demand_gate` formula, window, completeness rule, and threshold from available demand evidence. Credentials alone never constitute demand.
-- DataForSEO is used automatically when credentials, target market/language, request cap, and spend cap are configured. Without them it is `unavailable`; the pulse continues with other evidence and does not request per-run approval.
+- DataForSEO is used automatically when credentials, target market/language, request cap, and spend cap are configured. The base64-encoded `login:password` credential is available in `.env.local` as `DATA_FOR_SEO_LOGIN_PASSWORD`. Without credentials or caps it is `unavailable`; the pulse continues with other evidence and does not request per-run approval.
 - Qualitative evidence may justify one experimental page PR when product fit, unique value, current sources, honest claims, canonical/indexation handling, measurement, and rollback checks pass. Quantitative demand can justify up to three pages in one intent cluster.
 - The PR itself is the human checkpoint. No separate pilot approval or approval key exists.
 - After deployment, evaluate indexation, Search Console query/page impressions, page-attributable CTA or signup intent, and activated teams only when their attribution is operational. Pause a pattern after two comparable mature misses.
