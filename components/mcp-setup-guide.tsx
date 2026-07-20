@@ -203,6 +203,15 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     },
   ]
   const [activeClient, setActiveClient] = useState(clients[0].id)
+  const activeGuide = clients.find((item) => item.id === activeClient) ?? clients[0]
+  const headerCopyValue =
+    activeGuide.steps.find((step) => step.snippet)?.snippet ?? config
+  const headerCopyLabel =
+    activeGuide.id === "claude-desktop"
+      ? "Copy MCP URL"
+      : activeGuide.id === "claude-code"
+        ? "Copy command"
+        : "Copy MCP config"
 
   function selectClient(value: string) {
     setActiveClient(value)
@@ -221,9 +230,12 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
           </p>
         </div>
         <CopyButton
-          value={config}
-          label="Copy MCP config"
-          analytics={{ event: "mcp_config_copied", properties: { client: "generic" } }}
+          value={headerCopyValue}
+          label={headerCopyLabel}
+          analytics={{
+            event: "mcp_config_copied",
+            properties: { client: activeGuide.analyticsId },
+          }}
         />
       </div>
 
