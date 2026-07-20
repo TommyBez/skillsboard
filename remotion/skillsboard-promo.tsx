@@ -15,10 +15,7 @@ import { MicroScaleFade } from "@/components/remocn/micro-scale-fade";
 import { PerCharacterRise } from "@/components/remocn/per-character-rise";
 import { pushThrough } from "@/components/remocn/push-through";
 import { ShaderMeshGradient } from "@/components/remocn/shader-mesh-gradient";
-import {
-  type TerminalLine,
-  TerminalSimulator,
-} from "@/components/remocn/terminal-simulator";
+import { SimulatedCursor } from "@/components/remocn/simulated-cursor";
 
 const SANS = "Bricolage Grotesque";
 const MONO = "Geist Mono";
@@ -43,15 +40,19 @@ const CANVAS = "#f7f8f4"; // --background
 const INK = "#17231b"; // --foreground
 const MUTED = "#5e6b61"; // --muted-foreground
 const ACCENT = "#00843d"; // --primary
-const SURFACE_INK = "#1b2620"; // --surface-ink
-const SURFACE_INK_CHROME = "#243129";
+const CARD = "#fdfdf8"; // --card
+const BORDER = "#d6d9cb"; // --border
+const CHIP = "#e4ead9"; // --accent (soft green chip)
+const CHIP_TEXT = "#2c4a35"; // --accent-foreground
 
-// Frame budget (~20.6s @ 30fps): sequence durations minus transition overlaps.
-export const HOOK = 135;
-export const POSITIONING = 120;
-export const PRODUCT = 185;
-export const FEATURES = 125;
-export const CTA = 120;
+const MONO_STACK = `'${MONO}', ui-monospace, monospace`;
+
+// Frame budget (~21.8s @ 30fps): sequence durations minus transition overlaps.
+export const HOOK = 100;
+export const POSITIONING = 110;
+export const PRODUCT = 290;
+export const FEATURES = 105;
+export const CTA = 115;
 const T_FADE = 15;
 const T_PUSH = 18;
 const T_FOCUS = 18;
@@ -64,21 +65,7 @@ export const PROMO_DURATION =
   CTA -
   (T_FADE + T_PUSH + T_FOCUS + T_FADE);
 
-const TERMINAL_LINES: TerminalLine[] = [
-  {
-    text: "npx skills add coreyhaines31/marketingskills",
-    type: "command",
-    delay: 6,
-  },
-  { text: "Fetching latest source from GitHub...", type: "log", delay: 8 },
-  { text: "✓ seo-audit installed for Claude Code", type: "success", delay: 10 },
-  {
-    text: "✓ Recommended by your team on Skills Board",
-    type: "success",
-    delay: 8,
-    pause: 24,
-  },
-];
+const EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1);
 
 function LogoMark({ size }: { size: number }) {
   return (
@@ -108,13 +95,23 @@ function HookScene() {
       >
         <KineticCenterBuild
           color={INK}
-          fontSize={62}
-          text="AI skills get lost in chats"
+          fontSize={64}
+          text="“Which skill should I use?”"
         />
       </AbsoluteFill>
     </AbsoluteFill>
   );
 }
+
+const SUBLINE_WORDS = [
+  { accent: false, text: "Your" },
+  { accent: false, text: "team’s" },
+  { accent: false, text: "skills." },
+  { accent: true, text: "All" },
+  { accent: true, text: "in" },
+  { accent: true, text: "one" },
+  { accent: true, text: "place." },
+];
 
 function PositioningScene() {
   const frame = useCurrentFrame();
@@ -124,71 +121,536 @@ function PositioningScene() {
       style={{
         alignItems: "center",
         background: CANVAS,
-        gap: 30,
+        gap: 28,
         justifyContent: "center",
       }}
     >
       <div
         style={{
           opacity: interpolate(frame, [0, 18], [0, 1], {
-            easing: Easing.bezier(0.16, 1, 0.3, 1),
+            easing: EASE_OUT,
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           }),
           scale: `${interpolate(frame, [0, 18], [0.7, 1], {
-            easing: Easing.bezier(0.16, 1, 0.3, 1),
+            easing: EASE_OUT,
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           })}`,
         }}
       >
-        <LogoMark size={84} />
+        <LogoMark size={80} />
       </div>
-      <div style={{ height: 130, position: "relative", width: "100%" }}>
-        <PerCharacterRise color={INK} fontSize={92} text="Skills Board" />
+      <div style={{ height: 122, position: "relative", width: "100%" }}>
+        <PerCharacterRise color={INK} fontSize={88} text="Skills Board" />
       </div>
-      <Sequence from={30} layout="none" name="Positioning subline">
-        <div style={{ height: 48, position: "relative", width: "100%" }}>
-          <MicroScaleFade
-            color={MUTED}
-            fontSize={30}
-            fontWeight={500}
-            text="Your team's skills. All in one place."
-          />
-        </div>
-      </Sequence>
+      <div
+        style={{
+          display: "flex",
+          fontSize: 32,
+          fontWeight: 600,
+          gap: 10,
+        }}
+      >
+        {SUBLINE_WORDS.map((word, i) => {
+          const start = 32 + i * 4;
+          const ease = Easing.bezier(0.4, 0, 0.2, 1);
+          return (
+            <span
+              key={`${word.text}-${i}`}
+              style={{
+                color: word.accent ? ACCENT : INK,
+                display: "inline-block",
+                filter: `blur(${interpolate(frame, [start, start + 24], [5, 0], {
+                  easing: ease,
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                })}px)`,
+                opacity: interpolate(frame, [start, start + 26], [0, 1], {
+                  easing: ease,
+                  extrapolateLeft: "clamp",
+                  extrapolateRight: "clamp",
+                }),
+                translate: `0 ${interpolate(
+                  frame,
+                  [start, start + 28],
+                  [8, 0],
+                  {
+                    easing: ease,
+                    extrapolateLeft: "clamp",
+                    extrapolateRight: "clamp",
+                  },
+                )}px`,
+              }}
+            >
+              {word.text}
+            </span>
+          );
+        })}
+      </div>
     </AbsoluteFill>
   );
 }
 
-function ProductScene() {
+// ---------------------------------------------------------------------------
+// Product reveal — a faithful sim of the Library view (app/(app)/library).
+// Timeline (local frames):
+//   0–30   window + header enter
+//   12–48  dossier cards stagger in
+//   70–130 cursor reaches search, types "review"
+//   ~112   library filters down to code-review
+//   ~154   cursor clicks "Copy" on the install command → Copied + toast
+// ---------------------------------------------------------------------------
+
+const WINDOW_X = 90;
+const WINDOW_Y = 56;
+const WINDOW_W = 1100;
+const WINDOW_H = 608;
+
+const DOSSIERS = [
+  {
+    installShort: "npx skills add acme/engineering-skills…",
+    match: true,
+    name: "code-review",
+    source: "acme/engineering-skills",
+    tags: ["review", "ci"],
+  },
+  {
+    installShort: "npx skills add acme/brand-kit…",
+    match: false,
+    name: "brand-voice",
+    source: "acme/brand-kit",
+    tags: ["writing", "brand"],
+  },
+  {
+    installShort: "npx skills add drizzle-team/skills…",
+    match: false,
+    name: "sql-migrations",
+    source: "drizzle-team/skills",
+    tags: ["database"],
+  },
+  {
+    installShort: "npx skills add vercel/skills…",
+    match: false,
+    name: "release-notes",
+    source: "vercel/skills",
+    tags: ["shipping", "docs"],
+  },
+];
+
+const SEARCH_QUERY = "review";
+const TYPE_START = 100;
+const TYPE_END = 128;
+const FILTER_AT = 136;
+const CLICK_AT = 174;
+const TOAST_AT = 188;
+
+function NavPill({ active, label }: { active?: boolean; label: string }) {
   return (
-    <AbsoluteFill
+    <div
       style={{
-        alignItems: "center",
-        background: CANVAS,
-        justifyContent: "center",
-        padding: 60,
+        background: active ? CHIP : "transparent",
+        borderRadius: 8,
+        color: active ? CHIP_TEXT : MUTED,
+        fontSize: 13,
+        fontWeight: 500,
+        padding: "5px 12px",
       }}
     >
-      <div style={{ height: 480, width: 960 }}>
-        <TerminalSimulator
-          background={SURFACE_INK}
-          chromeColor={SURFACE_INK_CHROME}
-          chunkSize={2}
-          fontSize={20}
-          lines={TERMINAL_LINES}
-          title="~/acme — install a team skill"
-        />
+      {label}
+    </div>
+  );
+}
+
+function DossierCard({
+  dossier,
+  frame,
+  index,
+}: {
+  dossier: (typeof DOSSIERS)[number];
+  frame: number;
+  index: number;
+}) {
+  const startFrame = 12 + index * 9;
+  const dimmed = frame >= FILTER_AT && !dossier.match;
+  const highlighted = frame >= FILTER_AT && dossier.match;
+  const copied = frame >= CLICK_AT + 4 && dossier.match;
+
+  const enterOpacity = interpolate(
+    frame,
+    [startFrame, startFrame + 16],
+    [0, 1],
+    { easing: EASE_OUT, extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+  );
+  const filterOpacity = dimmed
+    ? interpolate(frame, [FILTER_AT, FILTER_AT + 14], [1, 0.14], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      })
+    : 1;
+
+  return (
+    <div
+      style={{
+        background: CARD,
+        border: `1px solid ${highlighted ? ACCENT : BORDER}`,
+        borderRadius: 12,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        opacity: enterOpacity * filterOpacity,
+        padding: "14px 16px 12px",
+        translate: `0 ${interpolate(
+          frame,
+          [startFrame, startFrame + 18],
+          [18, 0],
+          {
+            easing: EASE_OUT,
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          },
+        )}px`,
+      }}
+    >
+      <div
+        style={{
+          alignItems: "center",
+          color: MUTED,
+          display: "flex",
+          fontFamily: MONO_STACK,
+          fontSize: 11.5,
+          gap: 6,
+        }}
+      >
+        <span style={{ color: ACCENT, fontWeight: 600 }}>
+          #{String(index + 1).padStart(2, "0")}
+        </span>
+        <span>⑂ {dossier.source}</span>
       </div>
+      <div
+        style={{
+          color: INK,
+          fontSize: 21,
+          fontWeight: 600,
+          letterSpacing: "-0.035em",
+        }}
+      >
+        {dossier.name}
+      </div>
+      <div style={{ display: "flex", gap: 6 }}>
+        {dossier.tags.map((tag) => (
+          <span
+            key={tag}
+            style={{
+              background: CHIP,
+              borderRadius: 6,
+              color: CHIP_TEXT,
+              fontSize: 11.5,
+              fontWeight: 500,
+              padding: "2px 8px",
+            }}
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div
+        style={{
+          alignItems: "center",
+          background: "#f4f5ee",
+          border: `1px solid ${BORDER}`,
+          borderRadius: 8,
+          display: "flex",
+          gap: 8,
+          justifyContent: "space-between",
+          marginTop: 2,
+          padding: "6px 8px 6px 10px",
+        }}
+      >
+        <span
+          style={{
+            color: MUTED,
+            fontFamily: MONO_STACK,
+            fontSize: 11.5,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {dossier.installShort}
+        </span>
+        <span
+          style={{
+            background: copied ? ACCENT : "#ffffff",
+            border: `1px solid ${copied ? ACCENT : BORDER}`,
+            borderRadius: 6,
+            color: copied ? "#ffffff" : INK,
+            flexShrink: 0,
+            fontSize: 11.5,
+            fontWeight: 600,
+            padding: "3px 10px",
+          }}
+        >
+          {copied ? "Copied ✓" : "Copy"}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function ProductScene() {
+  const frame = useCurrentFrame();
+
+  const typedChars = Math.round(
+    interpolate(frame, [TYPE_START, TYPE_END], [0, SEARCH_QUERY.length], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+  );
+  const typed = SEARCH_QUERY.slice(0, typedChars);
+  const searchFocused = frame >= TYPE_START - 6;
+  const caretVisible = searchFocused && Math.floor(frame / 15) % 2 === 0;
+
+  return (
+    <AbsoluteFill style={{ background: CANVAS }}>
+      <div
+        style={{
+          background: CARD,
+          border: `1px solid ${BORDER}`,
+          borderRadius: 16,
+          boxShadow: "0 18px 50px rgba(23,35,27,0.13)",
+          height: WINDOW_H,
+          left: WINDOW_X,
+          opacity: interpolate(frame, [0, 16], [0, 1], {
+            easing: EASE_OUT,
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          }),
+          overflow: "hidden",
+          position: "absolute",
+          top: WINDOW_Y,
+          translate: `0 ${interpolate(frame, [0, 20], [26, 0], {
+            easing: EASE_OUT,
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          })}px`,
+          width: WINDOW_W,
+        }}
+      >
+        {/* App header */}
+        <div
+          style={{
+            alignItems: "center",
+            borderBottom: `1px solid ${BORDER}`,
+            display: "flex",
+            gap: 14,
+            height: 56,
+            padding: "0 20px",
+          }}
+        >
+          <div style={{ alignItems: "center", display: "flex", gap: 8 }}>
+            <LogoMark size={22} />
+            <span style={{ color: INK, fontSize: 16, fontWeight: 600 }}>
+              Skills Board
+            </span>
+          </div>
+          <div
+            style={{
+              border: `1px solid ${BORDER}`,
+              borderRadius: 10,
+              display: "flex",
+              gap: 2,
+              padding: 3,
+            }}
+          >
+            <NavPill active label="Library" />
+            <NavPill label="Find skills" />
+            <NavPill label="Connect agent" />
+          </div>
+          <div
+            style={{
+              alignItems: "center",
+              display: "flex",
+              gap: 8,
+              marginLeft: "auto",
+            }}
+          >
+            <span
+              style={{
+                alignItems: "center",
+                background: CHIP,
+                borderRadius: 6,
+                color: CHIP_TEXT,
+                display: "flex",
+                fontFamily: MONO_STACK,
+                fontSize: 11,
+                fontWeight: 600,
+                height: 24,
+                justifyContent: "center",
+                width: 24,
+              }}
+            >
+              A
+            </span>
+            <span style={{ color: INK, fontSize: 13, fontWeight: 500 }}>
+              Acme
+            </span>
+          </div>
+        </div>
+
+        {/* Library content */}
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+            padding: "18px 24px 20px",
+          }}
+        >
+          <div
+            style={{
+              alignItems: "baseline",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            <span
+              style={{
+                color: INK,
+                fontSize: 24,
+                fontWeight: 600,
+                letterSpacing: "-0.035em",
+              }}
+            >
+              Team library
+            </span>
+            <span
+              style={{ color: MUTED, fontFamily: MONO_STACK, fontSize: 12.5 }}
+            >
+              {frame >= FILTER_AT ? "1 of 4 skills" : "4 team skills · 7 tags"}
+            </span>
+          </div>
+
+          {/* Search */}
+          <div
+            style={{
+              alignItems: "center",
+              background: "#ffffff",
+              border: `1.5px solid ${searchFocused ? ACCENT : BORDER}`,
+              borderRadius: 10,
+              display: "flex",
+              gap: 10,
+              height: 42,
+              padding: "0 14px",
+            }}
+          >
+            <svg fill="none" height="15" viewBox="0 0 24 24" width="15">
+              <circle cx="11" cy="11" r="7" stroke={MUTED} strokeWidth="2" />
+              <path
+                d="M20 20l-3.5-3.5"
+                stroke={MUTED}
+                strokeLinecap="round"
+                strokeWidth="2"
+              />
+            </svg>
+            {typed ? (
+              <span style={{ color: INK, fontSize: 14.5, fontWeight: 500 }}>
+                {typed}
+              </span>
+            ) : (
+              <span style={{ color: MUTED, fontSize: 14.5 }}>
+                Search by task, repo, or tag…
+              </span>
+            )}
+            {caretVisible ? (
+              <span
+                style={{
+                  background: INK,
+                  height: 18,
+                  marginLeft: typed ? -6 : -8,
+                  width: 1.5,
+                }}
+              />
+            ) : null}
+          </div>
+
+          {/* Dossier grid */}
+          <div
+            style={{
+              display: "grid",
+              gap: 14,
+              gridTemplateColumns: "1fr 1fr",
+            }}
+          >
+            {DOSSIERS.map((dossier, i) => (
+              <DossierCard
+                dossier={dossier}
+                frame={frame}
+                index={i}
+                key={dossier.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Toast */}
+        <div
+          style={{
+            alignItems: "center",
+            background: INK,
+            borderRadius: 10,
+            bottom: 18,
+            boxShadow: "0 8px 24px rgba(23,35,27,0.25)",
+            color: "#f2f3eb",
+            display: "flex",
+            fontSize: 13,
+            fontWeight: 500,
+            gap: 8,
+            opacity: interpolate(frame, [TOAST_AT, TOAST_AT + 12], [0, 1], {
+              easing: EASE_OUT,
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+            padding: "10px 16px",
+            position: "absolute",
+            right: 18,
+            translate: `0 ${interpolate(
+              frame,
+              [TOAST_AT, TOAST_AT + 12],
+              [16, 0],
+              {
+                easing: EASE_OUT,
+                extrapolateLeft: "clamp",
+                extrapolateRight: "clamp",
+              },
+            )}px`,
+          }}
+        >
+          <span style={{ color: "#6bd58f", fontWeight: 700 }}>✓</span>
+          Install command copied — ready for your agent
+        </div>
+      </div>
+
+      {/* Cursor overlay (frame coordinates). The first leg is a zero-length
+          travel so the initial hold doesn't swallow the real first move. */}
+      <SimulatedCursor
+        color={INK}
+        points={[
+          { hold: 0, x: 840, y: 600 },
+          { hold: 46, x: 840, y: 600 },
+          { hold: 56, x: 420, y: 196 },
+          { click: true, hold: 130, x: 580, y: 348 },
+        ]}
+        size={22}
+      />
     </AbsoluteFill>
   );
 }
 
 const FEATURES_LIST = [
-  { label: "Save a skill once", sub: "From any GitHub repository" },
-  { label: "Tag it for your team", sub: "Searchable by task and tag" },
-  { label: "Install it anywhere", sub: "Claude, Codex, Cursor & more" },
+  { label: "Save a skill once", sub: "One shared, searchable library" },
+  { label: "Search by task, repo, or tag", sub: "Everyone knows where to look" },
+  { label: "Use it with any agent", sub: "Claude, Codex, Cursor & more" },
 ];
 
 function FeatureCard({
@@ -201,20 +663,19 @@ function FeatureCard({
   sub: string;
 }) {
   const frame = useCurrentFrame();
-  const enter = Easing.bezier(0.16, 1, 0.3, 1);
 
   return (
     <div
       style={{
         alignItems: "center",
-        background: "#fdfdf8",
-        border: "1px solid #d6d9cb",
+        background: CARD,
+        border: `1px solid ${BORDER}`,
         borderRadius: 13,
         boxShadow: "0 1px 2px rgba(23,35,27,0.08)",
         display: "flex",
         gap: 20,
         opacity: interpolate(frame, [startFrame, startFrame + 16], [0, 1], {
-          easing: enter,
+          easing: EASE_OUT,
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
         }),
@@ -224,7 +685,7 @@ function FeatureCard({
           [startFrame, startFrame + 18],
           [26, 0],
           {
-            easing: enter,
+            easing: EASE_OUT,
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           },
@@ -281,11 +742,11 @@ function FeaturesScene() {
         justifyContent: "center",
       }}
     >
-      <div style={{ height: 56, position: "relative", width: "100%" }}>
+      <div style={{ height: 60, position: "relative", width: "100%" }}>
         <MicroScaleFade
           color={INK}
           fontSize={40}
-          text="One library, every agent"
+          text="Answer it once, for the whole team"
         />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -316,7 +777,7 @@ function CtaScene() {
         <MicroScaleFade
           color={INK}
           fontSize={44}
-          text="Put your team's skills in one place"
+          text="Create your team library"
         />
       </div>
       <Sequence from={22} layout="none" name="CTA domain">
@@ -338,7 +799,7 @@ export function SkillsboardPromo() {
     <AbsoluteFill
       style={
         {
-          "--font-geist-mono": `'${MONO}', ui-monospace, monospace`,
+          "--font-geist-mono": MONO_STACK,
           "--font-geist-sans": `'${SANS}', ui-sans-serif, sans-serif`,
           background: CANVAS,
           fontFamily: `'${SANS}', ui-sans-serif, sans-serif`,
