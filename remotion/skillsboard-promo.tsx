@@ -1,4 +1,5 @@
 import { loadFont } from "@remotion/fonts";
+import { Audio } from "@remotion/media";
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import {
@@ -66,6 +67,9 @@ export const PROMO_DURATION =
   (T_FADE + T_PUSH + T_FOCUS + T_FADE);
 
 const EASE_OUT = Easing.bezier(0.16, 1, 0.3, 1);
+
+// Global frame where the product scene starts (transitions overlap scenes).
+const PRODUCT_START = HOOK - T_FADE + POSITIONING - T_PUSH;
 
 function LogoMark({ size }: { size: number }) {
   return (
@@ -843,6 +847,24 @@ export function SkillsboardPromo() {
           <CtaScene />
         </TransitionSeries.Sequence>
       </TransitionSeries>
+
+      {/* UI sound effects, timed to the push/focus transitions and to the
+          cursor interaction inside the product scene. */}
+      <Sequence from={PRODUCT_START} name="SFX whoosh in">
+        <Audio src={staticFile("sfx/whoosh.wav")} volume={0.3} />
+      </Sequence>
+      <Sequence from={PRODUCT_START + CLICK_AT} name="SFX copy click">
+        <Audio src={staticFile("sfx/mouse-click.wav")} volume={0.7} />
+      </Sequence>
+      <Sequence from={PRODUCT_START + TOAST_AT} name="SFX toast">
+        <Audio src={staticFile("sfx/ding.wav")} volume={0.18} />
+      </Sequence>
+      <Sequence
+        from={PRODUCT_START + PRODUCT - T_FOCUS}
+        name="SFX whoosh out"
+      >
+        <Audio src={staticFile("sfx/whoosh.wav")} volume={0.3} />
+      </Sequence>
     </AbsoluteFill>
   );
 }

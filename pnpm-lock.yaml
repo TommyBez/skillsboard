@@ -26,6 +26,9 @@ importers:
       '@remotion/google-fonts':
         specifier: ^4.0.495
         version: 4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@remotion/media':
+        specifier: 4.0.495
+        version: 4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@remotion/transitions':
         specifier: ^4.0.495
         version: 4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1429,6 +1432,12 @@ packages:
 
   '@remotion/media-utils@4.0.495':
     resolution: {integrity: sha512-rLhmUkukLAAEy68WwZCwMGd7tM4dsksxmIdfe16uGZKvux6sC1CBPYBaX5hRbSUcJ+1cr8nNJrWS0Kv7DawvGA==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/media@4.0.495':
+    resolution: {integrity: sha512-5d8DxPxEWG5mRqWeG8m5mDsHTnjmhwNmCWrPejtSLRJIn08TeOsLmCH/QuLWcck+NYr5U+Y8NonnufCiwOqK0Q==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -5239,6 +5248,14 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       remotion: 4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+
+  '@remotion/media@4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
+    dependencies:
+      mediabunny: 1.50.8
+      react: 19.2.4
+      react-dom: 19.2.4(react@19.2.4)
+      remotion: 4.0.495(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      zod: 4.3.6
 
   '@remotion/paths@4.0.495': {}
 
