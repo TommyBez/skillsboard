@@ -4,7 +4,7 @@ import styles from "@/components/landing/landing-motion.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — restrained interface
- * fragments (name, source, command/file reference), never marketing claims.
+ * fragments (name, source, file reference), never marketing claims.
  * The whole board is aria-hidden; the hero copy carries the message.
  */
 const dossiers = [
@@ -13,34 +13,30 @@ const dossiers = [
     source: "github.com/acme/skills",
     ref: "SKILL.md",
     dir: "left",
-    density: "wide",
   },
   {
     name: "pdf-extraction",
     source: "internal / tools",
-    cmd: "npx skills add pdf-extraction",
+    ref: "SKILL.md",
     dir: "top",
-    density: "regular",
   },
   {
     name: "brand-voice",
     source: "notion export",
+    ref: "SKILL.md",
     dir: "right",
-    density: "compact",
   },
   {
     name: "sql-migrations",
     source: "skills/sql-migrations",
     ref: "SKILL.md",
     dir: "right",
-    density: "regular",
   },
   {
     name: "release-notes",
     source: "github.com/acme/skills",
-    cmd: "npx skills add release-notes",
+    ref: "SKILL.md",
     dir: "bottom",
-    density: "wide",
   },
 ] as const
 
@@ -48,17 +44,12 @@ type Dossier = (typeof dossiers)[number]
 
 function DossierCard({ dossier }: { dossier: Dossier }) {
   return (
-    <div className={styles.dossier} data-density={dossier.density}>
+    <div className={styles.dossier}>
       <div className={styles.dossierTop}>
         <p className={styles.dossierName}>{dossier.name}</p>
       </div>
       <p className={styles.dossierSource}>{dossier.source}</p>
-      {"cmd" in dossier && dossier.cmd ? (
-        <p className={styles.dossierCmd}>{dossier.cmd}</p>
-      ) : null}
-      {"ref" in dossier && dossier.ref ? (
-        <p className={styles.dossierRef}>{dossier.ref}</p>
-      ) : null}
+      <p className={styles.dossierRef}>{dossier.ref}</p>
     </div>
   )
 }

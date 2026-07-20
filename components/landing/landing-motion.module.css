@@ -429,14 +429,6 @@
     border-color 190ms var(--lp-ease-out);
 }
 
-.dossier[data-density="wide"] {
-  width: 15.5rem;
-}
-
-.dossier[data-density="compact"] {
-  width: 11.75rem;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .heroCards:hover .dossier {
     opacity: 0.55;
@@ -474,19 +466,6 @@
   font-size: 0.62rem;
   letter-spacing: 0.01em;
   color: var(--muted-foreground);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.dossierCmd {
-  margin-top: 0.55rem;
-  padding: 0.3rem 0.45rem;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--accent-foreground);
-  background: color-mix(in oklch, var(--primary) 9%, transparent);
-  border-left: 2px solid var(--primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
