@@ -5,15 +5,18 @@ import { useLayoutEffect } from "react"
 const VIEWPORT_THRESHOLD = 0.25
 const PARALLAX_MAX = 1
 
-/**
- * Fraction of min(hero height, viewport height) the user scrolls before the
- * hero dossiers finish converging. Small on purpose: the settled library is
- * the payoff, and it must land while the hero is still mostly on screen.
- */
-const ROUTE_PROGRESS_TRAVEL = 0.14
-
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
+}
+
+/** Scroll progress through a tall sticky chapter (same math as MCP). */
+function chapterProgress(el: HTMLElement) {
+  const rect = el.getBoundingClientRect()
+  const span = el.offsetHeight - window.innerHeight
+  if (span > 80) {
+    return clamp01(-rect.top / span)
+  }
+  return rect.top < window.innerHeight * 0.5 ? 1 : 0
 }
 
 /**
@@ -23,8 +26,8 @@ function clamp01(value: number) {
  * controller drives:
  *
  * - `data-scrolled` on the root (header command-strip background)
- * - `--route-progress` (hero dossiers converging from chaos into the stack)
- * - `--mcp-progress` (signal path drawing through the MCP chapter)
+ * - `--route-progress` (hero sticky chapter: dossiers filing into the library)
+ * - `--mcp-progress` (MCP sticky chapter: signal path drawing)
  * - `--px` / `--py` pointer parallax on the hero board (capped, pointer-fine)
  * - `data-page-hidden` (pauses ambient pulses when the tab is not visible)
  * - `data-motion-state` viewport reveals for below-the-fold groups
@@ -63,23 +66,17 @@ export function LandingMotionController() {
       }
 
       if (hero) {
-        const height = hero.offsetHeight || 1
-        const travel =
-          Math.min(height, window.innerHeight) * ROUTE_PROGRESS_TRAVEL
-        const progress = clamp01(y / Math.max(travel, 1))
-        root.style.setProperty("--route-progress", progress.toFixed(4))
+        root.style.setProperty(
+          "--route-progress",
+          chapterProgress(hero).toFixed(4)
+        )
       }
 
       if (mcp) {
-        const rect = mcp.getBoundingClientRect()
-        const span = mcp.offsetHeight - window.innerHeight
-        const progress =
-          span > 80
-            ? clamp01(-rect.top / span)
-            : rect.top < window.innerHeight * 0.5
-              ? 1
-              : 0
-        root.style.setProperty("--mcp-progress", progress.toFixed(4))
+        root.style.setProperty(
+          "--mcp-progress",
+          chapterProgress(mcp).toFixed(4)
+        )
       }
     }
 
@@ -89,15 +86,26 @@ export function LandingMotionController() {
       }
     }
 
+    // Enable tall sticky chapters before the first progress measure so hero/MCP
+    // heights include their scroll runways (otherwise progress clamps to 1).
+    if (!reducedMotion) {
+      root.dataset.motionEnabled = "true"
+    }
+
     window.addEventListener("scroll", requestUpdate, { passive: true })
     window.addEventListener("resize", requestUpdate)
-    update()
     cleanups.push(() => {
       window.removeEventListener("scroll", requestUpdate)
       window.removeEventListener("resize", requestUpdate)
       if (frame) {
         window.cancelAnimationFrame(frame)
       }
+      root.removeAttribute("data-motion-enabled")
+    })
+
+    // Measure after layout applies the motion-enabled chapter heights.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(update)
     })
 
     const onVisibility = () => {
@@ -139,7 +147,6 @@ export function LandingMotionController() {
       groups.forEach((group) => {
         group.dataset.motionState = "pending"
       })
-      root.dataset.motionEnabled = "true"
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -166,7 +173,6 @@ export function LandingMotionController() {
       cleanups.push(() => {
         observer.disconnect()
         groups.forEach((group) => group.removeAttribute("data-motion-state"))
-        root.removeAttribute("data-motion-enabled")
       })
 
       // Pointer parallax on the hero board: a few pixels of depth at most,

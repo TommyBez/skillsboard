@@ -128,13 +128,35 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Hero — full-viewport skill routing table
+   Hero — sticky chapter: dossiers file into the team library
 --------------------------------------------------------------------------- */
 
 .hero {
   position: relative;
-  overflow: clip;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+.heroSticky {
+  position: relative;
+  /* Resting / no-JS / reduced-motion: one viewport of hero. */
+  min-height: calc(100dvh - var(--lp-header-h));
+}
+
+/* Tall sticky runway only when the controller is live; without JS or with
+   reduced motion the hero is a normal one-viewport spread. */
+@media (min-width: 64rem) {
+  .root[data-motion-enabled="true"] .hero {
+    height: 180vh;
+  }
+
+  .root[data-motion-enabled="true"] .heroSticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    display: flex;
+    align-items: stretch;
+    overflow: clip;
+  }
 }
 
 .heroGridLines {
@@ -236,7 +258,7 @@
 }
 
 /* ------------------------------------------------------------------
-   Hero board: dossiers orbiting the mark, converging on scroll
+   Hero board: scattered dossiers filing into the team library panel
 ------------------------------------------------------------------ */
 
 .heroBoard {
@@ -257,57 +279,120 @@
   inset: 0;
 }
 
-/* Converged (indexed stack) positions are the base; scatter is a transform
-   scaled by (1 - route progress), so scrolling routes chaos into order. */
+/* The landing target: a quiet product-library panel that materializes
+   ahead of the cards, so the deck visibly files *into* something. */
+.libraryFrame {
+  position: absolute;
+  left: calc(18% - 1.1rem);
+  top: calc(17% - 3.6rem);
+  width: calc(16.5rem + 2.2rem);
+  height: 27.25rem;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 1rem;
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
+  --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
+  opacity: var(--frame-p);
+  transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
+}
+
+/* Without the controller (no JS), the page rests in its settled state. */
+.root:not([data-motion-enabled="true"]) .libraryFrame {
+  opacity: 1;
+  transform: none;
+}
+
+.libraryHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3rem;
+  padding: 0 1.1rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.libraryDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+.libraryLabel {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foreground);
+}
+
+.libraryCount {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+}
+
+/* Converged (filed) positions are the base; scatter is a transform scaled
+   by (1 - landing progress). Each slot gets its own progress window so
+   cards file into the panel one after another across the sticky runway. */
 .dossierSlot {
+  --lp: clamp(0, calc((var(--route-p) - var(--ls, 0)) / 0.72), 1);
   position: absolute;
   left: 18%;
   pointer-events: auto;
   transform: translate3d(
-      calc(var(--sx) * (1 - var(--route-p))),
-      calc(var(--sy) * (1 - var(--route-p))),
+      calc(var(--sx) * (1 - var(--lp))),
+      calc(var(--sy) * (1 - var(--lp))),
       0
     )
-    rotate(calc(var(--sr) * (1 - var(--route-p))));
+    rotate(calc(var(--sr) * (1 - var(--lp))));
 }
 
 /* Taller SkillDossier-like cards: start higher and step less so the
    converged stack overlaps and still fits a ~900px-tall viewport. */
 .dossierSlot[data-slot="1"] {
-  top: 12%;
+  top: 17%;
   z-index: 1;
-  --sx: -120px;
-  --sy: -120px;
+  --ls: 0.05;
+  --sx: -70px;
+  --sy: -130px;
   --sr: -6deg;
 }
 
 .dossierSlot[data-slot="2"] {
-  top: calc(12% + 2.55rem);
+  top: calc(17% + 2.55rem);
   z-index: 2;
+  --ls: 0.1;
   --sx: 160px;
   --sy: -150px;
   --sr: 5deg;
 }
 
 .dossierSlot[data-slot="3"] {
-  top: calc(12% + 5.1rem);
+  top: calc(17% + 5.1rem);
   z-index: 3;
-  --sx: -150px;
-  --sy: -40px;
+  --ls: 0.15;
+  --sx: -50px;
+  --sy: -45px;
   --sr: -4deg;
 }
 
 .dossierSlot[data-slot="4"] {
-  top: calc(12% + 7.65rem);
+  top: calc(17% + 7.65rem);
   z-index: 4;
+  --ls: 0.2;
   --sx: 175px;
   --sy: -55px;
   --sr: 7deg;
 }
 
 .dossierSlot[data-slot="5"] {
-  top: calc(12% + 10.2rem);
+  top: calc(17% + 10.2rem);
   z-index: 5;
+  --ls: 0.25;
   --sx: 35px;
   --sy: 40px;
   --sr: -3deg;
@@ -615,9 +700,22 @@
   z-index: 3;
 }
 
+/* The mobile “after” state: the same team library panel, at rest. */
+.mobileLibrary {
+  margin-top: 1.5rem;
+  overflow: hidden;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 1rem;
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+}
+
+.mobileLibrary .libraryHead {
+  height: 2.75rem;
+  padding: 0 1rem;
+}
+
 .mobileStack {
-  margin-top: 1.25rem;
-  border-top: 1px solid var(--lp-hairline-strong);
+  padding: 0.25rem 1rem 0.5rem;
 }
 
 .mobileStackRow {
@@ -626,6 +724,10 @@
   gap: 0.75rem;
   padding: 0.55rem 0.15rem;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+.mobileStackRow:last-child {
+  border-bottom: none;
 }
 
 .mobileStackName {
@@ -1346,10 +1448,15 @@
     opacity: 1;
   }
 
-  /* Static “after”: the stack rests aligned and indexed. */
+  /* Static “after”: the stack rests filed inside the library panel. */
   .dossierSlot {
     transform: none;
     will-change: auto;
+  }
+
+  .libraryFrame {
+    opacity: 1;
+    transform: none;
   }
 
   .dossierParallax {

@@ -92,9 +92,17 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
 export function HeroBoard() {
   return (
     <>
-      {/* Desktop / large tablet: scattered dossiers converging on scroll. */}
+      {/* Desktop / large tablet: scattered dossiers filing into the team
+          library panel on scroll. */}
       <div className={styles.heroBoard} data-hero-board aria-hidden="true">
         <div className={styles.heroCards}>
+          <div className={styles.libraryFrame}>
+            <div className={styles.libraryHead}>
+              <span className={styles.libraryDot} />
+              <span className={styles.libraryLabel}>Team library</span>
+              <span className={styles.libraryCount}>5 skills</span>
+            </div>
+          </div>
           {dossiers.map((dossier, i) => (
             <div
               key={dossier.name}
@@ -123,13 +131,20 @@ export function HeroBoard() {
             </div>
           ))}
         </div>
-        <ul className={styles.mobileStack}>
-          {dossiers.map((dossier) => (
-            <li key={dossier.name} className={styles.mobileStackRow}>
-              <span className={styles.mobileStackName}>{dossier.name}</span>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.mobileLibrary}>
+          <div className={styles.libraryHead}>
+            <span className={styles.libraryDot} />
+            <span className={styles.libraryLabel}>Team library</span>
+            <span className={styles.libraryCount}>5 skills</span>
+          </div>
+          <ul className={styles.mobileStack}>
+            {dossiers.map((dossier) => (
+              <li key={dossier.name} className={styles.mobileStackRow}>
+                <span className={styles.mobileStackName}>{dossier.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </>
   )

@@ -257,46 +257,48 @@ export default function HomePage() {
       </header>
 
       <main>
-        {/* Hero — full-viewport skill routing table */}
-        <section className={`${styles.hero} ${styles.grain}`} data-hero-scene>
-          <div className="relative mx-auto flex w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:min-h-[calc(100dvh-3.5rem)] lg:py-16">
-            <div className={styles.heroGridLines} aria-hidden="true" />
+        {/* Hero — sticky chapter: dossiers file into the team library */}
+        <section className={styles.hero} data-hero-scene>
+          <div className={`${styles.heroSticky} ${styles.grain}`}>
+            <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:py-16">
+              <div className={styles.heroGridLines} aria-hidden="true" />
 
-            <div className="relative z-0">
-              <p className={styles.heroEyebrow}>Skills selected by your team</p>
-              <h1
-                className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
-              >
-                <span className={styles.heroLineMask}>
-                  <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
-                    Your team&apos;s skills.
+              <div className="relative z-0">
+                <p className={styles.heroEyebrow}>Skills selected by your team</p>
+                <h1
+                  className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
+                >
+                  <span className={styles.heroLineMask}>
+                    <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
+                      Your team&apos;s skills.
+                    </span>
                   </span>
-                </span>
-                <span className={styles.heroLineMask}>
-                  <span
-                    className={`${styles.heroLine} ${styles.heroLineSecond} text-primary`}
-                  >
-                    All in one place.
+                  <span className={styles.heroLineMask}>
+                    <span
+                      className={`${styles.heroLine} ${styles.heroLineSecond} text-primary`}
+                    >
+                      All in one place.
+                    </span>
                   </span>
-                </span>
-              </h1>
-            </div>
-
-            <div className="relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]">
-              <p
-                className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
-              >
-                Build a shared, searchable library so everyone knows which skills
-                to use and where to find them.
-              </p>
-              <div className={`${styles.heroCta} mt-7`}>
-                <Suspense fallback={<HomeCtaFallback />}>
-                  <HomeHeroActions />
-                </Suspense>
+                </h1>
               </div>
-            </div>
 
-            <HeroBoard />
+              <div className="relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]">
+                <p
+                  className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
+                >
+                  Build a shared, searchable library so everyone knows which
+                  skills to use and where to find them.
+                </p>
+                <div className={`${styles.heroCta} mt-7`}>
+                  <Suspense fallback={<HomeCtaFallback />}>
+                    <HomeHeroActions />
+                  </Suspense>
+                </div>
+              </div>
+
+              <HeroBoard />
+            </div>
           </div>
         </section>
 
