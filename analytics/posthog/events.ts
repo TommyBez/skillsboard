@@ -4,6 +4,24 @@ type NonTeamEventPropertiesMap = {
     location: "header" | "hero" | "closing"
     visitor_state: "anonymous" | "signed_in"
   }
+  mcp_entry_clicked: {
+    destination: "#mcp" | "/settings/mcp" | "/sign-up"
+    location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
+    visitor_state: "anonymous" | "signed_in"
+  }
+  mcp_setup_viewed: Record<never, never>
+  mcp_client_selected: {
+    client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
+  }
+  mcp_config_copied: {
+    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+  }
+  mcp_authorization_approved: Record<never, never>
+  mcp_authorization_denied: Record<never, never>
+  mcp_tool_used: {
+    succeeded: boolean
+    tool_name: "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
+  }
   signup_form_submitted: {
     method: "email_otp"
     signup_context: "new_team" | "team_invitation"

@@ -12,7 +12,12 @@ export const landingFaqs = [
   {
     question: "Do teammates need to use the same AI agent?",
     answer:
-      "No. Skills Board is built for mixed setups. Everyone starts from the same team recommendation, then opens the source, copies a compatible install command, or downloads the latest files as a ZIP.",
+      "No. Skills Board is built for mixed setups. Everyone starts from the same team recommendation, then connects an MCP-compatible agent or opens the source, copies a compatible install command, or downloads the latest files as a ZIP.",
+  },
+  {
+    question: "What can my agent do through MCP?",
+    answer:
+      "After you connect Skills Board, an MCP-compatible agent can list and search your team libraries, retrieve install commands for saved skills, and browse the public catalog. Access is read-only: the agent cannot add, edit, or delete team skills.",
   },
   {
     question: "Does every skill work with every agent?",

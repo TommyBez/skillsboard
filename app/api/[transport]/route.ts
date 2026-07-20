@@ -4,7 +4,7 @@ import { z } from "zod"
 
 import { getUserSkill, listUserSkills } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
-import { captureTeamEvent } from "@/lib/posthog-server"
+import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
 
 function getOrigin(request: Request) {
@@ -13,14 +13,64 @@ function getOrigin(request: Request) {
   return forwardedHost ? `${forwardedProto}://${forwardedHost}` : new URL(request.url).origin
 }
 
+type McpToolName = "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
+
+function captureMcpToolUsed(userId: string, toolName: McpToolName, succeeded: boolean) {
+  capturePostHogEvent({
+    distinctId: userId,
+    event: "mcp_tool_used",
+    properties: { succeeded, tool_name: toolName },
+  })
+}
+
+async function trackMcpToolCall<Result>(
+  userId: string,
+  toolName: McpToolName,
+  execute: () => Promise<Result>,
+) {
+  try {
+    const result = await execute()
+    captureMcpToolUsed(userId, toolName, true)
+    return result
+  } catch (error) {
+    captureMcpToolUsed(userId, toolName, false)
+    throw error
+  }
+}
+
 async function route(request: Request) {
   const origin = getOrigin(request)
   const resource = `${origin}/api/mcp`
   return mcpHandler({ jwksUrl: `${origin}/api/auth/jwks`, verifyOptions: { issuer: `${origin}/api/auth`, audience: resource } }, async (req, jwt) => {
     if (!jwt.sub) return new Response("Token subject is required", { status: 401 })
     return createMcpHandler((server) => {
-      server.registerTool("list_skills", { title: "List team skills", description: "List every skill saved across the authenticated user's team libraries", inputSchema: {} }, async () => ({ content: [{ type: "text", text: JSON.stringify(await listUserSkills(jwt.sub!), null, 2) }] }))
-      server.registerTool("search_skills", { title: "Search team skills", description: "Search saved team skills by name, description, note, repository, or tag", inputSchema: { query: z.string().min(1) } }, async ({ query }) => { const skills = await listUserSkills(jwt.sub!); const normalized = query.toLowerCase(); return { content: [{ type: "text", text: JSON.stringify(skills.filter((skill) => `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`.toLowerCase().includes(normalized)), null, 2) }] } })
+      server.registerTool("list_skills", {
+        title: "List team skills",
+        description: "List every skill saved across the authenticated user's team libraries",
+        inputSchema: {},
+      }, async () => trackMcpToolCall(jwt.sub!, "list_skills", async () => ({
+        content: [{ type: "text", text: JSON.stringify(await listUserSkills(jwt.sub!), null, 2) }],
+      })))
+
+      server.registerTool("search_skills", {
+        title: "Search team skills",
+        description: "Search saved team skills by name, description, note, repository, or tag",
+        inputSchema: { query: z.string().min(1) },
+      }, async ({ query }) => trackMcpToolCall(jwt.sub!, "search_skills", async () => {
+        const skills = await listUserSkills(jwt.sub!)
+        const normalized = query.toLowerCase()
+        return {
+          content: [{
+            type: "text" as const,
+            text: JSON.stringify(skills.filter((skill) => (
+              `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`
+                .toLowerCase()
+                .includes(normalized)
+            )), null, 2),
+          }],
+        }
+      }))
+
       server.registerTool("get_skill_command", { title: "Get install command", description: "Return the skills.sh CLI command for a saved skill", inputSchema: { skillId: z.uuid() } }, async ({ skillId }) => {
         const found = await getUserSkill(jwt.sub!, skillId)
         const payload = {
@@ -30,6 +80,8 @@ async function route(request: Request) {
           }],
           isError: !found,
         }
+
+        captureMcpToolUsed(jwt.sub!, "get_skill_command", Boolean(found))
 
         if (found) {
           captureTeamEvent({
@@ -48,7 +100,25 @@ async function route(request: Request) {
 
         return payload
       })
-      server.registerTool("discover_skills", { title: "Discover public skills", description: "Search skills.sh or browse a leaderboard", inputSchema: { query: z.string().optional(), view: z.enum(["trending", "hot", "all-time"]).optional(), page: z.number().int().min(0).optional() } }, async ({ query, view, page }) => ({ content: [{ type: "text", text: JSON.stringify(query ? await searchCatalog(query) : await getLeaderboard(view ?? "trending", page ?? 0), null, 2) }] }))
+
+      server.registerTool("discover_skills", {
+        title: "Discover public skills",
+        description: "Search skills.sh or browse a leaderboard",
+        inputSchema: {
+          query: z.string().optional(),
+          view: z.enum(["trending", "hot", "all-time"]).optional(),
+          page: z.number().int().min(0).optional(),
+        },
+      }, async ({ query, view, page }) => trackMcpToolCall(jwt.sub!, "discover_skills", async () => ({
+        content: [{
+          type: "text" as const,
+          text: JSON.stringify(
+            query ? await searchCatalog(query) : await getLeaderboard(view ?? "trending", page ?? 0),
+            null,
+            2,
+          ),
+        }],
+      })))
     }, { serverInfo: { name: "skills-board", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
   })(request)
 }

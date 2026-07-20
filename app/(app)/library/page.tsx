@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
+import { CableIcon, DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
@@ -8,6 +8,7 @@ import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { SkillDossier } from "@/components/skill-dossier"
 import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
+import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -246,6 +247,26 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
           <Suspense fallback={<LibraryStatsFallback />}>
             <LibraryStats />
           </Suspense>
+          <Button
+            variant="outline"
+            nativeButton={false}
+            render={(
+              <TrackedLink
+                href="/settings/mcp"
+                analytics={{
+                  event: "mcp_entry_clicked",
+                  properties: {
+                    destination: "/settings/mcp",
+                    location: "library_header",
+                    visitor_state: "signed_in",
+                  },
+                }}
+              />
+            )}
+          >
+            <CableIcon data-icon="inline-start" />
+            Connect agent
+          </Button>
           <AddSkillDialog />
         </div>
       </section>

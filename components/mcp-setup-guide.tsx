@@ -1,7 +1,11 @@
+"use client"
+
 import type { ReactNode } from "react"
+import { useState } from "react"
 
 import { CopyButton } from "@/components/copy-button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 interface Step {
   text: ReactNode
@@ -10,28 +14,36 @@ interface Step {
 
 interface ClientGuide {
   id: string
+  analyticsId: McpClientAnalyticsId
   label: string
   steps: Step[]
 }
+
+type McpClientAnalyticsId = "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
 
 function InlineCode({ children }: { children: ReactNode }) {
   return <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
 }
 
-function Snippet({ code }: { code: string }) {
+function Snippet({ code, client }: { code: string; client: McpClientAnalyticsId }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[12px] border">
       <pre className="overflow-x-auto bg-foreground p-4 font-mono text-xs leading-5 text-background">
         <code>{code}</code>
       </pre>
       <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton value={code} label="Copy" compact />
+        <CopyButton
+          value={code}
+          label="Copy"
+          compact
+          analytics={{ event: "mcp_config_copied", properties: { client } }}
+        />
       </div>
     </div>
   )
 }
 
-function StepList({ steps }: { steps: Step[] }) {
+function StepList({ steps, client }: { steps: Step[]; client: McpClientAnalyticsId }) {
   return (
     <ol className="space-y-6">
       {steps.map((step, index) => (
@@ -41,7 +53,7 @@ function StepList({ steps }: { steps: Step[] }) {
           </span>
           <div className="min-w-0 flex-1 pt-1">
             <p className="text-sm leading-relaxed text-muted-foreground">{step.text}</p>
-            {step.snippet ? <Snippet code={step.snippet} /> : null}
+            {step.snippet ? <Snippet code={step.snippet} client={client} /> : null}
           </div>
         </li>
       ))}
@@ -82,6 +94,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
   const clients: ClientGuide[] = [
     {
       id: "claude-code",
+      analyticsId: "claude_code",
       label: "Claude Code",
       steps: [
         {
@@ -103,6 +116,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     },
     {
       id: "claude-desktop",
+      analyticsId: "claude_desktop",
       label: "Claude Desktop & claude.ai",
       steps: [
         {
@@ -129,6 +143,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     },
     {
       id: "cursor",
+      analyticsId: "cursor",
       label: "Cursor",
       steps: [
         {
@@ -155,6 +170,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     },
     {
       id: "vscode",
+      analyticsId: "vscode",
       label: "VS Code",
       steps: [
         {
@@ -172,6 +188,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
     },
     {
       id: "other",
+      analyticsId: "other",
       label: "Other clients",
       steps: [
         {
@@ -184,21 +201,28 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
       ],
     },
   ]
+  const [activeClient, setActiveClient] = useState(clients[0].id)
+
+  function selectClient(value: string) {
+    setActiveClient(value)
+    const client = clients.find((item) => item.id === value)
+    if (client) captureAnalyticsEvent("mcp_client_selected", { client: client.analyticsId })
+  }
 
   return (
     <div className="grid gap-6">
       <section className="overflow-hidden rounded-[16px] border bg-card">
         <div className="px-5 py-5 sm:px-6 sm:py-6">
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Setup guide</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Install in your client</h2>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Choose your agent</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Pick your client and follow the steps. Every client connects to the same endpoint and signs in through
-            your browser, with no API key to create or rotate.
+            Pick a client and follow its connection steps. You&apos;ll sign in securely through your browser—there&apos;s
+            no API key to copy.
           </p>
         </div>
 
         <div className="border-t px-5 py-5 sm:px-6 sm:py-6">
-          <Tabs defaultValue="claude-code">
+          <Tabs value={activeClient} onValueChange={selectClient}>
             <TabsList className="max-w-full overflow-x-auto">
               {clients.map((client) => (
                 <TabsTrigger key={client.id} value={client.id}>
@@ -209,7 +233,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
 
             {clients.map((client) => (
               <TabsContent key={client.id} value={client.id} className="pt-5">
-                <StepList steps={client.steps} />
+                <StepList steps={client.steps} client={client.analyticsId} />
               </TabsContent>
             ))}
           </Tabs>

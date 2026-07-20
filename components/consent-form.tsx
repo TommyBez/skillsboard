@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 
 import { authClient } from "@/lib/auth-client"
 import { Button } from "@/components/ui/button"
+import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 export function ConsentForm() {
   const router = useRouter()
@@ -17,6 +18,7 @@ export function ConsentForm() {
     try {
       const result = await authClient.oauth2.consent({ accept })
       if (result.data?.url) {
+        captureAnalyticsEvent(accept ? "mcp_authorization_approved" : "mcp_authorization_denied")
         window.location.assign(result.data.url)
         return
       }

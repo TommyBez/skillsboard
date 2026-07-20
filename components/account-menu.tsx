@@ -4,6 +4,7 @@ import Link from "next/link"
 import { LogOutIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
 
 import { SignOutForm } from "@/components/sign-out-form"
+import { TrackedLink } from "@/components/tracked-link"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -55,10 +56,22 @@ export function AccountMenu({ user }: AccountMenuProps) {
           <DropdownMenuItem
             className="gap-2 rounded-lg px-3 py-2 text-sm font-medium"
             nativeButton={false}
-            render={<Link href="/settings/mcp" />}
+            render={(
+              <TrackedLink
+                href="/settings/mcp"
+                analytics={{
+                  event: "mcp_entry_clicked",
+                  properties: {
+                    destination: "/settings/mcp",
+                    location: "account_menu",
+                    visitor_state: "signed_in",
+                  },
+                }}
+              />
+            )}
           >
             <SlidersHorizontalIcon className="size-4" aria-hidden="true" />
-            MCP setup
+            Connect an agent
           </DropdownMenuItem>
         </nav>
         <div className="border-t border-border p-1">

@@ -18,7 +18,7 @@
 - Skills Board points to the latest version available from the saved source. It does not pin or preserve historical versions.
 - Teammates choose how to use a skill: original source, install command, or ZIP download.
 - A ZIP contains the latest skill files available from the source at download time. It does not guarantee installation in every agent.
-- MCP is an optional advanced access method. It is not the primary product narrative.
+- MCP is a first-class way to access the shared library from a compatible agent. It supports the primary team-library narrative rather than replacing it.
 
 ## Target Audience
 **Target companies:** Small and mid-sized teams that already use AI agents in their work, especially teams whose members use a mix of Claude, Codex, Cursor, and other agent tools.
@@ -32,6 +32,7 @@
 - Collect useful recommendations before they disappear into chats, bookmarks, or personal setups.
 - Help teammates search for a skill by task, problem, or team-specific tag.
 - Let each teammate choose the source, command, or ZIP that fits their setup.
+- Connect a compatible agent so it can search team recommendations and retrieve install commands directly.
 - Keep every saved entry connected to the latest version from its source.
 
 **Use cases:**
@@ -39,6 +40,7 @@
 - Someone finds a useful skill and adds it so the whole team can find it later.
 - Teammates using different agents get the same recommendation but choose different ways to use it.
 - A teammate opens the original source for context, copies a compatible install command, or downloads the latest skill files as a ZIP.
+- A teammate connects an MCP-compatible agent, signs in through the browser, and searches the same team library without copying an API key.
 
 ## Personas
 | Persona | Cares about | Challenge | Value we promise |
@@ -81,10 +83,10 @@
 - Multiple usage paths: source, install command, and ZIP download
 - Latest source version instead of a pinned or detached copy
 - Neutrality toward the agent each teammate prefers
-- Optional authenticated read-only MCP access for advanced workflows
+- Authenticated read-only MCP access from compatible agents, with browser-based sign-in and no API key to copy
 - Free hosted product with open-source code
 
-**How we do it differently:** Skills Board starts with the team's judgment. Public catalogs and repositories remain useful inputs, while Skills Board records what the team recommends and makes those recommendations easy for everyone to find and use.
+**How we do it differently:** Skills Board starts with the team's judgment. Public catalogs and repositories remain useful inputs, while Skills Board records what the team recommends and makes those recommendations available both in the product and directly inside compatible agents through MCP.
 
 **Why that's better:** The team shares one set of recommendations without requiring everyone to adopt the same agent or installation workflow.
 
@@ -125,7 +127,7 @@
 - "Ognuno può scegliere la maniera più congeniale per utilizzare la skill."
 - "Your team's skills. All in one place."
 
-**Words to use:** recommended by your team, shared skill library, all in one place, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
+**Words to use:** recommended by your team, shared skill library, all in one place, connect your agent, search from your agent, read-only MCP access, sign in through your browser, no API key to copy, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
 
 **Words to avoid:** skill champion, GitHub-backed, approved skill, verified skill, trusted skill, universal compatibility, works with every agent, automatically synchronized, agent capability platform, AI-native knowledge infrastructure, enterprise governance, unlock, supercharge, revolutionize
 
@@ -138,7 +140,7 @@
 | Original source | The repository and path from which Skills Board retrieves the skill's latest available files. |
 | Install command | A command a teammate can copy when it is compatible with their setup. |
 | ZIP download | An archive of the latest skill files available from the original source at download time. |
-| MCP | An optional advanced way for compatible agents to access the library through authenticated read-only tools. |
+| MCP | A read-only connection that lets compatible agents search the shared library and retrieve install commands after browser-based authorization. |
 | Public skill catalog | A discovery source that can help people find skills before adding selected ones to the team library. |
 
 ## Brand Voice
@@ -151,16 +153,16 @@
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.
 2. A shared library saves team members from asking the same questions and searching from scratch.
-3. Teammates can use different agents and still draw from the same recommendations.
-4. Each skill offers practical usage choices: original source, install command, or latest files as a ZIP.
-5. Search, tags, membership, open source, and MCP support the promise but should not lead the story.
+3. Connect a compatible agent through MCP so it can search the same recommendations and retrieve install commands directly.
+4. Teammates can use different agents and still draw from the same shared library.
+5. Original source, install command, ZIP, search, tags, membership, and open source provide practical alternatives and support the promise.
 
 **Core narrative:**
 1. A teammate needs a skill for a task.
 2. Someone on the team has already added a useful recommendation.
 3. The teammate finds it in the shared library.
-4. They open the source, copy a compatible command, or download the latest files as a ZIP.
-5. They follow the option that is compatible with their agent and setup.
+4. They either ask their connected agent to search the library or use Skills Board directly.
+5. They retrieve a compatible command, open the source, or download the latest files as a ZIP.
 
 ## Proof Points
 **Metrics:** No production metric is validated for public claims yet.
@@ -177,7 +179,7 @@
 | More than one path for different setups | Original source, install command, and ZIP download choices |
 | Connected to the latest source | Repository-backed retrieval without version pinning |
 | Shared with the team | Team membership and invitations |
-| Advanced access when needed | Authenticated read-only MCP tools |
+| Available inside the agent | Authenticated read-only MCP tools with browser-based authorization |
 | Open access | Hosted product free forever and open-source code |
 
 ## Goals
@@ -185,6 +187,6 @@
 
 **Conversion action:** Create a team library.
 
-**Activation path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate -> open the source, copy a command, or download the ZIP.
+**Activation path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
 
 **Current metrics:** Not established.

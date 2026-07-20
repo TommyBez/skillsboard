@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRightIcon } from "lucide-react"
+import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
@@ -118,29 +118,87 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <Button
-      size="lg"
-      className={styles.ctaButton}
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={primary.href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties(signedIn, "hero"),
-          }}
-        />
-      )}
-    >
-      {primary.label}
-      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-    </Button>
+    <div className="flex flex-wrap gap-3">
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primary.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties(signedIn, "hero"),
+            }}
+          />
+        )}
+      >
+        {primary.label}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+      <Button
+        size="lg"
+        variant="outline"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href="#mcp"
+            analytics={{
+              event: "mcp_entry_clicked",
+              properties: {
+                destination: "#mcp",
+                location: "landing_hero",
+                visitor_state: signedIn ? "signed_in" : "anonymous",
+              },
+            }}
+          />
+        )}
+      >
+        See MCP access
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+    </div>
   )
 }
 
 async function HomeHeroActions() {
   const session = await getSession()
   return <HomeHeroActionsView signedIn={Boolean(session?.user)} />
+}
+
+function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
+  const href = signedIn ? "/settings/mcp" : "/sign-up"
+
+  return (
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={(
+        <TrackedLink
+          href={href}
+          analytics={{
+            event: "mcp_entry_clicked",
+            properties: {
+              destination: href,
+              location: "landing_section",
+              visitor_state: signedIn ? "signed_in" : "anonymous",
+            },
+          }}
+        />
+      )}
+    >
+      <CableIcon data-icon="inline-start" />
+      {signedIn ? "Connect your agent" : "Create a library to connect"}
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+    </Button>
+  )
+}
+
+async function HomeMcpActions() {
+  const session = await getSession()
+  return <HomeMcpActionsView signedIn={Boolean(session?.user)} />
 }
 
 function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
@@ -171,8 +229,6 @@ async function HomeFinalActions() {
   const session = await getSession()
   return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
 }
-
-const agents = ["Claude", "Codex", "Cursor", "Other agents"]
 
 function GitHubMark() {
   return (
@@ -233,54 +289,61 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="border-y border-border/70 bg-accent/30">
+      <section id="mcp" aria-labelledby="mcp-heading" className="scroll-mt-20 border-y border-border/70 bg-accent/30">
         <div className="mx-auto grid w-full max-w-[1440px] gap-10 px-4 py-16 md:px-8 md:py-24 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(28rem,1.2fr)] lg:items-center lg:gap-20">
           <div className="w-full">
-            <h2 className="max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
-              The library belongs to your team, not one agent.
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">MCP access</p>
+            <h2 id="mcp-heading" className="mt-4 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
+              Bring your team&apos;s skills into your agent.
             </h2>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              Skills Board is a shared AI skill library for teams. Everyone starts from the same recommendation, then chooses the source, command, or ZIP that fits their setup.
+              Connect Skills Board through MCP. Your agent can search the shared library and retrieve install commands with read-only access.
             </p>
-            <p className="mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
-              Compatible agents can optionally access the same library through authenticated, read-only MCP.
-            </p>
+            <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+              <ShieldCheckIcon className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              <p>Sign in securely through your browser—there&apos;s no API key to copy.</p>
+            </div>
+            <div className="mt-7">
+              <Suspense fallback={<HomeCtaFallback />}>
+                <HomeMcpActions />
+              </Suspense>
+            </div>
           </div>
 
           <figure
             className="w-full"
-            aria-label="One team library can support different agents"
+            aria-label="Skills Board connects a shared team library to an MCP-compatible agent"
             data-motion-group="library"
           >
             <div className="grid border-y border-border py-7 sm:grid-cols-[minmax(0,0.9fr)_auto_minmax(0,1.1fr)] sm:items-center sm:gap-8 sm:py-9">
               <div className={styles.librarySource}>
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                  One team recommendation
+                  Team library
                 </p>
-                <p className="mt-2 text-3xl font-semibold tracking-[-0.045em] md:text-4xl">
-                  Shared library
+                <p className="mt-2 max-w-[12ch] text-3xl font-semibold tracking-[-0.045em] md:text-4xl">
+                  Skills your team recommends
                 </p>
               </div>
 
-              <ArrowRightIcon
-                className={`${styles.libraryArrow} my-6 size-7 rotate-90 text-primary sm:my-0 sm:rotate-0`}
-                aria-hidden="true"
-              />
+              <div className={`${styles.libraryArrow} my-6 flex flex-col items-center gap-2 text-primary sm:my-0`}>
+                <span className="rounded-full border border-primary/35 bg-background/70 px-2.5 py-1 font-mono text-[0.65rem] font-semibold uppercase tracking-[0.16em]">MCP</span>
+                <ArrowRightIcon className="size-7 rotate-90 sm:rotate-0" aria-hidden="true" />
+              </div>
 
               <div>
-                <p className={`${styles.agentsLabel} text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground`}>
-                  Wherever people work
+                <p className={`${styles.mcpTargetLabel} text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground`}>
+                  Inside your agent
                 </p>
                 <ul
-                  className={`${styles.agentList} mt-3 flex flex-col gap-1.5`}
-                  aria-label="Supported agent choices"
+                  className={`${styles.mcpToolList} mt-3 flex flex-col gap-2`}
+                  aria-label="Available MCP actions"
                 >
-                  {agents.map((agent) => (
-                    <li key={agent} className={styles.agentItem}>
+                  {["Search team skills", "Find saved recommendations", "Get install commands"].map((tool) => (
+                    <li key={tool} className={styles.mcpToolItem}>
                       <span
-                        className={`${styles.agentName} inline-block text-2xl font-semibold tracking-[-0.03em] md:text-3xl lg:text-4xl`}
+                        className={`${styles.mcpToolName} inline-block text-xl font-semibold tracking-[-0.03em] md:text-2xl lg:text-3xl`}
                       >
-                        {agent}
+                        {tool}
                       </span>
                     </li>
                   ))}
@@ -288,7 +351,7 @@ export default function HomePage() {
               </div>
             </div>
             <figcaption className={`${styles.libraryCaption} mt-5 text-sm leading-relaxed text-muted-foreground`}>
-              Open the source, copy the command, or download the latest ZIP.
+              Choose Claude, Cursor, VS Code, or another MCP-compatible client. The same library remains available in Skills Board.
             </figcaption>
           </figure>
         </div>

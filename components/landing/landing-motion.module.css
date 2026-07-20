@@ -101,10 +101,10 @@
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentsLabel,
+  .mcpTargetLabel,
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentItem {
+  .mcpToolItem {
   transition:
     opacity 360ms var(--landing-ease-out),
     transform 360ms var(--landing-ease-out);
@@ -112,28 +112,28 @@
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentsLabel,
+  .mcpTargetLabel,
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentItem:nth-child(1) {
+  .mcpToolItem:nth-child(1) {
   transition-delay: 150ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentItem:nth-child(2) {
+  .mcpToolItem:nth-child(2) {
   transition-delay: 195ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentItem:nth-child(3) {
+  .mcpToolItem:nth-child(3) {
   transition-delay: 240ms;
 }
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="visible"]
-  .agentItem:nth-child(4) {
+  .mcpToolItem:nth-child(4) {
   transition-delay: 285ms;
 }
 
@@ -161,10 +161,10 @@
 
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="pending"]
-  .agentsLabel,
+  .mcpTargetLabel,
 .root[data-motion-enabled="true"]
   [data-motion-group="library"][data-motion-state="pending"]
-  .agentItem {
+  .mcpToolItem {
   opacity: 0;
   transform: translate3d(0, 10px, 0);
 }
@@ -289,20 +289,20 @@
     transform: translate3d(3px, 0, 0);
   }
 
-  /* Hovering the agent list singles one agent out of the crowd: siblings
-     recede, the hovered name takes the accent and steps forward. */
-  .agentName {
+  /* The MCP capability list keeps the existing editorial reveal, then lets
+     one concrete agent action take focus on hover. */
+  .mcpToolName {
     transition:
       color 180ms var(--landing-ease-out),
       opacity 180ms var(--landing-ease-out),
       transform 200ms var(--landing-ease-out);
   }
 
-  .agentList:hover .agentName {
+  .mcpToolList:hover .mcpToolName {
     opacity: 0.35;
   }
 
-  .agentList li:hover .agentName {
+  .mcpToolList li:hover .mcpToolName {
     color: var(--primary);
     opacity: 1;
     transform: translate3d(4px, 0, 0);
@@ -324,8 +324,8 @@
 
   .root[data-motion-enabled="true"] .librarySource,
   .root[data-motion-enabled="true"] .libraryArrow,
-  .root[data-motion-enabled="true"] .agentsLabel,
-  .root[data-motion-enabled="true"] .agentItem,
+  .root[data-motion-enabled="true"] .mcpTargetLabel,
+  .root[data-motion-enabled="true"] .mcpToolItem,
   .root[data-motion-enabled="true"] .libraryCaption,
   .root[data-motion-enabled="true"] .pricingZero,
   .root[data-motion-enabled="true"] .pricingMessage,
@@ -344,13 +344,13 @@
     transform: none;
   }
 
-  .agentName {
+  .mcpToolName {
     transition:
       color 180ms var(--landing-ease-out),
       opacity 180ms var(--landing-ease-out);
   }
 
-  .agentList li:hover .agentName {
+  .mcpToolList li:hover .mcpToolName {
     transform: none;
   }
 }
