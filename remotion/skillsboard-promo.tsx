@@ -13,7 +13,6 @@ import { focusPull } from "@/components/remocn/focus-pull";
 import { KineticCenterBuild } from "@/components/remocn/kinetic-center-build";
 import { MicroScaleFade } from "@/components/remocn/micro-scale-fade";
 import { PerCharacterRise } from "@/components/remocn/per-character-rise";
-import { ProgressSteps } from "@/components/remocn/progress-steps";
 import { pushThrough } from "@/components/remocn/push-through";
 import { ShaderMeshGradient } from "@/components/remocn/shader-mesh-gradient";
 import {
@@ -176,7 +175,7 @@ function ProductScene() {
         <TerminalSimulator
           background={SURFACE_INK}
           chromeColor={SURFACE_INK_CHROME}
-          chunkSize={3}
+          chunkSize={2}
           fontSize={20}
           lines={TERMINAL_LINES}
           title="~/acme — install a team skill"
@@ -186,38 +185,119 @@ function ProductScene() {
   );
 }
 
+const FEATURES_LIST = [
+  { label: "Save a skill once", sub: "From any GitHub repository" },
+  { label: "Tag it for your team", sub: "Searchable by task and tag" },
+  { label: "Install it anywhere", sub: "Claude, Codex, Cursor & more" },
+];
+
+function FeatureCard({
+  label,
+  startFrame,
+  sub,
+}: {
+  label: string;
+  startFrame: number;
+  sub: string;
+}) {
+  const frame = useCurrentFrame();
+  const enter = Easing.bezier(0.16, 1, 0.3, 1);
+
+  return (
+    <div
+      style={{
+        alignItems: "center",
+        background: "#fdfdf8",
+        border: "1px solid #d6d9cb",
+        borderRadius: 13,
+        boxShadow: "0 1px 2px rgba(23,35,27,0.08)",
+        display: "flex",
+        gap: 20,
+        opacity: interpolate(frame, [startFrame, startFrame + 16], [0, 1], {
+          easing: enter,
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        }),
+        padding: "20px 26px",
+        translate: `0 ${interpolate(
+          frame,
+          [startFrame, startFrame + 18],
+          [26, 0],
+          {
+            easing: enter,
+            extrapolateLeft: "clamp",
+            extrapolateRight: "clamp",
+          },
+        )}px`,
+        width: 620,
+      }}
+    >
+      <div
+        style={{
+          alignItems: "center",
+          background: ACCENT,
+          borderRadius: 999,
+          display: "flex",
+          height: 44,
+          justifyContent: "center",
+          scale: `${interpolate(
+            frame,
+            [startFrame + 8, startFrame + 20],
+            [0, 1],
+            {
+              easing: Easing.bezier(0.34, 1.56, 0.64, 1),
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            },
+          )}`,
+          width: 44,
+        }}
+      >
+        <svg fill="none" height="22" viewBox="0 0 24 24" width="22">
+          <path
+            d="M5 12.5l4.5 4.5L19 7"
+            stroke="#fff"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="3"
+          />
+        </svg>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+        <div style={{ color: INK, fontSize: 27, fontWeight: 600 }}>{label}</div>
+        <div style={{ color: MUTED, fontSize: 18, fontWeight: 400 }}>{sub}</div>
+      </div>
+    </div>
+  );
+}
+
 function FeaturesScene() {
   return (
     <AbsoluteFill
       style={{
         alignItems: "center",
         background: CANVAS,
-        gap: 56,
+        gap: 40,
         justifyContent: "center",
       }}
     >
-      <div style={{ height: 60, position: "relative", width: "100%" }}>
+      <div style={{ height: 56, position: "relative", width: "100%" }}>
         <MicroScaleFade
           color={INK}
           fontSize={40}
           text="One library, every agent"
         />
       </div>
-      <Sequence from={12} layout="none" name="Feature steps">
-        <div style={{ height: 130, position: "relative", width: "100%" }}>
-          <ProgressSteps
-            activeColor={ACCENT}
-            inactiveColor="#dfe4db"
-            stepDuration={26}
-            steps={[
-              { label: "Save a skill once" },
-              { label: "Tag it for your team" },
-              { label: "Install it anywhere" },
-            ]}
-            textColor={INK}
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {FEATURES_LIST.map((feature, i) => (
+          <FeatureCard
+            key={feature.label}
+            label={feature.label}
+            startFrame={10 + i * 22}
+            sub={feature.sub}
           />
-        </div>
-      </Sequence>
+        ))}
+      </div>
     </AbsoluteFill>
   );
 }

@@ -246,10 +246,15 @@ function TerminalLineRow({
   // nearest multiple of `chunkSize`. This is what gives the bursty terminal
   // feel — text doesn't drip, it lurches.
   const linearRevealed = Math.floor(
-    interpolate(localFrame, [0, totalChars / charsPerFrame], [0, totalChars], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
+    interpolate(
+      localFrame,
+      [0, totalChars / (charsPerFrame * chunkSize)],
+      [0, totalChars],
+      {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      },
+    ),
   );
   const revealed = Math.min(
     totalChars,
