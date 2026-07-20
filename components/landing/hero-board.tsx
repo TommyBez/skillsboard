@@ -10,7 +10,6 @@ import styles from "@/components/landing/landing-motion.module.css"
  */
 const dossiers = [
   {
-    idx: "001",
     name: "code-review",
     source: "github.com/acme/skills",
     ref: "SKILL.md",
@@ -19,7 +18,6 @@ const dossiers = [
     density: "wide",
   },
   {
-    idx: "002",
     name: "pdf-extraction",
     source: "internal / tools",
     cmd: "npx skills add pdf-extraction",
@@ -28,7 +26,6 @@ const dossiers = [
     density: "regular",
   },
   {
-    idx: "003",
     name: "brand-voice",
     source: "notion export",
     rec: true,
@@ -36,7 +33,6 @@ const dossiers = [
     density: "compact",
   },
   {
-    idx: "004",
     name: "sql-migrations",
     source: "skills/sql-migrations",
     ref: "SKILL.md",
@@ -45,7 +41,6 @@ const dossiers = [
     density: "regular",
   },
   {
-    idx: "005",
     name: "release-notes",
     source: "github.com/acme/skills",
     cmd: "npx skills add release-notes",
@@ -60,8 +55,8 @@ type Dossier = (typeof dossiers)[number]
 function DossierCard({ dossier }: { dossier: Dossier }) {
   return (
     <div className={styles.dossier} data-density={dossier.density}>
-      <div className={styles.dossierMeta}>
-        <span className={styles.dossierIdx}>{dossier.idx}</span>
+      <div className={styles.dossierTop}>
+        <p className={styles.dossierName}>{dossier.name}</p>
         {dossier.rec ? (
           <span className={styles.dossierRec}>
             <span className={styles.dossierRecDot} />
@@ -69,7 +64,6 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
           </span>
         ) : null}
       </div>
-      <p className={styles.dossierName}>{dossier.name}</p>
       <p className={styles.dossierSource}>{dossier.source}</p>
       {"cmd" in dossier && dossier.cmd ? (
         <p className={styles.dossierCmd}>{dossier.cmd}</p>
@@ -114,7 +108,7 @@ export function HeroBoard() {
         <div className={styles.heroCards}>
           {dossiers.map((dossier, i) => (
             <div
-              key={dossier.idx}
+              key={dossier.name}
               className={styles.dossierSlot}
               data-slot={i + 1}
             >
@@ -132,11 +126,11 @@ export function HeroBoard() {
       </div>
 
       {/* Small screens & reduced motion: a static before/after — scattered
-          artifacts routed through the mark into an indexed stack. */}
+          artifacts routed through the mark into an aligned stack. */}
       <div className={styles.heroBoardMobile} aria-hidden="true">
         <div className={styles.mobileChaos}>
           {dossiers.slice(0, 3).map((dossier) => (
-            <div key={dossier.idx} className={styles.mobileChaosCard}>
+            <div key={dossier.name} className={styles.mobileChaosCard}>
               <DossierCard dossier={dossier} />
             </div>
           ))}
@@ -157,8 +151,7 @@ export function HeroBoard() {
         </div>
         <ul className={styles.mobileStack}>
           {dossiers.map((dossier) => (
-            <li key={dossier.idx} className={styles.mobileStackRow}>
-              <span className={styles.mobileStackIdx}>{dossier.idx}</span>
+            <li key={dossier.name} className={styles.mobileStackRow}>
               <span className={styles.mobileStackName}>{dossier.name}</span>
               {dossier.rec ? (
                 <span className={styles.mobileStackRec}>REC</span>

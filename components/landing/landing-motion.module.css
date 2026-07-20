@@ -127,10 +127,6 @@
   background: var(--lp-hairline);
 }
 
-.chapterMarkIdx {
-  color: var(--primary);
-}
-
 /* ---------------------------------------------------------------------------
    Hero — full-viewport skill routing table
 --------------------------------------------------------------------------- */
@@ -297,7 +293,8 @@
   animation: lp-spine-pulse 7s linear 1050ms infinite;
 }
 
-.root[data-page-hidden] .boardSpine {
+.root[data-page-hidden] .boardSpine,
+.root[data-hero-offscreen] .boardSpine {
   animation-play-state: paused;
 }
 
@@ -340,7 +337,6 @@
       0
     )
     rotate(calc(var(--sr) * (1 - var(--route-p))));
-  will-change: transform;
 }
 
 .dossierSlot[data-slot="1"] {
@@ -527,22 +523,14 @@
   }
 }
 
-.dossierMeta {
+.dossierTop {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
-  margin-bottom: 0.55rem;
-  padding-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--lp-hairline);
-}
-
-.dossierIdx {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--muted-foreground);
 }
 
 .dossierRec {
@@ -571,7 +559,7 @@
 }
 
 .dossierSource {
-  margin-top: 0.25rem;
+  margin-top: 0;
   font-family: var(--font-mono);
   font-size: 0.62rem;
   letter-spacing: 0.01em;
@@ -700,14 +688,6 @@
   border-bottom: 1px solid var(--lp-hairline);
 }
 
-.mobileStackIdx {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--primary);
-}
-
 .mobileStackName {
   flex: 1;
   font-size: 0.95rem;
@@ -794,14 +774,6 @@
   gap: 0.7rem;
   padding: 0.5rem 0.1rem;
   border-bottom: 1px solid var(--lp-hairline);
-}
-
-.schemaRowIdx {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--muted-foreground);
 }
 
 .schemaRowName {
@@ -949,14 +921,6 @@
   background: var(--primary);
   transform: scaleX(var(--a, 1));
   transform-origin: left;
-}
-
-.agentActionIdx {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--primary);
 }
 
 .agentActionName {
@@ -1287,7 +1251,7 @@
 
 .faqSummary {
   display: grid;
-  grid-template-columns: 2.6rem minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   gap: 0.85rem;
   padding-block: 1.4rem;
@@ -1304,14 +1268,6 @@
   outline-offset: 4px;
 }
 
-.faqIdx {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  color: var(--primary);
-}
-
 .faqQuestion {
   font-size: clamp(1.2rem, 1.9vw, 1.65rem);
   font-weight: 650;
@@ -1326,8 +1282,8 @@
   height: 1.05rem;
   color: var(--muted-foreground);
   transition:
-    transform 220ms var(--lp-ease-in-out),
-    color 220ms var(--lp-ease-in-out);
+    transform 200ms var(--lp-ease-in-out),
+    color 200ms var(--lp-ease-in-out);
 }
 
 .faqGlyph::before,
@@ -1362,7 +1318,6 @@
 
 @media (min-width: 40rem) {
   .faqAnswer {
-    margin-left: 3.45rem;
     padding-left: 1.1rem;
     border-left: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
   }
@@ -1390,14 +1345,6 @@
 
 .closingRailChip:last-child {
   border-right: none;
-}
-
-.closingRailIdx {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  color: var(--primary);
 }
 
 .closingRailName {

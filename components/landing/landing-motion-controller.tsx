@@ -104,6 +104,24 @@ export function LandingMotionController() {
       document.removeEventListener("visibilitychange", onVisibility)
     )
 
+    // Pause the hero's ambient routing pulse once the hero leaves the viewport.
+    if (hero && "IntersectionObserver" in window) {
+      const heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            delete root.dataset.heroOffscreen
+          } else {
+            root.dataset.heroOffscreen = "true"
+          }
+        })
+      })
+      heroObserver.observe(hero)
+      cleanups.push(() => {
+        heroObserver.disconnect()
+        delete root.dataset.heroOffscreen
+      })
+    }
+
     if (!reducedMotion && "IntersectionObserver" in window) {
       const groups = Array.from(
         root.querySelectorAll<HTMLElement>("[data-motion-group]")

@@ -31,13 +31,13 @@ export const metadata: Metadata = {
   },
 }
 
-/** Decorative index rail in the closing chapter. Visual examples only. */
+/** Decorative library rail in the closing chapter. Visual examples only. */
 const closingRailSkills = [
-  { idx: "001", name: "code-review" },
-  { idx: "002", name: "pdf-extraction" },
-  { idx: "003", name: "brand-voice" },
-  { idx: "004", name: "sql-migrations" },
-  { idx: "005", name: "release-notes" },
+  "code-review",
+  "pdf-extraction",
+  "brand-voice",
+  "sql-migrations",
+  "release-notes",
 ] as const
 
 function primaryAction(signedIn: boolean): {
@@ -271,7 +271,7 @@ export default function HomePage() {
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:min-h-[calc(100dvh-3.5rem)] lg:py-16">
             <div className={styles.heroGridLines} aria-hidden="true" />
 
-            <div className="relative z-[1]">
+            <div className="relative z-0">
               <p className={styles.heroEyebrow}>Skills selected by your team</p>
               <h1
                 className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
@@ -291,7 +291,7 @@ export default function HomePage() {
               </h1>
             </div>
 
-            <div className="relative z-[3] mt-9 lg:mt-12 lg:max-w-[34rem]">
+            <div className="relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]">
               <p
                 className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
               >
@@ -319,19 +319,14 @@ export default function HomePage() {
           <div className={styles.mcpSticky}>
             <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(19rem,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16 lg:py-0">
               <div className="w-full">
-                <p className={`${styles.chapterMark} uppercase`}>
-                  <span className={styles.chapterMarkIdx} aria-hidden="true">
-                    002
-                  </span>
-                  MCP access
-                </p>
+                <p className={`${styles.chapterMark} uppercase`}>MCP access</p>
                 <h2
                   id="mcp-heading"
                   className="mt-5 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
                 >
                   Bring your team&apos;s skills into your agent.
                 </h2>
-                <p className="mt-5 max-w-lg text-lg leading-relaxed text-muted-foreground">
+                <p className="mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
                   Connect Skills Board through MCP. Your agent can search the
                   shared library and retrieve install commands with read-only
                   access.
@@ -403,34 +398,25 @@ export default function HomePage() {
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(16rem,0.7fr)_minmax(28rem,1.3fr)] lg:gap-20">
             <div>
-              <p className={`${styles.chapterMark} uppercase`}>
-                <span className={styles.chapterMarkIdx} aria-hidden="true">
-                  003
-                </span>
-                Index
-              </p>
               <h2
                 id="faq-heading"
-                className="mt-5 max-w-[14ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
+                className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
               >
                 Common questions
               </h2>
-              <p className="mt-5 max-w-md text-lg leading-relaxed text-muted-foreground">
+              <p className="mt-5 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
                 Straight answers about what Skills Board is, how it fits mixed
                 agent setups, and what “recommended” means.
               </p>
             </div>
 
             <div className="border-t border-border/80">
-              {landingFaqs.map((faq, index) => (
+              {landingFaqs.map((faq) => (
                 <details
                   key={faq.question}
                   className={`faq-disclosure ${styles.faqItem}`}
                 >
                   <summary className={styles.faqSummary}>
-                    <span className={styles.faqIdx} aria-hidden="true">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
                     <span className={styles.faqQuestion}>{faq.question}</span>
                     <span className={styles.faqGlyph} aria-hidden="true" />
                   </summary>
@@ -450,9 +436,8 @@ export default function HomePage() {
           <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
             <div className={styles.closingRail} aria-hidden="true">
               {closingRailSkills.map((skill) => (
-                <span key={skill.idx} className={styles.closingRailChip}>
-                  <span className={styles.closingRailIdx}>{skill.idx}</span>
-                  <span className={styles.closingRailName}>{skill.name}</span>
+                <span key={skill} className={styles.closingRailChip}>
+                  <span className={styles.closingRailName}>{skill}</span>
                 </span>
               ))}
             </div>
@@ -464,7 +449,7 @@ export default function HomePage() {
               <span className={styles.onceStamp}>once.</span>
             </h2>
             <p
-              className={`${styles.closingCopy} mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground`}
+              className={`${styles.closingCopy} mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground`}
             >
               Save the recommendation where the whole team can find it. The next
               person can get started without asking where to look.

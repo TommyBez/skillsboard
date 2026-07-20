@@ -8,11 +8,11 @@ const mcpTools = [
 
 /** Decorative library rows echoing the hero dossiers. Visual examples only. */
 const libraryRows = [
-  { idx: "001", name: "code-review" },
-  { idx: "002", name: "pdf-extraction" },
-  { idx: "003", name: "brand-voice" },
-  { idx: "004", name: "sql-migrations" },
-  { idx: "005", name: "release-notes" },
+  "code-review",
+  "pdf-extraction",
+  "brand-voice",
+  "sql-migrations",
+  "release-notes",
 ] as const
 
 /**
@@ -33,9 +33,8 @@ export function McpSchematic() {
           <p className={styles.schemaStackTitle}>Skills your team recommends</p>
           <ul className={styles.schemaRows} aria-hidden="true">
             {libraryRows.map((row) => (
-              <li key={row.idx} className={styles.schemaRow}>
-                <span className={styles.schemaRowIdx}>{row.idx}</span>
-                <span className={styles.schemaRowName}>{row.name}</span>
+              <li key={row} className={styles.schemaRow}>
+                <span className={styles.schemaRowName}>{row}</span>
                 <span className={styles.schemaRowTick} />
               </li>
             ))}
@@ -97,9 +96,6 @@ export function McpSchematic() {
           <ul className={styles.agentActions} aria-label="Available MCP actions">
             {mcpTools.map((tool, i) => (
               <li key={tool} className={styles.agentAction} data-action={i + 1}>
-                <span className={styles.agentActionIdx} aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
                 <span className={styles.agentActionName}>{tool}</span>
               </li>
             ))}
@@ -107,7 +103,7 @@ export function McpSchematic() {
         </div>
       </div>
 
-      <figcaption className={styles.schemaCaption}>
+      <figcaption className={`${styles.schemaCaption} text-pretty`}>
         Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
         same library remains available in Skills Board.
       </figcaption>
