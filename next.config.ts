@@ -2,12 +2,6 @@ import type { NextConfig } from 'next'
 
 const nextConfig = {
   cacheComponents: true,
-  env: {
-    NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN:
-      process.env.VERCEL_ENV === 'production'
-        ? process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ?? ''
-        : '',
-  },
   cacheLife: {
     catalog: {
       stale: 60,

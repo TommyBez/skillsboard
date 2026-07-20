@@ -27,7 +27,7 @@ function getPostHogClient() {
     const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ?? ""
     posthogClient = new PostHog(token, {
       host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
-      disabled: !token,
+      disabled: !token || process.env.VERCEL_ENV !== "production",
       waitUntil: after,
     })
   }

@@ -5,7 +5,7 @@ The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 
 
 The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Analytics ingestion is disabled outside Vercel production.
 
-The production-scoped client `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and ingestion host send product events. The GTM pulse uses the official authenticated PostHog plugin — the `posthog:posthog` skill and its authenticated tools — to query production analytics and manage Pulse-owned PostHog resources.
+The browser initializes PostHog only when the Production-scoped `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` exists. The server SDK uses its native `disabled` option outside Vercel production. The GTM pulse uses the official authenticated PostHog plugin — the `posthog:posthog` skill and its authenticated tools — to query production analytics and manage Pulse-owned PostHog resources.
 
 The production baseline starts with the successful production deployment of this change. Events captured before that cutover may include development or Preview traffic and are not decision-ready without explicit reconciliation.
 
