@@ -1,10 +1,9 @@
 import { cache, Suspense } from "react"
 import Link from "next/link"
 import { headers } from "next/headers"
-import { ArrowLeftIcon, ServerIcon } from "lucide-react"
+import { ArrowLeftIcon } from "lucide-react"
 
-import { CopyButton } from "@/components/copy-button"
-import { McpSetupGuide } from "@/components/mcp-setup-guide"
+import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -30,65 +29,10 @@ const getMcpDetails = cache(async () => {
   return { config, host, mcpUrl }
 })
 
-async function McpEndpoint() {
-  const { mcpUrl } = await getMcpDetails()
-
-  return (
-    <aside className="rounded-[16px] border bg-card p-5">
-      <div className="flex items-center gap-3">
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-accent text-accent-foreground">
-          <ServerIcon className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0">
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-            MCP endpoint
-          </p>
-          <code className="mt-1 block truncate font-mono text-sm text-foreground">{mcpUrl}</code>
-        </div>
-      </div>
-    </aside>
-  )
-}
-
-async function McpConfiguration() {
-  const { config, host } = await getMcpDetails()
-
-  return (
-    <section className="overflow-hidden rounded-[16px] border bg-card">
-      <div className="px-5 py-5 sm:px-6 sm:py-6">
-        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Connect</p>
-        <h2 className="mt-2 text-2xl font-semibold tracking-tight">Use the generic MCP config</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Use this when your client is not listed above. On first use, your browser opens so you can approve read-only access.
-        </p>
-      </div>
-
-      <div className="border-t bg-muted/30 p-3 sm:p-4">
-        <pre className="overflow-x-auto rounded-[16px] bg-foreground p-5 font-mono text-sm leading-6 text-background sm:p-6">
-          <code>{config}</code>
-        </pre>
-      </div>
-
-      <div className="flex flex-col gap-3 border-t px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-        <p className="text-sm text-muted-foreground">Generated for {host}.</p>
-        <CopyButton
-          value={config}
-          label="Copy MCP config"
-          analytics={{ event: "mcp_config_copied", properties: { client: "generic" } }}
-        />
-      </div>
-    </section>
-  )
-}
-
 async function McpGuide() {
   const { config, mcpUrl } = await getMcpDetails()
 
   return <McpSetupGuide config={config} mcpUrl={mcpUrl} />
-}
-
-function McpConfigurationFallback() {
-  return <Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading MCP configuration" />
 }
 
 export default function McpSettingsPage() {
@@ -100,39 +44,29 @@ export default function McpSettingsPage() {
         Back to library
       </Button>
 
-      <header className="mt-8 grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
-        <div>
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
-          <h1 className="mt-4 max-w-3xl text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
-            Connect your agent
-          </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Search your team libraries and retrieve install commands without leaving your agent. Sign in securely through your browser—there&apos;s no API key to copy.
-          </p>
-        </div>
-
-        <Suspense fallback={<Skeleton className="h-20 rounded-[16px]" />}>
-          <McpEndpoint />
-        </Suspense>
+      <header className="mt-8 border-b pb-10">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
+        <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+          Connect your agent
+        </h1>
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Search your team libraries and retrieve install commands from your agent. Sign in through the browser — no API
+          key to copy.
+        </p>
       </header>
 
-      <div className="mt-8">
-        <Suspense fallback={<Skeleton className="h-[32rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}>
+      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-10">
+        <Suspense
+          fallback={<Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}
+        >
           <McpGuide />
         </Suspense>
-      </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(16rem,0.75fr)] lg:items-start">
-        <Suspense fallback={<McpConfigurationFallback />}>
-          <McpConfiguration />
-        </Suspense>
-
-        <section className="overflow-hidden rounded-[16px] border bg-card">
-          <div className="px-5 py-5 sm:px-6 sm:py-6">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">What agents can do</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Available tools</h2>
+        <aside className="overflow-hidden rounded-[16px] border bg-card">
+          <div className="px-5 py-5 sm:px-6">
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Tools</p>
+            <h2 className="mt-2 text-xl font-semibold tracking-tight">Available tools</h2>
           </div>
-
           <div className="border-t">
             {availableTools.map((tool) => (
               <div key={tool.name} className="border-b px-5 py-4 last:border-b-0 sm:px-6">
@@ -141,9 +75,12 @@ export default function McpSettingsPage() {
               </div>
             ))}
           </div>
-        </section>
+        </aside>
       </div>
 
+      <div className="mt-8">
+        <McpTroubleshooting />
+      </div>
     </main>
   )
 }
