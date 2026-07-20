@@ -169,6 +169,12 @@
       "skillPath": "skills/improve-animations/SKILL.md",
       "computedHash": "32f23d860467841f5b07cef198fb53efc70f2adaaa6144cf1a3434d782aed246"
     },
+    "interactivity-best-practices": {
+      "source": "Remocn/remocn",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/interactivity-best-practices/SKILL.md",
+      "computedHash": "4e56bff002ebe4c2586424d9ef076f00b36ea2cc8c4b939762c734f01a142c0b"
+    },
     "launch": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
@@ -276,6 +282,18 @@
       "sourceType": "github",
       "skillPath": "skills/referrals/SKILL.md",
       "computedHash": "1b9228f8c74abd2ad43f72baf34e7de1727dc56fba8ed8a54588bec181c39c97"
+    },
+    "remocn": {
+      "source": "Remocn/remocn",
+      "sourceType": "github",
+      "skillPath": "skills/remocn/SKILL.md",
+      "computedHash": "2d076a55d873db5fe9350bf24c2a9a6211fb223564b6f0672f1221e3d5c06344"
+    },
+    "remotion-best-practices": {
+      "source": "remotion-dev/skills",
+      "sourceType": "github",
+      "skillPath": "skills/remotion-best-practices/SKILL.md",
+      "computedHash": "c20bea275d2d86a5df405d36ee85e1104964fb7c987101ac18edd8573e316d76"
     },
     "resend": {
       "source": "resend/resend-skills",
