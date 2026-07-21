@@ -262,7 +262,7 @@ function ChapterRail() {
 const flowSteps = [
   {
     title: "Save the skill",
-    copy: "Point at the source repo a teammate recommends. Skills Board keeps the name, description, and install command tied to it.",
+    copy: "Paste a GitHub skill URL you want the team to reuse. Skills Board keeps the name, description, and install command tied to it.",
   },
   {
     title: "Find it later",

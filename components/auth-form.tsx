@@ -327,7 +327,6 @@ export function AuthForm({
         {isPending ? "Starting…" : acceptAnyOtp ? "Continue" : "Email me a code"}
         {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
       </Button>
-      {isSignUp ? <p className="-mt-2 text-center text-xs text-muted-foreground">No credit card required.</p> : null}
       <p className="border-t border-border pt-4 text-center text-sm text-muted-foreground">
         {isSignUp ? "Already have an account?" : "New to Skills Board?"}{" "}
         <Link
