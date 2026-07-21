@@ -35,11 +35,9 @@ function InLibraryLabel({ name }: { name: string }) {
 function SkillCard({
   item,
   isSaved,
-  rank,
 }: {
   item: CatalogSkill
   isSaved: boolean
-  rank?: number
 }) {
   const command = buildInstallCommand(item.installUrl, item.slug)
 
@@ -51,7 +49,6 @@ function SkillCard({
       source={item.source}
       command={command}
       metric={installCount(item.installs)}
-      rank={rank}
       details={<CatalogSkillDetailsDialog item={item} isSaved={isSaved} />}
       actions={
         isSaved
@@ -173,12 +170,11 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       )}
 
       <section aria-label="Catalog results" className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {skills.map((item, index) => (
+        {skills.map((item) => (
           <SkillCard
             key={item.id}
             item={item}
             isSaved={saved.has(`${item.installUrl}:${item.slug}`)}
-            rank={page.source === "leaderboard" ? index + 1 : undefined}
           />
         ))}
       </section>

@@ -1496,7 +1496,8 @@
   transition: transform 260ms var(--lp-ease-out);
 }
 
-.railLink[aria-current] .railTick {
+.railLink:hover .railTick,
+.railLink:focus-visible .railTick {
   transform: scaleX(1);
 }
 
@@ -1514,8 +1515,7 @@
 }
 
 .railLink:hover .railLabel,
-.railLink:focus-visible .railLabel,
-.railLink[aria-current] .railLabel {
+.railLink:focus-visible .railLabel {
   opacity: 1;
   translate: 0 0;
 }
