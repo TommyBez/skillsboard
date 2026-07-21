@@ -1546,79 +1546,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Skill ticker — the library streaming past, set in display type
---------------------------------------------------------------------------- */
-
-.ticker {
-  position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--lp-hairline);
-  padding-block: 1.1rem;
-}
-
-.tickerViewport {
-  overflow: hidden;
-  mask-image: linear-gradient(
-    to right,
-    transparent,
-    black 7%,
-    black 93%,
-    transparent
-  );
-}
-
-.tickerTrack {
-  display: flex;
-  width: max-content;
-  animation: lp-ticker 60s linear infinite;
-}
-
-.root[data-page-hidden] .tickerTrack {
-  animation-play-state: paused;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .ticker:hover .tickerTrack {
-    animation-play-state: paused;
-  }
-}
-
-.tickerGroup {
-  display: flex;
-  align-items: center;
-  gap: 2.5rem;
-  margin: 0;
-  padding: 0 2.5rem 0 0;
-  list-style: none;
-}
-
-.tickerItem {
-  display: flex;
-  align-items: center;
-  gap: 0.95rem;
-  font-size: clamp(1.3rem, 2.3vw, 1.9rem);
-  font-weight: 600;
-  font-stretch: 93%;
-  letter-spacing: -0.03em;
-  white-space: nowrap;
-  color: var(--muted-foreground);
-}
-
-.tickerItem::before {
-  content: "";
-  width: 0.42rem;
-  height: 0.42rem;
-  background: var(--primary);
-  rotate: 45deg;
-}
-
-@keyframes lp-ticker {
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-/* ---------------------------------------------------------------------------
    Workflow chapter — three moves, indexed like a manual
 --------------------------------------------------------------------------- */
 
@@ -1833,10 +1760,6 @@
 
   .schemaPulse {
     opacity: 0;
-  }
-
-  .tickerTrack {
-    animation: none;
   }
 
   .magnetic,

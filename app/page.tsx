@@ -259,41 +259,6 @@ function ChapterRail() {
   )
 }
 
-const tickerSkills = [
-  "code-review",
-  "pdf-extraction",
-  "brand-voice",
-  "sql-migrations",
-  "release-notes",
-  "incident-runbook",
-  "api-docs",
-  "design-tokens",
-] as const
-
-function SkillTicker() {
-  return (
-    <section className={styles.ticker} aria-label="Example skills teams share">
-      <p className="sr-only">
-        Teams share skills like code review, PDF extraction, brand voice, SQL
-        migrations, and release notes.
-      </p>
-      <div className={styles.tickerViewport} aria-hidden="true">
-        <div className={styles.tickerTrack}>
-          {[0, 1].map((copy) => (
-            <ul key={copy} className={styles.tickerGroup}>
-              {tickerSkills.map((skill) => (
-                <li key={skill} className={styles.tickerItem}>
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 const flowSteps = [
   {
     title: "Save the skill",
@@ -396,9 +361,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        {/* Ticker — the library streaming past */}
-        <SkillTicker />
 
         {/* Workflow — three moves, indexed like a manual */}
         <section
