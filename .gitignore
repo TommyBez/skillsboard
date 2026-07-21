@@ -10,6 +10,9 @@ __v0_jsx-dev-runtime.ts
 .env*.local
 !.env.example
 
+# Local service-account credentials
+.credentials/
+
 # Common ignores
 node_modules
 .next/
