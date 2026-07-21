@@ -1490,7 +1490,7 @@
 .railTick {
   width: 1.4rem;
   height: 1px;
-  background: currentColor;
+  background: currentcolor;
   transform: scaleX(0.5);
   transform-origin: right center;
   transition: transform 260ms var(--lp-ease-out);
