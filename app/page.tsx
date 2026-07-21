@@ -554,7 +554,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer — open-source colophon */}
-      <footer className="border-t border-border/70" data-motion-group="footer">
+      <footer className="border-t border-border/70">
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <Brand />
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
@@ -579,9 +579,6 @@ export default function HomePage() {
               <GitHubMark />
             </a>
           </div>
-        </div>
-        <div className={styles.footerWordmarkWrap} aria-hidden="true">
-          <p className={styles.footerWordmark}>Skills Board</p>
         </div>
       </footer>
     </div>

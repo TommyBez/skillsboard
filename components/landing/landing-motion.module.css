@@ -1667,40 +1667,6 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Footer — colophon with an outline wordmark set at press scale
---------------------------------------------------------------------------- */
-
-.footerWordmarkWrap {
-  overflow: hidden;
-  padding-inline: clamp(1.25rem, 2.5vw, 2.5rem);
-}
-
-.footerWordmark {
-  margin: 1.75rem 0 -0.14em;
-  font-size: clamp(4rem, 13.5vw, 13.5rem);
-  font-weight: 650;
-  font-stretch: 90%;
-  letter-spacing: -0.045em;
-  line-height: 0.86;
-  white-space: nowrap;
-  color: transparent;
-  -webkit-text-stroke: 1.5px var(--lp-hairline-strong);
-  user-select: none;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="footer"][data-motion-state="pending"]
-  .footerWordmark {
-  translate: 0 26%;
-}
-
-.root[data-motion-enabled="true"]
-  [data-motion-group="footer"][data-motion-state="visible"]
-  .footerWordmark {
-  transition: translate 750ms var(--lp-ease-out) 60ms;
-}
-
-/* ---------------------------------------------------------------------------
    Reduced motion — the page stays complete and beautiful, at rest
 --------------------------------------------------------------------------- */
 
@@ -1765,8 +1731,7 @@
   .magnetic,
   .railLink,
   .railTick,
-  .railLabel,
-  .footerWordmark {
+  .railLabel {
     transition: none;
   }
 }
