@@ -291,15 +291,12 @@
   border-radius: 1rem;
   background: color-mix(in oklch, var(--card) 72%, transparent);
   box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
+  /* Defaults with --route-p at 0 (pre-controller / top of runway). Do not
+     force opacity:1 while data-motion-enabled is unset — that paints the
+     settled shell on first load, then flashes off when the controller arms. */
   --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
   opacity: var(--frame-p);
   transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
-}
-
-/* Without the controller (no JS), the page rests in its settled state. */
-.root:not([data-motion-enabled="true"]) .libraryFrame {
-  opacity: 1;
-  transform: none;
 }
 
 .libraryHead {
