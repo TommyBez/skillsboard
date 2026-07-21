@@ -974,9 +974,9 @@
 /* Desktop schematic: horizontal wires, scroll-driven drawing. */
 @media (min-width: 64rem) {
   .schematicGrid {
-    grid-template-columns: minmax(0, 1fr) clamp(7rem, 11vw, 10rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) clamp(7.5rem, 12vw, 11rem) minmax(0, 1fr);
     align-items: center;
-    column-gap: 0;
+    column-gap: 1.25rem;
     padding-block: 2.75rem;
   }
 
@@ -1630,37 +1630,6 @@
   [data-motion-group="flow"][data-motion-state="visible"]
   .flowRow:nth-child(3) {
   transition-delay: 270ms;
-}
-
-/* ---------------------------------------------------------------------------
-   Registration marks — blueprint crosses at chapter corners
---------------------------------------------------------------------------- */
-
-.corners {
-  position: absolute;
-  inset: 1.2rem clamp(1.25rem, 2.5vw, 2.5rem);
-  pointer-events: none;
-}
-
-.corners::before,
-.corners::after {
-  content: "+";
-  position: absolute;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  font-weight: 500;
-  line-height: 1;
-  color: var(--lp-hairline-strong);
-}
-
-.corners::before {
-  top: 0;
-  left: 0;
-}
-
-.corners::after {
-  bottom: 0;
-  right: 0;
 }
 
 /* ---------------------------------------------------------------------------

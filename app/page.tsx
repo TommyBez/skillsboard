@@ -373,7 +373,6 @@ export default function HomePage() {
             className="relative mx-auto w-full max-w-[1440px] px-5 py-16 md:px-10 md:py-24"
             data-motion-group="flow"
           >
-            <div className={styles.corners} aria-hidden="true" />
             <div className={styles.flowHead}>
               <p className={`${styles.chapterMark} uppercase`} data-decode="">
                 How it works
@@ -531,7 +530,6 @@ export default function HomePage() {
           data-chapter-target="start"
         >
           <div className="relative mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
-            <div className={styles.corners} aria-hidden="true" />
             <h2
               className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
             >
