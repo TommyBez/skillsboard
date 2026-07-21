@@ -65,6 +65,13 @@ export function LandingMotionController() {
         return
       }
 
+      const scrollSpan =
+        document.documentElement.scrollHeight - window.innerHeight
+      root.style.setProperty(
+        "--scroll-progress",
+        scrollSpan > 0 ? clamp01(y / scrollSpan).toFixed(4) : "0"
+      )
+
       if (hero) {
         root.style.setProperty(
           "--route-progress",
@@ -139,6 +146,48 @@ export function LandingMotionController() {
       })
     }
 
+    // Chapter rail: aria-current follows whichever chapter crosses the middle
+    // of the viewport. Navigation state, not motion — runs regardless of the
+    // reduced-motion preference.
+    const railLinks = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-rail-link]")
+    )
+    const chapters = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-chapter-target]")
+    )
+
+    if (
+      railLinks.length &&
+      chapters.length &&
+      "IntersectionObserver" in window
+    ) {
+      const setCurrentChapter = (name: string) => {
+        railLinks.forEach((link) => {
+          if (link.dataset.railLink === name) {
+            link.setAttribute("aria-current", "true")
+          } else {
+            link.removeAttribute("aria-current")
+          }
+        })
+      }
+
+      const chapterObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return
+            }
+            const target = entry.target as HTMLElement
+            setCurrentChapter(target.dataset.chapterTarget ?? "")
+          })
+        },
+        { rootMargin: "-46% 0px -46% 0px", threshold: 0 }
+      )
+
+      chapters.forEach((chapter) => chapterObserver.observe(chapter))
+      cleanups.push(() => chapterObserver.disconnect())
+    }
+
     if (!reducedMotion && "IntersectionObserver" in window) {
       const groups = Array.from(
         root.querySelectorAll<HTMLElement>("[data-motion-group]")
@@ -175,6 +224,72 @@ export function LandingMotionController() {
         groups.forEach((group) => group.removeAttribute("data-motion-state"))
       })
 
+      // Decode effect: mono chapter marks scramble into place once, the
+      // first time they enter the viewport. The SSR text is the final text,
+      // so the page never depends on this running.
+      const decodeTargets = Array.from(
+        root.querySelectorAll<HTMLElement>("[data-decode]")
+      )
+
+      if (decodeTargets.length) {
+        const DECODE_CHARS = "ABCDEFGHJKMNPQRSTVWXYZ0123456789#/<>*"
+        const DECODE_DURATION = 620
+        const decodeFrames = new Set<number>()
+        const finalTexts = new Map<HTMLElement, string>()
+
+        const runDecode = (el: HTMLElement) => {
+          const finalText = finalTexts.get(el) ?? ""
+          const start = performance.now()
+
+          const step = (now: number) => {
+            const p = clamp01((now - start) / DECODE_DURATION)
+            const reveal = Math.floor(p * finalText.length)
+            let out = finalText.slice(0, reveal)
+            for (let i = reveal; i < finalText.length; i++) {
+              out +=
+                finalText[i] === " "
+                  ? " "
+                  : DECODE_CHARS[
+                      Math.floor(Math.random() * DECODE_CHARS.length)
+                    ]
+            }
+            el.textContent = p < 1 ? out : finalText
+            if (p < 1) {
+              decodeFrames.add(window.requestAnimationFrame(step))
+            }
+          }
+
+          decodeFrames.add(window.requestAnimationFrame(step))
+        }
+
+        decodeTargets.forEach((el) => {
+          finalTexts.set(el, el.textContent ?? "")
+        })
+
+        const decodeObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) {
+                return
+              }
+              const el = entry.target as HTMLElement
+              decodeObserver.unobserve(el)
+              runDecode(el)
+            })
+          },
+          { threshold: 0.5 }
+        )
+
+        decodeTargets.forEach((el) => decodeObserver.observe(el))
+        cleanups.push(() => {
+          decodeObserver.disconnect()
+          decodeFrames.forEach((id) => window.cancelAnimationFrame(id))
+          finalTexts.forEach((text, el) => {
+            el.textContent = text
+          })
+        })
+      }
+
       // Pointer parallax on the hero board: a few pixels of depth at most,
       // pointer-fine only, smoothed by a CSS transition on the card layer.
       const board = root.querySelector<HTMLElement>("[data-hero-board]")
@@ -208,6 +323,43 @@ export function LandingMotionController() {
           hero.removeEventListener("pointerleave", onPointerLeave)
         })
       }
+
+      // Magnetic CTAs: primary actions lean a few pixels toward the pointer
+      // while hovered, then settle back. Pointer-fine only, tightly capped.
+      if (finePointer) {
+        const magnets = Array.from(
+          root.querySelectorAll<HTMLElement>("[data-magnetic]")
+        )
+
+        magnets.forEach((el) => {
+          const onMagnetMove = (event: PointerEvent) => {
+            const rect = el.getBoundingClientRect()
+            const dx = event.clientX - (rect.left + rect.width / 2)
+            const dy = event.clientY - (rect.top + rect.height / 2)
+            el.style.setProperty(
+              "--mx",
+              Math.max(-6, Math.min(6, dx * 0.12)).toFixed(2)
+            )
+            el.style.setProperty(
+              "--my",
+              Math.max(-4, Math.min(4, dy * 0.2)).toFixed(2)
+            )
+          }
+          const onMagnetLeave = () => {
+            el.style.setProperty("--mx", "0")
+            el.style.setProperty("--my", "0")
+          }
+
+          el.addEventListener("pointermove", onMagnetMove, { passive: true })
+          el.addEventListener("pointerleave", onMagnetLeave)
+          cleanups.push(() => {
+            el.removeEventListener("pointermove", onMagnetMove)
+            el.removeEventListener("pointerleave", onMagnetLeave)
+            el.style.removeProperty("--mx")
+            el.style.removeProperty("--my")
+          })
+        })
+      }
     }
 
     return () => {
@@ -216,6 +368,7 @@ export function LandingMotionController() {
       delete root.dataset.pageHidden
       root.style.removeProperty("--route-progress")
       root.style.removeProperty("--mcp-progress")
+      root.style.removeProperty("--scroll-progress")
     }
   }, [])
 

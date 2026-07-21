@@ -122,23 +122,25 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      <Button
-        size="lg"
-        className={styles.ctaButton}
-        nativeButton={false}
-        render={(
-          <TrackedLink
-            href={primary.href}
-            analytics={{
-              event: "landing_cta_clicked",
-              properties: primaryCtaEventProperties(signedIn, "hero"),
-            }}
-          />
-        )}
-      >
-        {primary.label}
-        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-      </Button>
+      <span className={styles.magnetic} data-magnetic>
+        <Button
+          size="lg"
+          className={styles.ctaButton}
+          nativeButton={false}
+          render={(
+            <TrackedLink
+              href={primary.href}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties(signedIn, "hero"),
+              }}
+            />
+          )}
+        >
+          {primary.label}
+          <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+        </Button>
+      </span>
       <Button
         size="lg"
         variant="outline"
@@ -170,24 +172,26 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
   const href = signedIn ? "/settings/mcp" : "/sign-up"
 
   return (
-    <Button
-      size="lg"
-      className={styles.ctaButton}
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={href}
-          analytics={{
-            event: "mcp_entry_clicked",
-            properties: mcpEntryEventProperties(signedIn, "landing_section", href),
-          }}
-        />
-      )}
-    >
-      <CableIcon data-icon="inline-start" />
-      {signedIn ? "Connect your agent" : "Create a library to connect"}
-      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-    </Button>
+    <span className={styles.magnetic} data-magnetic>
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={href}
+            analytics={{
+              event: "mcp_entry_clicked",
+              properties: mcpEntryEventProperties(signedIn, "landing_section", href),
+            }}
+          />
+        )}
+      >
+        <CableIcon data-icon="inline-start" />
+        {signedIn ? "Connect your agent" : "Create a library to connect"}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+    </span>
   )
 }
 
@@ -200,23 +204,25 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <Button
-      size="lg"
-      className={styles.ctaButton}
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={primary.href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties(signedIn, "closing"),
-          }}
-        />
-      )}
-    >
-      {primary.label}
-      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-    </Button>
+    <span className={styles.magnetic} data-magnetic>
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primary.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties(signedIn, "closing"),
+            }}
+          />
+        )}
+      >
+        {primary.label}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+    </span>
   )
 }
 
@@ -224,6 +230,84 @@ async function HomeFinalActions() {
   const session = await getSession()
   return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
 }
+
+const railChapters = [
+  { id: "intro", label: "Library" },
+  { id: "flow", label: "Workflow" },
+  { id: "mcp", label: "MCP" },
+  { id: "pricing", label: "Pricing" },
+  { id: "faq", label: "FAQ" },
+  { id: "start", label: "Start" },
+] as const
+
+function ChapterRail() {
+  return (
+    <nav className={styles.rail} aria-label="Page chapters">
+      {railChapters.map((chapter) => (
+        <a
+          key={chapter.id}
+          href={`#${chapter.id}`}
+          className={styles.railLink}
+          data-rail-link={chapter.id}
+          aria-current={chapter.id === "intro" ? "true" : undefined}
+        >
+          <span className={styles.railLabel}>{chapter.label}</span>
+          <span className={styles.railTick} aria-hidden="true" />
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+const tickerSkills = [
+  "code-review",
+  "pdf-extraction",
+  "brand-voice",
+  "sql-migrations",
+  "release-notes",
+  "incident-runbook",
+  "api-docs",
+  "design-tokens",
+] as const
+
+function SkillTicker() {
+  return (
+    <section className={styles.ticker} aria-label="Example skills teams share">
+      <p className="sr-only">
+        Teams share skills like code review, PDF extraction, brand voice, SQL
+        migrations, and release notes.
+      </p>
+      <div className={styles.tickerViewport} aria-hidden="true">
+        <div className={styles.tickerTrack}>
+          {[0, 1].map((copy) => (
+            <ul key={copy} className={styles.tickerGroup}>
+              {tickerSkills.map((skill) => (
+                <li key={skill} className={styles.tickerItem}>
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+const flowSteps = [
+  {
+    title: "Save the skill",
+    copy: "Point at the source repo a teammate recommends. Skills Board keeps the name, description, and install command tied to it.",
+  },
+  {
+    title: "Find it later",
+    copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
+  },
+  {
+    title: "Use it your way",
+    copy: "Open the source, copy the install command, download a ZIP, or let your agent fetch it over MCP.",
+  },
+] as const
 
 function GitHubMark() {
   return (
@@ -246,6 +330,7 @@ export default function HomePage() {
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
+      <ChapterRail />
 
       <header className={styles.header}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
@@ -254,17 +339,25 @@ export default function HomePage() {
             <HomeHeaderActions />
           </Suspense>
         </div>
+        <span className={styles.scrollProgress} aria-hidden="true" />
       </header>
 
       <main>
         {/* Hero — sticky chapter: dossiers file into the team library */}
-        <section className={styles.hero} data-hero-scene>
+        <section
+          id="intro"
+          className={styles.hero}
+          data-hero-scene
+          data-chapter-target="intro"
+        >
           <div className={`${styles.heroSticky} ${styles.grain}`}>
             <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:py-16">
               <div className={styles.heroGridLines} aria-hidden="true" />
 
-              <div className="relative z-0">
-                <p className={styles.heroEyebrow}>Skills selected by your team</p>
+              <div className={`${styles.heroExit} relative z-0`}>
+                <p className={styles.heroEyebrow} data-decode="">
+                  Skills selected by your team
+                </p>
                 <h1
                   className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
                 >
@@ -283,7 +376,9 @@ export default function HomePage() {
                 </h1>
               </div>
 
-              <div className="relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]">
+              <div
+                className={`${styles.heroExit} relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]`}
+              >
                 <p
                   className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
                 >
@@ -302,17 +397,57 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Ticker — the library streaming past */}
+        <SkillTicker />
+
+        {/* Workflow — three moves, indexed like a manual */}
+        <section
+          id="flow"
+          aria-labelledby="flow-heading"
+          className={`${styles.flowSection} scroll-mt-14`}
+          data-chapter-target="flow"
+        >
+          <div
+            className="relative mx-auto w-full max-w-[1440px] px-5 py-16 md:px-10 md:py-24"
+            data-motion-group="flow"
+          >
+            <div className={styles.corners} aria-hidden="true" />
+            <div className={styles.flowHead}>
+              <p className={`${styles.chapterMark} uppercase`} data-decode="">
+                How it works
+              </p>
+              <h2
+                id="flow-heading"
+                className="mt-5 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
+              >
+                Save once. Find fast. Use it your way.
+              </h2>
+            </div>
+            <ol className={styles.flowRows}>
+              {flowSteps.map((step) => (
+                <li key={step.title} className={styles.flowRow}>
+                  <h3 className={styles.flowTitle}>{step.title}</h3>
+                  <p className={styles.flowCopy}>{step.copy}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
         {/* MCP — the signature routing chapter */}
         <section
           id="mcp"
           aria-labelledby="mcp-heading"
           className={`${styles.mcpChapter} scroll-mt-14 border-b border-border/70`}
           data-mcp-chapter
+          data-chapter-target="mcp"
         >
           <div className={styles.mcpSticky}>
             <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(19rem,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16 lg:py-0">
               <div className="w-full">
-                <p className={`${styles.chapterMark} uppercase`}>MCP access</p>
+                <p className={`${styles.chapterMark} uppercase`} data-decode="">
+                  MCP access
+                </p>
                 <h2
                   id="mcp-heading"
                   className="mt-5 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
@@ -352,6 +487,7 @@ export default function HomePage() {
           aria-labelledby="pricing-heading"
           className={`${styles.pricingSection} ${styles.grain} scroll-mt-14`}
           data-motion-group="pricing"
+          data-chapter-target="pricing"
         >
           <div className="mx-auto w-full max-w-[1440px] px-5 py-20 md:px-10 md:py-28 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.65fr)] lg:items-end lg:gap-6">
             <div className={styles.pricingZeroWrap} aria-hidden="true">
@@ -388,6 +524,7 @@ export default function HomePage() {
           id="faq"
           aria-labelledby="faq-heading"
           className="scroll-mt-14 border-b border-border/70"
+          data-chapter-target="faq"
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(16rem,0.7fr)_minmax(28rem,1.3fr)] lg:gap-20">
             <div>
@@ -425,8 +562,14 @@ export default function HomePage() {
         </section>
 
         {/* Closing — everything indexed, one final action */}
-        <section className={styles.grain} data-motion-group="closing">
-          <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
+        <section
+          id="start"
+          className={`${styles.grain} scroll-mt-14`}
+          data-motion-group="closing"
+          data-chapter-target="start"
+        >
+          <div className="relative mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
+            <div className={styles.corners} aria-hidden="true" />
             <h2
               className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
             >
@@ -449,7 +592,7 @@ export default function HomePage() {
       </main>
 
       {/* Footer — open-source colophon */}
-      <footer className="border-t border-border/70">
+      <footer className="border-t border-border/70" data-motion-group="footer">
         <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
           <Brand />
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
@@ -474,6 +617,9 @@ export default function HomePage() {
               <GitHubMark />
             </a>
           </div>
+        </div>
+        <div className={styles.footerWordmarkWrap} aria-hidden="true">
+          <p className={styles.footerWordmark}>Skills Board</p>
         </div>
       </footer>
     </div>
