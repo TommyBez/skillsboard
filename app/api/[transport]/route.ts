@@ -125,7 +125,7 @@ async function route(request: Request) {
 
       server.registerTool("search_skills", {
         title: "Search team skills",
-        description: "Search saved team skills by name, description, note, repository, or tag",
+        description: "Search saved team skills by name, description, note, example prompt, repository, or tag",
         inputSchema: { query: z.string().min(1) },
       }, async ({ query }) => trackMcpToolCall(jwt.sub!, "search_skills", async () => {
         const skills = await listUserSkills(jwt.sub!)
@@ -134,7 +134,7 @@ async function route(request: Request) {
           content: [{
             type: "text" as const,
             text: JSON.stringify(skills.filter((skill) => (
-              `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`
+              `${skill.title} ${skill.description ?? ""} ${skill.note ?? ""} ${skill.examplePrompts.join(" ")} ${skill.repoOwner}/${skill.repoName} ${skill.tags.join(" ")}`
                 .toLowerCase()
                 .includes(normalized)
             )), null, 2),
@@ -229,9 +229,10 @@ async function route(request: Request) {
           skillPath: z.string().max(512).optional().describe("Repository-relative folder containing SKILL.md (\"\" for the repository root). Optional when the repository contains a single skill."),
           tags: z.array(z.string().trim().min(1).max(30)).max(10).optional().describe("Up to 10 team tags"),
           note: z.string().trim().max(500).optional().describe("Optional note for teammates"),
+          examplePrompts: z.array(z.string().trim().min(1).max(800)).max(8).optional().describe("Up to 8 example prompts for teammates"),
           organizationId: z.string().optional().describe("Team library to save into. Optional when you belong to a single team."),
         },
-      }, async ({ githubUrl, skillPath, tags, note, organizationId }) => {
+      }, async ({ githubUrl, skillPath, tags, note, examplePrompts, organizationId }) => {
         if (!tokenHasScope(jwt, "skills:write")) {
           captureMcpToolUsed(jwt.sub!, "add_skill", false)
           return textResult("This connection is missing the skills:write scope. Reconnect Skills Board from your MCP client to grant write access.", true)
@@ -268,6 +269,7 @@ async function route(request: Request) {
           skillPath: resolvedPath.skillPath,
           tags: tags ?? [],
           note,
+          examplePrompts: examplePrompts ?? [],
           surface: "mcp",
         })
         captureMcpToolUsed(jwt.sub!, "add_skill", result.ok)
@@ -287,6 +289,7 @@ async function route(request: Request) {
             skillPath: result.skill.skillPath,
             tags: result.skill.tags,
             note: result.skill.note,
+            examplePrompts: result.skill.examplePrompts,
           },
         }, null, 2))
       })

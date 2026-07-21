@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { SkillPromptList } from "@/components/skill-prompt-list"
 import { TrackedAnchor } from "@/components/tracked-anchor"
 import { Badge } from "@/components/ui/badge"
 import type { ClientAnalyticsEvent } from "@/lib/analytics-client"
@@ -31,6 +32,7 @@ interface SkillDossierProps {
   name: string
   description?: string | null
   note?: string | null
+  examplePrompts?: string[]
   source: string
   command: string
   metric?: string
@@ -71,6 +73,7 @@ export function SkillDossier({
   name,
   description,
   note,
+  examplePrompts = [],
   source,
   command,
   metric,
@@ -135,6 +138,7 @@ export function SkillDossier({
               {note}
             </p>
           ) : null}
+          <SkillPromptList prompts={examplePrompts} skillName={name} />
         </div>
 
         {tags.length ? (

@@ -13,6 +13,7 @@ export interface SaveSkillInput {
   skillPath: string
   tags: string[]
   note?: string
+  examplePrompts: string[]
   surface: "web" | "mcp"
 }
 
@@ -28,6 +29,7 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
     const selectedSkill = repository.skill
 
     const note = input.note || null
+    const examplePrompts = [...new Set(input.examplePrompts)]
     const [savedSkill] = await db.insert(skill).values({
       organizationId: input.organizationId,
       createdBy: input.userId,
@@ -42,6 +44,7 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
       skillPath: selectedSkill.path,
       tags: [...new Set(input.tags.map((tag) => tag.toLowerCase()))],
       note,
+      examplePrompts,
     }).onConflictDoNothing({
       target: [skill.organizationId, skill.githubUrl, skill.skillName],
     }).returning()
@@ -56,6 +59,7 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
         repo_name: repository.repoName,
         tag_count: input.tags.length,
         has_note: Boolean(note),
+        example_prompt_count: examplePrompts.length,
         surface: input.surface,
       },
       teamId: input.organizationId,

@@ -20,11 +20,17 @@ const githubRepositorySchema = z.object({
   githubUrl: z.url(),
 })
 
+const examplePromptsSchema = z
+  .array(z.string().trim().min(1).max(800))
+  .max(8)
+  .transform((prompts) => [...new Set(prompts)])
+
 const skillSchema = z.object({
   githubUrl: z.url(),
   skillPath: z.string().max(512),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).default([]),
   note: z.string().trim().max(500).optional(),
+  examplePrompts: examplePromptsSchema.default([]),
 })
 
 export async function discoverRepositorySkills(input: z.input<typeof githubRepositorySchema>) {
@@ -67,7 +73,7 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
   const parsed = skillSchema.safeParse(input)
 
   if (!parsed.success) {
-    return { ok: false as const, error: "Check the repository, selected skill, tags, and note, then try again." }
+    return { ok: false as const, error: "Check the repository, selected skill, tags, note, and prompts, then try again." }
   }
 
   const result = await saveSkillToLibrary({
@@ -77,6 +83,7 @@ export async function addSkill(input: z.input<typeof skillSchema>) {
     skillPath: parsed.data.skillPath,
     tags: parsed.data.tags,
     note: parsed.data.note,
+    examplePrompts: parsed.data.examplePrompts,
     surface: "web",
   })
   if (!result.ok) return { ok: false as const, error: result.error }
@@ -127,6 +134,62 @@ export async function updateSkillNote(input: z.input<typeof updateSkillNoteSchem
     properties: {
       skill_id: parsed.data.skillId,
       has_note: Boolean(parsed.data.note),
+    },
+    teamId: organizationId,
+  })
+  return { ok: true as const }
+}
+
+const updateSkillExamplePromptsSchema = z.object({
+  skillId: z.uuid(),
+  examplePrompts: examplePromptsSchema,
+})
+
+export async function updateSkillExamplePrompts(
+  input: z.input<typeof updateSkillExamplePromptsSchema>,
+) {
+  const session = await requireSession()
+  const { organizationId, userId } = await requireActiveOrganization(session)
+  const parsed = updateSkillExamplePromptsSchema.safeParse(input)
+
+  if (!parsed.success) {
+    return {
+      ok: false as const,
+      error: "Add up to 8 prompts, with no more than 800 characters each.",
+    }
+  }
+
+  const [savedSkill] = await db
+    .select({ id: skill.id })
+    .from(skill)
+    .where(and(
+      eq(skill.id, parsed.data.skillId),
+      eq(skill.organizationId, organizationId),
+    ))
+    .limit(1)
+
+  if (!savedSkill) {
+    return { ok: false as const, error: "Skill not found" }
+  }
+
+  await db
+    .update(skill)
+    .set({
+      examplePrompts: parsed.data.examplePrompts,
+      updatedAt: new Date(),
+    })
+    .where(and(
+      eq(skill.id, parsed.data.skillId),
+      eq(skill.organizationId, organizationId),
+    ))
+
+  updateTag(cacheTags.organizationSkills(organizationId))
+  captureTeamEvent({
+    distinctId: userId,
+    event: "skill_example_prompts_updated",
+    properties: {
+      skill_id: parsed.data.skillId,
+      example_prompt_count: parsed.data.examplePrompts.length,
     },
     teamId: organizationId,
   })

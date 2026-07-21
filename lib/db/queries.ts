@@ -26,6 +26,7 @@ export async function listOrganizationSkills(organizationId: string) {
       skillPath: skill.skillPath,
       tags: skill.tags,
       note: skill.note,
+      examplePrompts: skill.examplePrompts,
       metadataRefreshedAt: skill.metadataRefreshedAt,
       createdAt: skill.createdAt,
       updatedAt: skill.updatedAt,
@@ -54,6 +55,7 @@ export async function listUserSkills(userId: string) {
       skillPath: skill.skillPath,
       tags: skill.tags,
       note: skill.note,
+      examplePrompts: skill.examplePrompts,
       createdAt: skill.createdAt,
       updatedAt: skill.updatedAt,
     })

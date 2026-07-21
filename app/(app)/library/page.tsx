@@ -5,6 +5,7 @@ import { CableIcon, DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "l
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
+import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
 import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { SkillDossier } from "@/components/skill-dossier"
 import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
@@ -72,7 +73,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     : [0, 0]
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
-    (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
+    (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.examplePrompts.join(" ")} ${item.tags.join(" ")}`.toLowerCase().includes(query))
     && (!params.tag || item.tags.includes(params.tag))
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
@@ -109,7 +110,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
             <label htmlFor="library-search" className="text-sm font-semibold">Search team library</label>
             <div className="relative">
               <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, note, or tag" className="pl-10" />
+              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, prompt, note, or tag" className="pl-10" />
             </div>
           </div>
           {params.tag ? <input type="hidden" name="tag" value={params.tag} /> : null}
@@ -148,6 +149,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 name={item.title}
                 description={item.description ?? `${item.repoOwner}/${item.repoName}`}
                 note={item.note}
+                examplePrompts={item.examplePrompts}
                 source={`${item.repoOwner}/${item.repoName}`}
                 command={command}
                 metric={`${item.repoStars.toLocaleString()} ${item.repoStars === 1 ? "star" : "stars"}`}
@@ -163,6 +165,11 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 }}
                 actions={(
                   <div className="flex flex-wrap items-center gap-2">
+                    <EditSkillPromptsDialog
+                      skillId={item.id}
+                      skillName={item.title}
+                      prompts={item.examplePrompts}
+                    />
                     {canEditNote ? (
                       <EditSkillNoteDialog
                         skillId={item.id}
