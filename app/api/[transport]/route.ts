@@ -180,16 +180,23 @@ async function route(request: Request) {
           view: z.enum(["trending", "hot", "all-time"]).optional(),
           page: z.number().int().min(0).optional(),
         },
-      }, async ({ query, view, page }) => trackMcpToolCall(jwt.sub!, "discover_skills", async () => ({
-        content: [{
-          type: "text" as const,
-          text: JSON.stringify(
-            query ? await searchCatalog(query) : await getLeaderboard(view ?? "trending", page ?? 0),
-            null,
-            2,
-          ),
-        }],
-      })))
+      }, async ({ query, view, page }) => {
+        try {
+          return await trackMcpToolCall(jwt.sub!, "discover_skills", async () => ({
+            content: [{
+              type: "text" as const,
+              text: JSON.stringify(
+                query ? await searchCatalog(query) : await getLeaderboard(view ?? "trending", page ?? 0),
+                null,
+                2,
+              ),
+            }],
+          }))
+        } catch (error) {
+          console.error("Unable to load the skills catalog from MCP", error)
+          return textResult("The public skills catalog is unavailable. Try again in a moment.", true)
+        }
+      })
 
       server.registerTool("discover_repository_skills", {
         title: "Inspect a repository for skills",
