@@ -110,7 +110,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
           ),
         },
         {
-          text: "Approve read-only access. The tools are available right away. Try asking Claude to list your saved skills.",
+          text: "Approve access. The tools are available right away. Try asking Claude to list your saved skills or add one from a GitHub URL.",
         },
       ],
     },
@@ -165,7 +165,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
           ),
         },
         {
-          text: "Approve read-only access in the browser window that opens.",
+          text: "Approve access in the browser window that opens.",
         },
       ],
     },

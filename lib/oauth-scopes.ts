@@ -1,4 +1,4 @@
-export const oauthScopes = ["openid", "profile", "email", "offline_access", "skills:read"] as const
+export const oauthScopes = ["openid", "profile", "email", "offline_access", "skills:read", "skills:write"] as const
 
 export const oauthScopeDescriptions: Record<string, string> = {
   openid: "Confirm your Skills Board identity",
@@ -6,4 +6,5 @@ export const oauthScopeDescriptions: Record<string, string> = {
   email: "View your email address",
   offline_access: "Keep access after you close the client",
   "skills:read": "View and search saved skills, public skills, and install commands",
+  "skills:write": "Save new skills to your team libraries",
 }
