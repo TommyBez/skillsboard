@@ -273,7 +273,7 @@ async function route(request: Request) {
         captureMcpToolUsed(jwt.sub!, "add_skill", result.ok)
         if (!result.ok) return textResult(result.error, true)
 
-        revalidateTag(cacheTags.organizationSkills(organization.organization.id), "max")
+        revalidateTag(cacheTags.organizationSkills(organization.organization.id), { expire: 0 })
         return textResult(JSON.stringify({
           saved: true,
           organizationName: organization.organization.name,

@@ -1,5 +1,3 @@
-import { and, eq } from "drizzle-orm"
-
 import { db } from "@/lib/db"
 import { skill } from "@/lib/db/schema"
 import {
@@ -29,17 +27,6 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
     const repository = await resolveGitHubSkill(input.githubUrl, input.skillPath)
     const selectedSkill = repository.skill
 
-    const existing = await db
-      .select({ id: skill.id })
-      .from(skill)
-      .where(and(
-        eq(skill.organizationId, input.organizationId),
-        eq(skill.githubUrl, repository.githubUrl),
-        eq(skill.skillName, selectedSkill.name),
-      ))
-      .limit(1)
-    if (existing.length) return { ok: false, error: "This skill is already in your team library" }
-
     const note = input.note || null
     const [savedSkill] = await db.insert(skill).values({
       organizationId: input.organizationId,
@@ -55,7 +42,10 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
       skillPath: selectedSkill.path,
       tags: [...new Set(input.tags.map((tag) => tag.toLowerCase()))],
       note,
+    }).onConflictDoNothing({
+      target: [skill.organizationId, skill.githubUrl, skill.skillName],
     }).returning()
+    if (!savedSkill) return { ok: false, error: "This skill is already in your team library" }
 
     captureTeamEvent({
       distinctId: input.userId,
