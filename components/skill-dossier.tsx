@@ -37,8 +37,6 @@ interface SkillDossierProps {
   command: string
   metric?: string
   tags?: string[]
-  /** Position in a ranked list (leaderboards); rendered as a monospace ordinal. */
-  rank?: number
   addedBy?: string | null
   href?: string
   hrefLabel?: string
@@ -78,7 +76,6 @@ export function SkillDossier({
   command,
   metric,
   tags = [],
-  rank,
   addedBy,
   href,
   hrefLabel = "View source",
@@ -111,11 +108,6 @@ export function SkillDossier({
       <div className={cn("flex flex-1 flex-col", compact ? "gap-4 p-4" : "gap-5 p-5 md:p-6")}>
         <div className="flex min-w-0 items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2 font-mono text-xs text-muted-foreground">
-            {typeof rank === "number" ? (
-              <span className="shrink-0 font-semibold tabular-nums text-primary">
-                {String(rank).padStart(2, "0")}
-              </span>
-            ) : null}
             <GitForkIcon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
             <span className="truncate">{source}</span>
           </div>
