@@ -20,7 +20,7 @@ type NonTeamEventPropertiesMap = {
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
     succeeded: boolean
-    tool_name: "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
+    tool_name: "add_skill" | "discover_repository_skills" | "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
   }
   signup_form_submitted: {
     method: "email_otp"
@@ -46,6 +46,7 @@ type TeamEventPropertiesMap = {
     repo_name: string
     repo_owner: string
     skill_name: string
+    surface: "mcp" | "web"
     tag_count: number
   }
   team_member_invited: {

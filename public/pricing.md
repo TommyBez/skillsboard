@@ -3,7 +3,7 @@
 ## Free
 - Price: $0/month
 - Limits: Unlimited team libraries on the hosted product
-- Features: Shared skill library, search, team-specific tags, original source links, install commands, ZIP downloads of the latest source files, optional authenticated read-only MCP access
+- Features: Shared skill library, search, team-specific tags, original source links, install commands, ZIP downloads of the latest source files, optional authenticated MCP access
 - Notes: No trial. No credit card. No paid tier. The hosted product is free forever. The code is open source.
 
 ## Self-hosted

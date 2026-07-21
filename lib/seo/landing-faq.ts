@@ -17,7 +17,7 @@ export const landingFaqs = [
   {
     question: "What can my agent do through MCP?",
     answer:
-      "After you connect Skills Board, an MCP-compatible agent can list and search your team libraries, retrieve install commands for saved skills, and browse the public catalog. Access is read-only: the agent cannot add, edit, or delete team skills.",
+      "After you connect Skills Board, an MCP-compatible agent can list and search your team libraries, retrieve install commands for saved skills, browse the public catalog, and save new skills to a team library. The agent cannot edit or delete team skills.",
   },
   {
     question: "Does every skill work with every agent?",

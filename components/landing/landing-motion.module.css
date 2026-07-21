@@ -291,15 +291,12 @@
   border-radius: 1rem;
   background: color-mix(in oklch, var(--card) 72%, transparent);
   box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
+  /* Defaults with --route-p at 0 (pre-controller / top of runway). Do not
+     force opacity:1 while data-motion-enabled is unset — that paints the
+     settled shell on first load, then flashes off when the controller arms. */
   --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
   opacity: var(--frame-p);
   transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
-}
-
-/* Without the controller (no JS), the page rests in its settled state. */
-.root:not([data-motion-enabled="true"]) .libraryFrame {
-  opacity: 1;
-  transform: none;
 }
 
 .libraryHead {
@@ -977,9 +974,9 @@
 /* Desktop schematic: horizontal wires, scroll-driven drawing. */
 @media (min-width: 64rem) {
   .schematicGrid {
-    grid-template-columns: minmax(0, 1fr) clamp(7rem, 11vw, 10rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) clamp(7.5rem, 12vw, 11rem) minmax(0, 1fr);
     align-items: center;
-    column-gap: 0;
+    column-gap: 1.25rem;
     padding-block: 2.75rem;
   }
 
@@ -1430,6 +1427,212 @@
 }
 
 /* ---------------------------------------------------------------------------
+   Scroll progress — a hairline of primary ink under the command strip
+--------------------------------------------------------------------------- */
+
+.scrollProgress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Chapter rail — fixed section index, printed in difference ink
+--------------------------------------------------------------------------- */
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: clamp(0.9rem, 1.6vw, 1.6rem);
+  z-index: 30;
+  display: none;
+  translate: 0 -50%;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.9rem;
+  mix-blend-mode: difference;
+}
+
+@media (min-width: 80rem) {
+  .rail {
+    display: flex;
+  }
+}
+
+.railLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+  color: #fff;
+  opacity: 0.38;
+  text-decoration: none;
+  transition: opacity 220ms var(--lp-ease-out);
+}
+
+.railLink:hover,
+.railLink[aria-current] {
+  opacity: 1;
+}
+
+.railLink:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  opacity: 1;
+}
+
+.railTick {
+  width: 1.4rem;
+  height: 1px;
+  background: currentcolor;
+  transform: scaleX(0.5);
+  transform-origin: right center;
+  transition: transform 260ms var(--lp-ease-out);
+}
+
+.railLink[aria-current] .railTick {
+  transform: scaleX(1);
+}
+
+.railLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  translate: 6px 0;
+  transition:
+    opacity 220ms var(--lp-ease-out),
+    translate 220ms var(--lp-ease-out);
+}
+
+.railLink:hover .railLabel,
+.railLink:focus-visible .railLabel,
+.railLink[aria-current] .railLabel {
+  opacity: 1;
+  translate: 0 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Hero exit — copy recedes slightly as the dossiers finish filing
+--------------------------------------------------------------------------- */
+
+@media (min-width: 64rem) {
+  .root[data-motion-enabled="true"] .heroExit {
+    --hx: clamp(0, calc((var(--route-p) - 0.45) / 0.55), 1);
+    translate: 0 calc(var(--hx) * -18px);
+    opacity: calc(1 - var(--hx) * 0.28);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Magnetic CTAs — a few pixels of pull, pointer-fine only
+--------------------------------------------------------------------------- */
+
+.magnetic {
+  display: inline-flex;
+  translate: calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px);
+  transition: translate 300ms var(--lp-ease-out);
+}
+
+/* ---------------------------------------------------------------------------
+   Workflow chapter — three moves, indexed like a manual
+--------------------------------------------------------------------------- */
+
+.flowSection {
+  position: relative;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.flowRows {
+  margin-top: 3rem;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.flowRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem 2.5rem;
+  padding-block: 1.9rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+@media (min-width: 64rem) {
+  .flowRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: baseline;
+    padding-block: 2.7rem;
+  }
+}
+
+.flowTitle {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.flowCopy {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+/* Staggered reveal, driven by the shared motion-group state machine. */
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="pending"]
+  .flowHead,
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="pending"]
+  .flowRow {
+  opacity: 0;
+  translate: 0 18px;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowHead,
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow {
+  transition:
+    opacity 500ms var(--lp-ease-out),
+    translate 500ms var(--lp-ease-out);
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(1) {
+  transition-delay: 110ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(2) {
+  transition-delay: 190ms;
+}
+
+.root[data-motion-enabled="true"]
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(3) {
+  transition-delay: 270ms;
+}
+
+/* ---------------------------------------------------------------------------
    Reduced motion — the page stays complete and beautiful, at rest
 --------------------------------------------------------------------------- */
 
@@ -1489,5 +1692,12 @@
 
   .schemaPulse {
     opacity: 0;
+  }
+
+  .magnetic,
+  .railLink,
+  .railTick,
+  .railLabel {
+    transition: none;
   }
 }

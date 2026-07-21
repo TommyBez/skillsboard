@@ -13,6 +13,8 @@ const availableTools = [
   { name: "search_skills", description: "Search saved skills by name, source, description, or tag" },
   { name: "get_skill_command", description: "Retrieve the install command for a saved skill" },
   { name: "discover_skills", description: "Search or browse the public skills.sh catalog" },
+  { name: "discover_repository_skills", description: "Inspect a GitHub repository for installable skills" },
+  { name: "add_skill", description: "Save a skill from a GitHub repository to a team library" },
 ]
 
 const getMcpDetails = cache(async () => {
