@@ -848,23 +848,20 @@ export function SkillsboardPromo() {
         </TransitionSeries.Sequence>
       </TransitionSeries>
 
-      {/* UI sound effects, timed to the push/focus transitions and to the
-          cursor interaction inside the product scene. */}
-      <Sequence from={PRODUCT_START} name="SFX whoosh in">
-        <Audio src={staticFile("sfx/whoosh.wav")} volume={0.3} />
-      </Sequence>
-      <Sequence from={PRODUCT_START + CLICK_AT} name="SFX copy click">
-        <Audio src={staticFile("sfx/mouse-click.wav")} volume={0.7} />
-      </Sequence>
-      <Sequence from={PRODUCT_START + TOAST_AT} name="SFX toast">
-        <Audio src={staticFile("sfx/ding.wav")} volume={0.18} />
-      </Sequence>
-      <Sequence
-        from={PRODUCT_START + PRODUCT - T_FOCUS}
-        name="SFX whoosh out"
-      >
-        <Audio src={staticFile("sfx/whoosh.wav")} volume={0.3} />
-      </Sequence>
+      {/* Background music — "Fresh Focus" (FreePD, CC0 / public domain),
+          gentle fade in and a longer fade out into the CTA hold. */}
+      <Audio
+        name="Music"
+        src={staticFile("music/fresh-focus.mp3")}
+        volume={(f) =>
+          interpolate(
+            f,
+            [0, 24, PROMO_DURATION - 70, PROMO_DURATION - 4],
+            [0, 0.38, 0.38, 0],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+          )
+        }
+      />
     </AbsoluteFill>
   );
 }
