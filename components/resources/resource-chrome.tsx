@@ -1,5 +1,6 @@
 import { Suspense } from "react"
 import Link from "next/link"
+import { connection } from "next/server"
 import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
@@ -16,6 +17,12 @@ import { siteConfig } from "@/lib/site"
 type ResourceLandingPath = GuidePath | typeof resourcePaths.index
 type ResourceHeaderLocation = "guide_header" | "resources_header"
 type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
+
+async function CurrentYear() {
+  await connection()
+
+  return <span className="tabular-nums">{new Date().getFullYear()}</span>
+}
 
 function ctaProperties(
   landingPath: ResourceLandingPath,
@@ -219,7 +226,13 @@ export function ResourceFooter() {
             </a>
           </nav>
           <p className="text-sm text-muted-foreground">
-            © {siteConfig.name}. Free and open source.
+            ©{" "}
+            <Suspense
+              fallback={<span className="inline-block w-[4ch]" aria-hidden="true" />}
+            >
+              <CurrentYear />
+            </Suspense>{" "}
+            {siteConfig.name}. Free and open source.
           </p>
         </div>
       </div>
