@@ -219,7 +219,7 @@ export function ResourceFooter() {
             </a>
           </nav>
           <p className="text-sm text-muted-foreground">
-            © 2026 {siteConfig.name}. Free and open source.
+            © {siteConfig.name}. Free and open source.
           </p>
         </div>
       </div>

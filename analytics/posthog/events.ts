@@ -1,11 +1,10 @@
+import type { GuidePath } from "@/lib/seo/guides"
+import type { resourcePaths } from "@/lib/seo/resources"
+
 type NonTeamEventPropertiesMap = {
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    landing_path:
-      | "/"
-      | "/resources"
-      | "/guides/share-agent-skills-with-your-team"
-      | "/guides/manage-skills-across-claude-codex-cursor"
+    landing_path: "/" | GuidePath | typeof resourcePaths.index
     location:
       | "header"
       | "hero"
