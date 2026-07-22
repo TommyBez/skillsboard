@@ -315,7 +315,9 @@ function OgTemplate({
 
 const fontsDir = join(process.cwd(), "lib", "og", "fonts")
 
-async function loadOgFonts() {
+let fontsPromise: ReturnType<typeof readOgFonts> | undefined
+
+async function readOgFonts() {
   const [medium, bold, extraBold, mono] = await Promise.all([
     readFile(join(fontsDir, "bricolage-grotesque-500.ttf")),
     readFile(join(fontsDir, "bricolage-grotesque-700.ttf")),
@@ -329,6 +331,11 @@ async function loadOgFonts() {
     { name: "Bricolage Grotesque", data: extraBold, weight: 800 as const, style: "normal" as const },
     { name: "Geist Mono", data: mono, weight: 500 as const, style: "normal" as const },
   ]
+}
+
+function loadOgFonts() {
+  fontsPromise ??= readOgFonts()
+  return fontsPromise
 }
 
 export async function createSocialImageResponse(
