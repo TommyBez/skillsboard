@@ -14,7 +14,7 @@ export function buildResourceIndexSchema() {
         url: pageUrl,
         name: "Skills Board resources",
         description:
-          "Practical guides and articles for teams that share, review, and operate reusable AI skills.",
+          "Practical resources for teams that share, review, and operate reusable AI skills.",
         inLanguage: "en",
         isPartOf: { "@id": absoluteUrl("/#website") },
         mainEntity: { "@id": itemListId },
@@ -22,7 +22,7 @@ export function buildResourceIndexSchema() {
       {
         "@type": "ItemList",
         "@id": itemListId,
-        name: "Skills Board guides and articles",
+        name: "Skills Board resources",
         numberOfItems: resourceEntries.length,
         itemListElement: resourceEntries.map((entry, index) => ({
           "@type": "ListItem",

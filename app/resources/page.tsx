@@ -16,10 +16,10 @@ import {
 } from "@/lib/seo/resources"
 
 const description =
-  "Explore practical guides and articles for sharing, reviewing, and managing reusable AI skills across your team and agent workflows."
+  "Explore practical resources for sharing, reviewing, and managing reusable AI skills across your team and agent workflows."
 
 export const metadata: Metadata = {
-  title: { absolute: "AI Skill Guides and Articles | Skills Board" },
+  title: { absolute: "AI Skill Resources for Teams | Skills Board" },
   description,
   alternates: { canonical: resourcePaths.index },
   openGraph: {
@@ -63,7 +63,7 @@ export default function ResourcesPage() {
               Practical thinking for teams working with AI skills.
             </h1>
             <p className="mt-7 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
-              Start with step-by-step guides. As the library grows, this is also where you’ll find focused articles on the decisions, patterns, and trade-offs behind durable team workflows.
+              Use practical, step-by-step guidance to navigate the decisions, patterns, and trade-offs behind durable team workflows.
             </p>
           </div>
         </header>
