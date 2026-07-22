@@ -80,12 +80,6 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="flex items-center gap-1.5">
-      <Link
-        href="/resources"
-        className="rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
-      >
-        Resources
-      </Link>
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation">
         {!signedIn ? (
