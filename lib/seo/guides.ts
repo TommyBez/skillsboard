@@ -7,6 +7,8 @@ export type GuidePath = (typeof guidePaths)[keyof typeof guidePaths]
 
 export interface GuideDefinition {
   path: GuidePath
+  contentType: "guide"
+  topics: readonly string[]
   eyebrow: string
   title: string
   description: string
@@ -38,11 +40,6 @@ export interface GuideDefinition {
     body: string
   }[]
   checklist: readonly string[]
-  relatedGuide: {
-    href: GuidePath
-    label: string
-    description: string
-  }
   sources: readonly {
     label: string
     href: string
@@ -54,6 +51,8 @@ export interface GuideDefinition {
 
 export const shareTeamSkillsGuide: GuideDefinition = {
   path: guidePaths.shareTeamSkills,
+  contentType: "guide",
+  topics: ["team operations", "skill sharing", "governance", "mixed-agent teams"],
   eyebrow: "Team skill operations",
   title: "How to share AI agent skills with your team",
   description:
@@ -162,11 +161,6 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     "The record has an owner, status, and review trigger.",
     "The next teammate can find and use it without searching chat history.",
   ],
-  relatedGuide: {
-    href: guidePaths.manageCrossAgentSkills,
-    label: "Manage skills across Claude Code, Codex, and Cursor",
-    description: "Turn the shared-source model into a practical cross-agent operating system.",
-  },
   sources: [
     {
       label: "OpenAI: Using skills",
@@ -190,6 +184,8 @@ export const shareTeamSkillsGuide: GuideDefinition = {
 
 export const manageCrossAgentSkillsGuide: GuideDefinition = {
   path: guidePaths.manageCrossAgentSkills,
+  contentType: "guide",
+  topics: ["team operations", "skill sharing", "compatibility", "mixed-agent teams"],
   eyebrow: "Cross-agent operations",
   title: "Manage skills across Claude Code, Codex, and Cursor",
   description:
@@ -312,11 +308,6 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     "A failed agent path can be paused without forking the canonical skill.",
     "The team can discover the recommendation without knowing its install location in advance.",
   ],
-  relatedGuide: {
-    href: guidePaths.shareTeamSkills,
-    label: "Share AI agent skills with your team",
-    description: "Set ownership, review, discovery, and lifecycle rules before adding more agent paths.",
-  },
   sources: [
     {
       label: "OpenAI: Skills in ChatGPT",

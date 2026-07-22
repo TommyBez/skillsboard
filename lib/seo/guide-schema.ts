@@ -1,4 +1,5 @@
 import type { GuideDefinition } from "@/lib/seo/guides"
+import { resourcePaths } from "@/lib/seo/resources"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 export function buildGuideSchema(guide: GuideDefinition) {
@@ -35,6 +36,12 @@ export function buildGuideSchema(guide: GuideDefinition) {
           {
             "@type": "ListItem",
             position: 2,
+            name: "Resources",
+            item: absoluteUrl(resourcePaths.index),
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
             name: guide.title,
             item: pageUrl,
           },

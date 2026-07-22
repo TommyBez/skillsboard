@@ -1,10 +1,18 @@
 import type { MetadataRoute } from "next"
 
+import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
-import { guidePaths } from "@/lib/seo/guides"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
+  const resourceSitemapEntries: MetadataRoute.Sitemap = resourceEntries.map(
+    (entry) => ({
+      url: `${siteConfig.url}${entry.path}`,
+      lastModified: new Date(entry.modifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }),
+  )
 
   return [
     {
@@ -20,16 +28,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     {
-      url: `${siteConfig.url}${guidePaths.shareTeamSkills}`,
+      url: `${siteConfig.url}${resourcePaths.index}`,
       lastModified: new Date("2026-07-22"),
-      changeFrequency: "monthly",
-      priority: 0.7,
+      changeFrequency: "weekly",
+      priority: 0.8,
     },
-    {
-      url: `${siteConfig.url}${guidePaths.manageCrossAgentSkills}`,
-      lastModified: new Date("2026-07-22"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
+    ...resourceSitemapEntries,
   ]
 }

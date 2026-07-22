@@ -3,6 +3,7 @@ type NonTeamEventPropertiesMap = {
     destination: "/library" | "/sign-up"
     landing_path:
       | "/"
+      | "/resources"
       | "/guides/share-agent-skills-with-your-team"
       | "/guides/manage-skills-across-claude-codex-cursor"
     location:
@@ -12,6 +13,8 @@ type NonTeamEventPropertiesMap = {
       | "guide_header"
       | "guide_inline"
       | "guide_closing"
+      | "resources_header"
+      | "resources_closing"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {

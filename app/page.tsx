@@ -43,10 +43,16 @@ function primaryAction(signedIn: boolean): {
 function HomeHeaderActionsFallback() {
   return (
     <div className="flex items-center gap-1.5">
+      <Link
+        href="/resources"
+        className="px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:px-3 sm:text-xs"
+      >
+        Resources
+      </Link>
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
         <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-28 rounded-[3px] sm:h-10 sm:w-40" />
+        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-10 sm:w-40" />
       </nav>
     </div>
   )
@@ -74,6 +80,12 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="flex items-center gap-1.5">
+      <Link
+        href="/resources"
+        className="rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
+      >
+        Resources
+      </Link>
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation">
         {!signedIn ? (
@@ -89,7 +101,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
         ) : null}
         <Button
           size="sm"
-          className={`${styles.ctaButton} sm:h-10 sm:px-4`}
+          className={`${styles.ctaButton} px-2.5 sm:h-10 sm:px-4`}
           nativeButton={false}
           render={(
             <TrackedLink
@@ -101,7 +113,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
             />
           )}
         >
-          <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
+          <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
           <span className="hidden sm:inline">{primary.label}</span>
           <ArrowRightIcon
             className={`${styles.ctaArrow} hidden sm:block`}
@@ -300,7 +312,7 @@ export default function HomePage() {
 
       <header className={styles.header}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
-          <Brand />
+          <Brand compactOnMobile />
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
@@ -559,7 +571,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
             <nav
               aria-label="Footer"
-              className="flex items-center gap-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+              className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
               <a href="#pricing" className="transition-colors hover:text-foreground">
                 Pricing
@@ -568,16 +580,10 @@ export default function HomePage() {
                 FAQ
               </a>
               <Link
-                href="/guides/share-agent-skills-with-your-team"
+                href="/resources"
                 className="transition-colors hover:text-foreground"
               >
-                Share skills
-              </Link>
-              <Link
-                href="/guides/manage-skills-across-claude-codex-cursor"
-                className="transition-colors hover:text-foreground"
-              >
-                Cross-agent guide
+                Resources
               </Link>
             </nav>
             <a

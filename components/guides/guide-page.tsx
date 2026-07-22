@@ -1,141 +1,15 @@
-import { Suspense } from "react"
 import Link from "next/link"
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
-import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
-import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
-import { ThemeToggle } from "@/components/theme-toggle"
-import { TrackedLink } from "@/components/tracked-link"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/session"
+import {
+  ResourceCta,
+  ResourceFooter,
+  ResourceHeader,
+} from "@/components/resources/resource-chrome"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
 import type { GuideDefinition } from "@/lib/seo/guides"
-import { siteConfig } from "@/lib/site"
-
-function guideCtaProperties(
-  guide: GuideDefinition,
-  signedIn: boolean,
-  location: "guide_header" | "guide_inline" | "guide_closing",
-): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
-  return {
-    destination: signedIn ? "/library" : "/sign-up",
-    landing_path: guide.path,
-    location,
-    visitor_state: signedIn ? "signed_in" : "anonymous",
-  }
-}
-
-function GuideCtaView({
-  guide,
-  signedIn,
-  location,
-}: {
-  guide: GuideDefinition
-  signedIn: boolean
-  location: "guide_inline" | "guide_closing"
-}) {
-  const href = signedIn ? "/library" : "/sign-up"
-
-  return (
-    <Button
-      size="lg"
-      className="rounded-[3px]"
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: guideCtaProperties(guide, signedIn, location),
-          }}
-        />
-      )}
-    >
-      {signedIn ? "Open your team library" : "Create your team library"}
-      <ArrowRightIcon data-icon="inline-end" />
-    </Button>
-  )
-}
-
-async function GuideCta({
-  guide,
-  location,
-}: {
-  guide: GuideDefinition
-  location: "guide_inline" | "guide_closing"
-}) {
-  const session = await getSession()
-
-  return (
-    <GuideCtaView
-      guide={guide}
-      signedIn={Boolean(session?.user)}
-      location={location}
-    />
-  )
-}
-
-function GuideCtaFallback() {
-  return <Skeleton className="h-11 w-56 rounded-[3px]" aria-busy="true" />
-}
-
-function GuideHeaderActionsView({
-  guide,
-  signedIn,
-}: {
-  guide: GuideDefinition
-  signedIn: boolean
-}) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <ThemeToggle />
-      {!signedIn ? (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="hidden rounded-[3px] sm:inline-flex"
-          nativeButton={false}
-          render={<Link href="/sign-in" />}
-        >
-          Sign in
-        </Button>
-      ) : null}
-      <Button
-        size="sm"
-        className="rounded-[3px]"
-        nativeButton={false}
-        render={(
-          <TrackedLink
-            href={signedIn ? "/library" : "/sign-up"}
-            analytics={{
-              event: "landing_cta_clicked",
-              properties: guideCtaProperties(guide, signedIn, "guide_header"),
-            }}
-          />
-        )}
-      >
-        {signedIn ? "Open library" : "Create library"}
-      </Button>
-    </div>
-  )
-}
-
-async function GuideHeaderActions({ guide }: { guide: GuideDefinition }) {
-  const session = await getSession()
-
-  return <GuideHeaderActionsView guide={guide} signedIn={Boolean(session?.user)} />
-}
-
-function GuideHeaderActionsFallback() {
-  return (
-    <div className="flex items-center gap-1.5">
-      <ThemeToggle />
-      <Skeleton className="h-8 w-28 rounded-[3px]" aria-busy="true" />
-    </div>
-  )
-}
+import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
 const chapters = [
   { href: "#decision", label: "Choose a model" },
@@ -146,18 +20,13 @@ const chapters = [
 ] as const
 
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
+  const relatedResources = getRelatedResources(guide.path)
+
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
       <JsonLd data={buildGuideSchema(guide)} />
 
-      <header className="sticky top-0 z-40 border-b border-border/80 bg-background/92 backdrop-blur-xl">
-        <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center justify-between gap-4 px-5 md:px-10">
-          <Brand />
-          <Suspense fallback={<GuideHeaderActionsFallback />}>
-            <GuideHeaderActions guide={guide} />
-          </Suspense>
-        </div>
-      </header>
+      <ResourceHeader landingPath={guide.path} location="guide_header" />
 
       <main>
         <article>
@@ -172,6 +41,13 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
             />
             <div className="mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
               <div>
+                <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
+                  <Link href={resourcePaths.index} className="transition-colors hover:text-foreground">
+                    Resources
+                  </Link>
+                  <span aria-hidden="true">/</span>
+                  <span aria-current="page">Guide</span>
+                </nav>
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                   {guide.eyebrow}
                 </p>
@@ -314,9 +190,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   It does not silently synchronize every agent. Your team keeps control of the reviewed source and chooses the path that fits each setup.
                 </p>
                 <div className="mt-7">
-                  <Suspense fallback={<GuideCtaFallback />}>
-                    <GuideCta guide={guide} location="guide_inline" />
-                  </Suspense>
+                  <ResourceCta landingPath={guide.path} location="guide_inline" />
                 </div>
               </section>
 
@@ -401,25 +275,48 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 </ul>
               </section>
 
-              <section className="mt-16 border-y border-border py-8">
-                <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                  Continue the workflow
-                </p>
-                <Link
-                  href={guide.relatedGuide.href}
-                  className="group mt-4 grid gap-3 rounded-[3px] border border-border bg-card p-5 transition-colors hover:border-primary/70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
-                >
-                  <span>
-                    <span className="block text-lg font-semibold group-hover:text-primary">
-                      {guide.relatedGuide.label}
-                    </span>
-                    <span className="mt-2 block text-sm leading-relaxed text-muted-foreground">
-                      {guide.relatedGuide.description}
-                    </span>
-                  </span>
-                  <ArrowRightIcon className="size-5 text-primary" aria-hidden="true" />
-                </Link>
-              </section>
+              {relatedResources.length > 0 ? (
+                <section className="mt-16 border-y border-border py-8">
+                  <div className="flex flex-wrap items-end justify-between gap-3">
+                    <div>
+                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                        More resources
+                      </p>
+                      <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                        Keep exploring
+                      </h2>
+                    </div>
+                    <Link
+                      href={resourcePaths.index}
+                      className="text-sm font-semibold text-muted-foreground underline decoration-border underline-offset-4 transition-colors hover:text-foreground"
+                    >
+                      View all resources
+                    </Link>
+                  </div>
+                  <div className="mt-5 grid gap-4">
+                    {relatedResources.map((resource) => (
+                      <Link
+                        key={resource.path}
+                        href={resource.path}
+                        className="group grid gap-3 rounded-[3px] border border-border bg-card p-5 transition-colors hover:border-primary/70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                      >
+                        <span>
+                          <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                            {resource.contentType}
+                          </span>
+                          <span className="mt-2 block text-lg font-semibold group-hover:text-primary">
+                            {resource.title}
+                          </span>
+                          <span className="mt-2 block text-sm leading-relaxed text-muted-foreground">
+                            {resource.description}
+                          </span>
+                        </span>
+                        <ArrowRightIcon className="size-5 text-primary" aria-hidden="true" />
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              ) : null}
 
               <section className="py-16 text-center">
                 <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
@@ -429,9 +326,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   Save the reviewed skill, document the path that works, and keep the recommendation visible to the whole team.
                 </p>
                 <div className="mt-7 flex justify-center">
-                  <Suspense fallback={<GuideCtaFallback />}>
-                    <GuideCta guide={guide} location="guide_closing" />
-                  </Suspense>
+                  <ResourceCta landingPath={guide.path} location="guide_closing" />
                 </div>
               </section>
             </div>
@@ -439,14 +334,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
         </article>
       </main>
 
-      <footer className="border-t border-border/70">
-        <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 px-5 py-9 md:flex-row md:items-center md:justify-between md:px-10">
-          <Brand />
-          <p className="text-sm text-muted-foreground">
-            © 2026 {siteConfig.name}. Free and open source.
-          </p>
-        </div>
-      </footer>
+      <ResourceFooter />
     </div>
   )
 }
