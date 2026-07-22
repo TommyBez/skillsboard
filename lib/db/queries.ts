@@ -1,9 +1,9 @@
-import { and, count, desc, eq, gt } from "drizzle-orm"
+import { and, asc, count, desc, eq, gt } from "drizzle-orm"
 import { cacheLife, cacheTag } from "next/cache"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
-import { invitation, member, organization, skill, user } from "@/lib/db/schema"
+import { collection, collectionSkill, invitation, member, organization, skill, user } from "@/lib/db/schema"
 
 export async function listOrganizationSkills(organizationId: string) {
   "use cache"
@@ -87,6 +87,108 @@ export async function getUserSkill(userId: string, skillId: string) {
     .limit(1)
 
   return savedSkill ?? null
+}
+
+export async function listOrganizationCollections(organizationId: string) {
+  "use cache"
+  cacheLife("hours")
+  cacheTag(cacheTags.organizationCollections(organizationId))
+
+  return db
+    .select({
+      id: collection.id,
+      organizationId: collection.organizationId,
+      createdBy: collection.createdBy,
+      title: collection.title,
+      description: collection.description,
+      tags: collection.tags,
+      createdAt: collection.createdAt,
+      updatedAt: collection.updatedAt,
+      createdByName: user.name,
+      skillCount: count(collectionSkill.skillId),
+    })
+    .from(collection)
+    .leftJoin(user, eq(collection.createdBy, user.id))
+    .leftJoin(collectionSkill, eq(collectionSkill.collectionId, collection.id))
+    .where(eq(collection.organizationId, organizationId))
+    .groupBy(collection.id, user.name)
+    .orderBy(desc(collection.createdAt))
+}
+
+export async function getOrganizationCollection(organizationId: string, collectionId: string) {
+  "use cache"
+  cacheLife("hours")
+  cacheTag(cacheTags.organizationCollections(organizationId))
+
+  const [found] = await db
+    .select({
+      id: collection.id,
+      organizationId: collection.organizationId,
+      createdBy: collection.createdBy,
+      title: collection.title,
+      description: collection.description,
+      tags: collection.tags,
+      createdAt: collection.createdAt,
+      updatedAt: collection.updatedAt,
+      createdByName: user.name,
+    })
+    .from(collection)
+    .leftJoin(user, eq(collection.createdBy, user.id))
+    .where(and(eq(collection.id, collectionId), eq(collection.organizationId, organizationId)))
+    .limit(1)
+
+  return found ?? null
+}
+
+export async function listCollectionSkills(organizationId: string, collectionId: string) {
+  "use cache"
+  cacheLife("hours")
+  cacheTag(cacheTags.organizationCollections(organizationId))
+  cacheTag(cacheTags.organizationSkills(organizationId))
+
+  return db
+    .select({
+      id: skill.id,
+      createdBy: skill.createdBy,
+      githubUrl: skill.githubUrl,
+      skillName: skill.skillName,
+      title: skill.title,
+      description: skill.description,
+      repoOwner: skill.repoOwner,
+      repoName: skill.repoName,
+      repoStars: skill.repoStars,
+      skillPath: skill.skillPath,
+      tags: skill.tags,
+      note: skill.note,
+      examplePrompts: skill.examplePrompts,
+      addedByName: user.name,
+      addedToCollectionAt: collectionSkill.createdAt,
+    })
+    .from(collectionSkill)
+    .innerJoin(skill, and(
+      eq(collectionSkill.skillId, skill.id),
+      eq(skill.organizationId, organizationId),
+    ))
+    .leftJoin(user, eq(skill.createdBy, user.id))
+    .where(eq(collectionSkill.collectionId, collectionId))
+    .orderBy(asc(collectionSkill.createdAt))
+}
+
+export async function listOrganizationCollectionMemberships(organizationId: string) {
+  "use cache"
+  cacheLife("hours")
+  cacheTag(cacheTags.organizationCollections(organizationId))
+
+  return db
+    .select({
+      collectionId: collectionSkill.collectionId,
+      skillId: collectionSkill.skillId,
+    })
+    .from(collectionSkill)
+    .innerJoin(collection, and(
+      eq(collectionSkill.collectionId, collection.id),
+      eq(collection.organizationId, organizationId),
+    ))
 }
 
 export async function listUserOrganizations(userId: string) {

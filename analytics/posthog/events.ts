@@ -71,7 +71,7 @@ type TeamEventPropertiesMap = {
     method: "command" | "source"
     skill_id: string
     skill_name: string
-    surface: "library" | "mcp"
+    surface: "collection" | "library" | "mcp"
   }
   skill_downloaded: {
     actor_is_skill_creator: boolean
@@ -106,6 +106,30 @@ type TeamEventPropertiesMap = {
     repo_name: string
     repo_owner: string
     skill_id: string
+  }
+  collection_created: {
+    collection_id: string
+    has_description: boolean
+    tag_count: number
+  }
+  collection_updated: {
+    collection_id: string
+    has_description: boolean
+    tag_count: number
+  }
+  collection_deleted: {
+    collection_id: string
+    skill_count: number
+  }
+  collection_skill_added: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library"
+  }
+  collection_skill_removed: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library"
   }
 }
 

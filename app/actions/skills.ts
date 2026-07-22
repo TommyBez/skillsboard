@@ -231,6 +231,8 @@ export async function deleteSkill(input: z.input<typeof deleteSkillSchema>) {
     .delete(skill)
     .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
+  // Removing a skill cascades out of every collection that referenced it.
+  updateTag(cacheTags.organizationCollections(organizationId))
   captureTeamEvent({
     distinctId: userId,
     event: "skill_deleted",

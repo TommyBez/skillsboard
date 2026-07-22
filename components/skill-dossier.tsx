@@ -25,6 +25,7 @@ interface SkillUsageTracking {
   actorIsSkillCreator: boolean
   skillId: string
   skillName: string
+  surface?: "collection" | "library"
   teamId: string
 }
 
@@ -61,7 +62,7 @@ function getSkillUsageAnalytics(
       method,
       skill_id: tracking.skillId,
       skill_name: tracking.skillName,
-      surface: "library",
+      surface: tracking.surface ?? "library",
       team_id: tracking.teamId,
     },
   }
