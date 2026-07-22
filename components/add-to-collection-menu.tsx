@@ -59,12 +59,17 @@ export function AddToCollectionMenu({
   }
 
   async function handleCreated(collectionId: string) {
-    const result = await addSkillToCollection({ collectionId, skillId, surface: "library" })
-    if (!result.ok) {
-      toast.error(result.error)
-      return
+    try {
+      const result = await addSkillToCollection({ collectionId, skillId, surface: "library" })
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
+      toast.success(`Added ${skillName} to the new collection`)
+    } catch (error) {
+      console.error("Unable to add skill to the new collection", error)
+      toast.error(`The collection was created, but we couldn’t add ${skillName}. Add it from the collection menu.`)
     }
-    toast.success(`Added ${skillName} to the new collection`)
   }
 
   return (

@@ -399,23 +399,31 @@ async function route(request: Request) {
         }
 
         const normalizedTags = [...new Set(tags ?? [])]
-        const [created] = await db
-          .insert(collection)
-          .values({
-            organizationId: organization.organization.id,
-            createdBy: jwt.sub!,
-            title,
-            description: description || null,
-            tags: normalizedTags,
-          })
-          .returning({ id: collection.id })
+        let createdId: string
+        try {
+          const [created] = await db
+            .insert(collection)
+            .values({
+              organizationId: organization.organization.id,
+              createdBy: jwt.sub!,
+              title,
+              description: description || null,
+              tags: normalizedTags,
+            })
+            .returning({ id: collection.id })
+          createdId = created.id
+        } catch (error) {
+          console.error("Unable to create collection over MCP", error)
+          captureMcpToolUsed(jwt.sub!, "create_collection", false)
+          return textResult("We couldn’t create this collection. Try again.", true)
+        }
 
         captureMcpToolUsed(jwt.sub!, "create_collection", true)
         captureTeamEvent({
           distinctId: jwt.sub!,
           event: "collection_created",
           properties: {
-            collection_id: created.id,
+            collection_id: createdId,
             has_description: Boolean(description),
             surface: "mcp",
             tag_count: normalizedTags.length,
@@ -427,7 +435,7 @@ async function route(request: Request) {
           created: true,
           organizationName: organization.organization.name,
           collection: {
-            id: created.id,
+            id: createdId,
             organizationId: organization.organization.id,
             title,
             description: description || null,
@@ -455,10 +463,16 @@ async function route(request: Request) {
           return textResult("Collection or skill not found in the same team library", true)
         }
 
-        await db
-          .insert(collectionSkill)
-          .values({ collectionId, skillId, addedBy: jwt.sub! })
-          .onConflictDoNothing()
+        try {
+          await db
+            .insert(collectionSkill)
+            .values({ collectionId, skillId, addedBy: jwt.sub! })
+            .onConflictDoNothing()
+        } catch (error) {
+          console.error("Unable to add skill to collection over MCP", error)
+          captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
+          return textResult("We couldn’t add this skill to the collection. Try again.", true)
+        }
 
         captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", true)
         captureTeamEvent({
@@ -487,12 +501,18 @@ async function route(request: Request) {
           return textResult("Collection not found", true)
         }
 
-        await db
-          .delete(collectionSkill)
-          .where(and(
-            eq(collectionSkill.collectionId, collectionId),
-            eq(collectionSkill.skillId, skillId),
-          ))
+        try {
+          await db
+            .delete(collectionSkill)
+            .where(and(
+              eq(collectionSkill.collectionId, collectionId),
+              eq(collectionSkill.skillId, skillId),
+            ))
+        } catch (error) {
+          console.error("Unable to remove skill from collection over MCP", error)
+          captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
+          return textResult("We couldn’t remove this skill from the collection. Try again.", true)
+        }
 
         captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", true)
         captureTeamEvent({

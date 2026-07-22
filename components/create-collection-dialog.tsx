@@ -57,8 +57,15 @@ export function CreateCollectionDialog({
         return
       }
       toast.success("Collection created")
-      await onCreated?.(result.collectionId)
       handleOpenChange(false)
+      try {
+        // The collection already exists: a follow-up failure must not
+        // reopen the dialog or read as a creation error. Callers surface
+        // their own feedback.
+        await onCreated?.(result.collectionId)
+      } catch (error) {
+        console.error("Collection created, but the follow-up action failed", error)
+      }
       router.refresh()
     } catch (error) {
       console.error("Unable to create collection", error)
