@@ -50,6 +50,7 @@ export async function createCollection(input: z.input<typeof createCollectionSch
     properties: {
       collection_id: created.id,
       has_description: Boolean(parsed.data.description),
+      surface: "web",
       tag_count: parsed.data.tags.length,
     },
     teamId: organizationId,

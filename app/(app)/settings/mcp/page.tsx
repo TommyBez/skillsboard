@@ -15,6 +15,12 @@ const availableTools = [
   { name: "discover_skills", description: "Search or browse the public skills.sh catalog" },
   { name: "discover_repository_skills", description: "Inspect a GitHub repository for installable skills" },
   { name: "add_skill", description: "Save a skill from a GitHub repository to a team library" },
+  { name: "list_collections", description: "List skill collections across your team libraries" },
+  { name: "search_collections", description: "Search collections by title, description, or tag" },
+  { name: "get_collection_skills", description: "List the skills grouped in a collection" },
+  { name: "create_collection", description: "Create a collection that groups skills by use case or project" },
+  { name: "add_skill_to_collection", description: "Add a saved skill to a collection" },
+  { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },
 ]
 
 const getMcpDetails = cache(async () => {

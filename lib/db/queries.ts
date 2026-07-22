@@ -191,6 +191,52 @@ export async function listOrganizationCollectionMemberships(organizationId: stri
     ))
 }
 
+export async function listUserCollections(userId: string) {
+  return db
+    .select({
+      id: collection.id,
+      organizationId: collection.organizationId,
+      organizationName: organization.name,
+      createdBy: collection.createdBy,
+      title: collection.title,
+      description: collection.description,
+      tags: collection.tags,
+      createdAt: collection.createdAt,
+      updatedAt: collection.updatedAt,
+      skillCount: count(collectionSkill.skillId),
+    })
+    .from(collection)
+    .innerJoin(member, and(
+      eq(member.organizationId, collection.organizationId),
+      eq(member.userId, userId),
+    ))
+    .innerJoin(organization, eq(organization.id, collection.organizationId))
+    .leftJoin(collectionSkill, eq(collectionSkill.collectionId, collection.id))
+    .groupBy(collection.id, organization.name)
+    .orderBy(desc(collection.createdAt))
+}
+
+export async function getUserCollection(userId: string, collectionId: string) {
+  const [found] = await db
+    .select({
+      id: collection.id,
+      organizationId: collection.organizationId,
+      createdBy: collection.createdBy,
+      title: collection.title,
+      description: collection.description,
+      tags: collection.tags,
+    })
+    .from(collection)
+    .innerJoin(member, and(
+      eq(member.organizationId, collection.organizationId),
+      eq(member.userId, userId),
+    ))
+    .where(eq(collection.id, collectionId))
+    .limit(1)
+
+  return found ?? null
+}
+
 export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }
