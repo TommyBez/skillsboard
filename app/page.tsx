@@ -63,6 +63,7 @@ function primaryCtaEventProperties(
   const primary = primaryAction(signedIn)
   return {
     destination: primary.href,
+    landing_path: "/",
     location,
     visitor_state: signedIn ? "signed_in" : "anonymous",
   }
@@ -566,6 +567,18 @@ export default function HomePage() {
               <a href="#faq" className="transition-colors hover:text-foreground">
                 FAQ
               </a>
+              <Link
+                href="/guides/share-agent-skills-with-your-team"
+                className="transition-colors hover:text-foreground"
+              >
+                Share skills
+              </Link>
+              <Link
+                href="/guides/manage-skills-across-claude-codex-cursor"
+                className="transition-colors hover:text-foreground"
+              >
+                Cross-agent guide
+              </Link>
             </nav>
             <a
               href="https://github.com/TommyBez/skillsboard"

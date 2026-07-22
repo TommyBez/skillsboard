@@ -1,7 +1,17 @@
 type NonTeamEventPropertiesMap = {
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    location: "header" | "hero" | "closing"
+    landing_path:
+      | "/"
+      | "/guides/share-agent-skills-with-your-team"
+      | "/guides/manage-skills-across-claude-codex-cursor"
+    location:
+      | "header"
+      | "hero"
+      | "closing"
+      | "guide_header"
+      | "guide_inline"
+      | "guide_closing"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
