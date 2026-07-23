@@ -156,7 +156,7 @@ export function SkillDossier({
       </div>
 
       <div className="border-t border-border bg-muted/40 p-3 md:p-4">
-        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background/75 p-2 pl-3">
+        <div className="flex h-10 min-w-0 items-center gap-2 rounded-lg border border-border bg-background/75 px-3">
           <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <code className="block whitespace-nowrap font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
           </div>
@@ -172,21 +172,27 @@ export function SkillDossier({
           </div>
         </div>
         {details || href || actions ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            {details ? details : href ? (
-              <TrackedAnchor
-                analytics={sourceAnalytics}
-                aria-label={`${hrefLabel} for ${name}`}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
-                <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
-              </TrackedAnchor>
-            ) : <span />}
-            {actions}
+          <div className="mt-3 flex h-8 items-center gap-2">
+            <div className="min-w-0 shrink">
+              {details ? details : href ? (
+                <TrackedAnchor
+                  analytics={sourceAnalytics}
+                  aria-label={`${hrefLabel} for ${name}`}
+                  className="inline-flex h-8 items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
+                  <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
+                </TrackedAnchor>
+              ) : null}
+            </div>
+            {actions ? (
+              <div className="ml-auto flex min-w-0 items-center justify-end gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {actions}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

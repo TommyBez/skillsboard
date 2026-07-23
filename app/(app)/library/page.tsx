@@ -178,7 +178,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                   teamId: activeId,
                 }}
                 actions={(
-                  <div className="flex flex-wrap items-center gap-2">
+                  <>
                     <AddToCollectionMenu
                       skillId={item.id}
                       skillName={item.title}
@@ -205,20 +205,20 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                     ) : null}
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon-sm"
+                      className="size-8 rounded-lg"
                       nativeButton={false}
                       render={(
                         <a
                           href={`/api/skills/${item.id}/download`}
                           aria-label={`Download the latest version of ${item.title} as a ZIP`}
-                          title="Download the latest version from the repository"
+                          title="Download ZIP"
                         />
                       )}
                     >
-                      <DownloadIcon data-icon="inline-start" />
-                      Download ZIP
+                      <DownloadIcon />
                     </Button>
-                  </div>
+                  </>
                 )}
               />
             )

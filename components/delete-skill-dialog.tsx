@@ -53,13 +53,14 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
         render={
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
+            className="size-8 rounded-lg"
             aria-label={`Delete ${skillName} from the library`}
+            title="Delete"
           />
         }
       >
-        <Trash2Icon data-icon="inline-start" />
-        Delete
+        <Trash2Icon />
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

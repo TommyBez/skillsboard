@@ -133,7 +133,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
                   teamId: activeId,
                 }}
                 actions={(
-                  <div className="flex flex-wrap items-center gap-2">
+                  <>
                     <RemoveFromCollectionButton
                       collectionId={collection.id}
                       collectionTitle={collection.title}
@@ -142,20 +142,20 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
                     />
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon-sm"
+                      className="size-8 rounded-lg"
                       nativeButton={false}
                       render={(
                         <a
                           href={`/api/skills/${item.id}/download`}
                           aria-label={`Download the latest version of ${item.title} as a ZIP`}
-                          title="Download the latest version from the repository"
+                          title="Download ZIP"
                         />
                       )}
                     >
-                      <DownloadIcon data-icon="inline-start" />
-                      Download ZIP
+                      <DownloadIcon />
                     </Button>
-                  </div>
+                  </>
                 )}
               />
             )
