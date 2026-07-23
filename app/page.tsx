@@ -43,12 +43,6 @@ function primaryAction(signedIn: boolean): {
 function HomeHeaderActionsFallback() {
   return (
     <div className="flex items-center gap-1.5">
-      <Link
-        href="/resources"
-        className="px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:px-3 sm:text-xs"
-      >
-        Resources
-      </Link>
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
         <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
