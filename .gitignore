@@ -27,3 +27,6 @@ next-env.d.ts
 # Local state for recurring GTM loops
 .agents/loops/*.json
 .agents/loops/*.log
+
+# Remotion render output
+out/
