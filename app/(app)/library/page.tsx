@@ -3,6 +3,7 @@ import Link from "next/link"
 import { CableIcon, DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
@@ -18,6 +19,8 @@ import { getAppContext } from "@/lib/app-context"
 import {
   countOrganizationMembers,
   countPendingOrganizationInvitations,
+  listOrganizationCollectionMemberships,
+  listOrganizationCollections,
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
@@ -64,7 +67,18 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const [{ activeId, session, role }, params] = await Promise.all([getAppContext(), searchParams])
   const userId = session.user.id
   const canManageLibrary = isOrganizationAdmin(role)
-  const allSkills = await listOrganizationSkills(activeId)
+  const [allSkills, collections, collectionMemberships] = await Promise.all([
+    listOrganizationSkills(activeId),
+    listOrganizationCollections(activeId),
+    listOrganizationCollectionMemberships(activeId),
+  ])
+  const collectionIdsBySkill = new Map<string, string[]>()
+  for (const membership of collectionMemberships) {
+    const existing = collectionIdsBySkill.get(membership.skillId)
+    if (existing) existing.push(membership.collectionId)
+    else collectionIdsBySkill.set(membership.skillId, [membership.collectionId])
+  }
+  const collectionOptions = collections.map((item) => ({ id: item.id, title: item.title }))
   const [memberCount, pendingInvitationCount] = canManageLibrary && allSkills.length > 0
     ? await Promise.all([
         countOrganizationMembers(activeId),
@@ -164,7 +178,13 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                   teamId: activeId,
                 }}
                 actions={(
-                  <div className="flex flex-wrap items-center gap-2">
+                  <>
+                    <AddToCollectionMenu
+                      skillId={item.id}
+                      skillName={item.title}
+                      collections={collectionOptions}
+                      memberCollectionIds={collectionIdsBySkill.get(item.id) ?? []}
+                    />
                     <EditSkillPromptsDialog
                       skillId={item.id}
                       skillName={item.title}
@@ -185,20 +205,20 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                     ) : null}
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon-sm"
+                      className="size-8 rounded-lg"
                       nativeButton={false}
                       render={(
                         <a
                           href={`/api/skills/${item.id}/download`}
                           aria-label={`Download the latest version of ${item.title} as a ZIP`}
-                          title="Download the latest version from the repository"
+                          title="Download ZIP"
                         />
                       )}
                     >
-                      <DownloadIcon data-icon="inline-start" />
-                      Download ZIP
+                      <DownloadIcon />
                     </Button>
-                  </div>
+                  </>
                 )}
               />
             )

@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
-import { deleteSkill } from "@/app/actions/skills"
+import { deleteCollection } from "@/app/actions/collections"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -18,12 +18,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-interface DeleteSkillDialogProps {
-  skillId: string
-  skillName: string
+interface DeleteCollectionDialogProps {
+  collectionId: string
+  collectionTitle: string
 }
 
-export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps) {
+export function DeleteCollectionDialog({ collectionId, collectionTitle }: DeleteCollectionDialogProps) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, setIsPending] = useState(false)
@@ -31,17 +31,18 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
   async function handleDelete() {
     setIsPending(true)
     try {
-      const result = await deleteSkill({ skillId })
+      const result = await deleteCollection({ collectionId })
       if (!result.ok) {
         toast.error(result.error)
         return
       }
-      toast.success("Skill removed from the library")
+      toast.success("Collection deleted")
       setIsOpen(false)
+      router.push("/collections")
       router.refresh()
     } catch (error) {
-      console.error("Unable to delete skill", error)
-      toast.error("We couldn’t delete this skill. Try again.")
+      console.error("Unable to delete collection", error)
+      toast.error("We couldn’t delete this collection. Try again.")
     } finally {
       setIsPending(false)
     }
@@ -53,20 +54,19 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
         render={
           <Button
             variant="outline"
-            size="icon-sm"
-            className="size-8 rounded-lg"
-            aria-label={`Delete ${skillName} from the library`}
-            title="Delete"
+            size="sm"
+            aria-label={`Delete the ${collectionTitle} collection`}
           />
         }
       >
-        <Trash2Icon />
+        <Trash2Icon data-icon="inline-start" />
+        Delete
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Delete {skillName}?</DialogTitle>
+          <DialogTitle>Delete {collectionTitle}?</DialogTitle>
           <DialogDescription>
-            This removes the skill from your team library. The source repository is not affected.
+            This removes the collection for the whole team. The skills inside it stay in your library.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -74,7 +74,7 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
             Cancel
           </DialogClose>
           <Button variant="destructive" disabled={isPending} onClick={handleDelete}>
-            {isPending ? "Deleting…" : "Delete skill"}
+            {isPending ? "Deleting…" : "Delete collection"}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -32,7 +32,19 @@ type NonTeamEventPropertiesMap = {
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
     succeeded: boolean
-    tool_name: "add_skill" | "discover_repository_skills" | "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
+    tool_name:
+      | "add_skill"
+      | "add_skill_to_collection"
+      | "create_collection"
+      | "discover_repository_skills"
+      | "discover_skills"
+      | "get_collection_skills"
+      | "get_skill_command"
+      | "list_collections"
+      | "list_skills"
+      | "remove_skill_from_collection"
+      | "search_collections"
+      | "search_skills"
   }
   signup_form_submitted: {
     method: "email_otp"
@@ -71,7 +83,7 @@ type TeamEventPropertiesMap = {
     method: "command" | "source"
     skill_id: string
     skill_name: string
-    surface: "library" | "mcp"
+    surface: "collection" | "library" | "mcp"
   }
   skill_downloaded: {
     actor_is_skill_creator: boolean
@@ -106,6 +118,31 @@ type TeamEventPropertiesMap = {
     repo_name: string
     repo_owner: string
     skill_id: string
+  }
+  collection_created: {
+    collection_id: string
+    has_description: boolean
+    surface: "mcp" | "web"
+    tag_count: number
+  }
+  collection_updated: {
+    collection_id: string
+    has_description: boolean
+    tag_count: number
+  }
+  collection_deleted: {
+    collection_id: string
+    skill_count: number
+  }
+  collection_skill_added: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library" | "mcp"
+  }
+  collection_skill_removed: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library" | "mcp"
   }
 }
 

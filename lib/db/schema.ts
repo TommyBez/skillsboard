@@ -5,6 +5,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -250,4 +251,37 @@ export const skill = pgTable("skill", {
 }, (table) => [
   index("skill_org_created_idx").on(table.organizationId, table.createdAt),
   uniqueIndex("skill_org_repo_name_unique").on(table.organizationId, table.githubUrl, table.skillName),
+])
+
+export const collection = pgTable("collection", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  organizationId: text("organizationId").notNull(),
+  createdBy: text("createdBy").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  tags: text("tags").array().notNull().default([]),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("collection_org_created_idx").on(table.organizationId, table.createdAt),
+])
+
+export const collectionSkill = pgTable("collectionSkill", {
+  collectionId: uuid("collectionId").notNull(),
+  skillId: uuid("skillId").notNull(),
+  addedBy: text("addedBy").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  primaryKey({ name: "collectionSkill_pkey", columns: [table.collectionId, table.skillId] }),
+  index("collectionSkill_skill_idx").on(table.skillId),
+  foreignKey({
+    columns: [table.collectionId],
+    foreignColumns: [collection.id],
+    name: "collectionSkill_collectionId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.skillId],
+    foreignColumns: [skill.id],
+    name: "collectionSkill_skillId_fkey",
+  }).onDelete("cascade"),
 ])
