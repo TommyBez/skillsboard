@@ -12,6 +12,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -88,18 +89,20 @@ export function AddToCollectionMenu({
           {memberIds.size ? `Collections (${memberIds.size})` : "Add to collection"}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
-          <DropdownMenuLabel>{collections.length ? "Add to collection" : "No collections yet"}</DropdownMenuLabel>
-          {collections.map((item) => (
-            <DropdownMenuCheckboxItem
-              key={item.id}
-              checked={memberIds.has(item.id)}
-              closeOnClick={false}
-              disabled={pendingCollectionId !== null}
-              onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
-            >
-              <span className="truncate">{item.title}</span>
-            </DropdownMenuCheckboxItem>
-          ))}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel>{collections.length ? "Add to collection" : "No collections yet"}</DropdownMenuLabel>
+            {collections.map((item) => (
+              <DropdownMenuCheckboxItem
+                key={item.id}
+                checked={memberIds.has(item.id)}
+                closeOnClick={false}
+                disabled={pendingCollectionId !== null}
+                onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
+              >
+                <span className="truncate">{item.title}</span>
+              </DropdownMenuCheckboxItem>
+            ))}
+          </DropdownMenuGroup>
           {collections.length ? <DropdownMenuSeparator /> : null}
           <DropdownMenuItem onClick={() => setIsCreateOpen(true)}>
             <PlusIcon aria-hidden="true" />
