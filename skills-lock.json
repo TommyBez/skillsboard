@@ -355,6 +355,12 @@
       "skillPath": "skills/social/SKILL.md",
       "computedHash": "906a0529e4ee506c3e2ae81d6dab72d98d2933ec3dac0f332d6b8a2e67acf6a0"
     },
+    "typefully": {
+      "source": "typefully/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/typefully/SKILL.md",
+      "computedHash": "a86ec7d9ab44d48da7350e6b8ae6fe816718a93d1e5384ba6d421f1a57ad1d16"
+    },
     "video": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",
