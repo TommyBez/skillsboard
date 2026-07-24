@@ -221,7 +221,6 @@ export function AddSkillDialog({
                   <label className="flex cursor-pointer items-center gap-3 border-b border-border bg-muted/35 px-4 py-2.5">
                     <Checkbox
                       checked={allSelected}
-                      indeterminate={selectedCount > 0 && !allSelected}
                       onCheckedChange={(checked) => (
                         setSelectedPaths(checked ? skills.map((skill) => skill.path) : [])
                       )}
