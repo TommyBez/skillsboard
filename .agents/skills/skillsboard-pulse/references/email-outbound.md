@@ -39,22 +39,17 @@ The Pulse sees only aggregate or opaque state. A broken consent/unsubscribe path
 
 ## Secure Resend management plane
 
-Use the official Resend CLI skill with named profile `skillsboard-gtm-pulse`, macOS secure storage, and `--profile` on every call. Strip inherited `RESEND_API_KEY`; never use file credential storage, command-line keys, or the application's sending key. Prefer official interactive/OAuth-style setup, with a securely stored scoped key only as the documented fallback.
+Use the connected official Resend plugin and the repository-pinned `resend-connector` skill as the sole Pulse management plane. Follow every live tool's advertised lifecycle, read-before-write sequence, confirmation, and reversibility rule. Never use the Resend CLI, an API key, REST, a custom client, or the application's sending key as a fallback.
 
-Resend management remains `setup_required` until the named secure profile passes identity and domain readback. Each management operation then begins `read_only` and needs its exact graph route/switch before any shadow or enabled transition.
+Connecting or reauthorizing, changing scopes/access, revoking a grant, or accepting terms is human setup. Resend remains `setup_required` until low-risk authenticated reads prove exactly one verified Skills Board domain/capability match. Advertised OAuth-grant status and scopes are supporting evidence only; uniqueness is neither required nor proof of which grant backs the connection. Failed authentication or an absent, duplicate, or mismatched domain/capability result is `resend_identity_readback_unavailable`. Each operation begins `read_only` and needs its exact route/switch to advance.
 
-The human setup command is:
+Use only non-PII domain, OAuth-grant, webhook, topic, segment, Broadcast/automation status, and aggregate health metadata. Content-bearing reads require an advertised server-side field-limited or aggregate projection that keeps raw PII and untrusted content out of the result; filtering or discarding it later is not isolation. Never call `create_api_key` or expose OAuth, verification, attachment-download, or one-time secret values.
 
-```sh
-env -u RESEND_API_KEY RESEND_CREDENTIAL_STORE=secure_storage \
-  resend --profile skillsboard-gtm-pulse auth login
-```
+Never bring raw contacts, addresses, names, provider-returned or user-authored subjects and bodies, headers, attachments, suppression rows, receiving-email data, or content-bearing logs into model/tool context. Contact/suppression listing or retrieval, sent/received email reads, and content logs remain `unavailable` until a sealed server-side plane returns only aggregate counts, keyed hashes, booleans, and opaque IDs. Full log bodies are incident-only inside that sealed perimeter and are never persisted. This does not prohibit locally composing bounded non-PII Pulse draft copy under `product.truth`; safe provider reconciliation should use status-only metadata rather than reading that content back.
 
-Use only local `whoami`, `doctor`, profile metadata, and non-PII domain/webhook/topic metadata for safe identity readback.
+Provider suppressions may be account-gated or absent from the connector; discover capability live. When no dedicated safe suppression read is advertised, do not infer eligibility from contacts or logs. Never lift complaint or hard bounce. Manual, unsubscribe, or deletion suppression may be superseded only after a fresh verified opt-in and per-record sealed application/provider readback. Blind or batch removal is prohibited.
 
-Never bring raw contacts, addresses, names, subjects, bodies, headers, attachments, suppression rows, receiving-email data, or content-bearing logs into model/tool context. Contact/suppression listing or retrieval, sent/received email reads, and content logs remain `unavailable` until a sealed server-side plane returns only aggregate counts, keyed hashes, booleans, and opaque IDs. Full log bodies are incident-only inside that sealed perimeter and are never persisted.
-
-Provider suppressions may be beta/account-gated; discover capability live. Never lift complaint or hard bounce. Manual, unsubscribe, or deletion suppression may be superseded only after a fresh verified opt-in and per-record sealed application/provider readback. Blind or batch removal is prohibited.
+Evaluate each operation against the live surface. Contact/import/membership needs a server-side PII-safe projection and mutation path; individual sends need provider idempotency input and PII-safe status readback; Broadcast audience/send needs exact topic binding, authoritative suppression readback, payload validation, and its reversible lifecycle. A missing gate blocks only that operation. A zero-audience unsent `shadow` draft may advance with an exact Pulse-owned empty non-reused segment plus local copy validation, ownership, and status readback; keep it empty until every production gate passes. Logs, webhooks, schedules, and contact unsubscribe fields are not substitutes. Safe metadata and reversible webhook disable remain independently eligible on their routes.
 
 ## Topic, audience, Broadcast, and individual operations
 
@@ -63,12 +58,12 @@ The durable topic is exactly `product_communications` with immutable default `op
 - topic metadata: exact versioned topic;
 - audience/segment: one frozen campaign-only segment;
 - eligible suppression lift: fresh opt-in and sealed per-record readback;
-- Broadcast draft: exact non-reused segment plus exact topic, API-created only;
+- Broadcast shadow draft: connector-created against an exact Pulse-owned empty non-reused segment; bind the exact topic when supported, and otherwise keep it zero-audience and unsent;
 - webhook or domain metadata: only within the separately owned route and topology constraints.
 
-For a Broadcast, freeze the audience and subtract later opt-outs/suppressions; later opt-ins wait for a future campaign. Dry-run, create the API draft, and run just-in-time preview, target, reply-to, suppression, footer, consent, and cap checks before sending. Wrong segment, topic, reply-to, or preview requires delete/recreate while unsent. Dashboard-created Broadcasts are not API-sendable. Native Broadcast scheduling is ineligible; send just in time. Reconcile uncertain status by known opaque ID, never name.
+For a Broadcast, freeze the audience and subtract later opt-outs/suppressions; later opt-ins wait for a future campaign. Before audience eligibility exists, an unsent connector draft may enter `shadow` only against the exact Pulse-owned empty non-reused segment above after local non-PII payload validation; it remains zero-audience and unsent. Populate an audience or send only when exact topic binding and every audience gate are available, then run just-in-time content, target, reply-to, suppression, footer, consent, and cap checks before sending. Correct an unsent draft only when identity and definition remain valid; otherwise retain it inactive and create a deterministic versioned replacement. Connector removals that require fresh human confirmation remain `manual_action`. Native Broadcast scheduling is ineligible; send just in time. Reconcile uncertain status by known opaque ID, never name. Missing topic binding, authoritative suppression readback, safe validation, or reversible lifecycle blocks audience population and send as applicable, while the bounded shadow draft remains independently eligible.
 
-Every individual send freezes immutable intent, deterministic logical key, payload hash, opaque recipient reference, dry-run result, and idempotency key. Within Resend's 24-hour window, retry the identical payload at most three times and only for network failure, 429, 500, or concurrent-idempotent-request. Do not retry other 4xx responses or payload conflicts. After 24 hours without a provider ID, mark `delivery_ambiguous`, consume cap/cooldown, and never auto-resend.
+Every individual send freezes immutable intent, deterministic logical key, payload hash, opaque recipient reference, dry-run result, and provider-enforced idempotency key. Within Resend's 24-hour window, retry the identical payload at most three times and only for network failure, 429, 500, or concurrent-idempotent-request. Do not retry other 4xx responses or payload conflicts. After 24 hours without a provider ID, mark `delivery_ambiguous`, consume cap/cooldown, and never auto-resend. Missing the required idempotency-key input or PII-safe status-only readback keeps individual Pulse sends unavailable.
 
 Existing application transactional sending does not grant Pulse management authority. Every Pulse mutation must select its exact graph operation and satisfy every `switches_all` value. Missing, malformed, or non-`1` values fail closed.
 
