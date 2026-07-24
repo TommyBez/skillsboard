@@ -4,11 +4,12 @@ import { useEffect, useState, type FormEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
-import { ArrowRightIcon } from "lucide-react"
+import { ArrowRightIcon, Loader2Icon } from "lucide-react"
 import posthog from "posthog-js"
 
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
@@ -57,8 +58,9 @@ export function AuthForm({
   const [name, setName] = useState("")
   const [otp, setOtp] = useState("")
   const [error, setError] = useState("")
-  const [isPending, setIsPending] = useState(false)
+  const [pendingAction, setPendingAction] = useState<"email" | "verify" | "resend" | null>(null)
   const [resendIn, setResendIn] = useState(0)
+  const isPending = pendingAction !== null
   const isSignUp = mode === "sign-up"
   const alternateHref = (() => {
     const path = isSignUp ? "/sign-in" : "/sign-up"
@@ -90,7 +92,7 @@ export function AuthForm({
   }
 
   async function handleEmailSubmit(formData: FormData) {
-    setIsPending(true)
+    setPendingAction("email")
     setError("")
     const nextEmail = String(formData.get("email")).trim().toLowerCase()
     const nextName = isSignUp ? String(formData.get("name")).trim() : name
@@ -117,12 +119,12 @@ export function AuthForm({
             : "We couldn’t send a sign-in code. Try again.",
       )
     } finally {
-      setIsPending(false)
+      setPendingAction(null)
     }
   }
 
   async function verifyOtp(nextOtp: string) {
-    setIsPending(true)
+    setPendingAction("verify")
     setError("")
 
     try {
@@ -162,7 +164,7 @@ export function AuthForm({
     } catch {
       setError("That code didn’t work. Request a new one and try again.")
     } finally {
-      setIsPending(false)
+      setPendingAction(null)
     }
   }
 
@@ -174,7 +176,7 @@ export function AuthForm({
 
   async function handleResend() {
     if (resendIn > 0 || isPending) return
-    setIsPending(true)
+    setPendingAction("resend")
     setError("")
     try {
       await sendOtp(email)
@@ -188,7 +190,7 @@ export function AuthForm({
             : "We couldn’t send a sign-in code. Try again.",
       )
     } finally {
-      setIsPending(false)
+      setPendingAction(null)
     }
   }
 
@@ -241,19 +243,37 @@ export function AuthForm({
             {error}
           </p>
         ) : null}
-        <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending || otp.length !== OTP_LENGTH}>
-          {isPending ? "Verifying…" : isSignUp ? "Verify and create account" : "Verify and sign in"}
-          {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
+        <Button
+          type="submit"
+          size="lg"
+          className="h-12 w-full rounded-[16px] px-6"
+          disabled={isPending || otp.length !== OTP_LENGTH}
+          aria-busy={pendingAction === "verify" || undefined}
+        >
+          <ButtonPendingContent pending={pendingAction === "verify"} pendingLabel="Verifying…">
+            {isSignUp ? "Verify and create account" : "Verify and sign in"}
+            <ArrowRightIcon data-icon="inline-end" />
+          </ButtonPendingContent>
         </Button>
         <div className="flex flex-col gap-2 border-t border-border pt-4 text-center text-sm text-muted-foreground">
           {!acceptAnyOtp ? (
             <button
               type="button"
-              className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-1.5 font-medium text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary disabled:cursor-not-allowed disabled:no-underline disabled:opacity-50"
               onClick={handleResend}
               disabled={isPending || resendIn > 0}
+              aria-busy={pendingAction === "resend" || undefined}
             >
-              {resendIn > 0 ? `Resend code in ${resendIn}s` : "Resend code"}
+              {pendingAction === "resend" ? (
+                <>
+                  <Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
+                  Sending…
+                </>
+              ) : resendIn > 0 ? (
+                `Resend code in ${resendIn}s`
+              ) : (
+                "Resend code"
+              )}
             </button>
           ) : null}
           <button
@@ -323,9 +343,17 @@ export function AuthForm({
           {error}
         </p>
       ) : null}
-      <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6" disabled={isPending}>
-        {isPending ? "Starting…" : acceptAnyOtp ? "Continue" : "Email me a code"}
-        {!isPending ? <ArrowRightIcon data-icon="inline-end" /> : null}
+      <Button
+        type="submit"
+        size="lg"
+        className="h-12 w-full rounded-[16px] px-6"
+        disabled={isPending}
+        aria-busy={pendingAction === "email" || undefined}
+      >
+        <ButtonPendingContent pending={pendingAction === "email"} pendingLabel="Starting…">
+          {acceptAnyOtp ? "Continue" : "Email me a code"}
+          <ArrowRightIcon data-icon="inline-end" />
+        </ButtonPendingContent>
       </Button>
       <p className="border-t border-border pt-4 text-center text-sm text-muted-foreground">
         {isSignUp ? "Already have an account?" : "New to Skills Board?"}{" "}

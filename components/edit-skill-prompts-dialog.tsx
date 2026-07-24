@@ -6,6 +6,7 @@ import { MessageSquarePlusIcon, PencilLineIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateSkillExamplePrompts } from "@/app/actions/skills"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import {
@@ -103,8 +104,10 @@ export function EditSkillPromptsDialog({
             <DialogClose render={<Button type="button" variant="outline" disabled={isPending} />}>
               Cancel
             </DialogClose>
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving prompts…" : "Save prompts"}
+            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
+              <ButtonPendingContent pending={isPending} pendingLabel="Saving prompts…">
+                Save prompts
+              </ButtonPendingContent>
             </Button>
           </div>
         </form>

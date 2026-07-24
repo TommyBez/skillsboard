@@ -6,6 +6,7 @@ import { Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteCollection } from "@/app/actions/collections"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -73,8 +74,15 @@ export function DeleteCollectionDialog({ collectionId, collectionTitle }: Delete
           <DialogClose render={<Button variant="outline" disabled={isPending} />}>
             Cancel
           </DialogClose>
-          <Button variant="destructive" disabled={isPending} onClick={handleDelete}>
-            {isPending ? "Deleting…" : "Delete collection"}
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            aria-busy={isPending || undefined}
+            onClick={handleDelete}
+          >
+            <ButtonPendingContent pending={isPending} pendingLabel="Deleting…">
+              Delete collection
+            </ButtonPendingContent>
           </Button>
         </DialogFooter>
       </DialogContent>

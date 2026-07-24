@@ -6,6 +6,7 @@ import { FolderPenIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateCollection } from "@/app/actions/collections"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CollectionDetailsFields, parseCollectionTags } from "@/components/collection-details-fields"
 import { Button } from "@/components/ui/button"
 import {
@@ -92,8 +93,10 @@ export function EditCollectionDialog({
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving…" : "Save changes"}
+            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
+              <ButtonPendingContent pending={isPending} pendingLabel="Saving…">
+                Save changes
+              </ButtonPendingContent>
             </Button>
           </div>
         </form>

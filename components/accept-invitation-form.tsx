@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom"
 import Link from "next/link"
 
 import { acceptInvitation } from "@/app/actions/organizations"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 
 const initialState = { error: "" }
@@ -13,8 +14,16 @@ function AcceptButton() {
   const { pending } = useFormStatus()
 
   return (
-    <Button type="submit" size="lg" className="h-12 rounded-[16px] px-6" disabled={pending}>
-      {pending ? "Joining library…" : "Join team library"}
+    <Button
+      type="submit"
+      size="lg"
+      className="h-12 rounded-[16px] px-6"
+      disabled={pending}
+      aria-busy={pending || undefined}
+    >
+      <ButtonPendingContent pending={pending} pendingLabel="Joining library…">
+        Join team library
+      </ButtonPendingContent>
     </Button>
   )
 }

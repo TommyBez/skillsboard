@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { ArrowUpRightIcon, CheckIcon, GitForkIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CopyButton } from "@/components/copy-button"
 import { Button } from "@/components/ui/button"
 import {
@@ -112,9 +113,13 @@ export function CatalogSkillDetailsDialog({
                   variant="outline"
                   size="sm"
                   className="justify-self-start"
+                  disabled={isLoading}
+                  aria-busy={isLoading || undefined}
                   onClick={() => void loadDetail()}
                 >
-                  Try again
+                  <ButtonPendingContent pending={isLoading} pendingLabel="Loading…">
+                    Try again
+                  </ButtonPendingContent>
                 </Button>
               </div>
             ) : null}

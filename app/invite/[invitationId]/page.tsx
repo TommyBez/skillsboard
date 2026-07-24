@@ -6,7 +6,7 @@ import { redirect } from "next/navigation"
 
 import { AcceptInvitationForm } from "@/components/accept-invitation-form"
 import { AccessShell } from "@/components/access-shell"
-import { SignOutForm } from "@/components/sign-out-form"
+import { SignOutButton, SignOutForm } from "@/components/sign-out-form"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
@@ -63,9 +63,7 @@ async function InvitationDetails({ params }: InvitationPageProps) {
             Open your library
           </Button>
           <SignOutForm returnTo={returnTo}>
-            <Button type="submit" size="lg" className="h-12 w-full rounded-[16px] px-6">
-              Try another account
-            </Button>
+            <SignOutButton size="lg" className="h-12 w-full rounded-[16px] px-6" />
           </SignOutForm>
         </div>
       </AccessShell>

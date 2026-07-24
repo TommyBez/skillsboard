@@ -6,6 +6,7 @@ import { NotebookPenIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateSkillNote } from "@/app/actions/skills"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -101,8 +102,10 @@ export function EditSkillNoteDialog({
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving…" : "Save note"}
+            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
+              <ButtonPendingContent pending={isPending} pendingLabel="Saving…">
+                Save note
+              </ButtonPendingContent>
             </Button>
           </div>
         </form>

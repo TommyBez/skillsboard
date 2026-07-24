@@ -5,6 +5,7 @@ import { useFormStatus } from "react-dom"
 import { ChevronDownIcon, MailIcon } from "lucide-react"
 
 import { createInvitationLink } from "@/app/actions/organizations"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CopyButton } from "@/components/copy-button"
 import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
@@ -25,9 +26,16 @@ function SendInviteButton() {
   const { pending } = useFormStatus()
 
   return (
-    <Button type="submit" className="h-11 rounded-[12px] px-4" disabled={pending}>
-      <MailIcon data-icon="inline-start" />
-      {pending ? "Sending invitation…" : "Send invitation"}
+    <Button
+      type="submit"
+      className="h-11 rounded-[12px] px-4"
+      disabled={pending}
+      aria-busy={pending || undefined}
+    >
+      <ButtonPendingContent pending={pending} pendingLabel="Sending invitation…">
+        <MailIcon data-icon="inline-start" />
+        Send invitation
+      </ButtonPendingContent>
     </Button>
   )
 }

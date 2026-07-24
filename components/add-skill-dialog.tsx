@@ -5,6 +5,7 @@ import { GitBranchIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -301,18 +302,26 @@ export function AddSkillDialog({
             <Button
               type="submit"
               disabled={pendingMode !== null || !repositoryUrl.trim() || (hasDiscovery && selectedCount === 0)}
+              aria-busy={pendingMode !== null || undefined}
             >
-              {pendingMode === "discover"
-                ? "Inspecting repository…"
-                : pendingMode === "save"
-                  ? selectedCount > 1 ? `Saving ${selectedCount} skills…` : "Saving skill…"
-                  : selectedCount > 1
-                    ? `Save ${selectedCount} skills to library`
-                    : selectedCount === 1
-                      ? "Save to library"
-                      : hasDiscovery
-                        ? "Select skills to save"
-                        : "Find skills"}
+              <ButtonPendingContent
+                pending={pendingMode !== null}
+                pendingLabel={
+                  pendingMode === "discover"
+                    ? "Inspecting repository…"
+                    : selectedCount > 1
+                      ? `Saving ${selectedCount} skills…`
+                      : "Saving skill…"
+                }
+              >
+                {selectedCount > 1
+                  ? `Save ${selectedCount} skills to library`
+                  : selectedCount === 1
+                    ? "Save to library"
+                    : hasDiscovery
+                      ? "Select skills to save"
+                      : "Find skills"}
+              </ButtonPendingContent>
             </Button>
           </div>
         </form>
