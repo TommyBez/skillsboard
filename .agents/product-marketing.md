@@ -18,14 +18,18 @@
 - Skills Board points to the latest version available from the saved source. It does not pin or preserve historical versions.
 - Teammates choose how to use a skill: original source, install command, or ZIP download.
 - A ZIP contains the latest skill files available from the source at download time. It does not guarantee installation in every agent.
-- MCP is a first-class way to access the shared library from a compatible agent. It supports the primary team-library narrative rather than replacing it.
+- MCP is a first-class read-only way to access the shared library from a compatible agent. It supports the primary team-library narrative rather than replacing it, and cannot add, edit, delete, approve, install, or execute skills.
 
 ## Target Audience
 **Target companies:** Small and mid-sized teams that already use AI agents in their work, especially teams whose members use a mix of Claude, Codex, Cursor, and other agent tools.
 
+**Current testable ICP hypothesis:** Teams of roughly 5–25 people inside 10–150 person companies that already use at least two AI coding or work agents. This is a working hypothesis to review against production evidence, not an established market fact.
+
 **Decision-makers:** Hands-on team leads, product leaders, design leaders, engineering leaders, AI enablement leads, and individual contributors who help their teammates adopt useful skills.
 
 **Primary use case:** Give the whole team one place to collect, find, and reuse the skills it recommends.
+
+**Likely triggers:** A second agent enters the workflow, several reusable skills accumulate, teammates repeatedly ask where a recommendation lives, a new teammate is onboarded, or an AI guild or enablement function forms.
 
 **Jobs to be done:**
 - Stop answering the same questions about which skill to use and where to find it.
@@ -152,13 +156,15 @@
 
 ## Publication and communication contract
 
-- Publish only verified, already shipped product reality. Never turn a hypothesis, draft, experiment, private prototype, or unmerged pull request into a public capability claim.
+- Publish only verified, already shipped product reality. A capability claim requires the current production deployment and product readback to prove it. Never turn a hypothesis, draft, experiment, private prototype, or unmerged pull request into a public capability claim.
 - Do not invent founder anecdotes, customer stories, personal reading, roadmap commitments, timelines, or ETAs. First-person copy may describe only documented actions, motivations, and results.
 - The connected personal social account may discuss only Skills Board and its shipped features. LinkedIn copy is Italian; X and every email category are English.
 - Proactive founder-voice email uses `Tommaso from Skills Board <tommaso@skillsboard.sh>` only after the consent, suppression, unsubscribe, identity, provider, and public-postal-identity gates in the Growth/Product Pulse contract pass. Transactional email keeps a separate operational identity.
 - Product updates, newsletters, activation guidance, and structured product-research invitations share the `product_communications` consent topic. Optional in-app surveys follow their own non-blocking research/opt-out contract and do not require that email consent. The topic never authorizes personal qualitative follow-up.
 - Paid advertising is policy-ineligible while Skills Board has no revenue line. Reconsidering it requires a merged strategy change that establishes a revenue model.
-- Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent.
+- Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent. A public metric also requires its exact definition, window, denominator, privacy-safe aggregation, and approval under the policy that owns it.
+- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy requires an independently approved repository PR before it becomes executable.
+- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. It does not by itself authorize targeting, consent eligibility, attention caps, sending, publishing, spend, or provider writes; the owning Pulse policy must authorize those effects.
 
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.
@@ -200,5 +206,7 @@
 **Onboarding and individual value path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
 
 **Team activation metric:** Within 14 days of team creation, save the first skill, have an invitation accepted, and have a non-creator select a usage path.
+
+**AAT-28 ownership:** The exact AAT-28 definition and measurement rules belong to the analytics scorecard policy. Marketing work may reference the validated result but must not redefine the metric here.
 
 **Current metrics:** Not established.
