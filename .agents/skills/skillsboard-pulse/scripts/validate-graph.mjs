@@ -978,7 +978,7 @@ function validateCrossReferences(graph, repositoryRoot) {
           `${groupName} ${id} must load communications.attention and the attention state view for cross-channel attention caps`,
         );
       }
-      if (selection.operations.some((operation) => operation.includes("referral"))) {
+      if (skillIdsForSelection.includes("referrals")) {
         invariant(
           orderedNodes.includes("communications.attention") && selection.state_views.includes("attention"),
           `${groupName} ${id} must load communications.attention and the attention state view for cross-channel attention caps`,

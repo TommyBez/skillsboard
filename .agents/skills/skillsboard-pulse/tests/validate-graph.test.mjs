@@ -424,6 +424,22 @@ test("survey routes must load the cross-channel attention owner and state view",
   expectValidationError(() => checkGraph(graphPath), /cross-channel attention caps/);
 });
 
+test("referral-skilled routes must load the cross-channel attention owner and state view", () => {
+  const { graphPath } = makeFixture();
+  mutateGraph(graphPath, (graph) => {
+    graph.skills.referrals = {
+      selector: "fixture-skill",
+      source: "repository",
+      content_sha256: "pending",
+    };
+    graph.routes["product.referral"] = {
+      ...graph.routes["fixture.write"],
+      skills: ["referrals"],
+    };
+  });
+  expectValidationError(() => lockGraph(graphPath), /cross-channel attention caps/);
+});
+
 test("resolve requires an explicit non-mandatory origin for repository routes", () => {
   const { graphPath } = makeFixture();
   mutateGraph(graphPath, (graph) => {

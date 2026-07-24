@@ -5,7 +5,7 @@
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "250880767780adfaf6ce73f5fa8eb9f7213331a7ee323935808dee576177b075",
+      "content_sha256": "d34c70cd9b7fd4ecd9f76a90ef2c9b1bd5e8583e760b355a5ecb8cb5e56cd395",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
     }
   },
@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "ba4313afd2192a60f77cc8061ce5d0026f7ea10f6596594905dd601f4e8fed46"
+    "root_sha256": "4820fdf21516b446bed0a43e7545ba183ee6019b353851f11a11207f2bbaebe1"
   },
   "interference_keys": [
     "channel.community",
@@ -129,7 +129,7 @@
     },
     "email.inbound": {
       "conflicts_with": [],
-      "content_sha256": "94ab39d4d0ecd02f802d9451b544ab6bdc03e166b414387552c322fe6491714c",
+      "content_sha256": "a26930ed1d2b9bed5a28c4d3e32b5e4469f6c8ca6d9ba596fcb18e011e934100",
       "kind": "policy",
       "provides": [
         "ownership",
