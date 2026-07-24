@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { GitBranchIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -181,13 +181,20 @@ export function AddSkillDialog({
     }
   }
 
+  function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    // Avoid React 19 form actions: useState pending updates inside actions
+    // are deferred and never paint while the request is in flight.
+    event.preventDefault()
+    void handleSubmit(new FormData(event.currentTarget))
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger render={<Button aria-label={triggerAriaLabel} />}>
         <PlusIcon data-icon="inline-start" />{triggerLabel}
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto p-0 sm:max-w-xl">
-        <form action={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <DialogHeader className="border-b border-border bg-muted/35 p-6 pr-14">
             <span className="mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <GitBranchIcon className="size-5" aria-hidden="true" />

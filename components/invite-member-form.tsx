@@ -1,13 +1,11 @@
 "use client"
 
 import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
 import { ChevronDownIcon, MailIcon } from "lucide-react"
 
 import { createInvitationLink } from "@/app/actions/organizations"
-import { ButtonPendingContent } from "@/components/button-pending-content"
+import { FormSubmitButton } from "@/components/form-submit-button"
 import { CopyButton } from "@/components/copy-button"
-import { Button } from "@/components/ui/button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
@@ -21,24 +19,6 @@ const expiryFormatter = new Intl.DateTimeFormat("en-US", {
   timeZoneName: "short",
   year: "numeric",
 })
-
-function SendInviteButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button
-      type="submit"
-      className="h-11 rounded-[12px] px-4"
-      disabled={pending}
-      aria-busy={pending || undefined}
-    >
-      <ButtonPendingContent pending={pending} pendingLabel="Sending invitation…">
-        <MailIcon data-icon="inline-start" />
-        Send invitation
-      </ButtonPendingContent>
-    </Button>
-  )
-}
 
 export function InviteMemberForm() {
   const [state, action] = useActionState(createInvitationLink, initialState)
@@ -78,7 +58,10 @@ export function InviteMemberForm() {
           </div>
         </Field>
 
-        <SendInviteButton />
+        <FormSubmitButton className="h-11 rounded-[12px] px-4" pendingLabel="Sending invitation…">
+          <MailIcon data-icon="inline-start" />
+          Send invitation
+        </FormSubmitButton>
       </form>
 
       {state.error ? (

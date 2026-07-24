@@ -1,11 +1,9 @@
 "use client"
 
 import { useActionState } from "react"
-import { useFormStatus } from "react-dom"
 
 import { createOrganization } from "@/app/actions/organizations"
-import { ButtonPendingContent } from "@/components/button-pending-content"
-import { Button } from "@/components/ui/button"
+import { FormSubmitButton } from "@/components/form-submit-button"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
@@ -16,24 +14,6 @@ interface CreateOrganizationFormProps {
   idPrefix?: string
   submitLabel?: string
   pendingLabel?: string
-}
-
-function SubmitButton({ submitLabel, pendingLabel }: { submitLabel: string; pendingLabel: string }) {
-  const { pending } = useFormStatus()
-
-  return (
-    <Button
-      type="submit"
-      size="lg"
-      className="h-12 w-full rounded-[16px] px-6 sm:w-auto"
-      disabled={pending}
-      aria-busy={pending || undefined}
-    >
-      <ButtonPendingContent pending={pending} pendingLabel={pendingLabel}>
-        {submitLabel}
-      </ButtonPendingContent>
-    </Button>
-  )
 }
 
 export function CreateOrganizationForm({
@@ -72,7 +52,13 @@ export function CreateOrganizationForm({
       ) : null}
 
       <div className="border-t border-border pt-6">
-        <SubmitButton submitLabel={submitLabel} pendingLabel={pendingLabel} />
+        <FormSubmitButton
+          size="lg"
+          className="h-12 w-full rounded-[16px] px-6 sm:w-auto"
+          pendingLabel={pendingLabel}
+        >
+          {submitLabel}
+        </FormSubmitButton>
       </div>
     </form>
   )

@@ -6,8 +6,8 @@ import { FolderPenIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateCollection } from "@/app/actions/collections"
-import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CollectionDetailsFields, parseCollectionTags } from "@/components/collection-details-fields"
+import { FormSubmitButton, useFormPending } from "@/components/form-submit-button"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -26,6 +26,29 @@ interface EditCollectionDialogProps {
   tags: string[]
 }
 
+function EditCollectionFields({
+  idPrefix,
+  title,
+  description,
+  tags,
+}: {
+  idPrefix: string
+  title: string
+  description?: string | null
+  tags: string[]
+}) {
+  const pending = useFormPending()
+  return (
+    <CollectionDetailsFields
+      idPrefix={idPrefix}
+      defaultTitle={title}
+      defaultDescription={description}
+      defaultTags={tags}
+      disabled={pending}
+    />
+  )
+}
+
 export function EditCollectionDialog({
   collectionId,
   title,
@@ -35,10 +58,8 @@ export function EditCollectionDialog({
   const router = useRouter()
   const idPrefix = useId()
   const [isOpen, setIsOpen] = useState(false)
-  const [isPending, setIsPending] = useState(false)
 
   async function handleSubmit(formData: FormData) {
-    setIsPending(true)
     try {
       const nextDescription = String(formData.get("description") ?? "").trim()
       const result = await updateCollection({
@@ -57,8 +78,6 @@ export function EditCollectionDialog({
     } catch (error) {
       console.error("Unable to update collection", error)
       toast.error("We couldn’t update this collection. Try again.")
-    } finally {
-      setIsPending(false)
     }
   }
 
@@ -83,21 +102,18 @@ export function EditCollectionDialog({
           </DialogHeader>
 
           <FieldGroup className="gap-5 p-6">
-            <CollectionDetailsFields
+            <EditCollectionFields
               idPrefix={idPrefix}
-              defaultTitle={title}
-              defaultDescription={description}
-              defaultTags={tags}
-              disabled={isPending}
+              title={title}
+              description={description}
+              tags={tags}
             />
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
-              <ButtonPendingContent pending={isPending} pendingLabel="Saving…">
-                Save changes
-              </ButtonPendingContent>
-            </Button>
+            <FormSubmitButton pendingLabel="Saving…">
+              Save changes
+            </FormSubmitButton>
           </div>
         </form>
       </DialogContent>

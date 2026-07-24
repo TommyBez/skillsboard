@@ -6,7 +6,7 @@ import { MessageSquarePlusIcon, PencilLineIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateSkillExamplePrompts } from "@/app/actions/skills"
-import { ButtonPendingContent } from "@/components/button-pending-content"
+import { FormSubmitButton, useFormPending } from "@/components/form-submit-button"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import {
@@ -25,6 +25,20 @@ interface EditSkillPromptsDialogProps {
   prompts: string[]
 }
 
+function PromptEditorFields({ prompts }: { prompts: string[] }) {
+  const pending = useFormPending()
+  return <PromptExamplesEditor defaultValue={prompts} disabled={pending} />
+}
+
+function PromptDialogClose() {
+  const pending = useFormPending()
+  return (
+    <DialogClose render={<Button type="button" variant="outline" disabled={pending} />}>
+      Cancel
+    </DialogClose>
+  )
+}
+
 export function EditSkillPromptsDialog({
   skillId,
   skillName,
@@ -32,7 +46,6 @@ export function EditSkillPromptsDialog({
 }: EditSkillPromptsDialogProps) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  const [isPending, setIsPending] = useState(false)
   const hasPrompts = prompts.length > 0
 
   async function handleSubmit(formData: FormData) {
@@ -41,7 +54,6 @@ export function EditSkillPromptsDialog({
       .map((prompt) => String(prompt).trim())
       .filter(Boolean)
 
-    setIsPending(true)
     try {
       const result = await updateSkillExamplePrompts({
         skillId,
@@ -59,8 +71,6 @@ export function EditSkillPromptsDialog({
     } catch (error) {
       console.error("Unable to update example prompts", error)
       toast.error("We couldn’t update these prompts. Try again.")
-    } finally {
-      setIsPending(false)
     }
   }
 
@@ -97,18 +107,14 @@ export function EditSkillPromptsDialog({
           </DialogHeader>
 
           <div className="p-6">
-            <PromptExamplesEditor defaultValue={prompts} disabled={isPending} />
+            <PromptEditorFields prompts={prompts} />
           </div>
 
           <div className="flex flex-col-reverse gap-2 border-t border-border bg-muted/35 p-4 sm:flex-row sm:justify-end">
-            <DialogClose render={<Button type="button" variant="outline" disabled={isPending} />}>
-              Cancel
-            </DialogClose>
-            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
-              <ButtonPendingContent pending={isPending} pendingLabel="Saving prompts…">
-                Save prompts
-              </ButtonPendingContent>
-            </Button>
+            <PromptDialogClose />
+            <FormSubmitButton pendingLabel="Saving prompts…">
+              Save prompts
+            </FormSubmitButton>
           </div>
         </form>
       </DialogContent>

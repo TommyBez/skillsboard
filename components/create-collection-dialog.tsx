@@ -6,8 +6,8 @@ import { FolderPlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { createCollection } from "@/app/actions/collections"
-import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CollectionDetailsFields, parseCollectionTags } from "@/components/collection-details-fields"
+import { FormSubmitButton, useFormPending } from "@/components/form-submit-button"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -26,6 +26,11 @@ interface CreateCollectionDialogProps {
   onCreated?: (collectionId: string) => Promise<void> | void
 }
 
+function CreateCollectionFields({ idPrefix }: { idPrefix: string }) {
+  const pending = useFormPending()
+  return <CollectionDetailsFields idPrefix={idPrefix} disabled={pending} />
+}
+
 export function CreateCollectionDialog({
   triggerLabel = "New collection",
   open,
@@ -35,7 +40,6 @@ export function CreateCollectionDialog({
   const router = useRouter()
   const idPrefix = useId()
   const [internalOpen, setInternalOpen] = useState(false)
-  const [isPending, setIsPending] = useState(false)
   const isControlled = open !== undefined
   const isOpen = isControlled ? open : internalOpen
 
@@ -45,7 +49,6 @@ export function CreateCollectionDialog({
   }
 
   async function handleSubmit(formData: FormData) {
-    setIsPending(true)
     try {
       const description = String(formData.get("description") ?? "").trim()
       const result = await createCollection({
@@ -71,8 +74,6 @@ export function CreateCollectionDialog({
     } catch (error) {
       console.error("Unable to create collection", error)
       toast.error("We couldn’t create this collection. Try again.")
-    } finally {
-      setIsPending(false)
     }
   }
 
@@ -97,15 +98,13 @@ export function CreateCollectionDialog({
           </DialogHeader>
 
           <FieldGroup className="gap-5 p-6">
-            <CollectionDetailsFields idPrefix={idPrefix} disabled={isPending} />
+            <CreateCollectionFields idPrefix={idPrefix} />
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
-              <ButtonPendingContent pending={isPending} pendingLabel="Creating…">
-                Create collection
-              </ButtonPendingContent>
-            </Button>
+            <FormSubmitButton pendingLabel="Creating…">
+              Create collection
+            </FormSubmitButton>
           </div>
         </form>
       </DialogContent>

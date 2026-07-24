@@ -7,7 +7,7 @@ import posthog from "posthog-js"
 
 import { signOut } from "@/app/actions/auth"
 import { ButtonPendingContent } from "@/components/button-pending-content"
-import { Button } from "@/components/ui/button"
+import { FormSubmitButton } from "@/components/form-submit-button"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
 
 interface SignOutFormProps {
@@ -35,23 +35,14 @@ export function SignOutButton({
   pendingLabel = "Signing out…",
   children = "Try another account",
   ...props
-}: Omit<ComponentProps<typeof Button>, "type" | "children"> & {
+}: Omit<ComponentProps<typeof FormSubmitButton>, "type" | "pendingLabel" | "children"> & {
   pendingLabel?: string
   children?: ReactNode
 }) {
-  const { pending } = useFormStatus()
-
   return (
-    <Button
-      {...props}
-      type="submit"
-      disabled={pending || props.disabled}
-      aria-busy={pending || undefined}
-    >
-      <ButtonPendingContent pending={pending} pendingLabel={pendingLabel}>
-        {children}
-      </ButtonPendingContent>
-    </Button>
+    <FormSubmitButton pendingLabel={pendingLabel} {...props}>
+      {children}
+    </FormSubmitButton>
   )
 }
 

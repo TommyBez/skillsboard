@@ -123,6 +123,12 @@ export function AuthForm({
     }
   }
 
+  function handleEmailFormSubmit(event: FormEvent<HTMLFormElement>) {
+    // Avoid React 19 form actions so pending useState updates paint immediately.
+    event.preventDefault()
+    void handleEmailSubmit(new FormData(event.currentTarget))
+  }
+
   async function verifyOtp(nextOtp: string) {
     setPendingAction("verify")
     setError("")
@@ -293,7 +299,7 @@ export function AuthForm({
   }
 
   return (
-    <form action={handleEmailSubmit} className="flex flex-col gap-5">
+    <form onSubmit={handleEmailFormSubmit} className="flex flex-col gap-5">
       <FieldGroup className="gap-4">
         {isSignUp ? (
           <Field>

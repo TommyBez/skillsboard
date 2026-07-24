@@ -6,7 +6,7 @@ import { NotebookPenIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { updateSkillNote } from "@/app/actions/skills"
-import { ButtonPendingContent } from "@/components/button-pending-content"
+import { FormSubmitButton } from "@/components/form-submit-button"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -32,11 +32,9 @@ export function EditSkillNoteDialog({
 }: EditSkillNoteDialogProps) {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  const [isPending, setIsPending] = useState(false)
   const hasNote = Boolean(note?.trim())
 
   async function handleSubmit(formData: FormData) {
-    setIsPending(true)
     try {
       const result = await updateSkillNote({
         skillId,
@@ -52,8 +50,6 @@ export function EditSkillNoteDialog({
     } catch (error) {
       console.error("Unable to update skill note", error)
       toast.error("We couldn’t update this note. Try again.")
-    } finally {
-      setIsPending(false)
     }
   }
 
@@ -102,11 +98,9 @@ export function EditSkillNoteDialog({
           </FieldGroup>
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
-            <Button type="submit" disabled={isPending} aria-busy={isPending || undefined}>
-              <ButtonPendingContent pending={isPending} pendingLabel="Saving…">
-                Save note
-              </ButtonPendingContent>
-            </Button>
+            <FormSubmitButton pendingLabel="Saving…">
+              Save note
+            </FormSubmitButton>
           </div>
         </form>
       </DialogContent>
