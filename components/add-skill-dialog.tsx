@@ -41,10 +41,15 @@ export function AddSkillDialog({
   const [skills, setSkills] = useState<DiscoveredGitHubSkill[]>([])
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
   const discoveryRequest = useRef(0)
+  const lastSinglePath = useRef<string | null>(null)
 
   const selectedSkills = skills.filter((skill) => selectedPaths.includes(skill.path))
   const selectedCount = selectedSkills.length
   const singleSelectedSkill = selectedCount === 1 ? selectedSkills[0] : null
+  // Note/prompts stay mounted through multi-select excursions so typed text
+  // survives, but must reset when the single selection becomes a different
+  // skill — the key below tracks the last single-selected skill's identity.
+  if (singleSelectedSkill) lastSinglePath.current = singleSelectedSkill.path
   const allSelected = skills.length > 0 && selectedCount === skills.length
   const hasDiscovery = inspectedUrl !== null && skills.length > 0
 
@@ -54,6 +59,7 @@ export function AddSkillDialog({
     setSkills([])
     setSelectedPaths([])
     setPendingMode(null)
+    lastSinglePath.current = null
   }
 
   function toggleSkill(path: string, checked: boolean) {
@@ -267,7 +273,10 @@ export function AddSkillDialog({
 
             {selectedCount > 0 ? (
               <div className="reveal-enter flex flex-col gap-5">
-                <div className={singleSelectedSkill ? "flex flex-col gap-5" : "hidden"}>
+                <div
+                  key={lastSinglePath.current ?? "none"}
+                  className={singleSelectedSkill ? "flex flex-col gap-5" : "hidden"}
+                >
                   <Field>
                     <FieldLabel htmlFor="note">Note (optional)</FieldLabel>
                     <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />

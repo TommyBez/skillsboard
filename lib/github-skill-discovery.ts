@@ -965,9 +965,12 @@ async function resolveDescriptors(
   const downloadsBySha = new Map<string, Promise<Uint8Array>>()
   let nextIndex = 0
   let totalBytes = 0
+  // Once one worker fails, siblings stop claiming new candidates so the
+  // rejected batch does not keep spending GitHub API budget.
+  let aborted = false
 
   async function worker() {
-    while (nextIndex < candidates.length) {
+    while (!aborted && nextIndex < candidates.length) {
       const index = nextIndex
       nextIndex += 1
       const candidate = candidates[index]
@@ -983,9 +986,16 @@ async function resolveDescriptors(
         downloadsBySha.set(candidate.entry.sha, download)
       }
 
-      const bytes = await download
+      let bytes: Uint8Array
+      try {
+        bytes = await download
+      } catch (error) {
+        aborted = true
+        throw error
+      }
       totalBytes += bytes.byteLength
       if (totalBytes > MAX_TOTAL_DESCRIPTOR_BYTES) {
+        aborted = true
         throw new GitHubSkillDiscoveryError(
           "The repository's skill definitions are too large to inspect safely.",
           413,
@@ -995,6 +1005,7 @@ async function resolveDescriptors(
 
       const skill = parseSkillDescriptor(bytes, candidate.path)
       if (!skill) {
+        aborted = true
         throw new GitHubSkillDiscoveryError(
           `The folder at ${candidate.entry.path} does not contain a valid SKILL.md definition.`,
           404,
@@ -1022,6 +1033,15 @@ export async function resolveGitHubSkills(
       "Select at least one skill from this repository.",
       400,
       "invalid_path",
+    )
+  }
+  // validateDescriptorCandidates enforces the same cap later; checking here
+  // rejects oversized selections before any GitHub requests are made.
+  if (normalizedPaths.length > MAX_DESCRIPTOR_CANDIDATES) {
+    throw new GitHubSkillDiscoveryError(
+      `Select at most ${MAX_DESCRIPTOR_CANDIDATES} skills at a time.`,
+      413,
+      "repository_too_large",
     )
   }
 

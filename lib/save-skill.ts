@@ -57,10 +57,12 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
       target: [skill.organizationId, skill.githubUrl, skill.skillName],
     }).returning()
 
-    const savedNames = new Set(savedSkills.map((savedSkill) => savedSkill.skillName))
+    // Correlate by path, not name: two selected paths can resolve to the same
+    // skill name, and only one of them wins the unique-name insert.
+    const savedPaths = new Set(savedSkills.map((savedSkill) => savedSkill.skillPath))
     const alreadySaved = repository.skills
+      .filter((selectedSkill) => !savedPaths.has(selectedSkill.path))
       .map((selectedSkill) => selectedSkill.name)
-      .filter((name) => !savedNames.has(name))
 
     for (const savedSkill of savedSkills) {
       captureTeamEvent({
