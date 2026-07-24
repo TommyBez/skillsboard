@@ -1,6 +1,6 @@
 # Product Marketing Context
 
-*Last updated: July 20, 2026*
+*Last updated: July 24, 2026*
 
 ## Product Overview
 **One-liner:** Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find and reuse them.
@@ -150,6 +150,16 @@
 
 **Personality:** Useful, open, credible, tool-neutral
 
+## Publication and communication contract
+
+- Publish only verified, already shipped product reality. Never turn a hypothesis, draft, experiment, private prototype, or unmerged pull request into a public capability claim.
+- Do not invent founder anecdotes, customer stories, personal reading, roadmap commitments, timelines, or ETAs. First-person copy may describe only documented actions, motivations, and results.
+- The connected personal social account may discuss only Skills Board and its shipped features. LinkedIn copy is Italian; X and every email category are English.
+- Proactive founder-voice email uses `Tommaso from Skills Board <tommaso@skillsboard.sh>` only after the consent, suppression, unsubscribe, identity, provider, and public-postal-identity gates in the Growth/Product Pulse contract pass. Transactional email keeps a separate operational identity.
+- Product updates, newsletters, activation guidance, and structured product-research invitations share the `product_communications` consent topic. Optional in-app surveys follow their own non-blocking research/opt-out contract and do not require that email consent. The topic never authorizes personal qualitative follow-up.
+- Paid advertising is policy-ineligible while Skills Board has no revenue line. Reconsidering it requires a merged strategy change that establishes a revenue model.
+- Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent.
+
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.
 2. A shared library saves team members from asking the same questions and searching from scratch.
@@ -187,6 +197,8 @@
 
 **Conversion action:** Create a team library.
 
-**Activation path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
+**Onboarding and individual value path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
+
+**Team activation metric:** Within 14 days of team creation, save the first skill, have an invitation accepted, and have a non-creator select a usage path.
 
 **Current metrics:** Not established.
