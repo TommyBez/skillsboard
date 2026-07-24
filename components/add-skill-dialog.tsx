@@ -4,9 +4,10 @@ import { useRef, useState } from "react"
 import { GitBranchIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import { addSkill, discoverRepositorySkills } from "@/app/actions/skills"
+import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
   DialogContent,
@@ -17,13 +18,6 @@ import {
 } from "@/components/ui/dialog"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import type { DiscoveredGitHubSkill } from "@/lib/github-skill-discovery"
 
@@ -32,18 +26,6 @@ interface AddSkillDialogProps {
   defaultName?: string
   triggerLabel?: string
   triggerAriaLabel?: string
-}
-
-const SKILL_VALUE_PREFIX = "skillsboard:"
-
-function selectValue(path: string) {
-  return `${SKILL_VALUE_PREFIX}${path}`
-}
-
-function skillPath(value: string | null) {
-  return value?.startsWith(SKILL_VALUE_PREFIX)
-    ? value.slice(SKILL_VALUE_PREFIX.length)
-    : value
 }
 
 export function AddSkillDialog({
@@ -57,20 +39,34 @@ export function AddSkillDialog({
   const [repositoryUrl, setRepositoryUrl] = useState(defaultUrl)
   const [inspectedUrl, setInspectedUrl] = useState<string | null>(null)
   const [skills, setSkills] = useState<DiscoveredGitHubSkill[]>([])
-  const [selectedPath, setSelectedPath] = useState<string | null>(null)
+  const [selectedPaths, setSelectedPaths] = useState<string[]>([])
   const discoveryRequest = useRef(0)
+  const lastSinglePath = useRef<string | null>(null)
 
-  const selectedSkill = selectedPath === null
-    ? null
-    : skills.find((skill) => skill.path === selectedPath) ?? null
+  const selectedSkills = skills.filter((skill) => selectedPaths.includes(skill.path))
+  const selectedCount = selectedSkills.length
+  const singleSelectedSkill = selectedCount === 1 ? selectedSkills[0] : null
+  // Note/prompts stay mounted through multi-select excursions so typed text
+  // survives, but must reset when the single selection becomes a different
+  // skill — the key below tracks the last single-selected skill's identity.
+  if (singleSelectedSkill) lastSinglePath.current = singleSelectedSkill.path
+  const allSelected = skills.length > 0 && selectedCount === skills.length
   const hasDiscovery = inspectedUrl !== null && skills.length > 0
 
   function resetDiscovery() {
     discoveryRequest.current += 1
     setInspectedUrl(null)
     setSkills([])
-    setSelectedPath(null)
+    setSelectedPaths([])
     setPendingMode(null)
+    lastSinglePath.current = null
+  }
+
+  function toggleSkill(path: string, checked: boolean) {
+    setSelectedPaths((current) => {
+      if (checked) return current.includes(path) ? current : [...current, path]
+      return current.filter((selected) => selected !== path)
+    })
   }
 
   async function inspectRepository(value = repositoryUrl) {
@@ -99,7 +95,7 @@ export function AddSkillDialog({
       setRepositoryUrl(result.githubUrl)
       setInspectedUrl(result.githubUrl)
       setSkills(result.skills)
-      setSelectedPath(selection?.path ?? null)
+      setSelectedPaths(selection ? [selection.path] : [])
     } catch (error) {
       if (requestId !== discoveryRequest.current) return
       console.error("Unable to inspect repository", error)
@@ -126,21 +122,26 @@ export function AddSkillDialog({
       await inspectRepository()
       return
     }
-    if (selectedPath === null) {
-      toast.error("Choose a skill from this repository.")
+    if (selectedCount === 0) {
+      toast.error("Choose at least one skill from this repository.")
       return
     }
 
     setPendingMode("save")
     try {
-      const note = String(formData.get("note") ?? "").trim()
-      const examplePrompts = formData
-        .getAll("examplePrompts")
-        .map((prompt) => String(prompt).trim())
-        .filter(Boolean)
-      const result = await addSkill({
+      // Notes and example prompts are skill-specific, so they only apply to
+      // single-skill saves; their fields stay mounted (hidden) to keep typed
+      // text while the selection changes.
+      const note = singleSelectedSkill ? String(formData.get("note") ?? "").trim() : ""
+      const examplePrompts = singleSelectedSkill
+        ? formData
+            .getAll("examplePrompts")
+            .map((prompt) => String(prompt).trim())
+            .filter(Boolean)
+        : []
+      const result = await addSkills({
         githubUrl: inspectedUrl,
-        skillPath: selectedPath,
+        skillPaths: selectedSkills.map((skill) => skill.path),
         tags: String(formData.get("tags") ?? "").split(",").map((tag) => tag.trim()).filter(Boolean),
         ...(note ? { note } : {}),
         examplePrompts,
@@ -149,11 +150,31 @@ export function AddSkillDialog({
         toast.error(result.error)
         return
       }
-      toast.success("Skill saved to your team library")
+
+      const skippedCount = result.alreadySaved.length
+      if (result.savedCount === 0) {
+        toast.error(skippedCount === 1
+          ? "This skill is already in your team library"
+          : "These skills are already in your team library")
+        return
+      }
+
+      toast.success(
+        result.savedCount === 1
+          ? "Skill saved to your team library"
+          : `${result.savedCount} skills saved to your team library`,
+        skippedCount
+          ? {
+              description: skippedCount === 1
+                ? "1 skill was skipped because it is already in your library."
+                : `${skippedCount} skills were skipped because they are already in your library.`,
+            }
+          : undefined,
+      )
       handleOpenChange(false)
     } catch (error) {
-      console.error("Unable to save skill", error)
-      toast.error("We couldn’t save this skill. Check the repository and try again.")
+      console.error("Unable to save skills", error)
+      toast.error("We couldn’t save the selected skills. Check the repository and try again.")
     } finally {
       setPendingMode(null)
     }
@@ -197,48 +218,80 @@ export function AddSkillDialog({
 
             {skills.length > 1 ? (
               <Field className="reveal-enter">
-                <FieldLabel htmlFor="skillPath">Skill</FieldLabel>
-                <Select
-                  id="skillPath"
-                  value={selectedPath === null ? null : selectValue(selectedPath)}
-                  onValueChange={(value) => setSelectedPath(skillPath(value))}
-                  required
+                <FieldLabel id="skillSelectionLabel">Skills in this repository</FieldLabel>
+                <div
+                  role="group"
+                  aria-labelledby="skillSelectionLabel"
+                  className="overflow-hidden rounded-xl border border-border"
                 >
-                  <SelectTrigger className="h-10 w-full">
-                    <SelectValue placeholder="Choose a skill from this repository" />
-                  </SelectTrigger>
-                  <SelectContent align="start">
+                  <label className="flex cursor-pointer items-center gap-3 border-b border-border bg-muted/35 px-4 py-2.5">
+                    <Checkbox
+                      checked={allSelected}
+                      onCheckedChange={(checked) => (
+                        setSelectedPaths(checked ? skills.map((skill) => skill.path) : [])
+                      )}
+                      disabled={pendingMode !== null}
+                      aria-label={allSelected ? "Deselect all skills" : "Select all skills"}
+                    />
+                    <span className="text-sm font-medium text-foreground">Select all</span>
+                    <span className="ml-auto text-xs tabular-nums text-muted-foreground">
+                      {selectedCount} of {skills.length} selected
+                    </span>
+                  </label>
+                  <div className="max-h-60 divide-y divide-border overflow-y-auto">
                     {skills.map((skill) => (
-                      <SelectItem key={`${skill.name}:${skill.path}`} value={selectValue(skill.path)}>
-                        {skill.name}
-                      </SelectItem>
+                      <label
+                        key={`${skill.name}:${skill.path}`}
+                        className="flex cursor-pointer items-start gap-3 px-4 py-3 transition-colors hover:bg-muted/40 has-[[data-checked]]:bg-muted/25"
+                      >
+                        <Checkbox
+                          checked={selectedPaths.includes(skill.path)}
+                          onCheckedChange={(checked) => toggleSkill(skill.path, checked)}
+                          disabled={pendingMode !== null}
+                          className="mt-0.5"
+                          aria-label={`Select ${skill.name}`}
+                        />
+                        <span className="min-w-0">
+                          <span className="block font-mono text-sm font-semibold text-foreground">{skill.name}</span>
+                          <span className="mt-0.5 line-clamp-2 block text-sm leading-relaxed text-muted-foreground">{skill.description}</span>
+                        </span>
+                      </label>
                     ))}
-                  </SelectContent>
-                </Select>
-                <FieldDescription>{selectedSkill?.description ?? `${skills.length} installable skills found.`}</FieldDescription>
+                  </div>
+                </div>
+                <FieldDescription>Choose one, several, or all skills to save to your team library.</FieldDescription>
               </Field>
-            ) : selectedSkill ? (
+            ) : singleSelectedSkill ? (
               <Field className="reveal-enter">
                 <FieldLabel>Skill found</FieldLabel>
                 <div className="rounded-xl border border-border bg-muted/35 p-4">
-                  <p className="font-mono text-sm font-semibold text-foreground">{selectedSkill.name}</p>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{selectedSkill.description}</p>
+                  <p className="font-mono text-sm font-semibold text-foreground">{singleSelectedSkill.name}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{singleSelectedSkill.description}</p>
                 </div>
               </Field>
             ) : null}
 
-            {selectedSkill ? (
+            {selectedCount > 0 ? (
               <div className="reveal-enter flex flex-col gap-5">
-                <Field>
-                  <FieldLabel htmlFor="note">Note (optional)</FieldLabel>
-                  <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />
-                  <FieldDescription>Shared with your team in the library. Up to 500 characters.</FieldDescription>
-                </Field>
-                <PromptExamplesEditor disabled={pendingMode !== null} />
+                <div
+                  key={lastSinglePath.current ?? "none"}
+                  className={singleSelectedSkill ? "flex flex-col gap-5" : "hidden"}
+                >
+                  <Field>
+                    <FieldLabel htmlFor="note">Note (optional)</FieldLabel>
+                    <Textarea id="note" name="note" rows={3} maxLength={500} placeholder="Why this skill belongs in the library, or when to use it." />
+                    <FieldDescription>Shared with your team in the library. Up to 500 characters.</FieldDescription>
+                  </Field>
+                  <PromptExamplesEditor disabled={pendingMode !== null} />
+                </div>
                 <Field>
                   <FieldLabel htmlFor="tags">Tags (optional)</FieldLabel>
                   <Input id="tags" name="tags" placeholder="research, productivity" />
-                  <FieldDescription>Comma-separated, up to 10 tags.</FieldDescription>
+                  <FieldDescription>
+                    {selectedCount > 1
+                      ? `Comma-separated, up to 10 tags, applied to all ${selectedCount} selected skills. Notes and example prompts can be added to each skill after saving.`
+                      : "Comma-separated, up to 10 tags."}
+                  </FieldDescription>
                 </Field>
               </div>
             ) : null}
@@ -247,17 +300,19 @@ export function AddSkillDialog({
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
             <Button
               type="submit"
-              disabled={pendingMode !== null || !repositoryUrl.trim() || (hasDiscovery && selectedPath === null)}
+              disabled={pendingMode !== null || !repositoryUrl.trim() || (hasDiscovery && selectedCount === 0)}
             >
               {pendingMode === "discover"
                 ? "Inspecting repository…"
                 : pendingMode === "save"
-                  ? "Saving skill…"
-                  : selectedSkill
-                    ? "Save to library"
-                    : hasDiscovery
-                      ? "Choose a skill"
-                      : "Find skills"}
+                  ? selectedCount > 1 ? `Saving ${selectedCount} skills…` : "Saving skill…"
+                  : selectedCount > 1
+                    ? `Save ${selectedCount} skills to library`
+                    : selectedCount === 1
+                      ? "Save to library"
+                      : hasDiscovery
+                        ? "Select skills to save"
+                        : "Find skills"}
             </Button>
           </div>
         </form>

@@ -957,53 +957,126 @@ export async function discoverGitHubSkills(value: string): Promise<GitHubSkillDi
   return { ...snapshot, skills, linkedSkillPath: null }
 }
 
-export async function resolveGitHubSkill(
-  value: string,
-  skillPath: string,
-): Promise<ResolvedGitHubSkill> {
-  const normalizedPath = normalizeSkillPath(skillPath)
-  const snapshot = await fetchGitHubRepositorySnapshot(value)
-  const descriptorPath = normalizedPath ? `${normalizedPath}/SKILL.md` : "SKILL.md"
-  const descriptor = snapshot.tree.find((entry) => (
-    entry.path === descriptorPath
-    && entry.type === "blob"
-    && ["100644", "100755"].includes(entry.mode)
-  ))
+async function resolveDescriptors(
+  snapshot: GitHubRepositorySnapshot,
+  candidates: DescriptorCandidate[],
+) {
+  const skills = new Array<DiscoveredGitHubSkill>(candidates.length)
+  const downloadsBySha = new Map<string, Promise<Uint8Array>>()
+  let nextIndex = 0
+  let totalBytes = 0
+  // Once one worker fails, siblings stop claiming new candidates so the
+  // rejected batch does not keep spending GitHub API budget.
+  let aborted = false
 
-  if (!descriptor) {
+  async function worker() {
+    while (!aborted && nextIndex < candidates.length) {
+      const index = nextIndex
+      nextIndex += 1
+      const candidate = candidates[index]
+
+      let download = downloadsBySha.get(candidate.entry.sha)
+      if (!download) {
+        download = fetchDescriptor(
+          snapshot.repoOwner,
+          snapshot.repoName,
+          snapshot.commitSha,
+          candidate.entry,
+        )
+        downloadsBySha.set(candidate.entry.sha, download)
+      }
+
+      let bytes: Uint8Array
+      try {
+        bytes = await download
+      } catch (error) {
+        aborted = true
+        throw error
+      }
+      totalBytes += bytes.byteLength
+      if (totalBytes > MAX_TOTAL_DESCRIPTOR_BYTES) {
+        aborted = true
+        throw new GitHubSkillDiscoveryError(
+          "The repository's skill definitions are too large to inspect safely.",
+          413,
+          "repository_too_large",
+        )
+      }
+
+      const skill = parseSkillDescriptor(bytes, candidate.path)
+      if (!skill) {
+        aborted = true
+        throw new GitHubSkillDiscoveryError(
+          `The folder at ${candidate.entry.path} does not contain a valid SKILL.md definition.`,
+          404,
+          "skill_not_found",
+        )
+      }
+      skills[index] = skill
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(DESCRIPTOR_CONCURRENCY, candidates.length) }, () => worker()),
+  )
+
+  return skills
+}
+
+export async function resolveGitHubSkills(
+  value: string,
+  skillPaths: string[],
+): Promise<GitHubSkillDiscovery> {
+  const normalizedPaths = [...new Set(skillPaths.map(normalizeSkillPath))]
+  if (!normalizedPaths.length) {
     throw new GitHubSkillDiscoveryError(
-      "The selected skill could not be found in this repository.",
-      404,
-      "skill_not_found",
+      "Select at least one skill from this repository.",
+      400,
+      "invalid_path",
     )
   }
-  if (descriptor.size !== undefined && descriptor.size > MAX_DESCRIPTOR_BYTES) {
+  // validateDescriptorCandidates enforces the same cap later; checking here
+  // rejects oversized selections before any GitHub requests are made.
+  if (normalizedPaths.length > MAX_DESCRIPTOR_CANDIDATES) {
     throw new GitHubSkillDiscoveryError(
-      `The skill definition at ${descriptor.path} is too large to inspect safely.`,
+      `Select at most ${MAX_DESCRIPTOR_CANDIDATES} skills at a time.`,
       413,
       "repository_too_large",
     )
   }
 
-  const bytes = await fetchDescriptor(
-    snapshot.repoOwner,
-    snapshot.repoName,
-    snapshot.commitSha,
-    descriptor,
-  )
-  const skill = parseSkillDescriptor(bytes, normalizedPath)
-  if (!skill) {
-    throw new GitHubSkillDiscoveryError(
-      "The selected folder does not contain a valid SKILL.md definition.",
-      404,
-      "skill_not_found",
-    )
-  }
+  const snapshot = await fetchGitHubRepositorySnapshot(value)
+  const candidates = validateDescriptorCandidates(normalizedPaths.map((path) => {
+    const descriptorPath = path ? `${path}/SKILL.md` : "SKILL.md"
+    const entry = snapshot.tree.find((candidate) => (
+      candidate.path === descriptorPath
+      && candidate.type === "blob"
+      && ["100644", "100755"].includes(candidate.mode)
+    ))
+
+    if (!entry) {
+      throw new GitHubSkillDiscoveryError(
+        "A selected skill could not be found in this repository.",
+        404,
+        "skill_not_found",
+      )
+    }
+    return { entry, path }
+  }))
+
+  const skills = await resolveDescriptors(snapshot, candidates)
 
   return {
     ...snapshot,
-    skills: [skill],
-    skill,
-    linkedSkillPath: normalizedPath,
+    skills,
+    linkedSkillPath: skills.length === 1 ? skills[0].path : null,
   }
+}
+
+export async function resolveGitHubSkill(
+  value: string,
+  skillPath: string,
+): Promise<ResolvedGitHubSkill> {
+  const resolved = await resolveGitHubSkills(value, [skillPath])
+  return { ...resolved, skill: resolved.skills[0] }
 }

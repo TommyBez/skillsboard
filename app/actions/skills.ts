@@ -13,7 +13,7 @@ import {
   GitHubSkillDiscoveryError,
 } from "@/lib/github-skill-discovery"
 import { captureTeamEvent } from "@/lib/posthog-server"
-import { saveSkillToLibrary } from "@/lib/save-skill"
+import { saveSkillsToLibrary } from "@/lib/save-skill"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
 const githubRepositorySchema = z.object({
@@ -25,9 +25,13 @@ const examplePromptsSchema = z
   .max(8)
   .transform((prompts) => [...new Set(prompts)])
 
-const skillSchema = z.object({
+const skillsSchema = z.object({
   githubUrl: z.url(),
-  skillPath: z.string().max(512),
+  skillPaths: z
+    .array(z.string().max(512))
+    .min(1)
+    .max(100)
+    .transform((paths) => [...new Set(paths)]),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).default([]),
   note: z.string().trim().max(500).optional(),
   examplePrompts: examplePromptsSchema.default([]),
@@ -67,28 +71,32 @@ export async function discoverRepositorySkills(input: z.input<typeof githubRepos
   }
 }
 
-export async function addSkill(input: z.input<typeof skillSchema>) {
+export async function addSkills(input: z.input<typeof skillsSchema>) {
   const session = await requireSession()
   const { organizationId, userId } = await requireActiveOrganization(session)
-  const parsed = skillSchema.safeParse(input)
+  const parsed = skillsSchema.safeParse(input)
 
   if (!parsed.success) {
-    return { ok: false as const, error: "Check the repository, selected skill, tags, note, and prompts, then try again." }
+    return { ok: false as const, error: "Check the repository, selected skills, tags, note, and prompts, then try again." }
   }
 
-  const result = await saveSkillToLibrary({
+  const result = await saveSkillsToLibrary({
     organizationId,
     userId,
     githubUrl: parsed.data.githubUrl,
-    skillPath: parsed.data.skillPath,
+    skillPaths: parsed.data.skillPaths,
     tags: parsed.data.tags,
     note: parsed.data.note,
     examplePrompts: parsed.data.examplePrompts,
     surface: "web",
   })
   if (!result.ok) return { ok: false as const, error: result.error }
-  updateTag(cacheTags.organizationSkills(organizationId))
-  return { ok: true as const }
+  if (result.saved.length) updateTag(cacheTags.organizationSkills(organizationId))
+  return {
+    ok: true as const,
+    savedCount: result.saved.length,
+    alreadySaved: result.alreadySaved,
+  }
 }
 
 const updateSkillNoteSchema = z.object({
