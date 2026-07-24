@@ -6,6 +6,7 @@ import { FolderMinusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { removeSkillFromCollection } from "@/app/actions/collections"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 
 interface RemoveFromCollectionButtonProps {
@@ -51,11 +52,14 @@ export function RemoveFromCollectionButton({
       variant="outline"
       size="sm"
       disabled={isPending}
+      aria-busy={isPending || undefined}
       onClick={handleRemove}
       aria-label={`Remove ${skillName} from the ${collectionTitle} collection`}
     >
-      <FolderMinusIcon data-icon="inline-start" />
-      {isPending ? "Removing…" : "Remove"}
+      <ButtonPendingContent pending={isPending} pendingLabel="Removing…">
+        <FolderMinusIcon data-icon="inline-start" />
+        Remove
+      </ButtonPendingContent>
     </Button>
   )
 }

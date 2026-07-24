@@ -1,10 +1,11 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { GitBranchIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -180,13 +181,20 @@ export function AddSkillDialog({
     }
   }
 
+  function handleFormSubmit(event: FormEvent<HTMLFormElement>) {
+    // Avoid React 19 form actions: useState pending updates inside actions
+    // are deferred and never paint while the request is in flight.
+    event.preventDefault()
+    void handleSubmit(new FormData(event.currentTarget))
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger render={<Button aria-label={triggerAriaLabel} />}>
         <PlusIcon data-icon="inline-start" />{triggerLabel}
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto p-0 sm:max-w-xl">
-        <form action={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <DialogHeader className="border-b border-border bg-muted/35 p-6 pr-14">
             <span className="mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <GitBranchIcon className="size-5" aria-hidden="true" />
@@ -301,18 +309,26 @@ export function AddSkillDialog({
             <Button
               type="submit"
               disabled={pendingMode !== null || !repositoryUrl.trim() || (hasDiscovery && selectedCount === 0)}
+              aria-busy={pendingMode !== null || undefined}
             >
-              {pendingMode === "discover"
-                ? "Inspecting repository…"
-                : pendingMode === "save"
-                  ? selectedCount > 1 ? `Saving ${selectedCount} skills…` : "Saving skill…"
-                  : selectedCount > 1
-                    ? `Save ${selectedCount} skills to library`
-                    : selectedCount === 1
-                      ? "Save to library"
-                      : hasDiscovery
-                        ? "Select skills to save"
-                        : "Find skills"}
+              <ButtonPendingContent
+                pending={pendingMode !== null}
+                pendingLabel={
+                  pendingMode === "discover"
+                    ? "Inspecting repository…"
+                    : selectedCount > 1
+                      ? `Saving ${selectedCount} skills…`
+                      : "Saving skill…"
+                }
+              >
+                {selectedCount > 1
+                  ? `Save ${selectedCount} skills to library`
+                  : selectedCount === 1
+                    ? "Save to library"
+                    : hasDiscovery
+                      ? "Select skills to save"
+                      : "Find skills"}
+              </ButtonPendingContent>
             </Button>
           </div>
         </form>

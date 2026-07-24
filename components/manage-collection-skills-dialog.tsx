@@ -6,6 +6,7 @@ import { PlusIcon, SearchIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkillToCollection, removeSkillFromCollection } from "@/app/actions/collections"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -116,12 +117,18 @@ export function ManageCollectionSkillsDialog({
                     variant={item.inCollection ? "outline" : "default"}
                     size="sm"
                     disabled={pendingSkillId !== null}
+                    aria-busy={pendingSkillId === item.id || undefined}
                     onClick={() => void toggleSkill(item)}
                     aria-label={item.inCollection
                       ? `Remove ${item.title} from ${collectionTitle}`
                       : `Add ${item.title} to ${collectionTitle}`}
                   >
-                    {pendingSkillId === item.id ? "Saving…" : item.inCollection ? "Remove" : "Add"}
+                    <ButtonPendingContent
+                      pending={pendingSkillId === item.id}
+                      pendingLabel="Saving…"
+                    >
+                      {item.inCollection ? "Remove" : "Add"}
+                    </ButtonPendingContent>
                   </Button>
                 </li>
               ))}

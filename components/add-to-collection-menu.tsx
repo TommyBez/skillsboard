@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { FolderPlusIcon, PlusIcon } from "lucide-react"
+import { FolderPlusIcon, Loader2Icon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkillToCollection, removeSkillFromCollection } from "@/app/actions/collections"
@@ -81,27 +81,45 @@ export function AddToCollectionMenu({
             <Button
               variant="outline"
               size="sm"
+              disabled={pendingCollectionId !== null}
+              aria-busy={pendingCollectionId !== null || undefined}
               aria-label={`Manage collections for ${skillName}`}
             />
           )}
         >
-          <FolderPlusIcon data-icon="inline-start" />
-          {memberIds.size ? `Collections (${memberIds.size})` : "Add to collection"}
+          {pendingCollectionId !== null ? (
+            <Loader2Icon className="size-4 animate-spin" data-icon="inline-start" aria-hidden="true" />
+          ) : (
+            <FolderPlusIcon data-icon="inline-start" />
+          )}
+          {pendingCollectionId !== null
+            ? "Saving…"
+            : memberIds.size
+              ? `Collections (${memberIds.size})`
+              : "Add to collection"}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuGroup>
             <DropdownMenuLabel>{collections.length ? "Add to collection" : "No collections yet"}</DropdownMenuLabel>
-            {collections.map((item) => (
-              <DropdownMenuCheckboxItem
-                key={item.id}
-                checked={memberIds.has(item.id)}
-                closeOnClick={false}
-                disabled={pendingCollectionId !== null}
-                onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
-              >
-                <span className="truncate">{item.title}</span>
-              </DropdownMenuCheckboxItem>
-            ))}
+            {collections.map((item) => {
+              const isSaving = pendingCollectionId === item.id
+              return (
+                <DropdownMenuCheckboxItem
+                  key={item.id}
+                  checked={memberIds.has(item.id)}
+                  closeOnClick={false}
+                  disabled={pendingCollectionId !== null}
+                  onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
+                >
+                  <span className="flex min-w-0 items-center gap-1.5">
+                    {isSaving ? (
+                      <Loader2Icon className="size-3.5 shrink-0 animate-spin" aria-hidden="true" />
+                    ) : null}
+                    <span className="truncate">{isSaving ? "Saving…" : item.title}</span>
+                  </span>
+                </DropdownMenuCheckboxItem>
+              )
+            })}
           </DropdownMenuGroup>
           {collections.length ? <DropdownMenuSeparator /> : null}
           <DropdownMenuItem onClick={() => setIsCreateOpen(true)}>
