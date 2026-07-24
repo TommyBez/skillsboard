@@ -108,7 +108,6 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
     loadingRef.current = true
     setIsLoadingMore(true)
-    setError(null)
 
     try {
       const response = await fetch(`/api/catalog?${params}`)
@@ -125,6 +124,9 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       }
       setPage(nextPage)
       pageRef.current = nextPage
+      // Keep the retry control mounted during pending requests so the button
+      // can show its loading label; only clear the error after success.
+      setError(null)
     } catch (loadError) {
       console.error(loadError)
       setError("Couldn’t load more skills. Try again.")
