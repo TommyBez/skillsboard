@@ -574,7 +574,7 @@ test("check rejects drift in a pinned repository skill", () => {
   expectValidationError(() => checkGraph(graphPath), /repository skill fixture content_sha256 mismatch/);
 });
 
-test("production Resend routes pin the connector adapter instead of CLI management", () => {
+test("production Resend routes pin the connector adapter instead of API-key or CLI management", () => {
   const checked = checkGraph();
   const connectorOperationIds = [
     "demand.email",
@@ -607,18 +607,30 @@ test("production Resend routes pin the connector adapter instead of CLI manageme
     "email.resend_webhook",
     "incident.notify",
   ];
+  const actualConnectorOperationIds = Object.entries(checked.graph.operations)
+    .filter(([, operation]) => operation.skills.includes("resend_connector"))
+    .map(([id]) => id)
+    .sort();
+  const actualConnectorRouteIds = Object.entries(checked.graph.routes)
+    .filter(([, route]) => route.skills.includes("resend_connector"))
+    .map(([id]) => id)
+    .sort();
 
+  assert.deepEqual(actualConnectorOperationIds, connectorOperationIds);
+  assert.deepEqual(actualConnectorRouteIds, connectorRouteIds);
   assert.deepEqual(checked.graph.skills.resend_connector, {
     selector: "resend-connector",
     source: "repository",
     content_sha256: checked.graph.skills.resend_connector.content_sha256,
   });
+  assert.equal(checked.graph.skills.resend, undefined);
   assert.equal(checked.graph.skills.resend_cli, undefined);
 
   for (const id of connectorOperationIds) {
     const operation = checked.graph.operations[id];
     assert.ok(operation, `${id} must exist`);
     assert.equal(operation.skills.includes("resend_connector"), true, `${id} must use resend_connector`);
+    assert.equal(operation.skills.includes("resend"), false, `${id} must not require resend`);
     assert.equal(operation.skills.includes("resend_cli"), false, `${id} must not require resend_cli`);
   }
 
@@ -626,6 +638,7 @@ test("production Resend routes pin the connector adapter instead of CLI manageme
     const route = checked.graph.routes[id];
     assert.ok(route, `${id} must exist`);
     assert.equal(route.skills.includes("resend_connector"), true, `${id} must use resend_connector`);
+    assert.equal(route.skills.includes("resend"), false, `${id} must not require resend`);
     assert.equal(route.skills.includes("resend_cli"), false, `${id} must not require resend_cli`);
   }
 });

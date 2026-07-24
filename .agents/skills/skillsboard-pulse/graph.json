@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "613359641ea2db18df0a15ef23047713311dd530850641c406661d50e7af2fd6"
+    "root_sha256": "ac7bba5cea05fd34f346a9fcebd82db4aeacc6e6e16faa0eb501b0878588c84b"
   },
   "interference_keys": [
     "channel.community",
@@ -661,7 +661,6 @@
         "email.outbound"
       ],
       "skills": [
-        "resend",
         "resend_connector"
       ],
       "switches_all": [
@@ -687,7 +686,6 @@
       "skills": [
         "email_best_practices",
         "emails",
-        "resend",
         "resend_connector"
       ],
       "switches_all": [
@@ -709,7 +707,6 @@
         "email.outbound"
       ],
       "skills": [
-        "resend",
         "resend_connector"
       ],
       "switches_all": [
@@ -752,7 +749,6 @@
       "skills": [
         "email_best_practices",
         "emails",
-        "resend",
         "resend_connector"
       ],
       "switches_all": [
@@ -791,7 +787,6 @@
         "email.outbound"
       ],
       "skills": [
-        "resend",
         "resend_connector"
       ],
       "switches_all": [
@@ -1232,7 +1227,6 @@
       "skills": [
         "email_best_practices",
         "emails",
-        "resend",
         "resend_connector"
       ],
       "state_views": [
@@ -1255,7 +1249,6 @@
       "skills": [
         "email_best_practices",
         "emails",
-        "resend",
         "resend_connector"
       ],
       "state_views": [
@@ -1319,7 +1312,6 @@
       "skills": [
         "email_best_practices",
         "emails",
-        "resend",
         "resend_connector"
       ],
       "state_views": [
@@ -1356,7 +1348,6 @@
         "resend.audience.write"
       ],
       "skills": [
-        "resend",
         "resend_connector"
       ],
       "state_views": [
@@ -1411,7 +1402,6 @@
         "resend.topic.write"
       ],
       "skills": [
-        "resend",
         "resend_connector"
       ],
       "state_views": [
@@ -1957,11 +1947,6 @@
     "referrals": {
       "content_sha256": "4ddd01713b7ef3c3fb669fd3bb9a720641ee8db8b9ac327c35d6be3548a7f777",
       "selector": "referrals",
-      "source": "repository"
-    },
-    "resend": {
-      "content_sha256": "fe13dcce83b6d074a75bf53b13d2d30865528e1d38494139d6f13b802c63dbca",
-      "selector": "resend",
       "source": "repository"
     },
     "resend_connector": {
