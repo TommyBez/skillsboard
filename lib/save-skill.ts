@@ -2,35 +2,43 @@ import { db } from "@/lib/db"
 import { skill } from "@/lib/db/schema"
 import {
   GitHubSkillDiscoveryError,
-  resolveGitHubSkill,
+  resolveGitHubSkills,
 } from "@/lib/github-skill-discovery"
 import { captureTeamEvent } from "@/lib/posthog-server"
 
-export interface SaveSkillInput {
+export interface SaveSkillsInput {
   organizationId: string
   userId: string
   githubUrl: string
-  skillPath: string
+  skillPaths: string[]
   tags: string[]
   note?: string
   examplePrompts: string[]
   surface: "web" | "mcp"
 }
 
+export interface SaveSkillInput extends Omit<SaveSkillsInput, "skillPaths"> {
+  skillPath: string
+}
+
 export type SavedSkill = typeof skill.$inferSelect
+
+export type SaveSkillsResult =
+  | { ok: true; saved: SavedSkill[]; alreadySaved: string[] }
+  | { ok: false; error: string }
 
 export type SaveSkillResult =
   | { ok: true; skill: SavedSkill }
   | { ok: false; error: string }
 
-export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSkillResult> {
+export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveSkillsResult> {
   try {
-    const repository = await resolveGitHubSkill(input.githubUrl, input.skillPath)
-    const selectedSkill = repository.skill
+    const repository = await resolveGitHubSkills(input.githubUrl, input.skillPaths)
 
     const note = input.note || null
     const examplePrompts = [...new Set(input.examplePrompts)]
-    const [savedSkill] = await db.insert(skill).values({
+    const tags = [...new Set(input.tags.map((tag) => tag.toLowerCase()))]
+    const savedSkills = await db.insert(skill).values(repository.skills.map((selectedSkill) => ({
       organizationId: input.organizationId,
       createdBy: input.userId,
       githubUrl: repository.githubUrl,
@@ -42,37 +50,53 @@ export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSki
       repoStars: repository.repoStars,
       repoUpdatedAt: repository.repoUpdatedAt,
       skillPath: selectedSkill.path,
-      tags: [...new Set(input.tags.map((tag) => tag.toLowerCase()))],
+      tags,
       note,
       examplePrompts,
-    }).onConflictDoNothing({
+    }))).onConflictDoNothing({
       target: [skill.organizationId, skill.githubUrl, skill.skillName],
     }).returning()
-    if (!savedSkill) return { ok: false, error: "This skill is already in your team library" }
 
-    captureTeamEvent({
-      distinctId: input.userId,
-      event: "skill_saved",
-      properties: {
-        skill_name: selectedSkill.name,
-        repo_owner: repository.repoOwner,
-        repo_name: repository.repoName,
-        tag_count: input.tags.length,
-        has_note: Boolean(note),
-        example_prompt_count: examplePrompts.length,
-        surface: input.surface,
-      },
-      teamId: input.organizationId,
-    })
+    const savedNames = new Set(savedSkills.map((savedSkill) => savedSkill.skillName))
+    const alreadySaved = repository.skills
+      .map((selectedSkill) => selectedSkill.name)
+      .filter((name) => !savedNames.has(name))
 
-    return { ok: true, skill: savedSkill }
+    for (const savedSkill of savedSkills) {
+      captureTeamEvent({
+        distinctId: input.userId,
+        event: "skill_saved",
+        properties: {
+          skill_name: savedSkill.skillName,
+          repo_owner: repository.repoOwner,
+          repo_name: repository.repoName,
+          tag_count: tags.length,
+          has_note: Boolean(note),
+          example_prompt_count: examplePrompts.length,
+          surface: input.surface,
+        },
+        teamId: input.organizationId,
+      })
+    }
+
+    return { ok: true, saved: savedSkills, alreadySaved }
   } catch (error) {
-    console.error("Unable to save skill", error)
+    console.error("Unable to save skills", error)
     return {
       ok: false,
       error: error instanceof GitHubSkillDiscoveryError
         ? error.message
-        : "We couldn’t fetch this repository or save the skill. Check the URL and try again.",
+        : "We couldn’t fetch this repository or save the skills. Check the URL and try again.",
     }
   }
+}
+
+export async function saveSkillToLibrary(input: SaveSkillInput): Promise<SaveSkillResult> {
+  const { skillPath, ...rest } = input
+  const result = await saveSkillsToLibrary({ ...rest, skillPaths: [skillPath] })
+
+  if (!result.ok) return result
+  const [savedSkill] = result.saved
+  if (!savedSkill) return { ok: false, error: "This skill is already in your team library" }
+  return { ok: true, skill: savedSkill }
 }
