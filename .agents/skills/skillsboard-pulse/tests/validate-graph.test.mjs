@@ -574,6 +574,62 @@ test("check rejects drift in a pinned repository skill", () => {
   expectValidationError(() => checkGraph(graphPath), /repository skill fixture content_sha256 mismatch/);
 });
 
+test("production Resend routes pin the connector adapter instead of CLI management", () => {
+  const checked = checkGraph();
+  const connectorOperationIds = [
+    "demand.email",
+    "inbound.process",
+    "inbound.reply",
+    "incident.email",
+    "resend.audience.write",
+    "resend.broadcast.send",
+    "resend.broadcast_draft.write",
+    "resend.domain.write",
+    "resend.proactive.send",
+    "resend.suppression_lift",
+    "resend.topic.write",
+    "resend.webhook.write",
+    "review.outreach",
+  ];
+  const connectorRouteIds = [
+    "distribution.demand_email",
+    "distribution.review_outreach",
+    "email.broadcast_prepare",
+    "email.broadcast_send",
+    "email.inbound_process",
+    "email.inbound_reply",
+    "email.proactive_send",
+    "email.reconcile",
+    "email.resend_audience",
+    "email.resend_domain",
+    "email.resend_suppression",
+    "email.resend_topic",
+    "email.resend_webhook",
+    "incident.notify",
+  ];
+
+  assert.deepEqual(checked.graph.skills.resend_connector, {
+    selector: "resend-connector",
+    source: "repository",
+    content_sha256: checked.graph.skills.resend_connector.content_sha256,
+  });
+  assert.equal(checked.graph.skills.resend_cli, undefined);
+
+  for (const id of connectorOperationIds) {
+    const operation = checked.graph.operations[id];
+    assert.ok(operation, `${id} must exist`);
+    assert.equal(operation.skills.includes("resend_connector"), true, `${id} must use resend_connector`);
+    assert.equal(operation.skills.includes("resend_cli"), false, `${id} must not require resend_cli`);
+  }
+
+  for (const id of connectorRouteIds) {
+    const route = checked.graph.routes[id];
+    assert.ok(route, `${id} must exist`);
+    assert.equal(route.skills.includes("resend_connector"), true, `${id} must use resend_connector`);
+    assert.equal(route.skills.includes("resend_cli"), false, `${id} must not require resend_cli`);
+  }
+});
+
 test("delivery repository cannot self-authorize its origin", () => {
   const { root, graphPath } = makeFixture();
   write(join(root, ".agents", "skills", "skillsboard-pulse", "references", "delivery.md"), "# Delivery\n");
