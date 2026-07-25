@@ -54,7 +54,7 @@ Use the Europe/Rome calendar month.
 - Use provider billing timestamp when available, otherwise request timestamp.
 - An overrun pauses the metered perimeter; uncontrolled continuing spend is SEV0.
 
-The route must also pass the shared included-quota reserve in `pulse.kernel`. Missing credentials, caps, quota readback, or the enable switch make only DataForSEO unavailable. Qualitative research continues. State/digest shows currency, period, confirmed actual, reserved, ambiguous, hard-cap remaining, normal-ceiling remaining, request count, and opaque provider references.
+The route must also pass the shared included-quota reserve in `pulse.kernel`. Missing credentials, caps, or quota readback make only DataForSEO unavailable. Qualitative research continues. State/digest shows currency, period, confirmed actual, reserved, ambiguous, hard-cap remaining, normal-ceiling remaining, request count, and opaque provider references.
 
 ## Publication gates
 

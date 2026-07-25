@@ -10,7 +10,7 @@ Accept only the Resend `email.received` event through a signature-verified webho
 
 The webhook signing secret is a one-time creation value. Autonomous creation is eligible only when the official connector advertises a create operation whose response flows directly to a sealed secret sink without model, tool-result, stdout, log, or file exposure, while official readback proves the webhook ID. Persist only that ID. If capture or persistence fails, immediately request reversible disable or connector-confirmed deletion, then require official readback to confirm that the original webhook is inactive or absent before creating a replacement. Keep setup quarantined while deactivation is unconfirmed or ambiguous; never recreate blindly, leave multiple active webhooks, or adopt a lost webhook by name. A connector removal that requires fresh human confirmation remains `manual_action`. Otherwise setup is an irreducibly human secure-placement step returning only the webhook ID. Connector received-email reads, `webhooks listen`, and `emails receiving *` output are prohibited substitutes.
 
-Production enablement requires an independently approved repository implementation with signature-before-body validation, replay defense, bounded size, sandboxing, provider-ID readback, loop suppression, and exact operation switches. Local shadow tests use a test-only secret and prove invalid, replayed, and oversized requests fail; HTML, quoted history, tracking, and active content are stripped; attachments are quarantined; raw bodies are discarded after bounded extraction; and untrusted input has no tools, secrets, files, network, or send authority.
+Production enablement requires an independently approved repository implementation with signature-before-body validation, replay defense, bounded size, sandboxing, provider-ID readback, and loop suppression. Local shadow tests use a test-only secret and prove invalid, replayed, and oversized requests fail; HTML, quoted history, tracking, and active content are stripped; attachments are quarantined; raw bodies are discarded after bounded extraction; and untrusted input has no tools, secrets, files, network, or send authority.
 
 ## Processing sequence
 
@@ -25,7 +25,7 @@ Raw or quoted content never enters model context, state, logs, Issues, or digest
 
 ## Eligible replies
 
-An automatic reply additionally requires its exact reply route/switch, an unaffected healthy send path, trustworthy sender authentication, official thread readback, and all outbound idempotency/cap gates.
+An automatic reply additionally requires its exact reply route, an unaffected healthy send path, trustworthy sender authentication, official thread readback, and all outbound idempotency/cap gates.
 
 Eligible bounded replies are:
 

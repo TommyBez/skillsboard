@@ -2,7 +2,7 @@
 
 **Node:** `channels.distribution`
 
-Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require the exact allowlist, official current rules/capability read, graph route, and switches.
+Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require the exact allowlist, official current rules/capability read, and graph route.
 
 If autonomous execution is unavailable but every other policy, evidence, identity, quality, cap, cooldown, and containment gate passes, emit a bounded `manual_action` package instead of dropping the opportunity. It reserves the same cap/lock and includes final target, evidence-backed brief, identity, rule URL/check time, expiry, containment, and required result URL/ID.
 
@@ -50,7 +50,7 @@ Run at most one solicitation campaign at a time. Select genuine recent meaningfu
 
 Evaluate at 30 days: under 30 delivered is `insufficient_sample`; 30–59 delivered with zero reviews permits one correction but no expansion; at least 60 across the original plus one extension with zero reviews retires the channel. A provider warning, biased cohort, or policy violation pauses immediately.
 
-Public review responses require their separate route and switch, official read/notification, truthful non-pressuring product facts, and no exposure of account/customer detail; target 72 hours when useful. Negative sentiment alone never changes exposure. Legal, privacy, security, grave allegations, identity ambiguity, dispute, or abuse receive a human handoff, not an autonomous substantive response.
+Public review responses require their separate route, official read/notification, truthful non-pressuring product facts, and no exposure of account/customer detail; target 72 hours when useful. Negative sentiment alone never changes exposure. Legal, privacy, security, grave allegations, identity ambiguity, dispute, or abuse receive a human handoff, not an autonomous substantive response.
 
 ## Earned media
 
@@ -76,7 +76,7 @@ Each party retains its audience, consent, and data. Do not exchange/export/match
 
 ## Switches, readback, and containment
 
-All operations begin `read_only`. Community writes use the community master route; directory, review outreach/response, earned media, partnership, and demand response each require the master plus their exact operation switch in `graph.json`. Missing, non-`1`, or malformed values fail closed.
+All operations begin `read_only`. Community, directory, review outreach/response, earned media, partnership, and demand-response effects each require their exact operation route plus the policy, provider, identity, cap, cooldown, and containment gates above.
 
 Before effect, read current platform rules, identity, caps, cooldown, quota, destination/thread state, and edit/removal path. Persist deterministic resource key, route, rule-check time, opaque external ID/URL, cap reservation, and measurement. Ambiguous effects reserve capacity and are not blindly duplicated.
 

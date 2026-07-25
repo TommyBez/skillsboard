@@ -1,11 +1,11 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "21dc21809331c327135fde66334ad5d7c5c60bc6cb2b05fcea3e4c4441f2a0d4",
+      "content_sha256": "ff3acd274a9b50bdc5efe8d670c9701924e3a25750e425fedff4300ebd1fee7a",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "76c082722bb65452c3b2e286a85103dba044fe8e2f083a85dd34d2a891e820ac",
+      "content_sha256": "b698256541137dcc2f2ddf03e3ac65f0049e201d7484d37a30602ad423225011",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
     }
   },
@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "8787a4cbbccda1a3205a6dc2d5dcdbce34e9c988800578b6b2205bb0e0b551e0"
+    "root_sha256": "975e938435f4b1da6c7d4a2c206d056f2882f793d81fe2b67c3354226930aee0"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "ec2cdaa16664cd4265f6b80d236aa5b089ec1252846be73c4b785fb41b819f2a",
+      "content_sha256": "3d0b70a2622f7f8f11f7cd520e068858b990b0f20894bb3d8ea1145e122917c1",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "8839d0cda2b209c1cc1ad8f0c39dcddfa35449e3bac90946b5f434898b2ecb5c",
+      "content_sha256": "454b59565859b959c806eb699977f63e99abbd972b669f7b412bfb49829f4128",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "becfd2fbcd6bd66a7c840a0e3c5efb0a9916e964a0fa3f86f3364d2f9dd1a1a3",
+      "content_sha256": "c710a5dea7284b427cf3c0307ceff5555b650e5a199c3829a93afda265383eb2",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "d5bad6f629b7df75049cad6c93e530194283e66524e2149d19c209b399875b74",
+      "content_sha256": "d3082efd868b5fce6418dab69d8fdc8d00249bfff4dc715de5785eefb8c58f51",
       "kind": "policy",
       "provides": [
         "approval",
@@ -129,7 +129,7 @@
     },
     "email.inbound": {
       "conflicts_with": [],
-      "content_sha256": "32e2c371bf5226d08e2e5fb3a1bf1bcc7fc86a0bfb32d4f2d5808f9ea6678475",
+      "content_sha256": "bd2dd32002fb3c5c6a63f0b646abea459e63c5ff49726f330c33d6889d3e80a1",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -143,7 +143,7 @@
     },
     "email.outbound": {
       "conflicts_with": [],
-      "content_sha256": "a760ff5cd04b2ad0f2cacfb0e369b561d58235a9662338f43acbe661005f8e1c",
+      "content_sha256": "4bc81caa3884d00e229a8b101e5aa765acac7e9a6812cc38285d848a02ecef04",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -158,7 +158,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "c9d324cd52da65c1d46bc28619a0386f620a7854804f46839b193ed59ff5331f",
+      "content_sha256": "52edd2333708d2ce896e391758c99cdd3bcceebeb401a0c3f1639331780cd800",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "aea67c657376d5ff6841e59e20fcb333ab1543ac73710b8c0625f73e4a97c533",
+      "content_sha256": "d3b0ea52829b2a250fe7169897238699ab50a4257425fbbfd89fee8b257ff0de",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "51eb7557bfbf75b33c92bff746cc0420fbf8389df538add19ed555eb31678aa9",
+      "content_sha256": "dbd5f484765b2581ad78b33459c63aa27f49717af017e7fe155055b4672ce1dd",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -260,9 +260,7 @@
       "skills": [
         "community_marketing"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES"
-      ]
+      "switches_all": []
     },
     "dataforseo.research": {
       "autonomy": "autonomous",
@@ -278,9 +276,7 @@
       "skills": [
         "programmatic_seo"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_METERED_RESEARCH"
-      ]
+      "switches_all": []
     },
     "demand.email": {
       "autonomy": "autonomous",
@@ -304,11 +300,7 @@
         "emails",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
-        "PULSE_ENABLE_PROACTIVE_EMAIL"
-      ]
+      "switches_all": []
     },
     "demand.respond": {
       "autonomy": "autonomous",
@@ -324,10 +316,7 @@
       "skills": [
         "community_marketing"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_DEMAND_RESPONSE_WRITES"
-      ]
+      "switches_all": []
     },
     "directory.publish": {
       "autonomy": "autonomous",
@@ -343,10 +332,7 @@
       "skills": [
         "directory_submissions"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_DIRECTORY_WRITES"
-      ]
+      "switches_all": []
     },
     "earned.outreach": {
       "autonomy": "autonomous",
@@ -364,10 +350,7 @@
       "skills": [
         "public_relations"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_EARNED_MEDIA_OUTREACH"
-      ]
+      "switches_all": []
     },
     "github.pr.write": {
       "autonomy": "autonomous",
@@ -437,9 +420,7 @@
         "agent_email_inbox",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_INBOUND_PROCESSING"
-      ]
+      "switches_all": []
     },
     "inbound.reply": {
       "autonomy": "autonomous",
@@ -461,10 +442,7 @@
         "agent_email_inbox",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_INBOUND_PROCESSING",
-        "PULSE_ENABLE_INBOUND_REPLIES"
-      ]
+      "switches_all": []
     },
     "incident.email": {
       "autonomy": "autonomous",
@@ -480,9 +458,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_INCIDENT_EMAIL"
-      ]
+      "switches_all": []
     },
     "neon.database.read": {
       "autonomy": "autonomous",
@@ -514,10 +490,7 @@
       "skills": [
         "community_marketing"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_PARTNERSHIP_WRITES"
-      ]
+      "switches_all": []
     },
     "posthog.asset.write": {
       "autonomy": "autonomous",
@@ -535,10 +508,7 @@
       "skills": [
         "posthog"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_POSTHOG_ASSET_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES"
-      ]
+      "switches_all": []
     },
     "posthog.experiment.write": {
       "autonomy": "autonomous",
@@ -560,11 +530,7 @@
         "ab_testing",
         "posthog"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_POSTHOG_EXPERIMENT_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES",
-        "PULSE_ENABLE_PRODUCT_EXPOSURE"
-      ]
+      "switches_all": []
     },
     "posthog.flag.write": {
       "autonomy": "autonomous",
@@ -586,11 +552,7 @@
         "ab_testing",
         "posthog"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_POSTHOG_FLAG_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES",
-        "PULSE_ENABLE_PRODUCT_EXPOSURE"
-      ]
+      "switches_all": []
     },
     "posthog.survey.write": {
       "autonomy": "autonomous",
@@ -611,11 +573,7 @@
         "customer_research",
         "posthog"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES",
-        "PULSE_ENABLE_PRODUCT_EXPOSURE"
-      ]
+      "switches_all": []
     },
     "product_hunt.submit": {
       "autonomy": "manual_only",
@@ -673,9 +631,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_AUDIENCE_WRITES"
-      ]
+      "switches_all": []
     },
     "resend.broadcast.send": {
       "autonomy": "autonomous",
@@ -698,10 +654,7 @@
         "emails",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_PROACTIVE_EMAIL",
-        "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS"
-      ]
+      "switches_all": []
     },
     "resend.broadcast_draft.write": {
       "autonomy": "autonomous",
@@ -719,9 +672,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS"
-      ]
+      "switches_all": []
     },
     "resend.domain.write": {
       "autonomy": "autonomous",
@@ -737,9 +688,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_DOMAIN_WRITES"
-      ]
+      "switches_all": []
     },
     "resend.proactive.send": {
       "autonomy": "autonomous",
@@ -761,9 +710,7 @@
         "emails",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_PROACTIVE_EMAIL"
-      ]
+      "switches_all": []
     },
     "resend.suppression_lift": {
       "autonomy": "autonomous",
@@ -781,9 +728,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_SUPPRESSION_LIFT"
-      ]
+      "switches_all": []
     },
     "resend.topic.write": {
       "autonomy": "autonomous",
@@ -799,9 +744,7 @@
       "skills": [
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_TOPIC_WRITES"
-      ]
+      "switches_all": []
     },
     "resend.webhook.write": {
       "autonomy": "autonomous",
@@ -820,9 +763,7 @@
         "agent_email_inbox",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_RESEND_WEBHOOK_WRITES"
-      ]
+      "switches_all": []
     },
     "review.outreach": {
       "autonomy": "autonomous",
@@ -846,11 +787,7 @@
         "emails",
         "resend_connector"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_PROACTIVE_EMAIL",
-        "PULSE_ENABLE_REVIEW_OUTREACH"
-      ]
+      "switches_all": []
     },
     "review.respond": {
       "autonomy": "autonomous",
@@ -869,10 +806,7 @@
       "skills": [
         "community_marketing"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_COMMUNITY_WRITES",
-        "PULSE_ENABLE_REVIEW_RESPONSES"
-      ]
+      "switches_all": []
     },
     "social.draft.write": {
       "autonomy": "autonomous",
@@ -892,9 +826,7 @@
         "social",
         "typefully"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_TYPEFULLY_DRAFTS"
-      ]
+      "switches_all": []
     },
     "social.publish": {
       "autonomy": "autonomous",
@@ -914,10 +846,7 @@
         "social",
         "typefully"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_SOCIAL_PUBLISH",
-        "PULSE_ENABLE_TYPEFULLY_DRAFTS"
-      ]
+      "switches_all": []
     }
   },
   "policy_selectors": [
@@ -2007,7 +1936,7 @@
       "source": "repository"
     },
     "typefully": {
-      "content_sha256": "50f33c68be0eb16ecfe257a81b94c5e766dd757fc069ee6eb2f3a9192a9d779b",
+      "content_sha256": "dfd940d0c3ba93232d5d6692f21afbc03786ea5d597e70b1670b652112d55583",
       "selector": "typefully",
       "source": "repository"
     }
@@ -2087,32 +2016,5 @@
       "/channels/social"
     ]
   },
-  "switches": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
-    "PULSE_ENABLE_DIRECTORY_WRITES",
-    "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
-    "PULSE_ENABLE_INBOUND_PROCESSING",
-    "PULSE_ENABLE_INBOUND_REPLIES",
-    "PULSE_ENABLE_INCIDENT_EMAIL",
-    "PULSE_ENABLE_METERED_RESEARCH",
-    "PULSE_ENABLE_PARTNERSHIP_WRITES",
-    "PULSE_ENABLE_POSTHOG_ASSET_WRITES",
-    "PULSE_ENABLE_POSTHOG_EXPERIMENT_WRITES",
-    "PULSE_ENABLE_POSTHOG_FLAG_WRITES",
-    "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-    "PULSE_ENABLE_POSTHOG_WRITES",
-    "PULSE_ENABLE_PROACTIVE_EMAIL",
-    "PULSE_ENABLE_PRODUCT_EXPOSURE",
-    "PULSE_ENABLE_RESEND_AUDIENCE_WRITES",
-    "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS",
-    "PULSE_ENABLE_RESEND_DOMAIN_WRITES",
-    "PULSE_ENABLE_RESEND_SUPPRESSION_LIFT",
-    "PULSE_ENABLE_RESEND_TOPIC_WRITES",
-    "PULSE_ENABLE_RESEND_WEBHOOK_WRITES",
-    "PULSE_ENABLE_REVIEW_OUTREACH",
-    "PULSE_ENABLE_REVIEW_RESPONSES",
-    "PULSE_ENABLE_SOCIAL_PUBLISH",
-    "PULSE_ENABLE_TYPEFULLY_DRAFTS"
-  ]
+  "switches": []
 }

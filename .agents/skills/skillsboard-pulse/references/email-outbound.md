@@ -41,7 +41,7 @@ The Pulse sees only aggregate or opaque state. A broken consent/unsubscribe path
 
 Use the connected official Resend plugin and the repository-pinned `resend-connector` skill as the sole Pulse management plane. Follow every live tool's advertised lifecycle, read-before-write sequence, confirmation, and reversibility rule. Never use the Resend CLI, an API key, REST, a custom client, or the application's sending key as a fallback.
 
-Connecting or reauthorizing, changing scopes/access, revoking a grant, or accepting terms is human setup. Resend remains `setup_required` until low-risk authenticated reads prove exactly one verified Skills Board domain/capability match. Advertised OAuth-grant status and scopes are supporting evidence only; uniqueness is neither required nor proof of which grant backs the connection. Failed authentication or an absent, duplicate, or mismatched domain/capability result is `resend_identity_readback_unavailable`. Each operation begins `read_only` and needs its exact route/switch to advance.
+Connecting or reauthorizing, changing scopes/access, revoking a grant, or accepting terms is human setup. Resend remains `setup_required` until low-risk authenticated reads prove exactly one verified Skills Board domain/capability match. Advertised OAuth-grant status and scopes are supporting evidence only; uniqueness is neither required nor proof of which grant backs the connection. Failed authentication or an absent, duplicate, or mismatched domain/capability result is `resend_identity_readback_unavailable`. Each operation begins `read_only` and needs its exact route to advance.
 
 Use only non-PII domain, OAuth-grant, webhook, topic, segment, Broadcast/automation status, and aggregate health metadata. Content-bearing reads require an advertised server-side field-limited or aggregate projection that keeps raw PII and untrusted content out of the result; filtering or discarding it later is not isolation. Never call `create_api_key` or expose OAuth, verification, attachment-download, or one-time secret values.
 
@@ -53,7 +53,7 @@ Evaluate each operation against the live surface. Contact/import/membership need
 
 ## Topic, audience, Broadcast, and individual operations
 
-The durable topic is exactly `product_communications` with immutable default `opt_out`. A wrong definition creates a versioned replacement rather than changing its default. Each management effect uses the exact route/switch combination in `graph.json`:
+The durable topic is exactly `product_communications` with immutable default `opt_out`. A wrong definition creates a versioned replacement rather than changing its default. Each management effect uses its exact operation route:
 
 - topic metadata: exact versioned topic;
 - audience/segment: one frozen campaign-only segment;
@@ -65,11 +65,11 @@ For a Broadcast, freeze the audience and subtract later opt-outs/suppressions; l
 
 Every individual send freezes immutable intent, deterministic logical key, payload hash, opaque recipient reference, dry-run result, and provider-enforced idempotency key. Within Resend's 24-hour window, retry the identical payload at most three times and only for network failure, 429, 500, or concurrent-idempotent-request. Do not retry other 4xx responses or payload conflicts. After 24 hours without a provider ID, mark `delivery_ambiguous`, consume cap/cooldown, and never auto-resend. Missing the required idempotency-key input or PII-safe status-only readback keeps individual Pulse sends unavailable.
 
-Existing application transactional sending does not grant Pulse management authority. Every Pulse mutation must select its exact graph operation and satisfy every `switches_all` value. Missing, malformed, or non-`1` values fail closed.
+Existing application transactional sending does not grant Pulse management authority. Every Pulse mutation must select its exact graph operation and satisfy its provider, identity, consent, suppression, cap, idempotency, and readback gates.
 
 ## Private configuration
 
-Pulse-only configuration lives at `/Users/tommaso/.config/skillsboard-gtm-pulse/env`; directory mode is `0700`, file mode `0600`. Its loader allowlists keys, validates owner/mode, never prints values, and rejects unknown keys. It may hold the private incident recipient, operation switches, public-postal-identity reference, and official DataForSEO/Search Console settings. It must not hold application DB/auth secrets, a PostHog Personal API Key, application Resend send key, or Typefully credential.
+Pulse-only configuration lives at `/Users/tommaso/.config/skillsboard-gtm-pulse/env`; directory mode is `0700`, file mode `0600`. Its loader allowlists keys, validates owner/mode, never prints values, and rejects unknown keys. It may hold the private incident recipient, public-postal-identity reference, and official DataForSEO/Search Console settings. It must not hold application DB/auth secrets, a PostHog Personal API Key, application Resend send key, or Typefully credential.
 
 `tommaso@skillsboard.sh` is a Resend inbound address, not a monitored traditional mailbox. Do not alter MX topology opportunistically. A conventional mailbox requires a future explicit topology decision.
 

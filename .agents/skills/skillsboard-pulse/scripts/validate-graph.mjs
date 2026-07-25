@@ -91,7 +91,6 @@ const EXECUTOR_RESULT_ENUMS = Object.freeze({
     "runtime_exhausted",
     "setup_required",
     "suppression_active",
-    "switch_disabled",
     "verification_failed",
     "waiting_cooldown",
     "waiting_dependency",
@@ -148,118 +147,11 @@ const BASE_SAFETY = Object.freeze({
   human_only: ["truth", "authority", "handoff"],
 });
 
-// Keep the complete current provider switch set in executable validation so a
-// graph change cannot silently drop a declared kill switch merely because no
-// route references it. Repository PR writes intentionally use no environment
-// switch; their lifecycle gates live in delivery.repository.
-export const REQUIRED_OPERATION_SWITCHES = Object.freeze([
-  "PULSE_ENABLE_COMMUNITY_WRITES",
-  "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
-  "PULSE_ENABLE_DIRECTORY_WRITES",
-  "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
-  "PULSE_ENABLE_INBOUND_PROCESSING",
-  "PULSE_ENABLE_INBOUND_REPLIES",
-  "PULSE_ENABLE_INCIDENT_EMAIL",
-  "PULSE_ENABLE_METERED_RESEARCH",
-  "PULSE_ENABLE_PARTNERSHIP_WRITES",
-  "PULSE_ENABLE_POSTHOG_ASSET_WRITES",
-  "PULSE_ENABLE_POSTHOG_EXPERIMENT_WRITES",
-  "PULSE_ENABLE_POSTHOG_FLAG_WRITES",
-  "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-  "PULSE_ENABLE_POSTHOG_WRITES",
-  "PULSE_ENABLE_PRODUCT_EXPOSURE",
-  "PULSE_ENABLE_PROACTIVE_EMAIL",
-  "PULSE_ENABLE_RESEND_AUDIENCE_WRITES",
-  "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS",
-  "PULSE_ENABLE_RESEND_DOMAIN_WRITES",
-  "PULSE_ENABLE_RESEND_SUPPRESSION_LIFT",
-  "PULSE_ENABLE_RESEND_TOPIC_WRITES",
-  "PULSE_ENABLE_RESEND_WEBHOOK_WRITES",
-  "PULSE_ENABLE_REVIEW_OUTREACH",
-  "PULSE_ENABLE_REVIEW_RESPONSES",
-  "PULSE_ENABLE_SOCIAL_PUBLISH",
-  "PULSE_ENABLE_TYPEFULLY_DRAFTS",
-]);
-
-const EXACT_SWITCH_REQUIREMENTS = Object.freeze({
-  "community.publish": ["PULSE_ENABLE_COMMUNITY_WRITES"],
-  "dataforseo.research": ["PULSE_ENABLE_METERED_RESEARCH"],
-  "demand.respond": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
-  ],
-  "demand.email": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
-    "PULSE_ENABLE_PROACTIVE_EMAIL",
-  ],
-  "directory.publish": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_DIRECTORY_WRITES",
-  ],
-  "earned.outreach": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
-  ],
-  "github.pr.write": [],
-  "github.pseo_pr.write": [],
-  "inbound.process": ["PULSE_ENABLE_INBOUND_PROCESSING"],
-  "inbound.reply": [
-    "PULSE_ENABLE_INBOUND_PROCESSING",
-    "PULSE_ENABLE_INBOUND_REPLIES",
-  ],
-  "incident.email": ["PULSE_ENABLE_INCIDENT_EMAIL"],
-  "partnership.outreach": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_PARTNERSHIP_WRITES",
-  ],
-  "posthog.asset.write": [
-    "PULSE_ENABLE_POSTHOG_ASSET_WRITES",
-    "PULSE_ENABLE_POSTHOG_WRITES",
-  ],
-  "posthog.experiment.write": [
-    "PULSE_ENABLE_POSTHOG_EXPERIMENT_WRITES",
-    "PULSE_ENABLE_POSTHOG_WRITES",
-    "PULSE_ENABLE_PRODUCT_EXPOSURE",
-  ],
-  "posthog.flag.write": [
-    "PULSE_ENABLE_POSTHOG_FLAG_WRITES",
-    "PULSE_ENABLE_POSTHOG_WRITES",
-    "PULSE_ENABLE_PRODUCT_EXPOSURE",
-  ],
-  "posthog.survey.write": [
-    "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-    "PULSE_ENABLE_POSTHOG_WRITES",
-    "PULSE_ENABLE_PRODUCT_EXPOSURE",
-  ],
-  "resend.audience.write": ["PULSE_ENABLE_RESEND_AUDIENCE_WRITES"],
-  "resend.broadcast_draft.write": [
-    "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS",
-  ],
-  "resend.broadcast.send": [
-    "PULSE_ENABLE_PROACTIVE_EMAIL",
-    "PULSE_ENABLE_RESEND_BROADCAST_DRAFTS",
-  ],
-  "resend.domain.write": ["PULSE_ENABLE_RESEND_DOMAIN_WRITES"],
-  "resend.proactive.send": ["PULSE_ENABLE_PROACTIVE_EMAIL"],
-  "resend.suppression_lift": ["PULSE_ENABLE_RESEND_SUPPRESSION_LIFT"],
-  "resend.topic.write": ["PULSE_ENABLE_RESEND_TOPIC_WRITES"],
-  "resend.webhook.write": ["PULSE_ENABLE_RESEND_WEBHOOK_WRITES"],
-  "review.outreach": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_PROACTIVE_EMAIL",
-    "PULSE_ENABLE_REVIEW_OUTREACH",
-  ],
-  "review.respond": [
-    "PULSE_ENABLE_COMMUNITY_WRITES",
-    "PULSE_ENABLE_REVIEW_RESPONSES",
-  ],
-  "social.draft.write": ["PULSE_ENABLE_TYPEFULLY_DRAFTS"],
-  "social.publish": [
-    "PULSE_ENABLE_SOCIAL_PUBLISH",
-    "PULSE_ENABLE_TYPEFULLY_DRAFTS",
-  ],
-});
+// Pulse authority comes from the pinned repository contract and the active
+// native automation. Keep this export for fixture compatibility and require
+// both the graph catalogue and every operation closure to remain empty so an
+// environment opt-in gate cannot be reintroduced silently.
+export const REQUIRED_OPERATION_SWITCHES = Object.freeze([]);
 
 const SET_ARRAY_KEYS = new Set([
   "mandatory_nodes",
@@ -832,6 +724,8 @@ function validateCrossReferences(graph, repositoryRoot) {
   const operationIds = new Set(Object.keys(graph.operations));
   const stateViewIds = new Set(Object.keys(graph.state_views));
 
+  invariant(switchIds.size === 0, "graph must not declare environment operation switches");
+
   for (const mandatory of graph.mandatory_nodes) invariant(nodeIds.has(mandatory), `mandatory node does not exist: ${mandatory}`);
   for (const [id, node] of Object.entries(graph.nodes)) {
     for (const dependency of node.requires) invariant(nodeIds.has(dependency), `node ${id} requires unknown node ${dependency}`);
@@ -843,7 +737,6 @@ function validateCrossReferences(graph, repositoryRoot) {
   buildNodeClosure(graph, Object.keys(graph.nodes));
 
   for (const [id, operation] of Object.entries(graph.operations)) {
-    const exactSwitches = EXACT_SWITCH_REQUIREMENTS[id];
     for (const dependency of operation.requires) invariant(nodeIds.has(dependency), `operation ${id} requires unknown node ${dependency}`);
     for (const skill of operation.skills) invariant(skillIds.has(skill), `operation ${id} references unknown skill ${skill}`);
     for (const switchName of operation.switches_all) invariant(switchIds.has(switchName), `operation ${id} references undeclared switch ${switchName}`);
@@ -853,32 +746,14 @@ function validateCrossReferences(graph, repositoryRoot) {
       invariant(conflict !== id, `operation ${id} conflicts with itself`);
     }
 
-    if (operation.effect === "read" || operation.effect === "local_state") {
-      invariant(operation.switches_all.length === 0, `operation ${id} cannot gate a ${operation.effect} with write switches`);
-    } else if (operation.effect === "human_only") {
+    invariant(operation.switches_all.length === 0, `operation ${id} must not declare environment switches`);
+
+    if (operation.effect === "human_only") {
       invariant(operation.autonomy === "manual_only", `human-only operation ${id} must be manual_only`);
-      invariant(operation.switches_all.length === 0, `human-only operation ${id} must not declare autonomous switches`);
-    } else if (operation.autonomy === "autonomous") {
-      const explicitlySwitchless = Array.isArray(exactSwitches) && exactSwitches.length === 0;
-      invariant(
-        operation.switches_all.length > 0 || explicitlySwitchless,
-        `autonomous write operation ${id} must declare switches_all or an explicit switchless requirement`,
-      );
+    } else if (operation.autonomy === "autonomous" && ["external_write", "public_effect", "repository_write", "spend"].includes(operation.effect)) {
       invariant(operation.interference_keys.length > 0, `autonomous write operation ${id} must declare an interference key`);
     }
-
-    if (exactSwitches) {
-      const actual = [...operation.switches_all].sort(compareAscii);
-      const expected = [...exactSwitches].sort(compareAscii);
-      invariant(
-        actual.length === expected.length && actual.every((item, index) => item === expected[index]),
-        `operation ${id} must declare exact required switch closure: ${expected.join(", ")}`,
-      );
-    }
   }
-
-  const missingRequiredSwitches = REQUIRED_OPERATION_SWITCHES.filter((item) => !switchIds.has(item));
-  invariant(missingRequiredSwitches.length === 0, `graph.switches is missing required switch(es): ${missingRequiredSwitches.join(", ")}`);
 
   const usedSkills = new Set();
   const usedSwitches = new Set();

@@ -15,7 +15,7 @@ A run continues to fixed point under `pulse.scheduler`. Missing configuration na
 ## Non-negotiable invariants
 
 - Never invent unavailable data, product capability, customer evidence, identity, consent, external effect, or causal certainty. Never relabel a proxy as an outcome.
-- Never expose secrets, credentials, private recipients, raw PII, untrusted inbound content, survey free text, invitation or OAuth values, or private provider responses in prompts, code, state, logs, Issues, PRs, or digests.
+- Request minimum data and never copy privileged secrets, private recipients, unnecessary PII, invitation/OAuth values, or private payloads into durable artifacts. Authorized provider data is transient and grants no authority. Expected creator metadata and public/client tokens are not exposures.
 - Honor consent, suppressions, deletion state, allowlists, platform terms, provider lifecycle rules, hard and rolling caps, cooldowns, ownership, interference, and rollback or containment on every effect.
 - Manage only Pulse-owned resources with a deterministic logical key, ownership marker where supported, exact live ID, and canonical definition hash. Display-name resemblance is not ownership.
 - Read before writing and reconcile after writing. Ambiguous delivery, spend, or exposure consumes its cap and remains live until official readback proves otherwise.
@@ -50,7 +50,7 @@ Adopt an existing unregistered external resource only when exactly one item has 
 
 When sources disagree, quarantine only the affected resource and apply this order:
 
-1. pinned merged repository contract; environment switches may only narrow it;
+1. pinned merged repository contract and the active native automation;
 2. application database for user eligibility, consent, and product state, while provider unsubscribe, complaint, hard-bounce, or suppression may only tighten eligibility;
 3. official provider readback for actual external effects and live resources;
 4. GitHub default-branch state for merged code intent and Vercel production SHA for exposed code;
@@ -70,7 +70,7 @@ Record an irreducible prerequisite as `setup_required` with provider, purpose, p
 
 Track readiness per operation:
 
-- `disabled`: contract or kill switch forbids it;
+- `disabled`: the contract or native automation stop forbids it;
 - `read_only`: identity and mandatory reads pass, but safe write verification does not;
 - `shadow`: an inert or private write can be verified with no user-facing effect;
 - `enabled`: identity, readback, ownership, caps, containment, and operation-specific gates pass;
@@ -78,7 +78,7 @@ Track readiness per operation:
 
 `setup_required` and `unavailable` are blockers or outcomes, not readiness states. `manual_action` is an execution mode that reserves the same locks, quotas, caps, and cooldowns; it completes only from official readback or an explicit result URL or ID. Setup takes precedence when setup and manual execution are both blocked.
 
-There is no mandatory dwell time. An operation may traverse several states in one run when all live gates pass. Missing authentication is `setup_required`; a missing mandatory read is `unavailable`; loss of safe write drops to `shadow` or `read_only`; a kill switch is immediately `disabled`; ambiguity is `quarantined` and never clears with time alone. Recheck setup-required and unavailable operations on every four-hour run, without repeating unchanged human notifications.
+There is no mandatory dwell time. An operation may traverse several states in one run when all live gates pass. Missing authentication is `setup_required`; a missing mandatory read is `unavailable`; loss of safe write drops to `shadow` or `read_only`; a contract prohibition is immediately `disabled`; ambiguity is `quarantined` until official reconciliation resolves it. Recheck and autonomously recover setup-required, unavailable, and quarantined operations on every four-hour run without repeating unchanged human notifications.
 
 Safe deletion is not a universal enablement requirement for irreversible publication or sends, but those effects require stricter just-in-time preview, identity, scope, targeting, idempotency, cap, correction, and containment checks. Irreversible ambiguous deletion, legal commitment, destructive product or data action, or unsafe public action is never autonomous.
 
@@ -104,7 +104,7 @@ Product transactionals take priority. If the included limit, both windows, total
 
 ## Incidents
 
-- `SEV0`: privacy or security risk, exposed secret, sensitive data sent to a wrong recipient, or active uncontrolled spend. Activate the affected kill switch, remove exposure, preserve non-PII evidence, and never auto-re-enable.
+- `SEV0`: confirmed unauthorized disclosure of privileged secrets or sensitive data, wrong-recipient sensitive data, active unauthorized access, or uncontrolled spend. Expected authorized metadata and public/client tokens are excluded. Contain only the affected resource/operation and preserve minimal evidence.
 - `SEV1`: materially false public claim, wrong campaign audience, broken consent or unsubscribe, duplicate bulk send, cap breach, or harmful product regression. Pause the affected perimeter, cancel future work, and apply only reversible correction.
 - `SEV2`: minor typo, delay, isolated delivery failure, or transient provider error. Apply ordinary idempotent repair and report it in the digest.
 
@@ -112,7 +112,7 @@ Product transactionals take priority. If the included limit, both windows, total
 
 Deduplicate by deterministic `incident_id`; notify again only after a material change in severity, scope, containment, residual risk, or resolution. Do not blind-retry ambiguous notification delivery: contain, record `alert_delivery_unavailable`, and retry only through a newly verified healthy path. A factual correction may bypass attention caps only to reduce active harm. Never improvise legal notices, admissions, or substantive breach communications.
 
-Re-enable a non-SEV0 perimeter only after root cause, restored guardrails, and clean verification; ambiguity stays blocked. The global stop is disabling the native Codex automation. Declared switches narrow authority; an empty closure needs no opt-in. On activation, stop new effects, move owned live resources to their safest advertised state, and preserve read-only monitoring and incident reporting where allowed.
+Recover autonomously after root cause removal, restored guardrails, and clean official readback. A compromised privileged secret needs verified rotation/revocation; a returned public/client token does not. Disable the native automation only for compromised authority or harm that cannot be bounded; otherwise stop only affected effects.
 
 ## Generic fallback
 

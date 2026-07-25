@@ -53,9 +53,9 @@ After independent approval, resolved actionable threads, and green required chec
 
 Direct Vercel mutations are disabled under this contract. Production deployment and code rollback use GitHub. For an active harmful flag-backed change, remove exposure first through its official provider containment, then use a rollback/fix PR as required. A protected preview is never the final production proof.
 
-## Operation readiness and switches
+## Operation readiness
 
-Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the route, verified GitHub identity/repository/default branch, ownership, WIP capacity, no overlap, and lifecycle gates. GitHub PR operations have no environment switch. Vercel remains read-only.
+Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the route, verified GitHub identity/repository/default branch, ownership, WIP capacity, no overlap, and lifecycle gates. Pulse operations have no environment opt-in switches. Vercel remains read-only.
 
 The Pulse may merge only after the independent checkpoint; a human approval is not permission to ignore a new failing check or unresolved actionable thread. If GitHub or deployment readback is unavailable, keep the affected lifecycle read-only/unavailable and continue independent work.
 

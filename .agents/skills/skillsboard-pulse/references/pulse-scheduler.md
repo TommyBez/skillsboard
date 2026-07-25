@@ -27,7 +27,7 @@ Resolve the run closure and each fresh route-executor closure separately, exactl
 
 At each iteration refresh dependencies and select the highest-priority compatible `actionable_now` item:
 
-1. SEV0/SEV1 containment, kill switches, spend or send cap breach, privacy/security exposure, and rollback;
+1. SEV0/SEV1 containment, spend or send cap breach, privacy/security exposure, and rollback;
 2. mandatory monitoring of live exposure, surveys, messages, posts, spend, deployments, and PR lifecycle;
 3. tracking, attribution, provider-control, consent, suppression, and state repairs;
 4. due evaluations, maturity decisions, stabilization, pruning, and retirements;
@@ -40,7 +40,7 @@ Never let new growth work delay protection. After every external transition, per
 
 ## Work graph and statuses
 
-Each work node has `work_id`, `resource_key`, `definition_hash`, `contract_root`, `lane`, `priority`, exactly one `origin_policy_node`, `policy_nodes`, `route_id`, the route plan's exact `switches_all`, `depends_on`, `interference_keys`, `risk`, `state`, `next_eligible_at`, `attempts`, and exact reason. Contract reconciliation refreshes the route plan mechanically; a root mismatch quarantines mutation until refreshed.
+Each work node has `work_id`, `resource_key`, `definition_hash`, `contract_root`, `lane`, `priority`, exactly one `origin_policy_node`, `policy_nodes`, `route_id`, `depends_on`, `interference_keys`, `risk`, `state`, `next_eligible_at`, `attempts`, and exact reason. Contract reconciliation refreshes the route plan mechanically; a root mismatch quarantines mutation until refreshed. Immediately re-evaluate historical `switch_disabled` work under the switchless route.
 
 Valid states:
 
@@ -85,7 +85,7 @@ After checkout and contract pin pass:
 2. resolve and read only the deterministic run closure and its required skills, obtaining the exact state-view pointers;
 3. load the schema-v4 index and only those graph-resolved views; reconcile incomplete atomic transitions and quarantine only corrupt or ambiguous resources;
 4. reconcile GitHub/default branch, Vercel production, configured providers, operation readiness, suppressions, caps, reservations, and live external effects;
-5. discover PostHog capabilities, verify project `225645`, reconcile canonical assets, and run due Tracking QA;
+5. discover PostHog capabilities, verify project `225645` through the selected bounded operation context, reconcile canonical assets, and run due Tracking QA;
 6. monitor every active item by its recorded route and policy IDs through a fresh isolated executor, prioritizing mandatory containment;
 7. only in a scheduled or catch-up `strategic` run, build the scorecard, complete due reviews through isolated policy routes, update evidence and Issues, route the strongest evidenced constraint, and freeze the weekly queue; an `operational` run never performs this step;
 8. refresh the work graph, atomically reserve a compatible item or batch, and dispatch one-transition route executors with immutable non-PII envelopes;
@@ -103,7 +103,7 @@ State contains only the projections needed to reconcile. It also maintains a com
 - schema and pinned contract version/root, run identity, last completion, termination, strategic catch-up, and review ledger;
 - work graph, policy/route IDs, dependencies, frozen queue/hash, suspensions, counts, WIP reservations, and next eligibility;
 - intervention registry, resource locks, interference, assignment units, exposure, and cooldowns;
-- operation readiness, setup requirements, manual packages, identity/readback, ownership, quarantine, switches, and retries;
+- operation readiness, setup requirements, manual packages, identity/readback, ownership, quarantine, and retries;
 - PostHog logical keys/versions, canonical pointers, definition hashes, opaque live IDs, lifecycle, measurement health, and result grades;
 - scorecard snapshots, data health, opportunity stages, deterministic Issue references, and evidence hashes;
 - feature inventory, class citations, baseline/version lineage, windows, decisions, stabilization, and pruning;
@@ -123,7 +123,7 @@ Append exactly one minimal non-PII line per run to `.agents/loops/skillsboard-gt
 - PostHog project/control failure: contain dependent exposure and continue independent lanes;
 - missing mandatory read: affected action `unavailable`, with no proxy;
 - missing fresh isolated executor: affected mutation `unavailable: isolated_executor_unavailable`; continue safe parent reconciliation and independent lanes;
-- broken, stale, or privacy-unsafe measurement: `measurement_failure`, one eligible repair, never a value decision;
+- broken, stale, or privacy-unsafe product instrumentation: `measurement_failure`, one eligible repair, never a value decision; extra authorized provider metadata is not measurement failure;
 - missing mature cohort, denominator, evidence threshold, consent, allowlist, cap, or containment: exact affected-resource `no_action`;
 - same resource or contaminating intervention: retain the existing lock and monitor;
 - open PR: continue its lifecycle and every independent lane;

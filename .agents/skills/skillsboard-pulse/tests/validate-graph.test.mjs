@@ -262,7 +262,7 @@ test("resolve returns dependency-first policy context without file contents", ()
   assert.equal(result.executor_result.max_bytes, 4_096);
   assert.equal(result.executor_result.schema_version, 1);
   assert.ok(result.executor_result.required_keys.includes("reason_code"));
-  assert.ok(result.executor_result.enums.reason_code.includes("switch_disabled"));
+  assert.equal(result.executor_result.enums.reason_code.includes("switch_disabled"), false);
   assert.equal(JSON.stringify(result).includes("# Kernel"), false);
 });
 
@@ -354,35 +354,25 @@ test("check reports dependency cycles with the involved chain", () => {
   expectValidationError(() => checkGraph(graphPath), /dependency cycle: .*pulse\.kernel.*work\.policy/);
 });
 
-test("check rejects missing required switches", () => {
+test("check rejects environment operation switches", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
-    graph.switches = graph.switches.filter((item) => item !== "PULSE_ENABLE_SOCIAL_PUBLISH");
-    graph.operations["fixture.write"].switches_all = graph.operations["fixture.write"].switches_all.filter(
-      (item) => item !== "PULSE_ENABLE_SOCIAL_PUBLISH",
-    );
+    graph.switches = ["PULSE_ENABLE_SOCIAL_PUBLISH"];
   });
-  expectValidationError(() => checkGraph(graphPath), /missing required switch.*PULSE_ENABLE_SOCIAL_PUBLISH/);
+  expectValidationError(() => checkGraph(graphPath), /must not declare environment operation switches/);
 });
 
-test("check enforces exact nested switch closure for inbound replies", () => {
+test("check rejects an operation-level environment switch", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
-    graph.operations["inbound.reply"] = {
-      ...graph.operations["fixture.write"],
-      switches_all: ["PULSE_ENABLE_INBOUND_REPLIES"],
-    };
-    graph.routes["inbound.reply"] = {
-      ...graph.routes["fixture.write"],
-      operations: ["inbound.reply"],
-    };
+    graph.operations["fixture.write"].switches_all = ["PULSE_ENABLE_SOCIAL_PUBLISH"];
   });
-  expectValidationError(() => checkGraph(graphPath), /exact required switch closure.*PULSE_ENABLE_INBOUND_PROCESSING/);
+  expectValidationError(() => checkGraph(graphPath), /references undeclared switch.*PULSE_ENABLE_SOCIAL_PUBLISH/);
 });
 
-test("GitHub PR writes are explicitly autonomous without an environment switch", () => {
+test("autonomous writes are valid without environment switches", () => {
   const { graphPath } = makeFixture();
   mutateGraph(graphPath, (graph) => {
     graph.operations["github.pr.write"] = {
@@ -399,16 +389,12 @@ test("GitHub PR writes are explicitly autonomous without an environment switch",
   assert.deepEqual(checked.graph.operations["github.pr.write"].switches_all, []);
 });
 
-test("other autonomous writes still require a declared switch closure", () => {
+test("every fixture operation resolves with an empty switch closure", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
-  mutateGraph(graphPath, (graph) => {
-    graph.operations["fixture.write"].switches_all = [];
-  });
-  expectValidationError(
-    () => checkGraph(graphPath),
-    /must declare switches_all or an explicit switchless requirement/,
-  );
+  const checked = checkGraph(graphPath);
+  const resolved = resolveGraph(checked.graph, { route: "fixture.write", nodes: ["work.policy"] });
+  assert.deepEqual(resolved.switches_all, []);
 });
 
 test("check rejects an external write operation unreachable from all routes", () => {
@@ -417,7 +403,7 @@ test("check rejects an external write operation unreachable from all routes", ()
   mutateGraph(graphPath, (graph) => {
     graph.operations["orphan.write"] = {
       ...graph.operations["fixture.write"],
-      switches_all: ["PULSE_ENABLE_SOCIAL_PUBLISH"],
+      switches_all: [],
     };
   });
   expectValidationError(() => checkGraph(graphPath), /external write operation is unreachable.*orphan\.write/);
@@ -434,11 +420,7 @@ test("survey routes must load the cross-channel attention owner and state view",
       requires: ["work.policy"],
       required_capabilities: [],
       skills: ["fixture"],
-      switches_all: [
-        "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES",
-        "PULSE_ENABLE_PRODUCT_EXPOSURE",
-      ],
+      switches_all: [],
       conflicts_with: [],
       interference_keys: ["fixture.effect"],
     };
