@@ -29,6 +29,16 @@ function getPostHogClient() {
       host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
       disabled: !token || process.env.VERCEL_ENV !== "production",
       waitUntil: after,
+      before_send: (event) =>
+        event
+          ? {
+              ...event,
+              properties: {
+                ...event.properties,
+                environment: "production",
+              },
+            }
+          : null,
     })
   }
 

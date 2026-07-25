@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "ac7bba5cea05fd34f346a9fcebd82db4aeacc6e6e16faa0eb501b0878588c84b"
+    "root_sha256": "c733c80acc76c8002a56f9ccdecfbd14c04fb625e091cb927f9b734e75ce993a"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "e8b34f70c5b348be8042530aa832e319c2731caa1dd4fd2bad37cfcb31290930",
+      "content_sha256": "8c4c2af638d1735e881158aead9324ea78d83bc968177f730b0667502197c6a5",
       "kind": "policy",
       "provides": [
         "ownership",

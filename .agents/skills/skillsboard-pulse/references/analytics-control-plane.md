@@ -8,30 +8,34 @@ This node is required on every scheduled Pulse. It owns PostHog identity, asset 
 
 Use only the official authenticated PostHog plugin, its live `posthog:posthog` skill, and the operations advertised in the current run. The plugin's live lifecycle, confirmation, and reversibility instructions are authoritative for the mechanism.
 
-A plugin-required confirmation or narrower lifecycle is a capability gate, not permission to stop the whole Pulse or reinterpret the user's standing strategy authorization. If the scheduled context cannot satisfy an advertised confirmation safely, mark only that PostHog transition `manual_action` or `unavailable` with the exact plugin reason, contain dependent exposure when required, and continue every independent lane. Never bypass the plugin requirement or ask for a second strategic approval.
+A plugin confirmation or narrower lifecycle gates only that transition. If it cannot be satisfied safely, use `manual_action` or `unavailable` with the plugin reason, contain dependent exposure when required, and continue independent lanes. Never bypass it or seek another strategic approval.
 
 1. Discover capabilities with low-risk reads; never assume yesterday's inventory.
 2. Verify production project `225645` before every dependent read or write.
 3. Reconcile canonical dashboard `833923` and canonical Tracking QA insight `5096653` (`kI4byVGc`) by live ID and definition; stored IDs remain projections, not proof.
-4. Read live state before every write. Manage only resources explicitly marked and registered as Pulse-owned.
-5. Persist logical key, deterministic name, semantic version, canonical `definition_hash`, opaque live ID, lifecycle, and reconciliation time. Display name alone is not identity.
-6. Reuse or update only an exact semantic match. A semantic change creates a new version and preserves comparable history.
-7. Recover a lost create response only by adopting exactly one deterministic-name and exact-definition match; otherwise quarantine.
-8. Before a flag-backed experiment, verify the Vercel production SHA contains code consuming the exact flag key. Otherwise route a repository PR and leave the experiment draft unexposed.
+4. Read before writes; manage only registered Pulse-owned resources.
+5. Persist logical key, deterministic name, version, `definition_hash`, live ID, lifecycle, and reconciliation. Display name is not identity.
+6. Reuse only exact semantic matches; version semantic changes and preserve history.
+7. Lost-create adoption requires one deterministic-name/exact-definition match; else quarantine.
+8. Before flag-backed experiments, verify production SHA consumes the exact key; else route a repository PR and leave the draft unexposed.
 9. A rollback removes exposure before measurement ends.
 10. Cross-user Activation and Retention use HogQL grouped by `properties.team_id`, never `person.properties.*`.
 
-Never use a private endpoint, Personal API Key, custom REST or HogQL client, local scorecard runner, screenshot, repository guess, database proxy, or product database query as a substitute for the plugin. A valid zero is `available`; missing access or definition is `unavailable`; stale, partial, privacy-unsafe, malformed, or failed measurement is `broken`.
+Never substitute private endpoints or keys, custom clients, local runners, screenshots, repository guesses, or database proxies/queries for the plugin. Valid zero is `available`; missing access/definition is `unavailable`; unsafe, malformed, or failed measurement is `broken`.
+
+## Capability recovery and Tracking QA repair
+
+Before final `unavailable`, any missing or connected-but-unadvertised capability requires bounded official authenticated discovery/retry plus executable work. `provider_exposure_unavailable` means operation exposure failed, never data absent without successful official readback. Missing instrumentation routes to `delivery.repository` with this node as origin; missing definitions to eligible provider routes; no proxy. Paths: PostHog `225645` official live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback then instrumentation/definition repair; Node `environment: production` retaining production-only/default `$is_server`; graph-selected/advertised official Neon read-only aggregate versus official PostHog. No DB mutation; missing Neon operation is not mismatch.
 
 ## Production tracking boundary
 
-Trust only production product traffic. Filter the production host and exclude localhost, preview, internal, and test activity according to the verified event schema. Tracking QA verifies sensitive URL sanitization and that attribution, environment, and `team_id` cannot leak raw private values. A repository definition is not evidence that production emits it.
+Trust only production traffic. Filter its verified host/schema and exclude localhost, preview, internal, and test activity. Tracking QA checks sensitive URL sanitization and no raw private values in attribution, environment, or `team_id`. Repository definition does not prove production emission.
 
 ## Read, shadow, and enable gates
 
 Authenticated production reads begin `read_only`. A PostHog write may become `shadow` only when the advertised operation can create or update a deterministic private, draft, or zero-exposure resource and exact readback confirms it.
 
-Every effect must select the exact graph route and satisfy all `switches_all` values declared there. Asset definitions, flags/rollouts, experiments, and surveys use separate operation routes. Any flag, experiment, survey, or rollout exposure additionally requires the product-exposure route; a flag-backed experiment requires both flag and experiment operations. Missing, empty, or non-`1` switches fail closed.
+Every effect must select its graph route and satisfy all `switches_all` values declared there. Asset definitions, flags/rollouts, experiments, and surveys use separate operation routes. Any flag, experiment, survey, or rollout exposure additionally requires the product-exposure route; a flag-backed experiment requires both flag and experiment operations. Missing, empty, or non-`1` switches fail closed.
 
 Before enabling, require healthy production tracking, exact cohort and assignment unit, preregistered definition hash, live-code flag-consumption proof where applicable, WIP and interference capacity, guardrails, official readback, and an advertised rollback or safe containment path.
 
