@@ -35,7 +35,7 @@ Trust only production traffic. Filter its verified host/schema and exclude local
 
 ## Read, shadow, and enable gates
 
-Authenticated production reads begin `read_only`. A deterministic private measurement asset such as a dashboard, insight, cohort definition, or event definition may become `enabled` after project identity, ownership, semantic version, `definition_hash`, asset-cap, and exact official readback pass; it does not inherit exposure gates. A flag, experiment, survey, rollout, or other user-visible resource may become only `shadow` before its exposure gates pass.
+Authenticated production reads begin `read_only`. A deterministic private measurement asset such as a dashboard, insight, cohort definition, or event definition may become `enabled` after its operation-specific gates, project identity, ownership, semantic version, `definition_hash`, asset-cap, advertised containment path, and exact official readback pass; it does not inherit user-exposure gates. A flag, experiment, survey, rollout, or other user-visible resource may become only `shadow` before its exposure gates pass.
 
 Every effect must select its exact graph route. Asset definitions, flags/rollouts, experiments, and surveys use separate operations. Any exposure additionally requires the product-lifecycle eligibility, assignment, WIP, guardrail, readback, and containment gates; a flag-backed experiment requires both flag and experiment operations.
 

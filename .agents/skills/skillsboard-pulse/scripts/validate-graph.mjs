@@ -739,15 +739,12 @@ function validateCrossReferences(graph, repositoryRoot) {
   for (const [id, operation] of Object.entries(graph.operations)) {
     for (const dependency of operation.requires) invariant(nodeIds.has(dependency), `operation ${id} requires unknown node ${dependency}`);
     for (const skill of operation.skills) invariant(skillIds.has(skill), `operation ${id} references unknown skill ${skill}`);
-    for (const switchName of operation.switches_all) invariant(switchIds.has(switchName), `operation ${id} references undeclared switch ${switchName}`);
+    invariant(operation.switches_all.length === 0, `operation ${id} must not declare environment switches`);
     for (const key of operation.interference_keys) invariant(interferenceIds.has(key), `operation ${id} references unknown interference key ${key}`);
     for (const conflict of operation.conflicts_with) {
       invariant(operationIds.has(conflict), `operation ${id} conflicts with unknown operation ${conflict}`);
       invariant(conflict !== id, `operation ${id} conflicts with itself`);
     }
-
-    invariant(operation.switches_all.length === 0, `operation ${id} must not declare environment switches`);
-
     if (operation.effect === "human_only") {
       invariant(operation.autonomy === "manual_only", `human-only operation ${id} must be manual_only`);
     } else if (operation.autonomy === "autonomous" && ["external_write", "public_effect", "repository_write", "spend"].includes(operation.effect)) {

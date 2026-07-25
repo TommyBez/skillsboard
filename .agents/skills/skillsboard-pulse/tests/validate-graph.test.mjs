@@ -369,7 +369,7 @@ test("check rejects an operation-level environment switch", () => {
   mutateGraph(graphPath, (graph) => {
     graph.operations["fixture.write"].switches_all = ["PULSE_ENABLE_SOCIAL_PUBLISH"];
   });
-  expectValidationError(() => checkGraph(graphPath), /references undeclared switch.*PULSE_ENABLE_SOCIAL_PUBLISH/);
+  expectValidationError(() => checkGraph(graphPath), /operation fixture\.write must not declare environment switches/);
 });
 
 test("autonomous writes are valid without environment switches", () => {
@@ -590,6 +590,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
   const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+  const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
   assert.equal(checked.graph.contract_version, 8);
   assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
@@ -597,6 +598,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
   assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
   assert.match(analytics, /A deterministic private measurement asset/);
+  assert.match(analytics, /operation-specific gates.*advertised containment path/);
   assert.match(analytics, /root_cause_hash \+ definition_hash/);
   assert.match(learning, /continuously replans each independent lane/);
   assert.match(learning, /deterministic low-risk non-experimental repair/);
@@ -606,12 +608,15 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(distribution, /official account-visible rules returned by an advertised authenticated operation/);
   assert.match(social, /at most three autonomous X replies/);
   assert.match(delivery, /`qa_required` permits PR creation and review only/);
+  assert.match(delivery, /exact canonical graph route ID/);
   assert.match(inbound, /as the primary ingress/);
   assert.match(inbound, /Never use a private API, Resend CLI, custom client/);
   assert.match(email, /bounded exact-record or frozen-target-set reads/);
+  assert.match(email, /at most three total attempts.*one initial send plus at most two retries/);
   assert.match(pseo, /three new experimental pSEO PRs per rolling seven days/);
   assert.match(product, /at most one optional open-text question/);
   assert.match(product, /at most three materially distinct treatment versions per rolling 90 days/);
+  assert.match(typefully, /full immutable transition envelope: exact account, required social set, resource key, contract root/);
 });
 
 test("runtime skills are reported as unpriced", () => {
