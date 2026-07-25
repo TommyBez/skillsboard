@@ -2,24 +2,24 @@
 
 **Node:** `channels.distribution`
 
-Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require the exact allowlist, official current rules/capability read, graph route, and switches.
+Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require positive destination eligibility, official current rules/capability read, and the exact graph route.
 
-If autonomous execution is unavailable but every other policy, evidence, identity, quality, cap, cooldown, and containment gate passes, emit a bounded `manual_action` package instead of dropping the opportunity. It reserves the same cap/lock and includes final target, evidence-backed brief, identity, rule URL/check time, expiry, containment, and required result URL/ID.
+If autonomous execution is unavailable but every other policy, evidence, identity, quality, cap, cooldown, and containment gate passes, emit a bounded `manual_action` package instead of dropping the opportunity. Creation records a soft hold for deduplication but consumes no cap, send allowance, WIP, or hard resource lock. The package includes final target, evidence-backed brief, identity, rule URL/check time, expiry, containment, and required result URL/ID. Before execution, an explicit claim atomically rechecks official state, ownership, eligibility, consent where applicable, caps, cooldowns, interference, and ambiguity, then reserves the exact resource and worst-case capacity just in time. A failed claim performs no effect. Before an autonomous alternative uses the same intent or resource, official readback must prove no human effect and atomically invalidate the unclaimed or expired soft hold.
 
 ## Community portfolio
 
 In any rolling seven days:
 
-- at most five first public contacts across allowlisted communities;
+- at most five first public contacts across eligible communities;
 - each new top-level post and each first contextual reply consumes one first-contact slot;
 - at most two first contacts may be new top-level posts/threads, each also consuming a first-contact slot;
 - Reddit permits at most one of those new posts and a 30-day cooldown per subreddit;
 - Show HN consumes one first-contact and one top-level slot and is human-only;
 - later replies are eligible only after another participant responds in the involved thread.
 
-LinkedIn, X, Product Hunt, directories, and review sites use their own ledgers and do not consume community slots unless the effect itself occurs in a community. Manual packages reserve the same limits and expire after seven days for a post or 48 hours for a reply.
+LinkedIn, X, Product Hunt, directories, and review sites use their own ledgers and do not consume community slots unless the effect itself occurs in a community. Manual packages retain the same limits when claimed and expire after seven days for a post or 48 hours for a reply; their unclaimed soft holds do not consume those limits.
 
-Every community has a positive allowlist entry with current rules URL/check time, identity, permitted action/link/disclosure/language, promotion and reply limits, official operation, measurement, and edit/removal path. Prohibit duplicate cross-posts, warm-up, generic engagement, DMs, vote requests, incentives, and invented anecdotes.
+The Pulse may create or refresh a positive destination-eligibility record without human approval from current official public rules or official account-visible rules returned by an advertised authenticated operation for the same verified identity and destination. The record contains destination, rule source/reference and content hash, checked/expiry time no later than seven days, verified identity, account/locale scope where applicable, permitted action/link/disclosure/language, promotion and reply limits, measurement, and edit/removal path. Login-only rules qualify only through that official authenticated read; inaccessible, ambiguous, missing, or conflicting rules do not. Product Hunt, Hacker News, Reddit's dedicated-account requirement, and every explicit human-only boundary below remain unaffected. Prohibit duplicate cross-posts, warm-up, generic engagement, DMs, vote requests, incentives, and invented anecdotes.
 
 After four measured weeks with complete observability and no policy/moderator violation, one strategic run may raise the top-level ceiling once from two to three. Three is the hard automatic ceiling; further increase requires a contract PR.
 
@@ -50,7 +50,7 @@ Run at most one solicitation campaign at a time. Select genuine recent meaningfu
 
 Evaluate at 30 days: under 30 delivered is `insufficient_sample`; 30–59 delivered with zero reviews permits one correction but no expansion; at least 60 across the original plus one extension with zero reviews retires the channel. A provider warning, biased cohort, or policy violation pauses immediately.
 
-Public review responses require their separate route and switch, official read/notification, truthful non-pressuring product facts, and no exposure of account/customer detail; target 72 hours when useful. Negative sentiment alone never changes exposure. Legal, privacy, security, grave allegations, identity ambiguity, dispute, or abuse receive a human handoff, not an autonomous substantive response.
+Public review responses require their separate route, official read/notification, truthful non-pressuring product facts, and no exposure of account/customer detail; target 72 hours when useful. Negative sentiment alone never changes exposure. Legal, privacy, security, grave allegations, identity ambiguity, dispute, or abuse receive a human handoff, not an autonomous substantive response.
 
 ## Earned media
 
@@ -74,9 +74,9 @@ Organization-level research requires at least 75/100 across fit, complementarity
 
 Each party retains its audience, consent, and data. Do not exchange/export/match leads; pay; offer revenue share, discounts, giveaways, exclusivity, or SLAs; promise roadmap, privileged support, or unsupported integrations; accept terms/DPAs; or grant broad trademark rights. Require the partner's exact contribution and final asset approval before launch. After 30 live days, activation and `AAT-28` are outcomes. One zero-activation unit permits one materially different unit; two live units over at least 60 days with zero activation retire that partner for 180 days. Partner non-execution is `partner_nonexecution`, not product evidence.
 
-## Switches, readback, and containment
+## Eligibility, readback, and containment
 
-All operations begin `read_only`. Community writes use the community master route; directory, review outreach/response, earned media, partnership, and demand response each require the master plus their exact operation switch in `graph.json`. Missing, non-`1`, or malformed values fail closed.
+All operations begin `read_only`. Community, directory, review outreach/response, earned media, partnership, and demand-response effects each require their exact operation route plus the policy, provider, identity, cap, cooldown, and containment gates above.
 
 Before effect, read current platform rules, identity, caps, cooldown, quota, destination/thread state, and edit/removal path. Persist deterministic resource key, route, rule-check time, opaque external ID/URL, cap reservation, and measurement. Ambiguous effects reserve capacity and are not blindly duplicated.
 

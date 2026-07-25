@@ -262,7 +262,7 @@ test("resolve returns dependency-first policy context without file contents", ()
   assert.equal(result.executor_result.max_bytes, 4_096);
   assert.equal(result.executor_result.schema_version, 1);
   assert.ok(result.executor_result.required_keys.includes("reason_code"));
-  assert.ok(result.executor_result.enums.reason_code.includes("switch_disabled"));
+  assert.equal(result.executor_result.enums.reason_code.includes("switch_disabled"), false);
   assert.equal(JSON.stringify(result).includes("# Kernel"), false);
 });
 
@@ -354,32 +354,50 @@ test("check reports dependency cycles with the involved chain", () => {
   expectValidationError(() => checkGraph(graphPath), /dependency cycle: .*pulse\.kernel.*work\.policy/);
 });
 
-test("check rejects missing required switches", () => {
+test("check rejects environment operation switches", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
-    graph.switches = graph.switches.filter((item) => item !== "PULSE_ENABLE_SOCIAL_PUBLISH");
-    graph.operations["fixture.write"].switches_all = graph.operations["fixture.write"].switches_all.filter(
-      (item) => item !== "PULSE_ENABLE_SOCIAL_PUBLISH",
-    );
+    graph.switches = ["PULSE_ENABLE_SOCIAL_PUBLISH"];
   });
-  expectValidationError(() => checkGraph(graphPath), /missing required switch.*PULSE_ENABLE_SOCIAL_PUBLISH/);
+  expectValidationError(() => checkGraph(graphPath), /must not declare environment operation switches/);
 });
 
-test("check enforces exact nested switch closure for inbound replies", () => {
+test("check rejects an operation-level environment switch", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
-    graph.operations["inbound.reply"] = {
-      ...graph.operations["fixture.write"],
-      switches_all: ["PULSE_ENABLE_INBOUND_REPLIES"],
-    };
-    graph.routes["inbound.reply"] = {
-      ...graph.routes["fixture.write"],
-      operations: ["inbound.reply"],
-    };
+    graph.operations["fixture.write"].switches_all = ["PULSE_ENABLE_SOCIAL_PUBLISH"];
   });
-  expectValidationError(() => checkGraph(graphPath), /exact required switch closure.*PULSE_ENABLE_INBOUND_PROCESSING/);
+  expectValidationError(() => checkGraph(graphPath), /operation fixture\.write must not declare environment switches/);
+});
+
+test("autonomous writes are valid without environment switches", () => {
+  const { graphPath } = makeFixture();
+  mutateGraph(graphPath, (graph) => {
+    for (const operationId of ["github.pr.write", "github.pseo_pr.write"]) {
+      graph.operations[operationId] = {
+        ...graph.operations["fixture.write"],
+        switches_all: [],
+      };
+      graph.routes[operationId] = {
+        ...graph.routes["fixture.write"],
+        operations: [operationId],
+      };
+    }
+  });
+  lockGraph(graphPath);
+  const checked = checkGraph(graphPath);
+  assert.deepEqual(checked.graph.operations["github.pr.write"].switches_all, []);
+  assert.deepEqual(checked.graph.operations["github.pseo_pr.write"].switches_all, []);
+});
+
+test("every fixture operation resolves with an empty switch closure", () => {
+  const { graphPath } = makeFixture();
+  lockGraph(graphPath);
+  const checked = checkGraph(graphPath);
+  const resolved = resolveGraph(checked.graph, { route: "fixture.write", nodes: ["work.policy"] });
+  assert.deepEqual(resolved.switches_all, []);
 });
 
 test("check rejects an external write operation unreachable from all routes", () => {
@@ -388,7 +406,7 @@ test("check rejects an external write operation unreachable from all routes", ()
   mutateGraph(graphPath, (graph) => {
     graph.operations["orphan.write"] = {
       ...graph.operations["fixture.write"],
-      switches_all: ["PULSE_ENABLE_GITHUB_WRITES"],
+      switches_all: [],
     };
   });
   expectValidationError(() => checkGraph(graphPath), /external write operation is unreachable.*orphan\.write/);
@@ -405,11 +423,7 @@ test("survey routes must load the cross-channel attention owner and state view",
       requires: ["work.policy"],
       required_capabilities: [],
       skills: ["fixture"],
-      switches_all: [
-        "PULSE_ENABLE_POSTHOG_SURVEY_WRITES",
-        "PULSE_ENABLE_POSTHOG_WRITES",
-        "PULSE_ENABLE_PRODUCT_EXPOSURE",
-      ],
+      switches_all: [],
       conflicts_with: [],
       interference_keys: ["fixture.effect"],
     };
@@ -552,6 +566,57 @@ test("run types must own shared-state persistence", () => {
     graph.run_types.operational.operations = [];
   });
   expectValidationError(() => checkGraph(graphPath), /must own pulse\.state\.persist/);
+});
+
+test("operational runs resolve the continuous per-lane replan policy and state", () => {
+  const checked = checkGraph();
+  const run = resolveGraph(checked.graph, { run: "operational", nodes: [] });
+
+  assert.equal(run.nodes.some(({ id }) => id === "learning.opportunities"), true);
+  assert.equal(Object.hasOwn(run.state_views, "opportunities"), true);
+  assert.deepEqual(run.switches_all, []);
+});
+
+test("autonomy controls use bounded replacements instead of routine blockers", () => {
+  const checked = checkGraph();
+  const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
+  const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
+  const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
+  const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
+  const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
+  const delivery = readFileSync(new URL("../references/delivery-repository.md", import.meta.url), "utf8");
+  const inbound = readFileSync(new URL("../references/email-inbound.md", import.meta.url), "utf8");
+  const email = readFileSync(new URL("../references/email-outbound.md", import.meta.url), "utf8");
+  const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
+  const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+  const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
+
+  assert.equal(checked.graph.contract_version, 8);
+  assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
+  assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
+  assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
+  assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
+  assert.match(analytics, /A deterministic private measurement asset/);
+  assert.match(analytics, /operation-specific gates.*advertised containment path/);
+  assert.match(analytics, /root_cause_hash \+ definition_hash/);
+  assert.match(learning, /continuously replans each independent lane/);
+  assert.match(learning, /deterministic low-risk non-experimental repair/);
+  assert.match(scheduler, /general repository WIP has a hard budget of six units/);
+  assert.match(scheduler, /Before claim it is a soft hold/);
+  assert.match(scheduler, /at most three open pSEO PRs/);
+  assert.match(distribution, /official account-visible rules returned by an advertised authenticated operation/);
+  assert.match(social, /at most three autonomous X replies/);
+  assert.match(delivery, /`qa_required` permits PR creation and review only/);
+  assert.match(delivery, /exact canonical graph route ID/);
+  assert.match(inbound, /as the primary ingress/);
+  assert.match(inbound, /Never use a private API, Resend CLI, custom client/);
+  assert.match(email, /bounded exact-record or frozen-target-set reads/);
+  assert.match(email, /at most three total attempts.*one initial send plus at most two retries/);
+  assert.match(pseo, /three new experimental pSEO PRs per rolling seven days/);
+  assert.match(product, /at most one optional open-text question/);
+  assert.match(product, /at most three materially distinct treatment versions per rolling 90 days/);
+  assert.match(typefully, /full immutable transition envelope: exact account, required social set, resource key, contract root/);
 });
 
 test("runtime skills are reported as unpriced", () => {

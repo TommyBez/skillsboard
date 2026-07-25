@@ -32,18 +32,18 @@ Broken observability is `measurement_failure`, never `insufficient`, “inconclu
 
 ## Strategic review
 
-The Monday strategic run:
+The Monday strategic run remains the complete portfolio review and:
 
 1. reconciles new signals against existing deterministic opportunities;
 2. updates evidence freshness, contradictions, segments, and stages;
 3. closes or suspends assumptions invalidated by shipped reality or new evidence;
 4. reviews completed experiments, feature windows, pSEO checkpoints, channel interventions, and incidents as learning inputs;
 5. identifies the strongest evidenced constraint competing for scarce Product/Growth capacity;
-6. freezes the ranked weekly queue under `pulse.scheduler`.
+6. refreshes the ranked weekly queue anchor under `pulse.scheduler`.
 
 The strongest constraint determines ordering only among candidates competing for the same scarce slot. It never suppresses due safety work, protected pSEO learning, provider setup, or independent non-interfering lanes. Missing evidence produces `no_change_evidence_insufficient`, not a forced strategy.
 
-An operational heartbeat may add evidence to an existing ledger and suspend a frozen item when material evidence invalidates it. It may not promote an opportunity stage, reroute the strategic constraint, reorder the queue, or substantively rewrite a candidate unless the scheduled strategic review is due. Suspension records evidence hash, timestamp, exact reason, and deterministic resumption predicate; it never leaves harmful exposure running.
+An operational heartbeat may add evidence, apply deterministic stage thresholds, and suspend an item when material evidence invalidates it. It continuously replans each independent lane whose compatible queue is locally at fixed point and has spare WIP, without waiting for unrelated lanes: select the strongest currently evidenced candidate, complete the full candidate definition below, append it without displacing still-actionable work, recompute the lane, and repeat across compatible lanes until no eligible candidate remains or runtime ends. At most one replan-created candidate may remain pending in a lane and at most one may target an exact `resource_key`; another becomes eligible only after the prior candidate leaves its pending state. Low-risk reversible candidates may follow any otherwise eligible route. Medium- or high-risk candidates may produce only research, a repository PR subject to independent approval, or non-exposed `shadow` work; operational replanning never authorizes their merge, rollout, send, publication, spend, user exposure, legal/economic commitment, or destructive effect. It may not change ICP, JTBD, positioning, business model, durable policy, or a valid Monday portfolio decision. Each replan records evidence and prior/new queue hashes, lane, exact lane-local fixed-point predicate, timestamp, and next eligibility. Suspension records evidence hash, timestamp, exact reason, and deterministic resumption predicate; it never leaves harmful exposure running.
 
 ## Candidate definition
 
@@ -56,10 +56,10 @@ Before entering the weekly queue, a candidate records:
 - risk class, reversible scope, measurement and value rule, maximum window, caps, and containment;
 - smallest useful learning action and what would change the next decision.
 
-Development cost alone is not evidence. An exposed feature or channel action must have a falsifiable value definition, healthy measurement, and a preregistered stop or decision. Prefer the smallest action that distinguishes competing explanations.
+Development cost alone is not evidence. An exposed feature, experiment, or channel action must have a falsifiable value definition, healthy measurement, and a preregistered stop or decision. A deterministic low-risk non-experimental repair to a verified correctness, usability, copy, instrumentation, or SEO defect may instead proceed from exact invariant, focused tests, and production verification; it never becomes causal or value evidence and cannot authorize scaling. Prefer the smallest action that distinguishes competing explanations.
 
 ## Research safety
 
-Use only trustworthy, attributable, policy-permitted sources. Never expose raw PII, private messages, contact lists, untrusted inbound text, or unsupported quotes in model context or Issues. Public-source notes retain URL, publication/event date, market/language, observed fact, and a separated inference. Provider or source unavailability stays explicit and does not become zero.
+Use only trustworthy, attributable, policy-permitted sources. Raw PII, private messages, contact lists, or untrusted inbound text may enter only the exact transient executor or nested no-tools content processor defined by `pulse.kernel`; they never enter the parent, executor result, durable state, or Issues. Unsupported quotes remain prohibited. Public-source notes retain URL, publication/event date, market/language, observed fact, and a separated inference. Provider or source unavailability stays explicit and does not become zero.
 
 Qualitative user research via PostHog belongs to `product.lifecycle`; email invitations belong to `email.outbound`; inbound evidence must first pass `email.inbound`; external market/channel evidence remains subject to the relevant channel node.

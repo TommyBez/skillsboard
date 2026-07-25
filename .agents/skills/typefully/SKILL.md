@@ -115,7 +115,7 @@ When the user asks to add notes, ideas, or context to a draft, use `--scratchpad
 ```
 
 - `next-free-slot` lets Typefully pick the optimal time.
-- **Publishing is irreversible and public** — unless the user says "publish now" / "post immediately", confirm first. Creating a draft is safe.
+- **Publishing is irreversible and public.** Confirm first unless the user explicitly requested publication or an independently approved repository-pinned automation contract grants standing publication authority and binds the full immutable transition envelope: exact account, required social set, resource key, contract root, platforms, copy, timing, schedule ID, parent ID, reply ID, caps, and readback, using explicit nulls for inapplicable IDs. Creating a draft is safe.
 - Single-arg commands require `--use-default` when a default social set is configured (see the [safety note](#commands) below).
 
 ---
