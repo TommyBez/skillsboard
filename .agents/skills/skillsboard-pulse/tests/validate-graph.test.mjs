@@ -643,6 +643,51 @@ test("production Resend routes pin the connector adapter instead of API-key or C
   }
 });
 
+test("analytics database reconciliation resolves the official Neon connector read-only", () => {
+  const checked = checkGraph();
+  const operation = checked.graph.operations["neon.database.read"];
+  const route = checked.graph.routes["analytics.database_reconcile"];
+
+  assert.deepEqual(checked.graph.skills.neon_postgres, {
+    selector: "neon-postgres:neon-postgres",
+    source: "runtime",
+  });
+  assert.deepEqual(operation, {
+    effect: "read",
+    autonomy: "autonomous",
+    requires: ["analytics.control_plane"],
+    required_capabilities: [],
+    skills: ["neon_postgres"],
+    switches_all: [],
+    conflicts_with: [],
+    interference_keys: [],
+  });
+  assert.deepEqual(route, {
+    entry_nodes: ["analytics.control_plane"],
+    operations: ["neon.database.read"],
+    skills: ["posthog"],
+    state_views: ["analytics", "core", "scorecard"],
+    max_known_context_bytes: 36_864,
+    requires_origin_policy_node: true,
+    allowed_origin_policy_nodes: ["analytics.control_plane"],
+  });
+
+  const resolved = resolveGraph(checked.graph, {
+    route: "analytics.database_reconcile",
+    nodes: ["analytics.control_plane"],
+  });
+  assert.deepEqual(resolved.operations, ["neon.database.read"]);
+  assert.deepEqual(resolved.skills.map(({ id }) => id), ["neon_postgres", "posthog"]);
+  assert.equal(resolved.origin_policy_node, "analytics.control_plane");
+  assert.equal(resolved.operations.every((id) => checked.graph.operations[id].effect === "read"), true);
+
+  for (const runId of ["operational", "strategic"]) {
+    const run = resolveGraph(checked.graph, { run: runId, nodes: [] });
+    assert.equal(run.operations.includes("neon.database.read"), true, `${runId} must advertise the Neon read`);
+    assert.equal(run.skills.some(({ id }) => id === "neon_postgres"), true, `${runId} must resolve the Neon skill`);
+  }
+});
+
 test("delivery repository cannot self-authorize its origin", () => {
   const { root, graphPath } = makeFixture();
   write(join(root, ".agents", "skills", "skillsboard-pulse", "references", "delivery.md"), "# Delivery\n");

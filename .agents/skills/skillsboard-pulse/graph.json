@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "ac7bba5cea05fd34f346a9fcebd82db4aeacc6e6e16faa0eb501b0878588c84b"
+    "root_sha256": "c5f99e8f67f401c0a1d150fa4cc4efb777df38a7cb8429b1a9bebb318b010620"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "e8b34f70c5b348be8042530aa832e319c2731caa1dd4fd2bad37cfcb31290930",
+      "content_sha256": "ec2cdaa16664cd4265f6b80d236aa5b089ec1252846be73c4b785fb41b819f2a",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -487,6 +487,20 @@
       "switches_all": [
         "PULSE_ENABLE_INCIDENT_EMAIL"
       ]
+    },
+    "neon.database.read": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "read",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "analytics.control_plane"
+      ],
+      "skills": [
+        "neon_postgres"
+      ],
+      "switches_all": []
     },
     "partnership.outreach": {
       "autonomy": "autonomous",
@@ -936,6 +950,27 @@
         "core",
         "incidents",
         "selected_work"
+      ]
+    },
+    "analytics.database_reconcile": {
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane"
+      ],
+      "entry_nodes": [
+        "analytics.control_plane"
+      ],
+      "max_known_context_bytes": 36864,
+      "operations": [
+        "neon.database.read"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "scorecard"
       ]
     },
     "contract.audit": {
@@ -1793,6 +1828,7 @@
       ],
       "max_known_context_bytes": 50176,
       "operations": [
+        "neon.database.read",
         "pulse.reconcile",
         "pulse.state.persist"
       ],
@@ -1819,6 +1855,7 @@
       ],
       "max_known_context_bytes": 87040,
       "operations": [
+        "neon.database.read",
         "pulse.reconcile",
         "pulse.state.persist"
       ],
@@ -1919,6 +1956,10 @@
       "content_sha256": "548e1bd8f31fdef3ffb8edf4f3218a8162b4ac2f04b639affe547bee6dd0cba0",
       "selector": "marketing-plan",
       "source": "repository"
+    },
+    "neon_postgres": {
+      "selector": "neon-postgres:neon-postgres",
+      "source": "runtime"
     },
     "onboarding": {
       "content_sha256": "15a802ffb73828730aba90b740426fbb8d2070721ee92d6f8737de4704e8ff0f",
