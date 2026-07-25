@@ -382,13 +382,42 @@ test("check enforces exact nested switch closure for inbound replies", () => {
   expectValidationError(() => checkGraph(graphPath), /exact required switch closure.*PULSE_ENABLE_INBOUND_PROCESSING/);
 });
 
+test("GitHub PR writes are explicitly autonomous without an environment switch", () => {
+  const { graphPath } = makeFixture();
+  mutateGraph(graphPath, (graph) => {
+    graph.operations["github.pr.write"] = {
+      ...graph.operations["fixture.write"],
+      switches_all: [],
+    };
+    graph.routes["github.pr.write"] = {
+      ...graph.routes["fixture.write"],
+      operations: ["github.pr.write"],
+    };
+  });
+  lockGraph(graphPath);
+  const checked = checkGraph(graphPath);
+  assert.deepEqual(checked.graph.operations["github.pr.write"].switches_all, []);
+});
+
+test("other autonomous writes still require a declared switch closure", () => {
+  const { graphPath } = makeFixture();
+  lockGraph(graphPath);
+  mutateGraph(graphPath, (graph) => {
+    graph.operations["fixture.write"].switches_all = [];
+  });
+  expectValidationError(
+    () => checkGraph(graphPath),
+    /must declare switches_all or an explicit switchless requirement/,
+  );
+});
+
 test("check rejects an external write operation unreachable from all routes", () => {
   const { graphPath } = makeFixture();
   lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
     graph.operations["orphan.write"] = {
       ...graph.operations["fixture.write"],
-      switches_all: ["PULSE_ENABLE_GITHUB_WRITES"],
+      switches_all: ["PULSE_ENABLE_SOCIAL_PUBLISH"],
     };
   });
   expectValidationError(() => checkGraph(graphPath), /external write operation is unreachable.*orphan\.write/);

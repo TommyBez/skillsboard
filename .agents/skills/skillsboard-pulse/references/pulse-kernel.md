@@ -112,7 +112,7 @@ Product transactionals take priority. If the included limit, both windows, total
 
 Deduplicate by deterministic `incident_id`; notify again only after a material change in severity, scope, containment, residual risk, or resolution. Do not blind-retry ambiguous notification delivery: contain, record `alert_delivery_unavailable`, and retry only through a newly verified healthy path. A factual correction may bypass attention caps only to reduce active harm. Never improvise legal notices, admissions, or substantive breach communications.
 
-Re-enable a non-SEV0 perimeter only after root cause, restored guardrails, and clean verification; ambiguity stays blocked. The global stop is disabling the native Codex automation. Every write operation also needs its declared environment switch; a switch only narrows authority. On activation, stop new effects, move owned live resources to their safest advertised state, and preserve read-only monitoring and incident reporting where allowed.
+Re-enable a non-SEV0 perimeter only after root cause, restored guardrails, and clean verification; ambiguity stays blocked. The global stop is disabling the native Codex automation. Declared switches narrow authority; an empty closure needs no opt-in. On activation, stop new effects, move owned live resources to their safest advertised state, and preserve read-only monitoring and incident reporting where allowed.
 
 ## Generic fallback
 

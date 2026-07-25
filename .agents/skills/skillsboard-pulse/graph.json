@@ -1,11 +1,11 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "b746e8d5c7ab3c3358f87c5f638c529cf0e3dfd901f7e6e1740b922c7d24acd6",
+      "content_sha256": "21dc21809331c327135fde66334ad5d7c5c60bc6cb2b05fcea3e4c4441f2a0d4",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "d34c70cd9b7fd4ecd9f76a90ef2c9b1bd5e8583e760b355a5ecb8cb5e56cd395",
+      "content_sha256": "76c082722bb65452c3b2e286a85103dba044fe8e2f083a85dd34d2a891e820ac",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
     }
   },
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 5,
+  "contract_version": 6,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "c5f99e8f67f401c0a1d150fa4cc4efb777df38a7cb8429b1a9bebb318b010620"
+    "root_sha256": "8787a4cbbccda1a3205a6dc2d5dcdbce34e9c988800578b6b2205bb0e0b551e0"
   },
   "interference_keys": [
     "channel.community",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "8bc62c4603872dd8415b88a328430ce678738d48a4c1957e11377e3e4aff9f1e",
+      "content_sha256": "d5bad6f629b7df75049cad6c93e530194283e66524e2149d19c209b399875b74",
       "kind": "policy",
       "provides": [
         "approval",
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "ce352e87b3fc00560cbf258123284508f536c129326805b01ba0fb6709c813f1",
+      "content_sha256": "aea67c657376d5ff6841e59e20fcb333ab1543ac73710b8c0625f73e4a97c533",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -386,9 +386,7 @@
         "github",
         "github_yeet"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_GITHUB_WRITES"
-      ]
+      "switches_all": []
     },
     "github.pseo_pr.write": {
       "autonomy": "autonomous",
@@ -408,9 +406,7 @@
         "github",
         "github_yeet"
       ],
-      "switches_all": [
-        "PULSE_ENABLE_GITHUB_WRITES"
-      ]
+      "switches_all": []
     },
     "hacker_news.submit": {
       "autonomy": "manual_only",
@@ -2096,7 +2092,6 @@
     "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
     "PULSE_ENABLE_DIRECTORY_WRITES",
     "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
-    "PULSE_ENABLE_GITHUB_WRITES",
     "PULSE_ENABLE_INBOUND_PROCESSING",
     "PULSE_ENABLE_INBOUND_REPLIES",
     "PULSE_ENABLE_INCIDENT_EMAIL",

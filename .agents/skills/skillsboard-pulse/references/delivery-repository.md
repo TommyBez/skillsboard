@@ -55,7 +55,7 @@ Direct Vercel mutations are disabled under this contract. Production deployment 
 
 ## Operation readiness and switches
 
-Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the exact graph route, all declared switches, verified GitHub identity/repository/default branch, ownership, WIP capacity, and no overlap. Vercel remains read-only.
+Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the route, verified GitHub identity/repository/default branch, ownership, WIP capacity, no overlap, and lifecycle gates. GitHub PR operations have no environment switch. Vercel remains read-only.
 
 The Pulse may merge only after the independent checkpoint; a human approval is not permission to ignore a new failing check or unresolved actionable thread. If GitHub or deployment readback is unavailable, keep the affected lifecycle read-only/unavailable and continue independent work.
 

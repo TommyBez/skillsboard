@@ -148,14 +148,15 @@ const BASE_SAFETY = Object.freeze({
   human_only: ["truth", "authority", "handoff"],
 });
 
-// Keep the complete current switch set in executable validation so a graph
-// change cannot silently drop a kill switch merely because no route references it.
+// Keep the complete current provider switch set in executable validation so a
+// graph change cannot silently drop a declared kill switch merely because no
+// route references it. Repository PR writes intentionally use no environment
+// switch; their lifecycle gates live in delivery.repository.
 export const REQUIRED_OPERATION_SWITCHES = Object.freeze([
   "PULSE_ENABLE_COMMUNITY_WRITES",
   "PULSE_ENABLE_DEMAND_RESPONSE_WRITES",
   "PULSE_ENABLE_DIRECTORY_WRITES",
   "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
-  "PULSE_ENABLE_GITHUB_WRITES",
   "PULSE_ENABLE_INBOUND_PROCESSING",
   "PULSE_ENABLE_INBOUND_REPLIES",
   "PULSE_ENABLE_INCIDENT_EMAIL",
@@ -200,8 +201,8 @@ const EXACT_SWITCH_REQUIREMENTS = Object.freeze({
     "PULSE_ENABLE_COMMUNITY_WRITES",
     "PULSE_ENABLE_EARNED_MEDIA_OUTREACH",
   ],
-  "github.pr.write": ["PULSE_ENABLE_GITHUB_WRITES"],
-  "github.pseo_pr.write": ["PULSE_ENABLE_GITHUB_WRITES"],
+  "github.pr.write": [],
+  "github.pseo_pr.write": [],
   "inbound.process": ["PULSE_ENABLE_INBOUND_PROCESSING"],
   "inbound.reply": [
     "PULSE_ENABLE_INBOUND_PROCESSING",
@@ -842,6 +843,7 @@ function validateCrossReferences(graph, repositoryRoot) {
   buildNodeClosure(graph, Object.keys(graph.nodes));
 
   for (const [id, operation] of Object.entries(graph.operations)) {
+    const exactSwitches = EXACT_SWITCH_REQUIREMENTS[id];
     for (const dependency of operation.requires) invariant(nodeIds.has(dependency), `operation ${id} requires unknown node ${dependency}`);
     for (const skill of operation.skills) invariant(skillIds.has(skill), `operation ${id} references unknown skill ${skill}`);
     for (const switchName of operation.switches_all) invariant(switchIds.has(switchName), `operation ${id} references undeclared switch ${switchName}`);
@@ -857,11 +859,14 @@ function validateCrossReferences(graph, repositoryRoot) {
       invariant(operation.autonomy === "manual_only", `human-only operation ${id} must be manual_only`);
       invariant(operation.switches_all.length === 0, `human-only operation ${id} must not declare autonomous switches`);
     } else if (operation.autonomy === "autonomous") {
-      invariant(operation.switches_all.length > 0, `autonomous write operation ${id} must declare switches_all`);
+      const explicitlySwitchless = Array.isArray(exactSwitches) && exactSwitches.length === 0;
+      invariant(
+        operation.switches_all.length > 0 || explicitlySwitchless,
+        `autonomous write operation ${id} must declare switches_all or an explicit switchless requirement`,
+      );
       invariant(operation.interference_keys.length > 0, `autonomous write operation ${id} must declare an interference key`);
     }
 
-    const exactSwitches = EXACT_SWITCH_REQUIREMENTS[id];
     if (exactSwitches) {
       const actual = [...operation.switches_all].sort(compareAscii);
       const expected = [...exactSwitches].sort(compareAscii);
