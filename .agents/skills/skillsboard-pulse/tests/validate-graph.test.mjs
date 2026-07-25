@@ -565,6 +565,33 @@ test("run types must own shared-state persistence", () => {
   expectValidationError(() => checkGraph(graphPath), /must own pulse\.state\.persist/);
 });
 
+test("operational runs resolve the bounded continuous-replan policy and state", () => {
+  const checked = checkGraph();
+  const run = resolveGraph(checked.graph, { run: "operational", nodes: [] });
+
+  assert.equal(run.nodes.some(({ id }) => id === "learning.opportunities"), true);
+  assert.equal(Object.hasOwn(run.state_views, "opportunities"), true);
+  assert.deepEqual(run.switches_all, []);
+});
+
+test("autonomy controls use bounded replacements instead of routine blockers", () => {
+  const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
+  const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
+  const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
+  const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
+  const email = readFileSync(new URL("../references/email-outbound.md", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+
+  assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
+  assert.match(kernel, /at most three total attempts/);
+  assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
+  assert.match(analytics, /three-total-attempt budget/);
+  assert.match(learning, /one `operational_replan` per rolling 24 hours/);
+  assert.match(scheduler, /general repository WIP has a hard budget of six units/);
+  assert.match(distribution, /create or refresh a positive destination-eligibility record without human approval/);
+  assert.match(email, /An exact-resource content read is eligible only when/);
+});
+
 test("runtime skills are reported as unpriced", () => {
   const { graphPath } = makeFixture();
   mutateGraph(graphPath, (graph) => {

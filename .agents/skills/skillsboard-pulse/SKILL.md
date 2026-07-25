@@ -4,7 +4,7 @@ description: Orchestrates the repository-pinned Skills Board Growth/Product Puls
 compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
-  version: "6.0.0"
+  version: "7.0.0"
 ---
 
 # Skills Board Pulse
@@ -13,7 +13,7 @@ Operate Skills Board as an autonomous full-funnel Growth and Product Manager. Th
 
 ## Entry gate
 
-The repository checkout gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must have passed in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node, run the gate, and stop with its exact whole-run `no_action` on failure. A read-only audit of a contract candidate may then use `contract.audit` plus `delivery.repository` to switch from the synchronized default branch to one fetched, clean, exact, verified Pulse-owned PR head; it loads no runtime state/provider and makes no external mutation. Being already on an arbitrary candidate branch never bypasses the gate.
+The dedicated-automation checkout gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must have passed in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node, prepare or verify the private checkout, and stop with its exact whole-run `no_action` on failure. Dirt in the user's interactive checkout is not a Pulse blocker and must never be touched. A read-only audit of a contract candidate may then use `contract.audit` plus `delivery.repository` to switch the dedicated checkout from the synchronized default tip to one fetched, clean, exact, verified Pulse-owned PR head; it loads no runtime state/provider and makes no external mutation. Being already on an arbitrary candidate branch never bypasses the gate.
 
 ## Deterministic loading
 
@@ -62,7 +62,7 @@ After the run closure's reconciliation and monitoring steps:
 4. validate its official readback result, persist the non-PII transition atomically, and reconcile the external effect;
 5. recompute the work graph and repeat until fixed point.
 
-Do not stop merely because one action completed. Do not route a second strategic constraint during an operational run. If runtime ends while compatible work remains, preserve it as `interrupted_with_runnable_work`.
+Do not stop merely because one action completed. An operational run may perform only the bounded continuous-replan transition owned by `learning.opportunities` and `pulse.scheduler`; it is not a second full strategic review. If runtime ends while compatible work remains, preserve it as `interrupted_with_runnable_work`.
 
 ## State projection and context hygiene
 
@@ -70,7 +70,7 @@ Request only data needed for the transition and persist only minimal projections
 
 ## Contract changes
 
-Every policy rule has one owning reference. Change that owner and graph metadata rather than duplicating prose elsewhere. Update the graph lock with `node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs lock`, run `check`, `benchmark`, and the validator tests, then follow `delivery.repository`. A new pinned contract first runs `reconciliation_only`, then one read-only strategic bootstrap, before normal execution.
+Every policy rule has one owning reference. Change that owner and graph metadata rather than duplicating prose elsewhere. Update the graph lock with `node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs lock`, run `check`, `benchmark`, and the validator tests, then follow `delivery.repository`. A newly pinned contract completes the ordered `reconciliation_only` and `strategic_read_only` phases inside one activation run, revalidates the pin between phases and before effects, and only then may enter normal fixed-point execution.
 
 ## Output
 

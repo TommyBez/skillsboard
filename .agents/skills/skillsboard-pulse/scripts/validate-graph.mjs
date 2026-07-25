@@ -835,6 +835,21 @@ function validateCrossReferences(graph, repositoryRoot) {
         invariant(orderedNodes.includes("pulse.scheduler"), `run type ${id} must load pulse.scheduler`);
         invariant(orderedNodes.includes("analytics.control_plane"), `run type ${id} must load analytics.control_plane`);
       }
+      if (
+        groupName === "run type"
+        && id === "operational"
+        && graph.nodes["learning.opportunities"]
+        && graph.state_views.opportunities
+      ) {
+        invariant(
+          orderedNodes.includes("learning.opportunities"),
+          "run type operational must load learning.opportunities for bounded continuous replanning",
+        );
+        invariant(
+          selection.state_views.includes("opportunities"),
+          "run type operational must load the opportunities state view for bounded continuous replanning",
+        );
+      }
       if (groupName === "route" && graph.operations["pulse.state.persist"]) {
         if (id !== "contract.audit" && graph.nodes["pulse.scheduler"]) {
           invariant(!orderedNodes.includes("pulse.scheduler"), `route ${id} must not load pulse.scheduler in an isolated executor`);

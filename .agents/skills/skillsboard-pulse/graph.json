@@ -1,11 +1,11 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "ff3acd274a9b50bdc5efe8d670c9701924e3a25750e425fedff4300ebd1fee7a",
+      "content_sha256": "1e975d1f4a980686d8d1949161d20d59e18998473847b67d67fc53f298bac38f",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "b698256541137dcc2f2ddf03e3ac65f0049e201d7484d37a30602ad423225011",
+      "content_sha256": "f16487698b1ae01bb915a33d0f2514e1a6f7d374729c759168220fd10cf63b5c",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
     }
   },
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 6,
+  "contract_version": 7,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "975e938435f4b1da6c7d4a2c206d056f2882f793d81fe2b67c3354226930aee0"
+    "root_sha256": "239b6c5f03b5e45fe24ade05e4beaacf2019f06b10c20555b0ed72371835a21f"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "3d0b70a2622f7f8f11f7cd520e068858b990b0f20894bb3d8ea1145e122917c1",
+      "content_sha256": "4950262f3c00827194f9e14793055d1a12c9338f42dc2a593beed57ab1882c58",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "61575c4d218aa8a53e3c1e757846e291b82a054b7cffffc1fbf2104f80407647",
+      "content_sha256": "cd2d559a16aef7554fde966701629ee86aec4b1549acf1ae88e0d9ff7b88291f",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "454b59565859b959c806eb699977f63e99abbd972b669f7b412bfb49829f4128",
+      "content_sha256": "703374ade25beafc1f9a1e06cb54b3a61616816d6ddacadf97b4652ced4250e1",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "d3082efd868b5fce6418dab69d8fdc8d00249bfff4dc715de5785eefb8c58f51",
+      "content_sha256": "5a210f7f374766b00403a03a8588e03e99e835609a3472f673ce64e9783ffb8b",
       "kind": "policy",
       "provides": [
         "approval",
@@ -143,7 +143,7 @@
     },
     "email.outbound": {
       "conflicts_with": [],
-      "content_sha256": "4bc81caa3884d00e229a8b101e5aa765acac7e9a6812cc38285d848a02ecef04",
+      "content_sha256": "3d26c974d9a5d0c666aad9ba0e42aa7fb15edd8f17d65020e0fb8503ebad4395",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -174,7 +174,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "97bf95ea9e2bfa1b6f4c951cf3e93fa72a6ca95552ecfad1bc16cfe51ec51c26",
+      "content_sha256": "817bb265b0a17509e53cd16d53f554c643d26e8e7c72b3ee2c6fefff156f1dc1",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "d3b0ea52829b2a250fe7169897238699ab50a4257425fbbfd89fee8b257ff0de",
+      "content_sha256": "eced4937c746e93097a6743e83902596bee8afbd0f95be77f80348b10f59d37f",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "dbd5f484765b2581ad78b33459c63aa27f49717af017e7fe155055b4672ce1dd",
+      "content_sha256": "971f07947419813172067771c5bd54cf525b63859f7a9145a9a568b391bb8e82",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -912,7 +912,7 @@
         "product.truth",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 133120,
+      "max_known_context_bytes": 147456,
       "operations": [],
       "skills": [],
       "state_views": [
@@ -1507,7 +1507,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 94208,
+      "max_known_context_bytes": 96256,
       "operations": [
         "github.pr.write"
       ],
@@ -1749,9 +1749,10 @@
       "entry_nodes": [
         "analytics.control_plane",
         "communications.attention",
+        "learning.opportunities",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 50176,
+      "max_known_context_bytes": 65536,
       "operations": [
         "neon.database.read",
         "pulse.reconcile",
@@ -1766,7 +1767,8 @@
         "attention",
         "core",
         "digest",
-        "incidents"
+        "incidents",
+        "opportunities"
       ]
     },
     "strategic": {
@@ -1778,7 +1780,7 @@
         "product.lifecycle",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 87040,
+      "max_known_context_bytes": 98304,
       "operations": [
         "neon.database.read",
         "pulse.reconcile",

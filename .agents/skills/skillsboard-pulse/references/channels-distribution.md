@@ -2,7 +2,7 @@
 
 **Node:** `channels.distribution`
 
-Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require the exact allowlist, official current rules/capability read, and graph route.
+Load for communities, directories, review sites, Product Hunt, Hacker News, earned media, demand-signal response, partnerships, or paid-channel eligibility. Add `product.truth` for copy and `email.outbound` for review invitations. All autonomous effects require positive destination eligibility, official current rules/capability read, and the exact graph route.
 
 If autonomous execution is unavailable but every other policy, evidence, identity, quality, cap, cooldown, and containment gate passes, emit a bounded `manual_action` package instead of dropping the opportunity. It reserves the same cap/lock and includes final target, evidence-backed brief, identity, rule URL/check time, expiry, containment, and required result URL/ID.
 
@@ -10,7 +10,7 @@ If autonomous execution is unavailable but every other policy, evidence, identit
 
 In any rolling seven days:
 
-- at most five first public contacts across allowlisted communities;
+- at most five first public contacts across eligible communities;
 - each new top-level post and each first contextual reply consumes one first-contact slot;
 - at most two first contacts may be new top-level posts/threads, each also consuming a first-contact slot;
 - Reddit permits at most one of those new posts and a 30-day cooldown per subreddit;
@@ -19,7 +19,7 @@ In any rolling seven days:
 
 LinkedIn, X, Product Hunt, directories, and review sites use their own ledgers and do not consume community slots unless the effect itself occurs in a community. Manual packages reserve the same limits and expire after seven days for a post or 48 hours for a reply.
 
-Every community has a positive allowlist entry with current rules URL/check time, identity, permitted action/link/disclosure/language, promotion and reply limits, official operation, measurement, and edit/removal path. Prohibit duplicate cross-posts, warm-up, generic engagement, DMs, vote requests, incentives, and invented anecdotes.
+The Pulse may create or refresh a positive destination-eligibility record without human approval only from current official public rules and an advertised official operation. The record contains destination, rules URL and content hash, checked/expiry time no later than seven days, verified identity, permitted action/link/disclosure/language, promotion and reply limits, measurement, and edit/removal path. Ambiguous, missing, login-only, or conflicting rules do not qualify. Product Hunt, Hacker News, Reddit's dedicated-account requirement, and every explicit human-only boundary below remain unaffected. Prohibit duplicate cross-posts, warm-up, generic engagement, DMs, vote requests, incentives, and invented anecdotes.
 
 After four measured weeks with complete observability and no policy/moderator violation, one strategic run may raise the top-level ceiling once from two to three. Three is the hard automatic ceiling; further increase requires a contract PR.
 
@@ -74,7 +74,7 @@ Organization-level research requires at least 75/100 across fit, complementarity
 
 Each party retains its audience, consent, and data. Do not exchange/export/match leads; pay; offer revenue share, discounts, giveaways, exclusivity, or SLAs; promise roadmap, privileged support, or unsupported integrations; accept terms/DPAs; or grant broad trademark rights. Require the partner's exact contribution and final asset approval before launch. After 30 live days, activation and `AAT-28` are outcomes. One zero-activation unit permits one materially different unit; two live units over at least 60 days with zero activation retire that partner for 180 days. Partner non-execution is `partner_nonexecution`, not product evidence.
 
-## Switches, readback, and containment
+## Eligibility, readback, and containment
 
 All operations begin `read_only`. Community, directory, review outreach/response, earned media, partnership, and demand-response effects each require their exact operation route plus the policy, provider, identity, cap, cooldown, and containment gates above.
 

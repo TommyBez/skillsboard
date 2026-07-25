@@ -67,7 +67,7 @@ Track qualified public visits, anonymous `landing_cta_clicked`, `signup_form_sub
 
 Use a rolling 28-day view. Suspend a source only after either 100 qualified sessions across eight weeks with no team start or five mature team starts with no activation. Three activated teams authorize another bounded test, not scaling.
 
-Eligible work: protected pSEO or a queued capped organic/community/content test. Block on weak product fit, false claims, canonical conflict, missing attribution required by the decision, failed cap/allowlist, or too many uncheckpointed pSEO pages.
+Eligible work: protected pSEO or a queued capped organic/community/content test. Block on weak product fit, false claims, canonical conflict, missing attribution required by the decision, failed cap/destination eligibility, or too many uncheckpointed pSEO pages.
 
 ### Activation
 

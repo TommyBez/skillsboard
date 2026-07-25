@@ -32,18 +32,18 @@ Broken observability is `measurement_failure`, never `insufficient`, “inconclu
 
 ## Strategic review
 
-The Monday strategic run:
+The Monday strategic run remains the complete portfolio review and:
 
 1. reconciles new signals against existing deterministic opportunities;
 2. updates evidence freshness, contradictions, segments, and stages;
 3. closes or suspends assumptions invalidated by shipped reality or new evidence;
 4. reviews completed experiments, feature windows, pSEO checkpoints, channel interventions, and incidents as learning inputs;
 5. identifies the strongest evidenced constraint competing for scarce Product/Growth capacity;
-6. freezes the ranked weekly queue under `pulse.scheduler`.
+6. refreshes the ranked weekly queue anchor under `pulse.scheduler`.
 
 The strongest constraint determines ordering only among candidates competing for the same scarce slot. It never suppresses due safety work, protected pSEO learning, provider setup, or independent non-interfering lanes. Missing evidence produces `no_change_evidence_insufficient`, not a forced strategy.
 
-An operational heartbeat may add evidence to an existing ledger and suspend a frozen item when material evidence invalidates it. It may not promote an opportunity stage, reroute the strategic constraint, reorder the queue, or substantively rewrite a candidate unless the scheduled strategic review is due. Suspension records evidence hash, timestamp, exact reason, and deterministic resumption predicate; it never leaves harmful exposure running.
+An operational heartbeat may add evidence, apply deterministic stage thresholds, and suspend an item when material evidence invalidates it. When no compatible actionable queue item remains because every higher-ranked item is complete, blocked, waiting, or invalidated, it may perform one `operational_replan` per rolling 24 hours: select the strongest currently evidenced low-risk reversible candidate, complete the full candidate definition below, and append it without displacing any still-actionable queue entry. It may not change ICP, JTBD, positioning, business model, durable policy, medium/high-risk scope, or a valid Monday portfolio decision. The replan records evidence and prior/new queue hashes, exact exhaustion predicate, timestamp, and next eligibility. Suspension records evidence hash, timestamp, exact reason, and deterministic resumption predicate; it never leaves harmful exposure running.
 
 ## Candidate definition
 

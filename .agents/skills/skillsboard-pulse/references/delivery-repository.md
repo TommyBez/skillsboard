@@ -6,7 +6,7 @@ Load for every repository modification, open PR, review/check transition, merge,
 
 ## Preconditions and ownership
 
-The whole-run checkout gate in `pulse.kernel` must already have passed. Before a new repository item, reconcile live open PRs and confirm no overlapping exact `resource_key` or materially conflicting `interference_keys`; reserve the applicable general or pSEO WIP slot.
+The dedicated whole-run checkout gate in `pulse.kernel` must already have passed. Before a new repository item, reconcile live open PRs and confirm no overlapping exact `resource_key` or materially conflicting `interference_keys`; reserve the applicable general repository risk units or pSEO slot.
 
 For new work, create `codex/gtm-<slug>` from the synchronized default-branch tip. To update an existing Pulse-owned PR after the gate:
 
@@ -14,7 +14,7 @@ For new work, create `codex/gtm-<slug>` from the synchronized default-branch tip
 2. verify clean checkout, resolved default base, matching GitHub/state head and owner/resource key, and no unrelated divergence;
 3. switch only to that exact head.
 
-Never create a worktree, restore an arbitrary prior branch, rewrite history, combine unrelated resource keys, or continue after a failed gate. A pending PR locks only its resource key; independent lanes continue.
+Create or reuse only the kernel-owned private automation worktree. Never create another worktree, restore an arbitrary prior branch, rewrite history, combine unrelated resource keys, or continue after a failed gate. A pending PR locks only its resource key; independent lanes continue.
 
 ## Implementation and verification
 
@@ -41,6 +41,7 @@ Commit and push only explicit in-scope files, then open or update the PR. The de
 - scope and explicitly excluded work;
 - local and automated verification;
 - observation window, success/kill rules, and interference;
+- risk class and reserved repository WIP units;
 - reversible containment and revert path.
 
 Answer actionable review comments within scope and mark the PR ready when green. Inspect live thread-aware state: green CI does not resolve review threads. Never self-approve, dismiss the independent checkpoint, fabricate approval, or bypass branch protection.
@@ -55,7 +56,7 @@ Direct Vercel mutations are disabled under this contract. Production deployment 
 
 ## Operation readiness
 
-Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the route, verified GitHub identity/repository/default branch, ownership, WIP capacity, no overlap, and lifecycle gates. Pulse operations have no environment opt-in switches. Vercel remains read-only.
+Authenticated GitHub/Vercel reads may be `read_only`. Local branch/test/diff work is `shadow`. Repository effects require the route, verified GitHub identity/repository/default branch, ownership, risk-weighted WIP capacity, no overlap, and lifecycle gates. Pulse operations have no environment opt-in switches. Vercel remains read-only.
 
 The Pulse may merge only after the independent checkpoint; a human approval is not permission to ignore a new failing check or unresolved actionable thread. If GitHub or deployment readback is unavailable, keep the affected lifecycle read-only/unavailable and continue independent work.
 

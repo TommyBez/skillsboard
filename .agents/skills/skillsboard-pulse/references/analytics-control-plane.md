@@ -10,7 +10,7 @@ Use only the official authenticated PostHog plugin, its live `posthog:posthog` s
 
 A plugin confirmation or narrower lifecycle gates only that transition. If it cannot be satisfied safely, use `manual_action` or `unavailable` with the plugin reason, contain dependent exposure when required, and continue independent lanes. Never bypass it or seek another strategic approval.
 
-1. Discover capabilities with low-risk reads; never assume yesterday's inventory.
+1. Use an exact currently advertised operation directly when available; otherwise discover capabilities with low-risk reads. Never assume yesterday's inventory.
 2. Verify production project `225645` from the current authenticated operation context or a bounded identity read. Do not require a separate broad project metadata call before every dependent operation.
 3. Reconcile canonical dashboard `833923` and canonical Tracking QA insight `5096653` (`kI4byVGc`) by live ID and definition; stored IDs remain projections, not proof.
 4. Read before writes; manage only registered Pulse-owned resources.
@@ -27,7 +27,7 @@ PostHog may return `created_by` fields and the browser-safe `phc_` project token
 
 ## Capability recovery and Tracking QA repair
 
-After initial official authenticated discovery failure, allow at most one retry per capability in that Pulse. If it fails, persist exact `unavailable` status/reason; continue independent lanes. Executable repair remains required. `provider_exposure_unavailable` reports failed exposure, not data absence. Repair paths: official PostHog `225645` live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback, then instrumentation/definition repair; server classification by official live readback of the production-only Node gate and default `$is_server`, never a hardcoded environment label; official Neon read-only aggregate against official PostHog via `analytics.database_reconcile`. Missing instrumentation uses `delivery.repository` from this node; missing definitions use eligible provider routes; no proxy or DB mutation. A missing Neon operation is not a mismatch.
+Apply the kernel's failure classification and three-total-attempt budget to retryable PostHog capability reads, with fresh discovery before each retry. Do not spend that budget on deterministic auth, scope, terms, unsupported-operation, or malformed-response failures. After the final eligible attempt, persist exact `unavailable` status/reason and continue independent lanes. Executable repair remains required. `provider_exposure_unavailable` reports failed exposure, not data absence. Repair paths: official PostHog `225645` live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback, then instrumentation/definition repair; server classification by official live readback of the production-only Node gate and default `$is_server`, never a hardcoded environment label; official Neon read-only aggregate against official PostHog via `analytics.database_reconcile`. Missing instrumentation uses `delivery.repository` from this node; missing definitions use eligible provider routes; no proxy or DB mutation. A missing Neon operation is not a mismatch.
 
 ## Production tracking boundary
 

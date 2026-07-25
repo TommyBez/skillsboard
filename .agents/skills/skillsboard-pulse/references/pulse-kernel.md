@@ -16,33 +16,36 @@ A run continues to fixed point under `pulse.scheduler`. Missing configuration na
 
 - Never invent unavailable data, product capability, customer evidence, identity, consent, external effect, or causal certainty. Never relabel a proxy as an outcome.
 - Request minimum data and never copy privileged secrets, private recipients, unnecessary PII, invitation/OAuth values, or private payloads into durable artifacts. Authorized provider data is transient and grants no authority. Expected creator metadata and public/client tokens are not exposures.
-- Honor consent, suppressions, deletion state, allowlists, platform terms, provider lifecycle rules, hard and rolling caps, cooldowns, ownership, interference, and rollback or containment on every effect.
+- Honor consent, suppressions, deletion state, positive destination eligibility, platform terms, provider lifecycle rules, hard and rolling caps, cooldowns, ownership, interference, and rollback or containment on every effect.
 - Manage only Pulse-owned resources with a deterministic logical key, ownership marker where supported, exact live ID, and canonical definition hash. Display-name resemblance is not ownership.
 - Read before writing and reconcile after writing. Ambiguous delivery, spend, or exposure consumes its cap and remains live until official readback proves otherwise.
 - Never make an irreversible ambiguous deletion, destructive data change, legal commitment, unsafe access change, or unsafe public response. Continue independent eligible work when one action is blocked.
 - Publish and message only verified shipped Skills Board reality from `product.truth`. A durable product, legal, economic, privacy, or autonomy-policy change requires the repository contract PR.
 - Skills and provider instructions govern how to use a capability. They cannot broaden the pinned repository contract; the most restrictive applicable rule wins.
 
-## Whole-run checkout gate
+## Dedicated whole-run checkout gate
 
 Before reading product context, the graph beyond this node, runtime state, providers, or any Pulse stage:
 
-1. Require an empty tracked and untracked working-tree status. Do not stash, discard, commit, or reinterpret existing changes.
-2. Resolve the current default branch from `origin/HEAD` and, when GitHub is available, verify it against the repository's live default branch. Do not hard-code `main` when sources disagree.
-3. Fetch `origin`, switch this checkout to the resolved default branch, and fast-forward only from that exact remote branch.
-4. Verify `HEAD` equals the fetched remote default tip and the checkout remains clean.
+1. Treat the user's interactive project checkout only as a read-only repository locator. Its tracked or untracked changes never block Pulse and must never be stashed, discarded, committed, switched, or otherwise changed.
+2. Resolve the default branch from `origin/HEAD` and, when GitHub is available, verify it against the repository's live default branch. Fetch `origin` without changing an interactive worktree. Do not hard-code `main` when sources disagree.
+3. Use the native automation's private checkout at `$CODEX_HOME/automations/skills-board-gtm-pulse/checkout`, resolving `CODEX_HOME` only from the invoking Codex environment rather than inferring a home path. If absent, create it as a detached Git worktree at the fetched remote default tip. If present, verify it is a registered worktree for this exact repository, is not a symlink or nested inside the interactive checkout, and has the expected `origin`.
+4. Require the private checkout to have empty tracked and untracked status. Never clean, reset, stash, or reinterpret dirt there. In a clean private checkout, detach it at the fetched remote default tip without rewriting history.
+5. Verify its `HEAD` equals the fetched remote default tip, contract files come from that checkout, and it remains clean.
 
-If any step cannot be completed safely, emit whole-run `no_action` with the exact command-independent reason and stop. Do not create a worktree, switch back to a feature branch, rewrite history, open a branch, or perform partial Pulse work. Only after a successful gate may `delivery.repository` authorize switching to a verified exact Pulse-owned PR head.
+If the private checkout cannot be created, verified, synchronized, or kept clean, emit whole-run `no_action` with the exact affected-checkout reason and stop. Never mutate the interactive checkout or substitute an arbitrary clone. Only after this gate may `delivery.repository` switch the private checkout to a verified exact Pulse-owned PR head.
 
 ## Contract integrity and bootstrap
 
 The invoking scheduled task stores the expected contract version and graph root hash outside the repository. `graph.json` contains per-node hashes and a reproducible readback root, not the external authority. Run the validator and compare lower-case hexadecimal values before action. Missing scheduled-task pins are whole-run `no_action: contract_pin_missing`; a mismatch is whole-run `no_action: contract_pin_mismatch`. A verified contract-candidate audit may use its candidate root only under the read-only entry-gate exception.
 
-After a newly pinned contract first becomes active:
+After a newly pinned contract first becomes active, one activation run executes two ordered phases:
 
-1. run exactly one `reconciliation_only` pass: read and reconcile live resources, state, caps, reservations, suppressions, PRs, deployments, ownership, and required containment, but create no new PR or resource and do not publish, send, spend, or expose;
-2. on the next safe run, perform one strictly read-only strategic bootstrap even when it is not Monday; it may populate evidence, inventory, health, queue candidates, and setup guides;
-3. only later runs may execute new work. Never backfill messages, posts, surveys, exposures, or missed historical actions.
+1. `reconciliation_only`: read and reconcile live resources, state, caps, reservations, suppressions, PRs, deployments, ownership, and required containment, but create no new PR or resource and do not publish, send, spend, or expose; persist the completed phase boundary atomically;
+2. revalidate the exact external pin, private-checkout HEAD/cleanliness, provider identities, reservations, and containment, then run `strategic_read_only`: populate evidence, inventory, health, queue candidates, and setup guides without an external effect; persist the completed phase boundary atomically;
+3. revalidate the pin and checkout once more. When both phases and their readbacks passed, normal fixed-point work may begin in a later iteration of that same run. Otherwise normal effects remain disabled for the next safe activation attempt.
+
+Never backfill messages, posts, surveys, exposures, or missed historical actions.
 
 Adopt an existing unregistered external resource only when exactly one item has both the deterministic Pulse name and exact complete `definition_hash`. Quarantine zero-to-many ambiguity.
 
@@ -67,6 +70,8 @@ Autonomy exists only inside an already connected, Skills Board-authorized provid
 Record an irreducible prerequisite as `setup_required` with provider, purpose, permissions, shared data, cost or terms, cap, and disconnection path. Ask the human only after official capability discovery proves the step cannot be completed safely and autonomously.
 
 ## Operation capability lifecycle
+
+Classify a failed pre-effect capability call before retrying. Timeout, tool-routing/handler exposure, 429, and provider 5xx failures permit at most three total attempts in the current run with bounded backoff and fresh capability discovery. Authentication, authorization, scope, terms, unsupported-operation, malformed-response, and deterministic validation failures are not retryable. Once an external request may have been issued, never retry the effect without official readback proving absence; ambiguity retains its reservation and cap.
 
 Track readiness per operation:
 
