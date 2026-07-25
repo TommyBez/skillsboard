@@ -375,18 +375,21 @@ test("check rejects an operation-level environment switch", () => {
 test("autonomous writes are valid without environment switches", () => {
   const { graphPath } = makeFixture();
   mutateGraph(graphPath, (graph) => {
-    graph.operations["github.pr.write"] = {
-      ...graph.operations["fixture.write"],
-      switches_all: [],
-    };
-    graph.routes["github.pr.write"] = {
-      ...graph.routes["fixture.write"],
-      operations: ["github.pr.write"],
-    };
+    for (const operationId of ["github.pr.write", "github.pseo_pr.write"]) {
+      graph.operations[operationId] = {
+        ...graph.operations["fixture.write"],
+        switches_all: [],
+      };
+      graph.routes[operationId] = {
+        ...graph.routes["fixture.write"],
+        operations: [operationId],
+      };
+    }
   });
   lockGraph(graphPath);
   const checked = checkGraph(graphPath);
   assert.deepEqual(checked.graph.operations["github.pr.write"].switches_all, []);
+  assert.deepEqual(checked.graph.operations["github.pseo_pr.write"].switches_all, []);
 });
 
 test("every fixture operation resolves with an empty switch closure", () => {
