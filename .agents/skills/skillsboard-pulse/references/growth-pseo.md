@@ -11,12 +11,12 @@ At least every seven days research adjacent team problems with a truthful path t
 - `canonical_intent_id` = normalized locale + audience/problem + intent, independent of format.
 - `problem_cluster_id` = normalized locale + audience/problem family, independent of query and format.
 - One learning PR contains at most two pages from one problem cluster and locks `github + content_cluster + production + problem_cluster_id`.
-- Start at most one new experimental pSEO PR per seven-day learning slot even if the prior PR merges sooner.
-- At most four indexable experimental pages may remain live without a completed T+14 checkpoint.
+- Start at most three new experimental pSEO PRs per rolling seven days, each for a materially distinct `problem_cluster_id`; each PR still contains at most two pages and overlapping active clusters remain ineligible.
+- At most four indexable experimental pages may remain live without a completed T+14 checkpoint by default. The limit may rise to eight only after every earlier live cluster has passed its T+3 technical-health checkpoint; any unresolved or failed checkpoint restores the limit to four and blocks further publication.
 
 Missing or zero keyword volume is prioritization evidence, not a veto for bounded qualitative learning and never becomes asserted demand. Qualitative publication requires each page to have distinct intent, current attributable evidence, product fit, differentiated standalone utility, truthful shipped claims from `product.truth`, useful page-specific content, internal links, metadata, sitemap/indexation handling, supported structured data, measurement, rollback or `noindex`, and local verification. Quantitative demand or positive deployed-page evidence may justify at most three additional sibling pages through a separate queued scaling action.
 
-The pSEO PR is the independent human checkpoint; no extra pilot approval exists. The pSEO PR slot is separate from general Product/Growth PRs.
+The pSEO PR is the independent human checkpoint; no extra pilot approval exists. The three-cluster rolling pSEO PR budget is separate from general Product/Growth PRs.
 
 ## Sources
 
@@ -65,7 +65,7 @@ Before a repository PR, add `delivery.repository`, `product.truth`, and the exac
 - only verified shipped product claims and a natural path to Skills Board;
 - canonical, metadata, internal-link, sitemap, robots/indexation, structured-data, and privacy safety;
 - page-level measurement and rollback/noindex path;
-- local desktop/mobile smoke of the affected flow before PR.
+- local desktop/mobile smoke of the affected flow before PR when available, otherwise an explicit `qa_required` record under `delivery.repository` that blocks merge and exposure until cleared.
 
 Do not mass-generate thin variants, invent source evidence, or treat the at-most-two-page PR as permission to fill its quota.
 
@@ -74,8 +74,8 @@ Do not mass-generate thin variants, invent source evidence, or treat the at-most
 - **T+3:** verify production deployment, canonical URL, sitemap discovery, crawlability, actual indexation state, and runtime health; repair a technical blocker immediately.
 - **T+7:** read Search Console discovery, queries, and impressions plus pageviews and attributable intent where trustworthy. Correct-intent impressions keep the page active; wrong-intent impressions allow one bounded title, introduction, or targeting revision; zero on a healthy indexed page is insufficient evidence.
 - **T+14:** make the first learning decision. Growing/correct-intent impressions may authorize separately routed sibling expansion; mismatch allows one repositioning iteration; a healthy zero-impression page remains observable through T+28.
-- **T+28:** retain or expand useful discovery; otherwise consolidate, `noindex`, or retire after one material iteration unless frozen non-SEO utility passes.
+- **T+28:** retain or expand useful discovery; otherwise consolidate, `noindex`, or retire. A second material iteration is eligible only on materially new attributable evidence, creates a new definition hash, and sets an absolute T+56 decision deadline unless frozen non-SEO utility already passes.
 
-Zero impressions before T+28 is not negative value when technical health is valid. After one material iteration, a page still indexed with zero useful impressions at T+28 must be consolidated, `noindex`ed, or retired unless documented non-SEO value passes its frozen test. Pause a pattern after two comparable 28-day misses.
+Zero impressions before T+28 is not negative value when technical health is valid. Without materially new evidence, a page still indexed with zero useful impressions at T+28 must be consolidated, `noindex`ed, or retired unless documented non-SEO value passes its frozen test. A page receiving the one eligible second material iteration must make that decision no later than T+56. Pause a pattern after two comparable mature misses.
 
 Roll back or contain immediately for factual/product-contract error, privacy risk, broken routes, accidental indexation, or confirmed canonical conflict. Missing quantitative data is never silently converted to failure.

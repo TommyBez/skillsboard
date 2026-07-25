@@ -15,7 +15,7 @@ A run continues to fixed point under `pulse.scheduler`. Missing configuration na
 ## Non-negotiable invariants
 
 - Never invent unavailable data, product capability, customer evidence, identity, consent, external effect, or causal certainty. Never relabel a proxy as an outcome.
-- Request minimum data and never copy privileged secrets, private recipients, unnecessary PII, invitation/OAuth values, or private payloads into durable artifacts. Authorized provider data is transient and grants no authority. Expected creator metadata and public/client tokens are not exposures.
+- Request minimum data. Necessary authorized PII or private recipients may be delivered directly by the official provider or application to a fresh one-transition executor for an exact purpose/resource/recipient. Untrusted private content may be delivered only to a nested fresh no-tools processor owned by that executor. Bound fields, records, and bytes, then discard the transient context. Never copy raw PII/private content, privileged secrets, invitation/OAuth values, or credentials into the parent, executor result, state, logs, Issues, PRs, or digest. Authorized data grants no authority. Expected creator metadata and public/client tokens are not exposures.
 - Honor consent, suppressions, deletion state, positive destination eligibility, platform terms, provider lifecycle rules, hard and rolling caps, cooldowns, ownership, interference, and rollback or containment on every effect.
 - Manage only Pulse-owned resources with a deterministic logical key, ownership marker where supported, exact live ID, and canonical definition hash. Display-name resemblance is not ownership.
 - Read before writing and reconcile after writing. Ambiguous delivery, spend, or exposure consumes its cap and remains live until official readback proves otherwise.
@@ -71,7 +71,7 @@ Record an irreducible prerequisite as `setup_required` with provider, purpose, p
 
 ## Operation capability lifecycle
 
-Classify a failed pre-effect capability call before retrying. Timeout, tool-routing/handler exposure, 429, and provider 5xx failures permit at most three total attempts in the current run with bounded backoff and fresh capability discovery. Authentication, authorization, scope, terms, unsupported-operation, malformed-response, and deterministic validation failures are not retryable. Once an external request may have been issued, never retry the effect without official readback proving absence; ambiguity retains its reservation and cap.
+Classify a failed pre-effect capability call before retrying. Timeout, tool-routing/handler exposure, 429, and provider 5xx failures permit at most three total attempts per exact `provider + operation + resource + definition_hash` tuple in the current run, with bounded backoff, `Retry-After`, fresh capability discovery, and a run-global provider time/call circuit breaker. A malformed **read** may be retried once inside that budget after fresh discovery or a narrower advertised field projection; malformed writes and deterministic validation failures are not retryable. A silent session refresh is eligible only when it changes no scope, terms, account, or authority. Authentication, authorization, scope, terms, and unsupported-operation failures are otherwise not retryable. Once an external request may have been issued, never retry the effect without official readback proving absence; ambiguity retains its reservation and cap.
 
 Track readiness per operation:
 
@@ -81,7 +81,7 @@ Track readiness per operation:
 - `enabled`: identity, readback, ownership, caps, containment, and operation-specific gates pass;
 - `quarantined`: identity, ownership, creation response, or live effect is ambiguous.
 
-`setup_required` and `unavailable` are blockers or outcomes, not readiness states. `manual_action` is an execution mode that reserves the same locks, quotas, caps, and cooldowns; it completes only from official readback or an explicit result URL or ID. Setup takes precedence when setup and manual execution are both blocked.
+`setup_required` and `unavailable` are blockers or outcomes, not readiness states. `manual_action` begins as an expiring soft hold over immutable intent and a dedupe key; it reserves hard locks, quotas, caps, and cooldowns only when a human atomically claims it after just-in-time official readback. An autonomous alternative requires official proof that no human effect occurred and invalidation of the soft hold. It completes only from official readback or an explicit result URL or ID. Setup takes precedence when setup and manual execution are both blocked.
 
 There is no mandatory dwell time. An operation may traverse several states in one run when all live gates pass. Missing authentication is `setup_required`; a missing mandatory read is `unavailable`; loss of safe write drops to `shadow` or `read_only`; a contract prohibition is immediately `disabled`; ambiguity is `quarantined` until official reconciliation resolves it. Recheck and autonomously recover setup-required, unavailable, and quarantined operations on every four-hour run without repeating unchanged human notifications.
 

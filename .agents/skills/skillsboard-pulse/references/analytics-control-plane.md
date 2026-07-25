@@ -27,7 +27,7 @@ PostHog may return `created_by` fields and the browser-safe `phc_` project token
 
 ## Capability recovery and Tracking QA repair
 
-Apply the kernel's failure classification and three-total-attempt budget to retryable PostHog capability reads, with fresh discovery before each retry. Do not spend that budget on deterministic auth, scope, terms, unsupported-operation, or malformed-response failures. After the final eligible attempt, persist exact `unavailable` status/reason and continue independent lanes. Executable repair remains required. `provider_exposure_unavailable` reports failed exposure, not data absence. Repair paths: official PostHog `225645` live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback, then instrumentation/definition repair; server classification by official live readback of the production-only Node gate and default `$is_server`, never a hardcoded environment label; official Neon read-only aggregate against official PostHog via `analytics.database_reconcile`. Missing instrumentation uses `delivery.repository` from this node; missing definitions use eligible provider routes; no proxy or DB mutation. A missing Neon operation is not a mismatch.
+Apply the kernel's tuple-scoped three-total-attempt budget to retryable PostHog capability reads, with fresh discovery before each retry and one eligible retry for a malformed read through a narrower advertised projection. Do not spend another resource's budget or retry deterministic auth, scope, terms, unsupported-operation, or validation failures. After the final eligible attempt, persist exact `unavailable` status/reason and continue independent lanes. Executable repair remains required. `provider_exposure_unavailable` reports failed exposure, not data absence. Repair paths: official PostHog `225645` live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback, then instrumentation/definition repair; server classification by official live readback of the production-only Node gate and default `$is_server`, never a hardcoded environment label; official Neon read-only aggregate against official PostHog via `analytics.database_reconcile`. Missing instrumentation uses `delivery.repository` from this node; missing definitions use eligible provider routes; no proxy or DB mutation. A missing Neon operation is not a mismatch.
 
 ## Production tracking boundary
 
@@ -35,11 +35,11 @@ Trust only production traffic. Filter its verified host/schema and exclude local
 
 ## Read, shadow, and enable gates
 
-Authenticated production reads begin `read_only`. A PostHog write may become `shadow` only when the advertised operation can create or update a deterministic private, draft, or zero-exposure resource and exact readback confirms it.
+Authenticated production reads begin `read_only`. A deterministic private measurement asset such as a dashboard, insight, cohort definition, or event definition may become `enabled` after project identity, ownership, semantic version, `definition_hash`, asset-cap, and exact official readback pass; it does not inherit exposure gates. A flag, experiment, survey, rollout, or other user-visible resource may become only `shadow` before its exposure gates pass.
 
 Every effect must select its exact graph route. Asset definitions, flags/rollouts, experiments, and surveys use separate operations. Any exposure additionally requires the product-lifecycle eligibility, assignment, WIP, guardrail, readback, and containment gates; a flag-backed experiment requires both flag and experiment operations.
 
-Before enabling, require healthy production tracking, exact cohort and assignment unit, preregistered definition hash, live-code flag-consumption proof where applicable, WIP and interference capacity, guardrails, official readback, and an advertised rollback or safe containment path.
+Before enabling **exposure**, require healthy production tracking, exact cohort and assignment unit, preregistered definition hash, live-code flag-consumption proof where applicable, WIP and interference capacity, guardrails, official readback, and an advertised rollback or safe containment path.
 
 Team-level experiments assign consistently by `team_id`. A team may enter multiple non-interfering experiments; the global cap is owned by `pulse.scheduler`.
 
@@ -53,7 +53,7 @@ An over-broad authorized projection may block only that metadata read, never ind
 - Low/medium-risk active exposure may continue for one heartbeat only when preregistered non-PostHog guardrails remain healthy; total unobservable exposure may not exceed 24 hours. Then pause.
 - High-risk exposure moves to its preregistered safe state immediately.
 - A measurement outage is `measurement_failure`, never `insufficient` or `inconclusive`.
-- Allow one automatic instrumentation repair and clean relaunch. A second failure of the same measurement architecture retires and blocks that architecture until a substantively new definition is independently approved where required.
+- Allow one automatic instrumentation repair and clean relaunch per distinct verified `root_cause_hash + definition_hash`, subject to a rolling circuit breaker. Retire an architecture only after the same cause/hash repeats after its clean relaunch; a different evidenced cause may receive its own bounded repair. Repository repairs still require independent PR approval.
 
 Containment removes exposure before closing measurement. Ambiguous identity, ownership, creation response, or live effect is quarantined. No time-based auto-release is allowed.
 

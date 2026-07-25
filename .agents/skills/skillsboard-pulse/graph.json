@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "1e975d1f4a980686d8d1949161d20d59e18998473847b67d67fc53f298bac38f",
+      "content_sha256": "59e7c29af4fcce7da7721d0d26e5808461de29ddbf55395e80c05da43dd3148c",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 7,
+  "contract_version": 8,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "239b6c5f03b5e45fe24ade05e4beaacf2019f06b10c20555b0ed72371835a21f"
+    "root_sha256": "23de0558fadf3406914033fcf424956c8a9ef664ba3575e48608dfd664de3524"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "4950262f3c00827194f9e14793055d1a12c9338f42dc2a593beed57ab1882c58",
+      "content_sha256": "46f9faa151e23a7c3e231d00bc12c7a8a1c551fa5f8bed48bf070401c7798daa",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "cd2d559a16aef7554fde966701629ee86aec4b1549acf1ae88e0d9ff7b88291f",
+      "content_sha256": "85e38f784a445846ed13fad835e816a2a39a61fd265db5dcdabbefaa426a792e",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "703374ade25beafc1f9a1e06cb54b3a61616816d6ddacadf97b4652ced4250e1",
+      "content_sha256": "5dd119fb8fc6a8b9b0916b89d40258c14769b45c994e4f99d5e59d022b231544",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "c710a5dea7284b427cf3c0307ceff5555b650e5a199c3829a93afda265383eb2",
+      "content_sha256": "9d21896fe7afa8e850004de834c3c92792fd69cea751f42e9b4ae27bbe6ff238",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "5a210f7f374766b00403a03a8588e03e99e835609a3472f673ce64e9783ffb8b",
+      "content_sha256": "5ab58a1f1bcc144d386f568c8369d352bf357c10927688cf8cbb481196d17b59",
       "kind": "policy",
       "provides": [
         "approval",
@@ -129,7 +129,7 @@
     },
     "email.inbound": {
       "conflicts_with": [],
-      "content_sha256": "bd2dd32002fb3c5c6a63f0b646abea459e63c5ff49726f330c33d6889d3e80a1",
+      "content_sha256": "ac951700557eb70603b81f673f6521b7c5d9eb2680e47f6ca8935be4c5607c12",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -143,7 +143,7 @@
     },
     "email.outbound": {
       "conflicts_with": [],
-      "content_sha256": "3d26c974d9a5d0c666aad9ba0e42aa7fb15edd8f17d65020e0fb8503ebad4395",
+      "content_sha256": "b8fac6d67d0a724729862a691a1d0a0c9573ae3d79ddf42f07bbb7f4024e37f0",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -158,7 +158,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "52edd2333708d2ce896e391758c99cdd3bcceebeb401a0c3f1639331780cd800",
+      "content_sha256": "57f3adfcfa4f38eaba9d97e8cede1a87837f9f57211da861775943ae9c3f07e1",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -174,7 +174,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "817bb265b0a17509e53cd16d53f554c643d26e8e7c72b3ee2c6fefff156f1dc1",
+      "content_sha256": "666d0a42c87c40a2469128544fddb9be621aa7fa2c2e4c2772cb484d6ee39937",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -186,7 +186,7 @@
     },
     "product.lifecycle": {
       "conflicts_with": [],
-      "content_sha256": "8d7a199efa99e89c868d88c71048d1f065be0da6c559040a67975ebe1c23ed8b",
+      "content_sha256": "ccad4f118c8cb502cd617a9c789820c5e51dd9b4396a0db2034a27e4c2ea7681",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "eced4937c746e93097a6743e83902596bee8afbd0f95be77f80348b10f59d37f",
+      "content_sha256": "0203e7b13c9c57b48282f9a208b18e29837dcfc8e85797af482f31b433634443",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "971f07947419813172067771c5bd54cf525b63859f7a9145a9a568b391bb8e82",
+      "content_sha256": "7ca60dd08dd051202a842c3cba8924341275d1b7512b7b33f91d6bacbf5cb0f4",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -862,7 +862,7 @@
       "entry_nodes": [
         "analytics.control_plane"
       ],
-      "max_known_context_bytes": 39936,
+      "max_known_context_bytes": 41984,
       "operations": [
         "posthog.asset.write"
       ],
@@ -912,7 +912,7 @@
         "product.truth",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 147456,
+      "max_known_context_bytes": 155648,
       "operations": [],
       "skills": [],
       "state_views": [
@@ -923,7 +923,7 @@
       "entry_nodes": [
         "delivery.repository"
       ],
-      "max_known_context_bytes": 29696,
+      "max_known_context_bytes": 32768,
       "operations": [],
       "skills": [
         "github"
@@ -952,7 +952,7 @@
       "entry_nodes": [
         "delivery.repository"
       ],
-      "max_known_context_bytes": 55296,
+      "max_known_context_bytes": 61440,
       "operations": [
         "github.pr.write"
       ],
@@ -973,7 +973,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 66560,
+      "max_known_context_bytes": 70656,
       "operations": [
         "community.publish"
       ],
@@ -993,7 +993,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 66560,
+      "max_known_context_bytes": 70656,
       "operations": [
         "demand.respond"
       ],
@@ -1014,7 +1014,7 @@
         "email.outbound",
         "product.truth"
       ],
-      "max_known_context_bytes": 92160,
+      "max_known_context_bytes": 96256,
       "operations": [
         "demand.email"
       ],
@@ -1038,7 +1038,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 80896,
+      "max_known_context_bytes": 84992,
       "operations": [
         "directory.publish"
       ],
@@ -1058,7 +1058,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 64512,
+      "max_known_context_bytes": 68608,
       "operations": [
         "earned.outreach"
       ],
@@ -1078,7 +1078,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 70656,
+      "max_known_context_bytes": 74752,
       "operations": [
         "hacker_news.submit"
       ],
@@ -1097,7 +1097,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 66560,
+      "max_known_context_bytes": 70656,
       "operations": [
         "partnership.outreach"
       ],
@@ -1117,7 +1117,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 70656,
+      "max_known_context_bytes": 74752,
       "operations": [
         "product_hunt.submit"
       ],
@@ -1137,7 +1137,7 @@
         "email.outbound",
         "product.truth"
       ],
-      "max_known_context_bytes": 92160,
+      "max_known_context_bytes": 96256,
       "operations": [
         "review.outreach"
       ],
@@ -1161,7 +1161,7 @@
         "channels.distribution",
         "product.truth"
       ],
-      "max_known_context_bytes": 66560,
+      "max_known_context_bytes": 70656,
       "operations": [
         "review.respond"
       ],
@@ -1244,7 +1244,7 @@
         "email.outbound",
         "product.truth"
       ],
-      "max_known_context_bytes": 86016,
+      "max_known_context_bytes": 89088,
       "operations": [
         "inbound.reply"
       ],
@@ -1411,7 +1411,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 83968,
+      "max_known_context_bytes": 89088,
       "operations": [
         "posthog.experiment.write"
       ],
@@ -1434,7 +1434,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 77824,
+      "max_known_context_bytes": 82944,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1456,7 +1456,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 83968,
+      "max_known_context_bytes": 89088,
       "operations": [
         "posthog.experiment.write",
         "posthog.flag.write"
@@ -1480,7 +1480,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 86016,
+      "max_known_context_bytes": 90112,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1507,7 +1507,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 96256,
+      "max_known_context_bytes": 101376,
       "operations": [
         "github.pr.write"
       ],
@@ -1534,7 +1534,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 96256,
+      "max_known_context_bytes": 101376,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1557,7 +1557,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 79872,
+      "max_known_context_bytes": 84992,
       "operations": [
         "posthog.survey.write"
       ],
@@ -1584,7 +1584,7 @@
         "growth.pseo",
         "product.truth"
       ],
-      "max_known_context_bytes": 96256,
+      "max_known_context_bytes": 100352,
       "operations": [
         "github.pseo_pr.write"
       ],
@@ -1610,7 +1610,7 @@
         "growth.pseo",
         "product.truth"
       ],
-      "max_known_context_bytes": 74752,
+      "max_known_context_bytes": 77824,
       "operations": [],
       "skills": [
         "content_strategy",
@@ -1629,7 +1629,7 @@
         "growth.pseo",
         "product.truth"
       ],
-      "max_known_context_bytes": 74752,
+      "max_known_context_bytes": 77824,
       "operations": [
         "dataforseo.research"
       ],
@@ -1651,7 +1651,7 @@
         "learning.opportunities",
         "product.truth"
       ],
-      "max_known_context_bytes": 68608,
+      "max_known_context_bytes": 70656,
       "operations": [],
       "skills": [
         "customer_research",
@@ -1668,7 +1668,7 @@
         "channels.social",
         "product.truth"
       ],
-      "max_known_context_bytes": 78848,
+      "max_known_context_bytes": 79872,
       "operations": [
         "social.draft.write"
       ],
@@ -1688,7 +1688,7 @@
         "channels.social",
         "product.truth"
       ],
-      "max_known_context_bytes": 78848,
+      "max_known_context_bytes": 79872,
       "operations": [
         "social.publish"
       ],
@@ -1725,7 +1725,7 @@
         "learning.opportunities",
         "product.truth"
       ],
-      "max_known_context_bytes": 94208,
+      "max_known_context_bytes": 98304,
       "operations": [],
       "skills": [
         "marketing_loops",

@@ -26,7 +26,7 @@ Only the production deployment sends PostHog or Vercel Analytics events. Decisio
 
 URL sanitization removes hashes and non-allowlisted query parameters and canonicalizes invitation paths. Replay URLs use the same sanitizer; network bodies, headers, and rendered invitation links remain excluded. Honor Do Not Track. Analytics is fail-open for product mutations: analytics failure cannot turn successful product work into a user-visible error. The browser-safe project token proves ingestion only; authenticated reads and asset management still require the official plugin.
 
-At contract adoption, raw public visits, CTA/signup intent, and signup context may be present while the qualified-visitor denominator and source-to-activation attribution remain `unavailable` until qualification, source taxonomy, exclusions, and the team-level attribution query pass Tracking QA. Historical events may not reconstruct activation for pre-instrumentation teams; Retention and dependent `AAT-28` remain unavailable until trustworthy reconciliation or backfill. Raw counts may be descriptive but cannot trigger scale or kill thresholds.
+At contract adoption, raw public visits, CTA/signup intent, and signup context may be present while the qualified-visitor denominator and source-to-activation attribution remain `unavailable` until qualification, source taxonomy, exclusions, and the team-level attribution query pass Tracking QA. Historical events may not reconstruct activation for pre-instrumentation teams; Retention and dependent `AAT-28` remain unavailable until trustworthy reconciliation or backfill. Raw counts may authorize research, instrumentation work, qualitative collection, or a deterministic low-risk non-experimental correctness/usability/copy/SEO repair, but cannot trigger exposure scaling, retirement, a causal/value decision, or a public metric claim.
 
 Every row records absolute numerator/count, denominator, window, comparison period, cohort maturity, `data_status = available|unavailable|broken`, confidence, and dependencies. A valid zero is available. Missing is not zero. Below 30 eligible teams, lead with absolute outcomes, raw ratios, and qualitative corroboration; percentage movement cannot decide.
 
@@ -110,7 +110,7 @@ acquisition cost per new AAT =
 
 A zero denominator is `undefined`, never zero or infinity. Monthly cost check and quarterly model review apply. Team growth is never called revenue.
 
-Eligible work: reconcile configured aggregate costs and optimize spend inside machine caps; route contract changes through a PR. Block on incomplete costs, zero denominator, anomaly, cap breach, or irreversible ambiguity.
+Eligible work: reconcile configured aggregate costs and optimize spend inside machine caps; route contract changes through a PR. Incomplete costs or a zero denominator block new spend, economic optimization, and economic claims, but not zero-incremental-cost cleanup or consolidation with deterministic verification. An anomaly, cap breach, or irreversible ambiguity remains blocking.
 
 ## Decision integrity
 

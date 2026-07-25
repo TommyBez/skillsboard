@@ -568,7 +568,7 @@ test("run types must own shared-state persistence", () => {
   expectValidationError(() => checkGraph(graphPath), /must own pulse\.state\.persist/);
 });
 
-test("operational runs resolve the bounded continuous-replan policy and state", () => {
+test("operational runs resolve the continuous per-lane replan policy and state", () => {
   const checked = checkGraph();
   const run = resolveGraph(checked.graph, { run: "operational", nodes: [] });
 
@@ -578,21 +578,40 @@ test("operational runs resolve the bounded continuous-replan policy and state", 
 });
 
 test("autonomy controls use bounded replacements instead of routine blockers", () => {
+  const checked = checkGraph();
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
   const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
   const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
   const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
+  const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
+  const delivery = readFileSync(new URL("../references/delivery-repository.md", import.meta.url), "utf8");
+  const inbound = readFileSync(new URL("../references/email-inbound.md", import.meta.url), "utf8");
   const email = readFileSync(new URL("../references/email-outbound.md", import.meta.url), "utf8");
+  const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
+  const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
+  assert.equal(checked.graph.contract_version, 8);
   assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
-  assert.match(kernel, /at most three total attempts/);
+  assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
+  assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
   assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
-  assert.match(analytics, /three-total-attempt budget/);
-  assert.match(learning, /one `operational_replan` per rolling 24 hours/);
+  assert.match(analytics, /A deterministic private measurement asset/);
+  assert.match(analytics, /root_cause_hash \+ definition_hash/);
+  assert.match(learning, /continuously replans each independent lane/);
+  assert.match(learning, /deterministic low-risk non-experimental repair/);
   assert.match(scheduler, /general repository WIP has a hard budget of six units/);
-  assert.match(distribution, /create or refresh a positive destination-eligibility record without human approval/);
-  assert.match(email, /An exact-resource content read is eligible only when/);
+  assert.match(scheduler, /Before claim it is a soft hold/);
+  assert.match(scheduler, /at most three open pSEO PRs/);
+  assert.match(distribution, /official account-visible rules returned by an advertised authenticated operation/);
+  assert.match(social, /at most three autonomous X replies/);
+  assert.match(delivery, /`qa_required` permits PR creation and review only/);
+  assert.match(inbound, /as the primary ingress/);
+  assert.match(inbound, /Never use a private API, Resend CLI, custom client/);
+  assert.match(email, /bounded exact-record or frozen-target-set reads/);
+  assert.match(pseo, /three new experimental pSEO PRs per rolling seven days/);
+  assert.match(product, /at most one optional open-text question/);
+  assert.match(product, /at most three materially distinct treatment versions per rolling 90 days/);
 });
 
 test("runtime skills are reported as unpriced", () => {
