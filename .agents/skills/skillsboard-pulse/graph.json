@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 9,
+  "contract_version": 10,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "e026236a9833fa7593080e9ea649fcbcab14eca4b2ae36a9ef52d04da38cbb73"
+    "root_sha256": "e3a4bf7a8951243c02218ce8e8ebcd1e74b7ddd7bc2e2a01fd69bcdcfe092143"
   },
   "interference_keys": [
     "channel.community",
@@ -1651,7 +1651,7 @@
         "learning.opportunities",
         "product.truth"
       ],
-      "max_known_context_bytes": 71680,
+      "max_known_context_bytes": 72704,
       "operations": [],
       "skills": [
         "customer_research",
@@ -1898,7 +1898,7 @@
       "source": "runtime"
     },
     "product_marketing": {
-      "content_sha256": "7a670462bbfa7b5b75117a7cd5856ac60013dd4ac382f93dd0b0a2e8731f5772",
+      "content_sha256": "b028fbaf55344ed142a1a21579b749014e6f91f896e409cb8e9a5b05aeeb2518",
       "selector": "product-marketing",
       "source": "repository"
     },

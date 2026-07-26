@@ -608,7 +608,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 9);
+  assert.equal(checked.graph.contract_version, 10);
   assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
