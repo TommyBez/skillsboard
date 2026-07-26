@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "e5204de03dc5bf84c65f9e3604a583ceb624961e6793c9e36467224f1f228117"
+    "root_sha256": "0a71c6eddfce0defcc044a61065800724e8298a9c393b2b0de7725cd3dc462f4"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "9a464a4449e1f54cbe1740c5cf8ffc0c2dd5edecb6999235e83dcd536860ebc6",
+      "content_sha256": "aea5a21bf514f8f1909040c51b666ab1f3bf173998eef9875acc960381e38606",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "85e38f784a445846ed13fad835e816a2a39a61fd265db5dcdabbefaa426a792e",
+      "content_sha256": "f76ecc44b71fb77af223d5caef9dfb92e777c1faecb63e73ae28278d9b4f9991",
       "kind": "policy",
       "provides": [
         "measurement"

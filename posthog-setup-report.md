@@ -39,7 +39,7 @@ The production baseline starts with the successful production deployment of this
 | `team_invite_prompt_clicked` | User opened team settings from the contextual invite prompt. | `components/invite-teammate-prompt.tsx` |
 | `team_library_viewed` | An identified user entered a mounted library route state, with team, skill-count, and filter-state context; search/tag navigation is tracked and same-route skill mutations are deduplicated while mounted. | `components/team-library-analytics.tsx` |
 
-All team-scoped events include a stable `team_id` property. The official `posthog-node` SDK generates event UUIDs before enqueue and preserves each queued event's identity across its transport retries. Skills Board does not override that identity or add an application-owned dedupe layer: no at-least-once replay across separate application capture calls has been evidenced. Production duplicate health therefore remains an official PostHog readback concern; existing stable business-ID properties may group diagnostic candidates where present, but the repository does not claim duplicate detection is repaired. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
+All team-scoped events include a stable `team_id` property. Skills Board assumes event capture is not duplicating until concrete contrary evidence exists. A duplicate investigation starts only from a reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event; it is not routine Tracking QA. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
 
 ## Full-funnel query rules
 
@@ -86,7 +86,6 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating each dependent production metric as decision-ready.
 - [x] Freeze qualified public visitor v1 and its PostHog-native 30-day source-to-new-team query semantics without a conversion-defined denominator or application-owned attribution state.
-- [ ] Verify production duplicate health through official PostHog readback. The repository relies on SDK-owned event identity and adds no custom dedupe instrumentation without an evidenced cross-call replay.
 - [x] Define team-level HogQL semantics for Activation and `AAT-28` state transitions; Retention fails closed as `unavailable` until historical activation milestones are reconciled.
 - [ ] Use the official authenticated PostHog plugin to verify project `225645` and reconcile the canonical Pulse dashboard and insight IDs.
 

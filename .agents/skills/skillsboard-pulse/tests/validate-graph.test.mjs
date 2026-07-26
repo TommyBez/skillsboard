@@ -581,6 +581,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const checked = checkGraph();
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
   const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
+  const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
   const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
   const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
   const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
@@ -603,6 +604,10 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(analytics, /Discovery and SDK doctor are optional diagnostics/);
   assert.match(analytics, /cannot stop repository repair, provider-independent work/);
   assert.match(analytics, /fail closed only its dependent item/);
+  assert.match(analytics, /Assume event capture is not duplicating until concrete contrary evidence exists/);
+  assert.match(analytics, /missing custom key or preventive health check is not evidence/);
+  assert.match(analytics, /reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event/);
+  assert.doesNotMatch(scorecard, /Verify event names[^\n]*duplicates/);
   assert.match(learning, /continuously replans each independent lane/);
   assert.match(learning, /deterministic low-risk non-experimental repair/);
   assert.match(scheduler, /general repository WIP has a hard budget of six units/);

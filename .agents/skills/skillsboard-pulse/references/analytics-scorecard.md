@@ -6,7 +6,7 @@ Load for Monday strategic runs, analytics-semantic changes, Tracking QA, or any 
 
 ## Tracking QA
 
-Run on every strategic pulse and after any analytics-semantic change. Verify event names and semantics, production host/environment, sensitive URL sanitization, duplicates, stable `team_id`, internal/test exclusions, first-touch and last non-direct attribution, freshness, and any explicitly designed DB/PostHog aggregate reconciliation. A broken dependency blocks only its decisions and becomes repair work.
+Run on every strategic pulse and after any analytics-semantic change. Verify event names and semantics, production host/environment, sensitive URL sanitization, stable `team_id`, internal/test exclusions, first-touch and last non-direct attribution, freshness, and any explicitly designed DB/PostHog aggregate reconciliation. A broken dependency blocks only its decisions and becomes repair work.
 
 Only the production deployment sends PostHog or Vercel Analytics events. Decision queries filter `properties.$host = 'www.skillsboard.sh'`; `localhost:3000`, Preview, internal, and test traffic never enter denominators. Team-scoped events carry stable `team_id`. Custom properties never contain a raw invited email, team name, invitation capability token, or full repository URL.
 
