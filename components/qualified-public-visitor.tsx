@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 
 import {
@@ -11,43 +11,63 @@ import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 export function QualifiedPublicVisitor() {
   const pathname = usePathname()
+  const qualified = useRef(false)
+  const remaining = useRef<number>(
+    qualifiedPublicVisitorDefinitionV1.qualification.minimumVisibleMilliseconds,
+  )
+  const firstEligibleSurface =
+    useRef<ReturnType<typeof resolvePublicLandingSurface>>(null)
+  const visibleSince = useRef<number | null>(null)
+  const timeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => {
     const definition = qualifiedPublicVisitorDefinitionV1
     const landingSurface = resolvePublicLandingSurface(pathname)
-    if (window.location.hostname !== definition.productionHost || !landingSurface) return
-
-    let remaining: number = definition.qualification.minimumVisibleMilliseconds
-    let qualified = false
-    let visibleSince = document.visibilityState === "visible" ? performance.now() : null
-    let timeout: ReturnType<typeof setTimeout> | undefined
+    if (
+      qualified.current ||
+      window.location.hostname !== definition.productionHost ||
+      !landingSurface
+    ) {
+      return
+    }
+    const measuredLandingSurface = firstEligibleSurface.current ?? landingSurface
+    firstEligibleSurface.current = measuredLandingSurface
 
     const qualify = () => {
-      if (qualified) return
-      qualified = true
-      timeout = undefined
+      if (qualified.current) return
+      qualified.current = true
+      timeout.current = undefined
       document.removeEventListener("visibilitychange", onVisibilityChange)
       captureAnalyticsEvent("qualified_public_visitor", {
         definition_version: definition.version,
-        landing_surface: landingSurface,
+        landing_surface: measuredLandingSurface,
         qualification_rule: "visible_15s",
       })
     }
 
     const schedule = () => {
-      if (qualified || document.visibilityState !== "visible" || timeout) return
-      visibleSince = performance.now()
-      timeout = setTimeout(qualify, remaining)
+      if (
+        qualified.current ||
+        document.visibilityState !== "visible" ||
+        timeout.current
+      ) {
+        return
+      }
+      visibleSince.current = performance.now()
+      timeout.current = setTimeout(qualify, remaining.current)
     }
 
     const pause = () => {
-      if (qualified) return
-      if (visibleSince !== null) {
-        remaining = Math.max(0, remaining - (performance.now() - visibleSince))
+      if (qualified.current) return
+      if (visibleSince.current !== null) {
+        remaining.current = Math.max(
+          0,
+          remaining.current - (performance.now() - visibleSince.current),
+        )
       }
-      visibleSince = null
-      if (timeout) clearTimeout(timeout)
-      timeout = undefined
+      visibleSince.current = null
+      if (timeout.current) clearTimeout(timeout.current)
+      timeout.current = undefined
     }
 
     const onVisibilityChange = () => {
