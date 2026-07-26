@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 8,
+  "contract_version": 9,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "8f86b305a6829331cb68a19ef635523a2ece603942b5acb04f8a855e3aa7b9a7"
+    "root_sha256": "e5204de03dc5bf84c65f9e3604a583ceb624961e6793c9e36467224f1f228117"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "18b71e2af004d3faea22ae0e10d3c9352d5b0464815edac9a90916eff55a760f",
+      "content_sha256": "9a464a4449e1f54cbe1740c5cf8ffc0c2dd5edecb6999235e83dcd536860ebc6",
       "kind": "policy",
       "provides": [
         "ownership",

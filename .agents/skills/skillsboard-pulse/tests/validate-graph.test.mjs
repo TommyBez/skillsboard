@@ -592,7 +592,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 8);
+  assert.equal(checked.graph.contract_version, 9);
   assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
@@ -600,6 +600,9 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(analytics, /A deterministic private measurement asset/);
   assert.match(analytics, /operation-specific gates.*advertised containment path/);
   assert.match(analytics, /root_cause_hash \+ definition_hash/);
+  assert.match(analytics, /Discovery and SDK doctor are optional diagnostics/);
+  assert.match(analytics, /cannot stop repository repair, provider-independent work/);
+  assert.match(analytics, /fail closed only its dependent item/);
   assert.match(learning, /continuously replans each independent lane/);
   assert.match(learning, /deterministic low-risk non-experimental repair/);
   assert.match(scheduler, /general repository WIP has a hard budget of six units/);

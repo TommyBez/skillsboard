@@ -13,6 +13,7 @@ The production baseline starts with the successful production deployment of this
 
 | Event name | Description | File |
 |---|---|---|
+| `qualified_public_visitor` | A unique PostHog visitor accumulated 15 seconds of foreground-visible time on an eligible production public page, independently of CTA or signup activity. | `components/qualified-public-visitor.tsx` |
 | `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
 | `mcp_setup_viewed` | An identified user opened the MCP connection guide. | `components/mcp-setup-analytics.tsx` |
@@ -38,12 +39,14 @@ The production baseline starts with the successful production deployment of this
 | `team_invite_prompt_clicked` | User opened team settings from the contextual invite prompt. | `components/invite-teammate-prompt.tsx` |
 | `team_library_viewed` | An identified user entered a mounted library route state, with team, skill-count, and filter-state context; search/tag navigation is tracked and same-route skill mutations are deduplicated while mounted. | `components/team-library-analytics.tsx` |
 
-All team-scoped events include a stable `team_id` property. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
+All team-scoped events include a stable `team_id` property. The official `posthog-node` SDK generates event UUIDs before enqueue and preserves each queued event's identity across its transport retries. Skills Board does not override that identity or add an application-owned dedupe layer: no at-least-once replay across separate application capture calls has been evidenced. Production duplicate health therefore remains an official PostHog readback concern; existing stable business-ID properties may group diagnostic candidates where present, but the repository does not claim duplicate detection is repaired. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
 
 ## Full-funnel query rules
 
 - Acquisition ends at anonymous signup intent; signup completion begins Activation.
-- Raw traffic and intent are instrumented, but qualified visitors and source-to-activation attribution remain unavailable until their rules and team-level query are implemented.
+- Qualified public visitor v1 is a unique PostHog `distinct_id` that accumulates at least 15 seconds of foreground-visible time on `/`, `/resources/*`, or `/guides/*` at the exact production host `www.skillsboard.sh`. CTA, signup, and team creation events are explicitly excluded from the qualification rule, so the denominator is not circular.
+- Qualified traffic excludes non-production hosts, application/auth/invitation routes, and the internal/test traffic excluded by production Tracking QA. The application emits only definition version, bounded landing surface, and qualification rule; it does not duplicate PostHog session, referrer, UTM, or first-touch state.
+- Source-to-new-team attribution v1 selects the first `qualified_public_visitor` in the 30 days before `team_created`, uses only PostHog-native identity/session and first-touch/referrer/UTM properties after official schema or connector verification, and groups outcomes by unique `properties.team_id`. The application owns no attribution cookie, classifier, or query engine.
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.
@@ -52,7 +55,7 @@ All team-scoped events include a stable `team_id` property. Usage-path events al
 
 ## GTM pulse official PostHog plugin contract
 
-1. Treat the official `posthog:posthog` skill and its authenticated tools as authoritative. Discover the tools advertised on each run and verify production project `225645` before any write.
+1. Treat the official `posthog:posthog` skill and its authenticated tools as authoritative. Use the exact tools advertised on each run and verify production project `225645` before any write. Capability discovery and SDK doctor are optional diagnostics: record and retry their absence, but do not classify that absence alone as measurement failure or stop independent repair and measurement.
 2. Read live state before every transition and manage only resources with exact Pulse ownership. Persist stable logical keys, ownership markers, definition hashes, and live PostHog IDs so retries reuse resources.
 3. Use only currently advertised operations, obey each tool's lifecycle, confirmation, and irreversibility rules, and never use private APIs or an alternate PostHog query or control client. Browser and server SDK ingestion remain separate.
 4. Before launching any flag-backed experiment, verify that deployed product code consumes the exact flag. Otherwise ship the repository PR first and leave the experiment unlaunched.
@@ -82,6 +85,8 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.
 - [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating each dependent production metric as decision-ready.
+- [x] Freeze qualified public visitor v1 and its PostHog-native 30-day source-to-new-team query semantics without a conversion-defined denominator or application-owned attribution state.
+- [ ] Verify production duplicate health through official PostHog readback. The repository relies on SDK-owned event identity and adds no custom dedupe instrumentation without an evidenced cross-call replay.
 - [x] Define team-level HogQL semantics for Activation and `AAT-28` state transitions; Retention fails closed as `unavailable` until historical activation milestones are reconciled.
 - [ ] Use the official authenticated PostHog plugin to verify project `225645` and reconcile the canonical Pulse dashboard and insight IDs.
 
