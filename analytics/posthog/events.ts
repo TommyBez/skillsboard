@@ -2,11 +2,6 @@ import type { GuidePath } from "@/lib/seo/guides"
 import type { resourcePaths } from "@/lib/seo/resources"
 
 type NonTeamEventPropertiesMap = {
-  qualified_public_visitor: {
-    definition_version: 1
-    landing_surface: "guide" | "home" | "resources"
-    qualification_rule: "visible_15s"
-  }
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
     landing_path: "/" | GuidePath | typeof resourcePaths.index

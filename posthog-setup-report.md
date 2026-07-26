@@ -13,7 +13,6 @@ The production baseline starts with the successful production deployment of this
 
 | Event name | Description | File |
 |---|---|---|
-| `qualified_public_visitor` | A unique PostHog visitor accumulated 15 seconds of foreground-visible time on an eligible production public page, independently of CTA or signup activity. | `components/qualified-public-visitor.tsx` |
 | `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
 | `mcp_setup_viewed` | An identified user opened the MCP connection guide. | `components/mcp-setup-analytics.tsx` |
@@ -44,9 +43,9 @@ All team-scoped events include a stable `team_id` property. Skills Board assumes
 ## Full-funnel query rules
 
 - Acquisition ends at anonymous signup intent; signup completion begins Activation.
-- Qualified public visitor v1 is a unique PostHog `distinct_id` that accumulates at least 15 seconds of foreground-visible time on `/`, `/resources/*`, or `/guides/*` at the exact production host `www.skillsboard.sh`. CTA, signup, and team creation events are explicitly excluded from the qualification rule, so the denominator is not circular.
-- Qualified traffic excludes non-production hosts, application/auth/invitation routes, and the internal/test traffic excluded by production Tracking QA. The application emits only definition version, bounded landing surface, and qualification rule; it does not duplicate PostHog session, referrer, UTM, or first-touch state.
-- Source-to-new-team attribution v1 selects the first `qualified_public_visitor` in the 30 days before `team_created`, uses only PostHog-native identity/session and first-touch/referrer/UTM properties after official schema or connector verification, and groups outcomes by unique `properties.team_id`. The application owns no attribution cookie, classifier, or query engine.
+- Measure acquisition with PostHog-native unique visitors, sessions, pageviews, and pageview duration on the exact production host `www.skillsboard.sh`, then use the real conversion events `landing_cta_clicked`, `signup_form_submitted`, `user_signed_up`, and `team_created`.
+- There is no custom engaged or qualified visitor event and no application-defined attention threshold. Skills Board does not duplicate PostHog session, referrer, UTM, first-touch, or page-duration state in application events.
+- Use PostHog-native session and acquisition properties when analyzing journeys to real conversion events. This contract does not define a custom source-to-new-team classifier, attribution cookie, or frozen source-to-team rule.
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.
@@ -85,7 +84,6 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.
 - [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating each dependent production metric as decision-ready.
-- [x] Freeze qualified public visitor v1 and its PostHog-native 30-day source-to-new-team query semantics without a conversion-defined denominator or application-owned attribution state.
 - [x] Define team-level HogQL semantics for Activation and `AAT-28` state transitions; Retention fails closed as `unavailable` until historical activation milestones are reconciled.
 - [ ] Use the official authenticated PostHog plugin to verify project `225645` and reconcile the canonical Pulse dashboard and insight IDs.
 

@@ -24,9 +24,8 @@
     "validate:pulse-graph": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs check",
     "benchmark:pulse-graph": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs benchmark",
     "test:pulse-graph": "node --test .agents/skills/skillsboard-pulse/tests/*.test.mjs",
-    "test:tracking-qa": "node --test analytics/posthog/*.test.mjs",
     "pulse:context": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs resolve",
-    "check": "pnpm typecheck && pnpm test:tracking-qa && pnpm validate:pulse-graph && pnpm test:pulse-graph",
+    "check": "pnpm typecheck && pnpm validate:pulse-graph && pnpm test:pulse-graph",
     "db:push": "drizzle-kit push",
     "email": "email dev --dir emails --port 3001"
   },
