@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "Skills Board",
-  url: "https://skillsboard.sh",
+  url: "https://www.skillsboard.sh",
   description:
     "Build a shared library of AI skills your team recommends. Connect your agent through MCP, or use the source, command, or ZIP that fits your setup.",
   tagline: "Your team’s skills. All in one place.",
