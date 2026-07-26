@@ -577,10 +577,26 @@ test("operational runs resolve the continuous per-lane replan policy and state",
   assert.deepEqual(run.switches_all, []);
 });
 
+test("the mandatory kernel applies the global evidence-proportional default without weakening positive gates", () => {
+  const checked = checkGraph();
+  const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
+
+  assert.deepEqual(checked.graph.mandatory_nodes, ["pulse.kernel"]);
+  assert.match(kernel, /Across Pulse, the evidence-proportional default assumes ordinary non-defective state until contrary evidence/);
+  assert.match(kernel, /Without evidence[^\n]*create no presumed problems, work items, blockers, monitoring, setup requirements, unavailable states, QA gates, or proof requests/);
+  assert.match(kernel, /Evidence to the contrary: a reproducible observation, authoritative provider\/product signal, failed mandatory readback, or exact deterministic contract trigger/);
+  assert.match(kernel, /Never fabricate positive authority\/safety/);
+  assert.match(kernel, /For an effect\/decision, verify required identity, consent, suppressions, ownership, eligibility, destination, cap\/capacity, spend authority/);
+  assert.match(kernel, /Missing proof narrows only that effect\/decision, creating no speculative remediation elsewhere/);
+  assert.match(kernel, /Optional diagnostics\/generic possibilities cannot create or preserve `waiting_dependency`, `setup_required`, `unavailable`, `qa_required`, monitoring, repair, or synthetic work/);
+  assert.match(kernel, /Waiting requires selected legitimate work plus an explicit mandatory dependency/);
+});
+
 test("autonomy controls use bounded replacements instead of routine blockers", () => {
   const checked = checkGraph();
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
   const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
+  const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
   const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
   const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
   const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
@@ -592,7 +608,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 8);
+  assert.equal(checked.graph.contract_version, 9);
   assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
@@ -600,6 +616,13 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(analytics, /A deterministic private measurement asset/);
   assert.match(analytics, /operation-specific gates.*advertised containment path/);
   assert.match(analytics, /root_cause_hash \+ definition_hash/);
+  assert.match(analytics, /Discovery and SDK doctor are optional diagnostics/);
+  assert.match(analytics, /cannot stop repository repair, provider-independent work/);
+  assert.match(analytics, /fail closed only its dependent item/);
+  assert.match(analytics, /Assume event capture is not duplicating until concrete contrary evidence exists/);
+  assert.match(analytics, /missing custom key or preventive health check is not evidence/);
+  assert.match(analytics, /reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event/);
+  assert.doesNotMatch(scorecard, /Verify event names[^\n]*duplicates/);
   assert.match(learning, /continuously replans each independent lane/);
   assert.match(learning, /deterministic low-risk non-experimental repair/);
   assert.match(scheduler, /general repository WIP has a hard budget of six units/);

@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 8,
+  "contract_version": 9,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "8f86b305a6829331cb68a19ef635523a2ece603942b5acb04f8a855e3aa7b9a7"
+    "root_sha256": "e026236a9833fa7593080e9ea649fcbcab14eca4b2ae36a9ef52d04da38cbb73"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "18b71e2af004d3faea22ae0e10d3c9352d5b0464815edac9a90916eff55a760f",
+      "content_sha256": "aea5a21bf514f8f1909040c51b666ab1f3bf173998eef9875acc960381e38606",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "85e38f784a445846ed13fad835e816a2a39a61fd265db5dcdabbefaa426a792e",
+      "content_sha256": "f76ecc44b71fb77af223d5caef9dfb92e777c1faecb63e73ae28278d9b4f9991",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "0203e7b13c9c57b48282f9a208b18e29837dcfc8e85797af482f31b433634443",
+      "content_sha256": "9804e2ecd618393047bf1c2c4d3a3d3ec42a9845dc37ae18be14e3ad74151fa7",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -1411,7 +1411,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 89088,
+      "max_known_context_bytes": 90112,
       "operations": [
         "posthog.experiment.write"
       ],
@@ -1434,7 +1434,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 82944,
+      "max_known_context_bytes": 83968,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1456,7 +1456,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 89088,
+      "max_known_context_bytes": 90112,
       "operations": [
         "posthog.experiment.write",
         "posthog.flag.write"
@@ -1480,7 +1480,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 90112,
+      "max_known_context_bytes": 92160,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1507,7 +1507,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 101376,
+      "max_known_context_bytes": 102400,
       "operations": [
         "github.pr.write"
       ],
@@ -1534,7 +1534,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 101376,
+      "max_known_context_bytes": 102400,
       "operations": [
         "posthog.flag.write"
       ],
@@ -1557,7 +1557,7 @@
         "product.lifecycle",
         "product.truth"
       ],
-      "max_known_context_bytes": 84992,
+      "max_known_context_bytes": 86016,
       "operations": [
         "posthog.survey.write"
       ],
@@ -1651,7 +1651,7 @@
         "learning.opportunities",
         "product.truth"
       ],
-      "max_known_context_bytes": 70656,
+      "max_known_context_bytes": 71680,
       "operations": [],
       "skills": [
         "customer_research",
@@ -1668,7 +1668,7 @@
         "channels.social",
         "product.truth"
       ],
-      "max_known_context_bytes": 79872,
+      "max_known_context_bytes": 80896,
       "operations": [
         "social.draft.write"
       ],
@@ -1688,7 +1688,7 @@
         "channels.social",
         "product.truth"
       ],
-      "max_known_context_bytes": 79872,
+      "max_known_context_bytes": 80896,
       "operations": [
         "social.publish"
       ],
@@ -1707,7 +1707,7 @@
       "entry_nodes": [
         "channels.social"
       ],
-      "max_known_context_bytes": 47104,
+      "max_known_context_bytes": 49152,
       "operations": [],
       "skills": [
         "typefully"
@@ -1725,7 +1725,7 @@
         "learning.opportunities",
         "product.truth"
       ],
-      "max_known_context_bytes": 98304,
+      "max_known_context_bytes": 99328,
       "operations": [],
       "skills": [
         "marketing_loops",

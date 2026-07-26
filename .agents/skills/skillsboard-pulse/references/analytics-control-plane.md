@@ -27,7 +27,9 @@ PostHog may return `created_by` fields and the browser-safe `phc_` project token
 
 ## Capability recovery and Tracking QA repair
 
-Apply the kernel's tuple-scoped three-total-attempt budget to retryable PostHog capability reads, with fresh discovery before each retry and one eligible retry for a malformed read through a narrower advertised projection. Do not spend another resource's budget or retry deterministic auth, scope, terms, unsupported-operation, or validation failures. After the final eligible attempt, persist exact `unavailable` status/reason and continue independent lanes. Executable repair remains required. `provider_exposure_unavailable` reports failed exposure, not data absence. Repair paths: official PostHog `225645` live SDK-health/duplicate query (production window/dedupe key); official attribution property/definition readback, then instrumentation/definition repair; server classification by official live readback of the production-only Node gate and default `$is_server`, never a hardcoded environment label; official Neon read-only aggregate against official PostHog via `analytics.database_reconcile`. Missing instrumentation uses `delivery.repository` from this node; missing definitions use eligible provider routes; no proxy or DB mutation. A missing Neon operation is not a mismatch.
+Use the kernel retry budget. Discovery and SDK doctor are optional diagnostics: record their absence, but it alone is not `measurement_failure` and cannot stop repository repair, provider-independent work, or a metric with available mandatory reads. Define mandatory reads per item and fail closed only its dependent item.
+
+`provider_exposure_unavailable` means failed exposure, not absent data. Assume event capture is not duplicating until concrete contrary evidence exists. A missing custom key or preventive health check is not evidence and creates no pending work, required read, monitoring obligation, or success gate. Open a bounded duplicate investigation only after a reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event. Repair instrumentation via `delivery.repository`; definitions and attribution via eligible provider routes. Validate Node server classification from production `$is_server`; Neon is read-only via `analytics.database_reconcile`. Never use proxies, private clients, hardcoded environment labels, or DB mutation.
 
 ## Production tracking boundary
 
@@ -52,7 +54,7 @@ An over-broad authorized projection may block only that metadata read, never ind
 - Never launch, expand, evaluate, or mutate a PostHog-dependent resource while its control or measurement plane is unavailable.
 - Low/medium-risk active exposure may continue for one heartbeat only when preregistered non-PostHog guardrails remain healthy; total unobservable exposure may not exceed 24 hours. Then pause.
 - High-risk exposure moves to its preregistered safe state immediately.
-- A measurement outage is `measurement_failure`, never `insufficient` or `inconclusive`.
+- A failed mandatory read or broken measurement is `measurement_failure` for its exact dependent metric, decision, or exposure, never `insufficient` or `inconclusive`. Missing optional diagnostics remain `diagnostic_unavailable` and do not broaden the outage perimeter.
 - Allow one automatic instrumentation repair and clean relaunch per distinct verified `root_cause_hash + definition_hash`, subject to a rolling circuit breaker. Retire an architecture only after the same cause/hash repeats after its clean relaunch; a different evidenced cause may receive its own bounded repair. Repository repairs still require independent PR approval.
 
 Containment removes exposure before closing measurement. Ambiguous identity, ownership, creation response, or live effect is quarantined. No time-based auto-release is allowed.

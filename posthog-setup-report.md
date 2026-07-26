@@ -38,12 +38,14 @@ The production baseline starts with the successful production deployment of this
 | `team_invite_prompt_clicked` | User opened team settings from the contextual invite prompt. | `components/invite-teammate-prompt.tsx` |
 | `team_library_viewed` | An identified user entered a mounted library route state, with team, skill-count, and filter-state context; search/tag navigation is tracked and same-route skill mutations are deduplicated while mounted. | `components/team-library-analytics.tsx` |
 
-All team-scoped events include a stable `team_id` property. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
+All team-scoped events include a stable `team_id` property. Skills Board assumes event capture is not duplicating until concrete contrary evidence exists. A duplicate investigation starts only from a reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event; it is not routine Tracking QA. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
 
 ## Full-funnel query rules
 
 - Acquisition ends at anonymous signup intent; signup completion begins Activation.
-- Raw traffic and intent are instrumented, but qualified visitors and source-to-activation attribution remain unavailable until their rules and team-level query are implemented.
+- Measure acquisition with PostHog-native unique visitors, sessions, pageviews, and pageview duration on the exact production host `www.skillsboard.sh`, then use the real conversion events `landing_cta_clicked`, `signup_form_submitted`, `user_signed_up`, and `team_created`.
+- There is no custom engaged or qualified visitor event and no application-defined attention threshold. Skills Board does not duplicate PostHog session, referrer, UTM, first-touch, or page-duration state in application events.
+- Use PostHog-native session and acquisition properties when analyzing journeys to real conversion events. This contract does not define a custom source-to-new-team classifier, attribution cookie, or frozen source-to-team rule.
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.
@@ -52,7 +54,7 @@ All team-scoped events include a stable `team_id` property. Usage-path events al
 
 ## GTM pulse official PostHog plugin contract
 
-1. Treat the official `posthog:posthog` skill and its authenticated tools as authoritative. Discover the tools advertised on each run and verify production project `225645` before any write.
+1. Treat the official `posthog:posthog` skill and its authenticated tools as authoritative. Use the exact tools advertised on each run and verify production project `225645` before any write. Capability discovery and SDK doctor are optional diagnostics: record and retry their absence, but do not classify that absence alone as measurement failure or stop independent repair and measurement.
 2. Read live state before every transition and manage only resources with exact Pulse ownership. Persist stable logical keys, ownership markers, definition hashes, and live PostHog IDs so retries reuse resources.
 3. Use only currently advertised operations, obey each tool's lifecycle, confirmation, and irreversibility rules, and never use private APIs or an alternate PostHog query or control client. Browser and server SDK ingestion remain separate.
 4. Before launching any flag-backed experiment, verify that deployed product code consumes the exact flag. Otherwise ship the repository PR first and leave the experiment unlaunched.
