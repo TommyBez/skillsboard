@@ -577,6 +577,21 @@ test("operational runs resolve the continuous per-lane replan policy and state",
   assert.deepEqual(run.switches_all, []);
 });
 
+test("the mandatory kernel applies the global evidence-proportional default without weakening positive gates", () => {
+  const checked = checkGraph();
+  const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
+
+  assert.deepEqual(checked.graph.mandatory_nodes, ["pulse.kernel"]);
+  assert.match(kernel, /Across Pulse, the evidence-proportional default assumes ordinary non-defective state until contrary evidence/);
+  assert.match(kernel, /Without evidence[^\n]*create no presumed problems, work items, blockers, monitoring, setup requirements, unavailable states, QA gates, or proof requests/);
+  assert.match(kernel, /Evidence to the contrary: a reproducible observation, authoritative provider\/product signal, failed mandatory readback, or exact deterministic contract trigger/);
+  assert.match(kernel, /Never fabricate positive authority\/safety/);
+  assert.match(kernel, /For an effect\/decision, verify required identity, consent, suppressions, ownership, eligibility, destination, cap\/capacity, spend authority/);
+  assert.match(kernel, /Missing proof narrows only that effect\/decision, creating no speculative remediation elsewhere/);
+  assert.match(kernel, /Optional diagnostics\/generic possibilities cannot create or preserve `waiting_dependency`, `setup_required`, `unavailable`, `qa_required`, monitoring, repair, or synthetic work/);
+  assert.match(kernel, /Waiting requires selected legitimate work plus an explicit mandatory dependency/);
+});
+
 test("autonomy controls use bounded replacements instead of routine blockers", () => {
   const checked = checkGraph();
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
