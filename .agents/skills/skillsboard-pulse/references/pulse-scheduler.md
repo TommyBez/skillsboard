@@ -120,7 +120,7 @@ Append exactly one minimal non-PII line per run to `.agents/loops/skillsboard-gt
 
 ## Exact outcomes
 
-- repository identity or default-branch readback failure: dependent repository lifecycle `unavailable`; continue independent lanes;
+- repository identity, default-branch, expected-base-commit, or exact-local-isolation failure: dependent repository lifecycle `unavailable`; continue independent lanes;
 - contract version/root mismatch: `no_action: contract_pin_mismatch`;
 - PostHog project/control failure: contain dependent exposure and continue independent lanes;
 - missing mandatory read: affected action `unavailable`, with no proxy;

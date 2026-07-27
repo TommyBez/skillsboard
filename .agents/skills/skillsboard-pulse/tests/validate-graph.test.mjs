@@ -611,12 +611,15 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
 
   assert.equal(checked.graph.contract_version, 11);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
-    assert.doesNotMatch(contractFile, /\$CODEX_HOME|private checkout|private automation worktree|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
+    assert.doesNotMatch(contractFile, /CODEX_HOME|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
   }
   assert.match(orchestrator, /repository checkout supplied by the runtime and does not require a separate automation-owned checkout/);
   assert.match(kernel, /The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate/);
+  assert.match(kernel, /Before executing the validator or any other repository code, establish the exact repository identity and commit through runtime-owned metadata or authenticated GitHub\/Git readback/);
+  assert.match(kernel, /Require the validator, graph, orchestrator, and every contract file consumed by validation to be byte-identical to that commit/);
+  assert.match(kernel, /Do not trust validator output until this bootstrap proof passes/);
   assert.match(delivery, /Never discard, reset, stash, overwrite, or commit unrelated local work/);
-  assert.match(scheduler, /repository identity or default-branch readback failure: dependent repository lifecycle `unavailable`/);
+  assert.match(scheduler, /repository identity, default-branch, expected-base-commit, or exact-local-isolation failure: dependent repository lifecycle `unavailable`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
   assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
