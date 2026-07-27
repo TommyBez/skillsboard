@@ -11,7 +11,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { launchPath } from "@/lib/launch"
 import { getSession } from "@/lib/session"
 
-type LaunchCtaLocation = "launch_header" | "launch_hero" | "launch_closing"
+type LaunchCtaLocation =
+  | "launch_header"
+  | "launch_hero"
+  | "launch_closing"
+  | "launch_footer"
 
 function primaryAction(signedIn: boolean): {
   href: "/library" | "/sign-up"
@@ -76,6 +80,38 @@ export function LaunchCta({ location }: { location: LaunchCtaLocation }) {
   return (
     <Suspense fallback={<Skeleton className="h-11 w-60 rounded-[3px]" aria-busy="true" />}>
       <LaunchCtaContent location={location} />
+    </Suspense>
+  )
+}
+
+function LaunchFooterLinkView({ signedIn }: { signedIn: boolean }) {
+  const primary = primaryAction(signedIn)
+
+  return (
+    <TrackedLink
+      href={primary.href}
+      analytics={{
+        event: "landing_cta_clicked",
+        properties: ctaProperties(signedIn, "launch_footer"),
+      }}
+      className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+    >
+      {signedIn ? "Open library" : "Create library"}
+      <ArrowRightIcon className="size-3.5" aria-hidden="true" />
+    </TrackedLink>
+  )
+}
+
+async function LaunchFooterLinkContent() {
+  const session = await getSession()
+
+  return <LaunchFooterLinkView signedIn={Boolean(session?.user)} />
+}
+
+export function LaunchFooterLink() {
+  return (
+    <Suspense fallback={<span className="inline-block h-4 w-24" aria-hidden="true" />}>
+      <LaunchFooterLinkContent />
     </Suspense>
   )
 }

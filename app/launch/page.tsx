@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import {
-  ArrowRightIcon,
   CableIcon,
   ExternalLinkIcon,
   SearchIcon,
@@ -9,7 +8,11 @@ import {
 } from "lucide-react"
 
 import { Brand } from "@/components/brand"
-import { LaunchCta, LaunchHeader } from "@/components/launch/launch-actions"
+import {
+  LaunchCta,
+  LaunchFooterLink,
+  LaunchHeader,
+} from "@/components/launch/launch-actions"
 import { Button } from "@/components/ui/button"
 import { launchPath } from "@/lib/launch"
 import { siteConfig } from "@/lib/site"
@@ -256,10 +259,7 @@ export default function LaunchPage() {
               GitHub
               <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
             </a>
-            <Link href="/sign-up" className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground">
-              Create library
-              <ArrowRightIcon className="size-3.5" aria-hidden="true" />
-            </Link>
+            <LaunchFooterLink />
           </nav>
         </div>
       </footer>

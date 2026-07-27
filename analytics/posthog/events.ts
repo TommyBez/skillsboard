@@ -18,6 +18,7 @@ type NonTeamEventPropertiesMap = {
       | "launch_header"
       | "launch_hero"
       | "launch_closing"
+      | "launch_footer"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
