@@ -8,9 +8,9 @@ Load for Typefully identity/readback, draft, scheduling, publication, reconcilia
 
 Use Typefully only after its official credential/configuration practice, identity readback, and exact social-set verification pass. The connected account is Tommaso's personal account and may discuss only Skills Board and its shipped features.
 
-Configuration lives at `~/.config/typefully/config.json` with mode `0600`. Do not copy its credential into Pulse state, logs, repository files, the general Pulse environment, or command output. Every invocation strips inherited `TYPEFULLY_API_KEY`. Fail closed when `config:show` reports an environment/project-local override, the global file is not active, or identity/social-set/platform/quota readback differs.
+Accept only the official CLI's global `~/.config/typefully/config.json` or repository-skill-local `.agents/skills/typefully/.typefully/config.json`, both mode `0600`; the local path must be confirmed Git-ignored by the pinned skill. Never copy the credential into Pulse state, logs, tracked files, the general environment, or output. Strip inherited `TYPEFULLY_API_KEY`. Fail closed on any other source or identity/social-set/platform/quota mismatch.
 
-The irreducibly human setup is the installed skill's interactive command `node .agents/skills/typefully/scripts/typefully.js setup`, global storage selection, and selection of the personal social set containing the intended LinkedIn/X accounts. After setup, set the global file mode to `0600`, then use `config:show`, `me:get`, `social-sets:list/get`, draft/queue readback, and quota before any write.
+The irreducibly human setup is the installed skill's interactive `setup` command and selection of the personal LinkedIn/X social set. Run later commands from the directory whose official config was selected, then use `config:show`, `me:get`, `social-sets:list/get`, draft/queue readback, and quota before writes.
 
 ## Operation states
 
@@ -24,13 +24,15 @@ The independently approved repository contract plus an active native Pulse autom
 
 ## Editorial policy and caps
 
+Owned social is a protected organic community lane. Monday refreshes current audience/problem signals; operational runs replan at local fixed point. Return a publish-ready unit, seven-day evidence repair, or exact gate; bare `not_selected_by_operational_graph`/`no_change_evidence_insufficient` are invalid. This is not a quota: bind signal, useful point, truthful bridge, platform copy, outcome, window, and stop rule. Engagement is channel evidence; qualified or activated teams are outcomes.
+
 - LinkedIn posts are in Italian.
 - X posts are in English.
 - Rolling seven-day cap: seven new editorial units shared across social, of which at most three may publish on LinkedIn and at most seven on X.
 - A cross-post consumes one shared unit and one unit on each platform.
 - Minimum gap: 24 hours between LinkedIn posts; 12 hours between X posts.
 - Scheduled items reserve capacity. Ambiguous delivery counts as published until official reconciliation.
-- There is no publication minimum. Do not fill capacity without evidence.
+- There is no unconditional publication minimum. Do not fill capacity without evidence, but do not use an empty prior queue or an immature team-outcome metric to skip current sensing and candidate construction.
 
 Publish only verified shipped reality. Never invent founder anecdotes, customer use, having read a source, metrics, roadmap, or ETA. An urgent factual/safety correction is an incident exception to editorial caps only when it reduces active harm.
 

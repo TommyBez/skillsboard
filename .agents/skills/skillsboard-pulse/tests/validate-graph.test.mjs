@@ -609,7 +609,7 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 11);
+  assert.equal(checked.graph.contract_version, 12);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
     assert.doesNotMatch(contractFile, /CODEX_HOME|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
   }
@@ -650,6 +650,38 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   assert.match(product, /at most one optional open-text question/);
   assert.match(product, /at most three materially distinct treatment versions per rolling 90 days/);
   assert.match(typefully, /full immutable transition envelope: exact account, required social set, resource key, contract root/);
+});
+
+test("protected organic growth lanes cannot skip current sensing or freeze a bare empty queue", () => {
+  const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
+  const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
+  const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
+  const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
+  const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+  const checked = checkGraph();
+  const strategic = resolveGraph(checked.graph, { run: "strategic", nodes: [] });
+  const strategicNodeIds = strategic.nodes.map(({ id }) => id);
+
+  assert.match(scorecard, /at least 20% week-over-week growth in new `team_activated_14d` teams/);
+  assert.match(scorecard, /otherwise mark it `undefined` and target at least one additional team/);
+  assert.match(learning, /refreshes attributable public evidence for both protected organic acquisition lanes/);
+  assert.match(learning, /`not_due_not_refreshed`, stale backlog, and bare `no_change_evidence_insufficient` are invalid/);
+  assert.match(pseo, /Intent adjacency is audience-led, not keyword-led/);
+  assert.match(pseo, /need not contain “skill”, “agent”, “library”, or the product name/);
+  assert.match(pseo, /DataForSEO is the only metered provider and Monday's default enrichment/);
+  assert.match(pseo, /Start from audience\/problem signals, not product-name keywords/);
+  assert.match(pseo, /Waiting for an existing page's maturity does not block a distinct cluster/);
+  assert.match(distribution, /Community is a protected zero-cost lane alongside social/);
+  assert.match(social, /Owned social is a protected organic community lane/);
+  assert.match(scheduler, /separate non-starving protected-lane pass/);
+  assert.match(scheduler, /A non-empty general queue never suppresses protected work/);
+  assert.match(scheduler, /The overall weekly queue may be empty only when every protected lane has the third outcome/);
+  assert.doesNotMatch(scheduler, /Monday 09:00[^\n]*pSEO research and learning/);
+  assert.equal(strategicNodeIds.includes("channels.distribution"), true);
+  assert.equal(strategicNodeIds.includes("channels.social"), true);
+  assert.equal(Object.hasOwn(strategic.state_views, "distribution"), true);
+  assert.equal(Object.hasOwn(strategic.state_views, "social"), true);
 });
 
 test("runtime skills are reported as unpriced", () => {
