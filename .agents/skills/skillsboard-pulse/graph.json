@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "886eff3c84445704db854d4a0f07ce413fb879b628b429083d6d752d279244b3",
+      "content_sha256": "20765b4f1ea772ad08c1739ec02eb7d2e41c8bc74a40eaf0ad1a86642ad37379",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 13,
+  "contract_version": 14,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "bc5130bc60815e05f2b8f82e6fc5e161f35a54c07d9007b06fe3cbab042787ec"
+    "root_sha256": "7fe9133ac1e63bff04aeb1a736e986921386e70b809af16069bb10a5c0dd577e"
   },
   "interference_keys": [
     "channel.community",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "8601b840ecf80390a22d75f3f37b564d08e30c8a4882e199913f8fe8b03cca9a",
+      "content_sha256": "33f5f9e01c47eb96e5f5a24c9381f82758aae6e8416d58148b4ca4905eddd54f",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -172,6 +172,19 @@
         "pulse.kernel"
       ]
     },
+    "launch.campaign": {
+      "conflicts_with": [],
+      "content_sha256": "790be5648822c4cbd708221987df6a029f0b27cb88cbc5c7d1e25dad9c410372",
+      "kind": "policy",
+      "provides": [
+        "launch_plan"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/launch-campaign.md",
+      "requires": [
+        "product.lifecycle",
+        "product.truth"
+      ]
+    },
     "learning.opportunities": {
       "conflicts_with": [],
       "content_sha256": "c6a010332007468d80644ddd10eda44e5130738de75d5b374448030af549cb0f",
@@ -186,7 +199,7 @@
     },
     "product.lifecycle": {
       "conflicts_with": [],
-      "content_sha256": "3b09a154541c1e6b17c1038a7c7eb9b12c6f68da12eb2353f25272c45a5a2b5e",
+      "content_sha256": "f55a05e96fa78cd254af32cd3e473daf2929661a429e006320823b8ce7853006",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -233,7 +246,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "aaa8c3207b9a873c690f40eaa9a05f693138a1133868fa9255b9c85463eb9f15",
+      "content_sha256": "92284a04c272afdf56dc3ebe9155f395b68e13789e62912505e4278d6e01668c",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -859,13 +872,18 @@
   ],
   "routes": {
     "analytics.asset_write": {
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "analytics.control_plane"
       ],
-      "max_known_context_bytes": 41984,
+      "max_known_context_bytes": 73728,
       "operations": [
         "posthog.asset.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "analytics",
         "posthog"
@@ -879,12 +897,13 @@
     },
     "analytics.database_reconcile": {
       "allowed_origin_policy_nodes": [
-        "analytics.control_plane"
+        "analytics.control_plane",
+        "launch.campaign"
       ],
       "entry_nodes": [
         "analytics.control_plane"
       ],
-      "max_known_context_bytes": 36864,
+      "max_known_context_bytes": 65536,
       "operations": [
         "neon.database.read"
       ],
@@ -895,7 +914,8 @@
       "state_views": [
         "analytics",
         "core",
-        "scorecard"
+        "scorecard",
+        "selected_work"
       ]
     },
     "contract.audit": {
@@ -907,6 +927,7 @@
         "email.inbound",
         "email.outbound",
         "growth.pseo",
+        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "product.truth",
@@ -944,6 +965,7 @@
         "email.inbound",
         "email.outbound",
         "growth.pseo",
+        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "product.truth",
@@ -969,6 +991,10 @@
       ]
     },
     "distribution.community": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -977,6 +1003,7 @@
       "operations": [
         "community.publish"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "community_marketing"
       ],
@@ -1074,6 +1101,10 @@
       ]
     },
     "distribution.hacker_news": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -1082,6 +1113,7 @@
       "operations": [
         "hacker_news.submit"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "launch"
       ],
@@ -1113,6 +1145,10 @@
       ]
     },
     "distribution.product_hunt": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -1121,6 +1157,7 @@
       "operations": [
         "product_hunt.submit"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "launch"
       ],
@@ -1176,6 +1213,10 @@
       ]
     },
     "email.broadcast_prepare": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound",
         "product.truth"
@@ -1184,6 +1225,7 @@
       "operations": [
         "resend.broadcast_draft.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "email_best_practices",
         "emails",
@@ -1198,6 +1240,10 @@
       ]
     },
     "email.broadcast_send": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound",
         "product.truth"
@@ -1206,6 +1252,7 @@
       "operations": [
         "resend.broadcast.send"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "email_best_practices",
         "emails",
@@ -1283,11 +1330,16 @@
       ]
     },
     "email.reconcile": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound"
       ],
-      "max_known_context_bytes": 48128,
+      "max_known_context_bytes": 73728,
       "operations": [],
+      "requires_origin_policy_node": true,
       "skills": [
         "resend_connector"
       ],
@@ -1500,6 +1552,7 @@
     },
     "product.repository": {
       "allowed_origin_policy_nodes": [
+        "launch.campaign",
         "product.lifecycle"
       ],
       "entry_nodes": [
@@ -1664,6 +1717,10 @@
       ]
     },
     "social.draft": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social",
         "product.truth"
@@ -1672,6 +1729,7 @@
       "operations": [
         "social.draft.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "social",
         "typefully"
@@ -1684,6 +1742,10 @@
       ]
     },
     "social.publish": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social",
         "product.truth"
@@ -1692,6 +1754,7 @@
       "operations": [
         "social.publish"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "social",
         "typefully"
@@ -1704,11 +1767,16 @@
       ]
     },
     "social.reconcile": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social"
       ],
-      "max_known_context_bytes": 49152,
+      "max_known_context_bytes": 73728,
       "operations": [],
+      "requires_origin_policy_node": true,
       "skills": [
         "typefully"
       ],
@@ -1717,6 +1785,24 @@
         "incidents",
         "selected_work",
         "social"
+      ]
+    },
+    "strategy.launch": {
+      "entry_nodes": [
+        "launch.campaign"
+      ],
+      "max_known_context_bytes": 114688,
+      "operations": [],
+      "skills": [
+        "launch"
+      ],
+      "state_views": [
+        "active_index",
+        "analytics",
+        "core",
+        "opportunities",
+        "product",
+        "selected_work"
       ]
     },
     "strategy.plan": {
@@ -1749,10 +1835,11 @@
       "entry_nodes": [
         "analytics.control_plane",
         "communications.attention",
+        "launch.campaign",
         "learning.opportunities",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 65536,
+      "max_known_context_bytes": 131072,
       "operations": [
         "neon.database.read",
         "pulse.reconcile",
@@ -1768,7 +1855,9 @@
         "core",
         "digest",
         "incidents",
-        "opportunities"
+        "opportunities",
+        "product",
+        "selected_work"
       ]
     },
     "strategic": {
@@ -1778,11 +1867,12 @@
         "channels.distribution",
         "channels.social",
         "growth.pseo",
+        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 122880,
+      "max_known_context_bytes": 196608,
       "operations": [
         "neon.database.read",
         "pulse.reconcile",
@@ -1804,6 +1894,7 @@
         "product",
         "pseo",
         "scorecard",
+        "selected_work",
         "social"
       ]
     }

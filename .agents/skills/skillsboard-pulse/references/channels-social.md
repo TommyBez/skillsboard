@@ -26,6 +26,8 @@ The draft or post ID identifies a resource; it does not prove that a timed-out `
 
 Owned social is a protected organic lane. Every strategic run senses current audience problems and publishes the strongest truthful useful unit. Operational runs may create and publish more units whenever the lane can produce useful content. Missing analytics, team activation maturity, prior queue content, or quantitative evidence never blocks publication.
 
+When selected work belongs to an active `launch.campaign`, prefer the due product-launch unit over unrelated generic advice: name or visibly demonstrate Skills Board, use one distinct shipped product proof, and connect the action to the campaign conversion or learning objective. Thematic similarity informs ranking but is not an editorial cap or cooldown; exact provider-effect deduplication remains mandatory.
+
 ## Replies
 
 Automated replies are allowed only through an official supported operation on the verified account and exact thread. Do not send cold DMs, impersonate a person, solicit artificial engagement, expose account/customer data, or answer legal/privacy/security/account-specific matters substantively. These limits exist for authorization, privacy, and binding platform rules, not for an internal reply cap.
