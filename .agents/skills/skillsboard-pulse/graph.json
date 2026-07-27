@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "037b3b7236d129a394efb1d882545cac9fd98699d11787a2946506b2cb832738",
+      "content_sha256": "bebc138e4a2b4057cc5170227ff71f1655c0fb7ef160b2ab4baeb8d811b1c26b",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 11,
+  "contract_version": 12,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "dcafb7919395c8f3577a0a49bfb4863b7da909597ddf7305acb8bc192f6d07c6"
+    "root_sha256": "fe559df7e5f8d7ed182ce81bf3c33d875222de4715d290ab3fdd4d0fa3254c59"
   },
   "interference_keys": [
     "channel.community",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "f76ecc44b71fb77af223d5caef9dfb92e777c1faecb63e73ae28278d9b4f9991",
+      "content_sha256": "69f935ad249e202ae6b2449aa69c3388ed1faaefb18888fe7913bc28c2464322",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "5dd119fb8fc6a8b9b0916b89d40258c14769b45c994e4f99d5e59d022b231544",
+      "content_sha256": "14ac8babccbe1d566074a168f6a4f879a8cd278f273653c5a1f3dcc09cd71071",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "9d21896fe7afa8e850004de834c3c92792fd69cea751f42e9b4ae27bbe6ff238",
+      "content_sha256": "7c339702e73381774e887da252f5297bb0572765e9af1070e3bd25f387feb79a",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -158,7 +158,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "57f3adfcfa4f38eaba9d97e8cede1a87837f9f57211da861775943ae9c3f07e1",
+      "content_sha256": "5f8bd2ff3f2050f7abdfc343f1e530a8fdb352f254019ceedaab210144306acb",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -174,7 +174,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "666d0a42c87c40a2469128544fddb9be621aa7fa2c2e4c2772cb484d6ee39937",
+      "content_sha256": "6bdac713b2c4aaace72f9ac59d3e523cc79bf8db26241915787fa55be745c494",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "6fabb4cadcc1a82eea61624262ef2a024bf14bda44adc6d66df956792f67f8a8",
+      "content_sha256": "ffecbadfa534a6ec71d91f7fb18485c28c7f02f1276414b9afb556dfee19315c",
       "kind": "policy",
       "provides": [
         "idempotency",

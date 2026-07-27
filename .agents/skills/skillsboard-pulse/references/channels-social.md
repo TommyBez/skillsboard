@@ -24,13 +24,15 @@ The independently approved repository contract plus an active native Pulse autom
 
 ## Editorial policy and caps
 
+Owned social is a protected organic community lane. Monday refreshes current audience/problem signals; operational runs replan at local fixed point. Return a publish-ready unit, seven-day evidence repair, or exact gate; bare `not_selected_by_operational_graph`/`no_change_evidence_insufficient` are invalid. This is not a quota: bind signal, useful point, truthful bridge, platform copy, outcome, window, and stop rule. Engagement is channel evidence; qualified or activated teams are outcomes.
+
 - LinkedIn posts are in Italian.
 - X posts are in English.
 - Rolling seven-day cap: seven new editorial units shared across social, of which at most three may publish on LinkedIn and at most seven on X.
 - A cross-post consumes one shared unit and one unit on each platform.
 - Minimum gap: 24 hours between LinkedIn posts; 12 hours between X posts.
 - Scheduled items reserve capacity. Ambiguous delivery counts as published until official reconciliation.
-- There is no publication minimum. Do not fill capacity without evidence.
+- There is no unconditional publication minimum. Do not fill capacity without evidence, but do not use an empty prior queue or an immature team-outcome metric to skip current sensing and candidate construction.
 
 Publish only verified shipped reality. Never invent founder anecdotes, customer use, having read a source, metrics, roadmap, or ETA. An urgent factual/safety correction is an incident exception to editorial caps only when it reduces active harm.
 

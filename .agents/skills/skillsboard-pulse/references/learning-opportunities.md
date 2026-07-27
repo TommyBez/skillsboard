@@ -34,14 +34,17 @@ Broken observability is `measurement_failure`, never `insufficient`, “inconclu
 
 The Monday strategic run remains the complete portfolio review and:
 
-1. reconciles new signals against existing deterministic opportunities;
-2. updates evidence freshness, contradictions, segments, and stages;
-3. closes or suspends assumptions invalidated by shipped reality or new evidence;
-4. reviews completed experiments, feature windows, pSEO checkpoints, channel interventions, and incidents as learning inputs;
-5. identifies the strongest evidenced constraint competing for scarce Product/Growth capacity;
-6. refreshes the ranked weekly queue anchor under `pulse.scheduler`.
+1. refreshes attributable public evidence for both protected organic acquisition lanes: audience-led search and organic community/social, even when a seven-day checkpoint is not yet due;
+2. reconciles new signals against existing deterministic opportunities;
+3. updates evidence freshness, contradictions, segments, and stages;
+4. closes or suspends assumptions invalidated by shipped reality or new evidence;
+5. reviews completed experiments, feature windows, pSEO checkpoints, channel interventions, and incidents as learning inputs;
+6. identifies the strongest evidenced constraint competing for scarce Product/Growth capacity;
+7. refreshes the ranked weekly queue anchor under `pulse.scheduler`.
 
-The strongest constraint determines ordering only among candidates competing for the same scarce slot. It never suppresses due safety work, protected pSEO learning, provider setup, or independent non-interfering lanes. Missing evidence produces `no_change_evidence_insufficient`, not a forced strategy.
+The strongest constraint orders only candidates competing for one slot; it never suppresses safety, setup, or independent protected organic lanes. Immature scorecard outcomes do not block a zero-cost qualitative search or community/social test with healthy action-level gates.
+
+Each Monday protected lane returns its smallest action, a seven-day evidence repair, or an exact gate with source attempts and recheck. `not_due_not_refreshed`, stale backlog, and bare `no_change_evidence_insufficient` are invalid. An empty queue requires exact gates in both lanes; immature outcomes are not one.
 
 An operational heartbeat may add evidence, apply deterministic stage thresholds, and suspend an item when material evidence invalidates it. It continuously replans each independent lane whose compatible queue is locally at fixed point and has spare WIP, without waiting for unrelated lanes: select the strongest currently evidenced candidate, complete the full candidate definition below, append it without displacing still-actionable work, recompute the lane, and repeat across compatible lanes until no eligible candidate remains or runtime ends. At most one replan-created candidate may remain pending in a lane and at most one may target an exact `resource_key`; another becomes eligible only after the prior candidate leaves its pending state. Low-risk reversible candidates may follow any otherwise eligible route. Medium- or high-risk candidates may produce only research, a repository PR subject to independent approval, or non-exposed `shadow` work; operational replanning never authorizes their merge, rollout, send, publication, spend, user exposure, legal/economic commitment, or destructive effect. It may not change ICP, JTBD, positioning, business model, durable policy, or a valid Monday portfolio decision. Each replan records evidence and prior/new queue hashes, lane, exact lane-local fixed-point predicate, timestamp, and next eligibility. Suspension records evidence hash, timestamp, exact reason, and deterministic resumption predicate; it never leaves harmful exposure running.
 

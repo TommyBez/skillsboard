@@ -2,11 +2,13 @@
 
 **Node:** `growth.pseo`
 
-This protected lane is independent of the routed Product/Growth queue and PostHog availability. It is a bounded publish-to-learn system, not a page factory. Load for the weekly research pass, pSEO backlog, Search Console/DataForSEO use, an active page or PR, or a T+3/7/14/28 checkpoint.
+This protected audience-led search lane is independent of the routed Product/Growth queue and PostHog availability. It is a bounded publish-to-learn system, not a page factory. Load for the weekly research pass, pSEO backlog, Search Console/DataForSEO use, an active page or PR, or a T+3/7/14/28 checkpoint.
 
 ## Research and identity
 
-At least every seven days research adjacent team problems with a truthful path to creating a team skill library. Refresh a deduplicated backlog from current product routes, existing canonical intents/URLs/candidates/open PRs, public SERPs, official vendor material, primary research, attributable public problem signals, Search Console when connected, downstream PostHog outcomes, and optional DataForSEO. Maintain at most 30 deduplicated seeds and shortlist at most five. The first heartbeat catches an overdue pass. Record market, language, provenance, source/event date, and `available|unavailable|broken`.
+Every seven days research ICP problems and interests. Monday refreshes public evidence; prior work never skips sensing. Deduplicate product routes, intents/URLs/PRs, SERPs, public signals, Search Console, PostHog, and DataForSEO. Keep 30 seeds, shortlist five, and record market, language, provenance, date, and status.
+
+Intent adjacency is audience-led, not keyword-led: queries need not contain “skill”, “agent”, “library”, or the product name. Store audience problem, intent, bridge hypothesis/evidence; require current ICP affinity, standalone value, and a truthful conversion path. Reject imagined affinity or traffic-only bridges.
 
 - `canonical_intent_id` = normalized locale + audience/problem + intent, independent of format.
 - `problem_cluster_id` = normalized locale + audience/problem family, independent of query and format.
@@ -16,13 +18,15 @@ At least every seven days research adjacent team problems with a truthful path t
 
 Missing or zero keyword volume is prioritization evidence, not a veto for bounded qualitative learning and never becomes asserted demand. Qualitative publication requires each page to have distinct intent, current attributable evidence, product fit, differentiated standalone utility, truthful shipped claims from `product.truth`, useful page-specific content, internal links, metadata, sitemap/indexation handling, supported structured data, measurement, rollback or `noindex`, and local verification. Quantitative demand or positive deployed-page evidence may justify at most three additional sibling pages through a separate queued scaling action.
 
+Waiting for an existing page's maturity does not block a distinct cluster whose caps and gates pass. Monday selects the strongest eligible search action, a seven-day evidence repair, or an exact hard gate; “not due” is invalid.
+
 The pSEO PR is the independent human checkpoint; no extra pilot approval exists. The three-cluster rolling pSEO PR budget is separate from general Product/Growth PRs.
 
 ## Sources
 
 Public SERPs, official vendor material, primary research, and attributable public problem signals are eligible qualitative sources when their terms and data safety pass. Search Console is read-only and must use an official connected integration; its exact configured property must match live readback. No scraped UI, screenshot, unofficial client, or inferred property is allowed. Missing Search Console access disables only its fields.
 
-DataForSEO is the only metered research provider and optional enrichment. Use only the approved operation route after secure credential presence, target scope, quota, and spend checks pass. The credential is the existing base64-encoded `login:password` value; never decode, print, store, or copy it. Target location code is `2840` and language code is `en` unless a stricter private setting narrows the operation.
+DataForSEO is the only metered provider and Monday's default enrichment when route, quota, ledger, and spend pass. Start from audience/problem signals, not product-name keywords; use the smallest useful keyword/SERP batch. Failure disables only quantitative fields. Never decode, print, store, or copy its base64 credential. Defaults: location `2840`, language `en`.
 
 The private loader recognizes these exact non-PII configuration names and rejects unknown or broader values:
 

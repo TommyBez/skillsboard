@@ -57,6 +57,10 @@ For closed non-overlapping 28-day periods: `new` first activates in the current 
 
 Period-1 retention is teams with a value-action proxy during days 29–56 after `activation_at`, divided by activated teams with 56 complete observation days. `team_value_action` is a proxy for accessing or choosing a path, not proof of install or execution.
 
+## Growth ambition
+
+Target at least 20% week-over-week growth in new `team_activated_14d` teams without weakening gates or making a guarantee/public claim. For closed Europe/Rome weeks store current, prior, and signed counts; compute the rate only when prior is non-zero, otherwise mark it `undefined` and target at least one additional team. Below 30 eligible teams, absolutes and corroboration decide; immature outcomes do not block zero-cost organic work with healthy action-level gates.
+
 ## Five scorecard rows
 
 ### Acquisition

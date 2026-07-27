@@ -8,6 +8,8 @@ If autonomous execution is unavailable but every other policy, evidence, identit
 
 ## Community portfolio
 
+Community is a protected zero-cost lane alongside social. Monday refreshes current signals and destination eligibility; operational runs replan at local fixed point. Return the smallest action/manual package, seven-day evidence repair, or exact gate; bare `not_selected_by_operational_graph`/`no_change_evidence_insufficient` are invalid. This is not a quota: require source-native utility and measure qualified or activated teams.
+
 In any rolling seven days:
 
 - at most five first public contacts across eligible communities;
