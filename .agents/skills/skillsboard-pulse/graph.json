@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "b2c58ba8a1475c4a7ef1098c6b9bae807fc4725d467fc4796b3cd34cf3ddf4d8"
+    "root_sha256": "7fe9133ac1e63bff04aeb1a736e986921386e70b809af16069bb10a5c0dd577e"
   },
   "interference_keys": [
     "channel.community",
@@ -872,13 +872,18 @@
   ],
   "routes": {
     "analytics.asset_write": {
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "analytics.control_plane"
       ],
-      "max_known_context_bytes": 41984,
+      "max_known_context_bytes": 73728,
       "operations": [
         "posthog.asset.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "analytics",
         "posthog"
@@ -892,12 +897,13 @@
     },
     "analytics.database_reconcile": {
       "allowed_origin_policy_nodes": [
-        "analytics.control_plane"
+        "analytics.control_plane",
+        "launch.campaign"
       ],
       "entry_nodes": [
         "analytics.control_plane"
       ],
-      "max_known_context_bytes": 36864,
+      "max_known_context_bytes": 65536,
       "operations": [
         "neon.database.read"
       ],
@@ -908,7 +914,8 @@
       "state_views": [
         "analytics",
         "core",
-        "scorecard"
+        "scorecard",
+        "selected_work"
       ]
     },
     "contract.audit": {
@@ -920,6 +927,7 @@
         "email.inbound",
         "email.outbound",
         "growth.pseo",
+        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "product.truth",
@@ -957,6 +965,7 @@
         "email.inbound",
         "email.outbound",
         "growth.pseo",
+        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "product.truth",
@@ -982,6 +991,10 @@
       ]
     },
     "distribution.community": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -990,6 +1003,7 @@
       "operations": [
         "community.publish"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "community_marketing"
       ],
@@ -1087,6 +1101,10 @@
       ]
     },
     "distribution.hacker_news": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -1095,6 +1113,7 @@
       "operations": [
         "hacker_news.submit"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "launch"
       ],
@@ -1126,6 +1145,10 @@
       ]
     },
     "distribution.product_hunt": {
+      "allowed_origin_policy_nodes": [
+        "channels.distribution",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.distribution",
         "product.truth"
@@ -1134,6 +1157,7 @@
       "operations": [
         "product_hunt.submit"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "launch"
       ],
@@ -1189,6 +1213,10 @@
       ]
     },
     "email.broadcast_prepare": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound",
         "product.truth"
@@ -1197,6 +1225,7 @@
       "operations": [
         "resend.broadcast_draft.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "email_best_practices",
         "emails",
@@ -1211,6 +1240,10 @@
       ]
     },
     "email.broadcast_send": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound",
         "product.truth"
@@ -1219,6 +1252,7 @@
       "operations": [
         "resend.broadcast.send"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "email_best_practices",
         "emails",
@@ -1296,11 +1330,16 @@
       ]
     },
     "email.reconcile": {
+      "allowed_origin_policy_nodes": [
+        "email.outbound",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "email.outbound"
       ],
-      "max_known_context_bytes": 48128,
+      "max_known_context_bytes": 73728,
       "operations": [],
+      "requires_origin_policy_node": true,
       "skills": [
         "resend_connector"
       ],
@@ -1513,6 +1552,7 @@
     },
     "product.repository": {
       "allowed_origin_policy_nodes": [
+        "launch.campaign",
         "product.lifecycle"
       ],
       "entry_nodes": [
@@ -1677,6 +1717,10 @@
       ]
     },
     "social.draft": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social",
         "product.truth"
@@ -1685,6 +1729,7 @@
       "operations": [
         "social.draft.write"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "social",
         "typefully"
@@ -1697,6 +1742,10 @@
       ]
     },
     "social.publish": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social",
         "product.truth"
@@ -1705,6 +1754,7 @@
       "operations": [
         "social.publish"
       ],
+      "requires_origin_policy_node": true,
       "skills": [
         "social",
         "typefully"
@@ -1717,11 +1767,16 @@
       ]
     },
     "social.reconcile": {
+      "allowed_origin_policy_nodes": [
+        "channels.social",
+        "launch.campaign"
+      ],
       "entry_nodes": [
         "channels.social"
       ],
-      "max_known_context_bytes": 49152,
+      "max_known_context_bytes": 73728,
       "operations": [],
+      "requires_origin_policy_node": true,
       "skills": [
         "typefully"
       ],

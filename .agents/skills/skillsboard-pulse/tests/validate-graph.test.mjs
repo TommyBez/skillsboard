@@ -704,8 +704,37 @@ test("coordinated product launch is first-class work on every run", () => {
     assert.equal(checked.graph.run_types[runType].entry_nodes.includes("launch.campaign"), true);
     assert.equal(checked.graph.run_types[runType].state_views.includes("selected_work"), true);
   }
-  assert.equal(checked.graph.nodes["launch.campaign"].reference, ".agents/skills/skillsboard-pulse/references/launch-campaign.md");
-  assert.deepEqual(checked.graph.routes["strategy.launch"].skills, ["launch"]);
+  const launchNode = checked.graph.nodes["launch.campaign"];
+  const launchRoute = checked.graph.routes["strategy.launch"];
+  assert.equal(launchNode.reference, ".agents/skills/skillsboard-pulse/references/launch-campaign.md");
+  assert.deepEqual(launchNode.requires, ["product.lifecycle", "product.truth"]);
+  assert.deepEqual(launchNode.provides, ["launch_plan"]);
+  assert.deepEqual(launchRoute.entry_nodes, ["launch.campaign"]);
+  assert.deepEqual(launchRoute.skills, ["launch"]);
+  assert.deepEqual(launchRoute.state_views, ["active_index", "analytics", "core", "opportunities", "product", "selected_work"]);
+  assert.equal(checked.graph.routes["contract.audit"].entry_nodes.includes("launch.campaign"), true);
+
+  const launchExecutionRoutes = [
+    "analytics.asset_write",
+    "analytics.database_reconcile",
+    "delivery.repository",
+    "distribution.community",
+    "distribution.hacker_news",
+    "distribution.product_hunt",
+    "email.broadcast_prepare",
+    "email.broadcast_send",
+    "email.reconcile",
+    "product.repository",
+    "social.draft",
+    "social.publish",
+    "social.reconcile",
+  ];
+  for (const routeId of launchExecutionRoutes) {
+    const resolved = resolveGraph(checked.graph, { route: routeId, nodes: ["launch.campaign"] });
+    assert.equal(resolved.origin_policy_node, "launch.campaign");
+    assert.equal(resolved.nodes.some(({ id }) => id === "launch.campaign"), true);
+    assert.deepEqual(resolved.switches_all, []);
+  }
   assert.match(scheduler, /treat its dated product launch as a protected priority lane/);
   assert.match(scheduler, /not the product launch/);
   assert.match(product, /first-class product work/);
@@ -840,10 +869,10 @@ test("analytics database reconciliation resolves the official Neon connector rea
     entry_nodes: ["analytics.control_plane"],
     operations: ["neon.database.read"],
     skills: ["posthog"],
-    state_views: ["analytics", "core", "scorecard"],
-    max_known_context_bytes: 36_864,
+    state_views: ["analytics", "core", "scorecard", "selected_work"],
+    max_known_context_bytes: 65_536,
     requires_origin_policy_node: true,
-    allowed_origin_policy_nodes: ["analytics.control_plane"],
+    allowed_origin_policy_nodes: ["analytics.control_plane", "launch.campaign"],
   });
 
   const resolved = resolveGraph(checked.graph, {
