@@ -622,7 +622,7 @@ test("autonomy contract removes every routine blocker outside the closed set", (
   const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 13);
+  assert.equal(checked.graph.contract_version, 14);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
     assert.doesNotMatch(contractFile, /CODEX_HOME|automation_checkout_path_unavailable/);
   }
@@ -691,6 +691,28 @@ test("public social publication never depends on a secondary executor or authori
   assert.match(social, /owner-approved, merged, externally pinned contract plus an active Pulse automation satisfy the pinned Typefully skill's standing automation authority/);
   assert.match(social, /A fresh isolated executor, child write-authorizer[^\n]*is not required/);
   assert.match(social, /retry only with provider-supported idempotency or after official exact-resource readback confirms that no public post exists/);
+});
+
+test("coordinated product launch is first-class work on every run", () => {
+  const checked = checkGraph();
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+  const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
+  const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
+  const launchPlan = readFileSync(new URL("../../../../docs/gtm/2026-08-product-launch.md", import.meta.url), "utf8");
+
+  for (const runType of ["operational", "strategic"]) {
+    assert.equal(checked.graph.run_types[runType].entry_nodes.includes("launch.campaign"), true);
+    assert.equal(checked.graph.run_types[runType].state_views.includes("selected_work"), true);
+  }
+  assert.equal(checked.graph.nodes["launch.campaign"].reference, ".agents/skills/skillsboard-pulse/references/launch-campaign.md");
+  assert.deepEqual(checked.graph.routes["strategy.launch"].skills, ["launch"]);
+  assert.match(scheduler, /treat its dated product launch as a protected priority lane/);
+  assert.match(scheduler, /not the product launch/);
+  assert.match(product, /first-class product work/);
+  assert.match(product, /Launch prioritization is not a readiness phase, editorial gate, cooldown, evidence threshold, WIP limit, or additional approval/);
+  assert.match(social, /prefer the due product-launch unit over unrelated generic advice/);
+  assert.match(launchPlan, /\*\*Launch day:\*\* Tuesday, August 11, 2026/);
+  assert.doesNotMatch(launchPlan, /Launch readiness gate|no launch-period post may be scheduled unless/);
 });
 
 test("upstream provider lifecycle labels normalize into the closed Pulse state set", () => {

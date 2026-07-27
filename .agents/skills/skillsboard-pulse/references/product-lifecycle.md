@@ -20,3 +20,11 @@ Create, expose, revise, adopt, consolidate, hide, deprecate, or remove work thro
 Record hypothesis, intended user/team outcome, primary observation, relevant guardrails, start/end time, and result. Measurement failure creates instrumentation work and does not stop other action. Feature inventory and review remain useful maintenance tools, not prerequisites for change.
 
 Contain an active privacy, authorization, legal, binding-platform, or uncontrolled-spend violation. Ordinary weak results, small samples, low use, or missing metrics guide the next iteration but do not block it.
+
+## Coordinated product launch
+
+A repository-pinned `launch.campaign` is first-class product work, not a label for unrelated SEO or social output. Resolve `strategy.launch`, persist its dated deliverables as selected work, and advance the highest-impact due launch item before creating unrelated generic content. Route each product, repository, analytics, social, email, or distribution effect through its exact existing route and continue every independent lane when another lane is unavailable.
+
+Earlier publications do not become a launch retroactively. The campaign begins and ends on the dates owned by `launch.campaign`, uses its product promise and conversion, and continues through the stated follow-through measurement. A blocked exact action receives only its closed-set state; select the next compatible campaign item instead of blocking the campaign.
+
+Launch prioritization is not a readiness phase, editorial gate, cooldown, evidence threshold, WIP limit, or additional approval. Missing measurement creates instrumentation work, thematic similarity guides candidate selection without prohibiting action, and only exact provider-effect deduplication prevents a duplicate write.

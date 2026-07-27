@@ -4,7 +4,7 @@ description: Orchestrates the repository-pinned Skills Board Growth/Product Puls
 compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
-  version: "13.0.0"
+  version: "14.0.0"
 ---
 
 # Skills Board Pulse

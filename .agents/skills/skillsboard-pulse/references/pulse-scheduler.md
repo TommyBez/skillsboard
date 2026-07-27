@@ -19,6 +19,10 @@ After legal/spend reconciliation:
 3. execute the highest-impact lawful zero-cost action across SEO, community, social, product, analytics, email, and repository lanes;
 4. repeat until runtime ends or only the closed-set blockers in `pulse.kernel` remain.
 
+While the repository-pinned `launch.campaign` is active, treat its dated product launch as a protected priority lane. Resolve `strategy.launch`, materialize its due deliverables in selected work, and execute the highest-impact due launch item before creating unrelated generic content. The item may use any exact product, repository, analytics, social, email, or distribution route. If one exact effect has a closed-set blocker, persist that blocker for the effect, select another compatible launch item, and continue all other lanes.
+
+SEO, community, and social may support the launch, but their existence alone is not the product launch. Do not describe earlier publications as a coordinated launch and do not replace a compatible product-launch item with adjacent content merely because an operational queue was previously empty. This is a priority rule, not a readiness, editorial, cooldown, evidence, WIP, or approval gate.
+
 Search and community/social remain protected independent lanes. Each Monday and whenever locally exhausted, each lane must synthesize and execute at least one smallest useful action when a lawful, authorized, within-budget, physically available action exists; an empty prior queue means create one. Skip a lane only when every truthful smallest useful action is blocked by an exact closed-set condition, persist that exact blocker, and continue every other lane. Missing metrics, keyword volume, attribution, provider diagnostics, or prior queue items never make a lane inactionable.
 
 There is no repository WIP budget, pSEO PR/page quota, exposure-unit budget, survey slot limit, editorial cap, internal cooldown, experiment-series limit, one-candidate rule, shadow-readiness stage, maturity wait, or queue-freeze state.
