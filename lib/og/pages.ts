@@ -64,6 +64,20 @@ export const aiCodingTeamOnboardingGuideOgContent: OgTemplateContent = {
   chips: ["6-step rollout", "Onboarding record"],
 }
 
+export const aiCodingGuidelinesTemplateGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · AI coding standards",
+  title: [
+    { text: "AI coding guidelines" },
+    { text: "your team can run.", accent: true },
+  ],
+  description:
+    "A copyable template for allowed work, trusted context, verification, human handoffs, and ownership.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["Copyable template", "6-step workflow"],
+}
+
 export const signUpOgContent: OgTemplateContent = {
   eyebrow: "Create your free account",
   title: [

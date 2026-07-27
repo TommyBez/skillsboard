@@ -214,6 +214,20 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                     </div>
                   ))}
                 </dl>
+                {guide.copyTemplate ? (
+                  <div className="mt-8 overflow-hidden rounded-[3px] border border-border bg-[var(--surface-ink)] text-[var(--surface-ink-foreground)]">
+                    <p className="border-b border-white/10 px-5 py-4 font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                      Copyable starting point
+                    </p>
+                    <pre
+                      aria-label={`${guide.templateTitle} content`}
+                      className="overflow-x-auto px-5 py-6 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                      tabIndex={0}
+                    >
+                      <code>{guide.copyTemplate}</code>
+                    </pre>
+                  </div>
+                ) : null}
               </section>
 
               <section id="pitfalls" aria-labelledby="pitfalls-heading" className="scroll-mt-24 pt-16">
