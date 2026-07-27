@@ -31,7 +31,7 @@ A run continues to fixed point under `pulse.scheduler`. Missing configuration na
 
 Before reading product context, the graph beyond this node, runtime state, providers, or any Pulse stage, run the validator against the repository presented by the runtime and compare its contract version and lower-case hexadecimal root with the exact external pins. The invoking scheduled task stores those pins outside the repository; `graph.json` contains per-node hashes and a reproducible readback root, not the external authority. Missing scheduled-task pins are whole-run `no_action: contract_pin_missing`; a mismatch is whole-run `no_action: contract_pin_mismatch`. A verified contract-candidate audit may use the exact candidate root and GitHub commit only under the read-only `contract.audit` route.
 
-The runtime supplies the repository context; it is not Pulse authority or a whole-run gate. Repository mutation safety belongs exclusively to `delivery.repository` and blocks only its dependent repository lifecycle; state/provider-only lanes remain independent.
+The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate. Repository mutation safety belongs exclusively to `delivery.repository` and blocks only its dependent repository lifecycle; state/provider-only lanes remain independent.
 
 After a newly pinned contract first becomes active, one activation run executes two ordered phases:
 

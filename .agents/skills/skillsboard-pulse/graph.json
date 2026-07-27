@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "355995f68c3c15264c7e0329ed2c0d952c6c2009d1c1f8048fcd05a75707c70b",
+      "content_sha256": "4ba852cfed4dc9e36a63cd838ab5a25c1de0115d10cf82d7c2c6a48e82e6fa90",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "819fde62b5e21b99fd5f0a9ccba05888b0f14dc5098a6c41ce2df77c93d0c1a3"
+    "root_sha256": "ae7b9f61a1ddce7ae08037ea32427550d8aa2330f2c049cc383fff0505a1f90f"
   },
   "interference_keys": [
     "channel.community",
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "30a53ce093f24c8d2a1ff61a977192eadca5d83062980708c3cdc46eb928c481",
+      "content_sha256": "f2beb9ba80c392acc8aa3647e95d5f4b91ef97951b59ad2bea618a5e036c6bf0",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "2322498bc0c3e036cc7e51988204b871e7155b13fa3cfdfebcfd4b4b489d42dd",
+      "content_sha256": "f84b6b24fb83303157e4c078a65e50eb99bd7695e2d36e8262a88a67e8f4d103",
       "kind": "policy",
       "provides": [
         "idempotency",

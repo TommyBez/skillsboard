@@ -98,7 +98,7 @@ Protective monitoring continues when a strategic source is unavailable. Missing 
 
 ## Schema-v4 persistence
 
-The parent alone persists non-PII state at `.agents/loops/skillsboard-gtm-pulse.json`; route executors return results and never edit it. It intentionally has no global lease, lease TTL, heartbeat, watchdog, or fencing owner. Write through a same-directory temporary file and atomic rename. Advance a cursor only after its transition completes. Persist a reservation before dispatch so a lost child or provider response remains recoverable. If persistence would modify tracked repository content, keep external actions read-only and record the exact safe-persistence failure.
+The parent alone persists non-PII state at `.agents/loops/skillsboard-gtm-pulse.json`; route executors return results and never edit it. It intentionally has no global lease, lease TTL, heartbeat, watchdog, or fencing owner. Write through a same-directory temporary file and atomic rename. Advance a cursor only after its transition completes. Persist a reservation before dispatch so a lost child or provider response remains recoverable. If persistence would dirty tracked checkout content, keep external actions read-only and record the exact safe-persistence failure.
 
 State contains only the projections needed to reconcile. It also maintains a compact non-PII `/digest` projection assembled by the parent from the index, aggregate ledgers, official readback, and validated route results; this lets the run emit every required unchanged and changed field without loading full domain histories:
 

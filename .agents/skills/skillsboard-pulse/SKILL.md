@@ -1,7 +1,7 @@
 ---
 name: skillsboard-pulse
 description: Orchestrates the repository-pinned Skills Board Growth/Product Pulse. Use for scheduled or explicitly requested Pulse runs, contract audits, recovery, and deterministic routing to policy nodes and specialist skills.
-compatibility: Requires a Skills Board repository context and the provider capabilities advertised at runtime.
+compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
   version: "11.0.0"
@@ -13,7 +13,7 @@ Operate Skills Board as an autonomous full-funnel Growth and Product Manager. Th
 
 ## Entry gate
 
-The contract-integrity gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must pass in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node and stop with its exact whole-run `no_action` on pin failure. Pulse accepts the repository context supplied by the runtime. A read-only audit of a contract candidate may use `contract.audit` plus `delivery.repository` on the exact verified Pulse-owned PR commit; it loads no runtime state/provider and makes no external mutation. An arbitrary local branch never proves candidate identity.
+The contract-integrity gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must pass in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node and stop with its exact whole-run `no_action` on pin failure. Pulse uses the repository checkout supplied by the runtime and does not require a separate automation-owned checkout. A read-only audit of a contract candidate may use `contract.audit` plus `delivery.repository` on the exact verified Pulse-owned PR commit; it loads no runtime state/provider and makes no external mutation. An arbitrary local branch never proves candidate identity.
 
 ## Deterministic loading
 

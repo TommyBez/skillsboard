@@ -611,9 +611,10 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
 
   assert.equal(checked.graph.contract_version, 11);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
-    assert.doesNotMatch(contractFile, /\$CODEX_HOME|\bcheckout\b|\bworktree\b|automation_checkout_path_unavailable/);
+    assert.doesNotMatch(contractFile, /\$CODEX_HOME|private checkout|private automation worktree|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
   }
-  assert.match(kernel, /The runtime supplies the repository context; it is not Pulse authority or a whole-run gate/);
+  assert.match(orchestrator, /repository checkout supplied by the runtime and does not require a separate automation-owned checkout/);
+  assert.match(kernel, /The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate/);
   assert.match(delivery, /Never discard, reset, stash, overwrite, or commit unrelated local work/);
   assert.match(scheduler, /repository identity or default-branch readback failure: dependent repository lifecycle `unavailable`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
