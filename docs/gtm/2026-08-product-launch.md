@@ -40,6 +40,19 @@ Every launch asset uses one primary call to action:
 
 Secondary calls to action may show the open-source repository or explain MCP, but must not compete with team-library creation.
 
+## Pre-launch publication control
+
+The existing homepage remains the canonical product landing page. The permanent launch announcement is prepared at `/launch`, while the homepage carries only a temporary launch-day banner linking to it.
+
+Both surfaces are controlled by `launchIsPublic` in `lib/launch.ts`. While it is `false`:
+
+- Production returns 404 for `/launch`.
+- The announcement stays out of the sitemap and declares `noindex, nofollow` in preview metadata.
+- Local and Preview deployments can render the announcement for review.
+- The homepage launch-day banner stays hidden.
+
+Set the flag to `true` only in the launch-day PR after the final preflight. That one change publishes the announcement, adds it to the sitemap, enables indexing metadata, and shows the homepage banner. The exact merge still requires owner approval.
+
 ## ORB channel plan
 
 ### Owned
@@ -73,16 +86,17 @@ An unavailable channel does not pause independent launch lanes.
 
 - [ ] Verify production signup → create team → save skill → invite → accept → teammate usage path on desktop and mobile.
 - [ ] Verify all launch-funnel events and campaign attribution in PostHog production project 225645.
-- [ ] Create a launch dashboard for landing CTA, signup, team creation, first skill, invite acceptance, and non-creator usage.
-- [ ] Capture truthful demo data that contains no private customer information.
+- [x] Create a launch dashboard for landing CTA, signup, team creation, first skill, invite acceptance, and non-creator usage.
+- [x] Verify the add → invite → accept → teammate reuse loop in Development with synthetic identities; keep Production verification as a separate required check.
+- [x] Capture truthful demo data that contains no private customer information.
 - [ ] Confirm support, privacy, terms, open-source, and contact links are current.
-- [ ] Record product limitations in the launch FAQ: recommendations are not formal approval; versions are not pinned; compatibility is not universal.
+- [x] Record product limitations in the launch announcement: recommendations are not formal approval; versions are not pinned; compatibility is not universal.
 
 ### 2. Pre-launch — August 1–7
 
-- [ ] Produce the 60–90 second product demo.
-- [ ] Draft and QA the launch announcement and temporary landing treatment.
-- [ ] Prepare launch-specific OG images and video captions.
+- [x] Produce the 62-second add → find → use product demo with synthetic identities and a public skill.
+- [x] Draft and QA the launch announcement and dormant homepage launch treatment on desktop and mobile.
+- [x] Prepare a launch-specific 1200×630 OG image, video poster, and English video captions.
 - [ ] Prepare LinkedIn, X, Product Hunt, Show HN, email, and community variants.
 - [ ] Assemble Product Hunt gallery, maker comment, first comment, and supporter list without engagement manipulation.
 - [ ] Invite a small number of relevant existing contacts to privately test the launch path and report blockers.
@@ -124,11 +138,11 @@ An unavailable channel does not pause independent launch lanes.
 | Workstream | Repository-pinned skill | Deliverable | Due | State |
 | --- | --- | --- | --- | --- |
 | Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | In progress |
-| Launch narrative | `copywriting`, `copy-editing` | Announcement, landing treatment, channel message spine | Jul 31 | Not started |
-| Product demonstration | `video` | 60–90 second add → find → use demo | Aug 4 | Not started |
-| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Not started |
+| Launch narrative | `copywriting`, `copy-editing` | Announcement, landing treatment, channel message spine | Jul 31 | Announcement ready for review in PR #65 |
+| Product demonstration | `video` | 60–90 second add → find → use demo | Aug 4 | 62-second demo ready for review in PR #65 |
+| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | CTA hierarchy and publication fail-safe ready in PR #65 |
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
-| Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Not started |
+| Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |
 | Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Not started |
 | Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | Not started |
 | Community | `community-marketing`, `public-relations` | Product Hunt, Show HN, and native community packages | Aug 7 | Not started |
@@ -187,4 +201,4 @@ This is a prioritization rule, not an editorial, cooldown, WIP, evidence, or rea
 
 Codex and the Pulse execute the routed, zero-cost workstreams, produce assets, verify providers, schedule eligible communications, and report evidence. Tommaso is required only at a genuine owner boundary, especially approval immediately before merging an exact repository PR/head SHA or where identity, law, consent, privacy, binding terms, or spend require it.
 
-The next critical path is: production journey QA → measurement QA → product demo → launch announcement/landing treatment → channel packages → final preflight and launch execution.
+The remaining critical path is: production journey QA → measurement QA → channel packages → final preflight → owner-approved launch-day flag merge → launch execution.

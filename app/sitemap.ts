@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next"
 
-import { launchPath } from "@/lib/launch"
+import { launchIsPublic, launchPath } from "@/lib/launch"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
@@ -33,12 +33,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${siteConfig.url}${launchPath}`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+    ...(launchIsPublic
+      ? [{
+          url: `${siteConfig.url}${launchPath}`,
+          lastModified,
+          changeFrequency: "monthly" as const,
+          priority: 0.8,
+        }]
+      : []),
     {
       url: `${siteConfig.url}${resourcePaths.index}`,
       lastModified: new Date(resourceIndexLastModified),

@@ -19,6 +19,7 @@ import { landingFaqs } from "@/lib/seo/landing-faq"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
 import { siteConfig } from "@/lib/site"
+import { launchIsPublic, launchPath } from "@/lib/launch"
 
 export const metadata: Metadata = {
   title: { absolute: "Skills Board, your team’s recommended AI skills" },
@@ -307,6 +308,21 @@ export default function HomePage() {
         </div>
         <span className={styles.scrollProgress} aria-hidden="true" />
       </header>
+
+      {launchIsPublic ? (
+        <aside className="relative z-30 border-b border-primary/25 bg-primary/10">
+          <Link
+            href={launchPath}
+            className="mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2 px-5 py-3 text-center text-sm font-semibold transition-colors hover:bg-primary/8 md:px-10"
+          >
+            <span className="font-mono text-xs uppercase tracking-[0.16em] text-primary">
+              New
+            </span>
+            <span>Skills Board is live. See the 62-second team demo.</span>
+            <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+          </Link>
+        </aside>
+      ) : null}
 
       <main>
         {/* Hero — sticky chapter: dossiers file into the team library */}
