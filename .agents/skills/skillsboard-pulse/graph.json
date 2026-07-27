@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "fe559df7e5f8d7ed182ce81bf3c33d875222de4715d290ab3fdd4d0fa3254c59"
+    "root_sha256": "4ef305053346c3c08434f9bfbd262fa81c38f914c18bb1064ae51998190b87a6"
   },
   "interference_keys": [
     "channel.community",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "7c339702e73381774e887da252f5297bb0572765e9af1070e3bd25f387feb79a",
+      "content_sha256": "fb4f5608a80d56ed27703e846e35ffc9c9206e37d3319e45722f1b3fe8cb58bd",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "ffecbadfa534a6ec71d91f7fb18485c28c7f02f1276414b9afb556dfee19315c",
+      "content_sha256": "810be312e7dce75b90037296d063c669a8493827c2d3d5648860b295a0cb66cd",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -1775,12 +1775,14 @@
       "entry_nodes": [
         "analytics.control_plane",
         "analytics.scorecard",
+        "channels.distribution",
+        "channels.social",
         "growth.pseo",
         "learning.opportunities",
         "product.lifecycle",
         "pulse.scheduler"
       ],
-      "max_known_context_bytes": 98304,
+      "max_known_context_bytes": 122880,
       "operations": [
         "neon.database.read",
         "pulse.reconcile",
@@ -1796,11 +1798,13 @@
         "budgets",
         "core",
         "digest",
+        "distribution",
         "incidents",
         "opportunities",
         "product",
         "pseo",
-        "scorecard"
+        "scorecard",
+        "social"
       ]
     }
   },

@@ -9,7 +9,7 @@ This run-orchestrator node owns cadence, deterministic policy routing, the mutab
 Run one Codex automation in `Europe/Rome` at 01:00, 05:00, 09:00, 13:00, 17:00, and 21:00 daily.
 
 - Monday 09:00 is the complete strategic pulse: Tracking QA, five-stage scorecard, learning and opportunity review, portfolio review, a fresh audience-led search pass, a fresh community/social evidence pass, due feature review, and weekly queue-anchor refresh.
-- Mark Monday 09:00 `completed` only after every mandatory strategic stage was attempted and state persisted; otherwise `failed`. If absent or incomplete, each later invocation resolves the `strategic` run type for exactly one catch-up attempt per run until every mandatory stage is complete. Persist an idempotent phase ledger so completed stages are not repeated; a failed or interrupted attempt remains eligible at the next invocation. Catch-up is not an operational run and does not create a second weekly constraint.
+- Mark Monday `completed` only after all mandatory stages are attempted and persisted; otherwise `failed`. Later invocations run one idempotent strategic catch-up attempt until complete, preserving the phase ledger. Catch-up is not operational and creates no second weekly constraint.
 - Every other run is operational: reconcile providers and live state; monitor active experiments, rollouts, surveys, channels, budgets, sends, deployments, incidents, and PRs; apply eligible repair, pause, rollback, evaluation, review fix, merge after approval, deployment follow-up, and queued work. It may continuously replan independent lanes as defined below, but never performs a second full portfolio review.
 - First Monday each month: review ICP, JTBD, and positioning.
 - First Monday of January, April, July, and October: review business model and autonomy policy. Paid ads remain ineligible until a merged strategy change creates a revenue line.
@@ -25,16 +25,18 @@ Resolve the run closure and each fresh route-executor closure separately, exactl
 
 ## Fixed-point priority
 
-At each iteration refresh dependencies and select the highest-priority compatible `actionable_now` item:
+At each iteration refresh dependencies and select the highest-priority compatible `actionable_now` item. Protection tiers 1–4 always win:
 
 1. SEV0/SEV1 containment, spend or send cap breach, privacy/security exposure, and rollback;
 2. mandatory monitoring of live exposure, surveys, messages, posts, spend, deployments, and PR lifecycle;
 3. tracking, attribution, provider-control, consent, suppression, and state repairs;
-4. due evaluations, maturity decisions, stabilization, pruning, and retirements;
+4. due evaluations, maturity decisions, stabilization, pruning, and retirements.
+
+Then run a separate non-starving protected-lane pass for due audience-led search and community/social work. Select one compatible item before the general queue, oldest `last_selected_at` first. A non-empty general queue never suppresses protected work. Otherwise continue with:
+
 5. ready queue items in current order;
-6. protected audience-led search and community/social research, learning, and due checkpoints in their independent lanes;
-7. automatable provider setup and shadow-readiness work;
-8. evidence gathering and eligible bounded continuous-replan transitions in independent lanes.
+6. automatable provider setup and shadow-readiness work;
+7. evidence gathering and eligible bounded continuous-replan transitions in independent lanes.
 
 Never let new growth work delay protection. After every external transition, persist state, reconcile the effect, and recalculate the graph before selecting again.
 

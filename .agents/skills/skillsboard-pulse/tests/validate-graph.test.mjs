@@ -659,6 +659,9 @@ test("protected organic growth lanes cannot skip current sensing or freeze a bar
   const distribution = readFileSync(new URL("../references/channels-distribution.md", import.meta.url), "utf8");
   const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+  const checked = checkGraph();
+  const strategic = resolveGraph(checked.graph, { run: "strategic", nodes: [] });
+  const strategicNodeIds = strategic.nodes.map(({ id }) => id);
 
   assert.match(scorecard, /at least 20% week-over-week growth in new `team_activated_14d` teams/);
   assert.match(scorecard, /otherwise mark it `undefined` and target at least one additional team/);
@@ -671,8 +674,14 @@ test("protected organic growth lanes cannot skip current sensing or freeze a bar
   assert.match(pseo, /Waiting for an existing page's maturity does not block a distinct cluster/);
   assert.match(distribution, /Community is a protected zero-cost lane alongside social/);
   assert.match(social, /Owned social is a protected organic community lane/);
+  assert.match(scheduler, /separate non-starving protected-lane pass/);
+  assert.match(scheduler, /A non-empty general queue never suppresses protected work/);
   assert.match(scheduler, /The overall weekly queue may be empty only when every protected lane has the third outcome/);
   assert.doesNotMatch(scheduler, /Monday 09:00[^\n]*pSEO research and learning/);
+  assert.equal(strategicNodeIds.includes("channels.distribution"), true);
+  assert.equal(strategicNodeIds.includes("channels.social"), true);
+  assert.equal(Object.hasOwn(strategic.state_views, "distribution"), true);
+  assert.equal(Object.hasOwn(strategic.state_views, "social"), true);
 });
 
 test("runtime skills are reported as unpriced", () => {

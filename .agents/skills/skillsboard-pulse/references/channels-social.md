@@ -8,9 +8,9 @@ Load for Typefully identity/readback, draft, scheduling, publication, reconcilia
 
 Use Typefully only after its official credential/configuration practice, identity readback, and exact social-set verification pass. The connected account is Tommaso's personal account and may discuss only Skills Board and its shipped features.
 
-Configuration lives at `~/.config/typefully/config.json` with mode `0600`. Do not copy its credential into Pulse state, logs, repository files, the general Pulse environment, or command output. Every invocation strips inherited `TYPEFULLY_API_KEY`. Fail closed when `config:show` reports an environment/project-local override, the global file is not active, or identity/social-set/platform/quota readback differs.
+Accept only the official CLI's global `~/.config/typefully/config.json` or repository-skill-local `.agents/skills/typefully/.typefully/config.json`, both mode `0600`; the local path must be confirmed Git-ignored by the pinned skill. Never copy the credential into Pulse state, logs, tracked files, the general environment, or output. Strip inherited `TYPEFULLY_API_KEY`. Fail closed on any other source or identity/social-set/platform/quota mismatch.
 
-The irreducibly human setup is the installed skill's interactive command `node .agents/skills/typefully/scripts/typefully.js setup`, global storage selection, and selection of the personal social set containing the intended LinkedIn/X accounts. After setup, set the global file mode to `0600`, then use `config:show`, `me:get`, `social-sets:list/get`, draft/queue readback, and quota before any write.
+The irreducibly human setup is the installed skill's interactive `setup` command and selection of the personal LinkedIn/X social set. Run later commands from the directory whose official config was selected, then use `config:show`, `me:get`, `social-sets:list/get`, draft/queue readback, and quota before writes.
 
 ## Operation states
 
