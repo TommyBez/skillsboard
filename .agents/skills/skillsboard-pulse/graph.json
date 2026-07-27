@@ -1,26 +1,74 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "20765b4f1ea772ad08c1739ec02eb7d2e41c8bc74a40eaf0ad1a86642ad37379",
+      "content_sha256": "23710d8a0a5e6eeb2725eca2790bc449fd60f8ff6f05960bad07c7b601730338",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "1966a14b1d7a7135f5cb983f220e780558413a2649009812b5cd7336a0ab7179",
+      "content_sha256": "ee7d272de6d0fd6ef33cf277adc25f860e62e77d6a55e3e3ef6dce46256ae9a4",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
+    },
+    "validator.closure": {
+      "content_sha256": "0a921b00bfc86e869b2fc7f26b8a4f73138181846e4e3c7b793108e38f6371c6",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/closure.mjs"
+    },
+    "validator.constants": {
+      "content_sha256": "f8c6be6495a0d4164f40443a78bed4bb0a6e1fd8878700fca135d7e4d70646cb",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/constants.mjs"
+    },
+    "validator.cross-refs": {
+      "content_sha256": "9d094284e929347a2becb185a1ee5c7ed7fc5372e7adf8ec654f446f9695d1ae",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/cross-refs.mjs"
+    },
+    "validator.errors": {
+      "content_sha256": "b85c47ae62b9e8d49ff688ff8164dcc4ee95da874e8402ad0bf38df31e62f732",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/errors.mjs"
+    },
+    "validator.expect": {
+      "content_sha256": "5927774dee0bdf5e735734f0a2fb8229cf1c76b705f6a534164984ffafab69fe",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/expect.mjs"
+    },
+    "validator.fs-safety": {
+      "content_sha256": "fd33a82d2f4df0b13bd154b83552a30e4448ed1cce04a21dba72d6e6cbc39f19",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/fs-safety.mjs"
+    },
+    "validator.load": {
+      "content_sha256": "55b3eed0c32e1bd784acefb45a3a5441d7d2ef17c511950a1bcf351d9935ef2c",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/load.mjs"
+    },
+    "validator.lock": {
+      "content_sha256": "a122e921dc073a01146564fa29b42cae82bdc8f3fd6c40b424ce26e5b70fd335",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/lock.mjs"
+    },
+    "validator.merkle": {
+      "content_sha256": "f2d3fd2021f822fd1129c937e8ea7f63c09b8b373cdba3d25c5c24b20b605ec6",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/merkle.mjs"
+    },
+    "validator.policy": {
+      "content_sha256": "955fbb87a4c512638c45d9aa1e65fe787599af929540a311922f0a20b700d153",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/policy.mjs"
+    },
+    "validator.resolve": {
+      "content_sha256": "4694412b0b36420e504004fdd8cf16e893f244ec23126ce8ff87e3537807017c",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/resolve.mjs"
+    },
+    "validator.shape": {
+      "content_sha256": "9c941220c80ed6fe55cf5315f07c392d9126984138af86f6ba8dd8ad168597c3",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/shape.mjs"
     }
   },
   "context_limits": {
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 14,
+  "contract_version": 15,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "7fe9133ac1e63bff04aeb1a736e986921386e70b809af16069bb10a5c0dd577e"
+    "root_sha256": "267e246984df86811834fa31a5352b02e7b53db6551258e21d1d48a053c89e0e"
   },
   "interference_keys": [
     "channel.community",
@@ -272,8 +320,7 @@
       ],
       "skills": [
         "community_marketing"
-      ],
-      "switches_all": []
+      ]
     },
     "dataforseo.research": {
       "autonomy": "autonomous",
@@ -288,8 +335,7 @@
       ],
       "skills": [
         "programmatic_seo"
-      ],
-      "switches_all": []
+      ]
     },
     "demand.email": {
       "autonomy": "autonomous",
@@ -312,8 +358,7 @@
         "email_best_practices",
         "emails",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "demand.respond": {
       "autonomy": "autonomous",
@@ -328,8 +373,7 @@
       ],
       "skills": [
         "community_marketing"
-      ],
-      "switches_all": []
+      ]
     },
     "directory.publish": {
       "autonomy": "autonomous",
@@ -344,8 +388,7 @@
       ],
       "skills": [
         "directory_submissions"
-      ],
-      "switches_all": []
+      ]
     },
     "earned.outreach": {
       "autonomy": "autonomous",
@@ -362,8 +405,7 @@
       ],
       "skills": [
         "public_relations"
-      ],
-      "switches_all": []
+      ]
     },
     "github.pr.write": {
       "autonomy": "autonomous",
@@ -381,8 +423,7 @@
       "skills": [
         "github",
         "github_yeet"
-      ],
-      "switches_all": []
+      ]
     },
     "github.pseo_pr.write": {
       "autonomy": "autonomous",
@@ -401,8 +442,7 @@
       "skills": [
         "github",
         "github_yeet"
-      ],
-      "switches_all": []
+      ]
     },
     "hacker_news.submit": {
       "autonomy": "manual_only",
@@ -415,8 +455,7 @@
       ],
       "skills": [
         "launch"
-      ],
-      "switches_all": []
+      ]
     },
     "inbound.process": {
       "autonomy": "autonomous",
@@ -432,8 +471,7 @@
       "skills": [
         "agent_email_inbox",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "inbound.reply": {
       "autonomy": "autonomous",
@@ -454,8 +492,7 @@
       "skills": [
         "agent_email_inbox",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "incident.email": {
       "autonomy": "autonomous",
@@ -470,8 +507,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "neon.database.read": {
       "autonomy": "autonomous",
@@ -484,8 +520,7 @@
       ],
       "skills": [
         "neon_postgres"
-      ],
-      "switches_all": []
+      ]
     },
     "partnership.outreach": {
       "autonomy": "autonomous",
@@ -502,8 +537,7 @@
       ],
       "skills": [
         "community_marketing"
-      ],
-      "switches_all": []
+      ]
     },
     "posthog.asset.write": {
       "autonomy": "autonomous",
@@ -520,8 +554,7 @@
       ],
       "skills": [
         "posthog"
-      ],
-      "switches_all": []
+      ]
     },
     "posthog.experiment.write": {
       "autonomy": "autonomous",
@@ -542,8 +575,7 @@
       "skills": [
         "ab_testing",
         "posthog"
-      ],
-      "switches_all": []
+      ]
     },
     "posthog.flag.write": {
       "autonomy": "autonomous",
@@ -564,8 +596,7 @@
       "skills": [
         "ab_testing",
         "posthog"
-      ],
-      "switches_all": []
+      ]
     },
     "posthog.survey.write": {
       "autonomy": "autonomous",
@@ -585,8 +616,7 @@
       "skills": [
         "customer_research",
         "posthog"
-      ],
-      "switches_all": []
+      ]
     },
     "product_hunt.submit": {
       "autonomy": "manual_only",
@@ -599,8 +629,7 @@
       ],
       "skills": [
         "launch"
-      ],
-      "switches_all": []
+      ]
     },
     "pulse.reconcile": {
       "autonomy": "autonomous",
@@ -613,8 +642,7 @@
       ],
       "skills": [
         "posthog"
-      ],
-      "switches_all": []
+      ]
     },
     "pulse.state.persist": {
       "autonomy": "autonomous",
@@ -625,8 +653,7 @@
       "requires": [
         "pulse.scheduler"
       ],
-      "skills": [],
-      "switches_all": []
+      "skills": []
     },
     "resend.audience.write": {
       "autonomy": "autonomous",
@@ -643,8 +670,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.broadcast.send": {
       "autonomy": "autonomous",
@@ -666,8 +692,7 @@
         "email_best_practices",
         "emails",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.broadcast_draft.write": {
       "autonomy": "autonomous",
@@ -684,8 +709,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.domain.write": {
       "autonomy": "autonomous",
@@ -700,8 +724,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.proactive.send": {
       "autonomy": "autonomous",
@@ -722,8 +745,7 @@
         "email_best_practices",
         "emails",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.suppression_lift": {
       "autonomy": "autonomous",
@@ -740,8 +762,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.topic.write": {
       "autonomy": "autonomous",
@@ -756,8 +777,7 @@
       ],
       "skills": [
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "resend.webhook.write": {
       "autonomy": "autonomous",
@@ -775,8 +795,7 @@
       "skills": [
         "agent_email_inbox",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "review.outreach": {
       "autonomy": "autonomous",
@@ -799,8 +818,7 @@
         "email_best_practices",
         "emails",
         "resend_connector"
-      ],
-      "switches_all": []
+      ]
     },
     "review.respond": {
       "autonomy": "autonomous",
@@ -818,8 +836,7 @@
       ],
       "skills": [
         "community_marketing"
-      ],
-      "switches_all": []
+      ]
     },
     "social.draft.write": {
       "autonomy": "autonomous",
@@ -838,8 +855,7 @@
       "skills": [
         "social",
         "typefully"
-      ],
-      "switches_all": []
+      ]
     },
     "social.publish": {
       "autonomy": "autonomous",
@@ -858,8 +874,56 @@
       "skills": [
         "social",
         "typefully"
-      ],
-      "switches_all": []
+      ]
+    }
+  },
+  "policy_invariants": {
+    "mandatory_nodes_must_equal": [
+      "pulse.kernel"
+    ],
+    "node_reference_must_equal": {
+      "product.truth": ".agents/product-marketing.md"
+    },
+    "routes": {
+      "*": {
+        "forbid_effects": [
+          "local_state"
+        ],
+        "forbid_nodes": [
+          "pulse.scheduler"
+        ]
+      },
+      "contract.audit": {
+        "allow_nodes": [
+          "pulse.scheduler"
+        ]
+      },
+      "delivery.repository": {
+        "forbid_self_origin": true
+      }
+    },
+    "run_types": {
+      "*": {
+        "effects_allowed": [
+          "local_state",
+          "read"
+        ],
+        "must_include_nodes": [
+          "analytics.control_plane",
+          "pulse.scheduler"
+        ],
+        "must_include_operations": [
+          "pulse.state.persist"
+        ]
+      },
+      "operational": {
+        "must_include_nodes": [
+          "learning.opportunities"
+        ],
+        "must_include_state_views": [
+          "opportunities"
+        ]
+      }
     }
   },
   "policy_selectors": [
@@ -1899,7 +1963,7 @@
       ]
     }
   },
-  "schema_version": 2,
+  "schema_version": 3,
   "skills": {
     "ab_testing": {
       "content_sha256": "1fd229160f6014f3f2d7c92cc7d2f991fbf8dc9ed68aac9793c71b408a6d1144",
@@ -2112,6 +2176,5 @@
     "social": [
       "/channels/social"
     ]
-  },
-  "switches": []
+  }
 }

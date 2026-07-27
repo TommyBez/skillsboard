@@ -1,27 +1,6 @@
 # Skills Board coordinated product launch
 
-## Decision
-
-- **Launch day:** Tuesday, August 11, 2026
-- **Launch window:** July 27–September 8, 2026
-- **Campaign:** `product_launch_2026_08`
-- **Primary conversion:** create a team library
-- **Primary message:** Your team already has useful skill recommendations. Put them somewhere everyone can find.
-- **Product category:** the shared AI skill library for teams
-
-This is Skills Board's first coordinated product launch. Earlier SEO pages, social posts, and community activity are supporting distribution, not a prior launch and not substitutes for this launch.
-
-## Launch thesis
-
-Teams using Claude, Codex, Cursor, and other agents accumulate useful skills, but the recommendations remain scattered across chats, bookmarks, and personal setups. Skills Board gives the team one searchable place for the skills it recommends while letting each teammate choose the original source, a compatible install command, a ZIP, or authenticated MCP access.
-
-The launch must demonstrate this product loop:
-
-1. A teammate adds one useful skill to the team library.
-2. Another teammate finds the recommendation without asking again.
-3. They use the source, command, ZIP, or a connected agent.
-
-MCP supports the story but does not lead it. The shared team library is the product.
+Working checklist for the campaign. Campaign identity, message, product loop, and selection rules are owned by `.agents/skills/skillsboard-pulse/references/launch-campaign.md` — keep those fields there and do not restate them here.
 
 ## Audience
 
