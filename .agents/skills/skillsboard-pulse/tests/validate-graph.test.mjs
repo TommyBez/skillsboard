@@ -594,6 +594,7 @@ test("the mandatory kernel applies the global evidence-proportional default with
 
 test("autonomy controls use bounded replacements instead of routine blockers", () => {
   const checked = checkGraph();
+  const orchestrator = readFileSync(new URL("../SKILL.md", import.meta.url), "utf8");
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
   const analytics = readFileSync(new URL("../references/analytics-control-plane.md", import.meta.url), "utf8");
   const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
@@ -608,8 +609,17 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 10);
-  assert.match(kernel, /private checkout at `\$CODEX_HOME\/automations\/skills-board-gtm-pulse\/checkout`/);
+  assert.equal(checked.graph.contract_version, 11);
+  for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
+    assert.doesNotMatch(contractFile, /CODEX_HOME|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
+  }
+  assert.match(orchestrator, /repository checkout supplied by the runtime and does not require a separate automation-owned checkout/);
+  assert.match(kernel, /The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate/);
+  assert.match(kernel, /Before executing the validator or any other repository code, establish the exact repository identity and commit through runtime-owned metadata or authenticated GitHub\/Git readback/);
+  assert.match(kernel, /Require the validator, graph, orchestrator, and every contract file consumed by validation to be byte-identical to that commit/);
+  assert.match(kernel, /Do not trust validator output until this bootstrap proof passes/);
+  assert.match(delivery, /Never discard, reset, stash, overwrite, or commit unrelated local work/);
+  assert.match(scheduler, /repository identity, default-branch, expected-base-commit, or exact-local-isolation failure: dependent repository lifecycle `unavailable`/);
   assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
   assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
   assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);

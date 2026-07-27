@@ -6,15 +6,15 @@ Load for every repository modification, open PR, review/check transition, merge,
 
 ## Preconditions and ownership
 
-The dedicated whole-run checkout gate in `pulse.kernel` must already have passed. Before a new repository item, reconcile live open PRs and confirm no overlapping exact `resource_key` or materially conflicting `interference_keys`; reserve the applicable general repository risk units or pSEO slot.
+Before a new repository item, reconcile live open PRs and confirm no overlapping exact `resource_key` or materially conflicting `interference_keys`; reserve the applicable general repository risk units or pSEO slot. Before a repository effect, verify the authenticated GitHub identity, exact repository, live default branch, and expected base commit.
 
-For new work, create `codex/gtm-<slug>` from the synchronized default-branch tip. To update an existing Pulse-owned PR after the gate:
+For new work, create `codex/gtm-<slug>` from the verified default-branch tip. To update an existing Pulse-owned PR:
 
 1. fetch its exact remote head;
-2. verify clean checkout, resolved default base, matching GitHub/state head and owner/resource key, and no unrelated divergence;
+2. verify the resolved default base, matching GitHub/state head and owner/resource key, and no unrelated divergence or overlapping local change;
 3. switch only to that exact head.
 
-Create or reuse only the kernel-owned private automation worktree. Never create another worktree, restore an arbitrary prior branch, rewrite history, combine unrelated resource keys, or continue after a failed gate. A pending PR locks only its resource key; independent lanes continue.
+Never discard, reset, stash, overwrite, or commit unrelated local work. If an overlapping local change prevents an exact isolated repository transition, mark only that repository lifecycle `unavailable` and continue independent lanes. Never restore an arbitrary prior branch, rewrite history, or combine unrelated resource keys. A pending PR locks only its resource key.
 
 ## Implementation and verification
 

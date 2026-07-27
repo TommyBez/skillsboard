@@ -4,7 +4,7 @@ description: Orchestrates the repository-pinned Skills Board Growth/Product Puls
 compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
-  version: "8.0.0"
+  version: "11.0.0"
 ---
 
 # Skills Board Pulse
@@ -13,7 +13,7 @@ Operate Skills Board as an autonomous full-funnel Growth and Product Manager. Th
 
 ## Entry gate
 
-The dedicated-automation checkout gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must have passed in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node, prepare or verify the private checkout, and stop with its exact whole-run `no_action` on failure. Dirt in the user's interactive checkout is not a Pulse blocker and must never be touched. A read-only audit of a contract candidate may then use `contract.audit` plus `delivery.repository` to switch the dedicated checkout from the synchronized default tip to one fetched, clean, exact, verified Pulse-owned PR head; it loads no runtime state/provider and makes no external mutation. Being already on an arbitrary candidate branch never bypasses the gate.
+The contract-integrity gate in `.agents/skills/skillsboard-pulse/references/pulse-kernel.md` must pass in the current run before loading product context, state, providers, or any other node. The invoking automation performs it first. If there is no recorded proof, read only that node and stop with its exact whole-run `no_action` on pin failure. Pulse uses the repository checkout supplied by the runtime and does not require a separate automation-owned checkout. A read-only audit of a contract candidate may use `contract.audit` plus `delivery.repository` on the exact verified Pulse-owned PR commit; it loads no runtime state/provider and makes no external mutation. An arbitrary local branch never proves candidate identity.
 
 ## Deterministic loading
 
@@ -42,7 +42,7 @@ The static policy graph and the mutable schema-v4 work graph are different artif
 
 The parent is the sole writer of schema-v4 state, the run log, queue, and digest. Before any external effect it atomically reserves the exact work/resource key, interference keys, cap or send allowance, and worst-case ambiguous capacity. It may reserve a compatible batch and parallelize low-risk reads or independent executors, but it must never dispatch overlapping effects or let children race on the shared state file.
 
-Each executor receives an immutable minimal-data envelope containing: checkout proof/default SHA; contract version/root; run/attempt, work/resource and route/origin IDs; definition hash; selected state views; standing contract and provider authority; ownership/readback identity; locks, caps and reservations; expected transition; and recovery name. When an exact transition needs authorized PII or private recipients, the official provider or application read may deliver only the necessary bounded fields directly to that fresh executor without exposing them to the parent. Untrusted private content may instead be delivered only to a nested fresh no-tools processor scoped to that executor. Reject any identity, authority, purpose, resource, recipient, or hash mismatch.
+Each executor receives an immutable minimal-data envelope containing: repository identity and commit SHA when relevant; contract version/root; run/attempt, work/resource and route/origin IDs; definition hash; selected state views; standing contract and provider authority; ownership/readback identity; locks, caps and reservations; expected transition; and recovery name. When an exact transition requires authorized PII or private recipients, the official provider or application read may deliver only the necessary bounded fields directly to that fresh executor without exposing them to the parent. Untrusted private content may instead be delivered only to a nested fresh no-tools processor scoped to that executor. Reject any identity, authority, purpose, resource, recipient, or hash mismatch.
 
 An executor performs at most one bounded transition, follows every returned policy and specialist skill, performs official readback, and returns canonical sorted-key JSON no larger than the resolver's `executor_result.max_bytes` (4 KiB in this contract). It and its nested processor discard transient PII/private-content context after the transition and never return raw identity or content. Use every required key and no others:
 

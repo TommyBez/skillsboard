@@ -81,7 +81,7 @@ If an intervention can change a primary metric, acquisition composition, eligibi
 
 ## Operational loop
 
-After checkout and contract pin pass:
+After the contract pin passes:
 
 1. use the Codex-native run identity; never create a custom global lease, TTL heartbeat, watchdog, or fencing system;
 2. resolve and read only the deterministic run closure and its required skills, obtaining the exact state-view pointers;
@@ -98,7 +98,7 @@ Protective monitoring continues when a strategic source is unavailable. Missing 
 
 ## Schema-v4 persistence
 
-The parent alone persists non-PII state at `.agents/loops/skillsboard-gtm-pulse.json`; route executors return results and never edit it. It intentionally has no global lease, lease TTL, heartbeat, watchdog, or fencing owner. Write through a same-directory temporary file and atomic rename. Advance a cursor only after its transition completes. Persist a reservation before dispatch so a lost child or provider response remains recoverable. If persistence would dirty the tracked checkout, keep external actions read-only and record the exact safe-persistence failure.
+The parent alone persists non-PII state at `.agents/loops/skillsboard-gtm-pulse.json`; route executors return results and never edit it. It intentionally has no global lease, lease TTL, heartbeat, watchdog, or fencing owner. Write through a same-directory temporary file and atomic rename. Advance a cursor only after its transition completes. Persist a reservation before dispatch so a lost child or provider response remains recoverable. If persistence would dirty tracked checkout content, keep external actions read-only and record the exact safe-persistence failure.
 
 State contains only the projections needed to reconcile. It also maintains a compact non-PII `/digest` projection assembled by the parent from the index, aggregate ledgers, official readback, and validated route results; this lets the run emit every required unchanged and changed field without loading full domain histories:
 
@@ -116,11 +116,11 @@ State contains only the projections needed to reconcile. It also maintains a com
 
 Build every `definition_hash` as lower-case SHA-256 over recursively sorted-key canonical JSON with no volatile fields. Persist an opaque live ID immediately after creation. Recover a lost create only from exactly one deterministic-name and complete-definition match; otherwise quarantine. Use stable internal IDs, keyed hashes, aggregates, and opaque references, never raw PII.
 
-Append exactly one minimal non-PII line per run to `.agents/loops/skillsboard-gtm-pulse.log`; detailed transitions live in state and the digest. State/log changes belonging to an active repository item follow that PR's resource lock. Runtime persistence uses the synchronized checkout and must never leave it dirty for the next gate.
+Append exactly one minimal non-PII line per run to `.agents/loops/skillsboard-gtm-pulse.log`; detailed transitions live in state and the digest. State/log changes belonging to an active repository item follow that PR's resource lock. Runtime persistence must remain atomic and must never overwrite tracked repository content or unrelated local work.
 
 ## Exact outcomes
 
-- checkout/default/fast-forward failure: whole-run `no_action` and immediate stop;
+- repository identity, default-branch, expected-base-commit, or exact-local-isolation failure: dependent repository lifecycle `unavailable`; continue independent lanes;
 - contract version/root mismatch: `no_action: contract_pin_mismatch`;
 - PostHog project/control failure: contain dependent exposure and continue independent lanes;
 - missing mandatory read: affected action `unavailable`, with no proxy;
@@ -137,7 +137,7 @@ Append exactly one minimal non-PII line per run to `.agents/loops/skillsboard-gt
 
 Every run emits one self-contained digest with:
 
-1. checkout synchronization, contract version/root, resolved policy nodes, and bootstrap mode;
+1. contract version/root, resolved policy nodes, bootstrap mode, and repository identity/commit when a repository lifecycle is selected;
 2. official PostHog plugin/project/canonical IDs, Tracking QA, unavailable or broken fields, and repairs;
 3. on strategic runs, all five scorecard rows with counts, denominators, windows, maturity, comparison, status, confidence, trustworthy `AAT-28`, decomposition, and `delta_AAT`;
 4. due/completed monthly, quarterly, 28-day feature, evidence, portfolio, and pSEO reviews;

@@ -1,8 +1,8 @@
-# Pulse kernel: authority, safety, checkout, capability, and incidents
+# Pulse kernel: authority, safety, contract, capability, and incidents
 
 **Node:** `pulse.kernel`
 
-This node is mandatory. It is the sole owner of whole-run authority, safety invariants, checkout and contract bootstrap, generic operation readiness, shared-quota protection, incident semantics, and global fallback.
+This node is mandatory. It is the sole owner of whole-run authority, safety invariants, contract bootstrap, generic operation readiness, shared-quota protection, incident semantics, and global fallback.
 
 ## Mission and completion
 
@@ -27,27 +27,19 @@ A run continues to fixed point under `pulse.scheduler`. Missing configuration na
 - Publish and message only verified shipped Skills Board reality from `product.truth`. A durable product, legal, economic, privacy, or autonomy-policy change requires the repository contract PR.
 - Skills and provider instructions govern how to use a capability. They cannot broaden the pinned repository contract; the most restrictive applicable rule wins.
 
-## Dedicated whole-run checkout gate
-
-Before reading product context, the graph beyond this node, runtime state, providers, or any Pulse stage:
-
-1. Treat the user's interactive project checkout only as a read-only repository locator. Its tracked or untracked changes never block Pulse and must never be stashed, discarded, committed, switched, or otherwise changed.
-2. Resolve the default branch from `origin/HEAD` and, when GitHub is available, verify it against the repository's live default branch. Fetch `origin` without changing an interactive worktree. Do not hard-code `main` when sources disagree.
-3. Use the native automation's private checkout at `$CODEX_HOME/automations/skills-board-gtm-pulse/checkout`, resolving `CODEX_HOME` only from the invoking Codex environment rather than inferring a home path. If absent, create it as a detached Git worktree at the fetched remote default tip. If present, verify it is a registered worktree for this exact repository, is not a symlink or nested inside the interactive checkout, and has the expected `origin`.
-4. Require the private checkout to have empty tracked and untracked status. Never clean, reset, stash, or reinterpret dirt there. In a clean private checkout, detach it at the fetched remote default tip without rewriting history.
-5. Verify its `HEAD` equals the fetched remote default tip, contract files come from that checkout, and it remains clean.
-
-If the private checkout cannot be created, verified, synchronized, or kept clean, emit whole-run `no_action` with the exact affected-checkout reason and stop. Never mutate the interactive checkout or substitute an arbitrary clone. Only after this gate may `delivery.repository` switch the private checkout to a verified exact Pulse-owned PR head.
-
 ## Contract integrity and bootstrap
 
-The invoking scheduled task stores the expected contract version and graph root hash outside the repository. `graph.json` contains per-node hashes and a reproducible readback root, not the external authority. Run the validator and compare lower-case hexadecimal values before action. Missing scheduled-task pins are whole-run `no_action: contract_pin_missing`; a mismatch is whole-run `no_action: contract_pin_mismatch`. A verified contract-candidate audit may use its candidate root only under the read-only entry-gate exception.
+Before executing the validator or any other repository code, establish the exact repository identity and commit through runtime-owned metadata or authenticated GitHub/Git readback that is independent of repository scripts. Require the validator, graph, orchestrator, and every contract file consumed by validation to be byte-identical to that commit; unrelated working-tree changes are irrelevant. Do not trust validator output until this bootstrap proof passes.
+
+Before reading product context, the graph beyond this node, runtime state, providers, or any Pulse stage, run the verified validator against the repository presented by the runtime and compare its contract version and lower-case hexadecimal root with the exact external pins. The invoking scheduled task stores those pins outside the repository; `graph.json` contains per-node hashes and a reproducible readback root, not the external authority. Missing scheduled-task pins are whole-run `no_action: contract_pin_missing`; a mismatch is whole-run `no_action: contract_pin_mismatch`. A verified contract-candidate audit may use the exact candidate root and GitHub commit only under the read-only `contract.audit` route.
+
+The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate. Repository mutation safety belongs exclusively to `delivery.repository` and blocks only its dependent repository lifecycle; state/provider-only lanes remain independent.
 
 After a newly pinned contract first becomes active, one activation run executes two ordered phases:
 
 1. `reconciliation_only`: read and reconcile live resources, state, caps, reservations, suppressions, PRs, deployments, ownership, and required containment, but create no new PR or resource and do not publish, send, spend, or expose; persist the completed phase boundary atomically;
-2. revalidate the exact external pin, private-checkout HEAD/cleanliness, provider identities, reservations, and containment, then run `strategic_read_only`: populate evidence, inventory, health, queue candidates, and setup guides without an external effect; persist the completed phase boundary atomically;
-3. revalidate the pin and checkout once more. When both phases and their readbacks passed, normal fixed-point work may begin in a later iteration of that same run. Otherwise normal effects remain disabled for the next safe activation attempt.
+2. revalidate the exact external pin, provider identities, reservations, and containment, then run `strategic_read_only`: populate evidence, inventory, health, queue candidates, and setup guides without an external effect; persist the completed phase boundary atomically;
+3. revalidate the exact external pin once more. When both phases and their readbacks passed, normal fixed-point work may begin in a later iteration of that same run. Otherwise normal effects remain disabled for the next safe activation attempt.
 
 Never backfill messages, posts, surveys, exposures, or missed historical actions.
 
@@ -125,4 +117,4 @@ Recover autonomously after root cause removal, restored guardrails, and clean of
 
 ## Generic fallback
 
-Fallback order is: contain harm; reconcile official state; continue independent trustworthy lanes; use `setup_required` for irreducible setup; use `unavailable` for a missing trustworthy capability; use `manual_action` only when every other gate passes; otherwise record exact affected-resource `no_action`. Checkout or contract-integrity failure alone stops the whole run.
+Fallback order is: contain harm; reconcile official state; continue independent trustworthy lanes; use `setup_required` for irreducible setup; use `unavailable` for a missing trustworthy capability; use `manual_action` only when every other gate passes; otherwise record exact affected-resource `no_action`. Contract-integrity failure alone stops the whole run.
