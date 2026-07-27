@@ -63,7 +63,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   Core principle
                 </p>
                 <p className="mt-3 text-pretty text-base font-medium leading-relaxed">
-                  One canonical source. One visible recommendation. Explicit setup for every agent path.
+                  {guide.corePrinciple}
                 </p>
               </div>
             </div>

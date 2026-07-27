@@ -1,4 +1,5 @@
 import {
+  aiCodingTeamOnboardingGuide,
   manageCrossAgentSkillsGuide,
   shareTeamSkillsGuide,
 } from "@/lib/seo/guides"
@@ -21,6 +22,7 @@ export interface ResourceIndexEntry {
 }
 
 export const resourceEntries = [
+  aiCodingTeamOnboardingGuide,
   shareTeamSkillsGuide,
   manageCrossAgentSkillsGuide,
 ] satisfies readonly ResourceIndexEntry[]

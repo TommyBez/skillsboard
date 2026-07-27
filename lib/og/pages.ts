@@ -50,6 +50,20 @@ export const manageCrossAgentSkillsGuideOgContent: OgTemplateContent = {
   chips: ["Compatibility matrix", "Rollout plan"],
 }
 
+export const aiCodingTeamOnboardingGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · AI coding operations",
+  title: [
+    { text: "Onboard your team to" },
+    { text: "AI coding tools.", accent: true },
+  ],
+  description:
+    "Start with one workflow, trusted context, clear review gates, and evidence another engineer can reproduce.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["6-step rollout", "Onboarding record"],
+}
+
 export const signUpOgContent: OgTemplateContent = {
   eyebrow: "Create your free account",
   title: [
