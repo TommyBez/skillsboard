@@ -115,7 +115,7 @@ When the user asks to add notes, ideas, or context to a draft, use `--scratchpad
 ```
 
 - `next-free-slot` lets Typefully pick the optimal time.
-- **Publishing is irreversible and public.** Confirm first unless the user explicitly requested publication or an independently approved repository-pinned automation contract grants standing publication authority and binds the full immutable transition envelope: exact account, required social set, resource key, contract root, platforms, copy, timing, schedule ID, parent ID, reply ID, caps, and readback, using explicit nulls for inapplicable IDs. Creating a draft is safe.
+- **Publishing is irreversible and public.** Confirm first unless the user explicitly requested publication or a repository-pinned active automation contract grants standing publication authority. Under that standing authority, the parent may publish directly after verifying the exact account, social set, platform, current draft, and absence of a binding provider/platform or spend restriction. Do not require a fresh executor, second write authorizer, immutable transition envelope, shadow stage, editorial cap, cooldown, or per-post confirmation.
 - Single-arg commands require `--use-default` when a default social set is configured (see the [safety note](#commands) below).
 
 ---
@@ -295,4 +295,4 @@ To keep accounts in good standing, especially on X:
 - No trending manipulation, no fake engagement (likes/reposts/follows).
 - Respect rate limits; drafts stay private until published or explicitly shared.
 
-When in doubt, create drafts for user review rather than publishing directly.
+Create a draft instead of publishing only when the user asked for a draft or a concrete account-identity, binding-platform, legal, consent, spend, or duplicate-delivery ambiguity prevents publication. Under standing automation authority, ordinary editorial uncertainty is resolved by the parent and is not a review gate.

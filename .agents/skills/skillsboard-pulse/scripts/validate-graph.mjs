@@ -72,29 +72,17 @@ const EXECUTOR_RESULT_ENUMS = Object.freeze({
   outcome: ["ambiguous", "completed", "contained", "failed", "no_action", "unavailable"],
   readback: ["ambiguous", "confirmed", "not_found", "not_required", "unavailable"],
   reason_code: [
-    "cap_exceeded",
-    "cap_unavailable",
-    "consent_ineligible",
+    "authority_or_identity",
     "containment_applied",
-    "definition_mismatch",
     "effect_ambiguous",
-    "invalid_envelope",
     "invalid_result",
-    "isolated_executor_unavailable",
-    "manual_action_required",
+    "legal_or_consent",
     "measurement_failure",
     "operation_completed",
-    "ownership_ambiguous",
-    "policy_ineligible",
+    "physical_unavailability",
     "provider_error",
-    "required_read_unavailable",
     "runtime_exhausted",
-    "setup_required",
-    "suppression_active",
-    "verification_failed",
-    "waiting_cooldown",
-    "waiting_dependency",
-    "waiting_maturity",
+    "spend_or_overage",
     "waiting_pr_approval",
   ],
 });
@@ -108,30 +96,20 @@ const BASE_SAFETY = Object.freeze({
     "checkout",
     "ownership",
     "idempotency",
-    "verification",
-    "rollback",
-    "incident",
   ],
   external_write: [
     "truth",
     "authority",
     "ownership",
     "idempotency",
-    "caps",
-    "readback",
-    "containment",
-    "incident",
+    "data_safety",
   ],
   public_effect: [
     "truth",
     "authority",
     "ownership",
     "idempotency",
-    "caps",
-    "readback",
-    "containment",
-    "incident",
-    "eligibility",
+    "data_safety",
   ],
   spend: [
     "truth",
@@ -849,7 +827,7 @@ function validateCrossReferences(graph, repositoryRoot) {
       }
       if (groupName === "route" && graph.operations["pulse.state.persist"]) {
         if (id !== "contract.audit" && graph.nodes["pulse.scheduler"]) {
-          invariant(!orderedNodes.includes("pulse.scheduler"), `route ${id} must not load pulse.scheduler in an isolated executor`);
+          invariant(!orderedNodes.includes("pulse.scheduler"), `route ${id} must not load parent-only pulse.scheduler state-writing context`);
         }
       }
       const skillIdsForSelection = selectionSkillIds(graph, selection);
@@ -864,18 +842,6 @@ function validateCrossReferences(graph, repositoryRoot) {
         );
       }
 
-      if (selection.operations.includes("posthog.survey.write")) {
-        invariant(
-          orderedNodes.includes("communications.attention") && selection.state_views.includes("attention"),
-          `${groupName} ${id} must load communications.attention and the attention state view for cross-channel attention caps`,
-        );
-      }
-      if (skillIdsForSelection.includes("referrals")) {
-        invariant(
-          orderedNodes.includes("communications.attention") && selection.state_views.includes("attention"),
-          `${groupName} ${id} must load communications.attention and the attention state view for cross-channel attention caps`,
-        );
-      }
     }
   }
 
@@ -1005,7 +971,7 @@ export function resolveGraph(graph, options = {}) {
   const explicitNodes = options.nodes ?? [];
   invariant(Boolean(runId) !== Boolean(routeId), "resolve requires exactly one isolated selector: --run or --route");
   invariant(!(runId && routeId), "resolve isolates orchestration and execution: use either --run or --route, never both");
-  invariant(!(runId && explicitNodes.length > 0), "run resolution does not accept --node; dispatch policy work through an isolated route executor");
+  invariant(!(runId && explicitNodes.length > 0), "run resolution does not accept --node; resolve policy work through a separate action route");
   if (runId) invariant(graph.run_types[runId], `unknown run type: ${runId}`);
   if (routeId) invariant(graph.routes[routeId], `unknown route: ${routeId}`);
   for (const id of explicitNodes) invariant(graph.nodes[id], `unknown explicit node: ${id}`);

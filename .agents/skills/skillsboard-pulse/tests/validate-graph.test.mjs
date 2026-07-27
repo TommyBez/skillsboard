@@ -262,7 +262,19 @@ test("resolve returns dependency-first policy context without file contents", ()
   assert.equal(result.executor_result.max_bytes, 4_096);
   assert.equal(result.executor_result.schema_version, 1);
   assert.ok(result.executor_result.required_keys.includes("reason_code"));
-  assert.equal(result.executor_result.enums.reason_code.includes("switch_disabled"), false);
+  for (const removedGate of [
+    "switch_disabled",
+    "policy_ineligible",
+    "waiting_maturity",
+    "waiting_cooldown",
+    "manual_action_required",
+    "qa_required",
+    "shadow_pending",
+    "isolated_executor_unavailable",
+    "evidence_insufficient",
+  ]) {
+    assert.equal(result.executor_result.enums.reason_code.includes(removedGate), false);
+  }
   assert.equal(JSON.stringify(result).includes("# Kernel"), false);
 });
 
@@ -412,9 +424,8 @@ test("check rejects an external write operation unreachable from all routes", ()
   expectValidationError(() => checkGraph(graphPath), /external write operation is unreachable.*orphan\.write/);
 });
 
-test("survey routes must load the cross-channel attention owner and state view", () => {
+test("survey routes do not require an internal attention-cap gate", () => {
   const { graphPath } = makeFixture();
-  lockGraph(graphPath);
   mutateGraph(graphPath, (graph) => {
     graph.state_views.attention = ["/communications/attention"];
     graph.operations["posthog.survey.write"] = {
@@ -435,10 +446,11 @@ test("survey routes must load the cross-channel attention owner and state view",
       max_known_context_bytes: 32_768,
     };
   });
-  expectValidationError(() => checkGraph(graphPath), /cross-channel attention caps/);
+  lockGraph(graphPath);
+  assert.doesNotThrow(() => checkGraph(graphPath));
 });
 
-test("referral-skilled routes must load the cross-channel attention owner and state view", () => {
+test("referral routes do not require an internal attention-cap gate", () => {
   const { graphPath } = makeFixture();
   mutateGraph(graphPath, (graph) => {
     graph.skills.referrals = {
@@ -451,7 +463,8 @@ test("referral-skilled routes must load the cross-channel attention owner and st
       skills: ["referrals"],
     };
   });
-  expectValidationError(() => lockGraph(graphPath), /cross-channel attention caps/);
+  lockGraph(graphPath);
+  assert.doesNotThrow(() => checkGraph(graphPath));
 });
 
 test("resolve requires an explicit non-mandatory origin for repository routes", () => {
@@ -577,22 +590,23 @@ test("operational runs resolve the continuous per-lane replan policy and state",
   assert.deepEqual(run.switches_all, []);
 });
 
-test("the mandatory kernel applies the global evidence-proportional default without weakening positive gates", () => {
+test("the mandatory kernel exposes a closed blocker set and direct parent authority", () => {
   const checked = checkGraph();
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
 
   assert.deepEqual(checked.graph.mandatory_nodes, ["pulse.kernel"]);
-  assert.match(kernel, /Across Pulse, the evidence-proportional default assumes ordinary non-defective state until contrary evidence/);
-  assert.match(kernel, /Without evidence[^\n]*create no presumed problems, work items, blockers, monitoring, setup requirements, unavailable states, QA gates, or proof requests/);
-  assert.match(kernel, /Evidence to the contrary: a reproducible observation, authoritative provider\/product signal, failed mandatory readback, or exact deterministic contract trigger/);
-  assert.match(kernel, /Never fabricate positive authority\/safety/);
-  assert.match(kernel, /For an effect\/decision, verify required identity, consent, suppressions, ownership, eligibility, destination, cap\/capacity, spend authority/);
-  assert.match(kernel, /Missing proof narrows only that effect\/decision, creating no speculative remediation elsewhere/);
-  assert.match(kernel, /Optional diagnostics\/generic possibilities cannot create or preserve `waiting_dependency`, `setup_required`, `unavailable`, `qa_required`, monitoring, repair, or synthetic work/);
-  assert.match(kernel, /Waiting requires selected legitimate work plus an explicit mandatory dependency/);
+  assert.match(kernel, /complete closed set of conditions that may block an action/);
+  assert.match(kernel, /The only human approval is the owner's approval immediately before merging a pull request/);
+  assert.match(kernel, /Every other historical gate is removed/);
+  assert.match(kernel, /The pinned contract plus an active native automation authorize all routed actions except PR merge/);
+  assert.match(kernel, /The parent executes routed actions directly/);
+  assert.match(kernel, /Official provider confirmation prompts may enforce binding terms, recipient\/account authorization, irreversible deletion, or spend/);
+  assert.match(kernel, /They may not add a general human confirmation for already-authorized publication/);
+  assert.match(kernel, /DataForSEO is the only metered Pulse provider/);
+  assert.match(kernel, /Contract pin failure alone stops the whole run/);
 });
 
-test("autonomy controls use bounded replacements instead of routine blockers", () => {
+test("autonomy contract removes every routine blocker outside the closed set", () => {
   const checked = checkGraph();
   const orchestrator = readFileSync(new URL("../SKILL.md", import.meta.url), "utf8");
   const kernel = readFileSync(new URL("../references/pulse-kernel.md", import.meta.url), "utf8");
@@ -609,50 +623,34 @@ test("autonomy controls use bounded replacements instead of routine blockers", (
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
   const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 12);
+  assert.equal(checked.graph.contract_version, 13);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
-    assert.doesNotMatch(contractFile, /CODEX_HOME|Dedicated whole-run checkout gate|automation_checkout_path_unavailable/);
+    assert.doesNotMatch(contractFile, /CODEX_HOME|automation_checkout_path_unavailable/);
   }
-  assert.match(orchestrator, /repository checkout supplied by the runtime and does not require a separate automation-owned checkout/);
-  assert.match(kernel, /The runtime supplies the repository checkout; its location and topology are not Pulse authority or a whole-run gate/);
-  assert.match(kernel, /Before executing the validator or any other repository code, establish the exact repository identity and commit through runtime-owned metadata or authenticated GitHub\/Git readback/);
-  assert.match(kernel, /Require the validator, graph, orchestrator, and every contract file consumed by validation to be byte-identical to that commit/);
-  assert.match(kernel, /Do not trust validator output until this bootstrap proof passes/);
-  assert.match(delivery, /Never discard, reset, stash, overwrite, or commit unrelated local work/);
-  assert.match(scheduler, /repository identity, default-branch, expected-base-commit, or exact-local-isolation failure: dependent repository lifecycle `unavailable`/);
-  assert.match(kernel, /per exact `provider \+ operation \+ resource \+ definition_hash` tuple/);
-  assert.match(kernel, /Necessary authorized PII or private recipients may be delivered directly/);
-  assert.match(kernel, /normal fixed-point work may begin in a later iteration of that same run/);
-  assert.match(analytics, /A deterministic private measurement asset/);
-  assert.match(analytics, /operation-specific gates.*advertised containment path/);
-  assert.match(analytics, /root_cause_hash \+ definition_hash/);
-  assert.match(analytics, /Discovery and SDK doctor are optional diagnostics/);
-  assert.match(analytics, /cannot stop repository repair, provider-independent work/);
-  assert.match(analytics, /fail closed only its dependent item/);
-  assert.match(analytics, /Assume event capture is not duplicating until concrete contrary evidence exists/);
-  assert.match(analytics, /missing custom key or preventive health check is not evidence/);
-  assert.match(analytics, /reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event/);
-  assert.doesNotMatch(scorecard, /Verify event names[^\n]*duplicates/);
-  assert.match(learning, /continuously replans each independent lane/);
-  assert.match(learning, /deterministic low-risk non-experimental repair/);
-  assert.match(scheduler, /general repository WIP has a hard budget of six units/);
-  assert.match(scheduler, /Before claim it is a soft hold/);
-  assert.match(scheduler, /at most three open pSEO PRs/);
-  assert.match(distribution, /official account-visible rules returned by an advertised authenticated operation/);
-  assert.match(social, /at most three autonomous X replies/);
-  assert.match(delivery, /`qa_required` permits PR creation and review only/);
-  assert.match(delivery, /exact canonical graph route ID/);
-  assert.match(inbound, /as the primary ingress/);
-  assert.match(inbound, /Never use a private API, Resend CLI, custom client/);
-  assert.match(email, /bounded exact-record or frozen-target-set reads/);
-  assert.match(email, /at most three total attempts.*one initial send plus at most two retries/);
-  assert.match(pseo, /three new experimental pSEO PRs per rolling seven days/);
-  assert.match(product, /at most one optional open-text question/);
-  assert.match(product, /at most three materially distinct treatment versions per rolling 90 days/);
-  assert.match(typefully, /full immutable transition envelope: exact account, required social set, resource key, contract root/);
+  assert.match(orchestrator, /Closed set of blocking conditions/);
+  assert.match(orchestrator, /The parent may directly execute every routed public, repository, analytics, community, social, and zero-cost provider transition/);
+  assert.match(kernel, /The only human approval is the owner's approval immediately before merging a pull request/);
+  assert.match(kernel, /Every other historical gate is removed/);
+  assert.match(kernel, /The parent executes routed actions directly/);
+  assert.match(kernel, /DataForSEO is the only metered Pulse provider/);
+  assert.match(delivery, /The owner's approval is required immediately before merge/);
+  assert.match(delivery, /There is no repository WIP budget, risk-unit budget, PR-count cap, QA-required state, shadow stage, review-freshness rule, maturity gate, or independent-review requirement/);
+  assert.match(analytics, /There is no read-only-to-shadow-to-enabled lifecycle, asset cap, WIP gate, maturity requirement, exposure wait, preregistration gate, or measurement-health prerequisite/);
+  assert.match(scorecard, /The scorecard reports reality and guides prioritization\. It never authorizes or blocks/);
+  assert.match(learning, /It does not impose evidence thresholds before action/);
+  assert.match(distribution, /There is no Pulse-defined seven-day contact cap/);
+  assert.match(social, /The parent invokes the official Typefully capability directly/);
+  assert.match(social, /There is no rolling editorial cap, minimum gap, queue reservation, cooldown, weekly quota, or publishing-frequency gate/);
+  assert.match(inbound, /There is no Pulse-defined mailbox lookback gate/);
+  assert.match(email, /No per-send human confirmation, isolated executor availability, shadow draft, empty-segment ceremony, internal attention cap, campaign WIP, audience-size threshold, scheduling prohibition, or readiness lifecycle is required/);
+  assert.match(pseo, /There is no rolling PR cap, page cap, problem-cluster lock, sibling limit, checkpoint gate, maturity wait/);
+  assert.match(product, /There is no exposure-unit budget, survey-slot cap, experiment-series limit, minimum sample, evidence-stage threshold, WIP gate/);
+  assert.match(scheduler, /Do not persist `waiting_maturity`, `waiting_cooldown`, `waiting_dependency`, `manual_action`, `setup_required`, `shadow`/);
+  assert.match(typefully, /the parent may publish directly/);
+  assert.match(typefully, /Do not require a fresh executor, second write authorizer/);
 });
 
-test("protected organic growth lanes cannot skip current sensing or freeze a bare empty queue", () => {
+test("protected organic growth lanes execute without internal readiness gates", () => {
   const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
   const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
   const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
@@ -664,24 +662,37 @@ test("protected organic growth lanes cannot skip current sensing or freeze a bar
   const strategicNodeIds = strategic.nodes.map(({ id }) => id);
 
   assert.match(scorecard, /at least 20% week-over-week growth in new `team_activated_14d` teams/);
-  assert.match(scorecard, /otherwise mark it `undefined` and target at least one additional team/);
-  assert.match(learning, /refreshes attributable public evidence for both protected organic acquisition lanes/);
-  assert.match(learning, /`not_due_not_refreshed`, stale backlog, and bare `no_change_evidence_insufficient` are invalid/);
-  assert.match(pseo, /Intent adjacency is audience-led, not keyword-led/);
-  assert.match(pseo, /need not contain “skill”, “agent”, “library”, or the product name/);
-  assert.match(pseo, /DataForSEO is the only metered provider and Monday's default enrichment/);
-  assert.match(pseo, /Start from audience\/problem signals, not product-name keywords/);
-  assert.match(pseo, /Waiting for an existing page's maturity does not block a distinct cluster/);
-  assert.match(distribution, /Community is a protected zero-cost lane alongside social/);
-  assert.match(social, /Owned social is a protected organic community lane/);
-  assert.match(scheduler, /separate non-starving protected-lane pass/);
-  assert.match(scheduler, /A non-empty general queue never suppresses protected work/);
-  assert.match(scheduler, /The overall weekly queue may be empty only when every protected lane has the third outcome/);
+  assert.match(scorecard, /When the prior closed week is zero, the percentage is undefined and the absolute target is at least one additional activated team/);
+  assert.match(learning, /It must produce and execute a search action and a community\/social action/);
+  assert.match(learning, /An empty queue, evidence repair in place of action, or evidence-insufficient no-action is invalid/);
+  assert.match(pseo, /Research the ICP's problems, work, tools, interests, and adjacent topics/);
+  assert.match(pseo, /Queries do not need to contain “skill”, “agent”, “library”, or the product name/);
+  assert.match(pseo, /DataForSEO is the only metered provider/);
+  assert.match(pseo, /The user's “bananas” example is valid in principle/);
+  assert.match(pseo, /There is no rolling PR cap, page cap, problem-cluster lock, sibling limit, checkpoint gate, maturity wait/);
+  assert.match(distribution, /Community includes social and is a protected zero-cost growth lane/);
+  assert.match(distribution, /There is no Pulse-defined seven-day contact cap, top-level-post cap, subreddit cooldown, directory quota/);
+  assert.match(social, /Owned social is a protected organic lane/);
+  assert.match(social, /The parent invokes the official Typefully capability directly/);
+  assert.match(scheduler, /Search and community\/social remain protected independent lanes/);
+  assert.match(scheduler, /repeat until runtime ends or only the closed-set blockers/);
+  assert.match(scheduler, /There is no repository WIP budget, pSEO PR\/page quota/);
   assert.doesNotMatch(scheduler, /Monday 09:00[^\n]*pSEO research and learning/);
   assert.equal(strategicNodeIds.includes("channels.distribution"), true);
   assert.equal(strategicNodeIds.includes("channels.social"), true);
   assert.equal(Object.hasOwn(strategic.state_views, "distribution"), true);
   assert.equal(Object.hasOwn(strategic.state_views, "social"), true);
+});
+
+test("public social publication never depends on a secondary executor or authorizer", () => {
+  const orchestrator = readFileSync(new URL("../SKILL.md", import.meta.url), "utf8");
+  const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
+  const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
+
+  assert.match(orchestrator, /The parent may directly execute every routed public/);
+  assert.match(social, /A fresh isolated executor, child write-authorizer[^\n]*is not required/);
+  assert.match(typefully, /the parent may publish directly/);
+  assert.match(typefully, /Do not require a fresh executor, second write authorizer/);
 });
 
 test("runtime skills are reported as unpriced", () => {

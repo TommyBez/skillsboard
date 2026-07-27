@@ -163,8 +163,9 @@
 - Product updates, newsletters, activation guidance, and structured product-research invitations share the `product_communications` consent topic. Optional in-app surveys follow their own non-blocking research/opt-out contract and do not require that email consent. The topic never authorizes personal qualitative follow-up.
 - Paid advertising is policy-ineligible while Skills Board has no revenue line. Reconsidering it requires a merged strategy change that establishes a revenue model.
 - Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent. A public metric also requires its exact definition, window, denominator, privacy-safe aggregation, and approval under the policy that owns it.
-- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy requires an independently approved repository PR before it becomes executable.
-- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. It does not by itself authorize targeting, consent eligibility, attention caps, sending, publishing, spend, or provider writes; the owning Pulse policy must authorize those effects.
+- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy is delivered through a repository PR. Branching, implementation, push, and PR preparation are autonomous; the owner's approval is required only immediately before merge.
+- Social, community, SEO, analytics, product, and legally consented/provider-compliant communication actions require no per-action human approval. The pinned active Pulse contract is standing authority.
+- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. The pinned Pulse contract authorizes routed sending, publishing, targeting, and provider writes subject only to its legal, consent, identity, binding-platform, spend, and PR-merge boundaries.
 
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.

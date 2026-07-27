@@ -1,11 +1,11 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "bebc138e4a2b4057cc5170227ff71f1655c0fb7ef160b2ab4baeb8d811b1c26b",
+      "content_sha256": "d49f5b5a8121eaf847ca65e012b36848ebd79ecc5392ebdaa9bbc0276e6c10d7",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
-      "content_sha256": "a791058b84c89ecb6d1947861547a4200d8ea023668a8e2b38af5e1d96e3c2c3",
+      "content_sha256": "1966a14b1d7a7135f5cb983f220e780558413a2649009812b5cd7336a0ab7179",
       "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
     }
   },
@@ -13,14 +13,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 12,
+  "contract_version": 13,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "4ef305053346c3c08434f9bfbd262fa81c38f914c18bb1064ae51998190b87a6"
+    "root_sha256": "859f64e76b86ba3f447eb8fab42bb1869582c148c7950a66c1872ae01cbaf155"
   },
   "interference_keys": [
     "channel.community",
@@ -46,7 +46,7 @@
   "nodes": {
     "analytics.control_plane": {
       "conflicts_with": [],
-      "content_sha256": "aea5a21bf514f8f1909040c51b666ab1f3bf173998eef9875acc960381e38606",
+      "content_sha256": "08823359905db367df2a88ed70d6803abad1d3c9ce712e16f5a113ba3e330284",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -60,7 +60,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "69f935ad249e202ae6b2449aa69c3388ed1faaefb18888fe7913bc28c2464322",
+      "content_sha256": "50c18edc1df5915b5fa809d29d6b0fed6685cc78fc6922f96d017044d49dc932",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "14ac8babccbe1d566074a168f6a4f879a8cd278f273653c5a1f3dcc09cd71071",
+      "content_sha256": "8ac1f1174fcb0eed3bd98d03010fae05f86b0c45e82c4e1bf77b5d60865338b4",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "fb4f5608a80d56ed27703e846e35ffc9c9206e37d3319e45722f1b3fe8cb58bd",
+      "content_sha256": "a4a4ce05766a512f7c7bf8437160caf082f59c97d4eae2328fa90b9be9ec6d5a",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -101,7 +101,7 @@
     },
     "communications.attention": {
       "conflicts_with": [],
-      "content_sha256": "30d2df3e1fe31f22a2b9fb55c6eefdfb7317b7b492873e520b1769af77bed285",
+      "content_sha256": "4d0d999d62f6d6d1f2a13eccb2c7d799f1c4f90d73dc1809a85da5c996266385",
       "kind": "policy",
       "provides": [
         "attention",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "74e60bbf0cd68213093d7234e3a0c2525fc7dccfc86ae3a9a806ca81b0fd0b34",
+      "content_sha256": "c374884019375f1676ed811cbeb91762956cc72990ad8b9b592bc1b8d6a0175b",
       "kind": "policy",
       "provides": [
         "approval",
@@ -129,7 +129,7 @@
     },
     "email.inbound": {
       "conflicts_with": [],
-      "content_sha256": "ac951700557eb70603b81f673f6521b7c5d9eb2680e47f6ca8935be4c5607c12",
+      "content_sha256": "588a1a2197561d266f55db490dde501fcdc9eef7c055f7a6895683db2ace86b4",
       "kind": "policy",
       "provides": [
         "ownership",
@@ -143,7 +143,7 @@
     },
     "email.outbound": {
       "conflicts_with": [],
-      "content_sha256": "51b7da85e8f00b9fcee93bfaf4c98cc74c3b71884e3a9876b55d91ca9ffe83ed",
+      "content_sha256": "2fd97259e522d38ff5589f57d57a68774ae236abf42a4428493068f36892e0da",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -158,7 +158,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "5f8bd2ff3f2050f7abdfc343f1e530a8fdb352f254019ceedaab210144306acb",
+      "content_sha256": "7d3d1f5c00e0747596e8b4bfe488779d81000afb5b3a2ac35256b0ba10433dda",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -174,7 +174,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "6bdac713b2c4aaace72f9ac59d3e523cc79bf8db26241915787fa55be745c494",
+      "content_sha256": "c6a010332007468d80644ddd10eda44e5130738de75d5b374448030af549cb0f",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -186,7 +186,7 @@
     },
     "product.lifecycle": {
       "conflicts_with": [],
-      "content_sha256": "ccad4f118c8cb502cd617a9c789820c5e51dd9b4396a0db2034a27e4c2ea7681",
+      "content_sha256": "3b09a154541c1e6b17c1038a7c7eb9b12c6f68da12eb2353f25272c45a5a2b5e",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -202,7 +202,7 @@
     },
     "product.truth": {
       "conflicts_with": [],
-      "content_sha256": "c59dd74f31ceaaea255df08633aaf73ee991ff71556ac079238df6dc00bcf480",
+      "content_sha256": "953f0687ae5647908f05ce07d2544c678228b1e8f46803c8cefc6a9640c569c0",
       "kind": "policy",
       "provides": [
         "product_truth"
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "fdfe292a04b949ef73fb46cecda25572abc3396ae13e8d8a5a91acc2fb4791a5",
+      "content_sha256": "820ff4baa3cb8b48234b16fd5d29334839c903de42e68bdfe5f2323d7b6e67b7",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "810be312e7dce75b90037296d063c669a8493827c2d3d5648860b295a0cb66cd",
+      "content_sha256": "897356a7de466e81f0d69a54d17cd8d389cfa9841cbeeb022ca439d4198aa223",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -1942,7 +1942,7 @@
       "source": "repository"
     },
     "typefully": {
-      "content_sha256": "8e8b19fa86d2c7f5a851d4a21ba853359996c5f4ced652ddbf244a51653c1b75",
+      "content_sha256": "66432b2bda08d99e7ed87d6629b96ee2d5785ed223321b6af4ecb86f22074c88",
       "selector": "typefully",
       "source": "repository"
     }
