@@ -31,7 +31,7 @@ Every other historical gate is removed. In particular, do not create or honor bl
 
 The pinned contract plus an active native automation authorize all routed actions except PR merge. A user instruction in the active task is additional authority, not a request that another runtime layer may reinterpret as missing.
 
-The parent executes routed actions directly. Isolation is used only to keep raw PII, private recipients, untrusted private content, privileged secrets, or metered credentials outside the parent context. Isolation never supplies strategic approval and its absence never blocks a public no-cost or repository action.
+The parent executes routed actions directly. Isolation is used only to keep raw PII, private recipients, untrusted private content, privileged secrets, or metered credentials outside the parent context. Isolation never supplies strategic approval and its absence never blocks a public no-cost or repository action. When law or privacy requires sealed handling and no official sealed provider path or safe no-tools processor exists, the affected action is `physical_unavailability`; never expose the protected material to the parent as a fallback.
 
 Official provider confirmation prompts may enforce binding terms, recipient/account authorization, irreversible deletion, or spend. They may not add a general human confirmation for already-authorized publication, scheduling, community activity, analytics work, or other zero-cost effects.
 
@@ -58,7 +58,7 @@ When a send, spend, or public effect may have been issued and repeating it could
 - `SEV1`: broken consent/unsubscribe, duplicate bulk send, materially deceptive public claim, or binding platform violation.
 - `SEV2`: ordinary typo, delay, or isolated provider failure.
 
-Contain only the affected legal, privacy, authority, or spend perimeter. Continue every independent action. Expected authorized metadata and browser-safe public tokens are not incidents.
+A SEV0 quarantines every action sharing the compromised account, credential, provider scope, or other authority perimeter until official revalidation proves that perimeter safe. Continue only actions demonstrably outside it. For lower-severity incidents, contain only the affected legal, privacy, authority, or spend perimeter and continue every independent action. Expected authorized metadata and browser-safe public tokens are not incidents.
 
 ## Fallback
 

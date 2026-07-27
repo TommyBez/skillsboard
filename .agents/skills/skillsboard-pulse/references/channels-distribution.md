@@ -27,4 +27,4 @@ Paid advertising remains ineligible while Skills Board has no approved revenue l
 
 ## State
 
-Persist destination, verified identity, binding-rule source/time, public URL/opaque ID, and duplicate ambiguity. Do not persist internal contact caps, cooldowns, WIP, evidence gates, or manual-action packages.
+Persist only a public destination URL or opaque provider ID, verified identity, binding-rule source/time, and duplicate ambiguity. Never persist a raw private recipient, contact, postal address, email address, or other private destination data. Do not persist internal contact caps, cooldowns, WIP, evidence gates, or manual-action packages.

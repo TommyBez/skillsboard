@@ -18,6 +18,15 @@ These are legal, privacy, authorization, and binding provider rules. Missing con
 
 No per-send human confirmation, isolated executor availability, shadow draft, empty-segment ceremony, internal attention cap, campaign WIP, audience-size threshold, scheduling prohibition, or readiness lifecycle is required. If an official operation exists and the send is legally eligible and free of incremental spend/overage, execute it.
 
+The pinned Resend connector skill remains byte-identical upstream. Normalize its lifecycle vocabulary at the Pulse boundary rather than persisting extra work states:
+
+- connector `setup_required` or failed authentication maps to `authority_or_identity`;
+- connector `manual_action` maps to the applicable `legal_or_consent`, `authority_or_identity`, or `spend_or_overage` state when that is the concrete cause; if the official connector physically cannot perform the otherwise-authorized operation without a human-only provider transition, map it to `unavailable`;
+- connector `shadow` describes inert unsent provider draft metadata only, never a Pulse work state or mandatory stage;
+- missing authoritative suppression proof maps to `legal_or_consent`, while a missing exact official operation maps to `unavailable`.
+
+Do not change or fork the upstream connector skill to implement this mapping. Provider-native drafts and metadata may be reconciled, but they do not create an approval, readiness, or shadow gate.
+
 Use provider idempotency and exact-resource readback where available. After a request may have issued, do not resend until official readback proves absence; this prevents duplicate or wrong-recipient mail and double charges. Binding provider rate limits remain authoritative, but Pulse adds no arbitrary retry count, cooldown, daily/weekly cap, or forecast reserve.
 
 ## Provider and spend boundary

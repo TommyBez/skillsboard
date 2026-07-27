@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "d49f5b5a8121eaf847ca65e012b36848ebd79ecc5392ebdaa9bbc0276e6c10d7",
+      "content_sha256": "886eff3c84445704db854d4a0f07ce413fb879b628b429083d6d752d279244b3",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -20,7 +20,7 @@
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "859f64e76b86ba3f447eb8fab42bb1869582c148c7950a66c1872ae01cbaf155"
+    "root_sha256": "bc5130bc60815e05f2b8f82e6fc5e161f35a54c07d9007b06fe3cbab042787ec"
   },
   "interference_keys": [
     "channel.community",
@@ -72,7 +72,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "8ac1f1174fcb0eed3bd98d03010fae05f86b0c45e82c4e1bf77b5d60865338b4",
+      "content_sha256": "19ff63dcade8126c57c5a083d24d58f84a3c5d21522c2a7ef44312b8692e9572",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -87,7 +87,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "a4a4ce05766a512f7c7bf8437160caf082f59c97d4eae2328fa90b9be9ec6d5a",
+      "content_sha256": "8601b840ecf80390a22d75f3f37b564d08e30c8a4882e199913f8fe8b03cca9a",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -114,7 +114,7 @@
     },
     "delivery.repository": {
       "conflicts_with": [],
-      "content_sha256": "c374884019375f1676ed811cbeb91762956cc72990ad8b9b592bc1b8d6a0175b",
+      "content_sha256": "3fd2f89d325f63a86187291fbed8af9355d128134acf9dff819b4b6df8c9ce47",
       "kind": "policy",
       "provides": [
         "approval",
@@ -143,7 +143,7 @@
     },
     "email.outbound": {
       "conflicts_with": [],
-      "content_sha256": "2fd97259e522d38ff5589f57d57a68774ae236abf42a4428493068f36892e0da",
+      "content_sha256": "11d9c9a931f45dffc8f94a8d18df28e415846f31caacd5b6f5da1fe84bd1f400",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -202,7 +202,7 @@
     },
     "product.truth": {
       "conflicts_with": [],
-      "content_sha256": "953f0687ae5647908f05ce07d2544c678228b1e8f46803c8cefc6a9640c569c0",
+      "content_sha256": "4012432001f2da744674b927b39d7cbab3e69e2be0fd0b3d91ebb001f1385826",
       "kind": "policy",
       "provides": [
         "product_truth"
@@ -214,7 +214,7 @@
     },
     "pulse.kernel": {
       "conflicts_with": [],
-      "content_sha256": "820ff4baa3cb8b48234b16fd5d29334839c903de42e68bdfe5f2323d7b6e67b7",
+      "content_sha256": "904d9d1c1163a39f8c2829b9af620de36734c983f9039ca844248365b5a0c186",
       "kind": "kernel",
       "provides": [
         "authority",
@@ -233,7 +233,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "897356a7de466e81f0d69a54d17cd8d389cfa9841cbeeb022ca439d4198aa223",
+      "content_sha256": "aaa8c3207b9a873c690f40eaa9a05f693138a1133868fa9255b9c85463eb9f15",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -1942,7 +1942,7 @@
       "source": "repository"
     },
     "typefully": {
-      "content_sha256": "66432b2bda08d99e7ed87d6629b96ee2d5785ed223321b6af4ecb86f22074c88",
+      "content_sha256": "8e8b19fa86d2c7f5a851d4a21ba853359996c5f4ced652ddbf244a51653c1b75",
       "selector": "typefully",
       "source": "repository"
     }

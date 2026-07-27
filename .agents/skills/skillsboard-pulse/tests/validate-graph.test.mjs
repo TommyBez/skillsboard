@@ -621,7 +621,6 @@ test("autonomy contract removes every routine blocker outside the closed set", (
   const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
   const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
-  const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
   assert.equal(checked.graph.contract_version, 13);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
@@ -646,8 +645,8 @@ test("autonomy contract removes every routine blocker outside the closed set", (
   assert.match(pseo, /There is no rolling PR cap, page cap, problem-cluster lock, sibling limit, checkpoint gate, maturity wait/);
   assert.match(product, /There is no exposure-unit budget, survey-slot cap, experiment-series limit, minimum sample, evidence-stage threshold, WIP gate/);
   assert.match(scheduler, /Do not persist `waiting_maturity`, `waiting_cooldown`, `waiting_dependency`, `manual_action`, `setup_required`, `shadow`/);
-  assert.match(typefully, /the parent may publish directly/);
-  assert.match(typefully, /Do not require a fresh executor, second write authorizer/);
+  assert.match(email, /The pinned Resend connector skill remains byte-identical upstream/);
+  assert.match(email, /Do not change or fork the upstream connector skill/);
 });
 
 test("protected organic growth lanes execute without internal readiness gates", () => {
@@ -687,12 +686,24 @@ test("protected organic growth lanes execute without internal readiness gates", 
 test("public social publication never depends on a secondary executor or authorizer", () => {
   const orchestrator = readFileSync(new URL("../SKILL.md", import.meta.url), "utf8");
   const social = readFileSync(new URL("../references/channels-social.md", import.meta.url), "utf8");
-  const typefully = readFileSync(new URL("../../typefully/SKILL.md", import.meta.url), "utf8");
 
   assert.match(orchestrator, /The parent may directly execute every routed public/);
+  assert.match(social, /owner-approved, merged, externally pinned contract plus an active Pulse automation satisfy the pinned Typefully skill's standing automation authority/);
   assert.match(social, /A fresh isolated executor, child write-authorizer[^\n]*is not required/);
-  assert.match(typefully, /the parent may publish directly/);
-  assert.match(typefully, /Do not require a fresh executor, second write authorizer/);
+  assert.match(social, /retry only with provider-supported idempotency or after official exact-resource readback confirms that no public post exists/);
+});
+
+test("upstream provider lifecycle labels normalize into the closed Pulse state set", () => {
+  const email = readFileSync(new URL("../references/email-outbound.md", import.meta.url), "utf8");
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+
+  assert.match(email, /connector `setup_required` or failed authentication maps to `authority_or_identity`/);
+  assert.match(email, /connector `manual_action` maps to the applicable `legal_or_consent`, `authority_or_identity`, or `spend_or_overage` state/);
+  assert.match(email, /connector `shadow` describes inert unsent provider draft metadata only, never a Pulse work state or mandatory stage/);
+  assert.match(email, /Do not change or fork the upstream connector skill to implement this mapping/);
+  assert.match(scheduler, /On the first run with the v13 root[^\n]*atomically normalize existing schema-v4 state/);
+  assert.match(scheduler, /Reclassify Pulse work in `waiting_maturity`, `waiting_cooldown`, `waiting_dependency`, `manual_action`, `shadow`/);
+  assert.match(scheduler, /Rebuild work indexes from the normalized items and record source root, target root, completion time, and released reservation counts/);
 });
 
 test("runtime skills are reported as unpriced", () => {

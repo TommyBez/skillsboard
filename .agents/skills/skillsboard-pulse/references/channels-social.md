@@ -6,11 +6,13 @@ Load for Typefully identity, drafts, scheduling, publication, reconciliation, an
 
 ## Authority and direct publication
 
-The pinned contract plus an active Pulse automation authorize publication without per-post confirmation. The parent invokes the official Typefully capability directly. A fresh isolated executor, child write-authorizer, shadow stage, editorial reservation, internal review, or second confirmation is not required.
+The owner-approved, merged, externally pinned contract plus an active Pulse automation satisfy the pinned Typefully skill's standing automation authority and authorize publication without per-post confirmation. The parent invokes the official Typefully capability directly. A fresh isolated executor, child write-authorizer, shadow stage, editorial reservation, internal review, or second confirmation is not required.
 
 Use only the official Typefully configuration locations accepted by the pinned skill, require mode `0600`, strip inherited `TYPEFULLY_API_KEY`, and verify the exact account, social set, and platform before acting. A wrong or unverified identity is `authority_or_identity`; an absent official operation is `unavailable`.
 
-Read the exact draft immediately before publication and bind its current provider ID and content. User edits in Typefully are authoritative and must not be overwritten. After a request may have issued, use the draft/post ID to avoid duplicate publication.
+Read the exact draft immediately before publication and bind the current contract root, account, social set, resource key, platform, provider draft ID, copy hash, timing, and applicable parent/reply IDs; use explicit nulls for inapplicable IDs. User edits in Typefully are authoritative and must not be overwritten.
+
+The draft or post ID identifies a resource; it does not prove that a timed-out `drafts:publish` request was not applied. After a request may have issued, retry only with provider-supported idempotency or after official exact-resource readback confirms that no public post exists.
 
 ## Editorial rules
 
@@ -26,9 +28,9 @@ Owned social is a protected organic lane. Every strategic run senses current aud
 
 ## Replies
 
-Reply only through an official supported operation on the verified account and exact thread. Do not send cold DMs, impersonate a person, solicit artificial engagement, expose account/customer data, or answer legal/privacy/security/account-specific matters substantively. These limits exist for authorization, privacy, and binding platform rules, not for an internal reply cap.
+Automated replies are allowed only through an official supported operation on the verified account and exact thread. Do not send cold DMs, impersonate a person, solicit artificial engagement, expose account/customer data, or answer legal/privacy/security/account-specific matters substantively. These limits exist for authorization, privacy, and binding platform rules, not for an internal reply cap.
 
-LinkedIn replies remain a human execution path only while no official supported operation exists; this is physical unavailability, not a request for strategic approval.
+The sole exception to the automated-operation rule is human execution of a LinkedIn reply while no official supported reply operation exists. For Pulse automation the effect is physically unavailable, not a request for strategic approval.
 
 ## State
 

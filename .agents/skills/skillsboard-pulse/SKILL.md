@@ -41,9 +41,9 @@ Required truth checks exist only to avoid deceptive public claims. Required iden
 
 ## Direct execution and privacy isolation
 
-The parent may directly execute every routed public, repository, analytics, community, social, and zero-cost provider transition. A missing fresh executor or a runtime write-authorizer available only to a child is never a Pulse blocker and never overrides the pinned contract's standing authority.
+The parent may directly execute every routed public, repository, analytics, community, social, and zero-cost provider transition. A missing fresh executor or a runtime write-authorizer available only to a child is never a Pulse blocker and never overrides the pinned contract's standing authority unless law or privacy requires sealed handling of protected material.
 
-Use a fresh isolated executor or nested no-tools processor only when strictly necessary to prevent raw authorized PII, private recipients, untrusted private content, privileged secrets, or metered credentials from entering the parent context. If the official provider can keep those fields sealed while the parent invokes the operation, direct parent execution remains valid. Isolation is a data-minimization mechanism, not an approval checkpoint.
+Use a fresh isolated executor or nested no-tools processor only when strictly necessary to prevent raw authorized PII, private recipients, untrusted private content, privileged secrets, or metered credentials from entering the parent context. If the official provider can keep those fields sealed while the parent invokes the operation, direct parent execution remains valid. If protected handling is legally required and no sealed path exists, the affected action is physically unavailable; do not expose the material to the parent. Isolation is a data-minimization mechanism, not an approval checkpoint.
 
 Before a chargeable or recipient-bearing effect, persist the exact spend or delivery reservation needed to prevent overage or duplicate delivery. For a public no-cost post, publication, repository write, or analytics asset, no capacity reservation, editorial unit, WIP slot, cooldown, or executor envelope is required.
 
