@@ -62,6 +62,7 @@ function validatePolicyInvariantsShape(policyInvariants, requireSorted) {
   expectExactKeys(
     policyInvariants,
     new Set([
+      "campaign_origin_node",
       "mandatory_nodes_must_equal",
       "node_reference_must_equal",
       "run_types",
@@ -69,6 +70,10 @@ function validatePolicyInvariantsShape(policyInvariants, requireSorted) {
     ]),
     "graph.policy_invariants",
   );
+
+  if (policyInvariants.campaign_origin_node !== undefined) {
+    expectId(policyInvariants.campaign_origin_node, "graph.policy_invariants.campaign_origin_node");
+  }
 
   if (policyInvariants.mandatory_nodes_must_equal !== undefined) {
     expectStringArray(policyInvariants.mandatory_nodes_must_equal, "graph.policy_invariants.mandatory_nodes_must_equal", {
@@ -115,6 +120,7 @@ function validateSelectionsShape(selections, label, allowOrigin, requireSorted) 
     if (allowOrigin) {
       allowed.add("allowed_origin_policy_nodes");
       allowed.add("requires_origin_policy_node");
+      allowed.add("accepts_campaign_origin");
     }
     expectExactKeys(selection, allowed, `${label}.${id}`);
     invariant(
@@ -132,6 +138,18 @@ function validateSelectionsShape(selections, label, allowOrigin, requireSorted) 
     expectPositiveInteger(selection.max_known_context_bytes, `${label}.${id}.max_known_context_bytes`);
     if (selection.requires_origin_policy_node !== undefined) {
       expectBoolean(selection.requires_origin_policy_node, `${label}.${id}.requires_origin_policy_node`);
+    }
+    if (selection.accepts_campaign_origin !== undefined) {
+      invariant(allowOrigin, `${label}.${id}.accepts_campaign_origin is not allowed`);
+      expectBoolean(selection.accepts_campaign_origin, `${label}.${id}.accepts_campaign_origin`);
+      invariant(
+        selection.accepts_campaign_origin === true,
+        `${label}.${id}.accepts_campaign_origin must be true when declared`,
+      );
+      invariant(
+        selection.requires_origin_policy_node === true,
+        `${label}.${id}.accepts_campaign_origin requires requires_origin_policy_node=true`,
+      );
     }
     if (selection.allowed_origin_policy_nodes !== undefined) {
       invariant(allowOrigin, `${label}.${id}.allowed_origin_policy_nodes is not allowed`);

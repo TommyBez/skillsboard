@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "23710d8a0a5e6eeb2725eca2790bc449fd60f8ff6f05960bad07c7b601730338",
+      "content_sha256": "e09bf235953ace12ed0e8fe5673e51c0feea5c89791ea853f9e545fb8c57f8c5",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -17,7 +17,7 @@
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/constants.mjs"
     },
     "validator.cross-refs": {
-      "content_sha256": "9d094284e929347a2becb185a1ee5c7ed7fc5372e7adf8ec654f446f9695d1ae",
+      "content_sha256": "f445b283c65eb512ff6581b7c487abc40992ea80ed32ff136d54ec4b7b14c2be",
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/cross-refs.mjs"
     },
     "validator.errors": {
@@ -44,16 +44,20 @@
       "content_sha256": "f2d3fd2021f822fd1129c937e8ea7f63c09b8b373cdba3d25c5c24b20b605ec6",
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/merkle.mjs"
     },
+    "validator.origins": {
+      "content_sha256": "080ac053234bcdc1c33bf96195ec4a48478ae098ba2712b9da2ce247a06a3e57",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/origins.mjs"
+    },
     "validator.policy": {
       "content_sha256": "955fbb87a4c512638c45d9aa1e65fe787599af929540a311922f0a20b700d153",
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/policy.mjs"
     },
     "validator.resolve": {
-      "content_sha256": "4694412b0b36420e504004fdd8cf16e893f244ec23126ce8ff87e3537807017c",
+      "content_sha256": "3d21c26514f93337899079434490983e77d33569b6e52f1528e1f35725d2577e",
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/resolve.mjs"
     },
     "validator.shape": {
-      "content_sha256": "9c941220c80ed6fe55cf5315f07c392d9126984138af86f6ba8dd8ad168597c3",
+      "content_sha256": "b56b31a0942eabc8eb11f9e5e6dbd39067fd1f450a6d68d100fc2560b249d525",
       "file": ".agents/skills/skillsboard-pulse/scripts/lib/shape.mjs"
     }
   },
@@ -61,14 +65,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 15,
+  "contract_version": 16,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "267e246984df86811834fa31a5352b02e7b53db6551258e21d1d48a053c89e0e"
+    "root_sha256": "b7e3bf1d7de50dea9c157fe845b0221eeb1b7c9871e936d0e56d78dc12deb319"
   },
   "interference_keys": [
     "channel.community",
@@ -878,6 +882,7 @@
     }
   },
   "policy_invariants": {
+    "campaign_origin_node": "launch.campaign",
     "mandatory_nodes_must_equal": [
       "pulse.kernel"
     ],
@@ -936,9 +941,9 @@
   ],
   "routes": {
     "analytics.asset_write": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "analytics.control_plane",
-        "launch.campaign"
+        "analytics.control_plane"
       ],
       "entry_nodes": [
         "analytics.control_plane"
@@ -960,9 +965,9 @@
       ]
     },
     "analytics.database_reconcile": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "analytics.control_plane",
-        "launch.campaign"
+        "analytics.control_plane"
       ],
       "entry_nodes": [
         "analytics.control_plane"
@@ -1021,6 +1026,7 @@
       ]
     },
     "delivery.repository": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
         "analytics.control_plane",
         "channels.distribution",
@@ -1029,7 +1035,6 @@
         "email.inbound",
         "email.outbound",
         "growth.pseo",
-        "launch.campaign",
         "learning.opportunities",
         "product.lifecycle",
         "product.truth",
@@ -1055,9 +1060,9 @@
       ]
     },
     "distribution.community": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.distribution",
-        "launch.campaign"
+        "channels.distribution"
       ],
       "entry_nodes": [
         "channels.distribution",
@@ -1165,9 +1170,9 @@
       ]
     },
     "distribution.hacker_news": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.distribution",
-        "launch.campaign"
+        "channels.distribution"
       ],
       "entry_nodes": [
         "channels.distribution",
@@ -1209,9 +1214,9 @@
       ]
     },
     "distribution.product_hunt": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.distribution",
-        "launch.campaign"
+        "channels.distribution"
       ],
       "entry_nodes": [
         "channels.distribution",
@@ -1277,9 +1282,9 @@
       ]
     },
     "email.broadcast_prepare": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "email.outbound",
-        "launch.campaign"
+        "email.outbound"
       ],
       "entry_nodes": [
         "email.outbound",
@@ -1304,9 +1309,9 @@
       ]
     },
     "email.broadcast_send": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "email.outbound",
-        "launch.campaign"
+        "email.outbound"
       ],
       "entry_nodes": [
         "email.outbound",
@@ -1394,9 +1399,9 @@
       ]
     },
     "email.reconcile": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "email.outbound",
-        "launch.campaign"
+        "email.outbound"
       ],
       "entry_nodes": [
         "email.outbound"
@@ -1615,8 +1620,8 @@
       ]
     },
     "product.repository": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "launch.campaign",
         "product.lifecycle"
       ],
       "entry_nodes": [
@@ -1781,9 +1786,9 @@
       ]
     },
     "social.draft": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.social",
-        "launch.campaign"
+        "channels.social"
       ],
       "entry_nodes": [
         "channels.social",
@@ -1806,9 +1811,9 @@
       ]
     },
     "social.publish": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.social",
-        "launch.campaign"
+        "channels.social"
       ],
       "entry_nodes": [
         "channels.social",
@@ -1831,9 +1836,9 @@
       ]
     },
     "social.reconcile": {
+      "accepts_campaign_origin": true,
       "allowed_origin_policy_nodes": [
-        "channels.social",
-        "launch.campaign"
+        "channels.social"
       ],
       "entry_nodes": [
         "channels.social"

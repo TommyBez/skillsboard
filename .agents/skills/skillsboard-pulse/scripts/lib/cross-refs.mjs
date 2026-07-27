@@ -6,6 +6,7 @@ import {
   selectionSkillIds,
 } from "./closure.mjs";
 import { invariant } from "./errors.mjs";
+import { effectiveOriginPolicyNodes } from "./origins.mjs";
 import {
   applyClosureSelectionPolicy,
   applyDeclaredSelectionPolicy,
@@ -88,8 +89,11 @@ export function validateCrossReferences(graph) {
         usedStateViews.add(stateView);
       }
 
-      if (selection.allowed_origin_policy_nodes) {
-        for (const origin of selection.allowed_origin_policy_nodes) {
+      const originVariants = groupName === "route" && selection.requires_origin_policy_node
+        ? effectiveOriginPolicyNodes(graph, selection)
+        : selection.allowed_origin_policy_nodes ?? [null];
+      if (selection.requires_origin_policy_node) {
+        for (const origin of originVariants) {
           invariant(nodeIds.has(origin), `${groupName} ${id} allows unknown origin policy node ${origin}`);
           invariant(graph.nodes[origin].kind === "policy", `${groupName} ${id} origin ${origin} must be a policy node`);
           invariant(!graph.mandatory_nodes.includes(origin), `${groupName} ${id} origin ${origin} must not be mandatory`);
@@ -110,8 +114,8 @@ export function validateCrossReferences(graph) {
       applyClosureSelectionPolicy(graph, { groupName, id, orderedNodes });
 
       const skillIdsForSelection = selectionSkillIds(graph, selection);
-      const originVariants = selection.allowed_origin_policy_nodes ?? [null];
-      for (const origin of originVariants) {
+      const budgetOrigins = selection.requires_origin_policy_node ? originVariants : [null];
+      for (const origin of budgetOrigins) {
         const variantNodes = origin ? buildNodeClosure(graph, [...orderedNodes, origin]) : orderedNodes;
         variantNodes.forEach((node) => reachableNodes.add(node));
         const measurement = measureKnownContext(graph, variantNodes, skillIdsForSelection);

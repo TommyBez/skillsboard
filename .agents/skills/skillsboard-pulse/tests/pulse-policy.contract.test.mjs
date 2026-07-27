@@ -47,7 +47,7 @@ test("autonomy contract removes every routine blocker outside the closed set", (
   const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 15);
+  assert.equal(checked.graph.contract_version, 16);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
     assert.doesNotMatch(contractFile, /CODEX_HOME|automation_checkout_path_unavailable/);
   }
@@ -155,7 +155,11 @@ test("coordinated product launch is first-class work on every run", () => {
     "social.publish",
     "social.reconcile",
   ];
+  assert.equal(checked.graph.policy_invariants.campaign_origin_node, "launch.campaign");
   for (const routeId of launchExecutionRoutes) {
+    const route = checked.graph.routes[routeId];
+    assert.equal(route.accepts_campaign_origin, true, `${routeId} must accept campaign origin`);
+    assert.equal(route.allowed_origin_policy_nodes.includes("launch.campaign"), false, `${routeId} must not graft launch.campaign into lane origins`);
     const resolved = resolveGraph(checked.graph, { route: routeId, nodes: ["launch.campaign"] });
     assert.equal(resolved.origin_policy_node, "launch.campaign");
     assert.equal(resolved.nodes.some(({ id }) => id === "launch.campaign"), true);
@@ -278,7 +282,8 @@ test("analytics database reconciliation resolves the official Neon connector rea
     state_views: ["analytics", "core", "scorecard", "selected_work"],
     max_known_context_bytes: 65_536,
     requires_origin_policy_node: true,
-    allowed_origin_policy_nodes: ["analytics.control_plane", "launch.campaign"],
+    accepts_campaign_origin: true,
+    allowed_origin_policy_nodes: ["analytics.control_plane"],
   });
 
   const resolved = resolveGraph(checked.graph, {

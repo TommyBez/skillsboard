@@ -8,6 +8,7 @@ import {
 import { EXECUTOR_RESULT_ENUMS, EXECUTOR_RESULT_REQUIRED_KEYS } from "./constants.mjs";
 import { invariant } from "./errors.mjs";
 import { compareAscii } from "./expect.mjs";
+import { effectiveOriginPolicyNodes, routeAllowsOrigin } from "./origins.mjs";
 
 export function resolveGraph(graph, options = {}) {
   const runId = options.run;
@@ -30,7 +31,7 @@ export function resolveGraph(graph, options = {}) {
   }
   if (route?.requires_origin_policy_node) {
     invariant(
-      route.allowed_origin_policy_nodes.includes(explicitNodes[0]),
+      routeAllowsOrigin(graph, route, explicitNodes[0]),
       `route ${routeId} does not allow origin policy node ${explicitNodes[0]}`,
     );
   } else if (route) {
@@ -123,9 +124,11 @@ export function benchmarkGraph(graph) {
   });
   const routes = Object.keys(graph.routes).sort(compareAscii).map((id) => {
     const route = graph.routes[id];
-    const origins = route.allowed_origin_policy_nodes ?? selectionEntries(route).filter(
-      (node) => graph.nodes[node].kind === "policy" && !graph.mandatory_nodes.includes(node),
-    );
+    const origins = route.requires_origin_policy_node
+      ? effectiveOriginPolicyNodes(graph, route)
+      : selectionEntries(route).filter(
+        (node) => graph.nodes[node].kind === "policy" && !graph.mandatory_nodes.includes(node),
+      );
     invariant(origins.length > 0, `route ${id} has no eligible origin policy node`);
     const variants = origins.map((origin) => resolveGraph(graph, {
       route: id,
