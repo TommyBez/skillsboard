@@ -1,4 +1,5 @@
 import {
+  aiCodingGuidelinesTemplateGuide,
   aiCodingTeamOnboardingGuide,
   manageCrossAgentSkillsGuide,
   shareTeamSkillsGuide,
@@ -22,6 +23,7 @@ export interface ResourceIndexEntry {
 }
 
 export const resourceEntries = [
+  aiCodingGuidelinesTemplateGuide,
   aiCodingTeamOnboardingGuide,
   shareTeamSkillsGuide,
   manageCrossAgentSkillsGuide,
@@ -31,7 +33,7 @@ export const resourceSections = [
   {
     contentType: "guide",
     title: "Guides",
-    description: "Practical workflows for making team skills easier to review, share, and use.",
+    description: "Practical workflows for adopting AI agents, standardizing team guidance, and sharing reusable skills.",
   },
   {
     contentType: "article",

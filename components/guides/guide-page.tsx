@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
+import { CopyButton } from "@/components/copy-button"
 import { JsonLd } from "@/components/json-ld"
 import {
   ResourceCta,
@@ -214,6 +215,29 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                     </div>
                   ))}
                 </dl>
+                {guide.copyTemplate ? (
+                  <div className="mt-8 overflow-hidden rounded-[3px] border border-border bg-[var(--surface-ink)] text-[var(--surface-ink-foreground)]">
+                    <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 px-5 py-3">
+                      <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                        Copyable starting point
+                      </p>
+                      <CopyButton
+                        value={guide.copyTemplate}
+                        label="Copy template"
+                        ariaLabel="Copy AI coding guidelines template"
+                        copiedAriaLabel="AI coding guidelines template copied"
+                        className="border-white/20 bg-white/10 text-[var(--surface-ink-foreground)] hover:border-white/35 hover:bg-white/15 hover:text-[var(--surface-ink-foreground)]"
+                      />
+                    </div>
+                    <pre
+                      aria-label={`${guide.templateTitle} content`}
+                      className="overflow-x-auto px-5 py-6 text-sm leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+                      tabIndex={0}
+                    >
+                      <code>{guide.copyTemplate}</code>
+                    </pre>
+                  </div>
+                ) : null}
               </section>
 
               <section id="pitfalls" aria-labelledby="pitfalls-heading" className="scroll-mt-24 pt-16">

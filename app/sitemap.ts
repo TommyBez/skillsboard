@@ -5,6 +5,11 @@ import { siteConfig } from "@/lib/site"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
+  const resourceIndexLastModified = resourceEntries.reduce(
+    (latest, entry) =>
+      entry.modifiedAt > latest ? entry.modifiedAt : latest,
+    "1970-01-01",
+  )
   const resourceSitemapEntries: MetadataRoute.Sitemap = resourceEntries.map(
     (entry) => ({
       url: `${siteConfig.url}${entry.path}`,
@@ -29,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${siteConfig.url}${resourcePaths.index}`,
-      lastModified: new Date("2026-07-22"),
+      lastModified: new Date(resourceIndexLastModified),
       changeFrequency: "weekly",
       priority: 0.8,
     },
