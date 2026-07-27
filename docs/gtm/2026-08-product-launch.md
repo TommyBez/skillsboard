@@ -40,26 +40,30 @@ Every launch asset uses one primary call to action:
 
 Secondary calls to action may show the open-source repository or explain MCP, but must not compete with team-library creation.
 
-## Pre-launch publication control
+## Product state and launch framing
 
-The existing homepage remains the canonical product landing page. The permanent launch announcement is prepared at `/launch`, while the homepage carries only a temporary launch-day banner linking to it.
+Skills Board is already publicly available with self-serve signup. August 11 is its first coordinated GTM launch and public introduction, not its release date, general-availability date, or first day online. Public copy must not imply that the application was unavailable before launch day.
 
-Both surfaces are controlled by `launchIsPublic` in `lib/launch.ts`. While it is `false`:
+The existing homepage remains the only canonical product landing page. There is no separate launch route or duplicate conversion surface.
 
-- Production returns 404 for `/launch`.
-- The announcement stays out of the sitemap and declares `noindex, nofollow` in preview metadata.
-- Local and Preview deployments can render the announcement for review.
-- The homepage launch-day banner stays hidden.
+## Homepage launch-treatment control
 
-Set the flag to `true` only in the launch-day PR after the final preflight. That one change publishes the announcement, adds it to the sitemap, enables indexing metadata, and shows the homepage banner. The exact merge still requires owner approval.
+The temporary homepage treatment is controlled by `launchTreatmentIsActive` in `lib/launch.ts`. While it is `false`, the Production homepage, metadata, and conversion flow remain unchanged; Development and Vercel Preview still render the treatment for review. When set to `true`, the same canonical homepage adds:
+
+- A compact product-walkthrough banner linking to the existing workflow section.
+- A silent, captioned 14-second add → share → find loop recorded from the current product.
+- A launch-specific OpenGraph image.
+- A measured `launch_demo` CTA location while preserving `landing_path: "/"`.
+
+Set the flag to `true` only in the launch-day PR after the final preflight. The exact merge still requires owner approval. Remove the temporary banner and launch framing after the launch window; retain the short demo only if observed behavior supports it.
 
 ## ORB channel plan
 
 ### Owned
 
 - Product landing page, temporarily carrying the launch demo and launch campaign attribution.
-- A permanent launch announcement explaining the problem, product loop, limitations, and how to start.
-- A 60–90 second product demo showing add → find → use across two teammates.
+- A silent 14-second homepage loop showing add → share → find across two teammates.
+- A 62-second complete product demo for Product Hunt, social, README, direct sharing, and high-intent evaluation.
 - Consent-compliant product email to eligible subscribers.
 - In-product activation prompts for first skill, invite, and teammate reuse.
 - PostHog launch dashboard and daily launch log.
@@ -90,12 +94,12 @@ An unavailable channel does not pause independent launch lanes.
 - [x] Verify the add → invite → accept → teammate reuse loop in Development with synthetic identities; keep Production verification as a separate required check.
 - [x] Capture truthful demo data that contains no private customer information.
 - [ ] Confirm support, privacy, terms, open-source, and contact links are current.
-- [x] Record product limitations in the launch announcement: recommendations are not formal approval; versions are not pinned; compatibility is not universal.
+- [x] Record product limitations in the existing homepage FAQ and campaign assets: recommendations are not formal approval; versions are not pinned; compatibility is not universal.
 
 ### 2. Pre-launch — August 1–7
 
-- [x] Produce the 62-second add → find → use product demo with synthetic identities and a public skill.
-- [x] Draft and QA the launch announcement and dormant homepage launch treatment on desktop and mobile.
+- [x] Produce the 62-second complete demo and 14-second homepage loop with synthetic identities and a public skill.
+- [x] Complete desktop and mobile QA of the dormant single-homepage launch treatment.
 - [x] Prepare a launch-specific 1200×630 OG image, video poster, and English video captions.
 - [ ] Prepare LinkedIn, X, Product Hunt, Show HN, email, and community variants.
 - [ ] Assemble Product Hunt gallery, maker comment, first comment, and supporter list without engagement manipulation.
@@ -114,7 +118,7 @@ An unavailable channel does not pause independent launch lanes.
 ### 4. Launch day — August 11, Europe/Rome
 
 - **08:30:** final production and analytics smoke test.
-- **09:00:** launch announcement and landing treatment go live.
+- **09:00:** the temporary homepage launch treatment goes live; the already-live application remains available through its existing routes.
 - **09:05:** Product Hunt listing goes live if the official capability and identity checks pass.
 - **09:15:** publish the product demo on LinkedIn and X.
 - **10:00:** send the consent-compliant product email.
@@ -138,9 +142,9 @@ An unavailable channel does not pause independent launch lanes.
 | Workstream | Repository-pinned skill | Deliverable | Due | State |
 | --- | --- | --- | --- | --- |
 | Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | In progress |
-| Launch narrative | `copywriting`, `copy-editing` | Announcement, landing treatment, channel message spine | Jul 31 | Announcement ready for review in PR #65 |
-| Product demonstration | `video` | 60–90 second add → find → use demo | Aug 4 | 62-second demo ready for review in PR #65 |
-| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | CTA hierarchy and publication fail-safe ready in PR #65 |
+| Launch narrative | `copywriting`, `copy-editing` | Homepage treatment and channel message spine | Jul 31 | Truthful already-live framing ready in PR #65 |
+| Product demonstration | `video` | Short homepage loop and complete channel demo | Aug 4 | 14-second loop and 62-second demo ready in PR #65 |
+| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Single-homepage gated treatment ready for review in PR #65 |
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
 | Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |
 | Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Not started |

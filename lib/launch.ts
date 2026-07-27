@@ -1,5 +1,8 @@
-export const launchPath = "/launch" as const
+// Skills Board is already publicly available. This flag controls only the
+// temporary homepage treatment for the coordinated GTM launch.
+export const launchTreatmentIsActive = false
 
-// Keep the announcement reviewable in local and preview deployments without
-// exposing it on Production before the coordinated launch.
-export const launchIsPublic = false
+export const launchTreatmentIsVisible =
+  launchTreatmentIsActive ||
+  process.env.VERCEL_ENV === "preview" ||
+  process.env.NODE_ENV === "development"

@@ -1,11 +1,10 @@
 import type { GuidePath } from "@/lib/seo/guides"
-import type { launchPath } from "@/lib/launch"
 import type { resourcePaths } from "@/lib/seo/resources"
 
 type NonTeamEventPropertiesMap = {
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    landing_path: "/" | GuidePath | typeof launchPath | typeof resourcePaths.index
+    landing_path: "/" | GuidePath | typeof resourcePaths.index
     location:
       | "header"
       | "hero"
@@ -15,10 +14,7 @@ type NonTeamEventPropertiesMap = {
       | "guide_closing"
       | "resources_header"
       | "resources_closing"
-      | "launch_header"
-      | "launch_hero"
-      | "launch_closing"
-      | "launch_footer"
+      | "launch_demo"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
