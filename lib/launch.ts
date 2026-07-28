@@ -10,24 +10,6 @@ type LaunchTreatmentEntities = {
   distinctId: string
 }
 
-function launchTreatmentOverride(): boolean | undefined {
-  // Production is governed only by the remote feature flag. The environment
-  // override exists to make local and Preview verification deterministic.
-  if (process.env.VERCEL_ENV === "production") {
-    return undefined
-  }
-
-  if (process.env.LAUNCH_TREATMENT_OVERRIDE === "true") {
-    return true
-  }
-
-  if (process.env.LAUNCH_TREATMENT_OVERRIDE === "false") {
-    return false
-  }
-
-  return undefined
-}
-
 const identifyLaunchTreatment = dedupe(async () => ({
   // The treatment is a global launch switch, not a per-person experiment.
   distinctId: "skillsboard-public-homepage",
@@ -49,19 +31,6 @@ const postHogLaunchAdapter: Adapter<boolean, LaunchTreatmentEntities> = postHogT
       },
     }
 
-const launchTreatmentAdapter: Adapter<boolean, LaunchTreatmentEntities> = {
-  ...postHogLaunchAdapter,
-  async decide(params) {
-    const override = launchTreatmentOverride()
-
-    if (override !== undefined) {
-      return override
-    }
-
-    return postHogLaunchAdapter.decide(params)
-  },
-}
-
 // Skills Board is already publicly available. This flag controls only the
 // temporary homepage treatment for the coordinated GTM launch. Proxy evaluates
 // it once, then rewrites to a precomputed static variant of the canonical page.
@@ -74,7 +43,7 @@ export const launchTreatmentIsVisible = flag<boolean, LaunchTreatmentEntities>({
     { label: "Standard homepage", value: false },
     { label: "Launch treatment", value: true },
   ],
-  adapter: launchTreatmentAdapter,
+  adapter: postHogLaunchAdapter,
   identify: identifyLaunchTreatment,
 })
 
