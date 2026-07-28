@@ -1,34 +1,31 @@
 WEBVTT
 
 00:00:00.000 --> 00:00:04.000
-Your team already has useful skill recommendations. Put them somewhere everyone can find.
+Which skill should I use? Answer it once and keep the recommendation with the team.
 
-00:00:04.000 --> 00:00:08.500
-Alex saves a useful skill to the shared team library.
+00:00:04.000 --> 00:00:10.500
+Alex saves a public skill with useful team context.
 
-00:00:08.500 --> 00:00:13.000
-The recommendation becomes available to the whole team.
+00:00:10.500 --> 00:00:17.000
+Sam finds the recommendation in the shared library.
 
-00:00:13.000 --> 00:00:17.567
-Sam finds it without asking Alex again.
-
-00:00:17.567 --> 00:00:20.567
-Now see the complete workflow.
+00:00:17.000 --> 00:00:20.567
+Now see the complete save, share, find, and use workflow.
 
 00:00:20.567 --> 00:00:36.617
 Alex adds the public copywriting skill to Northstar Studio, with a team note, an example prompt, and tags.
 
 00:00:36.617 --> 00:00:38.117
-The saved recommendation is now available to the whole team.
+The saved recommendation reaches the team library.
 
-00:00:38.117 --> 00:00:47.567
-Sam searches the shared library for copywriting, then copies the example prompt and install command.
+00:00:38.117 --> 00:00:40.000
+One recommendation becomes shared context from Alex to Sam.
 
-00:00:47.567 --> 00:00:52.567
+00:00:40.000 --> 00:00:49.450
+Sam searches for copywriting, then copies the example prompt and a compatible install command.
+
+00:00:49.450 --> 00:00:54.500
 Open the source, copy a compatible command, download a ZIP, or connect through authenticated MCP.
 
-00:00:52.567 --> 00:00:56.567
-Different setups. One shared team library.
-
-00:00:56.567 --> 00:01:00.000
-Save once. Find fast. Use it your way.
+00:00:54.500 --> 00:01:00.000
+Save once. Find fast. Use it your way. Create your team library at skillsboard.sh.

@@ -32,11 +32,11 @@ The official Typefully resource is draft `10084598` in social set `266935`:
 
 - one natural Italian LinkedIn post and one English four-post X thread;
 - the same shipped add → find → use product demonstration;
-- the 31-second privacy-safe accelerated cut attached to both platforms;
+- the pre-Remotion 31-second cut currently attached to both platforms;
 - exact channel URLs from the campaign-link table;
 - private, unscheduled, and unpublished at the July 28 official readback.
 
-Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. During August 8–10, reread the exact draft and bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
+Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `19b53722ca2f9f37421bf3367937ad3c9ddf07ade42c79030ed51e942cd302e7`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
 
 ## Product Hunt package
 
@@ -62,14 +62,21 @@ Create your team library
 
 1. `app/icon.svg` — product icon.
 2. `public/launch/skills-board-launch-og.jpg` — shared-library promise.
-3. `public/launch/skills-board-product-demo-poster.jpg` — add → find → use product proof.
-4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 60-second Product Hunt cut: fast outcome preview, 2× detailed walkthrough, usage paths, team handoff, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
-5. `public/launch/demo-intro.svg` — Alex adds a public skill.
-6. `public/launch/demo-handoff.svg` — the recommendation becomes shared team context.
-7. `public/launch/demo-usage-options.svg` — source, compatible command, ZIP, and authenticated MCP usage paths.
-8. `public/launch/demo-team.svg` — different setups sharing one team library.
-9. `public/launch/demo-outro.svg` — final call to action.
-10. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut with `public/launch/skills-board-product-demo.vtt` captions for social distribution.
+3. `public/launch/skills-board-product-demo-poster.jpg` — full-canvas find-and-use product proof from the final master.
+4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 60-second Product Hunt cut: fast outcome preview, complete walkthrough, animated team handoff, usage paths, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
+5. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut with the same product truth and `public/launch/skills-board-product-demo.vtt` captions for social distribution.
+
+### Video source and reproducible renders
+
+Both launch cuts are generated from shared Remotion scenes in `remotion/skillsboard-launch-videos.tsx` at 1440×900 and 30 fps. The immutable, privacy-safe product recording is `public/launch/skills-board-workflow-source.mp4`; rendered outputs never become their own input.
+
+- `pnpm video:render:product-hunt` renders exactly 1,800 frames / 60 seconds.
+- `pnpm video:render:social` renders exactly 930 frames / 31 seconds.
+- `pnpm video:render:launch` renders both outputs.
+
+The launch compositions use the repository-pinned Remotion and Remocn motion system for brand typography, guided product framing, the Alex → Sam handoff, usage paths, and CTA. They intentionally omit the prototype music because authoritative license provenance is not stored with the asset. Both cuts remain comprehensible while muted and retain exact VTT sidecars.
+
+`public/launch/skills-board-video-manifest.json` records the immutable source, composition source, dimensions, frame counts, durations, output bytes, and SHA-256 values used for final asset readback.
 
 ### Human-only maker and comment brief
 
@@ -175,8 +182,8 @@ Immediately before each exact effect:
 
 | Package | Prepared state | Remaining exact boundary |
 | --- | --- | --- |
-| LinkedIn and X | Existing official Typefully draft reconciled | Final truth/link/provider readback and August 8–10 scheduling |
-| Product Hunt | Listing copy, asset order, and human facts brief prepared | Current platform eligibility, personal account, and human publication/comments |
+| LinkedIn and X | Existing official Typefully draft reconciled; final Remotion media hash pinned | Replace draft media through the official capability, read it back, then complete August 8–10 scheduling |
+| Product Hunt | Listing copy, Remotion-enhanced 60-second master, asset order, and human facts brief prepared | Current platform eligibility, personal account, and human publication/comments |
 | Show HN | Title options and human facts brief prepared | Current rules, prior-submission check, maker availability, and human publication/comments |
 | Product email | English copy prepared | Eligible consent/suppression projection, official provider route, unsubscribe, and send readback |
 | Native community | Destination-specific brief schema prepared | Exact allowlisted destination, current rules, identity, and official operation |

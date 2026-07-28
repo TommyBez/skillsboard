@@ -146,11 +146,11 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 | --- | --- | --- | --- | --- |
 | Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | Homepage treatment merged; final preflight and flag activation remain |
 | Launch narrative | `copywriting`, `copy-editing` | Homepage treatment and channel message spine | Jul 31 | Homepage treatment merged; channel package prepared |
-| Product demonstration | `video` | Short homepage loop, paced launch demo, and accelerated social cut | Aug 4 | 14-second loop and 31-second cut merged on `main`; 60-second Product Hunt cut prepared in this PR |
+| Product demonstration | `video` | Short homepage loop, paced launch demo, and accelerated social cut | Aug 4 | Homepage loop preserved; reproducible Remotion-enhanced 60-second and 31-second cuts prepared in this PR |
 | Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Dormant single-homepage treatment merged on `main` |
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
 | Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |
-| Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Private draft verified; final preflight and scheduling remain |
+| Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Private draft verified; final Remotion media replacement, readback, preflight, and scheduling remain |
 | Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | English copy prepared; consent, suppression, unsubscribe, provider, and send readback remain |
 | Community | `community-marketing`, `public-relations` | Product Hunt, Show HN, and native community packages | Aug 7 | Product Hunt and Show HN handoffs prepared; exact destination/provider execution remains |
 | Learning | `customer-research` | Objection log, interview guide, launch retrospective | Aug 10 | Not started |

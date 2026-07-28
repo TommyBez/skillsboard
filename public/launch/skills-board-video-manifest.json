@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "generator": {
+    "source": "remotion/skillsboard-launch-videos.tsx",
+    "source_sha256": "155bb1ef88560f46ca5b2c26528630419c6777801743b52a04a77eae7368425e",
+    "font_loader": "remotion/fonts.ts",
+    "font_loader_sha256": "c45a892f5d21007ba13c5179442d1ce026315226cd7e5045ef8aa5be3abda6e0",
+    "remotion_version": "4.0.495",
+    "render_command": "pnpm video:render:launch"
+  },
+  "workflow_source": {
+    "path": "public/launch/skills-board-workflow-source.mp4",
+    "sha256": "556ab38136e0644711935300aacb41a7db84151d04310b188dcd7f8e8afca343",
+    "bytes": 1798683
+  },
+  "outputs": [
+    {
+      "composition": "skillsboard-launch-product-hunt",
+      "path": "public/launch/skills-board-product-demo-product-hunt.mp4",
+      "sha256": "86afb50a215f4157ba3f60fdd8af6e43f8f259806bd364e5336591222baecd25",
+      "bytes": 4011047,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 1800,
+      "duration_seconds": 60,
+      "video_codec": "h264",
+      "audio": false,
+      "captions": "public/launch/skills-board-product-demo-product-hunt.vtt",
+      "captions_sha256": "f26d8280a362dc7aa527c8548300b4c872205214b76085d743d4af983eb5a6f9"
+    },
+    {
+      "composition": "skillsboard-launch-social",
+      "path": "public/launch/skills-board-product-demo.mp4",
+      "sha256": "19b53722ca2f9f37421bf3367937ad3c9ddf07ade42c79030ed51e942cd302e7",
+      "bytes": 2278529,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 930,
+      "duration_seconds": 31,
+      "video_codec": "h264",
+      "audio": false,
+      "captions": "public/launch/skills-board-product-demo.vtt",
+      "captions_sha256": "972a3f48b2f680e2010ed7eca97cc6ce7e347e94217a1d75a61f0b4398a80109"
+    }
+  ],
+  "poster": {
+    "path": "public/launch/skills-board-product-demo-poster.jpg",
+    "sha256": "410011ab7a8b213370de96e6aabb0cf776b9ebc0863d046aeb2005ba6daf7c51",
+    "bytes": 126182,
+    "width": 1440,
+    "height": 900
+  }
+}
