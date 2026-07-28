@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 15:40 UTC",
+  "updated": "28 Jul, 16:45 UTC",
   "round": 1,
-  "phase": "Round 1 building",
+  "phase": "Round 1 swept, 6 of 6",
   "references": [
     {
       "id": "linear",
@@ -93,6 +93,30 @@
     {
       "at": "15:40",
       "text": "Eight builders out in parallel, each owning its own files. Critics follow once they land."
+    },
+    {
+      "at": "16:10",
+      "text": "All eight builders landed. Page is 7006px to 4955px with the voids gone: both sticky runways deleted, the giant zero deleted, and two evidence sections added."
+    },
+    {
+      "at": "16:20",
+      "text": "Caught our own instrument lying. The closing band came out empty in every full-page screenshot \u2014 not a page bug: the site sets scroll-behavior smooth, so the harness's scripted scroll animated, never arrived, and left the last sections unobserved. Captures now scroll instantly."
+    },
+    {
+      "at": "16:35",
+      "text": "Round 1 judged: four blind comparisons, four wins \u2014 including both Linear matchups we lost at baseline. Standing is 8-2 overall."
+    },
+    {
+      "at": "16:36",
+      "text": "The new gap is the opposite of the old one. Having removed the voids, three critics independently called the page monotonous: no scale shift, no full-bleed moment, a back half that stops paying out. We fixed emptiness into uniformity."
+    },
+    {
+      "at": "16:45",
+      "text": "Round 1 swept: six blind comparisons, six wins. Ours now beats Linear, Vercel and input-otp on both desktop and mobile. Standing 10-2 overall, and every loss was at baseline."
+    },
+    {
+      "at": "16:46",
+      "text": "Five of the six critics named the same remaining weakness unprompted, and it is the mirror image of the one we started with: the page is monotonous. No scale shift, no full-bleed moment, a back half that reads as padding. We turned emptiness into uniformity."
     }
   ],
   "pieces": [
@@ -100,7 +124,7 @@
       "key": "P",
       "name": "Whole page",
       "status": "judging",
-      "statusLabel": "2 of 6 lost",
+      "statusLabel": "3 of 3 won",
       "scope": "The page as one object: rhythm, length, whether every screen of scroll earns itself.",
       "rounds": [
         {
@@ -120,15 +144,33 @@
           "reference": "linear",
           "verdict": "reference",
           "why": "Linear sustains one repeated module with dense real product imagery, so every screen of scroll delivers new evidence rather than new layout ideas."
+        },
+        {
+          "round": 1,
+          "reference": "linear",
+          "verdict": "ours",
+          "why": "Ours commits to a single editorial system with product UI rendered as crisp legible fragments that demonstrate the search, the install command and the MCP call, rather than gesturing at them."
+        },
+        {
+          "round": 1,
+          "reference": "vercel",
+          "verdict": "ours",
+          "why": "Ours sustains a complete argument down the whole page; Vercel stops arguing after three sections and leaves roughly half the page as empty scroll."
+        },
+        {
+          "round": 1,
+          "reference": "inputotp",
+          "verdict": "ours",
+          "why": "Ours renders product UI at readable size so each section teaches something new; input-otp's evidence is a grid of tiny low-contrast panels nobody can read."
         }
       ],
-      "gap": "Dead vertical space and unresolved sections. All three critics named it independently, including both we beat: a near-empty viewport after the hero, an MCP third column of grey ghost text, and a black band holding a giant outlined 0 that reads as placeholder art."
+      "gap": "Uniformity. Three critics independently: the lower third is 'three consecutive near-empty bands with no product imagery, so the scroll stops paying out'; the middle third is 'evenly loud rather than building toward a climax'; the whole page is 'uniformly polite \u2014 never a single scale shift or full-bleed moment that would make it memorable rather than merely well-behaved'."
     },
     {
       "key": "I",
       "name": "Evidence",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Two new sections: a proof strip under the fold, and a product slab showing the library itself.",
       "rounds": [],
       "gap": "This is the piece we actually lost on. Linear carries real product surface in every module; we showed the product nowhere."
@@ -136,56 +178,56 @@
     {
       "key": "A",
       "name": "Hero",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Headline type, eyebrow, subcopy, CTA cluster, the dossier board, entrance choreography, sticky exit.",
       "rounds": []
     },
     {
       "key": "B",
       "name": "Chrome",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Sticky header, scroll progress, chapter rail, footer colophon.",
       "rounds": []
     },
     {
       "key": "C",
       "name": "Workflow",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "The three-move sequence and its section head.",
       "rounds": []
     },
     {
       "key": "D",
       "name": "MCP",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Sticky chapter, copy column, the routing schematic and its animation.",
       "rounds": []
     },
     {
       "key": "E",
       "name": "Pricing",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "The zero monument and the Free Forever statement.",
       "rounds": []
     },
     {
       "key": "F",
       "name": "FAQ + closing",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Disclosure list, closing statement, final call to action.",
       "rounds": []
     },
     {
       "key": "G",
       "name": "Motion system",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "round 1 shipped",
       "scope": "Springs, interruptibility, hover and press feedback, scroll timing, reduced-motion.",
       "rounds": []
     },
@@ -193,7 +235,7 @@
       "key": "H",
       "name": "Mobile",
       "status": "judging",
-      "statusLabel": "1 of 3 lost",
+      "statusLabel": "3 of 3 won",
       "scope": "Every section at 390px, judged on its own terms.",
       "rounds": [
         {
@@ -213,9 +255,27 @@
           "reference": "linear",
           "verdict": "reference",
           "why": "Linear re-composes for the column \u2014 full-bleed visuals using the entire width, one visual and one sentence per section; ours stacks the desktop layout into a card column."
+        },
+        {
+          "round": 1,
+          "reference": "linear",
+          "verdict": "ours",
+          "why": "Ours is genuinely composed for one thumb; Linear stacks and shrinks its desktop layout into clipped carousels and screenshots where nothing is readable."
+        },
+        {
+          "round": 1,
+          "reference": "vercel",
+          "verdict": "ours",
+          "why": "Ours re-composed for the narrow column with full-width tappable bars and code blocks that scroll rather than shrink; Vercel scaled desktop assets to unreadable sizes inside a huge dead-space column."
+        },
+        {
+          "round": 1,
+          "reference": "inputotp",
+          "verdict": "ours",
+          "why": "Ours states its purpose and its action within the first screen at a genuine mobile display scale; input-otp opens with a shrunken desktop hero at near-caption size."
         }
       ],
-      "gap": "The hero card cluster is illegible at 390px. Two critics called it independently: a shrunken collage that wastes the first scroll, with text too small to parse. Mobile type hierarchy is also flat \u2014 headings, eyebrows and body sit at near-identical weight and size."
+      "gap": "Mobile type scale is nearly flat \u2014 hero, section headings and FAQ questions all sit in a narrow size band at heavy weight, so nothing establishes a dominant entry point and there is nothing to skim by."
     }
   ]
 }
