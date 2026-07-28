@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 18:05 UTC",
+  "updated": "28 Jul, 18:40 UTC",
   "round": 1,
-  "phase": "Mobile repaired, harness in build",
+  "phase": "Instruments rebuilt, hero rematch lost",
   "references": [
     {
       "id": "linear",
@@ -141,6 +141,22 @@
     {
       "at": "17:31",
       "text": "Acceptance test for the new audit is falsifiable: run it against the commit that still contains the mobile bug, and it must surface the sliced text on its own, without being told where to look."
+    },
+    {
+      "at": "18:20",
+      "text": "Reference profile written from measurements rather than opinions. We win discipline decisively: 13 type combinations against Linear's 42 and input-otp's 63, two radii against nineteen, zero shadows, three transition specs."
+    },
+    {
+      "at": "18:25",
+      "text": "The measured version of 'uniformly polite': our tallest section is 1.02 screens. Nothing on our page ever fills more than one viewport, while seven of Linear's eleven sections do. The fix is not more variance \u2014 Vercel varies less than us and does not read as monotonous \u2014 it is one section big enough to dominate."
+    },
+    {
+      "at": "18:35",
+      "text": "Found a fairness bug in the harness I had just built: section captures put each section's top at the screen top, so every site's first line hid behind its own sticky nav. A critic named the symptom on Linear without knowing it was the instrument."
+    },
+    {
+      "at": "18:40",
+      "text": "Re-ran the hero comparison on the corrected instrument. The verdict reversed \u2014 Linear wins. Part of the six-win sweep was framing, exactly as suspected. Against Linear at section scale it is 1-1, not 2-0."
     }
   ],
   "pieces": [
@@ -193,28 +209,43 @@
     {
       "key": "M",
       "name": "The harness",
-      "status": "building",
-      "statusLabel": "building",
+      "status": "passing",
+      "statusLabel": "shipped",
       "scope": "How we measure. An absolute defect audit, a comparable design-system profile across all four sites, like-for-like section captures, and motion evidence.",
       "rounds": [],
-      "gap": "The old method only ever asked which of two pages is better. It never asked whether either was broken, so it handed us six wins while we shipped severed text."
+      "gap": "Two bugs in the instruments themselves were caught before trusting them: oklch colours read as transparent, reporting 146/146 contrast failures; and section captures hid every site's first line behind its own sticky nav."
     },
     {
       "key": "I",
       "name": "Evidence",
       "status": "passing",
-      "statusLabel": "round 1 shipped",
+      "statusLabel": "evidence won at section scale",
       "scope": "Two new sections: a proof strip under the fold, and a product slab showing the library itself.",
-      "rounds": [],
+      "rounds": [
+        {
+          "round": 2,
+          "reference": "linear",
+          "verdict": "ours",
+          "why": "Ours is legible where Linear's is not \u2014 the search field, the tag filters, the skill count, a real note and the exact install command; Linear fades 60% of its board into near-black and delivers atmosphere instead of information."
+        }
+      ],
       "gap": "This is the piece we actually lost on. Linear carries real product surface in every module; we showed the product nowhere."
     },
     {
       "key": "A",
       "name": "Hero",
       "status": "passing",
-      "statusLabel": "round 1 shipped",
+      "statusLabel": "hero lost at section scale",
       "scope": "Headline type, eyebrow, subcopy, CTA cluster, the dossier board, entrance choreography, sticky exit.",
-      "rounds": []
+      "rounds": [
+        {
+          "round": 2,
+          "reference": "linear",
+          "verdict": "reference",
+          "why": "Linear's headline states a specific contested claim backed by a dense product surface, so copy and visual make the same argument; ours is a two-line platitude whose filler second line gets the loudest treatment."
+        }
+      ],
+      "gap": "The headline claims a category, not a capability \u2014 and the one green line on the page, protected by the direction as our brand signature, is spent on \"All in one place.\", the least informative four words on it."
     },
     {
       "key": "B",
