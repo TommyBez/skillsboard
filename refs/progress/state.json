@@ -1,28 +1,106 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 14:20 UTC",
+  "updated": "28 Jul, 14:52 UTC",
   "round": 0,
-  "phase": "Groundwork",
+  "phase": "Baseline judged",
   "references": [
-    { "id": "linear", "name": "Linear", "note": "restraint, type scale, dark craft" },
-    { "id": "vercel", "name": "Vercel", "note": "geometry, whitespace, product density" },
-    { "id": "inputotp", "name": "input-otp", "note": "motion and interactive craft" }
+    {
+      "id": "linear",
+      "name": "Linear",
+      "note": "restraint, type scale, dark craft"
+    },
+    {
+      "id": "vercel",
+      "name": "Vercel",
+      "note": "geometry, whitespace, product density"
+    },
+    {
+      "id": "inputotp",
+      "name": "input-otp",
+      "note": "motion and interactive craft"
+    }
   ],
   "notes": [
-    { "at": "13:50", "text": "Session opened. Dependencies installed, dev server up on :3000, baseline screenshots captured at 1440x900 and 390x844." },
-    { "at": "13:55", "text": "Reference capture blocked: egress policy refused CONNECT to all three reference hosts. Raised with Tommaso." },
-    { "at": "14:05", "text": "Egress opened. Chromium's own TLS to the proxy still resets, so captures now route every request through Node's proxy-aware fetch and fulfil it into the page." },
-    { "at": "14:09", "text": "All three references captured full-page, desktop and mobile, into refs/." },
-    { "at": "14:15", "text": "Refactor in flight: splitting the 708-line page and 1703-line CSS module into per-section files so builders can work in parallel without collisions. Must come out pixel-identical." },
-    { "at": "14:16", "text": "Motion recon in flight: driving input-otp.rodz.dev live to extract its real timing, easing and interruptibility behaviour into a written spec." }
+    {
+      "at": "13:50",
+      "text": "Session opened. Dependencies installed, dev server up on :3000, baseline screenshots captured at 1440x900 and 390x844."
+    },
+    {
+      "at": "13:55",
+      "text": "Reference capture blocked: egress policy refused CONNECT to all three reference hosts. Raised with Tommaso."
+    },
+    {
+      "at": "14:05",
+      "text": "Egress opened. Chromium's own TLS to the proxy still resets, so captures now route every request through Node's proxy-aware fetch and fulfil it into the page."
+    },
+    {
+      "at": "14:09",
+      "text": "All three references captured full-page, desktop and mobile, into refs/."
+    },
+    {
+      "at": "14:15",
+      "text": "Refactor in flight: splitting the 708-line page and 1703-line CSS module into per-section files so builders can work in parallel without collisions. Must come out pixel-identical."
+    },
+    {
+      "at": "14:16",
+      "text": "Motion recon in flight: driving input-otp.rodz.dev live to extract its real timing, easing and interruptibility behaviour into a written spec."
+    },
+    {
+      "at": "14:35",
+      "text": "Refactor landed: 62 screenshot pairs byte-identical across both flag permutations, both themes and reduced motion. Committed and pushed."
+    },
+    {
+      "at": "14:40",
+      "text": "Art direction in flight. Seven builders working separately would produce seven aesthetics, so one director derives a shared spec from the references first."
+    },
+    {
+      "at": "14:44",
+      "text": "Round 0 judging: three critics comparing our current page blind against each reference. Each sees two unlabelled screenshots and must pick one."
+    },
+    {
+      "at": "14:52",
+      "text": "Round 0 result: we beat Vercel and input-otp on static composition, and lost to Linear. Critics were unanimous on why \u2014 Linear's page carries real product evidence on every screen; ours pads."
+    },
+    {
+      "at": "14:52",
+      "text": "Three independent critics, none of whom saw the other two, all named the same defect: the empty run after the hero, the ghost-text MCP column, and the giant outlined 0. That is the structural verdict, not a style note."
+    }
   ],
   "pieces": [
+    {
+      "key": "P",
+      "name": "Whole page",
+      "status": "judging",
+      "statusLabel": "1 of 3 lost",
+      "scope": "The page as one object: rhythm, length, whether every screen of scroll earns itself.",
+      "rounds": [
+        {
+          "round": 0,
+          "reference": "vercel",
+          "verdict": "ours",
+          "why": "Ours commits to one system \u2014 off-white ground, a single green used sparingly, hairline rules, a tight scale; Vercel read as unrelated panels with no shared grid."
+        },
+        {
+          "round": 0,
+          "reference": "inputotp",
+          "verdict": "ours",
+          "why": "Ours reads as one editorial system at a confident display scale; input-otp read as a stack of dark modules at near-identical spacing with no rhythm change."
+        },
+        {
+          "round": 0,
+          "reference": "linear",
+          "verdict": "reference",
+          "why": "Linear sustains one repeated module with dense real product imagery, so every screen of scroll delivers new evidence rather than new layout ideas."
+        }
+      ],
+      "gap": "Dead vertical space and unresolved sections. All three critics named it independently, including both we beat: a near-empty viewport after the hero, an MCP third column of grey ghost text, and a black band holding a giant outlined 0 that reads as placeholder art."
+    },
     {
       "key": "A",
       "name": "Hero",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "Headline type, eyebrow, subcopy, CTA cluster, the dossier board, entrance choreography, sticky exit.",
       "rounds": []
     },
@@ -30,7 +108,7 @@
       "key": "B",
       "name": "Chrome",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "Sticky header, scroll progress, chapter rail, footer colophon.",
       "rounds": []
     },
@@ -38,7 +116,7 @@
       "key": "C",
       "name": "Workflow",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "The three-move sequence and its section head.",
       "rounds": []
     },
@@ -46,7 +124,7 @@
       "key": "D",
       "name": "MCP",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "Sticky chapter, copy column, the routing schematic and its animation.",
       "rounds": []
     },
@@ -54,7 +132,7 @@
       "key": "E",
       "name": "Pricing",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "The zero monument and the Free Forever statement.",
       "rounds": []
     },
@@ -62,7 +140,7 @@
       "key": "F",
       "name": "FAQ + closing",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "Disclosure list, closing statement, final call to action.",
       "rounds": []
     },
@@ -70,7 +148,7 @@
       "key": "G",
       "name": "Motion system",
       "status": "pending",
-      "statusLabel": "queued",
+      "statusLabel": "awaiting direction",
       "scope": "Springs, interruptibility, hover and press feedback, scroll timing, reduced-motion.",
       "rounds": []
     },
