@@ -26,7 +26,7 @@ The shared team library leads the message. MCP is a supporting access path.
 
 ## Due work
 
-Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. Execute every positive compatible item; use the ordering below as dependency and timing information, not as automatic precedence over SEO, social, or another positive candidate.
+Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. Execute every positive compatible item. The ordering below is planning information, not an automatic total dependency chain or precedence over SEO, social, or another positive candidate. Emit a directed prerequisite only when an atomic effect cannot truthfully or physically execute before its prerequisite; otherwise sequence and deadline affect rank only.
 
 The candidate sequence and dependencies are:
 
@@ -37,6 +37,8 @@ The candidate sequence and dependencies are:
 5. native LinkedIn, X, consented email, Product Hunt, Hacker News, and community packages through their exact available routes;
 6. final truth/provider preflight and launch-day execution;
 7. launch support, qualitative learning, and the 14-day cohort report on August 25.
+
+Every public launch announcement requires completed production-journey and funnel/attribution QA. An effect that uses the demo or landing treatment requires that exact asset to be complete. Launch-day publication requires its channel package plus preflight of the exact provider. Support and cohort reporting require the corresponding launch effect, and the 14-day report also requires its observation window to close. Asset preparation and independent lanes remain selectable whenever they do not require one of those facts.
 
 Provider lanes remain independent. Product Hunt, Hacker News, email, or another unavailable operation never pauses compatible launch work.
 
@@ -50,7 +52,7 @@ Record at least five structured objections or confusion points and locate the la
 
 Launch content contributes most directly when it names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity informs contribution estimates but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, output quota, or publication prohibition. Prevent only an exact duplicate provider effect.
 
-Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate enters the same finite `pulse.scheduler` snapshot with exact effect keys and explicit dependency, resource, timing, or provider conflicts. Exact duplicates are ineligible, but they are not the only possible collision; the shared deterministic algorithm selects the compatible set.
+Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate enters the same finite `pulse.scheduler` snapshot with exact effect keys, sorted directed prerequisite IDs for true prerequisites, and separate resource, timing, or provider conflict edges. Prerequisites affect eligibility and are never normalized as conflicts. Exact duplicates are ineligible, but they are not the only possible collision; the shared deterministic algorithm selects the compatible set.
 
 ## Contract boundaries
 

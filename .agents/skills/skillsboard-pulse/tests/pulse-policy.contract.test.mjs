@@ -120,11 +120,14 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.match(social, /The parent invokes the official Typefully capability directly/);
   assert.match(scheduler, /freeze a finite snapshot/);
   assert.match(scheduler, /select the deterministic maximal compatible set/);
+  assert.match(scheduler, /`candidate\.v1\.<origin_hex>\.<route_hex>\.<effect_hex>`/);
+  assert.match(scheduler, /Prerequisites are directed all-of edges and are never copied into the symmetric conflict graph/);
+  assert.match(scheduler, /`prerequisite_pending:<sorted_candidate_ids>`/);
   assert.match(scheduler, /raw ASCII ascending/);
   assert.match(scheduler, /`conflict_loser:<winner_candidate_id>`/);
   assert.match(scheduler, /losing candidate is eligible for selection again/);
   assert.match(scheduler, /completing the first action or observing the first signal never discharges the objective/);
-  assert.match(scheduler, /`fixed_point_complete` requires a fresh snapshot/);
+  assert.match(scheduler, /`fixed_point_complete` requires a fresh valid snapshot/);
   assert.match(scheduler, /every applicable family has `family_enumerated=true`/);
   assert.match(scheduler, /There is no repository WIP budget, pSEO PR\/page quota/);
   assert.doesNotMatch(learning, /must produce and execute a search action and a community\/social action/);
@@ -142,7 +145,145 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.equal(Object.hasOwn(operational.state_views, "social"), true);
 });
 
-test("finite snapshots resolve collisions deterministically and never claim a false fixed point", () => {
+test("candidate IDs are canonical, injective, stable, and validated before selection", () => {
+  const identityTuple = ({ effectKey, originPolicyNode, routeId }) => [
+    originPolicyNode,
+    routeId,
+    effectKey,
+  ];
+  const encodeIdentityComponent = (value) => {
+    assert.match(value, /^[\x21-\x7e]+$/);
+    return Buffer.from(value, "utf8").toString("hex");
+  };
+  const deriveCandidateId = (candidate) =>
+    `candidate.v1.${identityTuple(candidate).map(encodeIdentityComponent).join(".")}`;
+  const compareCanonicalAscii = (left, right) => {
+    const leftJson = JSON.stringify(left);
+    const rightJson = JSON.stringify(right);
+    return leftJson < rightJson ? -1 : leftJson > rightJson ? 1 : 0;
+  };
+  const setLikeFields = new Set([
+    "conflicts",
+    "interferenceKeys",
+    "operations",
+    "prerequisites",
+  ]);
+  const canonicalize = (value, fieldName) => {
+    if (Array.isArray(value)) {
+      const items = value.map((child) => canonicalize(child));
+      return setLikeFields.has(fieldName) ? items.sort(compareCanonicalAscii) : items;
+    }
+    if (value && typeof value === "object") {
+      return Object.fromEntries(
+        Object.entries(value)
+          .sort(([left], [right]) => left < right ? -1 : left > right ? 1 : 0)
+          .map(([key, child]) => [key, canonicalize(child, key)]),
+      );
+    }
+    return value;
+  };
+  const nonIdentityKey = (candidate) => {
+    const {
+      effectKey: _effectKey,
+      originPolicyNode: _originPolicyNode,
+      persistedId: _persistedId,
+      routeId: _routeId,
+      snapshotId: _snapshotId,
+      ...nonIdentity
+    } = candidate;
+    return JSON.stringify(canonicalize(nonIdentity));
+  };
+  const prepareCandidates = (candidates) => {
+    const unique = new Map();
+    for (const candidate of candidates) {
+      const derivedId = deriveCandidateId(candidate);
+      if (candidate.persistedId && candidate.persistedId !== derivedId) {
+        throw new Error("persisted candidate ID mismatch");
+      }
+      const identity = JSON.stringify(identityTuple(candidate));
+      const nonIdentity = nonIdentityKey(candidate);
+      const existing = unique.get(derivedId);
+      if (existing && existing.identity !== identity) {
+        throw new Error("candidate ID associated with different identity tuples");
+      }
+      if (existing && existing.nonIdentity !== nonIdentity) {
+        throw new Error("inconsistent duplicate candidate emissions");
+      }
+      if (!existing) {
+        unique.set(derivedId, {
+          candidate: { ...candidate, id: derivedId },
+          identity,
+          nonIdentity,
+        });
+      }
+    }
+    return [...unique.values()].map(({ candidate }) => candidate);
+  };
+
+  const minimal = { effectKey: "c", originPolicyNode: "a", routeId: "b" };
+  assert.equal(deriveCandidateId(minimal), "candidate.v1.61.62.63");
+  assert.equal(deriveCandidateId({ ...minimal, rank: 4, snapshotId: "later" }), deriveCandidateId(minimal));
+  assert.notEqual(
+    deriveCandidateId({ effectKey: "d", originPolicyNode: "ab", routeId: "c" }),
+    deriveCandidateId({ effectKey: "d", originPolicyNode: "a", routeId: "bc" }),
+  );
+  assert.notEqual(deriveCandidateId({ ...minimal, originPolicyNode: "z" }), deriveCandidateId(minimal));
+  assert.notEqual(deriveCandidateId({ ...minimal, routeId: "z" }), deriveCandidateId(minimal));
+  assert.notEqual(deriveCandidateId({ ...minimal, effectKey: "z" }), deriveCandidateId(minimal));
+  assert.equal(prepareCandidates([minimal, { ...minimal }]).length, 1);
+  const candidateWithOrderedAndSetLikeFields = {
+    ...minimal,
+    conflicts: ["candidate.z", "candidate.a"],
+    prerequisites: ["candidate.p2", "candidate.p1"],
+    rank: [4, 3, 2, 1],
+  };
+  assert.equal(prepareCandidates([
+    candidateWithOrderedAndSetLikeFields,
+    {
+      ...candidateWithOrderedAndSetLikeFields,
+      conflicts: ["candidate.a", "candidate.z"],
+      prerequisites: ["candidate.p1", "candidate.p2"],
+    },
+  ]).length, 1);
+  assert.throws(
+    () => prepareCandidates([minimal, { ...minimal, rank: 2 }]),
+    /inconsistent duplicate candidate emissions/,
+  );
+  assert.throws(
+    () => prepareCandidates([{ ...minimal, rank: 2 }, minimal]),
+    /inconsistent duplicate candidate emissions/,
+  );
+  assert.throws(
+    () => prepareCandidates([
+      candidateWithOrderedAndSetLikeFields,
+      { ...candidateWithOrderedAndSetLikeFields, rank: [1, 2, 3, 4] },
+    ]),
+    /inconsistent duplicate candidate emissions/,
+  );
+  assert.throws(
+    () => deriveCandidateId({ ...minimal, effectKey: "" }),
+    /The input did not match/,
+  );
+  assert.throws(
+    () => deriveCandidateId({ ...minimal, effectKey: "é" }),
+    /The input did not match/,
+  );
+  assert.throws(
+    () => prepareCandidates([{ ...minimal, persistedId: deriveCandidateId({ ...minimal, effectKey: "other" }) }]),
+    /persisted candidate ID mismatch/,
+  );
+
+  const tiedA = { effectKey: "effect-a", originPolicyNode: "origin", routeId: "route" };
+  const tiedB = { effectKey: "effect-b", originPolicyNode: "origin", routeId: "route" };
+  const chooseTieWinner = (candidates) => [...candidates]
+    .map((candidate) => ({ ...candidate, id: deriveCandidateId(candidate) }))
+    .sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0)[0].id;
+  const tieWinnerId = chooseTieWinner([tiedA, tiedB]);
+  assert.equal(chooseTieWinner([tiedB, tiedA]), tieWinnerId);
+  assert.equal(`conflict_loser:${tieWinnerId}`.endsWith(tieWinnerId), true);
+});
+
+test("directed prerequisites and symmetric conflicts produce one deterministic valid snapshot", () => {
   const compareAscii = (left, right) => left < right ? -1 : left > right ? 1 : 0;
   const compareCandidates = (left, right) =>
     right.contribution - left.contribution
@@ -150,17 +291,56 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
     || right.confidence - left.confidence
     || left.runtimeMinutes - right.runtimeMinutes
     || compareAscii(left.id, right.id);
-  const selectCompatible = (candidates) => {
-    const conflicts = new Map(candidates.map(({ id }) => [id, new Set()]));
+  const validatePrerequisites = (candidates, completedIds) => {
+    const currentIds = new Set(candidates.map(({ id }) => id));
+    const knownIds = new Set([...currentIds, ...completedIds]);
     for (const candidate of candidates) {
       for (const conflictId of candidate.conflicts) {
+        if (!currentIds.has(conflictId)) throw new Error("unknown conflict");
+      }
+      for (const prerequisiteId of candidate.prerequisites) {
+        if (prerequisiteId === candidate.id) throw new Error("self prerequisite");
+        if (!knownIds.has(prerequisiteId)) throw new Error("unknown prerequisite");
+      }
+    }
+    const visiting = new Set();
+    const visited = new Set();
+    const byId = new Map(candidates.map((candidate) => [candidate.id, candidate]));
+    const visit = (candidateId) => {
+      if (visiting.has(candidateId)) throw new Error("prerequisite cycle");
+      if (visited.has(candidateId) || completedIds.has(candidateId)) return;
+      visiting.add(candidateId);
+      for (const prerequisiteId of byId.get(candidateId)?.prerequisites || []) visit(prerequisiteId);
+      visiting.delete(candidateId);
+      visited.add(candidateId);
+    };
+    for (const candidate of candidates) visit(candidate.id);
+  };
+  const selectCompatible = (candidates, completedIds = new Set(), blockedIds = new Set()) => {
+    validatePrerequisites(candidates, completedIds);
+    const dispositions = new Map();
+    const ready = candidates.filter((candidate) => {
+      if (blockedIds.has(candidate.id)) {
+        dispositions.set(candidate.id, "unavailable");
+        return false;
+      }
+      const pendingIds = candidate.prerequisites
+        .filter((prerequisiteId) => !completedIds.has(prerequisiteId))
+        .sort(compareAscii);
+      if (pendingIds.length === 0) return true;
+      dispositions.set(candidate.id, `prerequisite_pending:${pendingIds.join(",")}`);
+      return false;
+    });
+    const conflicts = new Map(ready.map(({ id }) => [id, new Set()]));
+    for (const candidate of ready) {
+      for (const conflictId of candidate.conflicts) {
+        if (!conflicts.has(conflictId)) continue;
         conflicts.get(candidate.id).add(conflictId);
         conflicts.get(conflictId)?.add(candidate.id);
       }
     }
     const selected = [];
-    const dispositions = new Map();
-    for (const candidate of [...candidates].sort(compareCandidates)) {
+    for (const candidate of [...ready].sort(compareCandidates)) {
       const winner = selected.find((selectedCandidate) =>
         conflicts.get(candidate.id).has(selectedCandidate.id));
       if (winner) dispositions.set(candidate.id, `conflict_loser:${winner.id}`);
@@ -168,15 +348,33 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
     }
     return { dispositions, selected };
   };
-  const isFixedPoint = ({ ambiguousIssuedEffect, candidates, conflictLosers = [], families, incompleteWinnerIds = [] }) =>
-    families.every(({ enumerated }) => enumerated)
-    && candidates.length === 0
-    && conflictLosers.every(({ winnerId }) => !incompleteWinnerIds.includes(winnerId))
-    && !ambiguousIssuedEffect;
+  const isFixedPoint = ({
+    ambiguousIssuedEffect,
+    candidates,
+    conflictLosers = [],
+    families,
+    prerequisitePending = [],
+    prerequisiteStates = new Map(),
+  }) => {
+    const nonReEvaluablePrerequisiteBlockers = new Set([
+      "authority_or_identity",
+      "legal_or_consent",
+      "spend_or_overage",
+      "unavailable",
+    ]);
+    return families.every(({ enumerated }) => enumerated)
+      && candidates.length === 0
+      && conflictLosers.length === 0
+      && prerequisitePending.every(({ prerequisiteIds }) =>
+        prerequisiteIds.every((id) =>
+          nonReEvaluablePrerequisiteBlockers.has(prerequisiteStates.get(id))))
+      && !ambiguousIssuedEffect;
+  };
 
   const candidateA = {
     id: "candidate.a",
     conflicts: ["candidate.b"],
+    prerequisites: [],
     contribution: 4,
     urgency: 3,
     confidence: 3,
@@ -185,6 +383,7 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
   const candidateB = {
     id: "candidate.b",
     conflicts: [],
+    prerequisites: [],
     contribution: 3,
     urgency: 4,
     confidence: 4,
@@ -193,6 +392,7 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
   const candidateC = {
     id: "candidate.c",
     conflicts: [],
+    prerequisites: [],
     contribution: 2,
     urgency: 2,
     confidence: 2,
@@ -213,7 +413,6 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
     candidates: [],
     conflictLosers: [{ id: "candidate.b", winnerId: "candidate.a" }],
     families: [{ enumerated: true }, { enumerated: true }],
-    incompleteWinnerIds: ["candidate.a"],
   }), false);
 
   const afterBlockedWinner = selectCompatible([candidateB, candidateC]);
@@ -228,6 +427,130 @@ test("finite snapshots resolve collisions deterministically and never claim a fa
     candidates: [],
     families: [{ enumerated: true }, { enumerated: false }],
   }), false);
+
+  const prerequisite = {
+    id: "candidate.prerequisite",
+    conflicts: [],
+    prerequisites: [],
+    contribution: 1,
+    urgency: 1,
+    confidence: 4,
+    runtimeMinutes: 4,
+  };
+  const dependent = {
+    id: "candidate.dependent",
+    conflicts: [],
+    prerequisites: [prerequisite.id],
+    contribution: 4,
+    urgency: 4,
+    confidence: 4,
+    runtimeMinutes: 1,
+  };
+  const independent = {
+    id: "candidate.independent",
+    conflicts: [],
+    prerequisites: [],
+    contribution: 2,
+    urgency: 2,
+    confidence: 2,
+    runtimeMinutes: 2,
+  };
+  const beforePrerequisite = selectCompatible([dependent, independent, prerequisite]);
+  assert.deepEqual(
+    beforePrerequisite.selected.map(({ id }) => id),
+    [independent.id, prerequisite.id],
+  );
+  assert.equal(
+    beforePrerequisite.dispositions.get(dependent.id),
+    `prerequisite_pending:${prerequisite.id}`,
+  );
+  assert.equal(beforePrerequisite.dispositions.has(prerequisite.id), false);
+
+  const afterPrerequisite = selectCompatible([dependent, independent], new Set([prerequisite.id]));
+  assert.deepEqual(afterPrerequisite.selected.map(({ id }) => id), [dependent.id, independent.id]);
+  assert.equal(afterPrerequisite.dispositions.has(dependent.id), false);
+
+  const secondPrerequisite = { ...prerequisite, id: "candidate.second-prerequisite" };
+  const allOfDependent = {
+    ...dependent,
+    id: "candidate.all-of-dependent",
+    prerequisites: [prerequisite.id, secondPrerequisite.id],
+  };
+  const oneOfTwoComplete = selectCompatible(
+    [allOfDependent, secondPrerequisite],
+    new Set([prerequisite.id]),
+  );
+  assert.equal(
+    oneOfTwoComplete.dispositions.get(allOfDependent.id),
+    `prerequisite_pending:${secondPrerequisite.id}`,
+  );
+  assert.deepEqual(oneOfTwoComplete.selected.map(({ id }) => id), [secondPrerequisite.id]);
+
+  const blockedPrerequisite = selectCompatible(
+    [dependent, prerequisite],
+    new Set(),
+    new Set([prerequisite.id]),
+  );
+  assert.deepEqual(blockedPrerequisite.selected, []);
+  assert.equal(blockedPrerequisite.dispositions.get(prerequisite.id), "unavailable");
+  assert.equal(
+    blockedPrerequisite.dispositions.get(dependent.id),
+    `prerequisite_pending:${prerequisite.id}`,
+  );
+
+  assert.throws(
+    () => selectCompatible([{ ...dependent, prerequisites: [dependent.id] }]),
+    /self prerequisite/,
+  );
+  assert.throws(
+    () => selectCompatible([{ ...dependent, prerequisites: ["candidate.missing"] }]),
+    /unknown prerequisite/,
+  );
+  assert.throws(
+    () => selectCompatible([{ ...dependent, conflicts: ["candidate.missing"], prerequisites: [] }]),
+    /unknown conflict/,
+  );
+  assert.throws(
+    () => selectCompatible([
+      { ...dependent, id: "candidate.cycle-a", prerequisites: ["candidate.cycle-b"] },
+      { ...prerequisite, id: "candidate.cycle-b", prerequisites: ["candidate.cycle-a"] },
+    ]),
+    /prerequisite cycle/,
+  );
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }],
+    prerequisitePending: [{ id: dependent.id, prerequisiteIds: [prerequisite.id] }],
+    prerequisiteStates: new Map([[prerequisite.id, "actionable_now"]]),
+  }), false);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }],
+    prerequisitePending: [{ id: dependent.id, prerequisiteIds: [prerequisite.id] }],
+    prerequisiteStates: new Map([[prerequisite.id, "ambiguous"]]),
+  }), false);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }],
+    prerequisitePending: [{ id: dependent.id, prerequisiteIds: [prerequisite.id] }],
+    prerequisiteStates: new Map([[prerequisite.id, "waiting_pr_approval"]]),
+  }), false);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }],
+    prerequisitePending: [{ id: dependent.id, prerequisiteIds: [prerequisite.id] }],
+  }), false);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }],
+    prerequisitePending: [{ id: dependent.id, prerequisiteIds: [prerequisite.id] }],
+    prerequisiteStates: new Map([[prerequisite.id, "unavailable"]]),
+  }), true);
 });
 
 test("public social publication never depends on a secondary executor or authorizer", () => {
@@ -289,13 +612,16 @@ test("coordinated product launch remains routable without automatic priority", (
   assert.match(scheduler, /launch work has no automatic precedence over SEO, social, or another positive candidate/);
   assert.doesNotMatch(scheduler, /protected priority lane/);
   assert.match(product, /first-class candidate family/);
-  assert.match(product, /create no automatic precedence over another positive candidate/);
+  assert.match(product, /never becomes a symmetric conflict or automatic precedence for unrelated work/);
+  assert.match(product, /A true execution prerequisite affects eligibility through a directed prerequisite ID/);
   assert.match(social, /creates no automatic precedence over a stronger non-launch unit/);
   const launchReference = readFileSync(new URL("../references/launch-campaign.md", import.meta.url), "utf8");
   assert.match(launchReference, /Launch day: Tuesday, August 11, 2026/);
   assert.match(launchReference, /Launch membership alone does not determine rank/);
+  assert.match(launchReference, /Prerequisites affect eligibility and are never normalized as conflicts/);
   assert.doesNotMatch(launchReference, /must not outrank a compatible due product-launch item/);
   assert.match(launchPlan, /owned by `\.agents\/skills\/skillsboard-pulse\/references\/launch-campaign\.md`/);
+  assert.match(launchPlan, /directed prerequisites kept separate from explicit cross-lane conflicts/);
   assert.doesNotMatch(launchPlan, /Launch readiness gate|no launch-period post may be scheduled unless/);
 });
 
@@ -326,9 +652,11 @@ test("v18 normalization rebuilds deterministic conflict state", () => {
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
   assert.match(scheduler, /On the first run with the v18 root[^\n]*atomically normalize existing schema-v4 state/);
-  assert.match(scheduler, /stable candidate IDs, family enumeration markers, rank tuples, normalized symmetric conflict edges/);
-  assert.match(scheduler, /Treat every earlier compatibility label, conflict loser, or fixed-point result as historical only/);
-  assert.match(scheduler, /Record source root, target root, completion time, candidate count, normalized conflict count, and family enumeration count/);
+  assert.match(scheduler, /recompute canonical candidate IDs from their identity tuples/);
+  assert.match(scheduler, /directed prerequisite edges separately from normalized symmetric conflict edges/);
+  assert.match(scheduler, /Do not promote legacy item keys or unverified persisted IDs/);
+  assert.match(scheduler, /Treat every earlier compatibility label, prerequisite result, conflict loser, or fixed-point result as historical only/);
+  assert.match(scheduler, /candidate count, prerequisite count, normalized conflict count, and family enumeration count/);
 });
 
 test("production Resend routes pin the connector adapter instead of API-key or CLI management", () => {
