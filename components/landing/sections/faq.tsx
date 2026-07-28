@@ -1,5 +1,6 @@
 import styles from "@/components/landing/sections/faq.module.css"
 import { landingFaqs } from "@/lib/seo/landing-faq"
+import { siteConfig } from "@/lib/site"
 
 /** FAQ — technical index. */
 export function Faq() {
@@ -7,40 +8,50 @@ export function Faq() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="scroll-mt-14 border-b border-border/70"
-      data-chapter-target="faq"
+      className={`${styles.faq} lp-section scroll-mt-14`}
     >
-      <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(16rem,0.7fr)_minmax(28rem,1.3fr)] lg:gap-20">
-        <div>
-          <h2
-            id="faq-heading"
-            className="max-w-[14ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
-          >
-            Common questions
-          </h2>
-          <p className="mt-5 max-w-md text-pretty text-lg leading-relaxed text-muted-foreground">
-            Straight answers about what Skills Board is, how it fits mixed
-            agent setups, and what “recommended” means.
-          </p>
-        </div>
-
-        <div className="border-t border-border/80">
-          {landingFaqs.map((faq) => (
-            <details
-              key={faq.question}
-              className={`faq-disclosure ${styles.faqItem}`}
-            >
-              <summary className={styles.faqSummary}>
-                <span className={styles.faqQuestion}>{faq.question}</span>
-                <span className={styles.faqGlyph} aria-hidden="true" />
-              </summary>
-              <p
-                className={`${styles.faqAnswer} max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground`}
+      <div className="lp-container">
+        <div className={`lp-grid ${styles.faqLayout}`}>
+          {/* Sticky on desktop: the list is twice the column's height, so a
+              static heading strands the left half of the section empty. */}
+          <div className={styles.faqIntro}>
+            <h2 id="faq-heading" className="lp-d2">
+              Common questions
+            </h2>
+            <p className={`lp-lead ${styles.faqLede}`}>
+              Straight answers about what Skills Board is, how it fits mixed
+              agent setups, and what “recommended” means.
+            </p>
+            <p className={`lp-small ${styles.faqAside}`}>
+              Something we have not answered?{" "}
+              <a
+                className={styles.faqLink}
+                href={`${siteConfig.githubUrl}/discussions`}
+                rel="noreferrer"
+                target="_blank"
               >
-                {faq.answer}
-              </p>
-            </details>
-          ))}
+                Ask in the repo discussions
+              </a>
+              .
+            </p>
+          </div>
+
+          <div className={styles.faqList}>
+            {landingFaqs.map((faq) => (
+              <details
+                key={faq.question}
+                className={`faq-disclosure ${styles.faqItem}`}
+              >
+                <summary className={styles.faqSummary}>
+                  <span className={`lp-h1 ${styles.faqQuestion}`}>
+                    {faq.question}
+                  </span>
+                  <span className={styles.faqGlyph} aria-hidden="true" />
+                </summary>
+                <p className={`lp-body ${styles.faqAnswer}`}>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -1,70 +1,50 @@
 /* ---------------------------------------------------------------------------
-   Closing — one final action
-   `[data-landing-motion-root]` stands in for the shared `.root` class so the
-   controller flags read across CSS-module boundaries at equal specificity.
+   Closing — the page's one ink-inverted section
+
+   Type sizes and section padding come from the shared ramp in globals.css
+   (`lp-d2`, `lp-lead`, `lp-section-tight`, `lp-container`). Nothing here
+   declares a font-size.
 --------------------------------------------------------------------------- */
 
-.closingHeading {
-  font-stretch: 93%;
+.closing {
+  background: var(--surface-ink);
+  color: var(--surface-ink-foreground);
+  /* Section divider, so hairline-strong per §5. It is doing real work: in dark
+     mode the ink ground is only ~3.5 points of lightness under the page ground,
+     and the edge is what announces the change of surface. */
+  border-top: 1px solid var(--lp-hairline-strong);
 }
 
-.onceStamp {
-  display: inline-block;
-  padding: 0 0.16em 0.06em;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  border-radius: 2px;
-  transform: rotate(-1.5deg);
+.closingCopy {
+  margin-top: 24px;
+  color: color-mix(in oklch, var(--surface-ink-foreground) 72%, transparent);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .onceStamp {
-  opacity: 0;
-  transform: rotate(-1.5deg) scale(1.14);
+.closingCta {
+  margin-top: 32px;
+  /* §5: the CTA on the inverted ground is ink-inverted, not accent — a large
+     green fill on near-black is the exact cliché this page avoids. Rebinding
+     the tokens keeps the shared button component untouched. */
+  --primary: var(--surface-ink-foreground);
+  --primary-foreground: var(--surface-ink);
+  --ring: var(--surface-ink-foreground);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .onceStamp {
-  transition:
-    opacity 300ms var(--lp-ease-out) 340ms,
-    transform 300ms var(--lp-ease-out) 340ms;
+.closingCta [data-slot="button"] {
+  border-radius: 6px;
+  /* No elevation on a control. */
+  box-shadow: none;
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingHeading,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCopy,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCta {
-  opacity: 0;
-  transform: translate3d(0, 16px, 0);
+@media (max-width: 63.99rem) {
+  .closingCta,
+  .closingCta > *,
+  .closingCta [data-slot="button"] {
+    width: 100%;
+  }
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingHeading {
-  transition:
-    opacity 520ms var(--lp-ease-out) 140ms,
-    transform 520ms var(--lp-ease-out) 140ms;
-}
-
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCopy {
-  transition:
-    opacity 420ms var(--lp-ease-out) 240ms,
-    transform 420ms var(--lp-ease-out) 240ms;
-}
-
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta {
-  transition:
-    opacity 380ms var(--lp-ease-out) 320ms,
-    transform 380ms var(--lp-ease-out) 320ms;
-}
+/* No motion rules here on purpose. The entrance is the controller's single
+   reveal — `data-reveal="children"` on the container, 420ms with an 80ms
+   stagger, played once and then stripped off the node — so everything above is
+   the resting state, which is the whole section without JavaScript. */

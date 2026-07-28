@@ -1,44 +1,129 @@
 /* ---------------------------------------------------------------------------
-   Header — compact command strip
+   Header — 56px command strip (direction §8.2)
+
    `[data-landing-motion-root]` stands in for the shared `.root` class: the
    scrolled/motion flags live on that element and the attribute selector reads
    across CSS-module boundaries at identical specificity.
+
+   The control rules below reach into the button primitive from here rather
+   than from the page, because the rule is about *chrome*, not about one
+   button: anything accent-filled, over-rounded or elevated that lands in this
+   strip gets neutralised on arrival. CSS modules are unlayered, so these win
+   over Tailwind's `@layer utilities` regardless of specificity.
 --------------------------------------------------------------------------- */
 
 .header {
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid var(--lp-hairline);
-  background-color: transparent;
-  transition:
-    background-color 240ms var(--lp-ease-out),
-    border-color 240ms var(--lp-ease-out),
-    box-shadow 240ms var(--lp-ease-out);
+  background-color: var(--background);
+  border-bottom: 1px solid transparent;
+  /* §7.2 interaction default. The old 240ms tint cross-fade is gone: 88%
+     background over the warm ground resolved to rgb(250,242,242) — literally
+     pink on a warm-yellow page — and the blur bought nothing over a flat
+     fill (§8.2). */
+  transition: border-color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
 }
 
+/* At zero scroll the strip shares its ground with the hero, so a rule there is
+   just a line drawn across the top of the page. It arrives once content starts
+   travelling underneath — the whole of the scrolled state. */
 [data-landing-motion-root][data-scrolled] .header {
-  background-color: color-mix(in oklch, var(--background) 88%, transparent);
-  backdrop-filter: blur(12px);
-  border-color: var(--lp-hairline-strong);
+  border-bottom-color: var(--lp-hairline);
 }
 
-.headerCellRule {
-  align-self: stretch;
-  width: 1px;
-  background: var(--lp-hairline);
+.bar {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 /* ---------------------------------------------------------------------------
-   Scroll progress — a hairline of primary ink under the command strip
+   Controls — §5 (no accent in chrome), §6 (radii, no elevation), §7 (motion)
+--------------------------------------------------------------------------- */
+
+.header :global([data-slot="button"]),
+.header :global([data-slot="skeleton"]) {
+  border-radius: 6px;
+}
+
+.header :global([data-slot="button"]) {
+  box-shadow: none;
+  /* Transform is deliberately absent from the list: press is opacity only. */
+  transition:
+    background-color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+    border-color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+    color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+/* §7.4: the cheapest possible press. No scale, no duration. */
+.header :global([data-slot="button"]):active {
+  transform: none;
+  opacity: 0.92;
+}
+
+/* §7.8: the primitive ships a `ring-3` box-shadow that silently replaces the
+   outline — the exact defect the motion spec caught on input-otp's own CTA.
+   Kill the shadow ring and let the outline render. */
+.header :global([data-slot="button"]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  box-shadow: none;
+}
+
+/* The primary CTA. §5 and kill-list 14: no accent fill persists in chrome.
+   Targeting the fill rather than one component means a second accent-filled
+   control dropped in here later is treated the same way. In light mode this
+   is Vercel's solid-black CTA; in dark `--foreground` inverts to near-white,
+   which is Linear's light-on-dark `Sign up`. */
+.header :global([data-slot="button"].bg-primary) {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+/* Text links in the strip spend nothing: opacity, no transition, no fill
+   (§7.4, measured off input-otp). */
+.header :global(a[data-slot="button"]:not(.bg-primary)) {
+  background-color: transparent;
+  color: var(--foreground);
+  transition: none;
+}
+
+/* The theme toggle is a surface, so it follows the surface hover rule (§6):
+   border colour, plus nothing. */
+.header :global(button[data-slot="button"]) {
+  border-color: var(--lp-hairline);
+  background-color: var(--card);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .header :global([data-slot="button"].bg-primary):hover {
+    background-color: color-mix(in oklch, var(--foreground) 86%, var(--background));
+  }
+
+  .header :global(a[data-slot="button"]:not(.bg-primary)):hover {
+    background-color: transparent;
+    opacity: 0.8;
+  }
+
+  .header :global(button[data-slot="button"]):hover {
+    background-color: var(--card);
+    border-color: var(--lp-hairline-strong);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Scroll progress — a 1px accent rule sitting on the header's bottom edge
 --------------------------------------------------------------------------- */
 
 .scrollProgress {
   position: absolute;
-  left: 0;
   right: 0;
   bottom: -1px;
-  height: 2px;
+  left: 0;
+  height: 1px;
   background: var(--primary);
   transform: scaleX(var(--scroll-progress, 0));
   transform-origin: left center;
@@ -48,5 +133,13 @@
 @media (prefers-reduced-motion: reduce) {
   .header {
     transition: none;
+  }
+
+  /* Hover and focus colour changes survive — they announce state (§7.7). */
+  .header :global([data-slot="button"]) {
+    transition:
+      background-color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      border-color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1)),
+      color 160ms var(--ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
   }
 }

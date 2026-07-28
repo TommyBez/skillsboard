@@ -1,12 +1,55 @@
 import Link from "next/link"
 
 import { Brand } from "@/components/brand"
+import { siteConfig } from "@/lib/site"
+
+const repoUrl = siteConfig.githubUrl
+const repoLabel = repoUrl.replace(/^https:\/\//, "")
+
+/**
+ * Interaction default: 160ms on the standard curve (§7.2). Colour only — a
+ * footer link is not a surface and gets no fill, no underline, no lift.
+ */
+const linkClass =
+  "text-muted-foreground transition-colors duration-[160ms] ease-[cubic-bezier(0.4,0,0.2,1)] hover:text-foreground focus-visible:rounded-[6px] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-ring"
+
+type FooterLink = { label: string; href: string; external?: boolean }
+
+/**
+ * Three columns of real destinations. Nothing here is a placeholder: every
+ * href resolves to a section, a route, or the repository.
+ */
+const columns: Array<{ heading: string; links: FooterLink[] }> = [
+  {
+    heading: "Product",
+    links: [
+      { label: "How it works", href: "#flow" },
+      { label: "MCP access", href: "#mcp" },
+      { label: "Pricing", href: "#pricing" },
+    ],
+  },
+  {
+    heading: "Resources",
+    links: [
+      { label: "Guides", href: "/resources" },
+      { label: "FAQ", href: "#faq" },
+    ],
+  },
+  {
+    heading: "Open source",
+    links: [
+      { label: "Repository", href: repoUrl, external: true },
+      { label: "Issues", href: `${repoUrl}/issues`, external: true },
+      { label: "Contributing", href: `${repoUrl}/blob/main/CONTRIBUTING.md`, external: true },
+    ],
+  },
+]
 
 function GitHubMark() {
   return (
     <svg
       aria-hidden="true"
-      className="size-5"
+      className="size-4 shrink-0"
       fill="currentColor"
       viewBox="0 0 24 24"
     >
@@ -15,40 +58,86 @@ function GitHubMark() {
   )
 }
 
-/** Footer — open-source colophon. */
+function FooterLinkItem({ link }: { link: FooterLink }) {
+  if (link.external) {
+    return (
+      <a className={linkClass} href={link.href} rel="noreferrer" target="_blank">
+        {link.label}
+      </a>
+    )
+  }
+
+  // Same-page anchors stay plain anchors so smooth scrolling is not routed.
+  return link.href.startsWith("#") ? (
+    <a className={linkClass} href={link.href}>
+      {link.label}
+    </a>
+  ) : (
+    <Link className={linkClass} href={link.href}>
+      {link.label}
+    </Link>
+  )
+}
+
+/**
+ * Footer — the open-source colophon (§8.2). Below 1024px each column turns
+ * into an index entry: the mono label holds a fixed left gutter and its links
+ * run beside it, which keeps all three groups without stacking three blocks.
+ */
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border/70">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
-        <Brand />
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
-          <nav
-            aria-label="Footer"
-            className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
-          >
-            <a href="#pricing" className="transition-colors hover:text-foreground">
-              Pricing
-            </a>
-            <a href="#faq" className="transition-colors hover:text-foreground">
-              FAQ
-            </a>
-            <Link
-              href="/resources"
-              className="transition-colors hover:text-foreground"
+    <footer className="border-t border-[var(--lp-hairline)]">
+      <div className="lp-container py-8">
+        <div className="lp-grid gap-y-4 lg:gap-y-6">
+          <div className="col-span-12 lg:col-span-4">
+            <Brand />
+            {/* Desktop only: on a phone this sentence lands ~100px under the
+                closing band, which already says it. */}
+            <p className="lp-small mt-3 hidden max-w-[34ch] text-muted-foreground lg:block">
+              A shared, searchable index of the skills your team already trusts.
+            </p>
+          </div>
+
+          {columns.map((column, index) => (
+            <nav
+              aria-label={column.heading}
+              className={`col-span-12 flex items-baseline gap-4 lg:flex-col lg:gap-2 ${
+                index === 0
+                  ? "lg:col-span-2 lg:col-start-6"
+                  : index === 1
+                    ? "lg:col-span-2 lg:col-start-8"
+                    : "lg:col-span-3 lg:col-start-10"
+              }`}
+              key={column.heading}
             >
-              Resources
-            </Link>
-          </nav>
+              <h2 className="lp-label w-24 shrink-0 text-muted-foreground lg:w-auto">
+                {column.heading}
+              </h2>
+              <ul className="lp-small flex flex-wrap gap-x-4 gap-y-2 lg:flex-col lg:gap-2">
+                {column.links.map((link) => (
+                  <li key={link.label}>
+                    <FooterLinkItem link={link} />
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        {/* No separator glyph: the row wraps to two lines on a phone and a
+            stranded middot is worse than a gap. */}
+        <p className="lp-code mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-[var(--lp-hairline)] pt-4 text-muted-foreground">
+          <span>MIT licence</span>
           <a
-            href="https://github.com/TommyBez/skillsboard"
-            target="_blank"
+            className={`inline-flex items-center gap-2 ${linkClass}`}
+            href={repoUrl}
             rel="noreferrer"
-            aria-label="Skills Board on GitHub"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-[3px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            target="_blank"
           >
             <GitHubMark />
+            {repoLabel}
           </a>
-        </div>
+        </p>
       </div>
     </footer>
   )

@@ -1,6 +1,74 @@
 /* ---------------------------------------------------------------------------
    FAQ — technical index
+
+   Type sizes and section padding come from the shared ramp in globals.css
+   (`lp-d2`, `lp-h1`, `lp-lead`, `lp-body`, `lp-small`, `lp-section`,
+   `lp-container`, `lp-grid`). Nothing here declares a font-size.
 --------------------------------------------------------------------------- */
+
+.faq {
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.faqLayout {
+  row-gap: 48px;
+}
+
+.faqIntro,
+.faqList {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 64rem) {
+  .faqIntro {
+    position: sticky;
+    /* 56px header + 32px clearance. */
+    top: 88px;
+    /* Without this the grid stretches the column to the row height and sticky
+       has nothing to travel through. */
+    align-self: start;
+    grid-column: 1 / span 4;
+  }
+
+  /* Runs to the edge rather than leaving column 5 as a decorative hole: the
+     wider measure is what keeps most questions on one line. */
+  .faqList {
+    grid-column: 5 / -1;
+  }
+}
+
+.faqLede {
+  margin-top: 24px;
+  color: var(--muted-foreground);
+}
+
+.faqAside {
+  margin-top: 24px;
+  color: var(--muted-foreground);
+}
+
+.faqLink {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--lp-hairline-strong);
+  transition: text-decoration-color 160ms var(--ease-standard);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .faqLink:hover {
+    text-decoration-color: var(--primary);
+  }
+}
+
+.faqLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.faqList {
+  border-top: 1px solid var(--lp-hairline);
+}
 
 .faqItem {
   border-bottom: 1px solid var(--lp-hairline);
@@ -10,8 +78,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 0.85rem;
-  padding-block: 1.4rem;
+  gap: 24px;
+  padding-block: 24px;
   cursor: pointer;
   list-style: none;
 }
@@ -22,25 +90,18 @@
 
 .faqSummary:focus-visible {
   outline: 2px solid var(--ring);
-  outline-offset: 4px;
-}
-
-.faqQuestion {
-  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
-  font-weight: 650;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  outline-offset: 3px;
 }
 
 .faqGlyph {
   position: relative;
   align-self: center;
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 16px;
+  height: 16px;
   color: var(--muted-foreground);
   transition:
-    transform 200ms var(--lp-ease-in-out),
-    color 200ms var(--lp-ease-in-out);
+    transform 240ms var(--ease-out),
+    color 160ms var(--ease-standard);
 }
 
 .faqGlyph::before,
@@ -64,24 +125,34 @@
   transform: translate(-50%, -50%);
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .faqSummary:hover .faqGlyph {
+    color: var(--foreground);
+  }
+}
+
+/* The glyph is the only thing announcing open/closed, so it keeps its
+   rotation — it is state, not decoration. */
 .faqItem[open] .faqGlyph {
   transform: rotate(135deg);
   color: var(--primary);
 }
 
 .faqAnswer {
-  padding-bottom: 1.6rem;
+  padding-bottom: 24px;
+  color: var(--muted-foreground);
 }
 
 @media (min-width: 40rem) {
   .faqAnswer {
-    padding-left: 1.1rem;
-    border-left: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
+    padding-left: 16px;
+    border-left: 1px solid var(--lp-hairline);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Colour still communicates state; the rotation just snaps. */
   .faqGlyph {
-    transition: none;
+    transition: color 160ms var(--ease-standard);
   }
 }

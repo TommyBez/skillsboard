@@ -4,11 +4,19 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-xl border border-transparent bg-clip-padding text-sm font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow] duration-150 ease-out outline-hidden select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/35 active:not-aria-[haspopup]:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-xl border border-transparent bg-clip-padding text-sm font-semibold whitespace-nowrap transition-[transform,background-color,border-color,color,box-shadow] duration-[160ms] ease-[var(--ease-standard)] outline-hidden select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/35 active:not-aria-[haspopup]:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground shadow-[0_1px_0_color-mix(in_oklch,var(--foreground)_12%,transparent)] hover:bg-primary/90",
+        // Ink-filled: inverted against the page ground in both themes — a dark
+        // chip on the warm ground, a light chip in dark mode. Persistent
+        // chrome never spends brand colour (refs/direction.md §5).
+        ink: "bg-foreground text-background hover:bg-foreground/88",
+        // The same idea on an ink-inverted panel, where the ground is already
+        // dark in both themes: light fill, dark label.
+        "on-ink":
+          "bg-[var(--surface-ink-foreground)] text-[var(--surface-ink)] hover:bg-[color-mix(in_oklch,var(--surface-ink-foreground)_88%,var(--surface-ink))]",
         outline:
           "border-border bg-card/80 hover:border-foreground/25 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-card/70 dark:hover:bg-input/50",
         secondary:

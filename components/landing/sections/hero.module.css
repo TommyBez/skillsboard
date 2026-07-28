@@ -1,674 +1,251 @@
 /* ---------------------------------------------------------------------------
-   Hero — sticky chapter: dossiers file into the team library
-   Owns the HeroBoard composition too (dossiers, library panel, mobile stack),
-   since every one of those rules is coupled to the hero's routing progress.
-   `[data-landing-motion-root]` stands in for the shared `.root` class so the
-   controller flags read across CSS-module boundaries at equal specificity.
+   Hero — one viewport of content, no sticky runway
+   Owns the card cluster too, since every rule in it is a position relative to
+   the hero's own column. The type sizes and the section padding come from the
+   shared ramp in globals.css; nothing here declares a font-size.
 --------------------------------------------------------------------------- */
 
 .hero {
   position: relative;
-  border-bottom: 1px solid var(--lp-hairline);
 }
 
-.heroSticky {
-  position: relative;
-  /* Resting / no-JS / reduced-motion: one viewport of hero. */
-  min-height: calc(100dvh - var(--lp-header-h));
-}
-
-/* Tall sticky runway only when the controller is live; without JS or with
-   reduced motion the hero is a normal one-viewport spread. */
-@media (min-width: 64rem) {
-  [data-landing-motion-root][data-motion-enabled="true"] .hero {
-    height: 180vh;
-  }
-
-  [data-landing-motion-root][data-motion-enabled="true"] .heroSticky {
-    position: sticky;
-    top: var(--lp-header-h);
-    height: calc(100dvh - var(--lp-header-h));
-    display: flex;
-    align-items: stretch;
-    overflow: clip;
-  }
-}
-
-.heroGridLines {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: linear-gradient(
-    to right,
-    var(--lp-grid-line) 1px,
-    transparent 1px
-  );
-  background-size: calc(100% / 6) 100%;
-  mask-image: linear-gradient(to bottom, black 55%, transparent 96%);
-  animation: lp-fade-in 700ms var(--lp-ease-out) both;
-}
-
-.heroEyebrow {
-  display: inline-flex;
+.inner {
   align-items: center;
-  gap: 0.65rem;
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  row-gap: 32px;
+}
+
+.copy {
+  grid-column: 1 / -1;
+}
+
+/* Eyebrow is muted on mobile and accent on desktop (§3): at 390px a green
+   12px label competes with the one accent-on-display instance below it. */
+.eyebrow {
+  color: var(--muted-foreground);
+}
+
+.headline {
+  margin-top: 16px;
+}
+
+.line {
+  display: block;
+}
+
+.lineAccent {
   color: var(--primary);
-  animation: lp-rise-in 400ms var(--lp-ease-out) 140ms both;
 }
 
-.heroEyebrow::before {
-  content: "";
-  width: 0.55rem;
-  height: 0.55rem;
-  background: var(--primary);
-}
-
-.heroHeadline {
-  font-stretch: 93%;
-}
-
-.heroLineMask {
-  display: block;
-  overflow: clip;
-  padding-block-end: 0.09em;
-  margin-block-end: -0.09em;
-}
-
-.heroLine {
-  display: block;
-  animation: lp-line-rise 720ms var(--lp-ease-out) both;
-}
-
-.heroLineFirst {
-  animation-delay: 230ms;
-}
-
-.heroLineSecond {
-  animation-delay: 330ms;
-}
-
-.heroCopy {
-  animation: lp-rise-in 460ms var(--lp-ease-out) 600ms both;
-}
-
-.heroCta {
-  animation: lp-rise-in 420ms var(--lp-ease-out) 690ms both;
-}
-
-@keyframes lp-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes lp-rise-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 12px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-line-rise {
-  from {
-    transform: translate3d(0, 108%, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-/* ------------------------------------------------------------------
-   Hero board: scattered dossiers filing into the team library panel
------------------------------------------------------------------- */
-
-.heroBoard {
-  --px: 0;
-  --py: 0;
-  position: absolute;
-  top: 6%;
-  bottom: 4%;
-  right: max(-2rem, -2vw);
-  width: min(46%, 42rem);
-  display: none;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.heroCards {
-  position: absolute;
-  inset: 0;
-}
-
-/* The landing target: a quiet product-library panel that materializes
-   ahead of the cards, so the deck visibly files *into* something. */
-.libraryFrame {
-  position: absolute;
-  left: calc(18% - 1.1rem);
-  top: calc(17% - 3.6rem);
-  width: calc(16.5rem + 2.2rem);
-  height: 27.25rem;
-  border: 1px solid var(--lp-hairline-strong);
-  border-radius: 1rem;
-  background: color-mix(in oklch, var(--card) 72%, transparent);
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
-  /* Defaults with --route-p at 0 (pre-controller / top of runway). Do not
-     force opacity:1 while data-motion-enabled is unset — that paints the
-     settled shell on first load, then flashes off when the controller arms. */
-  --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
-  opacity: var(--frame-p);
-  transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
-}
-
-.libraryHead {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: 3rem;
-  padding: 0 1.1rem;
-  border-bottom: 1px solid var(--lp-hairline);
-}
-
-.libraryDot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
-.libraryLabel {
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--foreground);
-}
-
-.libraryCount {
-  margin-left: auto;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-variant-numeric: tabular-nums;
+.lead {
+  margin-top: 24px;
   color: var(--muted-foreground);
 }
 
-/* Converged (filed) positions are the base; scatter is a transform scaled
-   by (1 - landing progress). Each slot gets its own progress window so
-   cards file into the panel one after another across the sticky runway. */
-.dossierSlot {
-  --lp: clamp(0, calc((var(--route-p) - var(--ls, 0)) / 0.72), 1);
-  position: absolute;
-  left: 18%;
-  pointer-events: auto;
-  transform: translate3d(
-      calc(var(--sx) * (1 - var(--lp))),
-      calc(var(--sy) * (1 - var(--lp))),
-      0
-    )
-    rotate(calc(var(--sr) * (1 - var(--lp))));
+.cta {
+  margin-top: 24px;
 }
 
-/* Taller SkillDossier-like cards: start higher and step less so the
-   converged stack overlaps and still fits a ~900px-tall viewport. */
-.dossierSlot[data-slot="1"] {
-  top: 17%;
-  z-index: 1;
-  --ls: 0.05;
-  --sx: -70px;
-  --sy: -130px;
-  --sr: -6deg;
+/* The CTA pair is rendered by the page; below 1024px it has to be a stacked
+   pair of full-width 48px targets (§4B) whatever shape it arrives in. */
+.cta > div {
+  flex-direction: column;
 }
 
-.dossierSlot[data-slot="2"] {
-  top: calc(17% + 2.55rem);
-  z-index: 2;
-  --ls: 0.1;
-  --sx: 160px;
-  --sy: -150px;
-  --sr: 5deg;
-}
-
-.dossierSlot[data-slot="3"] {
-  top: calc(17% + 5.1rem);
-  z-index: 3;
-  --ls: 0.15;
-  --sx: -50px;
-  --sy: -45px;
-  --sr: -4deg;
-}
-
-.dossierSlot[data-slot="4"] {
-  top: calc(17% + 7.65rem);
-  z-index: 4;
-  --ls: 0.2;
-  --sx: 175px;
-  --sy: -55px;
-  --sr: 7deg;
-}
-
-.dossierSlot[data-slot="5"] {
-  top: calc(17% + 10.2rem);
-  z-index: 5;
-  --ls: 0.25;
-  --sx: 35px;
-  --sy: 40px;
-  --sr: -3deg;
-}
-
-.dossierEnter {
-  animation-duration: 680ms;
-  animation-timing-function: var(--lp-ease-out);
-  animation-fill-mode: both;
-}
-
-.dossierEnter[data-dir="left"] {
-  animation-name: lp-dossier-left;
-}
-
-.dossierEnter[data-dir="right"] {
-  animation-name: lp-dossier-right;
-}
-
-.dossierEnter[data-dir="top"] {
-  animation-name: lp-dossier-top;
-}
-
-.dossierEnter[data-dir="bottom"] {
-  animation-name: lp-dossier-bottom;
-}
-
-.dossierSlot[data-slot="1"] .dossierEnter {
-  animation-delay: 480ms;
-}
-
-.dossierSlot[data-slot="2"] .dossierEnter {
-  animation-delay: 550ms;
-}
-
-.dossierSlot[data-slot="3"] .dossierEnter {
-  animation-delay: 620ms;
-}
-
-.dossierSlot[data-slot="4"] .dossierEnter {
-  animation-delay: 690ms;
-}
-
-.dossierSlot[data-slot="5"] .dossierEnter {
-  animation-delay: 760ms;
-}
-
-@keyframes lp-dossier-left {
-  from {
-    opacity: 0;
-    transform: translate3d(-72px, 0, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-right {
-  from {
-    opacity: 0;
-    transform: translate3d(72px, 0, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-top {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -64px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-bottom {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 64px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-.dossierParallax {
-  transform: translate3d(
-    calc(var(--px) * var(--depth, 3px)),
-    calc(var(--py) * var(--depth, 3px)),
-    0
-  );
-  transition: transform 320ms var(--lp-ease-out);
+.cta > div > * {
+  width: 100%;
 }
 
 /* ------------------------------------------------------------------
-   Skill dossier — mirrors SkillDossier (compact, decorative)
+   Card cluster — a static, un-rotated, un-shadowed stack
+   Consistent step: 16px in x, 80px in y. 80px is not a spacing choice, it
+   is a measurement: the card's top padding plus the source row plus the
+   skill name, so the two cards behind are cut in the gap *under* the name
+   and no line of text is ever half-covered.
 ------------------------------------------------------------------ */
 
-.dossier {
+.cluster {
+  --card-w: 27.5rem;
+  --step-x: 16px;
+  --step-y: 80px;
+  position: relative;
+  grid-column: 1 / -1;
+  /* `lp-grid`'s gap shorthand wins over a row-gap here, so the breathing room
+     between the CTA pair and the card is a margin. */
+  margin-top: 8px;
+  width: var(--card-w);
+}
+
+.card {
   display: flex;
+  width: var(--card-w);
   flex-direction: column;
-  width: 16.5rem;
-  overflow: hidden;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 10px;
   background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow:
-    0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
-    0 14px 28px hsl(var(--shadow-color) / 0.1);
-  transition:
-    opacity 190ms var(--lp-ease-out),
-    box-shadow 190ms var(--lp-ease-out),
-    border-color 190ms var(--lp-ease-out);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .heroCards:hover .dossier {
-    opacity: 0.55;
-  }
-
-  .dossierSlot:hover {
-    z-index: 7;
-  }
-
-  .dossierSlot:hover .dossier {
-    opacity: 1;
-    border-color: var(--primary);
-    box-shadow:
-      0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
-      0 20px 40px hsl(var(--shadow-color) / 0.16);
-  }
+.cardFront {
+  position: relative;
+  z-index: 3;
 }
 
-.dossierBody {
+/* Behind the front card: out of flow, so the cluster is exactly as tall as
+   the front card plus the two peeks. Each one is cut a little below its
+   peek and inset from the left, which puts its whole lower edge inside the
+   span of the card in front of it — nothing can escape past an edge.
+   Hidden entirely at 390px: one real object beats three cropped ones. */
+.cardBehind {
+  position: absolute;
+  display: none;
+  height: calc(var(--step-y) + 16px);
+  overflow: hidden;
+}
+
+/* The stack recedes up and to the left, so the front card — the only one
+   fully readable — is the object flush with the grid's right edge. */
+.cardBack {
+  top: 0;
+  left: calc(var(--step-x) * 2);
+  width: calc(var(--card-w) - var(--step-x) * 2);
+  z-index: 1;
+}
+
+.cardMiddle {
+  top: var(--step-y);
+  left: var(--step-x);
+  width: calc(var(--card-w) - var(--step-x));
+  z-index: 2;
+}
+
+.cardBody {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.85rem 0.9rem 0.75rem;
+  padding: 16px;
 }
 
-.dossierMeta {
-  display: flex;
-  min-width: 0;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.65rem;
-}
-
-.dossierSource {
+.cardMeta {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.35rem;
+  gap: 8px;
   margin: 0;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  letter-spacing: 0.01em;
+}
+
+.cardFork {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
   color: var(--muted-foreground);
 }
 
-.dossierSource span {
+.cardSource {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: var(--muted-foreground);
 }
 
-.dossierFork {
-  width: 0.85rem;
-  height: 0.85rem;
+/* Grouped left below 1024px: the card is cropped by the right viewport edge
+   there, and a right-aligned star count would always be cut mid-number. */
+.cardStars {
   flex-shrink: 0;
-  color: var(--primary);
-}
-
-.dossierStars {
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted-foreground);
   white-space: nowrap;
 }
 
-.dossierName {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+.cardName {
+  margin: 8px 0 0;
 }
 
-.dossierDesc {
-  margin: 0;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  font-size: 0.72rem;
-  line-height: 1.4;
+.cardDesc {
+  margin: 8px 0 0;
   color: var(--muted-foreground);
-  text-wrap: pretty;
 }
 
-.dossierTags {
+.cardTags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.15rem;
+  gap: 8px;
+  margin-top: 12px;
 }
 
-.dossierTag {
+.cardTag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.25rem;
-  padding: 0.1rem 0.4rem;
-  border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: var(--foreground);
+  padding: 2px 8px;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 6px;
+  color: var(--muted-foreground);
   white-space: nowrap;
 }
 
-.dossierFooter {
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklch, var(--muted) 40%, transparent);
-  padding: 0.55rem 0.65rem;
+.cardFooter {
+  border-top: 1px solid var(--lp-hairline);
+  padding: 12px;
 }
 
-.dossierCmdStrip {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: color-mix(in oklch, var(--background) 75%, transparent);
-  padding: 0.35rem 0.55rem;
-}
-
-.dossierCmd {
+.cardCmd {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: var(--background);
   color: var(--muted-foreground);
 }
 
-/* ------------------------------------------------------------------
-   Hero board, small screens: static before/after field manual
------------------------------------------------------------------- */
-
-.heroBoardMobile {
-  display: block;
-  margin-top: 3rem;
-  width: 100%;
-  max-width: 24rem;
-}
-
-.mobileChaos {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  min-height: 14.5rem;
-}
-
-.mobileChaosCard {
-  position: absolute;
-  top: 0;
-}
-
-.mobileChaosCard .dossier {
-  width: 13.25rem;
-}
-
-.mobileChaosCard:nth-child(1) {
-  left: 0;
-  transform: rotate(-5deg);
-  z-index: 1;
-}
-
-.mobileChaosCard:nth-child(2) {
-  right: 0;
-  top: 1.35rem;
-  transform: rotate(4deg);
-  z-index: 2;
-}
-
-.mobileChaosCard:nth-child(3) {
-  left: 12%;
-  top: 2.9rem;
-  transform: rotate(-2deg);
-  z-index: 3;
-}
-
-/* The mobile “after” state: the same team library panel, at rest. */
-.mobileLibrary {
-  margin-top: 1.5rem;
-  overflow: hidden;
-  border: 1px solid var(--lp-hairline-strong);
-  border-radius: 1rem;
-  background: color-mix(in oklch, var(--card) 72%, transparent);
-}
-
-.mobileLibrary .libraryHead {
-  height: 2.75rem;
-  padding: 0 1rem;
-}
-
-.mobileStack {
-  padding: 0.25rem 1rem 0.5rem;
-}
-
-.mobileStackRow {
-  display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.55rem 0.15rem;
-  border-bottom: 1px solid var(--lp-hairline);
-}
-
-.mobileStackRow:last-child {
-  border-bottom: none;
-}
-
-.mobileStackName {
-  flex: 1;
-  font-size: 0.95rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
-}
-
 @media (min-width: 64rem) {
-  .heroBoard {
-    display: block;
+  .inner {
+    row-gap: 48px;
   }
 
-  .heroBoardMobile {
-    display: none;
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   Hero exit — copy recedes slightly as the dossiers finish filing
---------------------------------------------------------------------------- */
-
-@media (min-width: 64rem) {
-  [data-landing-motion-root][data-motion-enabled="true"] .heroExit {
-    --hx: clamp(0, calc((var(--route-p) - 0.45) / 0.55), 1);
-    translate: 0 calc(var(--hx) * -18px);
-    opacity: calc(1 - var(--hx) * 0.28);
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   Reduced motion — the hero stays complete and beautiful, at rest
---------------------------------------------------------------------------- */
-
-@media (prefers-reduced-motion: reduce) {
-  .heroGridLines,
-  .heroEyebrow,
-  .heroCopy,
-  .heroCta {
-    animation: lp-fade-in 140ms var(--lp-ease-out) both;
+  .cardStars {
+    margin-left: auto;
   }
 
-  .heroLine,
-  .dossierEnter {
-    animation: none;
-    transform: none;
-    opacity: 1;
+  .copy {
+    /* The headline needs ~615px to hold "Your team's skills." on one line
+       at 72px; six columns is 588 and would wrap it to three. */
+    grid-column: 1 / span 7;
   }
 
-  /* Static “after”: the stack rests filed inside the library panel. */
-  .dossierSlot {
-    transform: none;
-    will-change: auto;
+  .eyebrow {
+    color: var(--primary);
   }
 
-  .libraryFrame {
-    opacity: 1;
-    transform: none;
+  .headline {
+    margin-top: 24px;
   }
 
-  .dossierParallax {
-    transform: none;
-    transition: none;
+  .cta {
+    margin-top: 32px;
   }
 
-  .dossier,
-  .heroCards:hover .dossier {
-    opacity: 1;
-    transition: none;
+  .cta > div {
+    flex-direction: row;
+  }
+
+  .cta > div > * {
+    width: auto;
+  }
+
+  .cluster {
+    grid-column: 8 / -1;
+    justify-self: end;
+    margin-top: 0;
+    padding-top: calc(var(--step-y) * 2);
+  }
+
+  .cardBehind {
+    display: flex;
   }
 }
+
+/* Entrance is the shared reveal: `data-reveal="children"` on the copy block
+   staggers the four lines, `data-reveal` on the cluster brings it in as one
+   object. The controller owns the timing and the reduced-motion behaviour,
+   so this module declares no entrance animation of its own — and every rule
+   above is already the section's resting state (§7.6). */

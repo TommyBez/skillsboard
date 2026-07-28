@@ -85,7 +85,12 @@
   --surface-ink: oklch(0.205 0.02 158);
   --surface-ink-foreground: oklch(0.95 0.009 103);
   --shadow-color: 151 28% 18%;
+  /* The sanctioned three: what the page shows you, what you touch, what
+     leaves. refs/direction.md §7.1. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  /* App-only. Neither is permitted in components/landing. */
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-press: 150ms;
@@ -344,6 +349,54 @@
   gap: var(--lp-col-gap);
 }
 
+/* ---------------------------------------------------------------------------
+ * Landing motion and surface floor — refs/direction.md §6, §7.
+ *
+ * Scoped to [data-landing-page] because /library, /discover and /sign-in share
+ * this stylesheet and keep their own elevation and press feedback. Unlayered,
+ * so these beat Tailwind utilities on cascade layer rather than on specificity
+ * or !important — the motion spec caught the reference site losing its own
+ * focus ring to exactly that kind of accident (motion-spec §2.1).
+ * --------------------------------------------------------------------------- */
+
+/* Focus is an outline, on everything, and it is never animated (§7.8). The
+   colour is also set at rest, because Tailwind's `transition-colors` includes
+   outline-color — without this the ring eases in over 160ms instead of
+   appearing. */
+[data-landing-page] * {
+  outline-color: var(--ring);
+}
+
+[data-landing-page] :focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+/* One z-plane, and it is the page (§6). Buttons carry no shadow at all here,
+   so the focus outline above is the only ring anyone ever sees. */
+[data-landing-page] [data-slot="button"],
+[data-landing-page] .surface-shadow {
+  box-shadow: none;
+}
+
+/* Press is opacity at 0ms, no transform (§7.4). opacity is deliberately absent
+   from the button's transition list, so this lands on the frame of mousedown. */
+[data-landing-page] [data-slot="button"]:active {
+  scale: 1;
+  opacity: 0.92;
+}
+
+/* Hover on a surface is a border-colour change and nothing else. */
+[data-landing-page] .lift-on-hover {
+  transition: border-color 160ms var(--ease-standard);
+}
+
+[data-landing-page] .lift-on-hover:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: color-mix(in oklch, var(--foreground) 22%, transparent);
+}
+
 .ink-panel {
   background: var(--surface-ink);
   color: var(--surface-ink-foreground);
@@ -438,14 +491,14 @@
 
 .copy-success-icon {
   transition:
-    opacity 120ms var(--ease-out),
-    transform 140ms var(--ease-out);
+    opacity 160ms var(--ease-standard),
+    transform 160ms var(--ease-standard);
 }
 
 @starting-style {
   .copy-success-icon {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.96);
   }
 }
 
@@ -469,7 +522,7 @@
   opacity: 0;
   transition:
     block-size 240ms var(--ease-out),
-    opacity 200ms var(--ease-out),
+    opacity 240ms var(--ease-out),
     content-visibility 240ms allow-discrete;
 }
 
@@ -478,9 +531,13 @@
   opacity: 1;
 }
 
+/* The disclosure survives reduced motion, because it is the answer arriving —
+   but the height snaps and only the opacity moves, at exit speed (§7.7). */
 @media (prefers-reduced-motion: reduce) {
   .faq-disclosure::details-content {
-    transition-duration: 0ms;
+    transition:
+      opacity 120ms var(--ease-out),
+      content-visibility 120ms allow-discrete;
   }
 }
 
@@ -505,11 +562,13 @@
   animation: cascade-enter 320ms var(--ease-out) both;
 }
 
-.cascade-grid > :nth-child(2) { animation-delay: 45ms; }
-.cascade-grid > :nth-child(3) { animation-delay: 90ms; }
-.cascade-grid > :nth-child(4) { animation-delay: 135ms; }
-.cascade-grid > :nth-child(5) { animation-delay: 180ms; }
-.cascade-grid > :nth-child(6) { animation-delay: 225ms; }
+/* 80ms per sibling, six children, and the cascade caps at 300ms so a long
+   first page never turns into slow motion (refs/direction.md §7.5). */
+.cascade-grid > :nth-child(2) { animation-delay: 80ms; }
+.cascade-grid > :nth-child(3) { animation-delay: 160ms; }
+.cascade-grid > :nth-child(4) { animation-delay: 240ms; }
+.cascade-grid > :nth-child(5) { animation-delay: 300ms; }
+.cascade-grid > :nth-child(6) { animation-delay: 300ms; }
 
 @keyframes cascade-enter {
   from {
@@ -541,14 +600,14 @@
 
 .theme-toggle-icon {
   transition:
-    opacity 140ms var(--ease-out),
-    transform 160ms var(--ease-out);
+    opacity 160ms var(--ease-standard),
+    transform 160ms var(--ease-standard);
 }
 
 @starting-style {
   .theme-toggle-icon {
     opacity: 0;
-    transform: scale(0.85) rotate(-30deg);
+    transform: scale(0.96) rotate(-30deg);
   }
 }
 

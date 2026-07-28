@@ -1,91 +1,179 @@
 /* ---------------------------------------------------------------------------
-   Workflow chapter — three moves, indexed like a manual
-   `[data-landing-motion-root]` stands in for the shared `.root` class so the
-   controller flags read across CSS-module boundaries at equal specificity.
+   Workflow chapter — three moves, indexed like a manual.
+   Sizes and section padding come from the shared ramp in `app/globals.css`
+   (`lp-*`); nothing here declares a font-size. The reveal is owned by
+   LandingMotionController via `data-reveal` — there is no motion in this file.
 --------------------------------------------------------------------------- */
 
-.flowSection {
+/* Section boundaries are top rules only; drawing both edges is what produced
+   the doubled 2px hairline elsewhere on the page. */
+.section {
   position: relative;
-  border-bottom: 1px solid var(--lp-hairline);
+  border-top: 1px solid var(--lp-hairline);
 }
 
-.flowRows {
-  margin-top: 3rem;
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Muted, never accent — the section spends no accent at all (§5). */
+.eyebrow {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.steps {
+  margin: 32px 0 0;
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--lp-hairline);
 }
 
-.flowRow {
-  position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 0.65rem 2.5rem;
-  padding-block: 1.9rem;
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-block: 16px;
   border-bottom: 1px solid var(--lp-hairline);
 }
 
-@media (min-width: 64rem) {
-  .flowRow {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    align-items: baseline;
-    padding-block: 2.7rem;
-  }
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 0;
 }
 
-.flowTitle {
-  margin: 0;
-  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+/* Index marks, not ornament: mono at label scale, muted, tabular so the
+   three of them line up. */
+.index {
+  color: var(--muted-foreground);
+  font-variant-numeric: tabular-nums;
 }
 
-.flowCopy {
+.copy {
   margin: 0;
-  max-width: 34rem;
-  font-size: 1.05rem;
-  line-height: 1.6;
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
 
-/* Staggered reveal, driven by the shared motion-group state machine. */
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="pending"]
-  .flowHead,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="pending"]
-  .flowRow {
-  opacity: 0;
-  translate: 0 18px;
+/* ---------------------------------------------------------------------------
+   Product fragments — the real chrome the app uses for a URL field, a search
+   result and the install command. The command genuinely does not fit; the app
+   clips it in a scroll box and so do we, rather than shrinking it (§4B law 2).
+--------------------------------------------------------------------------- */
+
+.fragment {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  width: 480px;
+  max-width: none;
+  height: 48px;
+  padding-inline: 12px;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 6px;
+  background: var(--card);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowHead,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow {
-  transition:
-    opacity 500ms var(--lp-ease-out),
-    translate 500ms var(--lp-ease-out);
+.fragmentIcon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(1) {
-  transition-delay: 110ms;
+/* Shrinkable and clipped, with the trailing control pinned: this is exactly
+   what the dossier's install-command box does with a command this long. */
+.fragmentText {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--foreground);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(2) {
-  transition-delay: 190ms;
+.fragmentMeta {
+  flex: none;
+  margin-left: auto;
+  white-space: nowrap;
+  color: var(--muted-foreground);
 }
 
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(3) {
-  transition-delay: 270ms;
+@media (min-width: 64rem) {
+  .steps {
+    margin-top: 32px;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: center;
+    gap: var(--lp-col-gap);
+    padding-block: 24px;
+  }
+
+  .heading {
+    grid-column: 1 / span 3;
+    gap: 16px;
+  }
+
+  .copy {
+    grid-column: 4 / span 4;
+  }
+
+  /* Columns 8–12 carry the evidence — the dead middle of the old layout is
+     what put the body copy on the far right with nothing beside it. */
+  .fragment {
+    grid-column: 8 / span 5;
+    width: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Gated launch treatment — visible only on the launch variant.
+--------------------------------------------------------------------------- */
+
+.launchDemo {
+  display: grid;
+  overflow: hidden;
+  margin-top: 48px;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 10px;
+  background: var(--card);
+}
+
+.launchCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  justify-content: center;
+  padding: 24px;
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.launchTitle,
+.launchBody,
+.launchActions {
+  margin: 0;
+}
+
+.launchBody {
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+@media (min-width: 64rem) {
+  .launchDemo {
+    grid-template-columns: minmax(0, 1.35fr) minmax(19rem, 0.65fr);
+  }
+
+  .launchCopy {
+    padding: 32px;
+    border-top: 0;
+    border-left: 1px solid var(--lp-hairline);
+  }
 }

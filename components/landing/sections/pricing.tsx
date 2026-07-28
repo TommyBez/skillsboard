@@ -1,42 +1,57 @@
-import shared from "@/components/landing/landing-shared.module.css"
-import styles from "@/components/landing/sections/pricing.module.css"
+import { ArrowUpRightIcon } from "lucide-react"
 
-/** Pricing — the zero monument. */
+import styles from "@/components/landing/sections/pricing.module.css"
+import { siteConfig } from "@/lib/site"
+
+/** The three objections a reader raises at the word "free", in that order. */
+const terms = ["No trial", "No credit card", "No paid tier"] as const
+
+/**
+ * Pricing — one hairline-bounded row on the normal ground. The near-black band
+ * and the 56vw zero are deleted: the page carries exactly one ink-inverted
+ * beat and it is the closing, not this.
+ */
 export function Pricing() {
   return (
     <section
       id="pricing"
       aria-labelledby="pricing-heading"
-      className={`${styles.pricingSection} ${shared.grain} scroll-mt-14`}
-      data-motion-group="pricing"
-      data-chapter-target="pricing"
+      className={`${styles.pricingSection} lp-section scroll-mt-14`}
     >
-      <div className="mx-auto w-full max-w-[1440px] px-5 py-20 md:px-10 md:py-28 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.65fr)] lg:items-end lg:gap-6">
-        <div className={styles.pricingZeroWrap} aria-hidden="true">
-          <p className={styles.pricingZero}>0</p>
-          <p className={styles.pricingZeroLayer} data-layer="alert">
-            0
-          </p>
-          <p className={styles.pricingZeroLayer} data-layer="ink">
-            0
+      {/* Two children, 80ms apart — the controller's one reveal (§7.5). */}
+      <div
+        className={`${styles.pricingRow} lp-container lp-grid`}
+        data-reveal="children"
+      >
+        <div className={styles.pricingStatement}>
+          <h2 id="pricing-heading" className="lp-d2">
+            Free. Forever.
+          </h2>
+          <p className={`${styles.pricingLead} lp-lead`}>
+            Skills Board is free to use and open source.
           </p>
         </div>
 
-        <div className={`${styles.pricingCopy} mt-12 max-w-lg lg:mt-0 lg:pb-3`}>
-          <h2
-            id="pricing-heading"
-            className={`${styles.pricingMessage} text-balance text-5xl font-semibold leading-[0.94] tracking-display md:text-7xl`}
+        <div className={styles.pricingTerms}>
+          <ul className={styles.pricingTermList}>
+            {terms.map((term) => (
+              <li key={term} className={`${styles.pricingTerm} lp-label`}>
+                {term}
+              </li>
+            ))}
+          </ul>
+          <a
+            className={`${styles.pricingCta} lp-body`}
+            href={siteConfig.githubUrl}
+            target="_blank"
+            rel="noreferrer"
           >
-            Free. Forever.
-          </h2>
-          <p className={`${styles.pricingMessage} mt-6 text-xl leading-relaxed md:text-2xl`}>
-            Skills Board is free to use and open source.
-          </p>
-          <p
-            className={`${styles.pricingNote} ${styles.pricingNoteRule} mt-8 pt-5 font-mono text-sm font-semibold tracking-[0.02em]`}
-          >
-            No trial. No credit card. No paid tier.
-          </p>
+            Read the source on GitHub
+            <ArrowUpRightIcon
+              aria-hidden="true"
+              className={styles.pricingCtaIcon}
+            />
+          </a>
         </div>
       </div>
     </section>

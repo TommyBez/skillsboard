@@ -1,57 +1,83 @@
+/*
+ * Proof strip — direction §9. Hairline-bounded band, full viewport width,
+ * three true claims. No fill, no accent, no shadow: the two rules are the
+ * whole treatment, which is why it costs 120px instead of 872.
+ *
+ * --lp-hairline lands in globals.css as part of the §5 colour pass; the
+ * fallback keeps this section correct either way.
+ */
 .strip {
-  border-block: 1px solid var(--border);
+  border-block: 1px solid var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
 }
 
 .inner {
-  margin-inline: auto;
-  display: flex;
-  width: 100%;
-  max-width: 1440px;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 1rem 3rem;
-  padding: 1.5rem 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .inner {
-    padding-inline: 2.5rem;
-  }
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
 .claim {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 16px;
+  padding-block: 12px;
+}
+
+/* Mobile keeps the rows apart with the same hairline as the band edges. */
+.claim + .claim {
+  border-top: 1px solid var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
 }
 
 .label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
   color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-.rule {
-  height: 1px;
-  width: 1.5rem;
-  flex: none;
-  background: var(--border);
 }
 
 .value {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 1.25rem;
-  font-size: 0.875rem;
   color: var(--foreground);
+  text-wrap: pretty;
 }
 
 .client {
   white-space: nowrap;
+}
+
+.sep {
+  padding-inline: 8px;
+  color: var(--muted-foreground);
+}
+
+/* The machine-readable half of each claim: a repo path, a route, a protocol. */
+.detail {
+  display: none;
+  color: var(--muted-foreground);
+}
+
+@media (min-width: 1024px) {
+  .inner {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .claim {
+    display: block;
+    padding-block: 24px;
+    padding-inline: 32px;
+  }
+
+  .claim:first-child {
+    padding-inline-start: 0;
+  }
+
+  .claim + .claim {
+    border-top: 0;
+    border-inline-start: 1px solid var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
+  }
+
+  .value {
+    margin-top: 4px;
+  }
+
+  .detail {
+    display: block;
+    margin-top: 4px;
+  }
 }

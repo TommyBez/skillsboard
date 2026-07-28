@@ -6,11 +6,14 @@ import styles from "@/components/landing/sections/site-header.module.css"
 /**
  * Sticky command strip. `actions` carries the session-dependent nav from the
  * page, so the header itself stays free of `getSession()` calls.
+ *
+ * The bar rides `lp-container`, not the old 1440px shell, so the wordmark
+ * shares a left edge with every headline on the page (§4).
  */
 export function SiteHeader({ actions }: { actions: ReactNode }) {
   return (
     <header className={styles.header}>
-      <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
+      <div className={`lp-container ${styles.bar}`}>
         <Brand compactOnMobile />
         {actions}
       </div>

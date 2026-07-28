@@ -1,83 +1,44 @@
 import styles from "@/components/landing/sections/mcp.module.css"
 
-const mcpTools = [
-  "Search team skills",
-  "Find saved recommendations",
-  "Get install commands",
-] as const
-
-/** Decorative library rows echoing the hero dossiers. Visual examples only. */
-const libraryRows = [
-  "code-review",
-  "pdf-extraction",
-  "brand-voice",
-  "sql-migrations",
-  "release-notes",
+/** The three MCP tools this section claims, named as the server names them. */
+const agentActions = [
+  { name: "Search the library", tool: "search_skills" },
+  { name: "Return the command", tool: "get_skill_command" },
+  { name: "Save a new skill", tool: "add_skill" },
 ] as const
 
 /**
- * Routing schematic: team library → MCP gateway → agent actions.
- * Desktop draws the signal paths from scroll progress (--mcp-p);
- * small screens run a vertical route revealed on visibility.
+ * Gateway → agent, drawn at rest. The wires used to draw themselves from
+ * scroll progress, which meant the honest resting state of this figure was
+ * three unfinished strokes and a column of ghost text.
  */
 export function McpSchematic() {
   return (
     <figure
       className={styles.schematic}
-      aria-label="Skills Board connects a shared team library to an MCP-compatible agent"
-      data-motion-group="mcp"
+      aria-label="An MCP-compatible agent calling the Skills Board tools"
     >
-      <div className={styles.schematicGrid}>
-        <div className={styles.schemaStack}>
-          <p className={styles.schemaEyebrow}>Team library</p>
-          <p className={styles.schemaStackTitle}>Skills your team recommends</p>
-          <ul className={styles.schemaRows} aria-hidden="true">
-            {libraryRows.map((row) => (
-              <li key={row} className={styles.schemaRow}>
-                <span className={styles.schemaRowName}>{row}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div className={styles.schemaGateway}>
-          {/* Wire coordinates: y=4/54/104 are the vertical centers of the three
-              fixed-height agent action rows; the box is centered on the same
-              axis as the rows, so endpoints align at every viewport width. */}
+      <div className={styles.schemaGrid}>
+        <div className={styles.gateway}>
+          {/* y=4/54/104 are the centres of the three fixed-height rows; the
+              box is centred on the same axis, so the endpoints land on a row
+              centre at every viewport width. */}
           <svg
-            className={styles.schemaWires}
+            className={styles.wires}
             viewBox="0 0 160 108"
             preserveAspectRatio="none"
             aria-hidden="true"
             focusable="false"
           >
-            <path d="M0 54H80" className={styles.schemaTrunk} pathLength={1} />
-            <path
-              d="M80 54h38V4h42"
-              className={`${styles.schemaBranch} ${styles.schemaBranchA}`}
-              pathLength={1}
-            />
-            <path
-              d="M80 54H160"
-              className={`${styles.schemaBranch} ${styles.schemaBranchB}`}
-              pathLength={1}
-            />
-            <path
-              d="M80 54h38v50h42"
-              className={`${styles.schemaBranch} ${styles.schemaBranchC}`}
-              pathLength={1}
-            />
-            <path
-              d="M0 54H160"
-              className={styles.schemaPulse}
-              pathLength={1}
-            />
+            <path d="M80 54h38V4h42" className={styles.wire} />
+            <path d="M80 54H160" className={styles.wire} />
+            <path d="M80 54h38v50h42" className={styles.wire} />
           </svg>
-          <span className={styles.schemaNode}>
+          <span className={styles.node}>
             <svg
               viewBox="0 0 32 32"
               fill="none"
-              className={styles.schemaNodeMark}
+              className={styles.nodeMark}
               aria-hidden="true"
               focusable="false"
             >
@@ -86,25 +47,28 @@ export function McpSchematic() {
                 fill="currentColor"
               />
             </svg>
-            <span className={styles.schemaNodeLabel}>MCP</span>
+            <span className="lp-label">MCP</span>
           </span>
         </div>
 
-        <div className={styles.schemaAgent}>
-          <p className={styles.schemaAgentLabel}>Inside your agent</p>
-          <ul className={styles.agentActions} aria-label="Available MCP actions">
-            {mcpTools.map((tool, i) => (
-              <li key={tool} className={styles.agentAction} data-action={i + 1}>
-                <span className={styles.agentActionName}>{tool}</span>
+        <div className={styles.agent}>
+          <p className={`${styles.agentLabel} lp-label`}>Inside your agent</p>
+          <ul className={styles.agentActions}>
+            {agentActions.map((action) => (
+              <li key={action.tool} className={styles.agentAction}>
+                <span className="lp-h1">{action.name}</span>
+                <span className={`${styles.agentActionTool} lp-code`}>
+                  {action.tool}
+                </span>
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <figcaption className={`${styles.schemaCaption} text-pretty`}>
-        Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
-        same library remains available in Skills Board.
+      <figcaption className={`${styles.caption} lp-small`}>
+        The agent reads and adds to the same library. It cannot edit or delete
+        what your team saved.
       </figcaption>
     </figure>
   )
