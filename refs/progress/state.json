@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 15:05 UTC",
-  "round": 0,
-  "phase": "Baseline judged, desktop and mobile",
+  "updated": "28 Jul, 15:40 UTC",
+  "round": 1,
+  "phase": "Round 1 building",
   "references": [
     {
       "id": "linear",
@@ -77,6 +77,22 @@
     {
       "at": "15:05",
       "text": "New mobile-specific defect, named by two critics independently: the hero card cluster is an illegible shrunken collage at 390px and wastes the first scroll."
+    },
+    {
+      "at": "15:20",
+      "text": "Art direction delivered. It measured what the critics only felt: 4094px of our 7006px page \u2014 58% \u2014 is uniform empty ground, and the cause is two sticky runways totalling 220vh that produce no new content by construction."
+    },
+    {
+      "at": "15:25",
+      "text": "Page recomposed: chapter rail deleted, and two new sections wired in \u2014 a proof strip under the fold and a product slab before the MCP section."
+    },
+    {
+      "at": "15:32",
+      "text": "Shared type and layout ramp added: ten steps on desktop collapsing to seven below 1024px. The page currently renders 33 distinct type combinations from seven different vw slopes. Builders now apply the ramp instead of inventing sizes."
+    },
+    {
+      "at": "15:40",
+      "text": "Eight builders out in parallel, each owning its own files. Critics follow once they land."
     }
   ],
   "pieces": [
@@ -109,58 +125,67 @@
       "gap": "Dead vertical space and unresolved sections. All three critics named it independently, including both we beat: a near-empty viewport after the hero, an MCP third column of grey ghost text, and a black band holding a giant outlined 0 that reads as placeholder art."
     },
     {
+      "key": "I",
+      "name": "Evidence",
+      "status": "building",
+      "statusLabel": "building",
+      "scope": "Two new sections: a proof strip under the fold, and a product slab showing the library itself.",
+      "rounds": [],
+      "gap": "This is the piece we actually lost on. Linear carries real product surface in every module; we showed the product nowhere."
+    },
+    {
       "key": "A",
       "name": "Hero",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "Headline type, eyebrow, subcopy, CTA cluster, the dossier board, entrance choreography, sticky exit.",
       "rounds": []
     },
     {
       "key": "B",
       "name": "Chrome",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "Sticky header, scroll progress, chapter rail, footer colophon.",
       "rounds": []
     },
     {
       "key": "C",
       "name": "Workflow",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "The three-move sequence and its section head.",
       "rounds": []
     },
     {
       "key": "D",
       "name": "MCP",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "Sticky chapter, copy column, the routing schematic and its animation.",
       "rounds": []
     },
     {
       "key": "E",
       "name": "Pricing",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "The zero monument and the Free Forever statement.",
       "rounds": []
     },
     {
       "key": "F",
       "name": "FAQ + closing",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "Disclosure list, closing statement, final call to action.",
       "rounds": []
     },
     {
       "key": "G",
       "name": "Motion system",
-      "status": "pending",
-      "statusLabel": "awaiting direction",
+      "status": "building",
+      "statusLabel": "building",
       "scope": "Springs, interruptibility, hover and press feedback, scroll timing, reduced-motion.",
       "rounds": []
     },
