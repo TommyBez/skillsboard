@@ -1,7 +1,7 @@
 {
   "label": "ours",
   "url": "http://localhost:3000",
-  "capturedAt": "2026-07-28T17:21:49.877Z",
+  "capturedAt": "2026-07-28T17:49:59.990Z",
   "viewports": {
     "desktop": {
       "docHeight": 4955,
@@ -10,14 +10,14 @@
         {
           "index": 1,
           "role": "hero",
-          "slug": "skills-boardsign-instart",
-          "label": "Skills BoardSign inStartCreate your team library",
+          "slug": "skills-board-sign-in-cre",
+          "label": "Skills Board Sign in Create your team library",
           "top": 0,
           "height": 806,
           "screens": 1,
           "sticky": true,
           "frames": [
-            "ours-desktop-01-skills-boardsign-instart.png"
+            "ours-desktop-01-skills-board-sign-in-cre.png"
           ]
         },
         {
@@ -104,13 +104,125 @@
           "index": 8,
           "role": "footer",
           "slug": "product",
-          "label": "Product",
+          "label": "PRODUCT",
           "top": 4724,
           "height": 231,
           "screens": 1,
           "sticky": false,
           "frames": [
             "ours-desktop-08-product.png"
+          ]
+        }
+      ]
+    },
+    "mobile": {
+      "docHeight": 5006,
+      "sectionCount": 8,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "skills-board-start",
+          "label": "Skills Board Start",
+          "top": 0,
+          "height": 967,
+          "screens": 2,
+          "sticky": true,
+          "frames": [
+            "ours-mobile-01-skills-board-start-p1.png",
+            "ours-mobile-01-skills-board-start-p2.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "save-once-find-fast",
+          "label": "Save once. Find fast.",
+          "top": 968,
+          "height": 762,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-02-save-once-find-fast.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "every-saved-skill-one-se",
+          "label": "Every saved skill, one search.",
+          "top": 1730,
+          "height": 679,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-03-every-saved-skill-one-se.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "give-your-agent-the-same",
+          "label": "Give your agent the same library.",
+          "top": 2409,
+          "height": 552,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-04-give-your-agent-the-same.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "free-forever",
+          "label": "Free. Forever.",
+          "top": 2961,
+          "height": 402,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-05-free-forever.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "common-questions",
+          "label": "Common questions",
+          "top": 3363,
+          "height": 922,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-06-common-questions-p1.png",
+            "ours-mobile-06-common-questions-p2.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "body6",
+          "slug": "answer-which-skill-shoul",
+          "label": "Answer “which skill should I use?” once.",
+          "top": 4285,
+          "height": 355,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-07-answer-which-skill-shoul.png"
+          ]
+        },
+        {
+          "index": 8,
+          "role": "footer",
+          "slug": "product",
+          "label": "PRODUCT",
+          "top": 4640,
+          "height": 366,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-mobile-08-product.png"
           ]
         }
       ]

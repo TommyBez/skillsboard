@@ -6,7 +6,7 @@
     "width": 1440,
     "height": 900
   },
-  "capturedAt": "2026-07-28T17:37:04.693Z",
+  "capturedAt": "2026-07-28T17:38:10.649Z",
   "reducedMotion": false,
   "entrance": {
     "animations": [],
@@ -16,10 +16,11 @@
         0,
         23,
         42,
-        63
+        60,
+        83
       ]
     },
-    "frameCount": 4
+    "frameCount": 5
   },
   "scrollReveal": {
     "section": {
@@ -37,7 +38,7 @@
         "delaysMs": [
           0
         ],
-        "firstAtMs": 147,
+        "firstAtMs": 146,
         "staggerMs": null
       }
     ],
@@ -45,23 +46,22 @@
       "file": "reveal-every-saved-skill-one-se-strip.png",
       "frames": [
         0,
-        174,
-        196,
-        215,
-        235,
-        254,
-        272,
-        292,
-        311,
-        337
+        163,
+        185,
+        204,
+        223,
+        262,
+        281,
+        300,
+        339
       ]
     },
-    "frameCount": 10,
+    "frameCount": 11,
     "replaysOnScrollBack": true
   },
   "interactions": [
     {
-      "selector": "body > div:nth-child(3) > main:nth-child(3) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > div:nth-child(1) > a:nth-child(1)",
+      "selector": "[data-harness-target=\"0\"]",
       "box": {
         "x": 120,
         "y": 492,
@@ -112,7 +112,7 @@
             "delaysMs": [
               0
             ],
-            "firstAtMs": 240,
+            "firstAtMs": 248,
             "staggerMs": null
           },
           {
@@ -124,7 +124,7 @@
             "delaysMs": [
               0
             ],
-            "firstAtMs": 240,
+            "firstAtMs": 249,
             "staggerMs": null
           }
         ],
@@ -132,18 +132,17 @@
           "backgroundColor": "lab(42.5974 -42.9476 31.9285) → oklab(0.489999 -0.122961 0.0768429 / 0.9)"
         },
         "strip": {
-          "file": "body-div-nth-child-3-main-nt-hover-strip.png",
+          "file": "data-harness-target-0-hover-strip.png",
           "frames": [
             0,
-            204,
-            239,
-            262,
-            287,
-            313,
-            333,
-            358,
-            385,
-            405
+            210,
+            245,
+            270,
+            295,
+            325,
+            354,
+            374,
+            397
           ]
         }
       },
@@ -154,10 +153,10 @@
           "scale": "none → 1"
         },
         "strip": {
-          "file": "body-div-nth-child-3-main-nt-press-strip.png",
+          "file": "data-harness-target-0-press-strip.png",
           "frames": [
             0,
-            141
+            134
           ]
         }
       },
@@ -167,20 +166,94 @@
       },
       "focus": {
         "animations": [],
-        "changed": null,
+        "changed": {},
         "strip": {
-          "file": "body-div-nth-child-3-main-nt-focus-strip.png",
+          "file": "data-harness-target-0-focus-strip.png",
           "frames": [
             0,
-            139,
-            169
+            136,
+            159
           ]
         }
       }
     },
     {
-      "selector": "body > div:nth-child(3) > header:nth-child(2) > div:nth-child(1) > div:nth-child(2) > nav:nth-child(2) > a:nth-child(1)",
-      "error": "not found"
+      "selector": "[data-harness-target=\"1\"]",
+      "box": {
+        "x": 0,
+        "y": 0,
+        "w": 0,
+        "h": 0
+      },
+      "rest": {
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "lab(5.44221 -3.96605 1.73996)",
+        "borderColor": "rgba(0, 0, 0, 0)",
+        "borderWidth": "1px",
+        "boxShadow": "none",
+        "opacity": "1",
+        "transform": "none",
+        "scale": "none",
+        "filter": "none",
+        "backdropFilter": "none",
+        "outline": "lab(42.5974 -42.9476 31.9285) none 0px",
+        "outlineOffset": "0px",
+        "borderRadius": "6px",
+        "letterSpacing": "normal",
+        "textDecorationLine": "none",
+        "backgroundImage": "none",
+        "transitionProperty": "none",
+        "transitionDuration": "0s",
+        "transitionTimingFunction": "ease",
+        "transitionDelay": "0s",
+        "animationName": "none",
+        "animationDuration": "0s",
+        "animationTimingFunction": "ease",
+        "cursor": "pointer",
+        "willChange": "auto",
+        "_box": {
+          "x": 0,
+          "y": 0,
+          "w": 0,
+          "h": 0
+        }
+      },
+      "hover": {
+        "animations": [],
+        "changed": {},
+        "strip": {
+          "file": "data-harness-target-1-hover-strip.png",
+          "frames": [
+            0
+          ]
+        }
+      },
+      "press": {
+        "animations": [],
+        "changedFromHover": {},
+        "strip": {
+          "file": "data-harness-target-1-press-strip.png",
+          "frames": [
+            0
+          ]
+        }
+      },
+      "hoverInterrupt": {
+        "leftAfterMs": 80,
+        "reverseAnimations": []
+      },
+      "focus": {
+        "animations": [],
+        "changed": {},
+        "strip": {
+          "file": "data-harness-target-1-focus-strip.png",
+          "frames": [
+            0,
+            149,
+            170
+          ]
+        }
+      }
     }
   ]
 }

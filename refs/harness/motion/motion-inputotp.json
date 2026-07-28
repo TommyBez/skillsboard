@@ -1,0 +1,804 @@
+{
+  "label": "inputotp",
+  "url": "https://input-otp.rodz.dev",
+  "viewport": {
+    "name": "desktop",
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-07-28T17:40:25.892Z",
+  "reducedMotion": false,
+  "entrance": {
+    "animations": [
+      {
+        "type": "CSSTransition",
+        "name": "color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 111,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 814,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "border-left-color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 4,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 815,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-spark",
+        "durationMs": 550,
+        "easing": "linear",
+        "count": 12,
+        "delaysMs": [
+          0,
+          30,
+          60,
+          90
+        ],
+        "firstAtMs": 815,
+        "staggerMs": 30
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-beam-in",
+        "durationMs": 250,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 815,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-win-shake",
+        "durationMs": 450,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 815,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-win-flash",
+        "durationMs": 500,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 818,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "background-color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 2,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 818,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "box-shadow",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 819,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "border-right-color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 819,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "border-top-color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 819,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "border-bottom-color",
+        "durationMs": 500,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 819,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-beam-spin",
+        "durationMs": 650,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 819,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-usedby-tear",
+        "durationMs": 500,
+        "easing": "linear",
+        "count": 2,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 965,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "opacity",
+        "durationMs": 300,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 1287,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-sweep-clip",
+        "durationMs": 620,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 1287,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-sweep-move",
+        "durationMs": 620,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 1288,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "opacity",
+        "durationMs": 320,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 2620,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "transform",
+        "durationMs": 320,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 2620,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "transform",
+        "durationMs": 700,
+        "easing": "cubic-bezier(0.76, 0, 0.24, 1)",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 2620,
+        "staggerMs": null
+      },
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 520,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 10,
+        "delaysMs": [
+          0,
+          120,
+          300,
+          410,
+          420,
+          475,
+          530,
+          585,
+          650
+        ],
+        "firstAtMs": 2820,
+        "staggerMs": 81
+      },
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 760,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 6,
+        "delaysMs": [
+          60,
+          106,
+          152,
+          198,
+          244,
+          290
+        ],
+        "firstAtMs": 2820,
+        "staggerMs": 46
+      },
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 620,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 1,
+        "delaysMs": [
+          340
+        ],
+        "firstAtMs": 2821,
+        "staggerMs": null
+      }
+    ],
+    "strip": {
+      "file": "entrance-strip.png",
+      "frames": [
+        0,
+        57,
+        128,
+        232,
+        351,
+        520,
+        922,
+        1614,
+        2265,
+        2760
+      ]
+    },
+    "frameCount": 78
+  },
+  "scrollReveal": {
+    "section": {
+      "label": "~/sponsors#",
+      "top": 1718,
+      "height": 456
+    },
+    "animations": [
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 760,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 9,
+        "delaysMs": [
+          60,
+          106,
+          152,
+          198
+        ],
+        "firstAtMs": 712,
+        "staggerMs": 46
+      },
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 620,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 2,
+        "delaysMs": [
+          248
+        ],
+        "firstAtMs": 712,
+        "staggerMs": null
+      },
+      {
+        "type": "WebAnimation",
+        "name": null,
+        "durationMs": 520,
+        "easing": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "count": 12,
+        "delaysMs": [
+          0,
+          180,
+          260,
+          318,
+          340,
+          420,
+          500
+        ],
+        "firstAtMs": 712,
+        "staggerMs": 83
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "xp-fb-carousel-fill",
+        "durationMs": 3200,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 713,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "opacity",
+        "durationMs": 250,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 713,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSAnimation",
+        "name": "pc-row-fill",
+        "durationMs": 5360,
+        "easing": "linear",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 713,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "opacity",
+        "durationMs": 300,
+        "easing": "ease",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 713,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "opacity",
+        "durationMs": 320,
+        "easing": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 1625,
+        "staggerMs": null
+      },
+      {
+        "type": "CSSTransition",
+        "name": "transform",
+        "durationMs": 520,
+        "easing": "cubic-bezier(0.32, 0.72, 0, 1)",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 1625,
+        "staggerMs": null
+      }
+    ],
+    "strip": {
+      "file": "reveal-sponsors-strip.png",
+      "frames": [
+        -59,
+        64,
+        123,
+        224,
+        479,
+        842,
+        1107,
+        1493,
+        1832,
+        2267
+      ]
+    },
+    "frameCount": 26,
+    "replayedGroups": [
+      "CSSAnimation|xp-fb-carousel-fill|3200|linear"
+    ],
+    "replaysReveal": false
+  },
+  "interactions": [
+    {
+      "selector": "a.xp-btn",
+      "box": {
+        "x": 499,
+        "y": 576,
+        "w": 144,
+        "h": 48
+      },
+      "rest": {
+        "backgroundColor": "rgba(0, 0, 0, 0)",
+        "color": "rgb(250, 250, 250)",
+        "borderColor": "rgba(255, 255, 255, 0.05)",
+        "borderWidth": "2px",
+        "boxShadow": "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px",
+        "opacity": "1",
+        "transform": "none",
+        "scale": "none",
+        "filter": "none",
+        "backdropFilter": "blur(25px)",
+        "outline": "rgb(250, 250, 250) none 0px",
+        "outlineOffset": "0px",
+        "borderRadius": "16px",
+        "letterSpacing": "normal",
+        "textDecorationLine": "none",
+        "backgroundImage": "linear-gradient(104deg, rgba(252, 252, 252, 0.05) 5%, rgba(241, 241, 229, 0.1))",
+        "transitionProperty": "all",
+        "transitionDuration": "0.2s",
+        "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "transitionDelay": "0s",
+        "animationName": "none",
+        "animationDuration": "0s",
+        "animationTimingFunction": "ease",
+        "cursor": "pointer",
+        "willChange": "auto",
+        "_box": {
+          "x": 499,
+          "y": 576,
+          "w": 144,
+          "h": 48
+        }
+      },
+      "hover": {
+        "animations": [
+          {
+            "type": "CSSTransition",
+            "name": "opacity",
+            "durationMs": 200,
+            "easing": "linear",
+            "count": 33,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 381,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSAnimation",
+            "name": "xp-usedby-tear",
+            "durationMs": 500,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 485,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "box-shadow",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 824,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 824,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "background-color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 824,
+            "staggerMs": null
+          }
+        ],
+        "changed": {
+          "backgroundColor": "rgba(0, 0, 0, 0) → rgba(255, 255, 255, 0.9)",
+          "color": "rgb(250, 250, 250) → rgb(9, 9, 11)",
+          "boxShadow": "rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px → rgba(255, 255, 255, 0.06) 0px 0px 4px 0px, rgba(255, 255, 255, 0.12) 0px 1px 14px 0px, rgba(255, 255, 255, 0.18) 0px 3px 32px 0px",
+          "outline": "rgb(250, 250, 250) none 0px → rgb(9, 9, 11) none 0px"
+        },
+        "strip": {
+          "file": "a-xp-btn-hover-strip.png",
+          "frames": [
+            -45,
+            62,
+            190,
+            304,
+            416,
+            558,
+            724,
+            966,
+            1235,
+            1508
+          ]
+        }
+      },
+      "press": {
+        "animations": [
+          {
+            "type": "CSSAnimation",
+            "name": "xp-blink",
+            "durationMs": 1000,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 634,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSAnimation",
+            "name": "xp-usedby-tear",
+            "durationMs": 500,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 635,
+            "staggerMs": null
+          }
+        ],
+        "changedFromHover": {},
+        "strip": {
+          "file": "a-xp-btn-press-strip.png",
+          "frames": [
+            -42,
+            0,
+            82,
+            223,
+            280,
+            342,
+            385,
+            547,
+            601,
+            675
+          ]
+        }
+      },
+      "hoverInterrupt": {
+        "leftAfterMs": 80,
+        "reverseAnimations": [
+          {
+            "type": "CSSTransition",
+            "name": "box-shadow",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "background-color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "opacity",
+            "durationMs": 200,
+            "easing": "linear",
+            "count": 27,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "box-shadow",
+            "durationMs": 0,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "opacity",
+            "durationMs": 50,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 180,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSAnimation",
+            "name": "xp-usedby-tear",
+            "durationMs": 500,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 573,
+            "staggerMs": null
+          }
+        ]
+      },
+      "focus": {
+        "animations": [
+          {
+            "type": "CSSTransition",
+            "name": "color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 455,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "background-color",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 456,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "outline-offset",
+            "durationMs": 200,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 456,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSAnimation",
+            "name": "xp-blink",
+            "durationMs": 1000,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 1012,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSAnimation",
+            "name": "xp-usedby-tear",
+            "durationMs": 500,
+            "easing": "linear",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 1098,
+            "staggerMs": null
+          }
+        ],
+        "changed": {
+          "backgroundColor": "rgba(0, 0, 0, 0) → rgba(255, 255, 255, 0.9)",
+          "color": "rgb(250, 250, 250) → rgb(9, 9, 11)",
+          "outline": "rgb(250, 250, 250) none 0px → rgb(9, 9, 11) none 0px",
+          "outlineOffset": "0px → 1px"
+        },
+        "strip": {
+          "file": "a-xp-btn-focus-strip.png",
+          "frames": [
+            -98,
+            0,
+            104,
+            229,
+            350,
+            520,
+            652,
+            883,
+            1142,
+            1414
+          ]
+        }
+      }
+    }
+  ]
+}

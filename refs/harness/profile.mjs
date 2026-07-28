@@ -96,6 +96,7 @@ const MEASURE_FN = async function measure([vpW, vpH]) {
     '#' + [r, g, b].map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')
 
   // -- element sweep --------------------------------------------------------
+  const layoutW = document.documentElement.clientWidth
   const all = [...document.querySelectorAll('body *')]
   const type = new Map()
   const textColor = new Map()
@@ -148,7 +149,11 @@ const MEASURE_FN = async function measure([vpW, vpH]) {
         bump(textColor, cs.color, ownText.length)
         bump(colorUsers, cs.color)
       }
-      if (!fixed) {
+      // Only text that is actually on stage defines the content box. Marquee
+      // belts and carousel tracks park copy hundreds of pixels off both edges,
+      // which made Linear report a 1,515px content width and a *negative*
+      // right gutter inside a 1,440px viewport.
+      if (!fixed && r.left >= -1 && r.right <= layoutW + 1) {
         textLeft = Math.min(textLeft, r.left)
         textRight = Math.max(textRight, r.right)
       }
@@ -194,7 +199,11 @@ const MEASURE_FN = async function measure([vpW, vpH]) {
 
     // Ink: anything that actually puts marks on the page. Used for the
     // content-to-void ratio, so backgrounds alone do not count as content.
-    if (!fixed && top + r.height > 0) {
+    // A wrapper that spans essentially the whole document says nothing about
+    // local density: one bordered full-height <main> made input-otp report
+    // "100% content, one ink band, zero void" for a 9,762px page.
+    const isPageWrapper = r.height > docH * 0.9
+    if (!fixed && !isPageWrapper && top + r.height > 0) {
       const isMedia = ['IMG', 'SVG', 'CANVAS', 'VIDEO', 'PICTURE'].includes(el.tagName)
       const hasBgImage = cs.backgroundImage && cs.backgroundImage !== 'none'
       // Two thresholds, because they answer different questions. "Ink" counts
@@ -303,7 +312,18 @@ const MEASURE_FN = async function measure([vpW, vpH]) {
   const typeRamp = sortDesc(type).map(([k, count]) => ({ ...JSON.parse(k), count }))
   typeRamp.sort((a, b) => b.size - a.size || b.count - a.count)
 
+  // A page that failed to load produces a clean-looking profile of nothing —
+  // one run reported Linear as "900px, 3 type combinations, 1 section" and
+  // would have gone straight into the comparison table as fact.
+  const health = { ok: true, reasons: [] }
+  if (cssText.length < 3000) health.reasons.push('almost no CSS read — stylesheets may have failed')
+  if (docH <= vpH * 1.15) health.reasons.push(`document is only ${Math.round(docH)}px — content likely never rendered`)
+  if (visibleCount < 80) health.reasons.push(`only ${visibleCount} visible elements`)
+  if (typeRamp.length < 5) health.reasons.push(`only ${typeRamp.length} type combinations`)
+  health.ok = health.reasons.length === 0
+
   return {
+    health,
     viewport: { width: vpW, height: vpH },
     document: {
       heightPx: Math.round(docH),
@@ -333,13 +353,13 @@ const MEASURE_FN = async function measure([vpW, vpH]) {
     container: {
       // Layout width, not viewport width — a classic scrollbar steals ~15px and
       // would otherwise show up as a phantom asymmetric gutter.
-      layoutWidthPx: document.documentElement.clientWidth,
+      layoutWidthPx: layoutW,
       textLeftPx: Number.isFinite(textLeft) ? Math.round(textLeft) : null,
       textRightPx: Number.isFinite(textRight) ? Math.round(textRight) : null,
       contentWidthPx: Number.isFinite(textLeft) ? Math.round(textRight - textLeft) : null,
       gutterLeftPx: Number.isFinite(textLeft) ? Math.round(textLeft) : null,
       gutterRightPx: Number.isFinite(textRight)
-        ? Math.round(document.documentElement.clientWidth - textRight)
+        ? Math.round(layoutW - textRight)
         : null,
       declaredMaxWidths: sortDesc(maxWidths).slice(0, 6).map(([w, n]) => ({ value: w, count: n })),
     },
@@ -398,22 +418,31 @@ async function profileSite() {
   const result = { label, url, capturedAt: new Date().toISOString(), viewports: {} }
 
   for (const vp of [VIEWPORTS.desktop, VIEWPORTS.mobile]) {
-    const { ctx, page } = await openPage(browser, url, vp, {
-      dark: has('--dark'),
-      deviceScaleFactor: 1, // no rasterising here, and 1 keeps memory sane
-    })
-    await settle(page, vp)
-    const profile = await page.evaluate(MEASURE_FN, [vp.width, vp.height]).catch(async (e) => {
-      console.error(`[${vp.name}] measure failed: ${e.message.split('\n')[0]}`)
-      return null
-    })
-    const sections = await getSections(page, vp)
-    result.viewports[vp.name] = { ...profile, sections: rhythm(sections, vp) }
-    console.log(
-      `[${label}/${vp.name}] ${profile?.document.heightPx}px, ` +
-        `${profile?.type.combinations} type combos, ${sections.length} sections`,
-    )
-    await ctx.close()
+    // One retry on a bad load. Reference hosts intermittently hand back a stub
+    // or an interstitial, and a silently-empty profile in the comparison table
+    // is worse than no profile at all.
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      const { ctx, page } = await openPage(browser, url, vp, {
+        dark: has('--dark'),
+        deviceScaleFactor: 1, // nothing is rasterised here, and 1 keeps memory sane
+      })
+      await settle(page, vp)
+      const profile = await page.evaluate(MEASURE_FN, [vp.width, vp.height]).catch((e) => {
+        console.error(`[${vp.name}] measure failed: ${e.message.split('\n')[0]}`)
+        return null
+      })
+      const sections = await getSections(page, vp).catch(() => [])
+      await ctx.close()
+      if (!profile) continue
+      result.viewports[vp.name] = { ...profile, sections: rhythm(sections, vp) }
+      console.log(
+        `[${label}/${vp.name}] ${profile.document.heightPx}px, ` +
+          `${profile.type.combinations} type combos, ${sections.length} sections` +
+          (profile.health.ok ? '' : `  ⚠ SUSPECT: ${profile.health.reasons.join('; ')}`),
+      )
+      if (profile.health.ok) break
+      if (attempt === 1) console.error(`[${label}/${vp.name}] retrying…`)
+    }
   }
   await browser.close()
 
@@ -524,7 +553,10 @@ function renderComparison() {
     const vps = sites.map((s) => s.viewports[vpName]).filter(Boolean)
     if (vps.length !== sites.length) continue
     md += `\n### ${vpName === 'desktop' ? 'Desktop — 1440×900' : 'Mobile — 390×844'}\n\n`
-    md += `| Metric | ${sites.map((s) => s.label).join(' | ')} |\n`
+    // Flag a bad capture in the header rather than letting it read as fact.
+    md += `| Metric | ${sites
+      .map((s, i) => s.label + (vps[i].health && !vps[i].health.ok ? ' ⚠' : ''))
+      .join(' | ')} |\n`
     md += `|---|${sites.map(() => '---').join('|')}|\n`
     for (const [name, get] of rows) {
       if (!get) {

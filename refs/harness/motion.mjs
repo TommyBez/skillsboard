@@ -272,7 +272,16 @@ const report = { label, url, viewport: vp, capturedAt: new Date().toISOString(),
     const t1 = startRecording()
     await scrollTo(page, Math.min(target.top, docH - vp.height))
     await page.waitForTimeout(1400)
-    report.scrollReveal.replaysOnScrollBack = summarise(t1).length > 0
+    // Only count a *reveal* animation firing twice. Ambient loops (carousel
+    // fills, marquees) legitimately restart when they re-enter the viewport, and
+    // counting those would report every well-behaved site as "replays".
+    const keyOf = (a) => `${a.type}|${a.name}|${a.durationMs}|${a.easing}`
+    const first = new Set(report.scrollReveal.animations.map(keyOf))
+    const again = summarise(t1)
+    report.scrollReveal.replayedGroups = again.filter((a) => first.has(keyOf(a))).map(keyOf)
+    report.scrollReveal.replaysReveal = again.some(
+      (a) => a.type === 'WebAnimation' && first.has(keyOf(a)),
+    )
   }
 }
 
@@ -312,6 +321,19 @@ if (!targets.length) {
   console.log(`[${label}] auto-selected: ${targets.map((t) => t.note).join(' | ')}`)
   targets = targets.map((t) => t.sel)
 }
+
+// The press test really does press. On a link or a submit button that
+// navigates, and every measurement after it silently describes a different
+// page — which is how the first run reported "focus changed: null" for a
+// button that plainly has a focus state. Cancel the default action only;
+// capture-phase preventDefault still lets the site's own handlers run, so
+// JS-driven press states are unaffected.
+await page.evaluate(() => {
+  const stop = (e) => e.preventDefault()
+  document.addEventListener('click', stop, true)
+  document.addEventListener('submit', stop, true)
+  document.addEventListener('keydown', (e) => { if (e.key === 'Enter') e.preventDefault() }, true)
+})
 
 report.interactions = []
 for (const sel of targets) {

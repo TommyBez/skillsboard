@@ -1,0 +1,205 @@
+{
+  "label": "vercel",
+  "url": "https://vercel.com",
+  "capturedAt": "2026-07-28T17:47:29.480Z",
+  "viewports": {
+    "desktop": {
+      "docHeight": 5333,
+      "sectionCount": 7,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "marketing-header",
+          "label": "marketing-header",
+          "top": 0,
+          "height": 900,
+          "screens": 1,
+          "sticky": true,
+          "frames": [
+            "vercel-desktop-01-marketing-header.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "build-agents-on-infrastr",
+          "label": "Build agents on infrastructure that thinks like them",
+          "top": 1108,
+          "height": 617,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-02-build-agents-on-infrastr.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "ship-apps-that-scale-fro",
+          "label": "Ship apps that scale from zero to millions instantly",
+          "top": 1981,
+          "height": 617,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-03-ship-apps-that-scale-fro.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "div",
+          "label": "",
+          "top": 2853,
+          "height": 617,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-04-div.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "div",
+          "label": "",
+          "top": 3470,
+          "height": 926,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-05-div-p1.png",
+            "vercel-desktop-05-div-p2.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "div",
+          "label": "",
+          "top": 4396,
+          "height": 714,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-06-div.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "footer",
+          "slug": "div",
+          "label": "",
+          "top": 5110,
+          "height": 846,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-desktop-07-div.png"
+          ]
+        }
+      ]
+    },
+    "mobile": {
+      "docHeight": 4981,
+      "sectionCount": 7,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "marketing-header",
+          "label": "marketing-header",
+          "top": 0,
+          "height": 844,
+          "screens": 1,
+          "sticky": true,
+          "frames": [
+            "vercel-mobile-01-marketing-header.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "build-agents-on-infrastr",
+          "label": "Build agents on infrastructure that thinks like them",
+          "top": 1004,
+          "height": 689,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-02-build-agents-on-infrastr.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "ship-apps-that-scale-fro",
+          "label": "Ship apps that scale from zero to millions instantly",
+          "top": 1773,
+          "height": 649,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-03-ship-apps-that-scale-fro.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "div",
+          "label": "",
+          "top": 2501,
+          "height": 681,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-04-div.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "div",
+          "label": "",
+          "top": 3182,
+          "height": 895,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-05-div-p1.png",
+            "vercel-mobile-05-div-p2.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "div",
+          "label": "",
+          "top": 4077,
+          "height": 662,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-06-div.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "footer",
+          "slug": "div",
+          "label": "",
+          "top": 4779,
+          "height": 1878,
+          "screens": 3,
+          "sticky": false,
+          "frames": [
+            "vercel-mobile-07-div-p1.png",
+            "vercel-mobile-07-div-p2.png",
+            "vercel-mobile-07-div-p3.png"
+          ]
+        }
+      ]
+    }
+  }
+}

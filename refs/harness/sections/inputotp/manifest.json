@@ -1,0 +1,238 @@
+{
+  "label": "inputotp",
+  "url": "https://input-otp.rodz.dev",
+  "capturedAt": "2026-07-28T17:48:14.110Z",
+  "viewports": {
+    "desktop": {
+      "docHeight": 9762,
+      "sectionCount": 8,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "o-t-p-input-otp-docs-how",
+          "label": "o t p input-otp Docs How I Built It Sponsors ★ 3.2k",
+          "top": 0,
+          "height": 914,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-01-o-t-p-input-otp-docs-how-p1.png",
+            "inputotp-desktop-01-o-t-p-input-otp-docs-how-p2.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "trusted-at-scale-0-1-2-3",
+          "label": "TRUSTED AT SCALE_ 0 1 2 3 4 5 6 7 8 9 0 0 1 2 3 4 5 6 7 8 9 ",
+          "top": 914,
+          "height": 328,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-02-trusted-at-scale-0-1-2-3.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "spotted-by-the-best",
+          "label": "Spotted by the best",
+          "top": 1242,
+          "height": 476,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-03-spotted-by-the-best.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "sponsors",
+          "label": "~/sponsors#",
+          "top": 1718,
+          "height": 456,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-04-sponsors.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "small-api-unusually-capa",
+          "label": "Small API. Unusually capable.",
+          "top": 2243,
+          "height": 282,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-05-small-api-unusually-capa.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "one-real-input-native-wi",
+          "label": "One real input. Native wins.",
+          "top": 2525,
+          "height": 978,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-06-one-real-input-native-wi-p1.png",
+            "inputotp-desktop-06-one-real-input-native-wi-p2.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "body6",
+          "slug": "1-4-1-9-5-2-1-4-1-9-5-2-",
+          "label": "1 4 1 9 5 2 1 4 1 9 5 2 one real HTML input — paint and all ",
+          "top": 3503,
+          "height": 5760,
+          "screens": 4,
+          "sticky": true,
+          "frames": [
+            "inputotp-desktop-07-1-4-1-9-5-2-1-4-1-9-5-2--p1.png",
+            "inputotp-desktop-07-1-4-1-9-5-2-1-4-1-9-5-2--p2.png",
+            "inputotp-desktop-07-1-4-1-9-5-2-1-4-1-9-5-2--p3.png",
+            "inputotp-desktop-07-1-4-1-9-5-2-1-4-1-9-5-2--p4.png"
+          ]
+        },
+        {
+          "index": 8,
+          "role": "footer",
+          "slug": "your-last-otp-input",
+          "label": "Your last OTP input.",
+          "top": 9263,
+          "height": 498,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-desktop-08-your-last-otp-input.png"
+          ]
+        }
+      ]
+    },
+    "mobile": {
+      "docHeight": 10877,
+      "sectionCount": 8,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "o-t-p-input-otp",
+          "label": "o t p input-otp",
+          "top": 0,
+          "height": 935,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-01-o-t-p-input-otp-p1.png",
+            "inputotp-mobile-01-o-t-p-input-otp-p2.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "trusted-at-scale-0-1-2-3",
+          "label": "TRUSTED AT SCALE_ 0 1 2 3 4 5 6 7 8 9 0 0 1 2 3 4 5 6 7 8 9 ",
+          "top": 935,
+          "height": 274,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-02-trusted-at-scale-0-1-2-3.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "spotted-by-the-best",
+          "label": "Spotted by the best",
+          "top": 1209,
+          "height": 438,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-03-spotted-by-the-best.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "sponsors",
+          "label": "~/sponsors#",
+          "top": 1647,
+          "height": 710,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-04-sponsors.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "small-api-unusually-capa",
+          "label": "Small API. Unusually capable.",
+          "top": 2414,
+          "height": 315,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-05-small-api-unusually-capa.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "one-real-input-native-wi",
+          "label": "One real input. Native wins.",
+          "top": 2729,
+          "height": 2211,
+          "screens": 3,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-06-one-real-input-native-wi-p1.png",
+            "inputotp-mobile-06-one-real-input-native-wi-p2.png",
+            "inputotp-mobile-06-one-real-input-native-wi-p3.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "body6",
+          "slug": "1-4-1-9-5-2-1-4-1-9-5-2-",
+          "label": "1 4 1 9 5 2 1 4 1 9 5 2 autoComplete=\"one-time-code\" inputMo",
+          "top": 4940,
+          "height": 5401,
+          "screens": 4,
+          "sticky": true,
+          "frames": [
+            "inputotp-mobile-07-1-4-1-9-5-2-1-4-1-9-5-2--p1.png",
+            "inputotp-mobile-07-1-4-1-9-5-2-1-4-1-9-5-2--p2.png",
+            "inputotp-mobile-07-1-4-1-9-5-2-1-4-1-9-5-2--p3.png",
+            "inputotp-mobile-07-1-4-1-9-5-2-1-4-1-9-5-2--p4.png"
+          ]
+        },
+        {
+          "index": 8,
+          "role": "footer",
+          "slug": "your-last-otp-input",
+          "label": "Your last OTP input.",
+          "top": 10341,
+          "height": 536,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "inputotp-mobile-08-your-last-otp-input.png"
+          ]
+        }
+      ]
+    }
+  }
+}

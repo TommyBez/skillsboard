@@ -147,3 +147,184 @@ failure modes, and passing it means those were not detected — nothing more.
 
 The audit found the mobile defect the critics missed. It will not find the next
 class of defect nobody has thought to encode. Keep opening the page on a phone.
+
+---
+
+# Relative comparison — `profile.mjs`, `sections.mjs`, `motion.mjs`
+
+The other half of the folder. `audit.mjs` asks *what is wrong with this page*;
+these three ask *how does this page differ from the references* — as numbers,
+as like-for-like images, and as measured motion, rather than as one critic's
+impression of one squashed screenshot.
+
+They exist because the previous method had four faults that we watched bite:
+
+1. **The full-page still flatters us.** Linear's page is 10,898px tall. Squashed
+   into one image its dense product UI becomes an illegible grey smear, and
+   critics penalised it for exactly that — "its evidence is unreadable, a dim
+   slab of miniature UI". Live at 1440×900 it is not.
+2. **Stills cannot judge motion**, which is the whole reason input-otp is on the
+   list.
+3. **Whole-page comparison hides local truth.** "Which page is better" says
+   nothing about whether our hero beats their hero.
+4. **Nothing was measured.** When the art director hand-measured the references
+   instead, those numbers were the most useful artefacts of the project.
+
+## Running them
+
+```bash
+./refs/harness/run.sh <tool.mjs> <args…>
+```
+
+Use the wrapper. Node must see `NODE_USE_ENV_PROXY=1` **before it starts** or
+external hosts fail: Chromium's own TLS to the egress proxy gets reset, so every
+request is fetched by Node and fulfilled into the page (`attachProxyRouting` in
+`lib.mjs`, copied from `refs/capture.mjs`). Local URLs skip routing entirely.
+
+## `profile.mjs` — comparable design-system profile
+
+```bash
+./refs/harness/run.sh profile.mjs <url> <label> [--out dir] [--dark]
+./refs/harness/run.sh profile.mjs --compare refs/harness/out/profile-*.json [--out table.md]
+```
+
+At 1440×900 and 390×844, into `out/profile-<label>.json`:
+
+| Group | What comes out |
+|---|---|
+| Type | Every distinct size/weight/family/line-height/tracking combination *actually rendered*, with counts, sorted by size; how many are above 24px and 32px; distinct sizes, weights, families |
+| Rhythm | Top-level section heights, the gaps between them, internal padding, and the coefficient of variation of each — one number for "how much does the rhythm vary" |
+| Container | Content width and gutters from real text extents, plus declared `max-width` values |
+| Colour | Weighted palette (background by area, text by character count), distinct colours, how many hues carry meaning, the accent, and accent uses per viewport-height |
+| Shape | Radii and shadow values in use, with counts and shadow layer depth |
+| Motion | Computed transition buckets (duration + easing), `@keyframes`, distinct cubic-béziers, `linear()` springs, declared durations |
+| Document | Height, screens tall, content-to-void ratio at two thresholds, and the longest empty run with its position |
+
+`--compare` puts every profile in one table, desktop and mobile, so you can read
+"we ship 13 type combinations, Linear ships 42, Vercel 30" at a glance.
+
+The type-combination count agrees with `audit.mjs` (13 desktop / 10 mobile) —
+they compute it independently, so treat a divergence as a bug in one of them.
+
+Method notes that change the numbers:
+
+- Measurement happens only after a full scroll walk, so scroll-revealed content
+  is not counted as invisible.
+- Colours are rasterised through a 1×1 canvas, not regex-parsed — the same
+  lesson `audit.mjs` learned. Chromium serialises computed colour in the
+  authored space, so our page hands back `lab(5.4 -3.9 1.7)` and an `rgb()`
+  regex finds **zero** colours on it.
+- Multi-value computed strings are split on top-level commas only.
+  `.split(', ')` shreds `cubic-bezier(0.4, 0, 0.2, 1)` into four bogus easings.
+- Cross-origin stylesheets throw on `.cssRules`, so they are refetched through
+  the same request interception and parsed as text. On Linear that is 68 sheets;
+  a same-origin-only reading sees a fraction of its motion.
+- Every profile carries a `health` block. A page that failed to load produces a
+  *clean-looking* profile of nothing — the run that reported Linear as "900px,
+  3 type combinations" is what put the guard there. `--compare` marks suspect
+  columns; re-run rather than reading them.
+
+## `sections.mjs` — like-for-like, viewport-sized section captures
+
+```bash
+./refs/harness/run.sh sections.mjs <url> <label> [--out dir] \
+    [--desktop-only|--mobile-only] [--dark] [--max-frames 4]
+```
+
+Segments the page into top-level modules and captures each at 1440×900 and
+390×844 — the scale a human actually sees — instead of one 10,000px smear.
+Writes `sections/<label>/<label>-<viewport>-<NN>-<slug>[-pN].png` plus a
+`manifest.json` giving each section's index, `role` (`hero`, `body1`…, `footer`),
+label, top, height and frames. Pair across sites by index or role and hand the
+pair to `refs/blind.mjs`.
+
+A module taller than the viewport becomes several frames spread across it,
+capped, so a 5,800px sticky chapter does not produce forty images.
+
+## `motion.mjs` — interaction and motion evidence
+
+```bash
+./refs/harness/run.sh motion.mjs <url> <label> [--selector S]… \
+    [--out dir] [--mobile] [--dark] [--reduced]
+```
+
+Follows `refs/motion-spec.md`: CDP `Animation.animationStarted` reports the real
+effect timing (duration, delay, easing, fill) for every CSS transition, CSS
+animation and WAAPI animation the page starts — as opposed to durations a
+stylesheet declares for rules that may never match.
+
+Into `motion-<label>.json` plus frame strips in `motion/<label>/`:
+
+- **Entrance** — recorded from first paint, before any settling.
+- **Scroll reveal** — the page is settled to choose a target section, then
+  *reloaded* and jumped straight to it, so the reveal is a genuine first
+  intersection. Plus a scroll-back replay test that ignores ambient loops.
+- **Per selector** — hover, press, keyboard focus, and a hover interrupted 80ms
+  in. Press is diffed against *hover*, not rest: a press state that merely
+  equals hover is "no press state", and that is the finding.
+- With no `--selector` it stamps the largest interactive element in the fold
+  (the primary CTA) and the smallest (a nav link) — the two ends of a site's
+  interaction vocabulary.
+
+Frames come from `Page.startScreencast`, not a screenshot loop: they carry the
+compositor's own timestamps and are only emitted when the page repaints, so "no
+frame" is itself evidence. Strips are composed by cropping in CSS on a `data:`
+URI — no image library, no new dependency.
+
+Two behaviours worth knowing: the press test really presses, so default actions
+(`click`, `submit`, Enter) are cancelled at capture phase for its duration —
+without that, pressing a link navigates and every later measurement describes a
+different page. And frame cadence is real but not calibrated, because driving
+the mouse takes time; trust the JSON timings over the strip captions.
+
+**Validation.** Run against input-otp, `motion.mjs` independently reproduced the
+hand-measured spec: the 46ms per-word reveal stagger at delays 60/106/152/198
+over 760ms `cubic-bezier(.22,1,.36,1)`; the 200ms `cubic-bezier(0.4,0,0.2,1)`
+CTA hover; **no press state**; the reveal never replaying; and the broken focus
+ring (focus changes background and colour but not `box-shadow`). `profile.mjs`
+reproduced the spec's Linear transition buckets — `160ms
+cubic-bezier(.25,.46,.45,.94)` ×74 against the spec's ×72.
+
+## `lib.mjs` — shared plumbing
+
+Browser launch, proxy routing, page opening, the scroll-settle walk, and the
+section segmentation shared by `profile.mjs` and `sections.mjs` so "section 03"
+is the same band of pixels in both.
+
+Segmentation is structural, not semantic — most marketing pages do not use
+`<section>` honestly. It walks down from `<body>`, opening up any element that is
+tall, whose children tile it, and most of whose *height* is made of module-sized
+children; then merges runts and closes holes. Four things it learned the hard
+way, all still in the code as comments: `display: contents` wrappers have no
+rect (input-otp's whole 9,762px document hangs off one), single-child wrappers
+must not consume a depth step (Linear stacks four), absolutely-positioned
+mega-menus inflate `<header>` to 900px and swallow the hero beneath it, and a
+1,224px section whose three children are 320px each is one module, not three.
+
+## Output layout
+
+```
+refs/harness/out/profile-<label>.json      profile.mjs
+refs/harness/sections/<label>/…            sections.mjs + manifest.json
+refs/harness/motion/motion-<label>.json    motion.mjs timing tables
+refs/harness/motion/<label>/*-strip.png    motion.mjs frame strips
+```
+
+The written-up comparison lives in `refs/reference-profile.md`.
+
+## What these cannot see
+
+- **Two widths, one browser, light scheme by default.** Same limits as the
+  audit.
+- **`profile.mjs` counts what rendered, not what was intended.** A type
+  combination used once by a legal footnote weighs the same as the headline
+  until you read the counts.
+- **Section segmentation is a heuristic.** It is good enough to pair modules
+  across four unrelated codebases; it is not the authors' own idea of their
+  sections. Read `manifest.json` before trusting a pairing.
+- **`motion.mjs` drives one selector at a time on a fine pointer.** Touch,
+  drag, scroll-linked and multi-element choreography are unmeasured, and
+  anything gated behind a first-visit flag (input-otp's preloader) plays or does
+  not play depending on storage state.
+- **None of them has taste.** They can prove our hero has three type sizes and
+  Linear's has five. They cannot tell you whose hero is better.
