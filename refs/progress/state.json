@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 17:10 UTC",
+  "updated": "28 Jul, 17:30 UTC",
   "round": 1,
-  "phase": "Mobile broken, fixing",
+  "phase": "Rebuilding the instruments",
   "references": [
     {
       "id": "linear",
@@ -129,6 +129,18 @@
     {
       "at": "17:10",
       "text": "Cause: the direction says never scale a mobile product visual \u2014 crop it and let it bleed. That is right for a large surface, where the crop reads as a window. Applied to a 40px pill holding one URL it just reads as a bug. Repair in flight."
+    },
+    {
+      "at": "17:25",
+      "text": "Tommaso: build a better harness for analysing the references. Correct, and it is the real lesson of the round \u2014 the method was comparative only, so it rewarded being least bad rather than being right."
+    },
+    {
+      "at": "17:30",
+      "text": "Four faults being fixed: the full-page still flattens Linear's dense UI into an illegible smear and flatters us; stills cannot judge motion, which is the only reason input-otp is on the list; whole-page comparison never tells us whether our hero beats their hero; and nothing was measured \u2014 every conclusion was a critic's opinion."
+    },
+    {
+      "at": "17:31",
+      "text": "Acceptance test for the new audit is falsifiable: run it against the commit that still contains the mobile bug, and it must surface the sliced text on its own, without being told where to look."
     }
   ],
   "pieces": [
@@ -177,6 +189,15 @@
         }
       ],
       "gap": "Uniformity. Three critics independently: the lower third is 'three consecutive near-empty bands with no product imagery, so the scroll stops paying out'; the middle third is 'evenly loud rather than building toward a climax'; the whole page is 'uniformly polite \u2014 never a single scale shift or full-bleed moment that would make it memorable rather than merely well-behaved'."
+    },
+    {
+      "key": "M",
+      "name": "The harness",
+      "status": "building",
+      "statusLabel": "building",
+      "scope": "How we measure. An absolute defect audit, a comparable design-system profile across all four sites, like-for-like section captures, and motion evidence.",
+      "rounds": [],
+      "gap": "The old method only ever asked which of two pages is better. It never asked whether either was broken, so it handed us six wins while we shipped severed text."
     },
     {
       "key": "I",
