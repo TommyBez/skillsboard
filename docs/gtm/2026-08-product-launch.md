@@ -84,6 +84,8 @@ Enable the PostHog flag only after the final launch-day preflight. The code can 
 
 An unavailable channel does not pause independent launch lanes.
 
+The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN human handoffs, email draft, and destination-specific community brief live in `docs/gtm/2026-08-launch-channel-packages.md`.
+
 ## Five-phase schedule
 
 ### 1. Internal launch — July 27–31
@@ -101,8 +103,9 @@ An unavailable channel does not pause independent launch lanes.
 - [x] Produce the 31-second complete demo and 14-second homepage loop with synthetic identities and a public skill.
 - [x] Complete desktop and mobile QA of the dormant single-homepage launch treatment.
 - [x] Prepare a launch-specific 1200×630 OG image, video poster, and English video captions.
-- [ ] Prepare LinkedIn, X, Product Hunt, Show HN, email, and community variants.
-- [ ] Assemble Product Hunt gallery, maker comment, first comment, and supporter list without engagement manipulation.
+- [x] Prepare the Italian LinkedIn and English X variants in one private Typefully draft with the 31-second demo.
+- [x] Prepare the Product Hunt listing, Show HN facts handoff, consented-email copy, campaign-link matrix, and destination-specific community brief schema.
+- [ ] Complete exact Product Hunt eligibility/account readback and let the human maker write and publish every platform-required comment without engagement manipulation.
 - [ ] Invite a small number of relevant existing contacts to privately test the launch path and report blockers.
 - [ ] Fix only launch-blocking product or measurement defects; defer unrelated polish.
 
@@ -141,15 +144,15 @@ An unavailable channel does not pause independent launch lanes.
 
 | Workstream | Repository-pinned skill | Deliverable | Due | State |
 | --- | --- | --- | --- | --- |
-| Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | In progress |
-| Launch narrative | `copywriting`, `copy-editing` | Homepage treatment and channel message spine | Jul 31 | Truthful already-live framing ready in PR #65 |
-| Product demonstration | `video` | Short homepage loop and complete channel demo | Aug 4 | 14-second loop and 31-second demo ready in PR #65 |
-| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Single-homepage gated treatment ready for review in PR #65 |
+| Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | Homepage treatment merged; final preflight and flag activation remain |
+| Launch narrative | `copywriting`, `copy-editing` | Homepage treatment and channel message spine | Jul 31 | Homepage treatment merged; channel package prepared |
+| Product demonstration | `video` | Short homepage loop and complete channel demo | Aug 4 | 14-second loop and 31-second demo merged on `main` |
+| Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Dormant single-homepage treatment merged on `main` |
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
 | Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |
-| Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Not started |
-| Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | Not started |
-| Community | `community-marketing`, `public-relations` | Product Hunt, Show HN, and native community packages | Aug 7 | Not started |
+| Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Private draft verified; final preflight and scheduling remain |
+| Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | English copy prepared; consent, suppression, unsubscribe, provider, and send readback remain |
+| Community | `community-marketing`, `public-relations` | Product Hunt, Show HN, and native community packages | Aug 7 | Product Hunt and Show HN handoffs prepared; exact destination/provider execution remains |
 | Learning | `customer-research` | Objection log, interview guide, launch retrospective | Aug 10 | Not started |
 
 Each specialist skill is loaded only when its workstream begins and only after the Pulse resolver selects it where the provider contract requires that routing.
