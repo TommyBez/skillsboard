@@ -36,7 +36,7 @@ The official Typefully resource is draft `10084598` in social set `266935`:
 - exact channel URLs from the campaign-link table;
 - private, unscheduled, and unpublished at the July 28 official readback.
 
-Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `19b53722ca2f9f37421bf3367937ad3c9ddf07ade42c79030ed51e942cd302e7`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
+Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `bc8d9af0228c2bc71920cf2c7dc25d558a46fa5614b288d9b01e3c11e60f084a`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
 
 ## Product Hunt package
 
@@ -63,8 +63,8 @@ Create your team library
 1. `app/icon.svg` — product icon.
 2. `public/launch/skills-board-launch-og.jpg` — shared-library promise.
 3. `public/launch/skills-board-product-demo-poster.jpg` — full-canvas find-and-use product proof from the final master.
-4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 60-second Product Hunt cut: fast outcome preview, complete walkthrough, animated team handoff, usage paths, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
-5. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut with the same product truth and `public/launch/skills-board-product-demo.vtt` captions for social distribution.
+4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 60-second Product Hunt cut: editorial hook, source-to-context flow, five focused real-product proof shots, animated team handoff, usage paths, team-library payoff, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
+5. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut built from the same visual grammar and product truth, with `public/launch/skills-board-product-demo.vtt` captions for social distribution.
 
 ### Video source and reproducible renders
 
@@ -74,7 +74,7 @@ Both launch cuts are generated from shared Remotion scenes in `remotion/skillsbo
 - `pnpm video:render:social` renders exactly 930 frames / 31 seconds.
 - `pnpm video:render:launch` renders both outputs.
 
-The launch compositions use the repository-pinned Remotion and Remocn motion system for brand typography, guided product framing, the Alex → Sam handoff, usage paths, and CTA. They intentionally omit the prototype music because authoritative license provenance is not stored with the asset. Both cuts remain comprehensible while muted and retain exact VTT sidecars.
+The launch compositions use the repository-pinned Remotion and Remocn motion system for brand typography, staged source → context → library flows, focused real-product proof shots, the Alex → Sam handoff, branched usage paths, and CTA. The visual system stays within Skills Board's light palette; quality comes from hierarchy, staging, crop, timing, and continuity rather than importing another product's color tokens. Both cuts are designed for silent-first comprehension and retain exact VTT sidecars.
 
 `public/launch/skills-board-video-manifest.json` records the immutable source, composition source, dimensions, frame counts, durations, output bytes, and SHA-256 values used for final asset readback.
 
@@ -108,7 +108,7 @@ Never request or incentivize upvotes, coordinate artificial engagement, mass-mes
 - The source remains visible; Skills Board follows the latest available source rather than pinning historical versions.
 - A saved recommendation is not formal approval, a security review, or universal compatibility certification.
 - The hosted product is free forever and the code is open source.
-- The 31-second synthetic-data cut shows the full add → find → use sequence; the 60-second Product Hunt cut adds a fast outcome preview, usage-path context, and team-library payoff without slowing the walkthrough.
+- The 31-second synthetic-data cut condenses the source → context → save → find → use story into focused beats; the 60-second Product Hunt cut adds the complete five-shot proof sequence, usage-path context, and team-library payoff.
 
 Final submission text, publication, and every comment remain human. Do not generate or AI-edit HN comments, solicit votes or submissions, automate a personal account, or repost a weak submission. Immediately before a human submission, verify that the product and tracked destination are live, the project has not already been submitted, the current Show HN rules allow the exact unit, and the human maker can remain available for discussion.
 

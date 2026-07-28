@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generator": {
     "source": "remotion/skillsboard-launch-videos.tsx",
-    "source_sha256": "155bb1ef88560f46ca5b2c26528630419c6777801743b52a04a77eae7368425e",
+    "source_sha256": "77a49815e16e4cbc5d2c794a2fe05eeb163817cc77f78d59a78eb96f043e5537",
     "font_loader": "remotion/fonts.ts",
     "font_loader_sha256": "c45a892f5d21007ba13c5179442d1ce026315226cd7e5045ef8aa5be3abda6e0",
     "remotion_version": "4.0.495",
@@ -17,8 +17,8 @@
     {
       "composition": "skillsboard-launch-product-hunt",
       "path": "public/launch/skills-board-product-demo-product-hunt.mp4",
-      "sha256": "86afb50a215f4157ba3f60fdd8af6e43f8f259806bd364e5336591222baecd25",
-      "bytes": 4011047,
+      "sha256": "3412da1bf3981ed2c0ee6b75de5ae8d884456e56ed066d73556092dbb6f7d286",
+      "bytes": 10157945,
       "width": 1440,
       "height": 900,
       "fps": 30,
@@ -27,13 +27,13 @@
       "video_codec": "h264",
       "audio": false,
       "captions": "public/launch/skills-board-product-demo-product-hunt.vtt",
-      "captions_sha256": "f26d8280a362dc7aa527c8548300b4c872205214b76085d743d4af983eb5a6f9"
+      "captions_sha256": "3b6bc013cd90ad19cc8a827f9c7d01e9fb423b4d73e681c68aeb55215f869e1b"
     },
     {
       "composition": "skillsboard-launch-social",
       "path": "public/launch/skills-board-product-demo.mp4",
-      "sha256": "19b53722ca2f9f37421bf3367937ad3c9ddf07ade42c79030ed51e942cd302e7",
-      "bytes": 2278529,
+      "sha256": "bc8d9af0228c2bc71920cf2c7dc25d558a46fa5614b288d9b01e3c11e60f084a",
+      "bytes": 6418074,
       "width": 1440,
       "height": 900,
       "fps": 30,
@@ -42,13 +42,13 @@
       "video_codec": "h264",
       "audio": false,
       "captions": "public/launch/skills-board-product-demo.vtt",
-      "captions_sha256": "972a3f48b2f680e2010ed7eca97cc6ce7e347e94217a1d75a61f0b4398a80109"
+      "captions_sha256": "bf63190c329efaaf89286ea31ba2e0a62dce0ad2ddeddebc33cfcf2cbbc8fead"
     }
   ],
   "poster": {
     "path": "public/launch/skills-board-product-demo-poster.jpg",
-    "sha256": "410011ab7a8b213370de96e6aabb0cf776b9ebc0863d046aeb2005ba6daf7c51",
-    "bytes": 126182,
+    "sha256": "f475fb56fb568ea08ae1f396e4254ab3e45f175da53b6c10ee83864464914001",
+    "bytes": 111293,
     "width": 1440,
     "height": 900
   }

@@ -1,16 +1,25 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:02.500
+00:00:00.000 --> 00:00:03.000
 Which skill should I use? Keep the recommendation with the team.
 
-00:00:02.500 --> 00:00:17.500
-Alex adds the public copywriting skill to Northstar Studio with useful team context.
+00:00:03.000 --> 00:00:06.000
+A public source becomes a team recommendation with its context attached.
 
-00:00:17.500 --> 00:00:20.000
-One recommendation becomes shared context from Alex to Sam.
+00:00:06.000 --> 00:00:11.000
+Alex starts from a public repository or skill URL. Skills Board reads its valid SKILL.md.
 
-00:00:20.000 --> 00:00:29.000
-Sam finds copywriting in the shared library and copies a compatible path.
+00:00:11.000 --> 00:00:15.500
+Alex adds a team note, an example prompt, and tags.
 
-00:00:29.000 --> 00:00:31.000
+00:00:15.500 --> 00:00:18.500
+Alex saves it. Sam can find it in the shared team library.
+
+00:00:18.500 --> 00:00:23.000
+Sam searches the library and finds Alex's recommendation with its context intact.
+
+00:00:23.000 --> 00:00:27.000
+Sam copies a compatible path while the original source stays visible.
+
+00:00:27.000 --> 00:00:31.000
 Save once. Find fast. Use it your way. Create your team library at skillsboard.sh.
