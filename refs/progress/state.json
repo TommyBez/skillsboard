@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 17:30 UTC",
+  "updated": "28 Jul, 18:05 UTC",
   "round": 1,
-  "phase": "Rebuilding the instruments",
+  "phase": "Mobile repaired, harness in build",
   "references": [
     {
       "id": "linear",
@@ -267,8 +267,8 @@
     {
       "key": "H",
       "name": "Mobile",
-      "status": "building",
-      "statusLabel": "broken, in repair",
+      "status": "passing",
+      "statusLabel": "repaired",
       "scope": "Every section at 390px, judged on its own terms.",
       "rounds": [
         {
@@ -308,7 +308,7 @@
           "why": "Ours states its purpose and its action within the first screen at a genuine mobile display scale; input-otp opens with a shrunken desktop hero at near-caption size."
         }
       ],
-      "gap": "Text sliced mid-word at the screen edge in three sections. The crop-and-bleed rule for product visuals was applied to small one-line chips, where it does not read as a crop at all. Mobile is also 5128px against desktop's 4955 \u2014 the narrower column is longer than the wide one."
+      "gap": "Section padding is now the binding constraint, not any section's content: 72px top and bottom means 144px of ground between adjacent sections, 17% of a phone screen."
     }
   ]
 }

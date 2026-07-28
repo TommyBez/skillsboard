@@ -1,0 +1,119 @@
+{
+  "label": "ours",
+  "url": "http://localhost:3000",
+  "capturedAt": "2026-07-28T17:21:49.877Z",
+  "viewports": {
+    "desktop": {
+      "docHeight": 4955,
+      "sectionCount": 8,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "skills-boardsign-instart",
+          "label": "Skills BoardSign inStartCreate your team library",
+          "top": 0,
+          "height": 806,
+          "screens": 1,
+          "sticky": true,
+          "frames": [
+            "ours-desktop-01-skills-boardsign-instart.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "save-once-find-fast",
+          "label": "Save once. Find fast.",
+          "top": 806,
+          "height": 676,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-02-save-once-find-fast.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "every-saved-skill-one-se",
+          "label": "Every saved skill, one search.",
+          "top": 1482,
+          "height": 912,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-03-every-saved-skill-one-se-p1.png",
+            "ours-desktop-03-every-saved-skill-one-se-p2.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "give-your-agent-the-same",
+          "label": "Give your agent the same library.",
+          "top": 2394,
+          "height": 595,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-04-give-your-agent-the-same.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "free-forever",
+          "label": "Free. Forever.",
+          "top": 2989,
+          "height": 355,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-05-free-forever.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "common-questions",
+          "label": "Common questions",
+          "top": 3344,
+          "height": 919,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-06-common-questions-p1.png",
+            "ours-desktop-06-common-questions-p2.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "body6",
+          "slug": "answer-which-skill-shoul",
+          "label": "Answer “which skill should I use?” once.",
+          "top": 4263,
+          "height": 461,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-07-answer-which-skill-shoul.png"
+          ]
+        },
+        {
+          "index": 8,
+          "role": "footer",
+          "slug": "product",
+          "label": "Product",
+          "top": 4724,
+          "height": 231,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "ours-desktop-08-product.png"
+          ]
+        }
+      ]
+    }
+  }
+}

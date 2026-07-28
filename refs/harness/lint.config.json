@@ -1,0 +1,36 @@
+{
+  "url": "http://localhost:3000/",
+  "viewports": ["1440x900", "390x844"],
+  "schemes": ["light", "dark"],
+
+  "_defaults": "0 means the defect must not exist. A non-zero ceiling is measured debt, not a target: it exists so a regression fails today, and it should be ratcheted down as the debt is paid. `null` disables a rule (report-only). Re-measure with: node refs/harness/lint.mjs --suggest",
+
+  "defaults": {
+    "proseClippedPastViewport": 0,
+    "documentHorizontalOverflowPx": 0,
+    "textSlicedByClip": 0,
+    "invisibleText": 0,
+    "bodyContrastFailures": 0,
+    "contrastFailures": 0,
+    "focusWithoutIndicator": 0,
+    "smallTapTargets": 7,
+    "ellipsisTruncation": 6,
+    "typeCombinations": 13,
+    "voidPctOfDocument": 60,
+    "accentPerViewport": null
+  },
+
+  "perViewport": {
+    "390x844": {
+      "typeCombinations": 10,
+      "smallTapTargets": 4
+    }
+  },
+
+  "_debt": {
+    "smallTapTargets": "desktop 7 / mobile 4 — footer links (20px tall), the header wordmark, the theme toggle at 40x40. All real; none fixed yet.",
+    "ellipsisTruncation": "6 — the install commands in the hero card, the workflow step and the slab cards are deliberately ellipsised. Kept visible as a ceiling so a seventh truncation has to be argued for.",
+    "typeCombinations": "13 desktop / 10 mobile as measured on 2026-07-28. The page shipped 33 before the ramp was made shared; this ceiling is the ratchet that keeps it there.",
+    "voidPctOfDocument": "60 against a measured 56-58%. This is a composition metric, not a defect: it says over half the page is flat band. Treat a rise as a prompt to look, not as a bug."
+  }
+}
