@@ -1,0 +1,85 @@
+/* ---------------------------------------------------------------------------
+   Chapter rail — fixed section index, printed in difference ink
+--------------------------------------------------------------------------- */
+
+.rail {
+  position: fixed;
+  top: 50%;
+  right: clamp(0.9rem, 1.6vw, 1.6rem);
+  z-index: 30;
+  display: none;
+  translate: 0 -50%;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.9rem;
+  mix-blend-mode: difference;
+}
+
+@media (min-width: 80rem) {
+  .rail {
+    display: flex;
+  }
+}
+
+.railLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-block: 0.25rem;
+  color: #fff;
+  opacity: 0.38;
+  text-decoration: none;
+  transition: opacity 220ms var(--lp-ease-out);
+}
+
+.railLink:hover,
+.railLink[aria-current] {
+  opacity: 1;
+}
+
+.railLink:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+  opacity: 1;
+}
+
+.railTick {
+  width: 1.4rem;
+  height: 1px;
+  background: currentcolor;
+  transform: scaleX(0.5);
+  transform-origin: right center;
+  transition: transform 260ms var(--lp-ease-out);
+}
+
+.railLink:hover .railTick,
+.railLink:focus-visible .railTick {
+  transform: scaleX(1);
+}
+
+.railLabel {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0;
+  translate: 6px 0;
+  transition:
+    opacity 220ms var(--lp-ease-out),
+    translate 220ms var(--lp-ease-out);
+}
+
+.railLink:hover .railLabel,
+.railLink:focus-visible .railLabel {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .railLink,
+  .railTick,
+  .railLabel {
+    transition: none;
+  }
+}

@@ -1,0 +1,70 @@
+/* ---------------------------------------------------------------------------
+   Closing — one final action
+   `[data-landing-motion-root]` stands in for the shared `.root` class so the
+   controller flags read across CSS-module boundaries at equal specificity.
+--------------------------------------------------------------------------- */
+
+.closingHeading {
+  font-stretch: 93%;
+}
+
+.onceStamp {
+  display: inline-block;
+  padding: 0 0.16em 0.06em;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 2px;
+  transform: rotate(-1.5deg);
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .onceStamp {
+  opacity: 0;
+  transform: rotate(-1.5deg) scale(1.14);
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .onceStamp {
+  transition:
+    opacity 300ms var(--lp-ease-out) 340ms,
+    transform 300ms var(--lp-ease-out) 340ms;
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingHeading,
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCopy,
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCta {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingHeading {
+  transition:
+    opacity 520ms var(--lp-ease-out) 140ms,
+    transform 520ms var(--lp-ease-out) 140ms;
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCopy {
+  transition:
+    opacity 420ms var(--lp-ease-out) 240ms,
+    transform 420ms var(--lp-ease-out) 240ms;
+}
+
+[data-landing-motion-root][data-motion-enabled="true"]
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCta {
+  transition:
+    opacity 380ms var(--lp-ease-out) 320ms,
+    transform 380ms var(--lp-ease-out) 320ms;
+}

@@ -1,4 +1,4 @@
-import styles from "@/components/landing/landing-motion.module.css"
+import styles from "@/components/landing/sections/mcp.module.css"
 
 const mcpTools = [
   "Search team skills",

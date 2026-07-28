@@ -1,0 +1,52 @@
+/* ---------------------------------------------------------------------------
+   Header — compact command strip
+   `[data-landing-motion-root]` stands in for the shared `.root` class: the
+   scrolled/motion flags live on that element and the attribute selector reads
+   across CSS-module boundaries at identical specificity.
+--------------------------------------------------------------------------- */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid var(--lp-hairline);
+  background-color: transparent;
+  transition:
+    background-color 240ms var(--lp-ease-out),
+    border-color 240ms var(--lp-ease-out),
+    box-shadow 240ms var(--lp-ease-out);
+}
+
+[data-landing-motion-root][data-scrolled] .header {
+  background-color: color-mix(in oklch, var(--background) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-color: var(--lp-hairline-strong);
+}
+
+.headerCellRule {
+  align-self: stretch;
+  width: 1px;
+  background: var(--lp-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+   Scroll progress — a hairline of primary ink under the command strip
+--------------------------------------------------------------------------- */
+
+.scrollProgress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(var(--scroll-progress, 0));
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header {
+    transition: none;
+  }
+}

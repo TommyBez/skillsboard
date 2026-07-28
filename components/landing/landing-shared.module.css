@@ -1,0 +1,138 @@
+/* ---------------------------------------------------------------------------
+   Skills Board landing — “The Living Skill Router”
+   One visual system: scattered dossiers → indexed library → MCP → agent.
+   Everything degrades to a complete static page without JS; scroll/pointer
+   choreography is layered on by LandingMotionController via CSS variables.
+
+   Only genuinely cross-section rules live here: the root token scope, the
+   paper grain, the shared CTA language, chapter marks and the magnetic
+   wrapper. Everything else lives beside its section in ./sections.
+--------------------------------------------------------------------------- */
+
+.root {
+  --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --lp-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --lp-hairline: color-mix(in oklch, var(--foreground) 16%, transparent);
+  --lp-hairline-strong: color-mix(in oklch, var(--foreground) 30%, transparent);
+  --lp-grid-line: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --lp-alert: oklch(0.62 0.15 55);
+  --lp-header-h: 3.5rem;
+
+  /* Routing state. Defaults are the complete, no-JS composition. */
+  --route-p: var(--route-progress, 0);
+  --mcp-p: 1;
+
+  /* Pricing monument: art-directed per theme, not mechanically inverted. */
+  --pricing-field: var(--surface-ink);
+  --pricing-ink: var(--surface-ink-foreground);
+  --pricing-zero: oklch(0.72 0.145 148);
+
+  position: relative;
+}
+
+:global(.dark) .root {
+  --lp-alert: oklch(0.74 0.14 60);
+  --pricing-field: oklch(0.945 0.011 103);
+  --pricing-ink: oklch(0.17 0.017 158);
+  --pricing-zero: oklch(0.5 0.15 148);
+}
+
+.root[data-motion-enabled="true"] {
+  --mcp-p: var(--mcp-progress, 0);
+}
+
+/* Paper grain: print texture at very low opacity, never over readability. */
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+}
+
+:global(.dark) .grain::after {
+  opacity: 0.08;
+  mix-blend-mode: soft-light;
+}
+
+/* ---------------------------------------------------------------------------
+   Shared CTA language — sharp, directional, routed
+--------------------------------------------------------------------------- */
+
+.ctaButton {
+  border-radius: 3px;
+}
+
+.ctaArrow {
+  transition: transform 180ms var(--lp-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ctaButton:hover .ctaArrow {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.ctaButton:active .ctaArrow {
+  transform: translate3d(6px, 0, 0);
+}
+
+/* Chapter index annotations — thin technical marks, decorative only. */
+.chapterMark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--muted-foreground);
+}
+
+.chapterMark::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+/* ---------------------------------------------------------------------------
+   Magnetic CTAs — a few pixels of pull, pointer-fine only
+--------------------------------------------------------------------------- */
+
+.magnetic {
+  display: inline-flex;
+  translate: calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px);
+  transition: translate 300ms var(--lp-ease-out);
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the page stays complete and beautiful, at rest
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .ctaArrow {
+    transition: none;
+  }
+
+  .ctaButton:hover .ctaArrow,
+  .ctaButton:active .ctaArrow {
+    transform: none;
+  }
+
+  .ctaButton:active {
+    scale: 1 !important;
+    transform: none;
+  }
+
+  .magnetic {
+    transition: none;
+  }
+}
