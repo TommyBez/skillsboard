@@ -9,7 +9,6 @@ import {
 } from "remotion";
 import { DataFlowPipes } from "@/components/remocn/data-flow-pipes";
 import { KineticCenterBuild } from "@/components/remocn/kinetic-center-build";
-import { MicroScaleFade } from "@/components/remocn/micro-scale-fade";
 import { MONO, SANS } from "./fonts";
 
 export const LAUNCH_FPS = 30;
@@ -70,17 +69,6 @@ function BrandBackground({ children }: { children: React.ReactNode }) {
       {children}
     </AbsoluteFill>
   );
-}
-
-function SceneFade({ children }: { children: React.ReactNode }) {
-  const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 12], [0, 1], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
-  return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
 }
 
 function HookScene({ compact = false }: { compact?: boolean }) {
@@ -197,10 +185,10 @@ const PRODUCT_SHOTS: Record<
     focus: "Team context added",
     number: "02",
     panelSide: "left",
-    scale: [1.04, 1.07, 1.08],
+    scale: [1, 1.02, 1.03],
     title: "Add what your team knows.",
     x: [0, 0, 0],
-    y: [0, -10, -35],
+    y: [22, 14, 4],
   },
   "save-share": {
     detail:
@@ -417,18 +405,6 @@ function ProductShot({
 }
 
 function SourceToContextScene({ compact = false }: { compact?: boolean }) {
-  const frame = useCurrentFrame();
-  const titleOpacity = interpolate(frame, [0, 12], [0, 1], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const flowReveal = interpolate(frame, [8, compact ? 64 : 72], [0, 100], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
   return (
     <BrandBackground>
       <div
@@ -437,7 +413,6 @@ function SourceToContextScene({ compact = false }: { compact?: boolean }) {
           fontFamily: MONO,
           fontSize: 15,
           left: 64,
-          opacity: titleOpacity,
           position: "absolute",
           top: 48,
         }}
@@ -449,7 +424,6 @@ function SourceToContextScene({ compact = false }: { compact?: boolean }) {
           fontSize: compact ? 46 : 52,
           fontWeight: 600,
           left: 0,
-          opacity: titleOpacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -462,7 +436,6 @@ function SourceToContextScene({ compact = false }: { compact?: boolean }) {
         style={{
           height: 720,
           left: 80,
-          clipPath: `inset(0 ${100 - flowReveal}% 0 0)`,
           position: "absolute",
           top: 90,
           width: 1280,
@@ -607,6 +580,13 @@ function LibraryValueScene() {
 }
 
 function MemoryStatementScene() {
+  const frame = useCurrentFrame();
+  const statementScale = interpolate(frame, [0, seconds(5)], [0.985, 1.015], {
+    easing: EASE_OUT,
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+  });
+
   return (
     <BrandBackground>
       <div
@@ -625,17 +605,29 @@ function MemoryStatementScene() {
       </div>
       <div
         style={{
+          alignItems: "center",
+          display: "flex",
           inset: 0,
+          justifyContent: "center",
+          padding: "0 150px",
           position: "absolute",
+          textAlign: "center",
+          transform: `scale(${statementScale})`,
           ["--font-geist-sans" as string]: `'${SANS}'`,
         }}
       >
-        <MicroScaleFade
-          color={COLORS.ink}
-          fontSize={58}
-          fontWeight={600}
-          text="One good recommendation stays with the team."
-        />
+        <div
+          style={{
+            color: COLORS.ink,
+            fontFamily: SANS,
+            fontSize: 58,
+            fontWeight: 600,
+            letterSpacing: "-.035em",
+            lineHeight: 1.04,
+          }}
+        >
+          One good recommendation stays with the team.
+        </div>
       </div>
       <div
         style={{
@@ -652,18 +644,6 @@ function MemoryStatementScene() {
 }
 
 function HandoffScene({ compact = false }: { compact?: boolean }) {
-  const frame = useCurrentFrame();
-  const titleOpacity = interpolate(frame, [0, 14], [0, 1], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const flowReveal = interpolate(frame, [8, compact ? 62 : 76], [0, 100], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
   return (
     <BrandBackground>
       <div
@@ -672,7 +652,6 @@ function HandoffScene({ compact = false }: { compact?: boolean }) {
           fontFamily: MONO,
           fontSize: 15,
           left: 0,
-          opacity: titleOpacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -686,7 +665,6 @@ function HandoffScene({ compact = false }: { compact?: boolean }) {
           fontSize: compact ? 48 : 56,
           fontWeight: 600,
           left: 0,
-          opacity: titleOpacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -699,7 +677,6 @@ function HandoffScene({ compact = false }: { compact?: boolean }) {
         style={{
           height: 720,
           left: 80,
-          clipPath: `inset(0 ${100 - flowReveal}% 0 0)`,
           position: "absolute",
           top: 90,
           width: 1280,
@@ -730,18 +707,6 @@ function HandoffScene({ compact = false }: { compact?: boolean }) {
 }
 
 function UsageOptionsScene() {
-  const frame = useCurrentFrame();
-  const opacity = interpolate(frame, [0, 14], [0, 1], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const flowReveal = interpolate(frame, [10, 96], [0, 100], {
-    easing: EASE_OUT,
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-
   return (
     <BrandBackground>
       <div
@@ -750,7 +715,6 @@ function UsageOptionsScene() {
           fontFamily: MONO,
           fontSize: 15,
           left: 0,
-          opacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -764,7 +728,6 @@ function UsageOptionsScene() {
           fontSize: 54,
           fontWeight: 600,
           left: 0,
-          opacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -777,7 +740,6 @@ function UsageOptionsScene() {
         style={{
           height: 720,
           left: 80,
-          clipPath: `inset(0 ${100 - flowReveal}% 0 0)`,
           position: "absolute",
           top: 100,
           width: 1280,
@@ -812,7 +774,6 @@ function UsageOptionsScene() {
           fontFamily: MONO,
           fontSize: 15,
           left: 0,
-          opacity,
           position: "absolute",
           right: 0,
           textAlign: "center",
@@ -839,42 +800,40 @@ function CtaScene({ compact = false }: { compact?: boolean }) {
 
   return (
     <BrandBackground>
-      <SceneFade>
+      <div
+        style={{
+          alignItems: "center",
+          display: "flex",
+          flexDirection: "column",
+          gap: compact ? 24 : 32,
+          inset: 0,
+          justifyContent: "center",
+          position: "absolute",
+          textAlign: "center",
+        }}
+      >
+        <LogoMark size={compact ? 62 : 72} />
+        <div style={{ fontSize: compact ? 55 : 67, fontWeight: 600 }}>
+          Save once. Find fast. Use it your way.
+        </div>
         <div
           style={{
-            alignItems: "center",
-            display: "flex",
-            flexDirection: "column",
-            gap: compact ? 24 : 32,
-            inset: 0,
-            justifyContent: "center",
-            position: "absolute",
-            textAlign: "center",
+            background: COLORS.accent,
+            borderRadius: 999,
+            color: "white",
+            fontSize: compact ? 22 : 25,
+            fontWeight: 600,
+            opacity: ctaOpacity,
+            padding: compact ? "15px 25px" : "18px 30px",
+            transform: `translateY(${ctaY}px)`,
           }}
         >
-          <LogoMark size={compact ? 62 : 72} />
-          <div style={{ fontSize: compact ? 55 : 67, fontWeight: 600 }}>
-            Save once. Find fast. Use it your way.
-          </div>
-          <div
-            style={{
-              background: COLORS.accent,
-              borderRadius: 999,
-              color: "white",
-              fontSize: compact ? 22 : 25,
-              fontWeight: 600,
-              opacity: ctaOpacity,
-              padding: compact ? "15px 25px" : "18px 30px",
-              transform: `translateY(${ctaY}px)`,
-            }}
-          >
-            Create your team library
-          </div>
-          <div style={{ color: COLORS.muted, fontFamily: MONO, fontSize: 18 }}>
-            skillsboard.sh
-          </div>
+          Create your team library
         </div>
-      </SceneFade>
+        <div style={{ color: COLORS.muted, fontFamily: MONO, fontSize: 18 }}>
+          skillsboard.sh
+        </div>
+      </div>
     </BrandBackground>
   );
 }
@@ -937,9 +896,9 @@ export function SkillsboardLaunchProductHunt() {
         <ProductShot
           durationInFrames={findUseDuration}
           kind="find-use"
-          playbackRate={(seconds(29) - seconds(25.8)) / findUseDuration}
+          playbackRate={(seconds(29) - seconds(26.2)) / findUseDuration}
           trimAfter={seconds(29)}
-          trimBefore={seconds(25.8)}
+          trimBefore={seconds(26.2)}
         />
       </Sequence>
       <Sequence durationInFrames={seconds(6)} from={seconds(37)}>
@@ -1006,9 +965,9 @@ export function SkillsboardLaunchSocial() {
         <ProductShot
           durationInFrames={findUseDuration}
           kind="find-use"
-          playbackRate={(seconds(29) - seconds(25.8)) / findUseDuration}
+          playbackRate={(seconds(29) - seconds(26.2)) / findUseDuration}
           trimAfter={seconds(29)}
-          trimBefore={seconds(25.8)}
+          trimBefore={seconds(26.2)}
         />
       </Sequence>
       <Sequence durationInFrames={seconds(4)} from={seconds(27)}>

@@ -2,7 +2,7 @@
   "schema_version": 1,
   "generator": {
     "source": "remotion/skillsboard-launch-videos.tsx",
-    "source_sha256": "77a49815e16e4cbc5d2c794a2fe05eeb163817cc77f78d59a78eb96f043e5537",
+    "source_sha256": "48d67f41efd00a0ac3f738620240c39a8bc2df61d1cd9d006d88a522535c457a",
     "font_loader": "remotion/fonts.ts",
     "font_loader_sha256": "c45a892f5d21007ba13c5179442d1ce026315226cd7e5045ef8aa5be3abda6e0",
     "remotion_version": "4.0.495",
@@ -17,8 +17,8 @@
     {
       "composition": "skillsboard-launch-product-hunt",
       "path": "public/launch/skills-board-product-demo-product-hunt.mp4",
-      "sha256": "3412da1bf3981ed2c0ee6b75de5ae8d884456e56ed066d73556092dbb6f7d286",
-      "bytes": 10157945,
+      "sha256": "901fe150a268406d9748499b7d3a05577be5dc9da5e2d196319c6eac59a231ad",
+      "bytes": 9936293,
       "width": 1440,
       "height": 900,
       "fps": 30,
@@ -32,8 +32,8 @@
     {
       "composition": "skillsboard-launch-social",
       "path": "public/launch/skills-board-product-demo.mp4",
-      "sha256": "bc8d9af0228c2bc71920cf2c7dc25d558a46fa5614b288d9b01e3c11e60f084a",
-      "bytes": 6418074,
+      "sha256": "cbb3728a5ec8cedfde33236429515ecfb38b537d5520b8ad342aa4d14ec3f911",
+      "bytes": 6153280,
       "width": 1440,
       "height": 900,
       "fps": 30,
