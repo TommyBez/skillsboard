@@ -170,10 +170,18 @@ export function ProductSlab() {
             </div>
           </div>
 
+          {/* Two independent columns rather than grid rows: the open skill is
+              much taller than a plain one, and equal-height rows would leave a
+              hole beside it instead of the next result. */}
           <div className={styles.results}>
-            {skills.map((skill) => (
-              <SkillCard key={skill.name} skill={skill} />
-            ))}
+            <div className={styles.column}>
+              <SkillCard skill={skills[0]} />
+            </div>
+            <div className={styles.column}>
+              {skills.slice(1).map((skill) => (
+                <SkillCard key={skill.name} skill={skill} />
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -3,8 +3,9 @@
  * three true claims. No fill, no accent, no shadow: the two rules are the
  * whole treatment, which is why it costs 120px instead of 872.
  *
- * --lp-hairline lands in globals.css as part of the §5 colour pass; the
- * fallback keeps this section correct either way.
+ * --lp-hairline is inherited from the landing root in landing-shared.module.css;
+ * the inline fallback is the same value, so the strip stays correct even if this
+ * section is ever rendered outside that root.
  */
 .strip {
   border-block: 1px solid var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
@@ -38,7 +39,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 24px;
+  column-gap: 16px;
   color: var(--foreground);
 }
 

@@ -25,13 +25,15 @@ await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
 await page.waitForTimeout(2500)
 
 const sections = ['intro', 'flow', 'mcp', 'pricing', 'faq', 'start']
-// Walk the page in viewport-sized steps so scroll-driven motion settles naturally.
+// Walk the page in viewport-sized steps so scroll-driven motion settles.
+// behavior:'instant' is load-bearing — the site sets scroll-behavior: smooth,
+// so a plain scrollTo animates and never arrives between steps.
 const total = await page.evaluate(() => document.body.scrollHeight)
 for (let y = 0; y < total; y += Math.floor(vp.height * 0.6)) {
-  await page.evaluate((yy) => window.scrollTo(0, yy), y)
+  await page.evaluate((yy) => window.scrollTo({ top: yy, behavior: 'instant' }), y)
   await page.waitForTimeout(180)
 }
-await page.evaluate(() => window.scrollTo(0, 0))
+await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
 await page.waitForTimeout(1500)
 await page.screenshot({ path: `${outBase}-00-fold.png` })
 
@@ -41,7 +43,7 @@ for (const id of sections) {
     const el = document.getElementById(sid)
     if (!el) return null
     const top = el.getBoundingClientRect().top + window.scrollY
-    window.scrollTo(0, top)
+    window.scrollTo({ top, behavior: 'instant' })
     return top
   }, id)
   if (found === null) {
@@ -54,7 +56,7 @@ for (const id of sections) {
   // Sticky chapters need a mid-scroll frame too — that is where their motion lives.
   const h = await page.evaluate((sid) => document.getElementById(sid).offsetHeight, id)
   if (h > vp.height * 1.6) {
-    await page.evaluate((y) => window.scrollTo(0, y), found + h * 0.5)
+    await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), found + h * 0.5)
     await page.waitForTimeout(1400)
     await page.screenshot({ path: `${outBase}-${n}-${id}-mid.png` })
   }

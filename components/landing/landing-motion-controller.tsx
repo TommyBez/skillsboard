@@ -9,6 +9,8 @@ const REVEAL_OFFSET = "10px"
 const REVEAL_STAGGER = 80
 /** Cap the cascade so a long section never turns into slow motion. */
 const REVEAL_STAGGER_MAX = 300
+/** How long a reveal may stay pending before it is placed without animating. */
+const REVEAL_SAFETY = 2500
 
 function clamp01(value: number) {
   return Math.min(1, Math.max(0, value))
@@ -188,6 +190,48 @@ export function LandingMotionController() {
     )
 
     hosts.forEach((host) => observer.observe(host))
+
+    /* A reveal that does not fire hides content permanently, so the observer is
+       not allowed to be the only thing that can start one.
+
+       Nothing here is known to be broken — the case that sent me looking was a
+       screenshot harness scrolling with scroll-behavior: smooth still in
+       effect, so the page never actually arrived and later sections were never
+       observed. That was the tool's bug, not this file's. But it is a fair
+       description of what a user's fling-scroll, a restored scroll position, or
+       an anchor jump can do, and the failure mode is content that stays
+       invisible for the rest of the session.
+
+       So: anything this file has hidden, that the reader has already scrolled
+       to, is placed at its resting state. It reads the DOM rather than the sets
+       above, because bookkeeping captured when the effect ran goes stale the
+       moment React replaces a node, and a rescue path that trusts the same
+       state that failed is not a rescue path. No animation — the moment for it
+       has passed. */
+    const rescue = () => {
+      const hidden = root.querySelectorAll<HTMLElement>('[style*="opacity: 0"]')
+      if (!hidden.length) {
+        return
+      }
+      const limit = window.innerHeight
+      hidden.forEach((el) => {
+        if (el.getBoundingClientRect().top > limit) {
+          return
+        }
+        pending.delete(el)
+        settle(el)
+      })
+    }
+
+    window.addEventListener("scroll", rescue, { passive: true })
+    window.addEventListener("resize", rescue, { passive: true })
+    const safety = window.setInterval(rescue, REVEAL_SAFETY)
+
+    cleanups.push(() => {
+      window.removeEventListener("scroll", rescue)
+      window.removeEventListener("resize", rescue)
+      window.clearInterval(safety)
+    })
 
     // Tab away mid-reveal and come back to a settled page rather than a
     // queue that replays itself.

@@ -83,13 +83,16 @@ for (const vp of viewports) {
     console.error(`[${vp.name}] goto failed: ${e.message.split('\n')[0]}`)
   }
   await page.waitForTimeout(waitMs)
-  // Walk the page so lazy content and scroll-triggered reveals settle before capture.
+  // Walk the page so lazy content and scroll-triggered reveals settle before
+// capture. behavior:'instant' is load-bearing — the site sets
+// scroll-behavior: smooth, so a plain scrollTo animates and never arrives
+// between steps, leaving late sections unrevealed and blank in the capture.
   const h = await page.evaluate(() => document.body.scrollHeight)
   for (let y = 0; y < h; y += Math.floor(vp.height * 0.7)) {
-    await page.evaluate((yy) => window.scrollTo(0, yy), y)
+    await page.evaluate((yy) => window.scrollTo({ top: yy, behavior: 'instant' }), y)
     await page.waitForTimeout(260)
   }
-  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
   await page.waitForTimeout(1500)
   await page.screenshot({ path: `${outBase}-${vp.name}-fold.png` })
   await page.screenshot({ path: `${outBase}-${vp.name}-full.png`, fullPage: true })

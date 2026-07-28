@@ -49,10 +49,12 @@ const columns: Array<{
     id: "footer-open-source",
     heading: "Open source",
     span: "lg:col-span-3 lg:col-start-10",
+    // The repository itself lives in the closing line, so this column carries
+    // the things you would go looking for once you are already there.
     links: [
-      { label: "Repository", href: repoUrl, external: true },
       { label: "Issues", href: `${repoUrl}/issues`, external: true },
       { label: "Contributing", href: `${repoUrl}/blob/main/CONTRIBUTING.md`, external: true },
+      { label: "Security", href: `${repoUrl}/blob/main/SECURITY.md`, external: true },
     ],
   },
 ]
@@ -136,7 +138,14 @@ export function SiteFooter() {
         {/* No separator glyph: the row wraps to two lines on a phone and a
             stranded middot is worse than a gap. */}
         <p className="lp-code mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-[var(--lp-hairline)] pt-4 text-muted-foreground">
-          <span>MIT licence</span>
+          <a
+            className={linkClass}
+            href={`${repoUrl}/blob/main/LICENSE`}
+            rel="noreferrer"
+            target="_blank"
+          >
+            MIT licence
+          </a>
           <a
             className={`inline-flex items-center gap-2 ${linkClass}`}
             href={repoUrl}

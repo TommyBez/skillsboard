@@ -9,8 +9,9 @@
  * 390px the same trick runs horizontally — the window narrows to --slab-w and
  * the internals stay at native size, cropped by the viewport (§4B law 2).
  *
- * --lp-hairline lands in globals.css with the §5 colour pass; the fallbacks
- * keep this section correct either way.
+ * --lp-hairline is inherited from the landing root in landing-shared.module.css;
+ * the inline fallbacks repeat the same values so the slab survives being
+ * rendered outside that root.
  */
 .section {
   --hairline: var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
@@ -157,6 +158,13 @@
   gap: 16px;
   margin-top: 16px;
   align-items: start;
+}
+
+.column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .card {
