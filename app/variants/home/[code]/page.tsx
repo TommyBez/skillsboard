@@ -1,12 +1,15 @@
-import { Suspense } from "react"
+import { generatePermutations } from "flags/next"
+import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
+import { notFound } from "next/navigation"
+import { Suspense } from "react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
 import { HeroBoard } from "@/components/landing/hero-board"
+import { LaunchDemoLoop } from "@/components/landing/launch-demo-loop"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { McpSchematic } from "@/components/landing/mcp-schematic"
@@ -19,16 +22,49 @@ import { landingFaqs } from "@/lib/seo/landing-faq"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
 import { siteConfig } from "@/lib/site"
+import { homepageFlags, launchTreatmentIsVisible } from "@/lib/launch"
 
-export const metadata: Metadata = {
-  title: { absolute: "Skills Board, your team’s recommended AI skills" },
-  description: siteConfig.description,
-  alternates: { canonical: "/" },
-  openGraph: {
-    url: "/",
-    title: "Skills Board: Your team’s skills. All in one place.",
-    description: siteConfig.ogDescription,
-  },
+type HomeVariantPageProps = {
+  params: Promise<{ code: string }>
+}
+
+export async function generateStaticParams() {
+  const codes = await generatePermutations(homepageFlags)
+  return codes.map((code) => ({ code }))
+}
+
+async function getLaunchTreatment(code: string) {
+  try {
+    return await launchTreatmentIsVisible(code, homepageFlags)
+  } catch {
+    // This internal segment exists only for signed, precomputed flag variants.
+    // Reject direct requests carrying an invalid or stale code.
+    notFound()
+  }
+}
+
+export async function generateMetadata({ params }: HomeVariantPageProps): Promise<Metadata> {
+  const { code } = await params
+  const showLaunchTreatment = await getLaunchTreatment(code)
+
+  return {
+    title: { absolute: "Skills Board, your team’s recommended AI skills" },
+    description: siteConfig.description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      url: "/",
+      title: "Skills Board: Your team’s skills. All in one place.",
+      description: siteConfig.ogDescription,
+      images: showLaunchTreatment
+        ? [{
+            url: "/launch/skills-board-launch-og.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Skills Board: a shared answer to which skill should I use?",
+          }]
+        : undefined,
+    },
+  }
 }
 
 function primaryAction(signedIn: boolean): {
@@ -58,7 +94,7 @@ function HomeCtaFallback() {
 
 function primaryCtaEventProperties(
   signedIn: boolean,
-  location: "header" | "hero" | "closing",
+  location: "header" | "hero" | "closing" | "launch_demo",
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   const primary = primaryAction(signedIn)
   return {
@@ -232,6 +268,79 @@ async function HomeFinalActions() {
   return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
 }
 
+function HomeLaunchActionsView({ signedIn }: { signedIn: boolean }) {
+  const primary = primaryAction(signedIn)
+
+  return (
+    <Button
+      size="lg"
+      className={styles.ctaButton}
+      nativeButton={false}
+      render={(
+        <TrackedLink
+          href={primary.href}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: primaryCtaEventProperties(signedIn, "launch_demo"),
+          }}
+        />
+      )}
+    >
+      {primary.label}
+      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+    </Button>
+  )
+}
+
+async function HomeLaunchActions() {
+  const session = await getSession()
+  return <HomeLaunchActionsView signedIn={Boolean(session?.user)} />
+}
+
+function HomeLaunchBanner() {
+  return (
+    <aside className="relative z-30 border-b border-primary/25 bg-primary/10">
+      <a
+        href="#launch-demo"
+        className="mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2 px-5 py-3 text-center text-sm font-semibold transition-colors hover:bg-primary/8 md:px-10"
+      >
+        <span className="font-mono text-xs uppercase tracking-[0.16em] text-primary">
+          Product walkthrough
+        </span>
+        <span>See how a team shares one useful skill in 14 seconds.</span>
+        <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+      </a>
+    </aside>
+  )
+}
+
+function HomeLaunchDemo() {
+  return (
+    <div
+      id="launch-demo"
+      className="surface-shadow mt-12 grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]"
+    >
+      <LaunchDemoLoop />
+      <div className="flex flex-col justify-center border-t border-border p-6 md:p-8 lg:border-l lg:border-t-0 lg:p-10">
+        <p className={`${styles.chapterMark} uppercase`}>
+          Current product · synthetic demo data
+        </p>
+        <h3 className="mt-5 max-w-[14ch] text-balance text-3xl font-semibold leading-none tracking-display md:text-4xl">
+          One teammate saves it. The next finds it.
+        </h3>
+        <p className="mt-5 text-pretty leading-relaxed text-muted-foreground">
+          Skills Board is already available. This short walkthrough shows the current add → share → find loop using synthetic identities and a public skill.
+        </p>
+        <div className="mt-7">
+          <Suspense fallback={<HomeCtaFallback />}>
+            <HomeLaunchActions />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const railChapters = [
   { id: "intro", label: "Library" },
   { id: "flow", label: "Workflow" },
@@ -288,7 +397,10 @@ function GitHubMark() {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage({ params }: HomeVariantPageProps) {
+  const { code } = await params
+  const showLaunchTreatment = await getLaunchTreatment(code)
+
   return (
     <div
       className={`${styles.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
@@ -307,6 +419,8 @@ export default function HomePage() {
         </div>
         <span className={styles.scrollProgress} aria-hidden="true" />
       </header>
+
+      {showLaunchTreatment ? <HomeLaunchBanner /> : null}
 
       <main>
         {/* Hero — sticky chapter: dossiers file into the team library */}
@@ -385,6 +499,9 @@ export default function HomePage() {
                 Save once. Find fast. Use it your way.
               </h2>
             </div>
+
+            {showLaunchTreatment ? <HomeLaunchDemo /> : null}
+
             <ol className={styles.flowRows}>
               {flowSteps.map((step) => (
                 <li key={step.title} className={styles.flowRow}>
