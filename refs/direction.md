@@ -129,18 +129,32 @@ Today our page renders 33 distinct combinations including 120.96px, 86.4px, 26.4
 14.72px, 11.52px, 10.4px, 9.92px and 9.28px (measured) — sizes nobody chose, produced by seven
 different `vw` slopes. That ends here.
 
-| Token | Desktop ≥1024 | Mobile <1024 | Weight | Line-height | Tracking | Face | Used for |
-|---|---|---|---|---|---|---|---|
-| `d1` | **72px** | 40px | 600 | 0.95 | -0.035em | Bricolage | Hero headline. **Exactly one per page.** |
-| `d2` | **52px** | 32px | 600 | 1.04 | -0.03em | Bricolage | Section headline. Max one per section. |
-| `h1` | **28px** | 22px | 600 | 1.2 | -0.02em | Bricolage | Sub-headline inside a section: workflow step title, MCP column title, FAQ question. |
-| `h2` | **20px** | 18px | 600 | 1.4 | -0.01em | Bricolage | Card title, list-item title, skill name. |
-| `lead` | **18px** | 17px | 400 | 1.55 | 0 | Bricolage | Hero subhead, section lead paragraph. One per section. |
-| `body` | **16px** | 16px | 400 | 1.6 | 0 | Bricolage | Default prose. |
-| `small` | **14px** | 14px | 400 | 1.55 | 0 | Bricolage | Caption, footnote, secondary line, footer link. |
-| `micro` | **12px** | 12px | 500 | 1.35 | 0 | Bricolage | Dense metadata *inside* a product surface only (chips, counts). Never in page chrome. |
-| `label` | **12px** | 12px | 500 | 1.35 | **0.12em**, uppercase | Geist Mono | Section eyebrow, footer nav, column header. |
-| `code` | **13px** | 13px | 400 | 1.55 | 0 | Geist Mono | Install commands, repo paths, literal strings. Never uppercase, never tracked. |
+**Desktop ramp (≥1024px) — 10 steps:**
+
+| Token | Size | Weight | Line-height | Tracking | Face | Used for |
+|---|---|---|---|---|---|---|
+| `d1` | **72px** | 600 | 0.95 | -0.035em | Bricolage | Hero headline. **Exactly one per page.** |
+| `d2` | **52px** | 600 | 1.04 | -0.03em | Bricolage | Section headline. Max one per section. |
+| `h1` | **28px** | 600 | 1.2 | -0.02em | Bricolage | Sub-headline inside a section: workflow step title, MCP column title, FAQ question. |
+| `h2` | **20px** | 600 | 1.4 | -0.01em | Bricolage | Card title, list-item title, skill name. |
+| `lead` | **18px** | 400 | 1.55 | 0 | Bricolage | Hero subhead, section lead paragraph. One per section. |
+| `body` | **16px** | 400 | 1.6 | 0 | Bricolage | Default prose. |
+| `small` | **14px** | 400 | 1.55 | 0 | Bricolage | Caption, footnote, secondary line, footer link. |
+| `micro` | **12px** | 500 | 1.35 | 0 | Bricolage | Dense metadata *inside* a product surface only (chips, counts). Never in page chrome. |
+| `label` | **12px** | 500 | 1.35 | **0.12em**, uppercase | Geist Mono | Section eyebrow, footer nav, column header. |
+| `code` | **13px** | 400 | 1.55 | 0 | Geist Mono | Install commands, repo paths, literal strings. Never uppercase, never tracked. |
+
+**Mobile ramp (<1024px) — 7 steps. This is its own scale, not the desktop ramp scaled down.**
+
+| Token | Size | Weight | Line-height | Tracking | Face | Used for |
+|---|---|---|---|---|---|---|
+| `d1` | **40px** | 600 | 0.98 | -0.03em | Bricolage | Hero headline only. |
+| `d2` | **28px** | 600 | 1.1 | -0.025em | Bricolage | Section headline. |
+| `h1` | **20px** | 600 | 1.3 | -0.015em | Bricolage | Everything sub-headline: step title, FAQ question, card title, column title. **`h2` does not exist on mobile — it collapses into `h1`.** |
+| `body` | **16px** | 400 | 1.6 | 0 | Bricolage | Prose *and* leads. **`lead` does not exist on mobile — it collapses into `body`** and is distinguished by ink colour and measure, never by size. |
+| `small` | **14px** | 400 | 1.5 | 0 | Bricolage | Caption, meta, footer link. **`micro` collapses into `small`.** |
+| `label` | **12px** | 500 | 1.35 | **0.10em**, uppercase | Geist Mono | Eyebrow, column header. Muted, never accent. |
+| `code` | **13px** | 400 | 1.55 | 0 | Geist Mono | Commands and paths. |
 
 Notes and hard rules:
 
@@ -149,13 +163,28 @@ Notes and hard rules:
   We land at 72 — deliberately a touch larger than all three, because a confident display face at
   genuine scale is a thing the blind critics named as *our* advantage over both Vercel and input-otp,
   and we are not trading it away. 72 keeps the swagger and removes the poster.
+- **Mobile has three steps fewer on purpose.** Measured at 390px: our page currently renders **32
+  distinct type combinations**, of which **four sit above 35px within a 12px band** (48 / 44 / 40 /
+  36 — one per section, each from a different `clamp()` slope) and **eight sit inside a single 8px
+  band** (24.8 / 24 / 20 / 19.2 / 18 / 17.6 / 16.8 / 16.8). Linear at the same width renders 27
+  combinations with exactly **one** size above 24px (38 / 24 / 20 / 16 / 15 / 14). That gap is
+  precisely what the mobile critic meant by "the same mid-weight body type repeated at near-identical
+  size for headings, sub-labels and paragraphs". A narrow column cannot carry ten steps — the
+  differences stop being legible as hierarchy and start reading as inconsistency. Collapsing `h2`,
+  `lead` and `micro` is not a compromise; it is the fix.
+- **Ratios are the spec, not the pixel values.** Mobile: `d1:d2` = 1.43, `d2:h1` = 1.40, `h1:body` =
+  1.25. Every adjacent pair is ≥1.25× apart. If a builder adds a step that lands inside 1.2× of its
+  neighbour, the step is wrong. (Linear's mobile ratios, measured: 1.58 / 1.20 / 1.25.)
 - **Mono is capped at two sizes, 12 and 13.** We currently ship seven mono label sizes between 9.28px
   and 11.52px (`0.58/0.6/0.62/0.65/0.675/0.7/0.72rem`, measured) with tracking between 0.0992px and
-  2.3808px. All of it collapses to `label` (12px/0.12em/uppercase) or `code` (13px/0/none). Nothing
+  2.3808px. All of it collapses to `label` (12px uppercase) or `code` (13px, no tracking). Nothing
   in Geist Mono is ever smaller than 12px. Linear's mono label tier is 12px and Vercel's is 14px
   (both measured); 9px mono is not restraint, it is unreadable.
-- **Tracking above 0.14em is forbidden.** Current eyebrows run 0.2–0.22em (measured). At 12px that
-  reads as a 2010s "PREMIUM ARTISANAL" label.
+- **Tracking above 0.14em is forbidden** (0.10em on mobile). Current eyebrows run 0.2–0.22em
+  (measured). At 12px that reads as a 2010s "PREMIUM ARTISANAL" label.
+- **Eyebrows are muted on mobile, not accent.** The mobile critic asked for "smaller, quieter
+  eyebrows"; the fix is colour and weight, not size — 12px is already the floor.
+
 - Text measure: `lead` ≤ 60ch, `body` ≤ 72ch, `d1`/`d2` ≤ 18ch. Enforce with `max-width`, not with
   manual line breaks.
 - `d1` and `d2` set `text-wrap: balance`. Nothing else does.
@@ -198,6 +227,69 @@ that uniformity is a large part of why it beat us in blind judging. Vercel's equ
 **Empty columns are forbidden.** If a grid cell has no content, the grid is wrong — change the span,
 do not ship the hole. See `refs/baseline/d-02-flow.png`: columns 3–7 of that section are empty across
 all three rows.
+
+---
+
+## 4B. Mobile is a format, not a breakpoint
+
+Blind judging ran again at 390px. Same result as desktop, same opponent: we beat Vercel, we beat
+input-otp, **we lost to Linear.** Standing is 4–2 and both losses are to the same page. Mobile is now
+our weakest surface and it gets its own position in this document.
+
+**The diagnosis, in the critic's words:** we "stack a desktop layout into a single card column with
+the same mid-weight body type repeated at near-identical size for headings, sub-labels and
+paragraphs", and we ship "the hero's screenshot collage as a shrunken, illegible cluster that wastes
+the first scroll before the product is ever shown at readable scale". A second critic hit the same
+hero independently — "overlapping code cards whose text is too small to parse at this width" — and
+added that the midsection is "monotonous: five near-identical cream sections, a team library list
+repeated twice".
+
+**The three laws.**
+
+**1. One visual + one sentence per section.** This is the mobile composition rule and it is absolute.
+A mobile section is: eyebrow, one `d2` headline, one paragraph, one visual. Not three columns
+stacked. Not a list plus a diagram plus a caption. If a desktop section has three columns, the mobile
+version does not stack all three — it **drops two of them.** Linear's mobile sections are 571, 575,
+575, 575 and 581px tall (measured) — a **10px spread across five modules**, because each one is
+mechanically the same shape. Ours must be too.
+
+**2. Product visuals are cropped at full scale, never shrunk to fit.** This is the single most
+important thing Linear does on a phone and the thing we get exactly backwards. In
+`refs/linear-mobile-fold.png` the product slab starts 18px from the left gutter and **runs off the
+right edge of the viewport** — the UI inside it is rendered at its native size and the viewport
+simply crops it. It is legible because it was never scaled. In `refs/baseline/m-00-fold.png` we do
+the opposite: five cards scaled down to fit 350px, overlapping, with `code-review`'s description
+clipped mid-word and the repo path unreadable. **Never scale a product visual to fit the mobile
+column.** Either show a full-scale crop that bleeds off the right edge, or show fewer elements at
+full scale. Bleeding off-screen is not a defect on mobile; it is the technique.
+
+**3. Rhythm comes from surface, not from colour.** The mobile critic's sharpest observation is the
+one with a trap in it: across their scroll, our page "relies almost entirely on the single dark 0 /
+Free. Forever. block for rhythm". The outlined zero that three desktop critics called placeholder art
+is simultaneously the only thing giving mobile any beat. Deleting it (§8.5) therefore has to be paid
+for, or mobile gets flatter, not better. **It is paid for structurally:** mobile sections alternate
+between two treatments —
+
+- **Type sections** — plain ground, 1px hairline top rule, text only.
+- **Slab sections** — a full-bleed product visual that breaks both gutters and crops off the right
+  edge, with no hairline.
+
+Alternating those two produces a visible beat every ~560px without spending a single drop of colour.
+**Plus exactly one ink-inverted section on the whole page** — the closing band, `--surface-ink`
+ground with light type — which supplies the one dark beat the zero was accidentally providing, at a
+third of the height and carrying a real CTA instead of a numeral.
+
+**Mobile mechanics.**
+
+- Gutters 20px. Slab sections break out to full bleed (`margin-inline: -20px`, or `width: 100vw`).
+- Section padding 72px (56px for the closing band). No exceptions — see §4.
+- **One column. There is no two-column layout below 1024px.** Not for the FAQ, not for the workflow,
+  not for MCP.
+- Tap targets ≥44px. CTAs are full-width at 48px tall, stacked with 12px between them.
+- The header is 56px with the logo, one ink CTA, and nothing else. No hamburger for four links —
+  they live in the footer.
+- Target mobile document height: **≈4200px.** We are at 5507px today (measured) and Linear is at
+  6382px (measured) — but Linear's 6382 contains eight product slabs and ours contains none.
 
 ---
 
@@ -263,7 +355,9 @@ amateur, and we are currently inconsistent in five directions at once.
   popover, dropdown, or dialog. Never on a card, panel, button, image, or section. Delete
   `.surface-shadow` (`0 24px 70px`) and the shadow half of `.lift-on-hover` (`0 26px 64px`) from
   landing usage. For calibration: Linear's most-used shadow is `0 2px 4px rgba(0,0,0,0.4)` and Vercel
-  ships none at all (both measured).
+  ships none at all (both measured). When a popover does need one, use a **layered ramp** rather than
+  a single blur — `0 1px 2px, 0 3px 6px, 0 8px 16px, 0 18px 36px` at decreasing alpha. A single
+  `box-shadow` cannot fake the falloff (measured on input-otp's hover card, `refs/motion-spec.md` §2.5).
 - **Hover state on a surface is a border-colour change to `--lp-hairline-strong`, plus nothing.** No
   lift, no translate, no scale, no shadow bloom.
 - **Radii: two values. `6px` and `10px`.** `6px` for controls, chips, inputs, small surfaces. `10px`
@@ -282,43 +376,175 @@ amateur, and we are currently inconsistent in five directions at once.
 
 ## 7. Motion principles
 
-`refs/motion-spec.md` does not exist as of this writing — a separate agent is measuring input-otp
-live and its findings will be merged in. **Defer all per-interaction values to that file when it
-lands.** What follows is the envelope it must fit inside, and the envelope does not move.
+`refs/motion-spec.md` is now complete — input-otp driven live via Playwright + CDP, with timings read
+off `Animation.animationStarted`, the served CSS, and the shipped JS bundles. It also measured Linear
+and Vercel the same way. Everything below is drawn from it; **it is the authority on values, this
+section is the authority on what is allowed to move at all.** Section references like §2.4 point into
+that file.
 
-**Durations.** `120ms` press/state · `180ms` hover and small enter · `240ms` disclosure and layout ·
-`320ms` scroll reveal. **Nothing on this page exceeds 320ms.**
+### 7.1 The easing inventory — exactly three curves
 
-**Easing.** Entrances and moves use the existing `--ease-out`
-`cubic-bezier(0.23, 1, 0.32, 1)`. Exits use `cubic-bezier(0.4, 0, 1, 1)` at 160ms. Do not introduce
-new curves; do not use `linear` on anything a person can see.
+Vercel ships **43 distinct cubic-béziers** (measured) and reads, in the spec's words, "as many teams'
+code in one stylesheet". Linear ships roughly **one** curve and a 100–160ms vocabulary for the entire
+site (measured). Linear is our model.
 
-**What may animate:** `opacity`, `transform` (translate ≤ 12px, scale ≥ 0.96), `border-color`,
-`background-color`. Plus `block-size` on the FAQ disclosure only — the existing
-`interpolate-size: allow-keywords` / `::details-content` implementation in `app/globals.css` is
-correct and well-built; keep it exactly as is.
+| Token | Value | Job |
+|---|---|---|
+| `--ease-out` | `cubic-bezier(0.23, 1, 0.32, 1)` | **Anything the page shows you** — entrances, reveals, state announcements. |
+| `--ease-standard` | `cubic-bezier(0.4, 0, 0.2, 1)` | **Anything the user touches** — hover, focus, toggle, press. **Add this token.** |
+| `--ease-in` | `cubic-bezier(0.4, 0, 1, 1)` | **Exits and dismissals only.** **Add this token.** |
 
-**What must not animate:** anything scroll-linked that moves, fades, or draws *primary content*.
-Position, opacity, and path-length driven by scroll offset are removed from this page. No parallax.
-No sticky scroll-jacking. No magnetic cursor pull (delete `.magnetic`). No marquee. No counters.
+`--ease-out` already exists in `app/globals.css` and is within 0.02 on every control point of
+input-otp's house curve `cubic-bezier(0.22, 1, 0.36, 1)` (measured). **Do not "upgrade" it** — it is
+already correct. `--ease-standard` is the workhorse on all three references simultaneously: it is
+input-otp's `.xp-btn` curve, and Vercel's two highest-frequency buckets (×79 and ×55, measured).
 
-**Scroll reveal:** one pattern only — `opacity 0→1` plus `translateY(8px→0)` over 320ms, triggered
-once at 15% intersection, **never replaying on scroll-back**. Stagger 45ms, maximum 6 children,
-so total sequence ≤ 270ms. The existing `.cascade-grid` rules are close; align them to these numbers.
+**Delete from landing usage:** `--ease-in-out` and `--ease-drawer`. There are no sheets and no
+symmetric moves on this page. **Never use `linear` on anything a person can see** — it is for opacity
+crossfades only. **No `linear()` springs.** input-otp has zero in its entire stylesheet and every
+"springy" moment there is a hand-authored keyframe with explicit overshoot (measured); we are not
+introducing a spring solver for a marketing page.
 
-**The resting-state rule.** *Every element must be complete and correct with zero scroll progress and
-zero JavaScript.* This is the rule our current page breaks most badly: in the full-page capture
-`refs/ours-baseline-desktop-full.png` the pricing zero is caught as a set of thin concentric green
-and orange outlines, and in `refs/baseline/d-03-mcp.png` the entire third MCP column is grey ghost
-text at roughly 30% opacity. Both are mid-animation states. A page whose screenshot looks broken is a
-page doing too much work with scroll. If a builder cannot screenshot their section at rest and have
-it look finished, the section is wrong.
+### 7.2 The duration inventory — five values, capped
 
-**Reduced motion** (`prefers-reduced-motion: reduce`): all transforms become `none`, all durations
-clamp to ≤120ms, and only opacity remains. Every sticky runway collapses to natural height. The
-existing reduced-motion blocks in `landing-shared.module.css` and `globals.css` already do this
-properly — preserve that quality, and add a block for anything new you write. No exceptions, no
-"but it's subtle".
+| ms | Curve | Job |
+|---|---|---|
+| **0** | — | Header nav link hover. Opacity only. |
+| **120** | `--ease-in` | Every exit, dismissal, and "leave" half of a hover pair. |
+| **160** | `--ease-standard` | The interaction default: button/card/row hover, focus ring, toggle. |
+| **240** | `--ease-out` | Disclosure (FAQ) and any layout-adjacent change. |
+| **420** | `--ease-out` | Entrance and scroll reveal. |
+
+**Nothing on this page uses any other duration. Nothing exceeds 420ms. There are no ambient loops at
+any duration.** Two derived rules from the measured clustering (§1.2 of the motion spec, where
+feedback lives at 90–200ms and entrances at 520–760ms with a deliberate dead zone between):
+
+- **Nothing sits between 260ms and 400ms.** If a value lands there, it is either feedback (drop to
+  160) or an entrance (raise to 420).
+- **In ≠ out. Always.** Entrances get 2.5–3.5× the exit: 420 in / 120 out. Entrances use
+  `--ease-out`, exits use `--ease-in`. Measured precedent: the OTP ring is 450 in / 120 out, the
+  hover card 260 in / 150 out, the sponsor tilt 110 tracking / 420 settling (§7.4 of the spec:
+  "entrances get time, dismissals get out of the way").
+
+We choose 160ms over input-otp's 200ms because Linear's entire interaction vocabulary is 100–160ms
+(measured: buckets of `0.1s` ×43 and `0.16s` ×72), and 420ms over input-otp's 520ms because our page
+is losing a third of its height and should feel correspondingly brisker.
+
+### 7.3 Hover and focus states live in CSS. This is not a preference.
+
+**Every hover, `:focus-visible`, and `:active` state is declared in CSS with a `transition`. None of
+them is ever driven from JavaScript** — not from `onMouseEnter`, not from a state variable, not from
+an animation library. A PR that sets hover styling from a React event handler is rejected on sight.
+
+The reason is measured, not aesthetic. Reversing input-otp's CTA hover 80ms into its 200ms transition
+produced a **91.66ms** reverse under CDP (§5 of the motion spec). That is the CSS Transitions
+reversing shortening factor doing the work: `cubic-bezier(0.4,0,0.2,1)` evaluated at `t = 0.4` gives
+≈0.458, and `0.458 × 200 = 91.6ms`. The browser **starts from the currently rendered value and takes
+proportionally less time.** Leaving after only 40ms produced a 0ms reverse. You get all of this free,
+and you lose all of it the moment you reimplement hover as a fixed-duration JS tween — which is
+exactly where the snap-back artefact everyone complains about comes from.
+
+For state that genuinely must be JS-owned, the sanctioned pattern is **swap the duration, not the
+implementation**: same property, same curve, one `data-` attribute toggling `110ms` while the user is
+driving and `420ms` on release (measured on input-otp's sponsor tilt). There is nothing on this
+landing page that needs it today.
+
+### 7.4 What may animate, and what must not
+
+**May animate:** `opacity`, `transform` (translate ≤12px, scale ≥0.96), `border-color`,
+`background-color`, `box-shadow` (popovers only). Plus `block-size` on the FAQ disclosure — the
+existing `interpolate-size: allow-keywords` / `::details-content` implementation in `app/globals.css`
+is correct, well-built, and the only sanctioned layout animation on the page. Keep it exactly as is.
+
+**Must not animate — no exceptions:**
+
+- Anything scroll-linked. No position, opacity, path-length, or `stroke-dashoffset` driven by scroll
+  offset. No CSS scroll-driven timelines (`animation-timeline` stays `auto`). No parallax. No sticky
+  scroll-jacking. input-otp ships **zero** scroll-driven timelines and exactly **one** `position:
+  sticky` element on a 9762px page (measured); Linear ships none on its homepage modules.
+- Layout: `width`, `height`, `top`/`left`, grid position. input-otp animates none of these anywhere
+  on the site (measured, §6.4).
+- `.magnetic` cursor pull — delete it.
+- Marquees, counters, ambient loops, page-transition overlays, cursor followers.
+
+**No transform on press.** input-otp has **no press state anywhere** — `getComputedStyle` at 80ms
+into `mousedown` on its CTA is byte-identical to its hover state (measured). We keep a press state
+because our audience is keyboard-and-CLI and the feedback is worth it, but it is the cheapest
+possible one: `opacity: 0.92` at **0ms**, no transform. Delete the `:active` scale on `.ctaButton`.
+The `.ctaArrow` nudge on hover stays — it is directional and on-brand — at 160ms.
+
+**Header nav links get 0ms.** `opacity: 1 → 0.8`, no transition declared, no colour change, no
+underline, no background. Stolen directly (measured, §2.4). These are the most-hovered, least
+important targets on the page; spend nothing on them. Spend the budget on the product surfaces.
+
+### 7.5 Scroll reveal — one pattern, once
+
+`opacity 0→1` + `translateY(10px→0)` over **420ms `--ease-out`**, triggered once at
+`IntersectionObserver({ threshold: 0, rootMargin: "0px 0px -5% 0px" })`.
+
+- **Stagger 80ms per sibling, capped at 6 children and 300ms total offset.** (Measured: input-otp
+  uses 80ms per card sibling with a 300ms cap so long content never turns into slow motion.) Our
+  existing `.cascade-grid` uses 45ms — retune to 80ms and cap at 6.
+- **It never replays.** `unobserve` on first intersection plus a `data-rv-played` flag. Verified
+  behaviour on input-otp: scrolled away and back produced **0 new animations** under CDP.
+- **It cleans up after itself.** On `finish`, set `transition: none`, remove the inline `opacity`,
+  `transform` **and `will-change`**, stamp `data-rv-done`, restore the original `transition` next
+  rAF. Most implementations leave `will-change: transform` on hundreds of nodes forever.
+- **Hard-finish everything on `visibilitychange`.** Tab away mid-reveal and come back to a settled
+  page, not a replaying queue.
+
+**Two things we deliberately do not steal.** input-otp splits headlines into words at 46ms and adds
+`filter: blur(9px)→0` to each. Both are lovely and both are wrong here:
+
+- **No per-word headline reveal.** A 7-word headline at 760ms + 46ms/word is over a second before the
+  hero is readable. Our thesis is that an index withholds nothing (§1). One block per element.
+- **No blur on text.** Blur-to-focus reads as a camera on input-otp's near-black ground; on our warm
+  off-white with a semibold display grotesque it reads as a failed font load. *(This is my judgement,
+  not a measurement.)* Blur is permitted on the hero card stack and the product slab — surfaces, not
+  language — at 4px, and nowhere else.
+
+### 7.6 The resting-state rule
+
+*Every element must be complete and correct at zero scroll progress with JavaScript disabled.*
+
+This is the rule our current page breaks most badly. In `refs/ours-baseline-desktop-full.png` the
+pricing zero is caught as a set of thin concentric green **and orange** outlines; in
+`refs/baseline/d-03-mcp.png` the entire third MCP column is grey ghost text at roughly 30% opacity.
+Both are mid-animation states that a static screenshot happened to catch — which is precisely how
+three blind critics saw them, and precisely why they read as broken.
+
+**If you cannot screenshot your section at rest and have it look finished, the section is wrong.**
+
+### 7.7 Reduced motion is a position, not a switch
+
+input-otp ships **21 separate `prefers-reduced-motion` blocks** (measured) rather than one blanket
+`* { animation: none }`. It removes the preloader, the scroll reveal, the WebGL loop, the proximity
+glow, the marquee — and **deliberately keeps** the 140ms character-in, the 130ms indicator slide, and
+the 200ms button hover, because those communicate state. Adopt the reasoning, component by component.
+
+For us, under `prefers-reduced-motion: reduce`:
+
+| Removed entirely | Kept at full speed |
+|---|---|
+| All scroll reveals — elements render at their final state immediately | Hover and focus colour changes (160ms) |
+| All `transform` (translate, scale, the CTA arrow nudge) | The FAQ disclosure — but at 120ms, opacity only, no height interpolation |
+| Any remaining sticky runway — collapses to natural height | The copy-confirmation icon swap and its 1500ms hold |
+| The scroll-progress bar animation (it may still be present, just not animated) | The 0ms press opacity |
+
+Every new component ships its own reduced-motion block. The existing blocks in
+`landing-shared.module.css` and `globals.css` already do this properly — that is genuinely good work;
+preserve its quality and match it. No exceptions, no "but it's subtle".
+
+### 7.8 Two details worth stealing outright
+
+- **Copy confirmation is one icon.** Click the install-command chip and a 14×14px glyph swaps to a
+  green check for exactly **1500ms**, then swaps back. No toast, no chip flash, no width change, no
+  layout shift (measured, §2.3). Our `.copy-success-icon` is already close — set the hold to 1500ms.
+- **Focus rings are never animated, and must actually win the cascade.** `:focus-visible`, `2px
+  solid var(--ring)`, `outline-offset: 3px`, no `transition` on `outline`. The motion spec caught
+  input-otp's own CTA focus ring being silently killed by a higher-specificity `box-shadow` rule
+  (§2.1, §9) — the intended ring never renders. Every builder must tab through their section and
+  confirm the ring is visible on every interactive element.
 
 ---
 
@@ -337,12 +563,25 @@ rotated and individually drop-shadowed into a scatter. A decorative 6-column gri
 (`.heroGridLines`) sits behind everything. On mobile (`refs/baseline/m-00-fold.png`) the cards
 overlap so heavily that `code-review`'s description is clipped mid-word.
 
-**Good looks like:** one viewport, no runway. `d1` at 72px, two lines, line two in accent. `lead` at
-18px capped to 60ch. Two CTAs — one accent fill, one hairline-bordered ghost. The card cluster stays
-— it is a genuine strength and the blind critics called it art direction rather than decoration — but
-it becomes a **static, un-rotated, un-shadowed stack**: three cards maximum, offset on a consistent
-16px x / 24px y step, each a `--card` fill with a 1px hairline, overlap never obscuring text. Delete
-`height: 180vh`, delete `.heroGridLines`. On mobile, the stack becomes a single un-overlapped card.
+**Good looks like (desktop):** one viewport, no runway. `d1` at 72px, two lines, line two in accent.
+`lead` at 18px capped to 60ch. Two CTAs — one accent fill, one hairline-bordered ghost. The card
+cluster stays — it is a genuine strength and the desktop critics called it art direction rather than
+decoration — but it becomes a **static, un-rotated, un-shadowed stack**: three cards maximum, offset
+on a consistent 16px x / 24px y step, each a `--card` fill with a 1px hairline, overlap never
+obscuring text. Delete `height: 180vh`, delete `.heroGridLines`.
+
+**Good looks like (mobile) — this is the biggest single mobile fix.** Two of three mobile critics
+independently killed the card cluster: "a shrunken, illegible cluster that wastes the first scroll
+before the product is ever shown at readable scale" and "overlapping code cards whose text is too
+small to parse at this width". In `refs/baseline/m-00-fold.png` five cards are scaled to fit ~350px,
+`code-review`'s description is clipped mid-word, and the repo paths are unreadable.
+
+**At 390px the hero shows exactly one card, at full desktop scale, cropped by the right viewport
+edge.** One `code-review` card, left edge on the 20px gutter, extending past the right edge and off
+screen. Its internal type stays at `h2`/`code`/`small` — native sizes, nothing scaled. This is
+Linear's technique, measured in `refs/linear-mobile-fold.png`: their product slab starts 18px from the
+gutter and runs off the right edge at native scale, and that is why it is legible. **No overlap, no
+rotation, no scaling, no second card.** One real object beats five illegible ones.
 
 ### 8.2 Chrome — header, rail, footer
 
@@ -374,12 +613,16 @@ is correct, because "open source, MIT, here is the repo" is load-bearing for thi
 text in columns 8–11, and **columns 3–7 empty in every row**. A 60px section headline sits above 90px
 of actual content per row inside 210px rows. It is a table with a hole in it.
 
-**Good looks like:** three rows on the 12-col grid — `01` marker + title (`h1`, cols 1–3), body
-(`body`, cols 4–7), and **a real product fragment (cols 8–12)**: the paste-a-URL field for step one,
-a search result row for step two, the copy-command chip for step three. Rows separated by
+**Good looks like (desktop):** three rows on the 12-col grid — `01` marker + title (`h1`, cols 1–3),
+body (`body`, cols 4–7), and **a real product fragment (cols 8–12)**: the paste-a-URL field for step
+one, a search result row for step two, the copy-command chip for step three. Rows separated by
 `--lp-hairline`, 48px padding block. **Number these steps `01 / 02 / 03`.** This is the one place on
 the page where numbering is honest — Save → Find → Use is a genuine sequence — and we currently do
 not number it while shipping a fake index (the rail) that we do. Section headline drops to `d2`.
+
+**Mobile:** one column, three rows, each row = `01` label + `h1` title + one `body` sentence + the
+product fragment at full scale bleeding off the right edge. This is a **slab section** in the §4B
+alternation. Target 620px.
 
 ### 8.4 MCP — target 560px, plus a new 720px evidence slab before it
 
@@ -391,10 +634,22 @@ text with no visual weight — all three blind critics flagged this independentl
 sits on the connector. The resolved state in `d-03-mcp-mid.png` is genuinely nice and almost nobody
 will scroll slowly enough to see it.
 
-**Good looks like:** delete `height: 240vh`. One static, resolved, full-ink three-column row: copy and
-CTA (cols 1–4), the library list (cols 5–8), the agent actions (cols 9–12), schematic connectors
-drawn at rest in a 1px accent rule. All three columns at the same ink weight — **ghost text is not a
-resting state.** Remove the orange.
+**Good looks like (desktop):** delete `height: 240vh`. One static, resolved, full-ink three-column
+row: copy and CTA (cols 1–4), the library list (cols 5–8), the agent actions (cols 9–12), schematic
+connectors drawn at rest in a 1px accent rule. All three columns at the same ink weight — **ghost
+text is not a resting state.** Remove the orange.
+
+**Mobile — drop two of the three columns.** Per §4B law 1, a three-column desktop row does not become
+three stacked blocks. Mobile MCP is: eyebrow, `d2` headline, one `body` sentence, one CTA, and **the
+agent-actions column only** (three items, full ink). **The library list is cut entirely on mobile** —
+see the deduplication note below. Target 480px, type section.
+
+**Deduplicate the library list.** A mobile critic flagged "a team library list repeated twice": the
+same five skill names (`code-review`, `pdf-extraction`, `brand-voice`, `sql-migrations`,
+`release-notes`) appear in the hero board *and* again in the MCP section — visible in
+`refs/baseline/m-00-fold.png` and `refs/baseline/m-03-mcp.png`. Two renderings of identical data on
+one page is why the midsection reads as monotonous. **The list belongs to the hero and the product
+slab. MCP does not repeat it at any breakpoint** — it shows what the *agent* does with it.
 
 **And add, immediately before it, a 720px full-bleed product slab.** This is the largest single gap
 between us and Linear and it is why we lost: Linear puts a real screenshot under the fold and another
@@ -418,6 +673,13 @@ open source." beneath it, and a three-item `label` row — `NO TRIAL · NO CREDI
 plus the CTA (cols 7–12). Roughly 320px. If someone later wants a proof moment here, it must be a
 *stat* moment with real numbers (skills indexed, teams, stars), not a numeral standing in for one.
 
+**Mobile — and the debt this creates.** A mobile critic noted our page "relies almost entirely on the
+single dark 0 / Free. Forever. block for rhythm" across the whole scroll. Deleting it removes the one
+beat mobile had, so **the beat moves to the closing band** (§8.7), which becomes the page's single
+ink-inverted section. Pricing itself on mobile is a plain type section: `d2` headline, one sentence,
+the three `label` items stacked as a 3-row list with hairlines, one full-width CTA. Target 300px. Do
+not reintroduce a dark band here — one inverted section per page, and it is the closing.
+
 ### 8.6 FAQ — target 720px (currently 803px)
 
 **Wrong today** (`refs/baseline/d-05-faq.png`): the layout is genuinely good — this is the healthiest
@@ -425,10 +687,13 @@ section on the page and the disclosure animation is well built. Two defects only
 out of content at ~460px and leaves the rest empty, and the questions are set at 26.4px, heavier than
 they need to be.
 
-**Good looks like:** keep the two-column split. Questions drop to `h1` (28px → so barely a change in
-size but a fixed token). Left column becomes `position: sticky; top: 88px` within the section so the
-heading tracks the list, and gains one `small` line beneath the intro: a link to the repo's
-discussions. Rows keep their hairlines, 24px padding block.
+**Good looks like:** keep the two-column split on desktop. Questions drop to `h1` (28px → so barely a
+change in size but a fixed token). Left column becomes `position: sticky; top: 88px` within the
+section so the heading tracks the list, and gains one `small` line beneath the intro: a link to the
+repo's discussions. Rows keep their hairlines, 24px padding block.
+
+**Mobile:** one column — `d2` headline, one `body` sentence, then the eight rows at `h1`. No sticky
+column, no two-column split. Type section. Target 720px.
 
 ### 8.7 Closing — target 480px including footer handoff (currently 593px + 738px of trailing void)
 
@@ -442,6 +707,14 @@ empty, and `refs/ours-baseline-desktop-full.png` shows ~738px of blank ground be
 the green highlight box**; if "once." needs emphasis it gets ink weight or a full stop, not a
 rotated fill. Headline, `lead`, one accent-fill CTA, `96px` padding (the one permitted exception),
 straight into the footer. No trailing void.
+
+**This is the page's one inverted section**, at both breakpoints: `--surface-ink` ground with
+`--surface-ink-foreground` type. It inherits the rhythmic job the pricing band was accidentally doing
+(§8.5) at roughly a third of the height, and it carries a real CTA instead of a numeral. Per §5, the
+CTA inside it is **ink-inverted, not accent** — a light fill with dark label. No large green fill on
+a dark ground anywhere on this page.
+
+**Mobile:** identical treatment, `d2` at 28px, full-width CTA. Target 380px including the handoff.
 
 ---
 
@@ -472,18 +745,22 @@ padded rather than paced". Our problem was never taste. It is that we have lengt
 
 **What replaces them.** Not a shorter page for its own sake — a denser one. Target composition:
 
-| # | Section | Target height | Status |
-|---|---|---|---|
-| 1 | Hero | **720px** | shrink from 1620, remove 180vh runway |
-| 2 | Proof strip | **120px** | **new** |
-| 3 | Workflow | **640px** | shrink from 855, fill the empty columns |
-| 4 | Product slab | **720px** | **new** |
-| 5 | MCP | **560px** | shrink from 2160, remove 240vh runway |
-| 6 | Pricing | **320px** | shrink from 801, band and zero deleted |
-| 7 | FAQ | **720px** | roughly unchanged |
-| 8 | Closing | **480px** | shrink from 593 + 738 of void |
-| 9 | Footer | **200px** | grow from ~90 |
-|  | **Total** | **≈4480px** | from 7006 |
+| # | Section | Desktop | Mobile | Treatment (§4B) | Status |
+|---|---|---|---|---|---|
+| 1 | Hero | **720px** | **660px** | slab | shrink from 1620, remove 180vh runway |
+| 2 | Proof strip | **120px** | **160px** | type | **new** |
+| 3 | Workflow | **640px** | **620px** | slab | shrink from 855, fill the empty columns |
+| 4 | Product slab | **720px** | **560px** | slab | **new** |
+| 5 | MCP | **560px** | **480px** | type | shrink from 2160, remove 240vh runway |
+| 6 | Pricing | **320px** | **300px** | type | shrink from 801, band and zero deleted |
+| 7 | FAQ | **720px** | **720px** | type | roughly unchanged |
+| 8 | Closing | **480px** | **380px** | **inverted** | shrink from 593 + 738 of void |
+| 9 | Footer | **200px** | **280px** | type | grow from ~90 |
+|  | **Total** | **≈4480px** | **≈4160px** | | from 7006 / 5507 |
+
+Read the treatment column down: slab, type, slab, slab, type, type, type, inverted. That alternation
+*is* the mobile rhythm (§4B law 3) — it replaces the dark band's beat structurally rather than
+chromatically, and it costs nothing.
 
 Two of those rows are new and they are the point. **The proof strip** (120px, hairline-bounded, full
 width) is what fills the 872px hole after the hero: `OPEN SOURCE · MIT` as a `label`, the GitHub star
@@ -540,19 +817,39 @@ Remove on sight. No discussion, no "but in my section it works".
 
 19. Font weights `650` and `700`. Three weights: 400, 500, 600.
 20. Geist Mono below `12px` — we currently ship seven sizes from 9.28px to 11.52px.
-21. Letter-spacing above `0.14em`.
+21. Letter-spacing above `0.14em` (`0.10em` on mobile).
 22. Per-component `clamp()` and `vw` font sizes. Every size resolves to a §3 token.
 23. A third typeface, in any form.
+24. **On mobile: any type step within 1.2× of its neighbour.** We currently ship four display sizes
+    inside a 12px band (48/44/40/36) and eight more inside an 8px band. Mobile has seven steps, and
+    `h2`, `lead` and `micro` do not exist there.
+
+**Mobile**
+
+25. **Product visuals scaled down to fit the column.** Crop at full scale and bleed off the right
+    edge instead. The five-card hero cluster at 390px is the worst instance.
+26. Any two-column layout below 1024px.
+27. Stacking all three columns of a desktop row. Drop two — one visual, one sentence.
+28. Rendering the same data twice — the team-library list currently appears in both the hero and MCP.
+29. More than one ink-inverted section per page. It is the closing band.
 
 **Motion**
 
-24. `.magnetic` cursor pull.
-25. Scroll-linked opacity, position, or path-length on primary content. Parallax. Marquees.
-    Animated counters.
-26. Any duration over `320ms`.
-27. Reveals that replay on scroll-back.
+30. `.magnetic` cursor pull.
+31. Scroll-linked opacity, position, or path-length on primary content. Parallax. Marquees.
+    Animated counters. Ambient loops. CSS scroll-driven timelines.
+32. Any duration over `420ms`, and any duration between `260ms` and `400ms`.
+33. Any curve outside the three in §7.1. No `linear()` springs. No `linear` on anything visible
+    except an opacity crossfade.
+34. Hover, focus, or active states driven from JavaScript rather than CSS.
+35. `transform` on `:active`. Press is `opacity: 0.92` at 0ms.
+36. Per-word headline reveals, and `filter: blur()` on any text.
+37. Reveals that replay on scroll-back, or that leave `will-change` on the node after finishing.
 
-**And one thing to protect, not kill:** the left-aligned editorial system, the warm neutral ground,
-the forest green, the Bricolage/Geist pairing, the hero card stack as a *composed* object, and the
-FAQ disclosure implementation. Blind critics named these as the reasons we beat two of three
-references. This is an elevation. Nobody rebrands anything.
+**And the things to protect, not kill:** the left-aligned editorial system, the warm neutral ground,
+the forest green, the Bricolage/Geist pairing, the hero card stack as a *composed* object (on
+desktop), the FAQ disclosure implementation, and the existing reduced-motion discipline. Blind
+critics at both widths named the first four as the reasons we beat Vercel and input-otp — twice each.
+We are 4–2, and both losses are to the same page for the same reason: Linear pays the reader on every
+screen and we do not. Fix the proportion and the evidence. **This is an elevation. Nobody rebrands
+anything.**
