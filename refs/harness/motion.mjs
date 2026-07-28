@@ -294,33 +294,23 @@ if (!targets.length) {
         return { el, r, area: r.width * r.height }
       })
       .filter((c) => c.r.top >= 0 && c.r.top < vpH && c.r.width > 40 && c.r.height > 16)
-    // Always-unique structural path. A class-based guess is prettier but fails
-    // silently on hashed CSS-module names and Tailwind's `group/button`, and a
-    // selector that does not resolve costs a whole interaction.
-    const path = (el) => {
-      if (el.id && document.querySelectorAll(`#${CSS.escape(el.id)}`).length === 1) {
-        return `#${CSS.escape(el.id)}`
-      }
-      const parts = []
-      for (let n = el; n && n !== document.body; n = n.parentElement) {
-        const i = [...n.parentElement.children].indexOf(n) + 1
-        parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${i})`)
-      }
-      return `body > ${parts.join(' > ')}`
-    }
     cands.sort((a, b) => b.area - a.area)
     // Biggest in the fold is the primary CTA on essentially every marketing
     // page; smallest is a nav link. The two ends bracket the interaction
     // vocabulary — the thing they spent motion on and the thing they did not.
-    const picks = [cands[0], cands[cands.length - 1]].filter(Boolean)
-    const out = []
-    for (const c of picks) {
-      const p = path(c.el)
-      if (p && !out.includes(p) && document.querySelector(p) === c.el) out.push(p)
-    }
-    return out
+    const picks = [...new Set([cands[0], cands[cands.length - 1]].filter(Boolean))]
+    // Stamp the elements rather than deriving a CSS path. Hashed CSS-module
+    // classes and Tailwind's `group/button` defeat class selectors, and an
+    // nth-child path breaks the moment a skip-link appears on first Tab —
+    // which is exactly what silently dropped the nav link on the first run.
+    return picks.map((c, i) => {
+      c.el.setAttribute('data-harness-target', String(i))
+      const text = (c.el.innerText || c.el.value || '').replace(/\s+/g, ' ').trim().slice(0, 30)
+      return { sel: `[data-harness-target="${i}"]`, note: `${c.el.tagName.toLowerCase()} "${text}" ${Math.round(c.r.width)}×${Math.round(c.r.height)}` }
+    })
   }, vp.height)
-  console.log(`[${label}] auto-selected: ${targets.join(', ') || '(none)'}`)
+  console.log(`[${label}] auto-selected: ${targets.map((t) => t.note).join(' | ')}`)
+  targets = targets.map((t) => t.sel)
 }
 
 report.interactions = []
