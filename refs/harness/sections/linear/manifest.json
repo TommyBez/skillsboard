@@ -1,0 +1,162 @@
+{
+  "label": "linear",
+  "url": "https://linear.app",
+  "capturedAt": "2026-07-28T19:06:28.873Z",
+  "viewports": {
+    "desktop": {
+      "docHeight": 10898,
+      "sectionCount": 11,
+      "sections": [
+        {
+          "index": 1,
+          "role": "hero",
+          "slug": "the-product-development-",
+          "label": "The product development system for teams and agents The prod",
+          "top": 271,
+          "height": 1404,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-01-the-product-development--p1.png",
+            "linear-desktop-01-the-product-development--p2.png"
+          ]
+        },
+        {
+          "index": 2,
+          "role": "body1",
+          "slug": "fig-0-2-purpose-built-li",
+          "label": "FIG 0.2 Purpose-built Linear is shaped by the practices and ",
+          "top": 1811,
+          "height": 468,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-02-fig-0-2-purpose-built-li.png"
+          ]
+        },
+        {
+          "index": 3,
+          "role": "body2",
+          "slug": "make-product-operations-",
+          "label": "Make product operations self-driving",
+          "top": 2481,
+          "height": 1224,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-03-make-product-operations--p1.png",
+            "linear-desktop-03-make-product-operations--p2.png"
+          ]
+        },
+        {
+          "index": 4,
+          "role": "body3",
+          "slug": "define-the-product-direc",
+          "label": "Define the product direction",
+          "top": 3715,
+          "height": 1216,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-04-define-the-product-direc-p1.png",
+            "linear-desktop-04-define-the-product-direc-p2.png"
+          ]
+        },
+        {
+          "index": 5,
+          "role": "body4",
+          "slug": "move-work-forward-across",
+          "label": "Move work forward across teams and agents",
+          "top": 4942,
+          "height": 1172,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-05-move-work-forward-across-p1.png",
+            "linear-desktop-05-move-work-forward-across-p2.png"
+          ]
+        },
+        {
+          "index": 6,
+          "role": "body5",
+          "slug": "review-prs-and-agent-out",
+          "label": "Review PRs and agent output",
+          "top": 6124,
+          "height": 1090,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-06-review-prs-and-agent-out-p1.png",
+            "linear-desktop-06-review-prs-and-agent-out-p2.png"
+          ]
+        },
+        {
+          "index": 7,
+          "role": "body6",
+          "slug": "understand-progress-at-s",
+          "label": "Understand progress at scale",
+          "top": 7224,
+          "height": 1196,
+          "screens": 2,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-07-understand-progress-at-s-p1.png",
+            "linear-desktop-07-understand-progress-at-s-p2.png"
+          ]
+        },
+        {
+          "index": 8,
+          "role": "body7",
+          "slug": "changelog",
+          "label": "Changelog",
+          "top": 8582,
+          "height": 422,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-08-changelog.png"
+          ]
+        },
+        {
+          "index": 9,
+          "role": "body8",
+          "slug": "customers",
+          "label": "customers",
+          "top": 9164,
+          "height": 564,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-09-customers.png"
+          ]
+        },
+        {
+          "index": 10,
+          "role": "body9",
+          "slug": "built-for-the-future-ava",
+          "label": "Built for the future. Available today.",
+          "top": 9952,
+          "height": 228,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-10-built-for-the-future-ava.png"
+          ]
+        },
+        {
+          "index": 11,
+          "role": "footer",
+          "slug": "product",
+          "label": "Product",
+          "top": 10404,
+          "height": 494,
+          "screens": 1,
+          "sticky": false,
+          "frames": [
+            "linear-desktop-11-product.png"
+          ]
+        }
+      ]
+    }
+  }
+}

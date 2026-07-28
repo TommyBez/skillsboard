@@ -45,6 +45,26 @@ for (const vp of viewports) {
 
   const entries = []
   let n = 0
+  // Measured once per viewport: the tallest bar pinned to the top of the screen
+  // that actually paints over content. Without it, every frame of a site with a
+  // sticky header opens with that section's first line hidden underneath it —
+  // a blind critic caught exactly that on Linear ("the headline is amputated by
+  // the viewport, the first line sits behind the nav"), which is the instrument
+  // penalising a site for having a fixed nav, not a design judgement.
+  const overlayTop = await page.evaluate(() => {
+    let worst = 0
+    for (const el of document.querySelectorAll('body *')) {
+      const cs = getComputedStyle(el)
+      if (cs.position !== 'fixed' && cs.position !== 'sticky') continue
+      if (cs.visibility === 'hidden' || cs.opacity === '0') continue
+      const r = el.getBoundingClientRect()
+      if (r.top > 4 || r.height < 8 || r.height > 200) continue
+      if (r.width < window.innerWidth * 0.5) continue
+      worst = Math.max(worst, Math.round(r.bottom))
+    }
+    return worst
+  })
+
   for (const s of sections) {
     n += 1
     const idx = String(n).padStart(2, '0')
@@ -65,7 +85,12 @@ for (const vp of viewports) {
       const y = screens === 1
         ? s.top
         : Math.round(s.top + (k * (s.height - vp.height)) / (screens - 1))
-      await scrollTo(page, Math.max(0, Math.min(y, docHeight - vp.height)))
+      // Offset by any fixed/sticky overlay pinned to the top, or the frame
+      // opens with the section's first line hidden behind someone's nav. A
+      // blind critic caught this on Linear — "the headline is amputated by the
+      // viewport, the first line sits behind the nav" — which is the instrument
+      // penalising a site for having a sticky header, not a design judgement.
+      await scrollTo(page, Math.max(0, Math.min(y - overlayTop, docHeight - vp.height)))
       await page.waitForTimeout(900)
       const file = screens === 1 ? `${name}.png` : `${name}-p${k + 1}.png`
       await page.screenshot({ path: `${outDir}/${label}/${file}` })
