@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 16:45 UTC",
+  "updated": "28 Jul, 17:10 UTC",
   "round": 1,
-  "phase": "Round 1 swept, 6 of 6",
+  "phase": "Mobile broken, fixing",
   "references": [
     {
       "id": "linear",
@@ -117,6 +117,18 @@
     {
       "at": "16:46",
       "text": "Five of the six critics named the same remaining weakness unprompted, and it is the mirror image of the one we started with: the page is monotonous. No scale shift, no full-bleed moment, a back half that reads as padding. We turned emptiness into uniformity."
+    },
+    {
+      "at": "17:05",
+      "text": "Tommaso: the mobile design is broken. He is right, and the blind critics missed it \u2014 they were comparing us against references whose mobile was worse, so we won while shipping sliced text."
+    },
+    {
+      "at": "17:08",
+      "text": "Measured: workflow chips run to 500px in a 390px viewport, the hero card to 447, the slab to 547. 'incident-review acme/o' and 'npx skills add https://github.com/acme/onca' both stop mid-word against the edge."
+    },
+    {
+      "at": "17:10",
+      "text": "Cause: the direction says never scale a mobile product visual \u2014 crop it and let it bleed. That is right for a large surface, where the crop reads as a window. Applied to a 40px pill holding one URL it just reads as a bug. Repair in flight."
     }
   ],
   "pieces": [
@@ -234,8 +246,8 @@
     {
       "key": "H",
       "name": "Mobile",
-      "status": "judging",
-      "statusLabel": "3 of 3 won",
+      "status": "building",
+      "statusLabel": "broken, in repair",
       "scope": "Every section at 390px, judged on its own terms.",
       "rounds": [
         {
@@ -275,7 +287,7 @@
           "why": "Ours states its purpose and its action within the first screen at a genuine mobile display scale; input-otp opens with a shrunken desktop hero at near-caption size."
         }
       ],
-      "gap": "Mobile type scale is nearly flat \u2014 hero, section headings and FAQ questions all sit in a narrow size band at heavy weight, so nothing establishes a dominant entry point and there is nothing to skim by."
+      "gap": "Text sliced mid-word at the screen edge in three sections. The crop-and-bleed rule for product visuals was applied to small one-line chips, where it does not read as a crop at all. Mobile is also 5128px against desktop's 4955 \u2014 the narrower column is longer than the wide one."
     }
   ]
 }
