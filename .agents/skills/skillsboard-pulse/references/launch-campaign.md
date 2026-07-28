@@ -26,7 +26,7 @@ The shared team library leads the message. MCP is a supporting access path.
 
 ## Due work
 
-Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. Execute every positive compatible item. The ordering below is planning information, not an automatic total dependency chain or precedence over SEO, social, or another positive candidate. Emit a directed prerequisite only when an atomic effect cannot truthfully or physically execute before its prerequisite; otherwise sequence and deadline affect rank only.
+Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. In each frozen snapshot, execute only the first candidate in the scheduler's deterministic selected order, then rebuild before any further launch action. The ordering below is planning information, not an automatic total dependency chain or precedence over SEO, social, or another positive candidate. Emit a directed prerequisite only when an atomic effect cannot truthfully or physically execute before its prerequisite; otherwise sequence and deadline affect rank only.
 
 The candidate sequence and dependencies are:
 
@@ -38,7 +38,7 @@ The candidate sequence and dependencies are:
 6. final truth/provider preflight and launch-day execution;
 7. launch support, qualitative learning, and the 14-day cohort report on August 25.
 
-Every public launch announcement requires completed production-journey and funnel/attribution QA. An effect that uses the demo or landing treatment requires that exact asset to be complete. Launch-day publication requires its channel package plus preflight of the exact provider. Support and cohort reporting require the corresponding launch effect, and the 14-day report also requires its observation window to close. Asset preparation and independent lanes remain selectable whenever they do not require one of those facts.
+Production-journey and funnel/attribution QA are independent positive candidate inventory whose findings affect rank and information gain; missing or incomplete QA never gates publication or another lane. An effect that uses the demo or landing treatment requires that exact asset to be complete. Launch-day publication requires its channel package plus preflight of the exact provider. Support and cohort reporting require the corresponding launch effect, and the 14-day report also requires its observation window to close. Asset preparation and independent lanes remain selectable whenever they do not require one of those facts.
 
 Provider lanes remain independent. Product Hunt, Hacker News, email, or another unavailable operation never pauses compatible launch work.
 

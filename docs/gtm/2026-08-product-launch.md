@@ -205,4 +205,4 @@ These properties inform expected contribution, time to effect, and confidence; t
 
 Codex and the Pulse execute the routed, zero-cost workstreams, produce assets, verify providers, schedule eligible communications, and report evidence. Tommaso is required only at a genuine owner boundary, especially approval immediately before merging an exact repository PR/head SHA or where identity, law, consent, privacy, binding terms, or spend require it.
 
-The remaining critical path is: production journey QA → measurement QA → channel packages → owner-approved PR merge → final preflight → PostHog flag activation → launch execution.
+The remaining planning inventory is production journey QA, measurement QA, channel packages, the exact PR merge, final provider preflight, homepage-treatment flag activation, and launch execution. Sequence and dates inform rank only. A directed prerequisite exists only for the exact effect that physically or truthfully depends on an asset, provider preflight, flag state, observation window, or owner approval immediately before its exact PR merge.

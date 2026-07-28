@@ -87,7 +87,13 @@ On the first run with the v17 root, after pin verification and before action sel
 
 ## v18 conflict-root normalization
 
-On the first run with the v18 root, after pin verification and before action selection, atomically normalize existing schema-v4 state. Preserve factual effects, blockers, provider IDs, reservations, and historical outcomes. Add a fresh `snapshot_id`, recompute canonical candidate IDs from their identity tuples, add directed prerequisite edges separately from normalized symmetric conflict edges, and add family enumeration markers, rank tuples, interference keys, and the dispositions defined above to current planning state. Do not promote legacy item keys or unverified persisted IDs into the current snapshot. Treat every earlier compatibility label, prerequisite result, conflict loser, or fixed-point result as historical only; rebuild the complete current snapshot before selecting work. Record source root, target root, completion time, candidate count, prerequisite count, normalized conflict count, and family enumeration count.
+On the first run with the v18 root, after pin verification and before action selection, atomically normalize existing schema-v4 state. This is a root migration, not an activation, readiness, reconciliation-only, or approval phase.
+
+- Preserve factual effects, blockers, provider IDs, reservations, and historical outcomes.
+- Add a fresh `snapshot_id`, recompute canonical candidate IDs from their identity tuples, add directed prerequisite edges separately from normalized symmetric conflict edges, and add family enumeration markers, rank tuples, interference keys, and the dispositions defined above to current planning state.
+- Do not promote legacy item keys or unverified persisted IDs into the current snapshot.
+- Treat every earlier compatibility label, prerequisite result, conflict loser, or fixed-point result as historical only; rebuild the complete current snapshot before selecting work.
+- Record source root, target root, completion time, candidate count, prerequisite count, normalized conflict count, and family enumeration count.
 
 ## Routing and execution
 

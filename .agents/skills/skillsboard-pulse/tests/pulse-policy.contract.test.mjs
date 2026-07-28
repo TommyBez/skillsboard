@@ -89,6 +89,7 @@ test("autonomy contract removes every routine blocker outside the closed set", (
 });
 
 test("the governing objective exhausts positive candidates without output quotas", () => {
+  const orchestrator = readFileSync(new URL("../SKILL.md", import.meta.url), "utf8");
   const scorecard = readFileSync(new URL("../references/analytics-scorecard.md", import.meta.url), "utf8");
   const learning = readFileSync(new URL("../references/learning-opportunities.md", import.meta.url), "utf8");
   const pseo = readFileSync(new URL("../references/growth-pseo.md", import.meta.url), "utf8");
@@ -105,6 +106,9 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.match(learning, /Every run synthesizes the complete current candidate set from every applicable action family/);
   assert.match(learning, /finite-snapshot fields/);
   assert.match(learning, /deterministic maximal-set algorithm/);
+  assert.match(learning, /A `prerequisite_pending` candidate remains excluded until every listed prerequisite is complete/);
+  assert.match(learning, /closed-set blocker on a prerequisite never releases the edge/);
+  assert.match(learning, /A `conflict_loser:<winner_candidate_id>` candidate returns for consideration while its winner remains incomplete/);
   assert.match(learning, /An empty queue, a first completed action, a first observed signal, or evidence repair never proves exhaustion/);
   assert.match(pseo, /Research the ICP's problems, work, tools, interests, and adjacent topics/);
   assert.match(pseo, /Queries do not need to contain “skill”, “agent”, “library”, or the product name/);
@@ -118,6 +122,9 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.match(social, /Owned social is a near-zero-cost candidate family/);
   assert.match(social, /There is no per-run publication quota/);
   assert.match(social, /The parent invokes the official Typefully capability directly/);
+  assert.match(orchestrator, /Execute only the first candidate in that snapshot's deterministic selected order/);
+  assert.match(orchestrator, /continue through successive fresh snapshots while any mutually compatible positive candidate remains actionable/);
+  assert.match(orchestrator, /Only the scheduler's fresh fixed-point proof establishes exhaustion; runtime ending earlier is an interruption/);
   assert.match(scheduler, /freeze a finite snapshot/);
   assert.match(scheduler, /select the deterministic maximal compatible set/);
   assert.match(scheduler, /`candidate\.v1\.<origin_hex>\.<route_hex>\.<effect_hex>`/);
@@ -152,7 +159,7 @@ test("candidate IDs are canonical, injective, stable, and validated before selec
     effectKey,
   ];
   const encodeIdentityComponent = (value) => {
-    assert.match(value, /^[\x21-\x7e]+$/);
+    assert.match(value, /^[\x21-\x7e]+$/, "non-canonical identity component");
     return Buffer.from(value, "utf8").toString("hex");
   };
   const deriveCandidateId = (candidate) =>
@@ -262,11 +269,11 @@ test("candidate IDs are canonical, injective, stable, and validated before selec
   );
   assert.throws(
     () => deriveCandidateId({ ...minimal, effectKey: "" }),
-    /The input did not match/,
+    /non-canonical identity component/,
   );
   assert.throws(
     () => deriveCandidateId({ ...minimal, effectKey: "é" }),
-    /The input did not match/,
+    /non-canonical identity component/,
   );
   assert.throws(
     () => prepareCandidates([{ ...minimal, persistedId: deriveCandidateId({ ...minimal, effectKey: "other" }) }]),
@@ -619,9 +626,17 @@ test("coordinated product launch remains routable without automatic priority", (
   assert.match(launchReference, /Launch day: Tuesday, August 11, 2026/);
   assert.match(launchReference, /Launch membership alone does not determine rank/);
   assert.match(launchReference, /Prerequisites affect eligibility and are never normalized as conflicts/);
+  assert.match(launchReference, /In each frozen snapshot, execute only the first candidate in the scheduler's deterministic selected order/);
+  assert.match(launchReference, /Production-journey and funnel\/attribution QA are independent positive candidate inventory/);
+  assert.match(launchReference, /missing or incomplete QA never gates publication or another lane/);
+  assert.doesNotMatch(launchReference, /public launch announcement requires[^\n]*QA/);
   assert.doesNotMatch(launchReference, /must not outrank a compatible due product-launch item/);
   assert.match(launchPlan, /owned by `\.agents\/skills\/skillsboard-pulse\/references\/launch-campaign\.md`/);
   assert.match(launchPlan, /directed prerequisites kept separate from explicit cross-lane conflicts/);
+  assert.match(launchPlan, /The remaining planning inventory is production journey QA, measurement QA, channel packages/);
+  assert.match(launchPlan, /Sequence and dates inform rank only/);
+  assert.match(launchPlan, /A directed prerequisite exists only for the exact effect that physically or truthfully depends/);
+  assert.doesNotMatch(launchPlan, /The remaining critical path is/);
   assert.doesNotMatch(launchPlan, /Launch readiness gate|no launch-period post may be scheduled unless/);
 });
 
@@ -652,6 +667,7 @@ test("v18 normalization rebuilds deterministic conflict state", () => {
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
   assert.match(scheduler, /On the first run with the v18 root[^\n]*atomically normalize existing schema-v4 state/);
+  assert.match(scheduler, /This is a root migration, not an activation, readiness, reconciliation-only, or approval phase/);
   assert.match(scheduler, /recompute canonical candidate IDs from their identity tuples/);
   assert.match(scheduler, /directed prerequisite edges separately from normalized symmetric conflict edges/);
   assert.match(scheduler, /Do not promote legacy item keys or unverified persisted IDs/);
