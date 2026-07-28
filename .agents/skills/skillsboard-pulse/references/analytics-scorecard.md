@@ -2,7 +2,7 @@
 
 **Node:** `analytics.scorecard`
 
-The scorecard reports reality and guides prioritization. It never authorizes or blocks product, SEO, social, community, repository, or zero-cost work.
+The scorecard reports reality and owns the governing growth objective. It never authorizes or blocks product, SEO, social, community, repository, or zero-cost work.
 
 ## Tracking QA
 
@@ -21,9 +21,11 @@ AAT_t = new activated_t + retained_t + reactivated_t
 delta_AAT = new activated_t + reactivated_t - lost_t
 ```
 
-## Growth ambition
+## Governing growth objective
 
-Target at least 20% week-over-week growth in new `team_activated_14d` teams. When the prior closed week is zero, the percentage is undefined and the absolute target is at least one additional activated team. This is an ambition, not a guarantee or public claim.
+Grow `AAT-28` by at least 20% week over week, comparing the same Europe/Rome weekly close. For an integer count, the target is `ceil(1.20 × prior AAT-28)`; when the prior close is zero, the percentage is undefined and the absolute target is at least one active team. This is the internal governing objective, not a guarantee or public claim.
+
+`team_activated_14d` is a leading contribution to the objective, not the objective itself. New, retained, and reactivated active teams contribute positively; lost teams contribute negatively. Every candidate action records a truthful plausibly positive path through acquisition, activation, retention, or reactivation to `AAT-28`. Missing measurement increases uncertainty and instrumentation value but never lowers the objective or proves that no action remains.
 
 ## Five rows
 

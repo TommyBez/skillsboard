@@ -4,7 +4,7 @@ description: Orchestrates the repository-pinned Skills Board Growth/Product Puls
 compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
-  version: "16.0.0"
+  version: "17.0.0"
 ---
 
 # Skills Board Pulse
@@ -35,9 +35,11 @@ Read before write only when needed to prove authority, binding platform eligibil
 
 ## Execution loop
 
-After reconciliation, select the highest-impact lawful zero-cost action and execute it. Continue across SEO, community, social, product, analytics, email, and repository lanes until runtime ends or every remaining item is blocked by the closed set in `pulse.kernel`. Missing analytics, immature cohorts, unavailable keyword volume, or an empty prior queue increase the need for action; they never justify inactivity.
+After reconciliation, use the governing `AAT-28` growth objective from `analytics.scorecard` to synthesize the complete current candidate set across SEO, community, social, product, analytics, email, repository, and campaign lanes. A candidate remains actionable when it is distinct, lawful, authorized, within hard spend limits, physically available, and has a truthful plausibly positive marginal contribution path to the objective.
 
-At Monday 09:00 Europe/Rome run the complete strategic review and refresh the +20% week-over-week new-team-activation ambition. Every other occurrence is operational and may still create and execute new zero-cost organic work.
+Near-zero marginal cost means execute every mutually compatible positive candidate, not only the highest-ranked candidate or the first observed signal. Rank by expected marginal contribution, time to effect, confidence or information gain, and runtime cost only to determine execution order when runtime is finite; ranking never makes another positive compatible candidate ineligible. After every completed or blocked effect, re-resolve its lane and synthesize again. Missing analytics, immature cohorts, unavailable keyword volume, or an empty prior queue increase the need for synthesis; they never prove a fixed point.
+
+At Monday 09:00 Europe/Rome run the complete strategic review and refresh the +20% week-over-week active-team objective. Every other occurrence is operational and uses the same objective while creating and executing all positive compatible candidates from the same objective-led set.
 
 ## Repository approval
 
@@ -49,4 +51,4 @@ Change the owning reference and graph metadata (including `policy_invariants` wh
 
 ## Output
 
-Persist schema-v4 state atomically, append one minimal non-PII run line, and emit the digest required by `pulse.scheduler`, including contract version/root, resolved nodes, actions, legal/spend blockers, PRs awaiting owner merge approval, and a reproducible SHA-256.
+Persist schema-v4 state atomically, append one minimal non-PII run line, and emit the digest required by `pulse.scheduler`, including contract version/root, objective and measured gap, candidate hypotheses, resolved nodes, actions, legal/spend blockers, PRs awaiting owner merge approval, remaining positive candidates, and a reproducible SHA-256.
