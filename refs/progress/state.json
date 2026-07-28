@@ -1,9 +1,9 @@
 {
   "title": "Landing page vs. the bar",
   "subtitle": "Skills Board's homepage, rebuilt piece by piece and judged blind against Linear, Vercel and input-otp.rodz.dev. A builder and an independent critic work each piece; the critic never knows which screenshot is ours.",
-  "updated": "28 Jul, 14:52 UTC",
+  "updated": "28 Jul, 15:05 UTC",
   "round": 0,
-  "phase": "Baseline judged",
+  "phase": "Baseline judged, desktop and mobile",
   "references": [
     {
       "id": "linear",
@@ -65,6 +65,18 @@
     {
       "at": "14:52",
       "text": "Three independent critics, none of whom saw the other two, all named the same defect: the empty run after the hero, the ghost-text MCP column, and the giant outlined 0. That is the structural verdict, not a style note."
+    },
+    {
+      "at": "15:02",
+      "text": "Mobile judged. Same split as desktop: we beat Vercel and input-otp, we lose to Linear. Standing is 4-2."
+    },
+    {
+      "at": "15:04",
+      "text": "Both losses are to the same page for the same reason. Linear re-composes for each viewport and puts real product evidence on every screen; we stack one layout and pad the gaps."
+    },
+    {
+      "at": "15:05",
+      "text": "New mobile-specific defect, named by two critics independently: the hero card cluster is an illegible shrunken collage at 390px and wastes the first scroll."
     }
   ],
   "pieces": [
@@ -72,7 +84,7 @@
       "key": "P",
       "name": "Whole page",
       "status": "judging",
-      "statusLabel": "1 of 3 lost",
+      "statusLabel": "2 of 6 lost",
       "scope": "The page as one object: rhythm, length, whether every screen of scroll earns itself.",
       "rounds": [
         {
@@ -155,10 +167,30 @@
     {
       "key": "H",
       "name": "Mobile",
-      "status": "pending",
-      "statusLabel": "queued",
+      "status": "judging",
+      "statusLabel": "1 of 3 lost",
       "scope": "Every section at 390px, judged on its own terms.",
-      "rounds": []
+      "rounds": [
+        {
+          "round": 0,
+          "reference": "vercel",
+          "verdict": "ours",
+          "why": "Ours reads as composed for 390px \u2014 full-width hero, two-tone headline at a genuinely mobile scale, stacked CTAs, thumb-sized accordion rows; Vercel shrank a desktop layout until its feature lists hit 5-6px."
+        },
+        {
+          "round": 0,
+          "reference": "inputotp",
+          "verdict": "ours",
+          "why": "Our type scale was re-set for the narrow column with real leading and 24px edge margins; input-otp shipped 8-10px body text and a 21,700px scroll."
+        },
+        {
+          "round": 0,
+          "reference": "linear",
+          "verdict": "reference",
+          "why": "Linear re-composes for the column \u2014 full-bleed visuals using the entire width, one visual and one sentence per section; ours stacks the desktop layout into a card column."
+        }
+      ],
+      "gap": "The hero card cluster is illegible at 390px. Two critics called it independently: a shrunken collage that wastes the first scroll, with text too small to parse. Mobile type hierarchy is also flat \u2014 headings, eyebrows and body sit at near-identical weight and size."
     }
   ]
 }
