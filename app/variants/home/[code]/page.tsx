@@ -327,6 +327,7 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
     <div
       className={`${styles.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
       data-landing-motion-root
+      data-landing-page
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />

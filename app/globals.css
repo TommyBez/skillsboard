@@ -155,6 +155,195 @@
   box-shadow: 0 24px 70px hsl(var(--shadow-color) / 0.11), 0 2px 8px hsl(var(--shadow-color) / 0.06);
 }
 
+/* ---------------------------------------------------------------------------
+ * Landing page ramp — refs/direction.md §3, §4.
+ *
+ * Ten type steps on desktop collapsing to seven below 1024px, two section
+ * paddings, one container. Scoped to [data-landing-page] so the rest of the app
+ * is untouched. Section modules apply these classes rather than declaring their
+ * own sizes: the ramp is the whole point, and eight builders each inventing a
+ * 26.4px heading is how we got here.
+ * --------------------------------------------------------------------------- */
+
+[data-landing-page] {
+  --lp-gutter: 20px;
+  --lp-section-pad: 72px;
+  --lp-section-pad-tight: 56px;
+  --lp-col-gap: 16px;
+}
+
+@media (min-width: 640px) {
+  [data-landing-page] {
+    --lp-gutter: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  [data-landing-page] {
+    --lp-gutter: 32px;
+    --lp-section-pad: 128px;
+    --lp-section-pad-tight: 96px;
+    --lp-col-gap: 24px;
+  }
+}
+
+[data-landing-page] .lp-d1,
+[data-landing-page] .lp-d2,
+[data-landing-page] .lp-h1,
+[data-landing-page] .lp-h2 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+}
+
+[data-landing-page] .lp-d1 {
+  font-size: 40px;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+[data-landing-page] .lp-d2 {
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* h2 does not exist below 1024px — it collapses into h1. */
+[data-landing-page] .lp-h1,
+[data-landing-page] .lp-h2 {
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+/* lead collapses into body on mobile, separated by ink colour, not size. */
+[data-landing-page] .lp-lead,
+[data-landing-page] .lp-body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+/* micro collapses into small on mobile. */
+[data-landing-page] .lp-small,
+[data-landing-page] .lp-micro {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+[data-landing-page] .lp-label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+[data-landing-page] .lp-code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.55;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+@media (min-width: 1024px) {
+  [data-landing-page] .lp-d1 {
+    font-size: 72px;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+  }
+
+  [data-landing-page] .lp-d2 {
+    font-size: 52px;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+
+  [data-landing-page] .lp-h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  [data-landing-page] .lp-h2 {
+    font-size: 20px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  [data-landing-page] .lp-lead {
+    font-size: 18px;
+    line-height: 1.55;
+  }
+
+  [data-landing-page] .lp-small {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  [data-landing-page] .lp-micro {
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.35;
+  }
+
+  [data-landing-page] .lp-label {
+    letter-spacing: 0.12em;
+  }
+}
+
+/* Measure caps. Enforced here so no section has to remember them. */
+[data-landing-page] .lp-d1,
+[data-landing-page] .lp-d2 {
+  max-width: 18ch;
+}
+
+[data-landing-page] .lp-lead {
+  max-width: 60ch;
+}
+
+[data-landing-page] .lp-body {
+  max-width: 72ch;
+}
+
+[data-landing-page] .lp-section {
+  padding-block: var(--lp-section-pad);
+}
+
+[data-landing-page] .lp-section-tight {
+  padding-block: var(--lp-section-pad-tight);
+}
+
+[data-landing-page] .lp-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: calc(1200px + var(--lp-gutter) * 2);
+  padding-inline: var(--lp-gutter);
+}
+
+/* Product slabs and the proof strip only. */
+[data-landing-page] .lp-bleed {
+  margin-inline: auto;
+  width: 100%;
+  max-width: calc(1440px + var(--lp-gutter) * 2);
+  padding-inline: var(--lp-gutter);
+}
+
+[data-landing-page] .lp-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--lp-col-gap);
+}
+
 .ink-panel {
   background: var(--surface-ink);
   color: var(--surface-ink-foreground);
