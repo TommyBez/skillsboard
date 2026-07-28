@@ -48,14 +48,14 @@ The existing homepage remains the only canonical product landing page. There is 
 
 ## Homepage launch-treatment control
 
-The temporary homepage treatment is controlled by `launchTreatmentIsActive` in `lib/launch.ts`. While it is `false`, the Production homepage, metadata, and conversion flow remain unchanged; Development and Vercel Preview still render the treatment for review. When set to `true`, the same canonical homepage adds:
+The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. The flag is a global release switch, defaults to `false`, and fails closed if PostHog is unavailable. For local or Vercel Preview review only, `LAUNCH_TREATMENT_OVERRIDE=true|false` can explicitly override PostHog; keep it unset in Production. When enabled, the same canonical homepage adds:
 
 - A compact product-walkthrough banner linking to the existing workflow section.
 - A silent, captioned 14-second add → share → find loop recorded from the current product.
 - A launch-specific OpenGraph image.
 - A measured `launch_demo` CTA location while preserving `landing_path: "/"`.
 
-Set the flag to `true` only in the launch-day PR after the final preflight. The exact merge still requires owner approval. Remove the temporary banner and launch framing after the launch window; retain the short demo only if observed behavior supports it.
+Enable the PostHog flag only after the final launch-day preflight. The code can ship safely while the flag remains disabled, and disabling it restores the standard homepage without a deploy. Remove the temporary banner and launch framing after the launch window; retain the short demo only if observed behavior supports it.
 
 ## ORB channel plan
 

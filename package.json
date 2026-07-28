@@ -32,6 +32,7 @@
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@better-auth/oauth-provider": "^1.6.23",
+    "@flags-sdk/posthog": "^0.2.2",
     "@vercel/analytics": "1.6.1",
     "@vercel/oidc": "^3.8.0",
     "better-auth": "^1.6.23",
@@ -39,6 +40,7 @@
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.2",
     "fflate": "^0.8.3",
+    "flags": "^4.2.3",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.16.0",
     "mcp-handler": "^1.1.0",

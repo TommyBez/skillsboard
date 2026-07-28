@@ -22,23 +22,27 @@ import { getSession } from "@/lib/session"
 import { siteConfig } from "@/lib/site"
 import { launchTreatmentIsVisible } from "@/lib/launch"
 
-export const metadata: Metadata = {
-  title: { absolute: "Skills Board, your team’s recommended AI skills" },
-  description: siteConfig.description,
-  alternates: { canonical: "/" },
-  openGraph: {
-    url: "/",
-    title: "Skills Board: Your team’s skills. All in one place.",
-    description: siteConfig.ogDescription,
-    images: launchTreatmentIsVisible
-      ? [{
-          url: "/launch/skills-board-launch-og.jpg",
-          width: 1200,
-          height: 630,
-          alt: "Skills Board: a shared answer to which skill should I use?",
-        }]
-      : undefined,
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const showLaunchTreatment = await launchTreatmentIsVisible()
+
+  return {
+    title: { absolute: "Skills Board, your team’s recommended AI skills" },
+    description: siteConfig.description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      url: "/",
+      title: "Skills Board: Your team’s skills. All in one place.",
+      description: siteConfig.ogDescription,
+      images: showLaunchTreatment
+        ? [{
+            url: "/launch/skills-board-launch-og.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Skills Board: a shared answer to which skill should I use?",
+          }]
+        : undefined,
+    },
+  }
 }
 
 function primaryAction(signedIn: boolean): {
@@ -327,7 +331,9 @@ function GitHubMark() {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const showLaunchTreatment = await launchTreatmentIsVisible()
+
   return (
     <div
       className={`${styles.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
@@ -347,7 +353,7 @@ export default function HomePage() {
         <span className={styles.scrollProgress} aria-hidden="true" />
       </header>
 
-      {launchTreatmentIsVisible ? (
+      {showLaunchTreatment ? (
         <aside className="relative z-30 border-b border-primary/25 bg-primary/10">
           <a
             href="#launch-demo"
@@ -440,7 +446,7 @@ export default function HomePage() {
               </h2>
             </div>
 
-            {launchTreatmentIsVisible ? (
+            {showLaunchTreatment ? (
               <div
                 id="launch-demo"
                 className="surface-shadow mt-12 grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]"
