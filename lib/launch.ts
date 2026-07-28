@@ -11,6 +11,12 @@ type LaunchTreatmentEntities = {
 }
 
 function launchTreatmentOverride(): boolean | undefined {
+  // Production is governed only by the remote feature flag. The environment
+  // override exists to make local and Preview verification deterministic.
+  if (process.env.VERCEL_ENV === "production") {
+    return undefined
+  }
+
   if (process.env.LAUNCH_TREATMENT_OVERRIDE === "true") {
     return true
   }

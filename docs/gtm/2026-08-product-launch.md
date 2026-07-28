@@ -48,7 +48,7 @@ The existing homepage remains the only canonical product landing page. There is 
 
 ## Homepage launch-treatment control
 
-The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. Vercel Flags evaluates it in `proxy.ts` and rewrites `/` to one of two variants generated under `app/variants/home/[code]`, so the canonical URL, metadata, and initial HTML agree without client flicker or making the PostHog decision part of the page render. `FLAGS_SECRET` must use a distinct value in Development, Preview, and Production. The flag defaults to `false` and fails closed if PostHog is unavailable. For local or Vercel Preview review only, `LAUNCH_TREATMENT_OVERRIDE=true|false` can explicitly override PostHog; keep it unset in Production. When enabled, the same canonical homepage adds:
+The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. Vercel Flags evaluates it in `proxy.ts` and rewrites `/` to one of two variants generated under `app/variants/home/[code]`, so the canonical URL, metadata, and initial HTML agree without client flicker or making the PostHog decision part of the page render. `FLAGS_SECRET` must use a distinct value in Development, Preview, and Production. The flag defaults to `false` and fails closed if PostHog is unavailable. For local or Vercel Preview review only, `LAUNCH_TREATMENT_OVERRIDE=true|false` can explicitly override PostHog; Vercel Production ignores it and uses only the remote flag. When enabled, the same canonical homepage adds:
 
 - A compact product-walkthrough banner linking to the existing workflow section.
 - A silent, captioned 14-second add → share → find loop recorded from the current product.
@@ -118,7 +118,7 @@ An unavailable channel does not pause independent launch lanes.
 ### 4. Launch day — August 11, Europe/Rome
 
 - **08:30:** final production and analytics smoke test.
-- **09:00:** the temporary homepage launch treatment goes live; the already-live application remains available through its existing routes.
+- **09:00:** after the final production and analytics smoke test passes, activate the PostHog `homepage-launch-treatment` flag; the already-live application remains available through its existing routes.
 - **09:05:** Product Hunt listing goes live if the official capability and identity checks pass.
 - **09:15:** publish the product demo on LinkedIn and X.
 - **10:00:** send the consent-compliant product email.
