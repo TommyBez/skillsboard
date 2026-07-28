@@ -30,3 +30,8 @@ next-env.d.ts
 
 # Remotion render output
 out/
+
+# Landing-page bake-off: per-round comparison output is transient.
+refs/compare/
+refs/rounds/
+refs/progress/index.html
