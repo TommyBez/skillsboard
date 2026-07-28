@@ -17,7 +17,14 @@
   --hairline: var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
   --hairline-strong: var(--lp-hairline-strong, color-mix(in oklch, var(--foreground) 22%, transparent));
   --slab-h: 320px;
-  --slab-w: 480px;
+  /* The crop only works when the crop line is the *viewport* edge. A flat 480px
+     did that at 390, but at 768 it left a 480px box floating in a 720px column
+     with its own hard border slicing the "release" chip in half — the same
+     "reads as a bug, not as a window" failure, just one breakpoint over. 130%
+     keeps the slab wider than whatever column it is in, so the overhang stays
+     proportional and the fade below always lands off the edge of the screen.
+     `max()` pins 390px to the 480px this was already verified at. */
+  --slab-w: max(480px, 130%);
   --slab-fade: 56px;
 }
 

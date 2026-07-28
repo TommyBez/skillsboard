@@ -20,19 +20,6 @@
 }
 
 @media (min-width: 64rem) {
-  .faqLayout {
-    row-gap: 48px;
-  }
-
-  .faqSummary {
-    gap: 24px;
-    padding-block: 24px;
-  }
-
-  .faqAnswer {
-    padding-bottom: 24px;
-  }
-
   .faqIntro {
     position: sticky;
     /* 56px header + 32px clearance. */
@@ -55,7 +42,12 @@
   color: var(--muted-foreground);
 }
 
+/* Desktop only. §8.6 adds this line to give the sticky left column something to
+   hold once the intro runs out; on a phone there is no column to fill, so it is
+   just a second sentence in a section §4B law 1 allows one of — and the repo is
+   already a link in the footer 400px below. */
 .faqAside {
+  display: none;
   margin-top: 24px;
   color: var(--muted-foreground);
 }
@@ -166,6 +158,29 @@
   .faqAnswer {
     padding-left: 16px;
     border-left: 1px solid var(--lp-hairline);
+  }
+}
+
+/* Desktop restores the roomier row. It has to live after the base declarations
+   rather than in the 64rem block above, because these selectors have the same
+   specificity and source order decides — put it up there and the 16px mobile
+   padding silently wins at 1440 too. */
+@media (min-width: 64rem) {
+  .faqLayout {
+    row-gap: 48px;
+  }
+
+  .faqSummary {
+    gap: 24px;
+    padding-block: 24px;
+  }
+
+  .faqAnswer {
+    padding-bottom: 24px;
+  }
+
+  .faqAside {
+    display: block;
   }
 }
 
