@@ -48,7 +48,7 @@ The existing homepage remains the only canonical product landing page. There is 
 
 ## Homepage launch-treatment control
 
-The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. The flag is a global release switch, defaults to `false`, and fails closed if PostHog is unavailable. For local or Vercel Preview review only, `LAUNCH_TREATMENT_OVERRIDE=true|false` can explicitly override PostHog; keep it unset in Production. When enabled, the same canonical homepage adds:
+The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. Vercel Flags evaluates it in `proxy.ts` and rewrites `/` to one of two variants generated under `app/variants/home/[code]`, so the canonical URL, metadata, and initial HTML agree without client flicker or making the PostHog decision part of the page render. `FLAGS_SECRET` must use a distinct value in Development, Preview, and Production. The flag defaults to `false` and fails closed if PostHog is unavailable. For local or Vercel Preview review only, `LAUNCH_TREATMENT_OVERRIDE=true|false` can explicitly override PostHog; keep it unset in Production. When enabled, the same canonical homepage adds:
 
 - A compact product-walkthrough banner linking to the existing workflow section.
 - A silent, captioned 14-second add → share → find loop recorded from the current product.
@@ -205,4 +205,4 @@ This is a prioritization rule, not an editorial, cooldown, WIP, evidence, or rea
 
 Codex and the Pulse execute the routed, zero-cost workstreams, produce assets, verify providers, schedule eligible communications, and report evidence. Tommaso is required only at a genuine owner boundary, especially approval immediately before merging an exact repository PR/head SHA or where identity, law, consent, privacy, binding terms, or spend require it.
 
-The remaining critical path is: production journey QA → measurement QA → channel packages → final preflight → owner-approved launch-day flag merge → launch execution.
+The remaining critical path is: production journey QA → measurement QA → channel packages → owner-approved PR merge → final preflight → PostHog flag activation → launch execution.

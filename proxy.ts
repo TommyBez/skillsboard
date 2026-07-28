@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
+import { precompute } from "flags/next"
+
+import { homepageFlags } from "@/lib/launch"
 
 function isProtectedPath(pathname: string) {
   if (pathname === "/onboarding" || pathname === "/consent") return true
@@ -12,8 +15,17 @@ function isProtectedPath(pathname: string) {
   )
 }
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
+
+  if (pathname === "/") {
+    const code = await precompute(homepageFlags)
+    const variantUrl = request.nextUrl.clone()
+    variantUrl.pathname = `/variants/home/${code}`
+
+    return NextResponse.rewrite(variantUrl)
+  }
+
   const sessionCookie = getSessionCookie(request)
 
   // Cookie presence is optimistic only: gate protected routes when missing.
@@ -39,6 +51,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/",
     "/library",
     "/library/:path*",
     "/discover",

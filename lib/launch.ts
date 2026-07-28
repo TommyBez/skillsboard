@@ -1,9 +1,8 @@
 import "server-only"
 
 import { createPostHogAdapter } from "@flags-sdk/posthog"
-import type { Adapter } from "flags"
-import { cacheLife } from "next/cache"
-import { flag } from "flags/next"
+import type { Adapter, Identify } from "flags"
+import { dedupe, flag } from "flags/next"
 
 const launchTreatmentFlagKey = "homepage-launch-treatment"
 
@@ -23,6 +22,11 @@ function launchTreatmentOverride(): boolean | undefined {
   return undefined
 }
 
+const identifyLaunchTreatment = dedupe(async () => ({
+  // The treatment is a global launch switch, not a per-person experiment.
+  distinctId: "skillsboard-public-homepage",
+})) satisfies Identify<LaunchTreatmentEntities>
+
 const postHogToken = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ?? ""
 const postHogLaunchAdapter: Adapter<boolean, LaunchTreatmentEntities> = postHogToken
   ? createPostHogAdapter({
@@ -39,34 +43,33 @@ const postHogLaunchAdapter: Adapter<boolean, LaunchTreatmentEntities> = postHogT
       },
     }
 
+const launchTreatmentAdapter: Adapter<boolean, LaunchTreatmentEntities> = {
+  ...postHogLaunchAdapter,
+  async decide(params) {
+    const override = launchTreatmentOverride()
+
+    if (override !== undefined) {
+      return override
+    }
+
+    return postHogLaunchAdapter.decide(params)
+  },
+}
+
 // Skills Board is already publicly available. This flag controls only the
-// temporary homepage treatment for the coordinated GTM launch. PostHog is the
-// default authority; the explicit environment override exists for local and
-// preview review. Missing configuration or provider failures fail closed.
-const launchTreatmentFlag = flag<boolean, LaunchTreatmentEntities>({
+// temporary homepage treatment for the coordinated GTM launch. Proxy evaluates
+// it once, then rewrites to a precomputed static variant of the canonical page.
+export const launchTreatmentIsVisible = flag<boolean, LaunchTreatmentEntities>({
   key: launchTreatmentFlagKey,
   description: "Show the temporary coordinated-launch treatment on the homepage.",
+  origin: "https://eu.posthog.com/project/225645/feature_flags/237551",
   defaultValue: false,
   options: [
     { label: "Standard homepage", value: false },
     { label: "Launch treatment", value: true },
   ],
-  adapter: postHogLaunchAdapter,
+  adapter: launchTreatmentAdapter,
+  identify: identifyLaunchTreatment,
 })
 
-async function cachedLaunchTreatmentDecision() {
-  "use cache"
-  cacheLife({ stale: 15, revalidate: 15, expire: 60 })
-
-  return launchTreatmentFlag.run({
-    // The treatment is a global launch switch, not a per-person experiment.
-    identify: { distinctId: "skillsboard-public-homepage" },
-    // A synthetic request avoids reading request headers or cookies, keeping the
-    // global homepage variant compatible with Next.js Cache Components.
-    request: new Request("https://skillsboard.sh/"),
-  })
-}
-
-export async function launchTreatmentIsVisible() {
-  return launchTreatmentOverride() ?? cachedLaunchTreatmentDecision()
-}
+export const homepageFlags = [launchTreatmentIsVisible] as const
