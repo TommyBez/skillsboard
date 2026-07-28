@@ -5,13 +5,8 @@
    shared ramp in globals.css; nothing here declares a font-size.
 --------------------------------------------------------------------------- */
 
-.hero {
-  position: relative;
-}
-
 .inner {
   align-items: center;
-  row-gap: 32px;
 }
 
 .copy {
@@ -173,7 +168,7 @@
 .cardTag {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 4px 8px;
   border: 1px solid var(--lp-hairline);
   border-radius: 6px;
   color: var(--muted-foreground);
@@ -198,10 +193,6 @@
 }
 
 @media (min-width: 64rem) {
-  .inner {
-    row-gap: 48px;
-  }
-
   .cardStars {
     margin-left: auto;
   }

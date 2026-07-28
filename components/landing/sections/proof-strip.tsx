@@ -1,3 +1,5 @@
+import { Fragment } from "react"
+
 import styles from "@/components/landing/sections/proof-strip.module.css"
 
 /**
@@ -38,14 +40,14 @@ export function ProofStrip() {
             <p className={`${styles.value} lp-body`}>
               {"clients" in claim
                 ? claim.clients.map((client, index) => (
-                    <span key={client} className={styles.client}>
+                    <Fragment key={client}>
                       {index > 0 ? (
                         <span className={styles.sep} aria-hidden="true">
                           ·
                         </span>
                       ) : null}
-                      {client}
-                    </span>
+                      <span className={styles.client}>{client}</span>
+                    </Fragment>
                   ))
                 : claim.value}
             </p>

@@ -15,9 +15,9 @@
 .section {
   --hairline: var(--lp-hairline, color-mix(in oklch, var(--foreground) 12%, transparent));
   --hairline-strong: var(--lp-hairline-strong, color-mix(in oklch, var(--foreground) 22%, transparent));
-  --slab-h: 300px;
+  --slab-h: 320px;
   --slab-w: 480px;
-  --slab-fade: 64px;
+  --slab-fade: 56px;
 }
 
 .head {
@@ -282,9 +282,6 @@
 }
 
 .cardFooter {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
   border-top: 1px solid var(--hairline);
   background: var(--muted);
   padding: 12px;
@@ -317,35 +314,17 @@
   color: var(--muted-foreground);
 }
 
-.cardLink {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-.linkIcon {
-  width: 12px;
-  height: 12px;
-  flex: none;
-}
-
 @media (min-width: 1024px) {
   .section {
-    --slab-h: 480px;
+    --slab-h: 488px;
     --slab-w: 100%;
-    --slab-fade: 96px;
+    --slab-fade: 80px;
   }
 
   .head {
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     align-items: end;
     column-gap: 24px;
-  }
-
-  .viewport {
-    margin-top: 48px;
   }
 
   .slab {

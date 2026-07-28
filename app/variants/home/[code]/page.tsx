@@ -22,7 +22,6 @@ import { Workflow } from "@/components/landing/sections/workflow"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
@@ -81,22 +80,6 @@ function primaryAction(signedIn: boolean): {
     : { href: "/sign-up", label: "Create your team library" }
 }
 
-function HomeHeaderActionsFallback() {
-  return (
-    <div className="flex items-center gap-1.5">
-      <ThemeToggle />
-      <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
-        <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-10 sm:w-40" />
-      </nav>
-    </div>
-  )
-}
-
-function HomeCtaFallback() {
-  return <Skeleton className="h-12 w-56 rounded-[3px]" aria-busy="true" />
-}
-
 function primaryCtaEventProperties(
   signedIn: boolean,
   location: "header" | "hero" | "closing" | "launch_demo",
@@ -121,34 +104,35 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           <Button
             size="sm"
             variant="ghost"
-            className="hidden rounded-[3px] sm:inline-flex"
+            className="hidden sm:inline-flex"
             nativeButton={false}
             render={<Link href="/sign-in" />}
           >
             Sign in
           </Button>
         ) : null}
-        <Button
-          size="sm"
-          className={`${styles.ctaButton} px-2.5 sm:h-10 sm:px-4`}
-          nativeButton={false}
-          render={(
-            <TrackedLink
-              href={primary.href}
-              analytics={{
-                event: "landing_cta_clicked",
-                properties: primaryCtaEventProperties(signedIn, "header"),
-              }}
-            />
-          )}
-        >
-          <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
-          <span className="hidden sm:inline">{primary.label}</span>
-          <ArrowRightIcon
-            className={`${styles.ctaArrow} hidden sm:block`}
-            data-icon="inline-end"
+      <Button
+        size="sm"
+        variant="ink"
+        className={`${styles.ctaButton} px-2.5 sm:h-10 sm:px-4`}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primary.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties(signedIn, "header"),
+            }}
           />
-        </Button>
+        )}
+      >
+        <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
+        <span className="hidden sm:inline">{primary.label}</span>
+        <ArrowRightIcon
+          className={`${styles.ctaArrow} hidden sm:block`}
+          data-icon="inline-end"
+        />
+      </Button>
       </nav>
     </div>
   )
@@ -164,25 +148,23 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      <span className={styles.magnetic} data-magnetic>
-        <Button
-          size="lg"
-          className={styles.ctaButton}
-          nativeButton={false}
-          render={(
-            <TrackedLink
-              href={primary.href}
-              analytics={{
-                event: "landing_cta_clicked",
-                properties: primaryCtaEventProperties(signedIn, "hero"),
-              }}
-            />
-          )}
-        >
-          {primary.label}
-          <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-        </Button>
-      </span>
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primary.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties(signedIn, "hero"),
+            }}
+          />
+        )}
+      >
+        {primary.label}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
       <Button
         size="lg"
         variant="outline"
@@ -214,7 +196,6 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
   const href = signedIn ? "/settings/mcp" : "/sign-up"
 
   return (
-    <span className={styles.magnetic} data-magnetic>
       <Button
         size="lg"
         className={styles.ctaButton}
@@ -233,7 +214,6 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
         {signedIn ? "Connect your agent" : "Create a library to connect"}
         <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
       </Button>
-    </span>
   )
 }
 
@@ -246,7 +226,6 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <span className={styles.magnetic} data-magnetic>
       <Button
         size="lg"
         className={styles.ctaButton}
@@ -264,7 +243,6 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
         {primary.label}
         <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
       </Button>
-    </span>
   )
 }
 
@@ -319,6 +297,33 @@ function HomeLaunchBanner() {
   )
 }
 
+/*
+ * Suspense fallbacks render the signed-out call to action rather than a
+ * skeleton. Next streams the resolved session in and swaps it, but with
+ * JavaScript disabled the fallback is what the reader keeps — skeletons left
+ * every CTA on the page as a grey block. Signed out is also the overwhelmingly
+ * common case for a landing page, so this is the cheaper guess besides.
+ */
+function HomeHeaderActionsFallback() {
+  return <HomeHeaderActionsView signedIn={false} />
+}
+
+function HomeHeroActionsFallback() {
+  return <HomeHeroActionsView signedIn={false} />
+}
+
+function HomeMcpActionsFallback() {
+  return <HomeMcpActionsView signedIn={false} />
+}
+
+function HomeFinalActionsFallback() {
+  return <HomeFinalActionsView signedIn={false} />
+}
+
+function HomeLaunchActionsFallback() {
+  return <HomeLaunchActionsView signedIn={false} />
+}
+
 export default async function HomePage({ params }: HomeVariantPageProps) {
   const { code } = await params
   const showLaunchTreatment = await getLaunchTreatment(code)
@@ -345,7 +350,7 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
       <main>
         <Hero
           actions={(
-            <Suspense fallback={<HomeCtaFallback />}>
+            <Suspense fallback={<HomeHeroActionsFallback />}>
               <HomeHeroActions />
             </Suspense>
           )}
@@ -356,7 +361,7 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
         <Workflow
           showLaunchDemo={showLaunchTreatment}
           launchActions={(
-            <Suspense fallback={<HomeCtaFallback />}>
+            <Suspense fallback={<HomeLaunchActionsFallback />}>
               <HomeLaunchActions />
             </Suspense>
           )}
@@ -366,7 +371,7 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
 
         <Mcp
           actions={(
-            <Suspense fallback={<HomeCtaFallback />}>
+            <Suspense fallback={<HomeMcpActionsFallback />}>
               <HomeMcpActions />
             </Suspense>
           )}
@@ -378,7 +383,7 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
 
         <Closing
           actions={(
-            <Suspense fallback={<HomeCtaFallback />}>
+            <Suspense fallback={<HomeFinalActionsFallback />}>
               <HomeFinalActions />
             </Suspense>
           )}

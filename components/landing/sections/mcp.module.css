@@ -159,7 +159,10 @@
     position: absolute;
     top: 50%;
     left: 0;
-    right: -24px;
+    /* An SVG is a replaced element: with `right` and an auto width it snaps
+       back to its intrinsic ratio, so the width is stated outright. It spans
+       the column gap so x=160 lands exactly on the rows' left edge. */
+    width: calc(100% + 24px);
     height: calc(var(--wire-row-h) * 2 * 1.08);
     transform: translateY(-50%);
     overflow: visible;

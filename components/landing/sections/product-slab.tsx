@@ -1,5 +1,4 @@
 import {
-  ArrowUpRightIcon,
   CopyIcon,
   GitForkIcon,
   MessageSquareQuoteIcon,
@@ -118,10 +117,6 @@ function SkillCard({ skill }: { skill: Skill }) {
           <code className={`${styles.commandText} lp-code`}>{skill.command}</code>
           <CopyIcon className={styles.commandIcon} aria-hidden="true" />
         </span>
-        <span className={`${styles.cardLink} lp-micro`}>
-          Open source
-          <ArrowUpRightIcon className={styles.linkIcon} aria-hidden="true" />
-        </span>
       </div>
     </article>
   )
@@ -138,8 +133,8 @@ export function ProductSlab() {
           </h2>
         </div>
         <p className={`${styles.lead} lp-lead`}>
-          Search by task, description, repository, or tag. Every result carries the note whoever
-          saved it left behind, an example prompt, and the command to install it.
+          Search by task, repo, or tag. Every result carries the note whoever saved it, an example
+          prompt, and the command to install it.
         </p>
       </div>
 

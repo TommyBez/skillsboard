@@ -17,11 +17,19 @@ type FooterLink = { label: string; href: string; external?: boolean }
 
 /**
  * Three columns of real destinations. Nothing here is a placeholder: every
- * href resolves to a section, a route, or the repository.
+ * href resolves to a section, a route, or the repository. `span` carries the
+ * column's own 12-col placement so the JSX stays a flat map.
  */
-const columns: Array<{ heading: string; links: FooterLink[] }> = [
+const columns: Array<{
+  id: string
+  heading: string
+  span: string
+  links: FooterLink[]
+}> = [
   {
+    id: "footer-product",
     heading: "Product",
+    span: "lg:col-span-2 lg:col-start-6",
     links: [
       { label: "How it works", href: "#flow" },
       { label: "MCP access", href: "#mcp" },
@@ -29,14 +37,18 @@ const columns: Array<{ heading: string; links: FooterLink[] }> = [
     ],
   },
   {
+    id: "footer-resources",
     heading: "Resources",
+    span: "lg:col-span-2 lg:col-start-8",
     links: [
       { label: "Guides", href: "/resources" },
       { label: "FAQ", href: "#faq" },
     ],
   },
   {
+    id: "footer-open-source",
     heading: "Open source",
+    span: "lg:col-span-3 lg:col-start-10",
     links: [
       { label: "Repository", href: repoUrl, external: true },
       { label: "Issues", href: `${repoUrl}/issues`, external: true },
@@ -98,19 +110,16 @@ export function SiteFooter() {
             </p>
           </div>
 
-          {columns.map((column, index) => (
+          {columns.map((column) => (
             <nav
-              aria-label={column.heading}
-              className={`col-span-12 flex items-baseline gap-4 lg:flex-col lg:gap-2 ${
-                index === 0
-                  ? "lg:col-span-2 lg:col-start-6"
-                  : index === 1
-                    ? "lg:col-span-2 lg:col-start-8"
-                    : "lg:col-span-3 lg:col-start-10"
-              }`}
-              key={column.heading}
+              aria-labelledby={column.id}
+              className={`col-span-12 flex items-baseline gap-4 lg:flex-col lg:gap-2 ${column.span}`}
+              key={column.id}
             >
-              <h2 className="lp-label w-24 shrink-0 text-muted-foreground lg:w-auto">
+              <h2
+                className="lp-label w-24 shrink-0 text-muted-foreground lg:w-auto"
+                id={column.id}
+              >
                 {column.heading}
               </h2>
               <ul className="lp-small flex flex-wrap gap-x-4 gap-y-2 lg:flex-col lg:gap-2">

@@ -17,10 +17,10 @@
 
 .claim {
   display: grid;
-  grid-template-columns: 88px minmax(0, 1fr);
+  grid-template-columns: 104px minmax(0, 1fr);
   align-items: baseline;
   column-gap: 16px;
-  padding-block: 12px;
+  padding-block: 8px;
 }
 
 /* Mobile keeps the rows apart with the same hairline as the band edges. */
@@ -32,17 +32,25 @@
   color: var(--muted-foreground);
 }
 
+/* Flex rather than inline text so the client list has wrap opportunities
+ * between wordmarks and never between the two words of one client name. */
 .value {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 16px;
   color: var(--foreground);
-  text-wrap: pretty;
 }
 
 .client {
   white-space: nowrap;
 }
 
+/* At 390px the list wraps, and a wrapped separated list always strands a
+ * separator at a line end. Vercel's below-fold wordmark row uses none at all;
+ * below 1024px neither do we. */
 .sep {
-  padding-inline: 8px;
+  display: none;
   color: var(--muted-foreground);
 }
 
@@ -74,6 +82,11 @@
 
   .value {
     margin-top: 4px;
+    column-gap: 8px;
+  }
+
+  .sep {
+    display: inline;
   }
 
   .detail {

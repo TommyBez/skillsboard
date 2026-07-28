@@ -114,6 +114,18 @@
   }
 }
 
+/* §4B tap targets. The page ships the CTA at `size="sm"` (32px) next to a 40px
+   toggle, which is both under the minimum and visibly mismatched. */
+@media (max-width: 1023px) {
+  .header :global([data-slot="button"]) {
+    min-height: 44px;
+  }
+
+  .header :global(button[data-slot="button"]) {
+    min-width: 44px;
+  }
+}
+
 /* ---------------------------------------------------------------------------
    Scroll progress — a 1px accent rule sitting on the header's bottom edge
 --------------------------------------------------------------------------- */

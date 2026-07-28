@@ -5,11 +5,11 @@
    LandingMotionController via `data-reveal` — there is no motion in this file.
 --------------------------------------------------------------------------- */
 
-/* Section boundaries are top rules only; drawing both edges is what produced
-   the doubled 2px hairline elsewhere on the page. */
+/* Draws neither edge, so it can never double against a neighbour: this is a
+   slab section (§4B), whose beat comes from the product fragments rather than
+   from a hairline. The rules inside `.steps` close the table, not the section. */
 .section {
   position: relative;
-  border-top: 1px solid var(--lp-hairline);
 }
 
 .head {
