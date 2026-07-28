@@ -11,7 +11,7 @@
 }
 
 .faqLayout {
-  row-gap: 48px;
+  row-gap: 32px;
 }
 
 .faqIntro,
@@ -20,6 +20,19 @@
 }
 
 @media (min-width: 64rem) {
+  .faqLayout {
+    row-gap: 48px;
+  }
+
+  .faqSummary {
+    gap: 24px;
+    padding-block: 24px;
+  }
+
+  .faqAnswer {
+    padding-bottom: 24px;
+  }
+
   .faqIntro {
     position: sticky;
     /* 56px header + 32px clearance. */
@@ -74,12 +87,18 @@
   border-bottom: 1px solid var(--lp-hairline);
 }
 
+/* 16/12 below 1024px, 24/24 above. Eight questions at the desktop numbers made
+   the FAQ 1116px on a phone — taller than the hero, and the tallest thing on
+   the page. The 24px column gap was the more expensive half: it took 24px off a
+   310px measure and wrapped questions that otherwise fit on one line, so the
+   row cost 48px of padding *and* a second line. The glyph is 16px and needs
+   12px of clearance, not 24. */
 .faqSummary {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 24px;
-  padding-block: 24px;
+  gap: 12px;
+  padding-block: 16px;
   cursor: pointer;
   list-style: none;
 }
@@ -139,7 +158,7 @@
 }
 
 .faqAnswer {
-  padding-bottom: 24px;
+  padding-bottom: 16px;
   color: var(--muted-foreground);
 }
 

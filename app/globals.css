@@ -200,8 +200,15 @@
   font-weight: 600;
 }
 
+/* 44, not the 40 the table lists. At 40 the mobile ramp was 40/28/20/16 and a
+   blind critic read it as one narrow band: `d1:d2` was 1.43 while `d2:h1` was
+   1.40, so the hero was barely more dominant than a section heading, and the
+   page had no entry point to skim from. 44 puts `d1:d2` at 1.57 — within 0.01
+   of Linear's measured mobile ratio (38/24 = 1.58), the one reference we lose
+   to at this width. It is the largest `d1` that still holds "Your team's
+   skills." on one line inside the 350px column. */
 [data-landing-page] .lp-d1 {
-  font-size: 40px;
+  font-size: 44px;
   line-height: 0.98;
   letter-spacing: -0.03em;
   text-wrap: balance;

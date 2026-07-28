@@ -10,8 +10,10 @@ import styles from "@/components/landing/sections/hero.module.css"
  *
  * Ordered back to front: the last entry is the fully visible card, and the
  * two behind it show only their source row. At 390px only the front card
- * renders, at the same width it has on desktop, cropped by the viewport
- * (direction §4B law 2) — scaling it down is what made it illegible.
+ * renders — one real object beats three cropped ones — and it fills the column
+ * rather than overhanging it. Its type is never scaled, which is the part of
+ * §4B law 2 that carries the weight; the overhang was the part that did not,
+ * because a single card is not visibly bigger than the screen.
  */
 const skills = [
   {

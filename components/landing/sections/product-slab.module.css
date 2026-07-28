@@ -38,10 +38,25 @@
   color: var(--muted-foreground);
 }
 
+/*
+ * The one crop on the page that is kept, because it is the one that earns it:
+ * 480px of a full library UI — search field, tag filters, a two-column result
+ * grid — is unmistakably wider than a 390px phone, so the edge reads as a
+ * window rather than as damage.
+ *
+ * What it was missing was the horizontal half of the signal. The slab already
+ * fades at its bottom edge to say "this UI keeps going down"; at the right it
+ * was guillotined by the viewport, which is what made the tag chips read as
+ * severed rather than as continuing. The mask below is the same device turned
+ * 90°, and it has to live here rather than on `.slab`: the slab's own right
+ * edge is at 500px, off screen, so a fade on it would never be seen.
+ */
 .viewport {
   margin-top: 32px;
   /* Clip rather than scroll: the mobile crop must never move the page sideways. */
   overflow-x: clip;
+  mask-image: linear-gradient(to right, #000 calc(100% - var(--slab-fade)), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - var(--slab-fade)), transparent 100%);
 }
 
 .slab {
@@ -324,6 +339,13 @@
     --slab-h: 488px;
     --slab-w: 100%;
     --slab-fade: 80px;
+  }
+
+  /* The slab fits its container at this width, so there is nothing to fade at
+     the right edge and a mask would only eat the border. */
+  .viewport {
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 
   .head {

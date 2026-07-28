@@ -61,8 +61,17 @@
 
 /* ---------------------------------------------------------------------------
    Product fragments — the real chrome the app uses for a URL field, a search
-   result and the install command. The command genuinely does not fit; the app
-   clips it in a scroll box and so do we, rather than shrinking it (§4B law 2).
+   result and the install command.
+
+   These used to be 480px wide at every breakpoint, which put their right edge
+   at 500px inside a 390px viewport and sliced all three of them mid-word. That
+   was §4B law 2 applied to the wrong kind of object. The law is right for the
+   product slab — 480px of a full application UI, where the viewport edge reads
+   as a window onto something bigger — but a 48px pill holding one URL is not
+   obviously bigger than the window, so the cut read as a rendering bug rather
+   than as a crop. Nothing here is scaled down, which is what the law is
+   actually protecting against; the chip just ends where the column ends, and
+   the one string that genuinely does not fit takes an ellipsis.
 --------------------------------------------------------------------------- */
 
 .fragment {
@@ -70,8 +79,7 @@
   align-items: center;
   gap: 12px;
   overflow: hidden;
-  width: 480px;
-  max-width: none;
+  width: 100%;
   height: 48px;
   padding-inline: 12px;
   border: 1px solid var(--lp-hairline);
@@ -86,12 +94,15 @@
   color: var(--muted-foreground);
 }
 
-/* Shrinkable and clipped, with the trailing control pinned: this is exactly
-   what the dossier's install-command box does with a command this long. */
+/* Shrinkable, with the trailing control pinned: this is exactly what the
+   dossier's install-command box does with a command this long. The ellipsis is
+   the affordance — it is the difference between a string that is telling you it
+   continues and one that has simply been cut off by the edge of the screen. */
 .fragmentText {
   flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--foreground);
 }

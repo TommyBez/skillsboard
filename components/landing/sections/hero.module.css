@@ -58,8 +58,17 @@
    and no line of text is ever half-covered.
 ------------------------------------------------------------------ */
 
+/* Below 1024px the card is the column, not a crop of one. A crop only reads as
+   a crop when the cropped thing is obviously bigger than the window: the slab
+   below is 480px of a full application UI and qualifies, but this is a single
+   ~440px card, and 55px of overhang just put its own right border off screen
+   and sliced the install command mid-URL. It read as an unfinished card, not as
+   a window. Fitting the column costs nothing — the card's internal type stays
+   at its native `h2`/`code`/`small` sizes (nothing is scaled, which is the part
+   of §4B law 2 that actually matters), and `.cardSource`/`.cardCmd` already
+   carry ellipses, so the one line that genuinely does not fit now says so. */
 .cluster {
-  --card-w: 27.5rem;
+  --card-w: 100%;
   --step-x: 16px;
   --step-y: 80px;
   position: relative;
@@ -140,9 +149,11 @@
   color: var(--muted-foreground);
 }
 
-/* Grouped left below 1024px: the card is cropped by the right viewport edge
-   there, and a right-aligned star count would always be cut mid-number. */
+/* Pinned right at every width now that the card fits its column: the source
+   path takes the ellipsis and the star count stays whole, which is the same
+   meta row the product slab and the real dossier render. */
 .cardStars {
+  margin-left: auto;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
   color: var(--muted-foreground);
@@ -193,10 +204,6 @@
 }
 
 @media (min-width: 64rem) {
-  .cardStars {
-    margin-left: auto;
-  }
-
   .copy {
     /* The headline needs ~615px to hold "Your team's skills." on one line
        at 72px; six columns is 588 and would wrap it to three. */
@@ -224,6 +231,9 @@
   }
 
   .cluster {
+    /* The stack is a composed object on desktop, so the card goes back to its
+       measured width rather than filling five columns. */
+    --card-w: 27.5rem;
     grid-column: 8 / -1;
     justify-self: end;
     margin-top: 0;

@@ -94,9 +94,15 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 }
 
 /**
- * Footer — the open-source colophon (§8.2). Below 1024px each column turns
- * into an index entry: the mono label holds a fixed left gutter and its links
- * run beside it, which keeps all three groups without stacking three blocks.
+ * Footer — the open-source colophon (§8.2).
+ *
+ * Below 1024px the label sits above its links rather than in a left gutter.
+ * The gutter version cost 96px of a 350px column, which was exactly enough to
+ * push "Pricing" onto a second line on its own with 180px of nothing beside it,
+ * while Resources and Open source stayed one line — three groups of three
+ * different shapes, which read as an accident rather than as an index. With the
+ * full width available every group's links fit on one line, so all three become
+ * the same two-line block on the same left edge.
  */
 export function SiteFooter() {
   return (
@@ -115,16 +121,14 @@ export function SiteFooter() {
           {columns.map((column) => (
             <nav
               aria-labelledby={column.id}
-              className={`col-span-12 flex items-baseline gap-4 lg:flex-col lg:gap-2 ${column.span}`}
+              className={`col-span-12 flex flex-col gap-2 ${column.span}`}
               key={column.id}
             >
-              <h2
-                className="lp-label w-24 shrink-0 text-muted-foreground lg:w-auto"
-                id={column.id}
-              >
+              <h2 className="lp-label text-muted-foreground" id={column.id}>
                 {column.heading}
               </h2>
               <ul className="lp-small flex flex-wrap gap-x-4 gap-y-2 lg:flex-col lg:gap-2">
+
                 {column.links.map((link) => (
                   <li key={link.label}>
                     <FooterLinkItem link={link} />
