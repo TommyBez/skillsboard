@@ -43,9 +43,7 @@ export function Faq() {
                 className={`faq-disclosure ${styles.faqItem}`}
               >
                 <summary className={styles.faqSummary}>
-                  <span className={`lp-h1 ${styles.faqQuestion}`}>
-                    {faq.question}
-                  </span>
+                  <span className="lp-h1">{faq.question}</span>
                   <span className={styles.faqGlyph} aria-hidden="true" />
                 </summary>
                 <p className={`lp-body ${styles.faqAnswer}`}>{faq.answer}</p>

@@ -150,7 +150,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
     <div className="flex flex-wrap gap-3">
       <Button
         size="lg"
-        className={styles.ctaButton}
+        className={`${styles.ctaButton} lp-cta-accent`}
         nativeButton={false}
         render={(
           <TrackedLink
@@ -198,7 +198,7 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
   return (
       <Button
         size="lg"
-        className={styles.ctaButton}
+        className={`${styles.ctaButton} lp-cta-accent`}
         nativeButton={false}
         render={(
           <TrackedLink
@@ -228,6 +228,7 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   return (
       <Button
         size="lg"
+        variant="on-ink"
         className={styles.ctaButton}
         nativeButton={false}
         render={(
@@ -257,7 +258,7 @@ function HomeLaunchActionsView({ signedIn }: { signedIn: boolean }) {
   return (
     <Button
       size="lg"
-      className={styles.ctaButton}
+      className={`${styles.ctaButton} lp-cta-accent`}
       nativeButton={false}
       render={(
         <TrackedLink

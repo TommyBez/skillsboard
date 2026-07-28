@@ -8,8 +8,7 @@
    The control rules below reach into the button primitive from here rather
    than from the page, because the rule is about *chrome*, not about one
    button: anything accent-filled, over-rounded or elevated that lands in this
-   strip gets neutralised on arrival. CSS modules are unlayered, so these win
-   over Tailwind's `@layer utilities` regardless of specificity.
+   strip gets neutralised on arrival.
 --------------------------------------------------------------------------- */
 
 .header {
@@ -60,6 +59,7 @@
 
 /* §7.4: the cheapest possible press. No scale, no duration. */
 .header :global([data-slot="button"]):active {
+  scale: none;
   transform: none;
   opacity: 0.92;
 }
@@ -73,21 +73,20 @@
   box-shadow: none;
 }
 
-/* The primary CTA. §5 and kill-list 14: no accent fill persists in chrome.
-   Targeting the fill rather than one component means a second accent-filled
-   control dropped in here later is treated the same way. In light mode this
-   is Vercel's solid-black CTA; in dark `--foreground` inverts to near-white,
-   which is Linear's light-on-dark `Sign up`. */
+/* Backstop for §5 and kill-list 14. The page ships the CTA as `variant="ink"`,
+   which is already correct; this catches anything accent-filled that lands in
+   the strip later, because the rule is about persistent chrome rather than
+   about one button. */
 .header :global([data-slot="button"].bg-primary) {
   background-color: var(--foreground);
   color: var(--background);
 }
 
 /* Text links in the strip spend nothing: opacity, no transition, no fill
-   (§7.4, measured off input-otp). */
-.header :global(a[data-slot="button"]:not(.bg-primary)) {
-  background-color: transparent;
-  color: var(--foreground);
+   (§7.4, measured off input-otp). `hover:bg-muted` is the ghost variant's
+   signature and is also exactly the declaration being cancelled, so this
+   fails safe — it can never strip the fill off a filled button. */
+.header :global(a[data-slot="button"].hover\:bg-muted) {
   transition: none;
 }
 
@@ -100,11 +99,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .header :global([data-slot="button"].bg-primary):hover {
-    background-color: color-mix(in oklch, var(--foreground) 86%, var(--background));
+    background-color: color-mix(in oklch, var(--foreground) 88%, var(--background));
   }
 
-  .header :global(a[data-slot="button"]:not(.bg-primary)):hover {
+  .header :global(a[data-slot="button"].hover\:bg-muted):hover {
     background-color: transparent;
+    color: var(--foreground);
     opacity: 0.8;
   }
 

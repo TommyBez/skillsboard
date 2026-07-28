@@ -386,6 +386,20 @@
   opacity: 0.92;
 }
 
+/* In dark mode the accent is a bright mint on a near-black green ground, and a
+   large fill of it is precisely the lone-acid-pop cliché the brief rules out
+   (§5). Accent survives in dark as text, as a 1px mark, and on the logo — so
+   the primary CTA inverts to ink instead. Light mode keeps the green fill,
+   which is the one accent fill per viewport the budget allows. */
+.dark [data-landing-page] [data-slot="button"].lp-cta-accent {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.dark [data-landing-page] [data-slot="button"].lp-cta-accent:hover {
+  background: color-mix(in oklch, var(--foreground) 88%, var(--background));
+}
+
 /* Hover on a surface is a border-colour change and nothing else. */
 [data-landing-page] .lift-on-hover {
   transition: border-color 160ms var(--ease-standard);
