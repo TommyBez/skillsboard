@@ -1,10 +1,14 @@
 {
   "url": "http://localhost:3000/",
-  "viewports": ["1440x900", "390x844"],
-  "schemes": ["light", "dark"],
-
-  "_defaults": "0 means the defect must not exist. A non-zero ceiling is measured debt, not a target: it exists so a regression fails today, and it should be ratcheted down as the debt is paid. `null` disables a rule (report-only). Re-measure with: node refs/harness/lint.mjs --suggest",
-
+  "viewports": [
+    "1440x900",
+    "390x844"
+  ],
+  "schemes": [
+    "light",
+    "dark"
+  ],
+  "_thresholds": "0 means the defect must not exist. A non-zero ceiling is measured debt, not a target: it exists so a regression fails today, and it should be ratcheted down as the debt is paid. `null` disables a rule (report-only). Re-measure with: node refs/harness/lint.mjs --suggest",
   "defaults": {
     "proseClippedPastViewport": 0,
     "documentHorizontalOverflowPx": 0,
@@ -16,21 +20,28 @@
     "smallTapTargets": 7,
     "ellipsisTruncation": 6,
     "typeCombinations": 13,
-    "voidPctOfDocument": 60,
-    "accentPerViewport": null
+    "voidPctOfDocument": 60
   },
-
   "perViewport": {
     "390x844": {
       "typeCombinations": 10,
       "smallTapTargets": 4
     }
   },
-
+  "_exempt": "Selector fragments whose findings are subtracted from a rule's count. This is the only sanctioned way to forgive a defect: it names what is forgiven, in writing, and the audit still reports it in full. Raising a ceiling instead would hide the next, different defect underneath the same number. Deliberately empty \u2014 see _standingDecision.",
+  "exempt": {
+    "proseClippedPastViewport": [
+      "product-slab-module"
+    ],
+    "textSlicedByClip": [
+      "product-slab-module"
+    ]
+  },
+  "_standingDecision": "Decided 2026-07-28, after looking rather than inferring. The slab's 27 clipped and 6 sliced findings at 390x844 are forgiven, and only inside .product-slab-module__*. Reason: the slab is a 480px window onto a full library UI, which is unmistakably wider than a phone, and the mobile repair added a horizontal mask so content dissolves into the ground before the viewport edge instead of terminating against it. Captured the right 150px of the slab at device-scale 3 and confirmed by eye: 'database', 'test' and 'caught' all fade to nothing; no glyph ends on a hard line. That is the whole difference between the defect the owner found (chips ending at 500px against a hard edge, in a section with no window reading at all) and a designed crop. The harness cannot see this distinction \u2014 it measures geometry, not perception \u2014 which is why the call is recorded here instead of buried in a raised ceiling. Residual risk, stated so the next person inherits it: if the mask is ever removed the geometry will not change, so this exemption would keep the gate green over a real defect. If you touch product-slab.module.css's mask-image, re-verify the right edge by eye and update this note.",
   "_debt": {
-    "smallTapTargets": "desktop 7 / mobile 4 — footer links (20px tall), the header wordmark, the theme toggle at 40x40. All real; none fixed yet.",
-    "ellipsisTruncation": "6 — the install commands in the hero card, the workflow step and the slab cards are deliberately ellipsised. Kept visible as a ceiling so a seventh truncation has to be argued for.",
-    "typeCombinations": "13 desktop / 10 mobile as measured on 2026-07-28. The page shipped 33 before the ramp was made shared; this ceiling is the ratchet that keeps it there.",
-    "voidPctOfDocument": "60 against a measured 56-58%. This is a composition metric, not a defect: it says over half the page is flat band. Treat a rise as a prompt to look, not as a bug."
+    "smallTapTargets": "desktop 7 / mobile 4 \u2014 footer links (20px tall), the header wordmark, the theme toggle at 40x40. All real, none fixed.",
+    "ellipsisTruncation": "6 \u2014 the install commands in the hero card, the workflow step and the slab cards are deliberately ellipsised. Held as a ceiling so a seventh has to be argued for.",
+    "typeCombinations": "13 desktop / 10 mobile, measured 2026-07-28. The page shipped 33 from seven vw slopes before the ramp was made shared; this is the ratchet that keeps it there.",
+    "voidPctOfDocument": "60 against a measured 56-58%. A composition metric, not a defect: it says over half the page is flat band. Treat a rise as a prompt to look, not as a bug."
   }
 }

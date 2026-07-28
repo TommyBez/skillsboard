@@ -114,7 +114,7 @@ function staggerOf(delays) {
 // ---------------------------------------------------------------------------
 // Screencast -> frame strip
 // ---------------------------------------------------------------------------
-async function screencast(action, { settleMs = 900 } = {}) {
+async function screencast(action, { settleMs = 900, baseFirst = false } = {}) {
   const frames = []
   const onFrame = async ({ data, sessionId, metadata }) => {
     frames.push({ data, t: metadata.timestamp })
@@ -125,12 +125,14 @@ async function screencast(action, { settleMs = 900 } = {}) {
     format: 'jpeg', quality: 90, maxWidth: vp.width, maxHeight: vp.height, everyNthFrame: 1,
   })
   await page.waitForTimeout(120) // let one baseline frame land before the trigger
+  // Zero the clock at the last frame before the trigger, so pre-trigger frames
+  // read as negative and the rest are "ms since the user did the thing".
   const t0 = frames.length ? frames[frames.length - 1].t : null
   await action()
   await page.waitForTimeout(settleMs)
   await client.send('Page.stopScreencast')
   client.off('Page.screencastFrame', onFrame)
-  const base = t0 ?? frames[0]?.t ?? 0
+  const base = (baseFirst ? frames[0]?.t : t0) ?? frames[0]?.t ?? 0
   return frames.map((f) => ({ data: f.data, ms: Math.round((f.t - base) * 1000) }))
 }
 
@@ -220,7 +222,7 @@ const report = { label, url, viewport: vp, capturedAt: new Date().toISOString(),
 
 {
   const t0 = startRecording()
-  const frames = await screencast(async () => {}, { settleMs: 2600 })
+  const frames = await screencast(async () => {}, { settleMs: 2600, baseFirst: true })
   report.entrance = {
     animations: summarise(t0),
     strip: await writeStrip('entrance', frames, { x: 0, y: 0, width: vp.width, height: vp.height }, `${label} — entrance`),
@@ -233,14 +235,19 @@ const report = { label, url, viewport: vp, capturedAt: new Date().toISOString(),
 // 2. Scroll reveal — a mid-page section entering the viewport for the first time
 // ---------------------------------------------------------------------------
 {
-  const docH = await page.evaluate(() => document.documentElement.scrollHeight)
+  // Segmentation needs a settled page; the reveal measurement needs a page that
+  // has never been scrolled. So: settle, choose the target, then reload and
+  // jump straight to it. Creeping up on the section first is what made the
+  // first attempt record nothing — a reveal engine with a negative rootMargin
+  // had already fired by the time recording started, and only the scroll-back
+  // (which should be silent) showed any animation at all.
+  await settle(page, vp, { dwell: 160, tail: 600 })
   const sections = await getSections(page, vp)
-  // Pick the first section that has never been on screen, so the reveal is
-  // genuinely a first intersection and not a replay (which most engines skip).
-  const target = sections.find((s) => s.top > vp.height * 1.2) || sections[1] || sections[0]
+  const target = sections.find((s) => s.top > vp.height * 1.4) || sections[1] || sections[0]
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.waitForTimeout(2600)
+  const docH = await page.evaluate(() => document.documentElement.scrollHeight)
   if (target) {
-    await scrollTo(page, Math.max(0, target.top - vp.height * 1.05))
-    await page.waitForTimeout(700)
     const t0 = startRecording()
     const frames = await screencast(
       () => scrollTo(page, Math.min(target.top, docH - vp.height)),
@@ -287,16 +294,27 @@ if (!targets.length) {
         return { el, r, area: r.width * r.height }
       })
       .filter((c) => c.r.top >= 0 && c.r.top < vpH && c.r.width > 40 && c.r.height > 16)
+    // Always-unique structural path. A class-based guess is prettier but fails
+    // silently on hashed CSS-module names and Tailwind's `group/button`, and a
+    // selector that does not resolve costs a whole interaction.
     const path = (el) => {
-      if (el.id) return `#${CSS.escape(el.id)}`
-      const cls = (typeof el.className === 'string' ? el.className : '').trim().split(/\s+/)[0]
-      const base = cls ? `${el.tagName.toLowerCase()}.${CSS.escape(cls)}` : el.tagName.toLowerCase()
-      const all = [...document.querySelectorAll(base)]
-      return all.length > 1 ? `${base}:nth-of-type(${all.indexOf(el) + 1})` : base
+      if (el.id && document.querySelectorAll(`#${CSS.escape(el.id)}`).length === 1) {
+        return `#${CSS.escape(el.id)}`
+      }
+      const parts = []
+      for (let n = el; n && n !== document.body; n = n.parentElement) {
+        const i = [...n.parentElement.children].indexOf(n) + 1
+        parts.unshift(`${n.tagName.toLowerCase()}:nth-child(${i})`)
+      }
+      return `body > ${parts.join(' > ')}`
     }
     cands.sort((a, b) => b.area - a.area)
+    // Biggest in the fold is the primary CTA on essentially every marketing
+    // page; smallest is a nav link. The two ends bracket the interaction
+    // vocabulary — the thing they spent motion on and the thing they did not.
+    const picks = [cands[0], cands[cands.length - 1]].filter(Boolean)
     const out = []
-    for (const c of [cands[0], cands[cands.length - 1]].filter(Boolean)) {
+    for (const c of picks) {
       const p = path(c.el)
       if (p && !out.includes(p) && document.querySelector(p) === c.el) out.push(p)
     }

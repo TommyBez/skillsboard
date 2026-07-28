@@ -31,7 +31,9 @@ if (inPath) {
   report = JSON.parse(readFileSync(resolve(inPath), 'utf8'))
 } else {
   const target = url || config.url
-  const args = ['refs/harness/audit.mjs', target, '--out', outPath, '--quiet']
+  // A generous cap: exemptions are matched against the item lists, so a list
+  // truncated at the default 25 would make them silently incomplete.
+  const args = ['refs/harness/audit.mjs', target, '--out', outPath, '--quiet', '--cap', '300']
   for (const vp of config.viewports) args.push('--viewport', vp)
   args.push('--scheme', config.schemes.length > 1 ? 'both' : config.schemes[0])
   const res = spawnSync(process.execPath, args, {
@@ -46,10 +48,16 @@ if (inPath) {
 }
 
 // Each rule reads one number out of a run and compares it to a ceiling.
+// `items` lets a rule be scoped: a selector fragment listed under `exempt` in
+// the config subtracts the matching findings from the count. That is the only
+// sanctioned way to forgive a defect — it is written down, it names what is
+// forgiven, and the audit still reports it in full. A raised ceiling would hide
+// the next, different defect underneath the same number.
 const RULES = {
   proseClippedPastViewport: {
     label: 'elements carrying copy past the viewport edge',
     read: (r) => r.overflow.counts.text,
+    items: (r) => r.overflow.text,
   },
   documentHorizontalOverflowPx: {
     label: 'horizontal document overflow (px)',
@@ -58,18 +66,22 @@ const RULES = {
   textSlicedByClip: {
     label: 'text sliced by an overflow:hidden box',
     read: (r) => r.truncation.counts.sliced,
+    items: (r) => r.truncation.clipped.filter((c) => c.category === 'sliced'),
   },
   ellipsisTruncation: {
     label: 'strings truncated with an ellipsis',
     read: (r) => r.truncation.counts.ellipsis,
+    items: (r) => r.truncation.ellipsis,
   },
   invisibleText: {
     label: 'invisible text after a full scroll pass',
     read: (r) => r.invisibleText.count,
+    items: (r) => r.invisibleText.items,
   },
   smallTapTargets: {
     label: 'interactive targets under 44px',
     read: (r) => r.tapTargets.count,
+    items: (r) => r.tapTargets.items,
   },
   bodyContrastFailures: {
     label: 'body text under 4.5:1',
@@ -86,6 +98,7 @@ const RULES = {
   focusWithoutIndicator: {
     label: 'focusable elements with no visible focus indicator',
     read: (r) => r.focus.noVisibleIndicator.length,
+    items: (r) => r.focus.noVisibleIndicator,
   },
   voidPctOfDocument: {
     label: 'share of the document that is a flat void band (%)',
@@ -126,12 +139,25 @@ for (const run of report.runs) {
   const limits = limitsFor(run)
   for (const [name, rule] of Object.entries(RULES)) {
     const limit = limits[name]
-    const actual = rule.read(run)
+    const raw = rule.read(run)
+    const patterns = config.exempt?.[name] || []
+    let exempted = 0
+    if (patterns.length && rule.items) {
+      const list = rule.items(run)
+      if (list.length < raw) {
+        lines.push(`  note  ${rule.label}: only ${list.length} of ${raw} findings kept — raise --cap before trusting exemptions`)
+      }
+      exempted = list.filter((it) =>
+        patterns.some((p) => `${it.selector || ''} ${it.clippedBy || ''}`.includes(p)),
+      ).length
+    }
+    const actual = Math.max(0, raw - exempted)
     actuals[run.viewport][name] = Math.max(actuals[run.viewport][name] ?? 0, actual)
     if (limit === undefined || limit === null) continue
     const ok = actual <= limit
     if (!ok) failures.push(`${key}: ${rule.label} = ${actual} (max ${limit})`)
-    lines.push(`  ${ok ? 'pass' : 'FAIL'}  ${String(actual).padStart(5)} / ${String(limit).padEnd(5)} ${rule.label}`)
+    const suffix = exempted ? `  (${exempted} exempted by config)` : ''
+    lines.push(`  ${ok ? 'pass' : 'FAIL'}  ${String(actual).padStart(5)} / ${String(limit).padEnd(5)} ${rule.label}${suffix}`)
   }
 }
 

@@ -134,7 +134,13 @@ export const SEGMENT_FN = function segment(vpH) {
     if (['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE', 'LINK', 'META'].includes(el.tagName)) return false
     return rectOf(el).height > 4
   }
-  const kidsOf = (el) => [...el.children].filter(inFlow)
+  // `display: contents` boxes have no rect at all, so a naive height filter
+  // deletes them and the whole page with them — input-otp's entire 9,762px
+  // document hangs off one such wrapper. Look through them instead.
+  const kidsOf = (el) =>
+    [...el.children].flatMap((k) =>
+      getComputedStyle(k).display === 'contents' ? kidsOf(k) : inFlow(k) ? [k] : [],
+    )
 
   const expand = (el, depth) => {
     const { height } = rectOf(el)
@@ -146,7 +152,7 @@ export const SEGMENT_FN = function segment(vpH) {
     // div > div.container > main > div.homepage), and charging each one a
     // level made the whole page come back as two sections.
     if (kids.length === 1) return expand(kids[0], depth)
-    if (depth >= 3) return [el]
+    if (depth >= 5) return [el]
     // Only treat it as a container if its children actually tile it. Under 0.7
     // it is a real section with absolutely-positioned decoration; over 1.35 the
     // children overlap (stacked layers), and splitting on them is meaningless.
@@ -168,9 +174,12 @@ export const SEGMENT_FN = function segment(vpH) {
     return kids.flatMap((k) => expand(k, depth + 1))
   }
 
+  // innerText, not textContent: inline <style> and <script> bodies are part of
+  // textContent, and input-otp's tallest section was getting named
+  // "<style> [data-input-otp] { --nojs-bg…".
   const label = (el) => {
     const h = el.querySelector('h1, h2, h3, [role="heading"]')
-    const t = (h?.textContent || el.getAttribute('aria-label') || el.id || el.textContent || '')
+    const t = (h?.innerText || el.getAttribute('aria-label') || el.id || el.innerText || '')
       .replace(/\s+/g, ' ')
       .trim()
     return t.slice(0, 60)
@@ -196,6 +205,14 @@ export const SEGMENT_FN = function segment(vpH) {
     .filter((s) => s.height > 0)
     .sort((a, b) => a.top - b.top)
 
+  // Clamp overlaps so the bands tile the page monotonically. Vercel's <header>
+  // measures 900px tall because of an absolutely-positioned mega-menu, and
+  // without this it swallows the hero that starts 64px below it.
+  for (let i = 0; i < raw.length - 1; i++) {
+    const room = raw[i + 1].top - raw[i].top
+    if (room > 0 && raw[i].height > room) raw[i].height = room
+  }
+
   // Merge runts forward: sub-quarter-viewport strips are dividers, hairlines
   // and one-line banners, not modules. Keeping them would inflate the section
   // count and wreck the variance numbers.
@@ -203,12 +220,29 @@ export const SEGMENT_FN = function segment(vpH) {
   const out = []
   for (const s of raw) {
     const prev = out[out.length - 1]
-    if (prev && (s.height < min || prev.height < min) && s.top <= prev.top + prev.height + 4) {
+    // Gap tolerance rather than strict adjacency: Linear's hero is followed by
+    // a 28px link and a 144px standfirst separated by ~100px of margin, and
+    // those are parts of the hero, not three modules.
+    const gap = prev ? s.top - (prev.top + prev.height) : Infinity
+    if (prev && (s.height < min || prev.height < min) && gap <= vpH * 0.75) {
       prev.height = Math.max(prev.height + prev.top, s.top + s.height) - prev.top
       if (!prev.label) prev.label = s.label
       prev.merged = (prev.merged || 1) + 1
     } else {
       out.push({ ...s })
+    }
+  }
+
+  // Close holes. A gap wider than three-quarters of a viewport with no section
+  // in it is a segmentation miss, not rhythm — input-otp's "How I built it"
+  // measures 969px because that is only its header block, while the sticky
+  // scene beneath it runs another 4,900px. Left alone, sections.mjs would never
+  // photograph that region at all.
+  for (let i = 0; i < out.length - 1; i++) {
+    const gap = out[i + 1].top - (out[i].top + out[i].height)
+    if (gap > vpH * 0.75) {
+      out[i].height = out[i + 1].top - out[i].top
+      out[i].extended = true
     }
   }
   return out

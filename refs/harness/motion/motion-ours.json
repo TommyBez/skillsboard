@@ -1,0 +1,186 @@
+{
+  "label": "ours",
+  "url": "http://localhost:3000",
+  "viewport": {
+    "name": "desktop",
+    "width": 1440,
+    "height": 900
+  },
+  "capturedAt": "2026-07-28T17:37:04.693Z",
+  "reducedMotion": false,
+  "entrance": {
+    "animations": [],
+    "strip": {
+      "file": "entrance-strip.png",
+      "frames": [
+        0,
+        23,
+        42,
+        63
+      ]
+    },
+    "frameCount": 4
+  },
+  "scrollReveal": {
+    "section": {
+      "label": "Every saved skill, one search.",
+      "top": 1482,
+      "height": 912
+    },
+    "animations": [
+      {
+        "type": "CSSTransition",
+        "name": "border-bottom-color",
+        "durationMs": 160,
+        "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "count": 1,
+        "delaysMs": [
+          0
+        ],
+        "firstAtMs": 147,
+        "staggerMs": null
+      }
+    ],
+    "strip": {
+      "file": "reveal-every-saved-skill-one-se-strip.png",
+      "frames": [
+        0,
+        174,
+        196,
+        215,
+        235,
+        254,
+        272,
+        292,
+        311,
+        337
+      ]
+    },
+    "frameCount": 10,
+    "replaysOnScrollBack": true
+  },
+  "interactions": [
+    {
+      "selector": "body > div:nth-child(3) > main:nth-child(3) > section:nth-child(1) > div:nth-child(1) > div:nth-child(1) > div:nth-child(4) > div:nth-child(1) > a:nth-child(1)",
+      "box": {
+        "x": 120,
+        "y": 492,
+        "w": 252,
+        "h": 48
+      },
+      "rest": {
+        "backgroundColor": "lab(42.5974 -42.9476 31.9285)",
+        "color": "lab(98.3228 -0.623286 2.97157)",
+        "borderColor": "rgba(0, 0, 0, 0)",
+        "borderWidth": "1px",
+        "boxShadow": "none",
+        "opacity": "1",
+        "transform": "none",
+        "scale": "none",
+        "filter": "none",
+        "backdropFilter": "none",
+        "outline": "lab(42.5974 -42.9476 31.9285) none 0px",
+        "outlineOffset": "0px",
+        "borderRadius": "6px",
+        "letterSpacing": "normal",
+        "textDecorationLine": "none",
+        "backgroundImage": "none",
+        "transitionProperty": "transform, background-color, border-color, color, box-shadow",
+        "transitionDuration": "0.16s",
+        "transitionTimingFunction": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "transitionDelay": "0s",
+        "animationName": "none",
+        "animationDuration": "0s",
+        "animationTimingFunction": "ease",
+        "cursor": "pointer",
+        "willChange": "auto",
+        "_box": {
+          "x": 120,
+          "y": 492,
+          "w": 252,
+          "h": 48
+        }
+      },
+      "hover": {
+        "animations": [
+          {
+            "type": "CSSTransition",
+            "name": "background-color",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 240,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "transform",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 240,
+            "staggerMs": null
+          }
+        ],
+        "changed": {
+          "backgroundColor": "lab(42.5974 -42.9476 31.9285) → oklab(0.489999 -0.122961 0.0768429 / 0.9)"
+        },
+        "strip": {
+          "file": "body-div-nth-child-3-main-nt-hover-strip.png",
+          "frames": [
+            0,
+            204,
+            239,
+            262,
+            287,
+            313,
+            333,
+            358,
+            385,
+            405
+          ]
+        }
+      },
+      "press": {
+        "animations": [],
+        "changedFromHover": {
+          "opacity": "1 → 0.92",
+          "scale": "none → 1"
+        },
+        "strip": {
+          "file": "body-div-nth-child-3-main-nt-press-strip.png",
+          "frames": [
+            0,
+            141
+          ]
+        }
+      },
+      "hoverInterrupt": {
+        "leftAfterMs": 80,
+        "reverseAnimations": []
+      },
+      "focus": {
+        "animations": [],
+        "changed": null,
+        "strip": {
+          "file": "body-div-nth-child-3-main-nt-focus-strip.png",
+          "frames": [
+            0,
+            139,
+            169
+          ]
+        }
+      }
+    },
+    {
+      "selector": "body > div:nth-child(3) > header:nth-child(2) > div:nth-child(1) > div:nth-child(2) > nav:nth-child(2) > a:nth-child(1)",
+      "error": "not found"
+    }
+  ]
+}
