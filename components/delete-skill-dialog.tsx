@@ -6,6 +6,7 @@ import { Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteSkill } from "@/app/actions/skills"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -53,13 +54,14 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
         render={
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
+            className="size-8 rounded-lg"
             aria-label={`Delete ${skillName} from the library`}
+            title="Delete"
           />
         }
       >
-        <Trash2Icon data-icon="inline-start" />
-        Delete
+        <Trash2Icon />
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -72,8 +74,15 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
           <DialogClose render={<Button variant="outline" disabled={isPending} />}>
             Cancel
           </DialogClose>
-          <Button variant="destructive" disabled={isPending} onClick={handleDelete}>
-            {isPending ? "Deleting…" : "Delete skill"}
+          <Button
+            variant="destructive"
+            disabled={isPending}
+            aria-busy={isPending || undefined}
+            onClick={handleDelete}
+          >
+            <ButtonPendingContent pending={isPending} pendingLabel="Deleting…">
+              Delete skill
+            </ButtonPendingContent>
           </Button>
         </DialogFooter>
       </DialogContent>

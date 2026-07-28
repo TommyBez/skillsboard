@@ -1,7 +1,20 @@
+import type { GuidePath } from "@/lib/seo/guides"
+import type { resourcePaths } from "@/lib/seo/resources"
+
 type NonTeamEventPropertiesMap = {
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    location: "header" | "hero" | "closing"
+    landing_path: "/" | GuidePath | typeof resourcePaths.index
+    location:
+      | "header"
+      | "hero"
+      | "closing"
+      | "guide_header"
+      | "guide_inline"
+      | "guide_closing"
+      | "resources_header"
+      | "resources_closing"
+      | "launch_demo"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
@@ -20,7 +33,19 @@ type NonTeamEventPropertiesMap = {
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
     succeeded: boolean
-    tool_name: "discover_skills" | "get_skill_command" | "list_skills" | "search_skills"
+    tool_name:
+      | "add_skill"
+      | "add_skill_to_collection"
+      | "create_collection"
+      | "discover_repository_skills"
+      | "discover_skills"
+      | "get_collection_skills"
+      | "get_skill_command"
+      | "list_collections"
+      | "list_skills"
+      | "remove_skill_from_collection"
+      | "search_collections"
+      | "search_skills"
   }
   signup_form_submitted: {
     method: "email_otp"
@@ -41,10 +66,12 @@ type TeamEventPropertiesMap = {
     creation_surface: "in_app" | "onboarding"
   }
   skill_saved: {
+    example_prompt_count: number
     has_note: boolean
     repo_name: string
     repo_owner: string
     skill_name: string
+    surface: "mcp" | "web"
     tag_count: number
   }
   team_member_invited: {
@@ -57,7 +84,7 @@ type TeamEventPropertiesMap = {
     method: "command" | "source"
     skill_id: string
     skill_name: string
-    surface: "library" | "mcp"
+    surface: "collection" | "library" | "mcp"
   }
   skill_downloaded: {
     actor_is_skill_creator: boolean
@@ -81,6 +108,10 @@ type TeamEventPropertiesMap = {
     has_note: boolean
     skill_id: string
   }
+  skill_example_prompts_updated: {
+    example_prompt_count: number
+    skill_id: string
+  }
   skill_deleted: {
     skill_id: string
   }
@@ -88,6 +119,31 @@ type TeamEventPropertiesMap = {
     repo_name: string
     repo_owner: string
     skill_id: string
+  }
+  collection_created: {
+    collection_id: string
+    has_description: boolean
+    surface: "mcp" | "web"
+    tag_count: number
+  }
+  collection_updated: {
+    collection_id: string
+    has_description: boolean
+    tag_count: number
+  }
+  collection_deleted: {
+    collection_id: string
+    skill_count: number
+  }
+  collection_skill_added: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library" | "mcp"
+  }
+  collection_skill_removed: {
+    collection_id: string
+    skill_id: string
+    surface: "collection_detail" | "library" | "mcp"
   }
 }
 

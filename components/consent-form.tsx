@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 
 import { authClient } from "@/lib/auth-client"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
@@ -43,17 +44,23 @@ export function ConsentForm() {
           variant="outline"
           className="h-12 rounded-[16px] px-6"
           disabled={pendingChoice !== null}
+          aria-busy={pendingChoice === "deny" || undefined}
           onClick={() => decide(false)}
         >
-          {pendingChoice === "deny" ? "Denying…" : "Deny access"}
+          <ButtonPendingContent pending={pendingChoice === "deny"} pendingLabel="Denying…">
+            Deny access
+          </ButtonPendingContent>
         </Button>
         <Button
           type="button"
           className="h-12 rounded-[16px] px-6"
           disabled={pendingChoice !== null}
+          aria-busy={pendingChoice === "accept" || undefined}
           onClick={() => decide(true)}
         >
-          {pendingChoice === "accept" ? "Allowing…" : "Allow read-only access"}
+          <ButtonPendingContent pending={pendingChoice === "accept"} pendingLabel="Allowing…">
+            Allow access
+          </ButtonPendingContent>
         </Button>
       </div>
     </div>

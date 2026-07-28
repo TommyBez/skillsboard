@@ -1,9 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { LogOutIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
+import { SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
 
-import { SignOutForm } from "@/components/sign-out-form"
+import { SignOutForm, SignOutMenuItem } from "@/components/sign-out-form"
 import { TrackedLink } from "@/components/tracked-link"
 import {
   DropdownMenu,
@@ -73,14 +73,7 @@ export function AccountMenu({ user }: AccountMenuProps) {
         </nav>
         <div className="border-t border-border p-1">
           <SignOutForm>
-            <DropdownMenuItem
-              className="w-full gap-2 rounded-lg px-3 py-2 text-sm font-medium"
-              nativeButton
-              render={<button type="submit" />}
-            >
-              <LogOutIcon className="size-4" aria-hidden="true" />
-              Sign out
-            </DropdownMenuItem>
+            <SignOutMenuItem />
           </SignOutForm>
         </div>
       </DropdownMenuContent>

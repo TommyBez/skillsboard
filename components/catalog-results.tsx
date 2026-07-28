@@ -5,6 +5,7 @@ import Link from "next/link"
 import { CheckIcon, SearchIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CatalogSkillDetailsDialog } from "@/components/catalog-skill-details-dialog"
 import { SkillDossier } from "@/components/skill-dossier"
 import { Button } from "@/components/ui/button"
@@ -35,11 +36,9 @@ function InLibraryLabel({ name }: { name: string }) {
 function SkillCard({
   item,
   isSaved,
-  rank,
 }: {
   item: CatalogSkill
   isSaved: boolean
-  rank?: number
 }) {
   const command = buildInstallCommand(item.installUrl, item.slug)
 
@@ -51,7 +50,6 @@ function SkillCard({
       source={item.source}
       command={command}
       metric={installCount(item.installs)}
-      rank={rank}
       details={<CatalogSkillDetailsDialog item={item} isSaved={isSaved} />}
       actions={
         isSaved
@@ -110,7 +108,6 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
     loadingRef.current = true
     setIsLoadingMore(true)
-    setError(null)
 
     try {
       const response = await fetch(`/api/catalog?${params}`)
@@ -127,6 +124,9 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       }
       setPage(nextPage)
       pageRef.current = nextPage
+      // Keep the retry control mounted during pending requests so the button
+      // can show its loading label; only clear the error after success.
+      setError(null)
     } catch (loadError) {
       console.error(loadError)
       setError("Couldn’t load more skills. Try again.")
@@ -173,12 +173,11 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       )}
 
       <section aria-label="Catalog results" className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {skills.map((item, index) => (
+        {skills.map((item) => (
           <SkillCard
             key={item.id}
             item={item}
             isSaved={saved.has(`${item.installUrl}:${item.slug}`)}
-            rank={page.source === "leaderboard" ? index + 1 : undefined}
           />
         ))}
       </section>
@@ -186,8 +185,17 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       {error ? (
         <div className="flex flex-col items-center gap-3">
           <p className="text-sm text-destructive" role="alert">{error}</p>
-          <Button type="button" variant="outline" size="sm" onClick={() => void loadMore()}>
-            Try again
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isLoadingMore}
+            aria-busy={isLoadingMore || undefined}
+            onClick={() => void loadMore()}
+          >
+            <ButtonPendingContent pending={isLoadingMore} pendingLabel="Loading…">
+              Try again
+            </ButtonPendingContent>
           </Button>
         </div>
       ) : null}

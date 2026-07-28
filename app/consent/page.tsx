@@ -124,10 +124,10 @@ export default function ConsentPage({ searchParams }: ConsentPageProps) {
   return (
     <AccessShell
       marker="MCP authorization"
-      title="Allow read-only access?"
+      title="Allow access?"
       description="Review the client and permissions before connecting it to Skills Board."
       editorialTitle="Your libraries stay yours."
-      editorialBody="This client can find saved skills and retrieve install commands. It cannot add, edit, or delete anything."
+      editorialBody="This client can find saved skills, retrieve install commands, and save new skills to your team libraries. It cannot edit or delete anything."
     >
       <Suspense fallback={<ConsentContentFallback />}>
         <ConsentContent searchParams={searchParams} />

@@ -1,12 +1,15 @@
-import { Suspense } from "react"
+import { generatePermutations } from "flags/next"
+import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowRightIcon, CableIcon, ShieldCheckIcon } from "lucide-react"
+import { notFound } from "next/navigation"
+import { Suspense } from "react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
 import { HeroBoard } from "@/components/landing/hero-board"
+import { LaunchDemoLoop } from "@/components/landing/launch-demo-loop"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-motion.module.css"
 import { McpSchematic } from "@/components/landing/mcp-schematic"
@@ -19,16 +22,49 @@ import { landingFaqs } from "@/lib/seo/landing-faq"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { getSession } from "@/lib/session"
 import { siteConfig } from "@/lib/site"
+import { homepageFlags, launchTreatmentIsVisible } from "@/lib/launch"
 
-export const metadata: Metadata = {
-  title: { absolute: "Skills Board, your team’s recommended AI skills" },
-  description: siteConfig.description,
-  alternates: { canonical: "/" },
-  openGraph: {
-    url: "/",
-    title: "Skills Board: Your team’s skills. All in one place.",
-    description: siteConfig.ogDescription,
-  },
+type HomeVariantPageProps = {
+  params: Promise<{ code: string }>
+}
+
+export async function generateStaticParams() {
+  const codes = await generatePermutations(homepageFlags)
+  return codes.map((code) => ({ code }))
+}
+
+async function getLaunchTreatment(code: string) {
+  try {
+    return await launchTreatmentIsVisible(code, homepageFlags)
+  } catch {
+    // This internal segment exists only for signed, precomputed flag variants.
+    // Reject direct requests carrying an invalid or stale code.
+    notFound()
+  }
+}
+
+export async function generateMetadata({ params }: HomeVariantPageProps): Promise<Metadata> {
+  const { code } = await params
+  const showLaunchTreatment = await getLaunchTreatment(code)
+
+  return {
+    title: { absolute: "Skills Board, your team’s recommended AI skills" },
+    description: siteConfig.description,
+    alternates: { canonical: "/" },
+    openGraph: {
+      url: "/",
+      title: "Skills Board: Your team’s skills. All in one place.",
+      description: siteConfig.ogDescription,
+      images: showLaunchTreatment
+        ? [{
+            url: "/launch/skills-board-launch-og.jpg",
+            width: 1200,
+            height: 630,
+            alt: "Skills Board: a shared answer to which skill should I use?",
+          }]
+        : undefined,
+    },
+  }
 }
 
 function primaryAction(signedIn: boolean): {
@@ -46,7 +82,7 @@ function HomeHeaderActionsFallback() {
       <ThemeToggle />
       <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
         <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-28 rounded-[3px] sm:h-10 sm:w-40" />
+        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-10 sm:w-40" />
       </nav>
     </div>
   )
@@ -58,11 +94,12 @@ function HomeCtaFallback() {
 
 function primaryCtaEventProperties(
   signedIn: boolean,
-  location: "header" | "hero" | "closing",
+  location: "header" | "hero" | "closing" | "launch_demo",
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   const primary = primaryAction(signedIn)
   return {
     destination: primary.href,
+    landing_path: "/",
     location,
     visitor_state: signedIn ? "signed_in" : "anonymous",
   }
@@ -88,7 +125,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
         ) : null}
         <Button
           size="sm"
-          className={`${styles.ctaButton} sm:h-10 sm:px-4`}
+          className={`${styles.ctaButton} px-2.5 sm:h-10 sm:px-4`}
           nativeButton={false}
           render={(
             <TrackedLink
@@ -100,7 +137,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
             />
           )}
         >
-          <span className="sm:hidden">{signedIn ? "Open library" : "Create library"}</span>
+          <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
           <span className="hidden sm:inline">{primary.label}</span>
           <ArrowRightIcon
             className={`${styles.ctaArrow} hidden sm:block`}
@@ -122,23 +159,25 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
 
   return (
     <div className="flex flex-wrap gap-3">
-      <Button
-        size="lg"
-        className={styles.ctaButton}
-        nativeButton={false}
-        render={(
-          <TrackedLink
-            href={primary.href}
-            analytics={{
-              event: "landing_cta_clicked",
-              properties: primaryCtaEventProperties(signedIn, "hero"),
-            }}
-          />
-        )}
-      >
-        {primary.label}
-        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-      </Button>
+      <span className={styles.magnetic} data-magnetic>
+        <Button
+          size="lg"
+          className={styles.ctaButton}
+          nativeButton={false}
+          render={(
+            <TrackedLink
+              href={primary.href}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties(signedIn, "hero"),
+              }}
+            />
+          )}
+        >
+          {primary.label}
+          <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+        </Button>
+      </span>
       <Button
         size="lg"
         variant="outline"
@@ -170,24 +209,26 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
   const href = signedIn ? "/settings/mcp" : "/sign-up"
 
   return (
-    <Button
-      size="lg"
-      className={styles.ctaButton}
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={href}
-          analytics={{
-            event: "mcp_entry_clicked",
-            properties: mcpEntryEventProperties(signedIn, "landing_section", href),
-          }}
-        />
-      )}
-    >
-      <CableIcon data-icon="inline-start" />
-      {signedIn ? "Connect your agent" : "Create a library to connect"}
-      <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
-    </Button>
+    <span className={styles.magnetic} data-magnetic>
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={href}
+            analytics={{
+              event: "mcp_entry_clicked",
+              properties: mcpEntryEventProperties(signedIn, "landing_section", href),
+            }}
+          />
+        )}
+      >
+        <CableIcon data-icon="inline-start" />
+        {signedIn ? "Connect your agent" : "Create a library to connect"}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+    </span>
   )
 }
 
@@ -200,6 +241,37 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
+    <span className={styles.magnetic} data-magnetic>
+      <Button
+        size="lg"
+        className={styles.ctaButton}
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primary.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties(signedIn, "closing"),
+            }}
+          />
+        )}
+      >
+        {primary.label}
+        <ArrowRightIcon className={styles.ctaArrow} data-icon="inline-end" />
+      </Button>
+    </span>
+  )
+}
+
+async function HomeFinalActions() {
+  const session = await getSession()
+  return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
+}
+
+function HomeLaunchActionsView({ signedIn }: { signedIn: boolean }) {
+  const primary = primaryAction(signedIn)
+
+  return (
     <Button
       size="lg"
       className={styles.ctaButton}
@@ -209,7 +281,7 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
           href={primary.href}
           analytics={{
             event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties(signedIn, "closing"),
+            properties: primaryCtaEventProperties(signedIn, "launch_demo"),
           }}
         />
       )}
@@ -220,10 +292,97 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
   )
 }
 
-async function HomeFinalActions() {
+async function HomeLaunchActions() {
   const session = await getSession()
-  return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
+  return <HomeLaunchActionsView signedIn={Boolean(session?.user)} />
 }
+
+function HomeLaunchBanner() {
+  return (
+    <aside className="relative z-30 border-b border-primary/25 bg-primary/10">
+      <a
+        href="#launch-demo"
+        className="mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2 px-5 py-3 text-center text-sm font-semibold transition-colors hover:bg-primary/8 md:px-10"
+      >
+        <span className="font-mono text-xs uppercase tracking-[0.16em] text-primary">
+          Product walkthrough
+        </span>
+        <span>See how a team shares one useful skill in 14 seconds.</span>
+        <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+      </a>
+    </aside>
+  )
+}
+
+function HomeLaunchDemo() {
+  return (
+    <div
+      id="launch-demo"
+      className="surface-shadow mt-12 grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]"
+    >
+      <LaunchDemoLoop />
+      <div className="flex flex-col justify-center border-t border-border p-6 md:p-8 lg:border-l lg:border-t-0 lg:p-10">
+        <p className={`${styles.chapterMark} uppercase`}>
+          Current product · synthetic demo data
+        </p>
+        <h3 className="mt-5 max-w-[14ch] text-balance text-3xl font-semibold leading-none tracking-display md:text-4xl">
+          One teammate saves it. The next finds it.
+        </h3>
+        <p className="mt-5 text-pretty leading-relaxed text-muted-foreground">
+          Skills Board is already available. This short walkthrough shows the current add → share → find loop using synthetic identities and a public skill.
+        </p>
+        <div className="mt-7">
+          <Suspense fallback={<HomeCtaFallback />}>
+            <HomeLaunchActions />
+          </Suspense>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const railChapters = [
+  { id: "intro", label: "Library" },
+  { id: "flow", label: "Workflow" },
+  { id: "mcp", label: "MCP" },
+  { id: "pricing", label: "Pricing" },
+  { id: "faq", label: "FAQ" },
+  { id: "start", label: "Start" },
+] as const
+
+function ChapterRail() {
+  return (
+    <nav className={styles.rail} aria-label="Page chapters">
+      {railChapters.map((chapter) => (
+        <a
+          key={chapter.id}
+          href={`#${chapter.id}`}
+          className={styles.railLink}
+          data-rail-link={chapter.id}
+          aria-current={chapter.id === "intro" ? "true" : undefined}
+        >
+          <span className={styles.railLabel}>{chapter.label}</span>
+          <span className={styles.railTick} aria-hidden="true" />
+        </a>
+      ))}
+    </nav>
+  )
+}
+
+const flowSteps = [
+  {
+    title: "Save the skill",
+    copy: "Paste a GitHub skill URL you want the team to reuse. Skills Board keeps the name, description, and install command tied to it.",
+  },
+  {
+    title: "Find it later",
+    copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
+  },
+  {
+    title: "Use it your way",
+    copy: "Open the source, copy the install command, download a ZIP, or let your agent fetch it over MCP.",
+  },
+] as const
 
 function GitHubMark() {
   return (
@@ -238,7 +397,10 @@ function GitHubMark() {
   )
 }
 
-export default function HomePage() {
+export default async function HomePage({ params }: HomeVariantPageProps) {
+  const { code } = await params
+  const showLaunchTreatment = await getLaunchTreatment(code)
+
   return (
     <div
       className={`${styles.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
@@ -246,25 +408,36 @@ export default function HomePage() {
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
+      <ChapterRail />
 
       <header className={styles.header}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
-          <Brand />
+          <Brand compactOnMobile />
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
         </div>
+        <span className={styles.scrollProgress} aria-hidden="true" />
       </header>
+
+      {showLaunchTreatment ? <HomeLaunchBanner /> : null}
 
       <main>
         {/* Hero — sticky chapter: dossiers file into the team library */}
-        <section className={styles.hero} data-hero-scene>
+        <section
+          id="intro"
+          className={styles.hero}
+          data-hero-scene
+          data-chapter-target="intro"
+        >
           <div className={`${styles.heroSticky} ${styles.grain}`}>
             <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:py-16">
               <div className={styles.heroGridLines} aria-hidden="true" />
 
-              <div className="relative z-0">
-                <p className={styles.heroEyebrow}>Skills selected by your team</p>
+              <div className={`${styles.heroExit} relative z-0`}>
+                <p className={styles.heroEyebrow} data-decode="">
+                  Skills selected by your team
+                </p>
                 <h1
                   className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
                 >
@@ -283,7 +456,9 @@ export default function HomePage() {
                 </h1>
               </div>
 
-              <div className="relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]">
+              <div
+                className={`${styles.heroExit} relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]`}
+              >
                 <p
                   className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
                 >
@@ -302,17 +477,56 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Workflow — three moves, indexed like a manual */}
+        <section
+          id="flow"
+          aria-labelledby="flow-heading"
+          className={`${styles.flowSection} scroll-mt-14`}
+          data-chapter-target="flow"
+        >
+          <div
+            className="relative mx-auto w-full max-w-[1440px] px-5 py-16 md:px-10 md:py-24"
+            data-motion-group="flow"
+          >
+            <div className={styles.flowHead}>
+              <p className={`${styles.chapterMark} uppercase`} data-decode="">
+                How it works
+              </p>
+              <h2
+                id="flow-heading"
+                className="mt-5 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
+              >
+                Save once. Find fast. Use it your way.
+              </h2>
+            </div>
+
+            {showLaunchTreatment ? <HomeLaunchDemo /> : null}
+
+            <ol className={styles.flowRows}>
+              {flowSteps.map((step) => (
+                <li key={step.title} className={styles.flowRow}>
+                  <h3 className={styles.flowTitle}>{step.title}</h3>
+                  <p className={styles.flowCopy}>{step.copy}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
         {/* MCP — the signature routing chapter */}
         <section
           id="mcp"
           aria-labelledby="mcp-heading"
           className={`${styles.mcpChapter} scroll-mt-14 border-b border-border/70`}
           data-mcp-chapter
+          data-chapter-target="mcp"
         >
           <div className={styles.mcpSticky}>
             <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(19rem,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16 lg:py-0">
               <div className="w-full">
-                <p className={`${styles.chapterMark} uppercase`}>MCP access</p>
+                <p className={`${styles.chapterMark} uppercase`} data-decode="">
+                  MCP access
+                </p>
                 <h2
                   id="mcp-heading"
                   className="mt-5 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
@@ -321,8 +535,8 @@ export default function HomePage() {
                 </h2>
                 <p className="mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
                   Connect Skills Board through MCP. Your agent can search the
-                  shared library and retrieve install commands with read-only
-                  access.
+                  shared library, retrieve install commands, and save new
+                  skills it discovers.
                 </p>
                 <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
                   <ShieldCheckIcon
@@ -352,6 +566,7 @@ export default function HomePage() {
           aria-labelledby="pricing-heading"
           className={`${styles.pricingSection} ${styles.grain} scroll-mt-14`}
           data-motion-group="pricing"
+          data-chapter-target="pricing"
         >
           <div className="mx-auto w-full max-w-[1440px] px-5 py-20 md:px-10 md:py-28 lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(20rem,0.65fr)] lg:items-end lg:gap-6">
             <div className={styles.pricingZeroWrap} aria-hidden="true">
@@ -388,6 +603,7 @@ export default function HomePage() {
           id="faq"
           aria-labelledby="faq-heading"
           className="scroll-mt-14 border-b border-border/70"
+          data-chapter-target="faq"
         >
           <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(16rem,0.7fr)_minmax(28rem,1.3fr)] lg:gap-20">
             <div>
@@ -425,8 +641,13 @@ export default function HomePage() {
         </section>
 
         {/* Closing — everything indexed, one final action */}
-        <section className={styles.grain} data-motion-group="closing">
-          <div className="mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
+        <section
+          id="start"
+          className={`${styles.grain} scroll-mt-14`}
+          data-motion-group="closing"
+          data-chapter-target="start"
+        >
+          <div className="relative mx-auto flex w-full max-w-[1440px] flex-col items-start px-5 py-20 md:px-10 md:py-32">
             <h2
               className={`${styles.closingHeading} max-w-[18ch] text-balance text-[clamp(2.5rem,6vw,5.75rem)] font-semibold leading-[0.98] tracking-display`}
             >
@@ -455,7 +676,7 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
             <nav
               aria-label="Footer"
-              className="flex items-center gap-6 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+              className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
             >
               <a href="#pricing" className="transition-colors hover:text-foreground">
                 Pricing
@@ -463,6 +684,12 @@ export default function HomePage() {
               <a href="#faq" className="transition-colors hover:text-foreground">
                 FAQ
               </a>
+              <Link
+                href="/resources"
+                className="transition-colors hover:text-foreground"
+              >
+                Resources
+              </Link>
             </nav>
             <a
               href="https://github.com/TommyBez/skillsboard"

@@ -1,11 +1,10 @@
-import { ImageResponse } from "next/og"
-
-import { SocialImage } from "@/components/social-image"
+import { homeOgContent } from "@/lib/og/pages"
+import { createSocialImageResponse, TWITTER_SIZE } from "@/lib/og/template"
 
 export const alt = "Skills Board: Your team’s skills. All in one place."
-export const size = { width: 1200, height: 675 }
+export const size = TWITTER_SIZE
 export const contentType = "image/png"
 
 export default function TwitterImage() {
-  return new ImageResponse(<SocialImage height={size.height} />, size)
+  return createSocialImageResponse(size, homeOgContent)
 }

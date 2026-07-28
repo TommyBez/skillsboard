@@ -46,7 +46,7 @@ Useful skill recommendations tend to disappear into chats, bookmarks, and person
 - **Different agents welcome.** Share the same recommendation across Claude, Codex, Cursor, and other agent setups.
 - **A choice of handoff.** Open the original source, copy a compatible install command, or download the latest skill files as a ZIP.
 - **Organization-scoped access.** Create a team, invite members, and keep each library available to its members.
-- **Optional MCP access.** Connect compatible agents to authenticated, read-only tools for listing and searching the library.
+- **Optional MCP access.** Connect compatible agents to authenticated tools for listing, searching, and saving skills to the library.
 
 > [!IMPORTANT]
 > A saved skill is a team recommendation, not a security review, compatibility certification, or pinned release. Skills Board reads the latest available source; inspect that source before using it in an agent.
@@ -112,7 +112,7 @@ Sign-in and sign-up use email one-time codes (no passwords). Outside development
 
 ## MCP access
 
-Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** for the connection flow. The server offers read-only tools to list and search team skills, get a saved skill's install command, and browse the optional public catalog.
+Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** for the connection flow. The server offers tools to list and search team skills, get a saved skill's install command, browse the optional public catalog, and save new skills from GitHub to a team library (guarded by the `skills:write` scope).
 
 ## Tech stack
 

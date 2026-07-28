@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { SkillPromptList } from "@/components/skill-prompt-list"
 import { TrackedAnchor } from "@/components/tracked-anchor"
 import { Badge } from "@/components/ui/badge"
 import type { ClientAnalyticsEvent } from "@/lib/analytics-client"
@@ -24,6 +25,7 @@ interface SkillUsageTracking {
   actorIsSkillCreator: boolean
   skillId: string
   skillName: string
+  surface?: "collection" | "library"
   teamId: string
 }
 
@@ -31,12 +33,11 @@ interface SkillDossierProps {
   name: string
   description?: string | null
   note?: string | null
+  examplePrompts?: string[]
   source: string
   command: string
   metric?: string
   tags?: string[]
-  /** Position in a ranked list (leaderboards); rendered as a monospace ordinal. */
-  rank?: number
   addedBy?: string | null
   href?: string
   hrefLabel?: string
@@ -61,7 +62,7 @@ function getSkillUsageAnalytics(
       method,
       skill_id: tracking.skillId,
       skill_name: tracking.skillName,
-      surface: "library",
+      surface: tracking.surface ?? "library",
       team_id: tracking.teamId,
     },
   }
@@ -71,11 +72,11 @@ export function SkillDossier({
   name,
   description,
   note,
+  examplePrompts = [],
   source,
   command,
   metric,
   tags = [],
-  rank,
   addedBy,
   href,
   hrefLabel = "View source",
@@ -108,11 +109,6 @@ export function SkillDossier({
       <div className={cn("flex flex-1 flex-col", compact ? "gap-4 p-4" : "gap-5 p-5 md:p-6")}>
         <div className="flex min-w-0 items-start justify-between gap-4">
           <div className="flex min-w-0 items-center gap-2 font-mono text-xs text-muted-foreground">
-            {typeof rank === "number" ? (
-              <span className="shrink-0 font-semibold tabular-nums text-primary">
-                {String(rank).padStart(2, "0")}
-              </span>
-            ) : null}
             <GitForkIcon className="size-3.5 shrink-0 text-primary" aria-hidden="true" />
             <span className="truncate">{source}</span>
           </div>
@@ -135,6 +131,7 @@ export function SkillDossier({
               {note}
             </p>
           ) : null}
+          <SkillPromptList prompts={examplePrompts} skillName={name} />
         </div>
 
         {tags.length ? (
@@ -159,7 +156,7 @@ export function SkillDossier({
       </div>
 
       <div className="border-t border-border bg-muted/40 p-3 md:p-4">
-        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-background/75 p-2 pl-3">
+        <div className="flex h-10 min-w-0 items-center gap-2 rounded-lg border border-border bg-background/75 px-3">
           <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             <code className="block whitespace-nowrap font-mono text-[0.7rem] text-muted-foreground md:text-xs">{command}</code>
           </div>
@@ -175,21 +172,27 @@ export function SkillDossier({
           </div>
         </div>
         {details || href || actions ? (
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
-            {details ? details : href ? (
-              <TrackedAnchor
-                analytics={sourceAnalytics}
-                aria-label={`${hrefLabel} for ${name}`}
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
-                href={href}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
-                <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
-              </TrackedAnchor>
-            ) : <span />}
-            {actions}
+          <div className="mt-3 flex h-8 items-center gap-2">
+            <div className="min-w-0 shrink">
+              {details ? details : href ? (
+                <TrackedAnchor
+                  analytics={sourceAnalytics}
+                  aria-label={`${hrefLabel} for ${name}`}
+                  className="inline-flex h-8 items-center gap-1.5 text-sm font-semibold text-foreground transition-colors hover:text-primary"
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
+                  <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
+                </TrackedAnchor>
+              ) : null}
+            </div>
+            {actions ? (
+              <div className="ml-auto flex min-w-0 items-center justify-end gap-1.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+                {actions}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

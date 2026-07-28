@@ -1,0 +1,2185 @@
+{
+  "artifacts": {
+    "orchestrator": {
+      "content_sha256": "e09bf235953ace12ed0e8fe5673e51c0feea5c89791ea853f9e545fb8c57f8c5",
+      "file": ".agents/skills/skillsboard-pulse/SKILL.md"
+    },
+    "validator": {
+      "content_sha256": "ee7d272de6d0fd6ef33cf277adc25f860e62e77d6a55e3e3ef6dce46256ae9a4",
+      "file": ".agents/skills/skillsboard-pulse/scripts/validate-graph.mjs"
+    },
+    "validator.closure": {
+      "content_sha256": "0a921b00bfc86e869b2fc7f26b8a4f73138181846e4e3c7b793108e38f6371c6",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/closure.mjs"
+    },
+    "validator.constants": {
+      "content_sha256": "f8c6be6495a0d4164f40443a78bed4bb0a6e1fd8878700fca135d7e4d70646cb",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/constants.mjs"
+    },
+    "validator.cross-refs": {
+      "content_sha256": "f445b283c65eb512ff6581b7c487abc40992ea80ed32ff136d54ec4b7b14c2be",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/cross-refs.mjs"
+    },
+    "validator.errors": {
+      "content_sha256": "b85c47ae62b9e8d49ff688ff8164dcc4ee95da874e8402ad0bf38df31e62f732",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/errors.mjs"
+    },
+    "validator.expect": {
+      "content_sha256": "5927774dee0bdf5e735734f0a2fb8229cf1c76b705f6a534164984ffafab69fe",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/expect.mjs"
+    },
+    "validator.fs-safety": {
+      "content_sha256": "fd33a82d2f4df0b13bd154b83552a30e4448ed1cce04a21dba72d6e6cbc39f19",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/fs-safety.mjs"
+    },
+    "validator.load": {
+      "content_sha256": "55b3eed0c32e1bd784acefb45a3a5441d7d2ef17c511950a1bcf351d9935ef2c",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/load.mjs"
+    },
+    "validator.lock": {
+      "content_sha256": "a122e921dc073a01146564fa29b42cae82bdc8f3fd6c40b424ce26e5b70fd335",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/lock.mjs"
+    },
+    "validator.merkle": {
+      "content_sha256": "f2d3fd2021f822fd1129c937e8ea7f63c09b8b373cdba3d25c5c24b20b605ec6",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/merkle.mjs"
+    },
+    "validator.origins": {
+      "content_sha256": "080ac053234bcdc1c33bf96195ec4a48478ae098ba2712b9da2ce247a06a3e57",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/origins.mjs"
+    },
+    "validator.policy": {
+      "content_sha256": "955fbb87a4c512638c45d9aa1e65fe787599af929540a311922f0a20b700d153",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/policy.mjs"
+    },
+    "validator.resolve": {
+      "content_sha256": "3d21c26514f93337899079434490983e77d33569b6e52f1528e1f35725d2577e",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/resolve.mjs"
+    },
+    "validator.shape": {
+      "content_sha256": "b56b31a0942eabc8eb11f9e5e6dbd39067fd1f450a6d68d100fc2560b249d525",
+      "file": ".agents/skills/skillsboard-pulse/scripts/lib/shape.mjs"
+    }
+  },
+  "context_limits": {
+    "max_kernel_bytes": 32768,
+    "max_node_bytes": 24576
+  },
+  "contract_version": 16,
+  "execution_limits": {
+    "executor_result_schema_version": 1,
+    "max_executor_result_bytes": 4096
+  },
+  "integrity": {
+    "algorithm": "sha256-merkle-v1",
+    "root_sha256": "b7e3bf1d7de50dea9c157fe845b0221eeb1b7c9871e936d0e56d78dc12deb319"
+  },
+  "interference_keys": [
+    "channel.community",
+    "channel.demand",
+    "channel.directory",
+    "channel.earned",
+    "channel.partnership",
+    "channel.review",
+    "channel.social",
+    "email.attention",
+    "email.inbound",
+    "email.resend",
+    "incident.notification",
+    "metered.dataforseo",
+    "posthog.assets",
+    "product.exposure",
+    "repo.general_pr",
+    "repo.pseo_pr"
+  ],
+  "mandatory_nodes": [
+    "pulse.kernel"
+  ],
+  "nodes": {
+    "analytics.control_plane": {
+      "conflicts_with": [],
+      "content_sha256": "08823359905db367df2a88ed70d6803abad1d3c9ce712e16f5a113ba3e330284",
+      "kind": "policy",
+      "provides": [
+        "ownership",
+        "readback",
+        "verification"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/analytics-control-plane.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "analytics.scorecard": {
+      "conflicts_with": [],
+      "content_sha256": "50c18edc1df5915b5fa809d29d6b0fed6685cc78fc6922f96d017044d49dc932",
+      "kind": "policy",
+      "provides": [
+        "measurement"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/analytics-scorecard.md",
+      "requires": [
+        "analytics.control_plane"
+      ]
+    },
+    "channels.distribution": {
+      "conflicts_with": [],
+      "content_sha256": "19ff63dcade8126c57c5a083d24d58f84a3c5d21522c2a7ef44312b8692e9572",
+      "kind": "policy",
+      "provides": [
+        "eligibility",
+        "ownership",
+        "readback"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/channels-distribution.md",
+      "requires": [
+        "learning.opportunities",
+        "pulse.kernel"
+      ]
+    },
+    "channels.social": {
+      "conflicts_with": [],
+      "content_sha256": "33f5f9e01c47eb96e5f5a24c9381f82758aae6e8416d58148b4ca4905eddd54f",
+      "kind": "policy",
+      "provides": [
+        "eligibility",
+        "ownership",
+        "readback"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/channels-social.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "communications.attention": {
+      "conflicts_with": [],
+      "content_sha256": "4d0d999d62f6d6d1f2a13eccb2c7d799f1c4f90d73dc1809a85da5c996266385",
+      "kind": "policy",
+      "provides": [
+        "attention",
+        "eligibility"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/communications-attention.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "delivery.repository": {
+      "conflicts_with": [],
+      "content_sha256": "3fd2f89d325f63a86187291fbed8af9355d128134acf9dff819b4b6df8c9ce47",
+      "kind": "policy",
+      "provides": [
+        "approval",
+        "ownership",
+        "rollback",
+        "verification"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/delivery-repository.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "email.inbound": {
+      "conflicts_with": [],
+      "content_sha256": "588a1a2197561d266f55db490dde501fcdc9eef7c055f7a6895683db2ace86b4",
+      "kind": "policy",
+      "provides": [
+        "ownership",
+        "readback",
+        "verification"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/email-inbound.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "email.outbound": {
+      "conflicts_with": [],
+      "content_sha256": "11d9c9a931f45dffc8f94a8d18df28e415846f31caacd5b6f5da1fe84bd1f400",
+      "kind": "policy",
+      "provides": [
+        "eligibility",
+        "ownership",
+        "readback"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/email-outbound.md",
+      "requires": [
+        "communications.attention",
+        "pulse.kernel"
+      ]
+    },
+    "growth.pseo": {
+      "conflicts_with": [],
+      "content_sha256": "7d3d1f5c00e0747596e8b4bfe488779d81000afb5b3a2ac35256b0ba10433dda",
+      "kind": "policy",
+      "provides": [
+        "eligibility",
+        "ownership",
+        "readback",
+        "rollback"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/growth-pseo.md",
+      "requires": [
+        "learning.opportunities",
+        "pulse.kernel"
+      ]
+    },
+    "launch.campaign": {
+      "conflicts_with": [],
+      "content_sha256": "790be5648822c4cbd708221987df6a029f0b27cb88cbc5c7d1e25dad9c410372",
+      "kind": "policy",
+      "provides": [
+        "launch_plan"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/launch-campaign.md",
+      "requires": [
+        "product.lifecycle",
+        "product.truth"
+      ]
+    },
+    "learning.opportunities": {
+      "conflicts_with": [],
+      "content_sha256": "c6a010332007468d80644ddd10eda44e5130738de75d5b374448030af549cb0f",
+      "kind": "policy",
+      "provides": [
+        "evidence"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/learning-opportunities.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "product.lifecycle": {
+      "conflicts_with": [],
+      "content_sha256": "f55a05e96fa78cd254af32cd3e473daf2929661a429e006320823b8ce7853006",
+      "kind": "policy",
+      "provides": [
+        "eligibility",
+        "rollback",
+        "verification"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/product-lifecycle.md",
+      "requires": [
+        "analytics.control_plane",
+        "communications.attention",
+        "learning.opportunities"
+      ]
+    },
+    "product.truth": {
+      "conflicts_with": [],
+      "content_sha256": "4012432001f2da744674b927b39d7cbab3e69e2be0fd0b3d91ebb001f1385826",
+      "kind": "policy",
+      "provides": [
+        "product_truth"
+      ],
+      "reference": ".agents/product-marketing.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    },
+    "pulse.kernel": {
+      "conflicts_with": [],
+      "content_sha256": "904d9d1c1163a39f8c2829b9af620de36734c983f9039ca844248365b5a0c186",
+      "kind": "kernel",
+      "provides": [
+        "authority",
+        "budget",
+        "caps",
+        "checkout",
+        "containment",
+        "data_safety",
+        "handoff",
+        "idempotency",
+        "incident",
+        "truth"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/pulse-kernel.md",
+      "requires": []
+    },
+    "pulse.scheduler": {
+      "conflicts_with": [],
+      "content_sha256": "92284a04c272afdf56dc3ebe9155f395b68e13789e62912505e4278d6e01668c",
+      "kind": "policy",
+      "provides": [
+        "idempotency",
+        "state"
+      ],
+      "reference": ".agents/skills/skillsboard-pulse/references/pulse-scheduler.md",
+      "requires": [
+        "pulse.kernel"
+      ]
+    }
+  },
+  "operations": {
+    "community.publish": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "public_effect",
+      "interference_keys": [
+        "channel.community"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "community_marketing"
+      ]
+    },
+    "dataforseo.research": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "spend",
+      "interference_keys": [
+        "metered.dataforseo"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "growth.pseo"
+      ],
+      "skills": [
+        "programmatic_seo"
+      ]
+    },
+    "demand.email": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "channel.demand",
+        "email.attention"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "product_truth"
+      ],
+      "requires": [
+        "channels.distribution",
+        "email.outbound",
+        "product.truth"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ]
+    },
+    "demand.respond": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "public_effect",
+      "interference_keys": [
+        "channel.demand"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "community_marketing"
+      ]
+    },
+    "directory.publish": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "public_effect",
+      "interference_keys": [
+        "channel.directory"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "directory_submissions"
+      ]
+    },
+    "earned.outreach": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "channel.earned"
+      ],
+      "required_capabilities": [
+        "eligibility"
+      ],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "public_relations"
+      ]
+    },
+    "github.pr.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "repository_write",
+      "interference_keys": [
+        "repo.general_pr"
+      ],
+      "required_capabilities": [
+        "approval"
+      ],
+      "requires": [
+        "delivery.repository"
+      ],
+      "skills": [
+        "github",
+        "github_yeet"
+      ]
+    },
+    "github.pseo_pr.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "repository_write",
+      "interference_keys": [
+        "repo.pseo_pr"
+      ],
+      "required_capabilities": [
+        "approval"
+      ],
+      "requires": [
+        "delivery.repository",
+        "growth.pseo"
+      ],
+      "skills": [
+        "github",
+        "github_yeet"
+      ]
+    },
+    "hacker_news.submit": {
+      "autonomy": "manual_only",
+      "conflicts_with": [],
+      "effect": "human_only",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "launch"
+      ]
+    },
+    "inbound.process": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.inbound"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "email.inbound"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ]
+    },
+    "inbound.reply": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.inbound"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "product_truth"
+      ],
+      "requires": [
+        "email.inbound",
+        "email.outbound",
+        "product.truth"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ]
+    },
+    "incident.email": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "incident.notification"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "neon.database.read": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "read",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "analytics.control_plane"
+      ],
+      "skills": [
+        "neon_postgres"
+      ]
+    },
+    "partnership.outreach": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "channel.partnership"
+      ],
+      "required_capabilities": [
+        "eligibility"
+      ],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "community_marketing"
+      ]
+    },
+    "posthog.asset.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "posthog.assets"
+      ],
+      "required_capabilities": [
+        "verification"
+      ],
+      "requires": [
+        "analytics.control_plane"
+      ],
+      "skills": [
+        "posthog"
+      ]
+    },
+    "posthog.experiment.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "product.exposure"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "rollback",
+        "verification"
+      ],
+      "requires": [
+        "analytics.control_plane",
+        "product.lifecycle"
+      ],
+      "skills": [
+        "ab_testing",
+        "posthog"
+      ]
+    },
+    "posthog.flag.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "product.exposure"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "rollback",
+        "verification"
+      ],
+      "requires": [
+        "analytics.control_plane",
+        "product.lifecycle"
+      ],
+      "skills": [
+        "ab_testing",
+        "posthog"
+      ]
+    },
+    "posthog.survey.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "product.exposure"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "verification"
+      ],
+      "requires": [
+        "analytics.control_plane",
+        "product.lifecycle"
+      ],
+      "skills": [
+        "customer_research",
+        "posthog"
+      ]
+    },
+    "product_hunt.submit": {
+      "autonomy": "manual_only",
+      "conflicts_with": [],
+      "effect": "human_only",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "channels.distribution"
+      ],
+      "skills": [
+        "launch"
+      ]
+    },
+    "pulse.reconcile": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "read",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "analytics.control_plane"
+      ],
+      "skills": [
+        "posthog"
+      ]
+    },
+    "pulse.state.persist": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "local_state",
+      "interference_keys": [],
+      "required_capabilities": [],
+      "requires": [
+        "pulse.scheduler"
+      ],
+      "skills": []
+    },
+    "resend.audience.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.resend"
+      ],
+      "required_capabilities": [
+        "eligibility"
+      ],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "resend.broadcast.send": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.attention",
+        "email.resend"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "product_truth"
+      ],
+      "requires": [
+        "email.outbound",
+        "product.truth"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ]
+    },
+    "resend.broadcast_draft.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.resend"
+      ],
+      "required_capabilities": [
+        "eligibility"
+      ],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "resend.domain.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.resend"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "resend.proactive.send": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.attention"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "product_truth"
+      ],
+      "requires": [
+        "email.outbound",
+        "product.truth"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ]
+    },
+    "resend.suppression_lift": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.resend"
+      ],
+      "required_capabilities": [
+        "eligibility"
+      ],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "resend.topic.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.resend"
+      ],
+      "required_capabilities": [],
+      "requires": [
+        "email.outbound"
+      ],
+      "skills": [
+        "resend_connector"
+      ]
+    },
+    "resend.webhook.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "email.inbound"
+      ],
+      "required_capabilities": [
+        "verification"
+      ],
+      "requires": [
+        "email.inbound"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ]
+    },
+    "review.outreach": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "channel.review",
+        "email.attention"
+      ],
+      "required_capabilities": [
+        "eligibility",
+        "product_truth"
+      ],
+      "requires": [
+        "channels.distribution",
+        "email.outbound",
+        "product.truth"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ]
+    },
+    "review.respond": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "public_effect",
+      "interference_keys": [
+        "channel.review"
+      ],
+      "required_capabilities": [
+        "product_truth"
+      ],
+      "requires": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "skills": [
+        "community_marketing"
+      ]
+    },
+    "social.draft.write": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "external_write",
+      "interference_keys": [
+        "channel.social"
+      ],
+      "required_capabilities": [
+        "product_truth"
+      ],
+      "requires": [
+        "channels.social",
+        "product.truth"
+      ],
+      "skills": [
+        "social",
+        "typefully"
+      ]
+    },
+    "social.publish": {
+      "autonomy": "autonomous",
+      "conflicts_with": [],
+      "effect": "public_effect",
+      "interference_keys": [
+        "channel.social"
+      ],
+      "required_capabilities": [
+        "product_truth"
+      ],
+      "requires": [
+        "channels.social",
+        "product.truth"
+      ],
+      "skills": [
+        "social",
+        "typefully"
+      ]
+    }
+  },
+  "policy_invariants": {
+    "campaign_origin_node": "launch.campaign",
+    "mandatory_nodes_must_equal": [
+      "pulse.kernel"
+    ],
+    "node_reference_must_equal": {
+      "product.truth": ".agents/product-marketing.md"
+    },
+    "routes": {
+      "*": {
+        "forbid_effects": [
+          "local_state"
+        ],
+        "forbid_nodes": [
+          "pulse.scheduler"
+        ]
+      },
+      "contract.audit": {
+        "allow_nodes": [
+          "pulse.scheduler"
+        ]
+      },
+      "delivery.repository": {
+        "forbid_self_origin": true
+      }
+    },
+    "run_types": {
+      "*": {
+        "effects_allowed": [
+          "local_state",
+          "read"
+        ],
+        "must_include_nodes": [
+          "analytics.control_plane",
+          "pulse.scheduler"
+        ],
+        "must_include_operations": [
+          "pulse.state.persist"
+        ]
+      },
+      "operational": {
+        "must_include_nodes": [
+          "learning.opportunities"
+        ],
+        "must_include_state_views": [
+          "opportunities"
+        ]
+      }
+    }
+  },
+  "policy_selectors": [
+    "/incidents/*/owner_policy_node",
+    "/reviews/due/*/policy_nodes",
+    "/work_graph/active_policy_nodes",
+    "/work_graph/due_policy_nodes",
+    "/work_graph/selected/origin_policy_node",
+    "/work_graph/selected/policy_nodes"
+  ],
+  "routes": {
+    "analytics.asset_write": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane"
+      ],
+      "entry_nodes": [
+        "analytics.control_plane"
+      ],
+      "max_known_context_bytes": 73728,
+      "operations": [
+        "posthog.asset.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "analytics",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "analytics.database_reconcile": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane"
+      ],
+      "entry_nodes": [
+        "analytics.control_plane"
+      ],
+      "max_known_context_bytes": 65536,
+      "operations": [
+        "neon.database.read"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "scorecard",
+        "selected_work"
+      ]
+    },
+    "contract.audit": {
+      "entry_nodes": [
+        "analytics.scorecard",
+        "channels.distribution",
+        "channels.social",
+        "delivery.repository",
+        "email.inbound",
+        "email.outbound",
+        "growth.pseo",
+        "launch.campaign",
+        "learning.opportunities",
+        "product.lifecycle",
+        "product.truth",
+        "pulse.scheduler"
+      ],
+      "max_known_context_bytes": 155648,
+      "operations": [],
+      "skills": [],
+      "state_views": [
+        "core"
+      ]
+    },
+    "delivery.pr_monitor": {
+      "entry_nodes": [
+        "delivery.repository"
+      ],
+      "max_known_context_bytes": 32768,
+      "operations": [],
+      "skills": [
+        "github"
+      ],
+      "state_views": [
+        "core",
+        "delivery",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "delivery.repository": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "analytics.control_plane",
+        "channels.distribution",
+        "channels.social",
+        "communications.attention",
+        "email.inbound",
+        "email.outbound",
+        "growth.pseo",
+        "learning.opportunities",
+        "product.lifecycle",
+        "product.truth",
+        "pulse.scheduler"
+      ],
+      "entry_nodes": [
+        "delivery.repository"
+      ],
+      "max_known_context_bytes": 61440,
+      "operations": [
+        "github.pr.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "github",
+        "github_yeet"
+      ],
+      "state_views": [
+        "core",
+        "delivery",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "distribution.community": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.distribution"
+      ],
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 70656,
+      "operations": [
+        "community.publish"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "community_marketing"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.demand": {
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 70656,
+      "operations": [
+        "demand.respond"
+      ],
+      "skills": [
+        "community_marketing"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.demand_email": {
+      "entry_nodes": [
+        "channels.distribution",
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 96256,
+      "operations": [
+        "demand.email"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "distribution",
+        "email",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.directory": {
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 84992,
+      "operations": [
+        "directory.publish"
+      ],
+      "skills": [
+        "directory_submissions"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.earned": {
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 68608,
+      "operations": [
+        "earned.outreach"
+      ],
+      "skills": [
+        "public_relations"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.hacker_news": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.distribution"
+      ],
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 74752,
+      "operations": [
+        "hacker_news.submit"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "launch"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.partnership": {
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 70656,
+      "operations": [
+        "partnership.outreach"
+      ],
+      "skills": [
+        "community_marketing"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.product_hunt": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.distribution"
+      ],
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 74752,
+      "operations": [
+        "product_hunt.submit"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "launch"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.review_outreach": {
+      "entry_nodes": [
+        "channels.distribution",
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 96256,
+      "operations": [
+        "review.outreach"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "distribution",
+        "email",
+        "incidents",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "distribution.review_response": {
+      "entry_nodes": [
+        "channels.distribution",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 70656,
+      "operations": [
+        "review.respond"
+      ],
+      "skills": [
+        "community_marketing"
+      ],
+      "state_views": [
+        "core",
+        "distribution",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.broadcast_prepare": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "email.outbound"
+      ],
+      "entry_nodes": [
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 91136,
+      "operations": [
+        "resend.broadcast_draft.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.broadcast_send": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "email.outbound"
+      ],
+      "entry_nodes": [
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 91136,
+      "operations": [
+        "resend.broadcast.send"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.inbound_process": {
+      "entry_nodes": [
+        "email.inbound"
+      ],
+      "max_known_context_bytes": 58368,
+      "operations": [
+        "inbound.process"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "inbound",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.inbound_reply": {
+      "entry_nodes": [
+        "email.inbound",
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 89088,
+      "operations": [
+        "inbound.reply"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "email",
+        "inbound",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.proactive_send": {
+      "entry_nodes": [
+        "email.outbound",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 91136,
+      "operations": [
+        "resend.proactive.send"
+      ],
+      "skills": [
+        "email_best_practices",
+        "emails",
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.reconcile": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "email.outbound"
+      ],
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 73728,
+      "operations": [],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "attention",
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.resend_audience": {
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 63488,
+      "operations": [
+        "resend.audience.write"
+      ],
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.resend_domain": {
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 48128,
+      "operations": [
+        "resend.domain.write"
+      ],
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.resend_suppression": {
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 48128,
+      "operations": [
+        "resend.suppression_lift"
+      ],
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.resend_topic": {
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 63488,
+      "operations": [
+        "resend.topic.write"
+      ],
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "email",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "email.resend_webhook": {
+      "entry_nodes": [
+        "email.inbound"
+      ],
+      "max_known_context_bytes": 58368,
+      "operations": [
+        "resend.webhook.write"
+      ],
+      "skills": [
+        "agent_email_inbox",
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "inbound",
+        "incidents",
+        "selected_work"
+      ]
+    },
+    "incident.notify": {
+      "entry_nodes": [
+        "email.outbound"
+      ],
+      "max_known_context_bytes": 48128,
+      "operations": [
+        "incident.email"
+      ],
+      "skills": [
+        "resend_connector"
+      ],
+      "state_views": [
+        "core",
+        "incidents"
+      ]
+    },
+    "product.experiment": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 90112,
+      "operations": [
+        "posthog.experiment.write"
+      ],
+      "skills": [
+        "ab_testing",
+        "cro",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.flag_rollout": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 83968,
+      "operations": [
+        "posthog.flag.write"
+      ],
+      "skills": [
+        "ab_testing",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.flagged_experiment": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 90112,
+      "operations": [
+        "posthog.experiment.write",
+        "posthog.flag.write"
+      ],
+      "skills": [
+        "ab_testing",
+        "cro",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.referral": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 92160,
+      "operations": [
+        "posthog.flag.write"
+      ],
+      "skills": [
+        "posthog",
+        "referrals"
+      ],
+      "state_views": [
+        "analytics",
+        "attention",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.repository": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "product.lifecycle"
+      ],
+      "entry_nodes": [
+        "delivery.repository",
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 102400,
+      "operations": [
+        "github.pr.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "cro",
+        "github",
+        "github_yeet",
+        "onboarding",
+        "signup"
+      ],
+      "state_views": [
+        "analytics",
+        "core",
+        "delivery",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.retention_intervention": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 102400,
+      "operations": [
+        "posthog.flag.write"
+      ],
+      "skills": [
+        "churn_prevention",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "attention",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "product.survey": {
+      "entry_nodes": [
+        "product.lifecycle",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 86016,
+      "operations": [
+        "posthog.survey.write"
+      ],
+      "skills": [
+        "customer_research",
+        "posthog"
+      ],
+      "state_views": [
+        "analytics",
+        "attention",
+        "core",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "pseo.repository": {
+      "allowed_origin_policy_nodes": [
+        "growth.pseo"
+      ],
+      "entry_nodes": [
+        "delivery.repository",
+        "growth.pseo",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 100352,
+      "operations": [
+        "github.pseo_pr.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "content_strategy",
+        "github",
+        "github_yeet",
+        "programmatic_seo",
+        "seo_audit"
+      ],
+      "state_views": [
+        "core",
+        "delivery",
+        "incidents",
+        "opportunities",
+        "pseo",
+        "selected_work"
+      ]
+    },
+    "pseo.research": {
+      "entry_nodes": [
+        "growth.pseo",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 77824,
+      "operations": [],
+      "skills": [
+        "content_strategy",
+        "programmatic_seo"
+      ],
+      "state_views": [
+        "budgets",
+        "core",
+        "opportunities",
+        "pseo",
+        "selected_work"
+      ]
+    },
+    "pseo.research_metered": {
+      "entry_nodes": [
+        "growth.pseo",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 77824,
+      "operations": [
+        "dataforseo.research"
+      ],
+      "skills": [
+        "content_strategy",
+        "programmatic_seo"
+      ],
+      "state_views": [
+        "budgets",
+        "core",
+        "incidents",
+        "opportunities",
+        "pseo",
+        "selected_work"
+      ]
+    },
+    "review.positioning": {
+      "entry_nodes": [
+        "learning.opportunities",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 72704,
+      "operations": [],
+      "skills": [
+        "customer_research",
+        "product_marketing"
+      ],
+      "state_views": [
+        "core",
+        "opportunities",
+        "selected_work"
+      ]
+    },
+    "social.draft": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.social"
+      ],
+      "entry_nodes": [
+        "channels.social",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 80896,
+      "operations": [
+        "social.draft.write"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "social",
+        "typefully"
+      ],
+      "state_views": [
+        "core",
+        "incidents",
+        "selected_work",
+        "social"
+      ]
+    },
+    "social.publish": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.social"
+      ],
+      "entry_nodes": [
+        "channels.social",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 80896,
+      "operations": [
+        "social.publish"
+      ],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "social",
+        "typefully"
+      ],
+      "state_views": [
+        "core",
+        "incidents",
+        "selected_work",
+        "social"
+      ]
+    },
+    "social.reconcile": {
+      "accepts_campaign_origin": true,
+      "allowed_origin_policy_nodes": [
+        "channels.social"
+      ],
+      "entry_nodes": [
+        "channels.social"
+      ],
+      "max_known_context_bytes": 73728,
+      "operations": [],
+      "requires_origin_policy_node": true,
+      "skills": [
+        "typefully"
+      ],
+      "state_views": [
+        "core",
+        "incidents",
+        "selected_work",
+        "social"
+      ]
+    },
+    "strategy.launch": {
+      "entry_nodes": [
+        "launch.campaign"
+      ],
+      "max_known_context_bytes": 114688,
+      "operations": [],
+      "skills": [
+        "launch"
+      ],
+      "state_views": [
+        "active_index",
+        "analytics",
+        "core",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "strategy.plan": {
+      "entry_nodes": [
+        "analytics.scorecard",
+        "learning.opportunities",
+        "product.truth"
+      ],
+      "max_known_context_bytes": 99328,
+      "operations": [],
+      "skills": [
+        "marketing_loops",
+        "marketing_plan"
+      ],
+      "state_views": [
+        "active_index",
+        "analytics",
+        "attention",
+        "budgets",
+        "core",
+        "opportunities",
+        "product",
+        "pseo",
+        "scorecard"
+      ]
+    }
+  },
+  "run_types": {
+    "operational": {
+      "entry_nodes": [
+        "analytics.control_plane",
+        "communications.attention",
+        "launch.campaign",
+        "learning.opportunities",
+        "pulse.scheduler"
+      ],
+      "max_known_context_bytes": 131072,
+      "operations": [
+        "neon.database.read",
+        "pulse.reconcile",
+        "pulse.state.persist"
+      ],
+      "skills": [
+        "posthog"
+      ],
+      "state_views": [
+        "active_index",
+        "analytics",
+        "attention",
+        "core",
+        "digest",
+        "incidents",
+        "opportunities",
+        "product",
+        "selected_work"
+      ]
+    },
+    "strategic": {
+      "entry_nodes": [
+        "analytics.control_plane",
+        "analytics.scorecard",
+        "channels.distribution",
+        "channels.social",
+        "growth.pseo",
+        "launch.campaign",
+        "learning.opportunities",
+        "product.lifecycle",
+        "pulse.scheduler"
+      ],
+      "max_known_context_bytes": 196608,
+      "operations": [
+        "neon.database.read",
+        "pulse.reconcile",
+        "pulse.state.persist"
+      ],
+      "skills": [
+        "posthog"
+      ],
+      "state_views": [
+        "active_index",
+        "analytics",
+        "attention",
+        "budgets",
+        "core",
+        "digest",
+        "distribution",
+        "incidents",
+        "opportunities",
+        "product",
+        "pseo",
+        "scorecard",
+        "selected_work",
+        "social"
+      ]
+    }
+  },
+  "schema_version": 3,
+  "skills": {
+    "ab_testing": {
+      "content_sha256": "1fd229160f6014f3f2d7c92cc7d2f991fbf8dc9ed68aac9793c71b408a6d1144",
+      "selector": "ab-testing",
+      "source": "repository"
+    },
+    "agent_email_inbox": {
+      "content_sha256": "51838b3e3c3f0ff22368e93aa0de37da898b290383c1893da647ccd0295d28e9",
+      "selector": "agent-email-inbox",
+      "source": "repository"
+    },
+    "analytics": {
+      "content_sha256": "16aab197f87bf6e2599d179061f1947d96acafe0a340837432d8ab96d2f8c55a",
+      "selector": "analytics",
+      "source": "repository"
+    },
+    "churn_prevention": {
+      "content_sha256": "88fd25b77e44ef3689d68d54091df9659a40f5e905c8bdeb09bdeed3f049ad67",
+      "selector": "churn-prevention",
+      "source": "repository"
+    },
+    "community_marketing": {
+      "content_sha256": "edd8060b63820e620a0612af0a280cf3ee68d3eab80684932257205c8327d971",
+      "selector": "community-marketing",
+      "source": "repository"
+    },
+    "content_strategy": {
+      "content_sha256": "0611532b2a0dce8d0d5b783c99bba10d13a6d5fd7eecd829974012f74ea33258",
+      "selector": "content-strategy",
+      "source": "repository"
+    },
+    "cro": {
+      "content_sha256": "199016bec3b44bc6a7507b111b6028f6550cc852cd54c7d0df789f15d6f814c4",
+      "selector": "cro",
+      "source": "repository"
+    },
+    "customer_research": {
+      "content_sha256": "f44c116c46904bba256604f62e97048c2872f389a963843254129cc511cdf1ff",
+      "selector": "customer-research",
+      "source": "repository"
+    },
+    "directory_submissions": {
+      "content_sha256": "dd08854f5cd1e16413dd588b13e02a32ce01dd3a9f4e9b1099f92a7b635ac24a",
+      "selector": "directory-submissions",
+      "source": "repository"
+    },
+    "email_best_practices": {
+      "content_sha256": "f1b957138619784e2c22f7ae689bde6e903a8134ee52d626d8846809382ef0c8",
+      "selector": "email-best-practices",
+      "source": "repository"
+    },
+    "emails": {
+      "content_sha256": "1fbd54df4c59f48408057e7db0dfb1a53c033e6a4ca5cd1927a47c51ec28d8f1",
+      "selector": "emails",
+      "source": "repository"
+    },
+    "github": {
+      "selector": "github:github",
+      "source": "runtime"
+    },
+    "github_yeet": {
+      "selector": "github:yeet",
+      "source": "runtime"
+    },
+    "launch": {
+      "content_sha256": "6d8bbd61449c48c458b20457c0b698386fe808e7063a7baadc197fc179bd94bb",
+      "selector": "launch",
+      "source": "repository"
+    },
+    "marketing_loops": {
+      "content_sha256": "db4ba419ee74c7ef4c6dacffdf92fa4038e720640a4b4b95e8766ad9ff269898",
+      "selector": "marketing-loops",
+      "source": "repository"
+    },
+    "marketing_plan": {
+      "content_sha256": "548e1bd8f31fdef3ffb8edf4f3218a8162b4ac2f04b639affe547bee6dd0cba0",
+      "selector": "marketing-plan",
+      "source": "repository"
+    },
+    "neon_postgres": {
+      "selector": "neon-postgres:neon-postgres",
+      "source": "runtime"
+    },
+    "onboarding": {
+      "content_sha256": "15a802ffb73828730aba90b740426fbb8d2070721ee92d6f8737de4704e8ff0f",
+      "selector": "onboarding",
+      "source": "repository"
+    },
+    "posthog": {
+      "selector": "posthog:posthog",
+      "source": "runtime"
+    },
+    "product_marketing": {
+      "content_sha256": "b028fbaf55344ed142a1a21579b749014e6f91f896e409cb8e9a5b05aeeb2518",
+      "selector": "product-marketing",
+      "source": "repository"
+    },
+    "programmatic_seo": {
+      "content_sha256": "15cb5979cab5263ede902a830e03342869256ece17905bff240eef498e27cde1",
+      "selector": "programmatic-seo",
+      "source": "repository"
+    },
+    "public_relations": {
+      "content_sha256": "d1aeff136f23e2bf3296d11e86d51abedfd08996fc8bf0c1637dd96faaa693a4",
+      "selector": "public-relations",
+      "source": "repository"
+    },
+    "referrals": {
+      "content_sha256": "4ddd01713b7ef3c3fb669fd3bb9a720641ee8db8b9ac327c35d6be3548a7f777",
+      "selector": "referrals",
+      "source": "repository"
+    },
+    "resend_connector": {
+      "content_sha256": "5fe18672e8daadd84023ea100d84a800ff7c0937aad90331365b170574087d09",
+      "selector": "resend-connector",
+      "source": "repository"
+    },
+    "seo_audit": {
+      "content_sha256": "3b03a2e07578e9964acac0b6907ae343a904c6547bfefe779ba326db5eedd1cb",
+      "selector": "seo-audit",
+      "source": "repository"
+    },
+    "signup": {
+      "content_sha256": "9395aabae64891ebdac5f31d17c83b9d47546dc0c9b22654c7b89e9b04da7cf6",
+      "selector": "signup",
+      "source": "repository"
+    },
+    "social": {
+      "content_sha256": "8cc93d9b361622cdb640e87969747b85603bed2d268e923179f8dfb4799ec8c7",
+      "selector": "social",
+      "source": "repository"
+    },
+    "typefully": {
+      "content_sha256": "8e8b19fa86d2c7f5a851d4a21ba853359996c5f4ced652ddbf244a51653c1b75",
+      "selector": "typefully",
+      "source": "repository"
+    }
+  },
+  "state_schema_version": 4,
+  "state_views": {
+    "active_index": [
+      "/work_graph/active_policy_nodes",
+      "/work_graph/due_policy_nodes",
+      "/work_graph/selected/origin_policy_node",
+      "/work_graph/selected/policy_nodes",
+      "/work_graph/selected/route_id"
+    ],
+    "analytics": [
+      "/posthog/assets",
+      "/posthog/capabilities",
+      "/posthog/measurement_health",
+      "/posthog/project"
+    ],
+    "attention": [
+      "/communications/attention"
+    ],
+    "budgets": [
+      "/budgets/metered",
+      "/budgets/shared_quota"
+    ],
+    "core": [
+      "/bootstrap",
+      "/contract",
+      "/last_run",
+      "/operation_capabilities",
+      "/schema_version",
+      "/work_graph/index"
+    ],
+    "delivery": [
+      "/repository/deployments",
+      "/repository/pull_requests"
+    ],
+    "digest": [
+      "/digest"
+    ],
+    "distribution": [
+      "/channels/distribution"
+    ],
+    "email": [
+      "/communications/email",
+      "/communications/suppressions"
+    ],
+    "inbound": [
+      "/communications/inbound"
+    ],
+    "incidents": [
+      "/incidents"
+    ],
+    "opportunities": [
+      "/opportunities/index",
+      "/weekly_queue"
+    ],
+    "product": [
+      "/experiments",
+      "/features",
+      "/intervention_registry",
+      "/referral",
+      "/surveys"
+    ],
+    "pseo": [
+      "/pseo"
+    ],
+    "scorecard": [
+      "/scorecard",
+      "/tracking_qa"
+    ],
+    "selected_work": [
+      "/work_graph/selected"
+    ],
+    "social": [
+      "/channels/social"
+    ]
+  }
+}

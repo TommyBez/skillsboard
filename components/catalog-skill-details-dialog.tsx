@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { ArrowUpRightIcon, CheckIcon, GitForkIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CopyButton } from "@/components/copy-button"
 import { Button } from "@/components/ui/button"
 import {
@@ -43,13 +44,15 @@ export function CatalogSkillDetailsDialog({
     const currentRequest = requestId.current + 1
     requestId.current = currentRequest
     setIsLoading(true)
-    setError(null)
 
     try {
       const response = await fetch(`/api/catalog/skill?id=${encodeURIComponent(item.id)}`)
       if (requestId.current !== currentRequest) return
       if (!response.ok) throw new Error("Skill details unavailable")
       setDetail((await response.json()) as CatalogSkillDetail)
+      // Keep the retry control mounted during pending requests so the button
+      // can show its loading label; only clear the error after success.
+      setError(null)
     } catch (loadError) {
       if (requestId.current !== currentRequest) return
       console.error(loadError)
@@ -96,7 +99,7 @@ export function CatalogSkillDetailsDialog({
           </DialogHeader>
 
           <div className="grid gap-5 p-6">
-            {isLoading && !detail ? (
+            {isLoading && !detail && !error ? (
               <div className="grid gap-3" aria-busy="true" aria-live="polite">
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-11/12" />
@@ -112,9 +115,13 @@ export function CatalogSkillDetailsDialog({
                   variant="outline"
                   size="sm"
                   className="justify-self-start"
+                  disabled={isLoading}
+                  aria-busy={isLoading || undefined}
                   onClick={() => void loadDetail()}
                 >
-                  Try again
+                  <ButtonPendingContent pending={isLoading} pendingLabel="Loading…">
+                    Try again
+                  </ButtonPendingContent>
                 </Button>
               </div>
             ) : null}

@@ -7,6 +7,7 @@ import {
   captureClientAnalyticsEvent,
   type ClientAnalyticsEvent,
 } from "@/lib/analytics-client"
+import { cn } from "@/lib/utils"
 
 interface CopyButtonProps {
   value: string
@@ -16,6 +17,7 @@ interface CopyButtonProps {
   ariaLabel?: string
   copiedAriaLabel?: string
   analytics?: ClientAnalyticsEvent
+  className?: string
 }
 
 async function writeToClipboard(value: string) {
@@ -44,6 +46,7 @@ export function CopyButton({
   ariaLabel,
   copiedAriaLabel,
   analytics,
+  className,
 }: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
 
@@ -71,7 +74,7 @@ export function CopyButton({
       aria-label={currentAriaLabel}
       variant="outline"
       size={iconOnly ? "icon-sm" : "sm"}
-      className={compact ? "h-7 border-transparent bg-card px-2" : undefined}
+      className={cn(compact && "h-7 border-transparent bg-card px-2", className)}
       onClick={copy}
     >
       {hasCopied ? (

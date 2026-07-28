@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "posthog": {
+      "enabled": true
+    },
+    "thermos": {
+      "enabled": true
+    }
+  }
+}

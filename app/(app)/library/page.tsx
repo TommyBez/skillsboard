@@ -3,8 +3,10 @@ import Link from "next/link"
 import { CableIcon, DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
+import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
 import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { SkillDossier } from "@/components/skill-dossier"
 import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
@@ -17,6 +19,8 @@ import { getAppContext } from "@/lib/app-context"
 import {
   countOrganizationMembers,
   countPendingOrganizationInvitations,
+  listOrganizationCollectionMemberships,
+  listOrganizationCollections,
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
@@ -63,7 +67,18 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const [{ activeId, session, role }, params] = await Promise.all([getAppContext(), searchParams])
   const userId = session.user.id
   const canManageLibrary = isOrganizationAdmin(role)
-  const allSkills = await listOrganizationSkills(activeId)
+  const [allSkills, collections, collectionMemberships] = await Promise.all([
+    listOrganizationSkills(activeId),
+    listOrganizationCollections(activeId),
+    listOrganizationCollectionMemberships(activeId),
+  ])
+  const collectionIdsBySkill = new Map<string, string[]>()
+  for (const membership of collectionMemberships) {
+    const existing = collectionIdsBySkill.get(membership.skillId)
+    if (existing) existing.push(membership.collectionId)
+    else collectionIdsBySkill.set(membership.skillId, [membership.collectionId])
+  }
+  const collectionOptions = collections.map((item) => ({ id: item.id, title: item.title }))
   const [memberCount, pendingInvitationCount] = canManageLibrary && allSkills.length > 0
     ? await Promise.all([
         countOrganizationMembers(activeId),
@@ -72,7 +87,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     : [0, 0]
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
-    (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
+    (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.examplePrompts.join(" ")} ${item.tags.join(" ")}`.toLowerCase().includes(query))
     && (!params.tag || item.tags.includes(params.tag))
   ))
   const tags = [...new Set(allSkills.flatMap((item) => item.tags))].sort()
@@ -109,7 +124,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
             <label htmlFor="library-search" className="text-sm font-semibold">Search team library</label>
             <div className="relative">
               <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, description, note, or tag" className="pl-10" />
+              <Input id="library-search" name="q" defaultValue={params.q} placeholder="Search by name, prompt, note, or tag" className="pl-10" />
             </div>
           </div>
           {params.tag ? <input type="hidden" name="tag" value={params.tag} /> : null}
@@ -148,6 +163,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 name={item.title}
                 description={item.description ?? `${item.repoOwner}/${item.repoName}`}
                 note={item.note}
+                examplePrompts={item.examplePrompts}
                 source={`${item.repoOwner}/${item.repoName}`}
                 command={command}
                 metric={`${item.repoStars.toLocaleString()} ${item.repoStars === 1 ? "star" : "stars"}`}
@@ -162,7 +178,18 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                   teamId: activeId,
                 }}
                 actions={(
-                  <div className="flex flex-wrap items-center gap-2">
+                  <>
+                    <AddToCollectionMenu
+                      skillId={item.id}
+                      skillName={item.title}
+                      collections={collectionOptions}
+                      memberCollectionIds={collectionIdsBySkill.get(item.id) ?? []}
+                    />
+                    <EditSkillPromptsDialog
+                      skillId={item.id}
+                      skillName={item.title}
+                      prompts={item.examplePrompts}
+                    />
                     {canEditNote ? (
                       <EditSkillNoteDialog
                         skillId={item.id}
@@ -178,20 +205,20 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                     ) : null}
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon-sm"
+                      className="size-8 rounded-lg"
                       nativeButton={false}
                       render={(
                         <a
                           href={`/api/skills/${item.id}/download`}
                           aria-label={`Download the latest version of ${item.title} as a ZIP`}
-                          title="Download the latest version from the repository"
+                          title="Download ZIP"
                         />
                       )}
                     >
-                      <DownloadIcon data-icon="inline-start" />
-                      Download ZIP
+                      <DownloadIcon />
                     </Button>
-                  </div>
+                  </>
                 )}
               />
             )

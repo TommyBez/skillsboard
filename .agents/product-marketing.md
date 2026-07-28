@@ -1,6 +1,6 @@
 # Product Marketing Context
 
-*Last updated: July 20, 2026*
+*Last updated: July 24, 2026*
 
 ## Product Overview
 **One-liner:** Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find and reuse them.
@@ -18,21 +18,25 @@
 - Skills Board points to the latest version available from the saved source. It does not pin or preserve historical versions.
 - Teammates choose how to use a skill: original source, install command, or ZIP download.
 - A ZIP contains the latest skill files available from the source at download time. It does not guarantee installation in every agent.
-- MCP is a first-class way to access the shared library from a compatible agent. It supports the primary team-library narrative rather than replacing it.
+- MCP is a first-class authenticated way to access and contribute to the shared library from a compatible agent. With the granted scopes, it can list and search team skills and collections, retrieve install commands, discover public and repository skills, save new skills, create collections, and add or remove saved skills from collections. It cannot edit or delete saved team skills, install them in the agent, or execute them.
 
 ## Target Audience
 **Target companies:** Small and mid-sized teams that already use AI agents in their work, especially teams whose members use a mix of Claude, Codex, Cursor, and other agent tools.
 
+**Current testable ICP hypothesis:** Teams of roughly 5–25 people inside 10–150 person companies that already use at least two AI coding or work agents. This is a working hypothesis to review against production evidence, not an established market fact.
+
 **Decision-makers:** Hands-on team leads, product leaders, design leaders, engineering leaders, AI enablement leads, and individual contributors who help their teammates adopt useful skills.
 
 **Primary use case:** Give the whole team one place to collect, find, and reuse the skills it recommends.
+
+**Likely triggers:** A second agent enters the workflow, several reusable skills accumulate, teammates repeatedly ask where a recommendation lives, a new teammate is onboarded, or an AI guild or enablement function forms.
 
 **Jobs to be done:**
 - Stop answering the same questions about which skill to use and where to find it.
 - Collect useful recommendations before they disappear into chats, bookmarks, or personal setups.
 - Help teammates search for a skill by task, problem, or team-specific tag.
 - Let each teammate choose the source, command, or ZIP that fits their setup.
-- Connect a compatible agent so it can search team recommendations and retrieve install commands directly.
+- Connect a compatible agent so it can search team recommendations, retrieve install commands, and, when authorized, save skills and organize collections directly.
 - Keep every saved entry connected to the latest version from its source.
 
 **Use cases:**
@@ -83,7 +87,7 @@
 - Multiple usage paths: source, install command, and ZIP download
 - Latest source version instead of a pinned or detached copy
 - Neutrality toward the agent each teammate prefers
-- Authenticated read-only MCP access from compatible agents, with browser-based sign-in and no API key to copy
+- Authenticated, scope-controlled MCP access from compatible agents, with browser-based sign-in and no API key to copy
 - Free hosted product with open-source code
 
 **How we do it differently:** Skills Board starts with the team's judgment. Public catalogs and repositories remain useful inputs, while Skills Board records what the team recommends and makes those recommendations available both in the product and directly inside compatible agents through MCP.
@@ -127,7 +131,7 @@
 - "Ognuno può scegliere la maniera più congeniale per utilizzare la skill."
 - "Your team's skills. All in one place."
 
-**Words to use:** recommended by your team, shared skill library, all in one place, connect your agent, search from your agent, read-only MCP access, sign in through your browser, no API key to copy, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
+**Words to use:** recommended by your team, shared skill library, all in one place, connect your agent, search from your agent, scope-controlled MCP access, sign in through your browser, no API key to copy, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
 
 **Words to avoid:** skill champion, GitHub-backed, approved skill, verified skill, trusted skill, universal compatibility, works with every agent, automatically synchronized, agent capability platform, AI-native knowledge infrastructure, enterprise governance, unlock, supercharge, revolutionize
 
@@ -140,7 +144,7 @@
 | Original source | The repository and path from which Skills Board retrieves the skill's latest available files. |
 | Install command | A command a teammate can copy when it is compatible with their setup. |
 | ZIP download | An archive of the latest skill files available from the original source at download time. |
-| MCP | A read-only connection that lets compatible agents search the shared library and retrieve install commands after browser-based authorization. |
+| MCP | An authenticated connection that lets compatible agents read the shared library and, with the granted scopes, save skills and organize collections after browser-based authorization. It does not install or execute skills in the agent. |
 | Public skill catalog | A discovery source that can help people find skills before adding selected ones to the team library. |
 
 ## Brand Voice
@@ -150,10 +154,23 @@
 
 **Personality:** Useful, open, credible, tool-neutral
 
+## Publication and communication contract
+
+- Publish only verified, already shipped product reality. A capability claim requires the current production deployment and product readback to prove it. Never turn a hypothesis, draft, experiment, private prototype, or unmerged pull request into a public capability claim.
+- Do not invent founder anecdotes, customer stories, personal reading, roadmap commitments, timelines, or ETAs. First-person copy may describe only documented actions, motivations, and results.
+- The connected personal social account may discuss only Skills Board and its shipped features. LinkedIn copy is Italian; X and every email category are English.
+- Proactive founder-voice email uses `Tommaso from Skills Board <tommaso@skillsboard.sh>` only after the consent, suppression, unsubscribe, identity, provider, and public-postal-identity gates in the Growth/Product Pulse contract pass. Transactional email keeps a separate operational identity.
+- Product updates, newsletters, activation guidance, and structured product-research invitations share the `product_communications` consent topic. Optional in-app surveys follow their own non-blocking research/opt-out contract and do not require that email consent. The topic never authorizes personal qualitative follow-up.
+- Paid advertising is policy-ineligible while Skills Board has no revenue line. Reconsidering it requires a merged strategy change that establishes a revenue model.
+- Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent. A public metric also requires its exact definition, window, denominator, privacy-safe aggregation, and authorization under the policy that owns it.
+- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy is delivered through a repository PR. Branching, implementation, push, and PR preparation are autonomous; the owner's approval is required only immediately before merge.
+- Social, community, SEO, analytics, product, and legally consented/provider-compliant communication actions require no per-action human approval. The pinned active Pulse contract is standing authority.
+- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. After contract-pin integrity passes, the pinned Pulse contract authorizes routed sending, publishing, targeting, and provider writes only when the exact operation is physically available and subject to its legal, consent, privacy, identity, binding-platform, spend/overage, and PR-merge boundaries.
+
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.
 2. A shared library saves team members from asking the same questions and searching from scratch.
-3. Connect a compatible agent through MCP so it can search the same recommendations and retrieve install commands directly.
+3. Connect a compatible agent through MCP so it can search the same recommendations, retrieve install commands, and, when authorized, contribute skills and organize collections directly.
 4. Teammates can use different agents and still draw from the same shared library.
 5. Original source, install command, ZIP, search, tags, membership, and open source provide practical alternatives and support the promise.
 
@@ -179,7 +196,7 @@
 | More than one path for different setups | Original source, install command, and ZIP download choices |
 | Connected to the latest source | Repository-backed retrieval without version pinning |
 | Shared with the team | Team membership and invitations |
-| Available inside the agent | Authenticated read-only MCP tools with browser-based authorization |
+| Available inside the agent | Authenticated, scope-controlled MCP tools with browser-based authorization |
 | Open access | Hosted product free forever and open-source code |
 
 ## Goals
@@ -187,6 +204,10 @@
 
 **Conversion action:** Create a team library.
 
-**Activation path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
+**Onboarding and individual value path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
+
+**Team activation metric:** Within 14 days of team creation, save the first skill, have an invitation accepted, and have a non-creator select a usage path.
+
+**AAT-28 ownership:** The exact AAT-28 definition and measurement rules belong to the analytics scorecard policy. Marketing work may reference the validated result but must not redefine the metric here.
 
 **Current metrics:** Not established.
