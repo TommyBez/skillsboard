@@ -9,12 +9,13 @@ import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/event
 import { JsonLd } from "@/components/json-ld"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
 import styles from "@/components/landing/landing-shared.module.css"
-import { ChapterRail } from "@/components/landing/sections/chapter-rail"
 import { Closing } from "@/components/landing/sections/closing"
 import { Faq } from "@/components/landing/sections/faq"
 import { Hero } from "@/components/landing/sections/hero"
 import { Mcp } from "@/components/landing/sections/mcp"
 import { Pricing } from "@/components/landing/sections/pricing"
+import { ProductSlab } from "@/components/landing/sections/product-slab"
+import { ProofStrip } from "@/components/landing/sections/proof-strip"
 import { SiteFooter } from "@/components/landing/sections/site-footer"
 import { SiteHeader } from "@/components/landing/sections/site-header"
 import { Workflow } from "@/components/landing/sections/workflow"
@@ -329,7 +330,6 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
     >
       <JsonLd data={buildLandingSchema()} />
       <LandingMotionController />
-      <ChapterRail />
 
       <SiteHeader
         actions={(
@@ -350,6 +350,8 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
           )}
         />
 
+        <ProofStrip />
+
         <Workflow
           showLaunchDemo={showLaunchTreatment}
           launchActions={(
@@ -358,6 +360,8 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
             </Suspense>
           )}
         />
+
+        <ProductSlab />
 
         <Mcp
           actions={(

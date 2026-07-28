@@ -1,0 +1,139 @@
+.section {
+  border-bottom: 1px solid var(--border);
+}
+
+.inner {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding: 4rem 1.25rem 0;
+}
+
+@media (min-width: 768px) {
+  .inner {
+    padding-inline: 2.5rem;
+  }
+}
+
+.head {
+  max-width: 34rem;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.heading {
+  margin-top: 1rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+@media (min-width: 1024px) {
+  .heading {
+    font-size: 3.25rem;
+  }
+}
+
+/* Bottom edge runs off the section so the surface reads as continuing. */
+.slab {
+  margin-top: 2.5rem;
+  border: 1px solid var(--border);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+  background: var(--card);
+  overflow: hidden;
+}
+
+.chrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding: 0.875rem 1rem;
+}
+
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  min-width: 16rem;
+}
+
+.searchIcon {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.searchText {
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.rows {
+  display: grid;
+}
+
+.row {
+  display: grid;
+  gap: 0.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .row {
+    grid-template-columns: 14rem minmax(0, 1fr) 12rem;
+    align-items: baseline;
+  }
+}
+
+.rowOwner {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
+
+.rowName {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+
+.rowSummary {
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+}
+
+.rowTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.rowTag {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.1rem 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+}
