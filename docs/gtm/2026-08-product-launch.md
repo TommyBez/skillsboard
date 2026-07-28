@@ -63,7 +63,7 @@ Enable the PostHog flag only after the final launch-day preflight. The code can 
 
 - Product landing page, temporarily carrying the launch demo and launch campaign attribution.
 - A silent 14-second homepage loop showing add → share → find across two teammates.
-- A 31-second complete product demo for Product Hunt, social, README, direct sharing, and high-intent evaluation.
+- A 62-second complete launch demo for Product Hunt, README, direct sharing, and high-intent evaluation, plus a 31-second accelerated cut for social distribution.
 - Consent-compliant product email to eligible subscribers.
 - In-product activation prompts for first skill, invite, and teammate reuse.
 - PostHog launch dashboard and daily launch log.
@@ -100,7 +100,7 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 
 ### 2. Pre-launch — August 1–7
 
-- [x] Produce the 31-second complete demo and 14-second homepage loop with synthetic identities and a public skill.
+- [x] Produce the 62-second complete launch demo, 31-second accelerated cut, and 14-second homepage loop with synthetic identities and a public skill.
 - [x] Complete desktop and mobile QA of the dormant single-homepage launch treatment.
 - [x] Prepare a launch-specific 1200×630 OG image, video poster, and English video captions.
 - [x] Prepare the Italian LinkedIn and English X variants in one private Typefully draft with the 31-second demo.
@@ -146,7 +146,7 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 | --- | --- | --- | --- | --- |
 | Launch control | `launch` | This schedule, preflight checks, run of show | Jul 27 | Homepage treatment merged; final preflight and flag activation remain |
 | Launch narrative | `copywriting`, `copy-editing` | Homepage treatment and channel message spine | Jul 31 | Homepage treatment merged; channel package prepared |
-| Product demonstration | `video` | Short homepage loop and complete channel demo | Aug 4 | 14-second loop and 31-second demo merged on `main` |
+| Product demonstration | `video` | Short homepage loop, complete launch demo, and accelerated channel cut | Aug 4 | 14-second loop and 31-second cut merged on `main`; 62-second complete demo prepared in this PR |
 | Landing conversion | `cro` | Launch-specific CTA hierarchy and friction review | Aug 4 | Dormant single-homepage treatment merged on `main` |
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
 | Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |

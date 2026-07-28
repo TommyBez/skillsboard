@@ -32,7 +32,7 @@ The official Typefully resource is draft `10084598` in social set `266935`:
 
 - one natural Italian LinkedIn post and one English four-post X thread;
 - the same shipped add → find → use product demonstration;
-- the 31-second privacy-safe complete demo attached to both platforms;
+- the 31-second privacy-safe accelerated cut attached to both platforms;
 - exact channel URLs from the campaign-link table;
 - private, unscheduled, and unpublished at the July 28 official readback.
 
@@ -66,7 +66,8 @@ Create your team library
 4. `public/launch/demo-intro.svg` — Alex adds a public skill.
 5. `public/launch/demo-handoff.svg` — the recommendation becomes shared team context.
 6. `public/launch/demo-outro.svg` — Sam finds the recommendation and chooses how to use it.
-7. `public/launch/skills-board-product-demo.mp4` — 31-second complete demo with `public/launch/skills-board-product-demo.vtt` captions.
+7. `public/launch/skills-board-product-demo-product-hunt.mp4` — 62-second complete add → find → use demo with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
+8. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut with `public/launch/skills-board-product-demo.vtt` captions for social distribution.
 
 ### Human-only maker and comment brief
 
@@ -98,7 +99,7 @@ Never request or incentivize upvotes, coordinate artificial engagement, mass-mes
 - The source remains visible; Skills Board follows the latest available source rather than pinning historical versions.
 - A saved recommendation is not formal approval, a security review, or universal compatibility certification.
 - The hosted product is free forever and the code is open source.
-- The 31-second synthetic-data demo shows the complete add → find → use loop.
+- The 31-second synthetic-data cut shows the full add → find → use sequence; the 62-second complete demo preserves the full pacing.
 
 Final submission text, publication, and every comment remain human. Do not generate or AI-edit HN comments, solicit votes or submissions, automate a personal account, or repost a weak submission. Immediately before a human submission, verify that the product and tracked destination are live, the project has not already been submitted, the current Show HN rules allow the exact unit, and the human maker can remain available for discussion.
 
@@ -161,6 +162,7 @@ Immediately before each exact effect:
 - reread shipped product reality and the channel asset;
 - verify the canonical destination and exact UTM parameters return the expected homepage;
 - verify the demo and all attached media are privacy-safe and current;
+- verify the Product Hunt primary demo remains 60–90 seconds and every duration label matches the selected asset;
 - verify provider account, platform, permissions, quota, and binding rules;
 - verify consent, suppression, unsubscribe, and recipient identity for email;
 - verify the resource is not already scheduled, published, or ambiguously issued;
