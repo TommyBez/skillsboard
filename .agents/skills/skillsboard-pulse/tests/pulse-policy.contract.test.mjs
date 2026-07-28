@@ -60,7 +60,7 @@ test("autonomy contract removes every routine blocker outside the closed set", (
   const product = readFileSync(new URL("../references/product-lifecycle.md", import.meta.url), "utf8");
   const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
 
-  assert.equal(checked.graph.contract_version, 17);
+  assert.equal(checked.graph.contract_version, 18);
   for (const contractFile of [orchestrator, kernel, delivery, scheduler]) {
     assert.doesNotMatch(contractFile, /CODEX_HOME|automation_checkout_path_unavailable/);
   }
@@ -103,7 +103,8 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.match(scorecard, /when the prior close is zero[^\n]*absolute target is at least one active team/);
   assert.match(scorecard, /`team_activated_14d` is a leading contribution to the objective, not the objective itself/);
   assert.match(learning, /Every run synthesizes the complete current candidate set from every applicable action family/);
-  assert.match(learning, /Execute every mutually compatible candidate with a truthful plausibly positive marginal contribution/);
+  assert.match(learning, /finite-snapshot fields/);
+  assert.match(learning, /deterministic maximal-set algorithm/);
   assert.match(learning, /An empty queue, a first completed action, a first observed signal, or evidence repair never proves exhaustion/);
   assert.match(pseo, /Research the ICP's problems, work, tools, interests, and adjacent topics/);
   assert.match(pseo, /Queries do not need to contain “skill”, “agent”, “library”, or the product name/);
@@ -117,10 +118,14 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.match(social, /Owned social is a near-zero-cost candidate family/);
   assert.match(social, /There is no per-run publication quota/);
   assert.match(social, /The parent invokes the official Typefully capability directly/);
-  assert.match(scheduler, /execute all positive compatible candidates/);
-  assert.match(scheduler, /do not remove a lower-ranked positive candidate from the set/);
+  assert.match(scheduler, /freeze a finite snapshot/);
+  assert.match(scheduler, /select the deterministic maximal compatible set/);
+  assert.match(scheduler, /raw ASCII ascending/);
+  assert.match(scheduler, /`conflict_loser:<winner_candidate_id>`/);
+  assert.match(scheduler, /losing candidate is eligible for selection again/);
   assert.match(scheduler, /completing the first action or observing the first signal never discharges the objective/);
-  assert.match(scheduler, /exhaustive synthesis across every applicable family finds no positive compatible candidate: `fixed_point_complete`/);
+  assert.match(scheduler, /`fixed_point_complete` requires a fresh snapshot/);
+  assert.match(scheduler, /every applicable family has `family_enumerated=true`/);
   assert.match(scheduler, /There is no repository WIP budget, pSEO PR\/page quota/);
   assert.doesNotMatch(learning, /must produce and execute a search action and a community\/social action/);
   assert.doesNotMatch(pseo, /Every strategic run publishes or opens a PR/);
@@ -135,6 +140,94 @@ test("the governing objective exhausts positive candidates without output quotas
   assert.equal(Object.hasOwn(operational.state_views, "scorecard"), true);
   assert.equal(Object.hasOwn(operational.state_views, "pseo"), true);
   assert.equal(Object.hasOwn(operational.state_views, "social"), true);
+});
+
+test("finite snapshots resolve collisions deterministically and never claim a false fixed point", () => {
+  const compareAscii = (left, right) => left < right ? -1 : left > right ? 1 : 0;
+  const compareCandidates = (left, right) =>
+    right.contribution - left.contribution
+    || right.urgency - left.urgency
+    || right.confidence - left.confidence
+    || left.runtimeMinutes - right.runtimeMinutes
+    || compareAscii(left.id, right.id);
+  const selectCompatible = (candidates) => {
+    const conflicts = new Map(candidates.map(({ id }) => [id, new Set()]));
+    for (const candidate of candidates) {
+      for (const conflictId of candidate.conflicts) {
+        conflicts.get(candidate.id).add(conflictId);
+        conflicts.get(conflictId)?.add(candidate.id);
+      }
+    }
+    const selected = [];
+    const dispositions = new Map();
+    for (const candidate of [...candidates].sort(compareCandidates)) {
+      const winner = selected.find((selectedCandidate) =>
+        conflicts.get(candidate.id).has(selectedCandidate.id));
+      if (winner) dispositions.set(candidate.id, `conflict_loser:${winner.id}`);
+      else selected.push(candidate);
+    }
+    return { dispositions, selected };
+  };
+  const isFixedPoint = ({ ambiguousIssuedEffect, candidates, conflictLosers = [], families, incompleteWinnerIds = [] }) =>
+    families.every(({ enumerated }) => enumerated)
+    && candidates.length === 0
+    && conflictLosers.every(({ winnerId }) => !incompleteWinnerIds.includes(winnerId))
+    && !ambiguousIssuedEffect;
+
+  const candidateA = {
+    id: "candidate.a",
+    conflicts: ["candidate.b"],
+    contribution: 4,
+    urgency: 3,
+    confidence: 3,
+    runtimeMinutes: 10,
+  };
+  const candidateB = {
+    id: "candidate.b",
+    conflicts: [],
+    contribution: 3,
+    urgency: 4,
+    confidence: 4,
+    runtimeMinutes: 5,
+  };
+  const candidateC = {
+    id: "candidate.c",
+    conflicts: [],
+    contribution: 2,
+    urgency: 2,
+    confidence: 2,
+    runtimeMinutes: 2,
+  };
+
+  const firstSnapshot = selectCompatible([candidateB, candidateC, candidateA]);
+  assert.deepEqual(firstSnapshot.selected.map(({ id }) => id), ["candidate.a", "candidate.c"]);
+  assert.equal(firstSnapshot.selected.some(({ id }) => id === "candidate.b"), false);
+  assert.equal(firstSnapshot.dispositions.get("candidate.b"), "conflict_loser:candidate.a");
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: firstSnapshot.selected,
+    families: [{ enumerated: true }, { enumerated: true }],
+  }), false);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    conflictLosers: [{ id: "candidate.b", winnerId: "candidate.a" }],
+    families: [{ enumerated: true }, { enumerated: true }],
+    incompleteWinnerIds: ["candidate.a"],
+  }), false);
+
+  const afterBlockedWinner = selectCompatible([candidateB, candidateC]);
+  assert.deepEqual(afterBlockedWinner.selected.map(({ id }) => id), ["candidate.b", "candidate.c"]);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }, { enumerated: true }],
+  }), true);
+  assert.equal(isFixedPoint({
+    ambiguousIssuedEffect: false,
+    candidates: [],
+    families: [{ enumerated: true }, { enumerated: false }],
+  }), false);
 });
 
 test("public social publication never depends on a secondary executor or authorizer", () => {
@@ -227,6 +320,15 @@ test("v17 normalization cannot inherit a false fixed point", () => {
   assert.match(scheduler, /Treat a prior `fixed_point_complete`, empty `actionable_now` index, empty lane output, or first blocked item as historical observations only/);
   assert.match(scheduler, /Rebuild current candidate and work indexes[^\n]*including SEO and social/);
   assert.match(scheduler, /Do not rewrite historical digest claims; supersede their current planning effect/);
+});
+
+test("v18 normalization rebuilds deterministic conflict state", () => {
+  const scheduler = readFileSync(new URL("../references/pulse-scheduler.md", import.meta.url), "utf8");
+
+  assert.match(scheduler, /On the first run with the v18 root[^\n]*atomically normalize existing schema-v4 state/);
+  assert.match(scheduler, /stable candidate IDs, family enumeration markers, rank tuples, normalized symmetric conflict edges/);
+  assert.match(scheduler, /Treat every earlier compatibility label, conflict loser, or fixed-point result as historical only/);
+  assert.match(scheduler, /Record source root, target root, completion time, candidate count, normalized conflict count, and family enumeration count/);
 });
 
 test("production Resend routes pin the connector adapter instead of API-key or CLI management", () => {

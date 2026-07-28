@@ -6,7 +6,7 @@ Community is a zero-cost candidate family and may include social destinations go
 
 ## Community action
 
-Synthesize every distinct source-native action with an explicit plausibly positive contribution path to the governing `AAT-28` objective. Execute all mutually compatible positive candidates and use ranking only to order finite runtime; there is no per-run community quota. Eligible actions include helpful posts, contextual replies, free directory submissions, launch participation, review requests/responses, earned-media contact, demand-signal responses, partnerships, and co-marketing.
+Synthesize every distinct source-native action with an explicit plausibly positive contribution path to the governing `AAT-28` objective. Emit the finite candidate list, exact effect keys, and explicit cross-candidate conflicts required by `pulse.scheduler`; exact deduplication is not the only possible collision. Execute the scheduler's deterministic compatible selection and use ranking only to order finite runtime; there is no per-run community quota. Eligible actions include helpful posts, contextual replies, free directory submissions, launch participation, review requests/responses, earned-media contact, demand-signal responses, partnerships, and co-marketing.
 
 Do not spam, impersonate, fabricate anecdotes, buy or manipulate votes/engagement, use undisclosed automation where forbidden, bypass login/CAPTCHA, send cold DMs, scrape/purchase/guess private contact data, or violate a destination's binding self-promotion or automation rules. Do not repeat an action whose provider readback is ambiguous.
 

@@ -50,7 +50,7 @@ Record at least five structured objections or confusion points and locate the la
 
 Launch content contributes most directly when it names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity informs contribution estimates but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, output quota, or publication prohibition. Prevent only an exact duplicate provider effect.
 
-Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate is ordered by the same objective-led criteria.
+Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate enters the same finite `pulse.scheduler` snapshot with exact effect keys and explicit dependency, resource, timing, or provider conflicts. Exact duplicates are ineligible, but they are not the only possible collision; the shared deterministic algorithm selects the compatible set.
 
 ## Contract boundaries
 

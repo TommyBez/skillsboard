@@ -199,7 +199,7 @@ The already-scheduled July 27 post remains a historical provider fact. Estimate 
 3. It is a distinct provider effect rather than an exact duplicate.
 4. It has a measurable role in the launch funnel or a documented learning objective.
 
-These properties inform expected contribution, time to effect, and confidence; they are not an editorial, cooldown, WIP, evidence, readiness, or output gate. Launch membership creates no automatic precedence over SEO, social, or another positive compatible candidate. Thematic similarity alone cannot block action, while exact provider-effect deduplication still prevents accidental duplicate publication. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem.
+These properties inform expected contribution, time to effect, and confidence; they are not an editorial, cooldown, WIP, evidence, readiness, or output gate. Launch membership creates no automatic precedence over SEO, social, or another positive compatible candidate. Every due item enters the finite `pulse.scheduler` snapshot with explicit cross-lane conflicts; exact provider-effect deduplication remains mandatory but is not the only possible collision. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem.
 
 ## Ownership and decision boundaries
 

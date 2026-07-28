@@ -4,7 +4,7 @@ description: Orchestrates the repository-pinned Skills Board Growth/Product Puls
 compatibility: Requires a Skills Board checkout and the provider capabilities advertised at runtime.
 metadata:
   author: skillsboard
-  version: "17.0.0"
+  version: "18.0.0"
 ---
 
 # Skills Board Pulse
@@ -35,7 +35,7 @@ Read before write only when needed to prove authority, binding platform eligibil
 
 ## Execution loop
 
-After reconciliation, use the governing `AAT-28` growth objective from `analytics.scorecard` to synthesize the complete current candidate set across SEO, community, social, product, analytics, email, repository, and campaign lanes. A candidate remains actionable when it is distinct, lawful, authorized, within hard spend limits, physically available, and has a truthful plausibly positive marginal contribution path to the objective.
+After reconciliation, use the governing `AAT-28` growth objective from `analytics.scorecard` to synthesize the complete current candidate set across SEO, community, social, product, analytics, email, repository, and campaign lanes. A candidate remains actionable when it is distinct, lawful, authorized, within hard spend limits, physically available, and has a truthful plausibly positive marginal contribution path to the objective. Freeze and resolve each finite full-family snapshot with the candidate identity, conflict normalization, deterministic maximal-set selection, terminal dispositions, and fixed-point proof owned by `pulse.scheduler`.
 
 Near-zero marginal cost means execute every mutually compatible positive candidate, not only the highest-ranked candidate or the first observed signal. Rank by expected marginal contribution, time to effect, confidence or information gain, and runtime cost only to determine execution order when runtime is finite; ranking never makes another positive compatible candidate ineligible. After every completed or blocked effect, re-resolve its lane and synthesize again. Missing analytics, immature cohorts, unavailable keyword volume, or an empty prior queue increase the need for synthesis; they never prove a fixed point.
 

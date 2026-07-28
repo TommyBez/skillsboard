@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "0ee8f24d281aaaca203fca7543a900e901aa0102f25e6c9c4c30e50933762cf1",
+      "content_sha256": "7c902da41aba521879296a619326b8ddd1cdebd8409ea12a8bdfb8e210a602f7",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -65,14 +65,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 17,
+  "contract_version": 18,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "45bbb480b6b541d3a1cff4bf709b7c394b0091fc390f91a81391f342555a7272"
+    "root_sha256": "5dca5f397fcf1b713b3166e1b6f2acf74f4b49ed6480ce9ce2b887886044c8d1"
   },
   "interference_keys": [
     "channel.community",
@@ -124,7 +124,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "9a8c74aabaf69182c139f9374bdaa97949c871297abf7fcaaf1e7088ddc90136",
+      "content_sha256": "963462cd64923e1a9d5412e707a0a37ac7b43c7d3b421031978232926e16dca4",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -139,7 +139,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "806541e5c98b7af8b378dacd85ffc3cf80da1bb0c4bd9057939567482d127c8d",
+      "content_sha256": "652a3bc86e0aa27ecc69fc43648d758b8e2057dfc2d278b92f460c8810cd1ad9",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -210,7 +210,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "17b3e75225c99314ca20a1941bb0fb46d133b40c01ffa2c7910b78b9764ad84e",
+      "content_sha256": "91246cececf201415cabd130f873b0118e3d3e8668423c3bf5b4fad04bcb2adf",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -226,7 +226,7 @@
     },
     "launch.campaign": {
       "conflicts_with": [],
-      "content_sha256": "acf9deae00b2c1bfdfc3c4db9acdfa1af51d20441be0b4fc6528ea7f8712bae4",
+      "content_sha256": "c7f98a657d2f777845a6d0b45634875b49a358248ba3410a82c5cbe459ef8f9d",
       "kind": "policy",
       "provides": [
         "launch_plan"
@@ -239,7 +239,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "47c2516532bdda689906dafdcabcb5652c35644a9e22cea8195e6d04c575723f",
+      "content_sha256": "63c5659d187563a735f9f02ebbd53beaa20db2b47ff9c6e14c54c5b1f9324e2c",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -251,7 +251,7 @@
     },
     "product.lifecycle": {
       "conflicts_with": [],
-      "content_sha256": "da6ad7329dd0094200d9a25766ad75a59d0f280d299cf752ac4d8c266b5c12db",
+      "content_sha256": "3275471c9d93421c2417def30316e19111b4f2ef93379b3da23388882a0cadfd",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -298,7 +298,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "c4be3da113556d895a3064c5b2f3e7b28a52040c7beebf8a78ce4427ffce48c8",
+      "content_sha256": "f18de69ea40a3f7110f40b1390fa782a48189b9e7065653864b72782ebe83ad3",
       "kind": "policy",
       "provides": [
         "idempotency",
