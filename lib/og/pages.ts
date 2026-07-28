@@ -23,6 +23,20 @@ export const resourcesOgContent: OgTemplateContent = {
   chips: ["Guides", "Workflows", "Templates"],
 }
 
+export const chooseFirstTeamSkillGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · First team skill",
+  title: [
+    { text: "Choose your team’s" },
+    { text: "first agent skill.", accent: true },
+  ],
+  description:
+    "A practical scorecard to choose, review, test, and hand one useful skill to a second teammate.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["Selection scorecard", "Team handoff test"],
+}
+
 export const shareTeamSkillsGuideOgContent: OgTemplateContent = {
   variant: "ink",
   eyebrow: "Guide · Team skill operations",
