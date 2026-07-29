@@ -20,9 +20,12 @@
      where its connector hangs), and `--row-pad`, where every row's text
      starts. All three columns use both.
 
-   • One right terminal: every rule in this chapter — captioned label rules,
-     list dividers, readout rules, control borders — stops on the cell's
-     content edge. Nothing stops anywhere else.
+   • One right terminal: every rule that spans the column — captioned label
+     rules, list dividers, control borders, the match band — stops on the
+     cell's content edge, and every right-aligned value stops `--row-pad`
+     inside it. The only rules that stop anywhere else are the three closing
+     readouts' leaders, which are bounded by their own value; those three are
+     identical to the pixel because the keys and values are the same length.
 
    Everything above the "motion" divider is the resting state — the diagrams
    are complete without JS and under reduced motion. The motion block at the
@@ -46,10 +49,12 @@
   --m-text: 0.6875rem;
   --m-meta: 0.625rem;
 
-  /* Two inks, both measured against the panel field: `--ink-1` at ~15:1 and
-     `--ink-2` at ~6.6:1 in dark, ~7.3:1 and ~4.9:1 in light. Hierarchy is
-     carried by size, weight and tracking — never by fading text toward the
-     background, which is what put four labels here under 4:1. */
+  /* Two inks, measured against the panel field: `--ink-1` at 15.5:1 and
+     `--ink-2` at 6.5:1 in dark, 14.8:1 and 6.4:1 in light (5.7:1 for the
+     secondary ink over the match band, the worst case in the chapter).
+     Hierarchy is carried by size, weight and tracking — never by fading text
+     toward the background, which is what put five labels under 4:1 and the
+     source column at 2.6:1. */
   --ink-1: var(--foreground);
   --ink-2: var(--muted-foreground);
 
@@ -1002,7 +1007,6 @@
   & .miniFoot,
   & .searchField,
   & .resultRow,
-  & .footKey,
   & .footVal,
   & .fanNode,
   & .fanRow {
@@ -1161,10 +1165,11 @@
     animation: flowDrawX 260ms var(--lp-ease-emph) calc(var(--t) + 1200ms) both;
   }
 
-  /* The readout is the column's conclusion: its key arrives with the diagram,
-     its value only once the diagram has resolved. */
-  & .footKey {
-    animation: flowRiseSm 400ms var(--lp-ease-out) calc(var(--t) + 700ms) both;
+  /* The readout is the column's conclusion, so it arrives after the caption
+     that opens the column — this rule follows `.vizLabel` and wins on order —
+     and its value only once the diagram has resolved. */
+  & .vizFoot {
+    animation: flowFade 380ms var(--lp-ease-out) calc(var(--t) + 700ms) both;
   }
 
   & .footVal {

@@ -21,9 +21,9 @@
 .mcpChapter {
   /* The module. lib row == lib head == agent row / 2, so
      5 lib rows + 1 head == 3 agent rows, exactly. */
-  --agent-row-h: 8rem;
-  --lib-row-h: 4rem;
-  --lib-head-h: 4rem;
+  --agent-row-h: 8.5rem;
+  --lib-row-h: 4.25rem;
+  --lib-head-h: 4.25rem;
   --wire-row-h: var(--agent-row-h);
 
   --gw: clamp(7rem, 13.4vw, 12rem);
@@ -38,7 +38,7 @@
 
 /* Short desktop viewports: step the module down rather than clip the
    diagram. The 1 : 1 : 2 relationship is preserved. */
-@media (min-width: 64rem) and (max-height: 46rem) {
+@media (min-width: 64rem) and (max-height: 48rem) {
   .mcpChapter {
     --agent-row-h: 6.5rem;
     --lib-row-h: 3.25rem;
@@ -114,7 +114,7 @@
 
 .frameIndex {
   flex: none;
-  margin-right: -0.1em;
+  margin-right: -0.17em;
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
@@ -430,7 +430,9 @@
   position: absolute;
   top: -1px;
   bottom: -1px;
-  right: -2px;
+  /* -3px, not -2px: `right` resolves against the padding box, so -2px would
+     lay the bus back over the 1px border it is supposed to sit beside. */
+  right: -3px;
   width: 2px;
   background: var(--primary);
   transform: scaleY(1);
@@ -480,9 +482,9 @@
 .schemaRow::after {
   content: "";
   position: absolute;
-  right: -2px;
+  right: -3px;
   top: 50%;
-  width: calc(0.9rem + 2px);
+  width: calc(0.9rem + 3px);
   height: 2px;
   margin-top: -1px;
   background: var(--primary);
@@ -879,10 +881,12 @@
   transform-origin: left center;
 }
 
-/* Input port on the row's leading edge — where the wire lands. */
+/* Input port on the row's leading edge — where the wire lands. Offset by the
+   card's 1px border so the nub is centred on the edge line, not on the row's
+   padding box, which sits half a pixel inboard of it. */
 .actionPort {
   position: absolute;
-  left: -4px;
+  left: -4.5px;
   top: 50%;
   width: 8px;
   height: 8px;

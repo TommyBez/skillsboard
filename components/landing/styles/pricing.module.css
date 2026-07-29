@@ -5,25 +5,53 @@
    page frame, at three quarters of the page measure, so the frame's rails run
    past it on both sides instead of being erased by it.
 
-   Everything on the plate sits on one derived grid. The numeral is drawn to
-   the exact height of the body, its width follows from the letterform's own
-   ratio (380 : 532), and that width *is* the first column. Every rule bleeds
-   to the plate edge; every text block is inset by exactly one `--pad` from its
-   own boundary (plate edge or column rule); every rule is one weight. The only
-   motion is the press run — rules scribe, then the key ink is pulled across
-   the numeral. It rests finished without JS and under reduced motion.
+   Everything on the plate is derived from three decisions:
+
+   1. The column rule sits at exactly two fifths of the plate width. Numeral
+      column : statement column = 2 : 3.
+   2. The numeral is drawn to *fill* that column and then overshoots every
+      boundary it has by the same `--os`: it crosses the head rule and the
+      column rule, and runs off the left and bottom trim, where the plate clips
+      it. Nothing about it is politely inset. Its 380 : 532 letterform ratio
+      then fixes the height of the plate's body, and therefore the plate.
+   3. The display line is set to the measure of the column it lives in, and the
+      lede is set to the size at which its single line measures exactly as wide
+      as the display line above it. Their right edges are one edge, by rule and
+      not by accident.
+
+   Three rule roles, three weights: the column rule (2px, structural tone), the
+   head rule (1px, structural tone), the ledger rules (1px, ledger tone). The
+   plate is trimmed on its last ledger rule, so the card ends where its own
+   structure ends. The only motion is the press run — rules scribe, then the key
+   ink is pulled across the numeral. It rests finished without JS and under
+   reduced motion.
+
+   Type metrics used below, measured from the shipped faces:
+     Bricolage Grotesque 650 — cap 0.686em; at line-height .88 the cap top sits
+       0.100em under the line box top and the box ends 0.094em under the
+       baseline. "Forever." advances 3.44729em before tracking.
+     Bricolage Grotesque 400 — at line-height 1.4 the cap top sits 0.275em under
+       the line box top and the box ends 0.438em under the baseline.
+     Geist Mono 500/600 — cap 0.708em; at line-height 1 the cap top sits 0.077em
+       under the line box top and the box ends 0.215em under the baseline.
 --------------------------------------------------------------------------- */
 
 .pricingSection {
   /* --- Ink ---------------------------------------------------------------
-     Light page → ink plate, dark page → paper plate. Exactly one green per
-     plate: the primary that belongs to the field the plate is printed on, so
-     the accent is the same green the rest of the page uses, not a third one. */
+     Light page → ink plate, dark page → paper plate. The plate's key green is
+     one step of the page's own green ramp, not a second green: same hue, same
+     saturation, a different lightness, chosen so it never clips the sRGB
+     boundary (which is what turned the old key into a 100%-saturated forest
+     green sitting next to a 42%-saturated logo). */
   --plate-field: oklch(0.155 0.016 158);
   --plate-ink: oklch(0.955 0.009 103);
-  --plate-key: oklch(0.72 0.145 148);
+  --plate-key: oklch(0.64 0.18 148);
 
-  --plate-rule: color-mix(in oklab, var(--plate-ink) 26%, transparent);
+  /* Three rule roles, two tones. */
+  --rule-struct: color-mix(in oklab, var(--plate-ink) 36%, transparent);
+  --rule-ledger: color-mix(in oklab, var(--plate-ink) 20%, transparent);
+  --rule-w: 2px;
+
   --plate-quiet: color-mix(in oklab, var(--plate-ink) 66%, transparent);
   --plate-lede: color-mix(in oklab, var(--plate-ink) 78%, transparent);
   --plate-spec: color-mix(in oklab, var(--plate-ink) 94%, transparent);
@@ -32,9 +60,13 @@
   --gutter: var(--lp-gutter, 1.25rem);
   --pad: clamp(1.15rem, 5vw, 1.75rem);
   --index-h: 0.7rem;
-  --rule-gap: 0.85rem;
-  --os: 0px;
-  --os-x: 4px;
+  --os: 5px;
+  /* Head band: the index cap sits exactly one pad below the trim and exactly
+     one pad above the head rule. */
+  --head-h: calc(2 * var(--pad) + 0.708 * var(--index-h));
+  --col-w: calc(100vw - 2 * var(--gutter) - 2 * var(--pad));
+  --display: min(calc(var(--col-w) / 3.23), 4.5rem);
+  --lede: clamp(0.95rem, 4vw, 1.15rem);
   --num-w: min(76vw, 17rem);
   --num-h: calc(var(--num-w) * 1.4);
 
@@ -66,7 +98,9 @@
 :global(.dark) .pricingSection {
   --plate-field: oklch(0.955 0.01 103);
   --plate-ink: oklch(0.16 0.018 158);
-  --plate-key: oklch(0.49 0.145 148);
+  /* rgb(50,122,65) — hsl(133 42% 34%) against the page's own
+     rgb(93,189,111) — hsl(131 42% 55%). Two steps of one ramp. */
+  --plate-key: oklch(0.52 0.115 148);
 }
 
 /* --- Stage ----------------------------------------------------------------- */
@@ -93,9 +127,7 @@
   overflow: clip;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  grid-template-rows: var(--index-h) auto auto;
-  row-gap: calc(var(--rule-gap) + 1px);
-  padding: var(--pad);
+  grid-template-rows: var(--head-h) auto auto;
   border-radius: 3px;
   background: var(--plate-field);
   color: var(--plate-ink);
@@ -114,12 +146,15 @@
   mix-blend-mode: soft-light;
 }
 
-/* --- Index ----------------------------------------------------------------- */
+/* --- Index: one pad below the trim, one pad above the head rule ------------ */
 
 .indexNum,
 .indexName {
   grid-row: 1;
   align-self: start;
+  padding-left: var(--pad);
+  /* Land the *cap*, not the line box, one pad off the trim. */
+  margin-top: calc(var(--pad) - 0.077em);
   font-family: var(--font-mono);
   font-size: var(--index-h);
   font-weight: 600;
@@ -135,30 +170,20 @@
 
 .indexName {
   grid-column: 2;
-  padding-left: var(--pad);
 }
 
-/* --- Rules: one weight, bleeding to the plate edge ------------------------- */
+/* --- Rules ----------------------------------------------------------------- */
 
-.ruleTop,
-.ruleBase {
+.ruleTop {
   position: absolute;
   z-index: 4;
   left: 0;
   right: 0;
+  top: var(--head-h);
   height: 1px;
-  background: var(--plate-rule);
+  background: var(--rule-struct);
   transform-origin: left center;
-}
-
-.ruleTop {
-  top: calc(var(--pad) + var(--index-h) + var(--rule-gap));
   --rd: 90ms;
-}
-
-.ruleBase {
-  bottom: var(--pad);
-  --rd: 400ms;
 }
 
 /* --- The numeral ----------------------------------------------------------- */
@@ -170,10 +195,9 @@
   grid-column: 1 / -1;
   width: var(--num-w);
   height: var(--num-h);
+  /* Every boundary it has, it crosses by the same amount. */
   margin-top: calc(-1 * var(--os));
-  /* A round glyph has to overhang the flat-sided type it aligns with, or it
-     reads inset. Optically its left edge then lands on the text column. */
-  margin-left: calc(-1 * var(--os-x));
+  margin-left: calc(-1 * var(--os));
 }
 
 .zero {
@@ -218,15 +242,16 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-width: 0;
+  padding-inline: var(--pad);
   margin-top: clamp(1.75rem, 5vw, 2.5rem);
 }
 
-/* The statement is the first cell of the right column's ledger; the rule under
-   it is the same rule that separates the three absences below. */
+/* The statement is the first cell of the ledger; the rule under it is the same
+   rule that separates the three absences below. */
 .statement {
   position: relative;
-  /* On a short viewport the air gives way before the ledger rows do. */
-  padding-bottom: min(clamp(1.5rem, 2.4vw, 2.1rem), 4vh);
+  /* The head rule sits 0.8 pad under the lede's baseline. */
+  padding-bottom: calc(0.8 * var(--pad) - 0.438 * var(--lede));
 }
 
 .statement::after {
@@ -237,31 +262,37 @@
   right: calc(-1 * var(--pad));
   bottom: 0;
   height: 1px;
-  background: var(--plate-rule);
+  background: var(--rule-ledger);
   transform-origin: left center;
   --rd: 250ms;
 }
 
 .heading {
   max-width: 4.6em;
-  font-size: min(
-    clamp(2.5rem, 9.4vw, 8.5rem),
-    calc(var(--col-w, 100em) / 3.2)
-  );
+  font-size: var(--display);
   font-weight: 650;
   line-height: 0.88;
-  letter-spacing: -0.048em;
+  letter-spacing: -0.038em;
   /* Side-bearing correction: the display line is the one that needs it, so
      its stem lands on the same column line as the mono and the lede. */
   margin-left: -0.038em;
-  /* Pull the cap-height of the first line onto the top rule. */
-  margin-top: -0.1em;
+  /* Land the cap of the first line half a pad below the head rule — a decided
+     unit of air, not the residue of `leading-none`. */
+  margin-top: calc(0.5 * var(--pad) - 0.1em);
+}
+
+/* The face draws F+r and F+o tight already; the setting's negative tracking
+   made those two pairs read tighter than every other pair in the line. They
+   get most of it back. */
+.kern {
+  letter-spacing: -0.012em;
 }
 
 .lede {
-  margin-top: min(clamp(1rem, 1.8vw, 1.6rem), 3.2vh);
+  /* One pad from the display's last baseline to the lede's cap. */
+  margin-top: calc(var(--pad) - 0.094 * var(--display) - 0.275em);
   max-width: 46ch;
-  font-size: clamp(1rem, 1.45vw, 1.3rem);
+  font-size: var(--lede);
   line-height: 1.4;
   letter-spacing: -0.004em;
   color: var(--plate-lede);
@@ -276,8 +307,12 @@
 .specRow {
   position: relative;
   display: flex;
-  align-items: flex-end;
-  padding-block: 0.85rem 0.7rem;
+  align-items: center;
+  /* Optical centring: `align-items: center` centres the *line box*, whose
+     centre sits 0.069em above the cap band's centre. This puts the cap band
+     itself on the centre of the row. */
+  padding-block: 0.138em 0;
+  min-height: 3.4rem;
   font-family: var(--font-mono);
   font-size: clamp(0.78rem, 1.02vw, 0.92rem);
   font-weight: 500;
@@ -294,45 +329,47 @@
   right: calc(-1 * var(--pad));
   bottom: 0;
   height: 1px;
-  background: var(--plate-rule);
+  background: var(--rule-ledger);
   transform-origin: left center;
   --rd: calc(310ms + var(--i, 0) * 70ms);
 }
 
-/* The last row is closed by the plate's own base rule, not by its own. */
+/* The last row is closed by the plate's own trim, not by a rule sitting in a
+   band of nothing. */
 .specRow:last-child::after {
   display: none;
 }
 
-/* --- Wide: two columns, and every measurement derived from the numeral ----- */
+/* --- Wide: two columns, every measurement derived from the numeral --------- */
 
 @media (min-width: 48rem) {
   .pricingSection {
-    /* Every column below is derived from these numbers. The plate's aspect is
-       fixed, the numeral is drawn to the exact height of the body, and its
-       width — the letterform's own 380 : 532 — *is* the first column. */
     --plate-frac: 1;
-    --plate-cap: min(74vh, 39rem);
+    --plate-cap: min(76vh, 44rem);
     --measure-w: calc(min(1440px, 100vw) - 2 * var(--gutter));
+
+    /* plate-h = 0.6384 · plate-w + 14.73px, expanded below from its parts;
+       inverted here so the plate can be capped against the stage. */
     --plate-w: min(
       calc(var(--measure-w) * var(--plate-frac)),
-      calc(var(--plate-cap) / 0.612)
+      calc((var(--plate-cap) - 14.73px) / 0.6384)
     );
-    --plate-h: calc(var(--plate-w) * 0.612);
-    --pad: clamp(1.35rem, calc(var(--plate-w) * 0.0392), 2.5rem);
-    --rule-gap: 0.9rem;
-    --body-h: calc(
-      var(--plate-h) - 2 * var(--pad) - var(--index-h) - var(--rule-gap) - 1px
-    );
-    --os: 5px;
-    --os-x: 7px;
-    --num-h: calc(var(--body-h) + 2 * var(--os));
-    --num-w: calc(var(--num-h) * 0.7142857);
-    /* The measure the statement is actually set on: plate, less four pads
-       (edge, gutter, rule inset, edge) and the numeral. The display size is
-       capped against it, so a short viewport can never push the headline past
-       its own column. */
-    --col-w: calc(var(--plate-w) - 4 * var(--pad) - var(--num-w));
+    --pad: calc(var(--plate-w) * 0.0392);
+
+    /* 1. the column rule, at two fifths */
+    --col-1: calc(var(--plate-w) * 0.4);
+    /* 2. the numeral: fills that column, crosses every edge by --os */
+    --num-w: calc(var(--col-1) + var(--rule-w) + 2 * var(--os));
+    --num-h: calc(var(--num-w) * 1.4);
+    --body-h: calc(var(--num-h) - 2 * var(--os));
+    --plate-h: calc(var(--head-h) + var(--body-h));
+    /* 3. the statement measure, and the type set to it */
+    --col-w: calc(var(--plate-w) * 0.6 - 2 * var(--pad));
+    --display: calc(var(--col-w) / 3.23);
+    /* The lede is set to the size at which its single line measures exactly as
+       wide as "Forever." above it: 3.16929em of display against 19.64em of
+       lede. Their right edges are one edge, by rule and not by accident. */
+    --lede: calc(var(--display) * 0.1614);
   }
 
   .plate {
@@ -340,12 +377,12 @@
     max-width: 100%;
     height: var(--plate-h);
     margin-inline: auto;
-    grid-template-columns: var(--num-w) minmax(0, 1fr);
-    grid-template-rows: var(--index-h) minmax(0, 1fr);
-    column-gap: var(--pad);
+    grid-template-columns: var(--col-1) minmax(0, 1fr);
+    grid-template-rows: var(--head-h) minmax(0, 1fr);
   }
 
   .numeral {
+    grid-row: 2;
     grid-column: 1;
   }
 
@@ -353,11 +390,16 @@
     grid-row: 2;
     grid-column: 2;
     margin-top: 0;
-    padding-left: var(--pad);
   }
 
-  /* The column rule: one vertical, running the full body height, terminating
-     on the top rule and the base rule. Nothing ends in dead air. */
+  /* The column rule: the plate's spine, and the heaviest line on it. It runs
+     from the head rule to the trim; the numeral crosses it. */
+  /* One line, always: the rule above only holds if it is one line, and an
+     overflow into the pad is a better failure than a second line. */
+  .lede {
+    white-space: nowrap;
+  }
+
   .column::before {
     content: "";
     position: absolute;
@@ -365,8 +407,8 @@
     left: 0;
     top: 0;
     bottom: 0;
-    width: 1px;
-    background: var(--plate-rule);
+    width: var(--rule-w);
+    background: var(--rule-struct);
     transform-origin: center top;
     --rd: 170ms;
   }
@@ -377,9 +419,7 @@
   }
 
   .specRow {
-    /* Sits on its own rule; the gap gives way before the type does on a short
-       viewport, where the three rows are the tightest thing on the plate. */
-    padding-block: 0 clamp(0.4rem, 1.35vh, 0.75rem);
+    min-height: 0;
   }
 }
 
@@ -413,9 +453,6 @@
   .ruleTop,
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"]
-  .ruleBase,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"]
   .statement::after,
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"]
@@ -429,9 +466,6 @@
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"][data-motion-state="pending"]
   .ruleTop,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="pending"]
-  .ruleBase,
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"][data-motion-state="pending"]
   .statement::after,
@@ -573,7 +607,6 @@
   .specRow::after,
   .statement::after,
   .ruleTop,
-  .ruleBase,
   .column::before,
   .wipe,
   .nip {

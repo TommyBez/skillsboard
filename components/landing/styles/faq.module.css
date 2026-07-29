@@ -397,7 +397,10 @@
     );
     /* Ticks stand ON the foot rule, not across it. */
     padding-bottom: 1px;
-    min-height: calc(2 * var(--faq-row));
+    /* Two register rows plus the rule itself, so this cell's rule lands on
+       the register's own rule between entries 06 and 07 rather than 1px
+       under it. */
+    min-height: calc(2 * var(--faq-row) + 1px);
   }
 }
 
@@ -891,10 +894,13 @@
   opacity: 0;
 }
 
+/* The scale's entrance runs on the `scale` property, not on `transform`: the
+   open station's raise already owns `transform`, and one shared property
+   would make the entrance's delay leak into every later toggle. */
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
   .faqMapTick {
-  transform: scaleY(0);
+  scale: 1 0;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -926,7 +932,8 @@
   [data-motion-group="faq"][data-motion-state="visible"]
   .faqMapTick {
   transition:
-    transform 520ms var(--lp-ease-emph) calc(660ms + var(--faq-t, 0) * 34ms),
+    scale 520ms var(--lp-ease-emph) calc(660ms + var(--faq-t, 0) * 34ms),
+    transform 340ms var(--lp-ease-emph),
     background-color 200ms var(--lp-ease-snap);
 }
 
@@ -982,5 +989,53 @@
       transition-duration: 0ms;
       transition-delay: 0ms;
     }
+  }
+}
+
+/* The entrance itself, held at its finished state. The controller still arms
+   the group under reduced motion, so the resting composition is asserted here
+   rather than left to a 560ms fade. */
+@media (prefers-reduced-motion: reduce) {
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    :is(
+      .faqStripNum,
+      .faqStripName,
+      .faqStripKey,
+      .faqStripReadout,
+      .faqHeading,
+      .faqIntro,
+      .faqMap,
+      .faqItem
+    ) {
+    opacity: 1;
+    translate: none;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqStrip::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqBody::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqStripHair {
+    transform: none;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqIndex::before,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqIndex::after {
+    opacity: 1;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="faq"][data-motion-state="pending"]
+    .faqMapTick {
+    scale: none;
   }
 }

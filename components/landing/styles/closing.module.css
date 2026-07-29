@@ -19,6 +19,11 @@
      rail that draws it and the sheet that sits on it all read this. */
   --closing-split: 0.61;
 
+  /* Measures down the column, one unit of 9rem: 45rem of display, four fifths
+     of that for the body, two fifths for the action. The paragraph is set as a
+     proportion of the line above it, not wherever it happened to run out. */
+  --closing-measure: 45rem;
+
   position: relative;
 }
 
@@ -213,6 +218,7 @@
    overhang; `text-indent` puts line one — which always starts on the "A" —
    back on the stem line. */
 .closingHeading {
+  max-width: var(--closing-measure);
   margin-top: -0.152em;
   margin-left: -0.0085em;
   font-stretch: 93%;
@@ -228,10 +234,9 @@
 /* Same correction, body scale: line one opens on a round "S", line two on a
    flat-stemmed "T", so the "T" holds the stem line and the "S" overhangs it.
 
-   Measures down the column are a ladder on one unit of 144px: 720px of
-   display, 576px of body, 288px of action — 5 : 4 : 2. The paragraph is not
-   stopping wherever it ran out; it is set to four fifths of the line above it. */
+   The measure comes from `--closing-measure`; see the ladder at the top. */
 .closingCopy {
+  max-width: calc(var(--closing-measure) * 0.8);
   margin-bottom: 0;
   margin-left: -0.014em;
   text-indent: -0.0417em;

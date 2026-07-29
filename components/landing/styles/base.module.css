@@ -222,7 +222,9 @@
 }
 
 .root[data-scrolled] .header::before {
-  background: var(--lp-hairline-strong);
+  /* Full strength once the strip has a field: the same ink as the footer rule
+     and the two side rails, so the frame closes as one rectangle of one
+     weight. At rest it sits back to a whisper and the hero owns the screen. */
   opacity: 1;
 }
 
@@ -236,7 +238,6 @@
   }
 
   .header::before {
-    background: var(--lp-hairline-strong);
     opacity: 1;
   }
 }

@@ -35,13 +35,13 @@ export function ClosingSection() {
         <div className={styles.closingGrid}>
           <div className={styles.closingMain}>
             <h2
-              className={`${styles.closingHeading} max-w-[45rem] text-balance text-[clamp(2.5rem,6.1vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}
+              className={`${styles.closingHeading} text-balance text-[clamp(2.5rem,6.1vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}
             >
               Answer “which skill should I use?”{" "}
               <span className={styles.onceStamp}>once.</span>
             </h2>
             <p
-              className={`${styles.closingCopy} mt-6 max-w-xl text-balance text-lg leading-relaxed text-muted-foreground`}
+              className={`${styles.closingCopy} mt-6 text-balance text-lg leading-relaxed text-muted-foreground`}
             >
               Save the recommendation where the whole team can find it. The next
               person can get started without asking where to look.
