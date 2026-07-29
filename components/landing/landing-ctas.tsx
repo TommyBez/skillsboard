@@ -6,7 +6,6 @@ import base from "@/components/landing/styles/base.module.css"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getSession } from "@/lib/session"
 
@@ -34,22 +33,38 @@ export function primaryCtaEventProperties(
   }
 }
 
+/**
+ * Streaming placeholder for the command strip. Same reasoning as
+ * `HomeCtaFallback`: without script this is the final render, so it has to be
+ * the working anonymous strip rather than two grey boxes.
+ */
 export function HomeHeaderActionsFallback() {
-  return (
-    <div className="flex items-center gap-2">
-      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
-      <nav className="flex items-center gap-2" aria-label="Main navigation" aria-busy="true">
-        {/* Widths are the measured widths of the resolved controls, so the
-            strip does not reflow when the session lands. */}
-        <Skeleton className="hidden h-9 w-[4.75rem] rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-[4.1rem] rounded-[3px] sm:h-9 sm:w-[12.6rem]" />
-      </nav>
-    </div>
-  )
+  return <HomeHeaderActionsView signedIn={false} />
 }
 
-export function HomeCtaFallback() {
-  return <Skeleton className="h-12 w-56 rounded-[3px]" aria-busy="true" />
+/**
+ * Streaming placeholder for a primary action.
+ *
+ * A Suspense fallback is only ever replaced by script, so without JavaScript
+ * this is the final render — a skeleton would leave the page's main action as
+ * a dead grey box. Render the anonymous action instead: it is a working link
+ * to the same place the resolved button sends a signed-out visitor, and for a
+ * signed-in one it is replaced the moment the session lands.
+ */
+export function HomeCtaFallback({ className }: { className?: string }) {
+  const primary = primaryAction(false)
+
+  return (
+    <Button
+      size="lg"
+      className={`${base.ctaButton} ${className ?? ""}`}
+      nativeButton={false}
+      render={<Link href={primary.href} />}
+    >
+      {primary.label}
+      <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+    </Button>
+  )
 }
 
 function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
