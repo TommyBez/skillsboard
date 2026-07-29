@@ -224,7 +224,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
+  color: color-mix(in oklch, var(--muted-foreground) 84%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -265,19 +265,6 @@
   color: var(--foreground);
 }
 
-/* The search field's shortcut chip. */
-.fieldKbd {
-  position: relative;
-  flex: none;
-  margin-left: 0.5rem;
-  padding: 0.08rem 0.28rem;
-  border: 1px solid var(--lp-hairline);
-  border-radius: var(--r-chip);
-  font-family: var(--font-mono);
-  font-size: var(--m-meta);
-  color: color-mix(in oklch, var(--muted-foreground) 80%, transparent);
-}
-
 .pasteDim {
   color: var(--muted-foreground);
 }
@@ -288,8 +275,8 @@
   position: relative;
   align-self: center;
   margin: 0;
-  width: 1px;
-  height: 3.9rem;
+  width: 1.5px;
+  height: 3.55rem;
   background: var(--wire);
   transform-origin: top center;
 }
@@ -298,8 +285,8 @@
   position: absolute;
   left: 50%;
   bottom: -1px;
-  width: 0.42rem;
-  height: 0.34rem;
+  width: 0.36rem;
+  height: 0.3rem;
   translate: -50% 0;
   background: var(--wire);
   clip-path: polygon(50% 100%, 0 0, 100% 0);
@@ -386,8 +373,8 @@
 .miniTag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.15rem;
-  padding: 0.05rem 0.36rem;
+  min-height: 1.3rem;
+  padding: 0.12rem 0.4rem;
   border: 1px solid var(--border);
   border-radius: var(--r-chip);
   font-family: var(--font-mono);
@@ -400,7 +387,7 @@
 .miniFoot {
   padding: 0.58rem 0.68rem;
   border-top: 1px solid var(--border);
-  background: color-mix(in oklch, var(--muted) 34%, transparent);
+  background: color-mix(in oklab, var(--foreground) 4%, transparent);
 }
 
 .miniCmd {
@@ -457,9 +444,9 @@
   position: absolute;
   left: 0;
   top: 50%;
-  width: 1px;
-  height: 0.85rem;
-  margin-top: -0.425rem;
+  width: 1.5px;
+  height: 0.9rem;
+  margin-top: -0.45rem;
   background: var(--primary);
   transform: translateX(3ch);
 }
@@ -482,9 +469,28 @@
 .resultRow:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 1.81rem;
-  right: 0;
-  bottom: 0;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--lp-grid-line);
+}
+
+/* The cut: everything under this line is library, not results. */
+.resultCut {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem 0.42rem 1.81rem;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
+}
+
+.resultCut::after {
+  content: "";
+  flex: 1;
   height: 1px;
   background: var(--lp-grid-line);
 }
@@ -564,25 +570,12 @@
   color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
 }
 
-.countPrev,
 .countNow {
-  position: absolute;
-  left: 1.81rem;
-  top: 0;
+  color: var(--foreground);
 }
 
 .countTotal {
   margin-left: auto;
-}
-
-/* The pre-filter readout only exists inside the transition; the resting,
-   no-JS truth is `1 match`. Decorative and aria-hidden by its container. */
-.countPrev {
-  opacity: 0;
-}
-
-.countNow {
-  color: var(--foreground);
 }
 
 /* ---------------------------------------------------------------------------
@@ -614,8 +607,8 @@
 
 .fanList {
   position: relative;
-  margin: 1.4rem 0 0;
-  padding: 0 0 0 1.78rem;
+  margin: 1.3rem 0 0;
+  padding: 0 0 0 1.15rem;
   list-style: none;
 }
 
@@ -623,9 +616,9 @@
 .fanList::before {
   content: "";
   position: absolute;
-  left: 0.9rem;
-  top: -1.55rem;
-  bottom: 1.4rem;
+  left: 0;
+  top: -1.4rem;
+  bottom: 1.32rem;
   width: 1px;
   background: var(--wire);
   transform-origin: top center;
@@ -636,17 +629,18 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  height: 2.8rem;
+  height: 2.64rem;
   padding-right: 0.6rem;
+  border-bottom: 1px solid var(--lp-grid-line);
 }
 
 /* Each branch stub: from the spine to the key column. */
 .fanRow::before {
   content: "";
   position: absolute;
-  left: -0.88rem;
-  top: 1.4rem;
-  width: 0.68rem;
+  left: -1.15rem;
+  top: 1.32rem;
+  width: 0.72rem;
   height: 1px;
   background: var(--wire);
   transform-origin: left center;
@@ -825,18 +819,6 @@
   }
 }
 
-@keyframes flowCountOut {
-  from {
-    opacity: 1;
-    transform: none;
-  }
-
-  to {
-    opacity: 0;
-    transform: translate3d(0, -6px, 0);
-  }
-}
-
 @keyframes flowCountIn {
   from {
     opacity: 0;
@@ -867,6 +849,7 @@
   & .searchField,
   & .resultRow,
   & .countNow,
+  & .countTotal,
   & .fanNode,
   & .fanRow {
     opacity: 0;
@@ -892,9 +875,6 @@
     opacity: 0;
   }
 
-  & .countPrev {
-    opacity: 1;
-  }
 }
 
 /* --- Visible: the chapter plays ---------------------------------------- */
@@ -966,8 +946,8 @@
 .miniTag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.15rem;
-  padding: 0.05rem 0.36rem;
+  min-height: 1.3rem;
+  padding: 0.12rem 0.4rem;
   border: 1px solid var(--border);
   border-radius: var(--r-chip);
   font-family: var(--font-mono);
@@ -1032,9 +1012,10 @@
     animation: flowDrawX 260ms var(--lp-ease-emph) calc(var(--t) + 1200ms) both;
   }
 
-  & .countPrev {
-    animation: flowCountOut 280ms var(--lp-ease-out) calc(var(--t) + 1240ms)
-      both;
+  /* The library total is a constant, so it arrives with the list; the match
+     count only exists once the query has resolved. */
+  & .countTotal {
+    animation: flowRiseSm 400ms var(--lp-ease-out) calc(var(--t) + 700ms) both;
   }
 
   & .countNow {

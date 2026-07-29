@@ -18,7 +18,7 @@ const dossiers = [
   {
     name: "code-review",
     source: "acme/eng-skills",
-    stars: "1.2k",
+    stars: "1,204",
     description: "Review PRs for correctness, style, and missing tests.",
     tags: ["review", "ci"],
     command: "npx skills add acme/eng-skills",
@@ -27,7 +27,7 @@ const dossiers = [
   {
     name: "pdf-extraction",
     source: "anthropic/skills",
-    stars: "8.4k",
+    stars: "8,431",
     description: "Pull text, tables, and metadata out of PDF documents.",
     tags: ["documents"],
     command: "npx skills add anthropic/skills",
@@ -54,7 +54,7 @@ const dossiers = [
   {
     name: "release-notes",
     source: "vercel/skills",
-    stars: "2.1k",
+    stars: "2,109",
     description: "Turn merged PRs into customer-facing release notes.",
     tags: ["shipping", "docs"],
     command: "npx skills add vercel/skills",

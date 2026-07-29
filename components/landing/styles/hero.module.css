@@ -18,6 +18,9 @@
 
 .hero {
   --hero-px: 1.25rem;
+  /* the board stage's height, shared so the copy band and the state rail can
+     be laid out against the same measure the scene occupies */
+  --stage-h: 36.5rem;
   position: relative;
   isolation: isolate;
   border-bottom: 1px solid var(--lp-hairline);
@@ -57,8 +60,8 @@
   position: relative;
   flex: 1;
   display: grid;
-  grid-template-rows: auto 1fr auto;
-  align-content: center;
+  grid-template-rows: auto auto auto;
+  align-content: start;
   width: 100%;
   max-width: 90rem;
   margin-inline: auto;
@@ -67,7 +70,9 @@
 
 @media (min-width: 64rem) {
   .heroFrame {
-    padding-block: 2.25rem 4.5rem;
+    padding-block: 2.25rem 2.5rem;
+    align-content: center;
+    align-content: safe center;
   }
 }
 
@@ -96,6 +101,21 @@
   min-width: 0;
 }
 
+/* The copy band spans exactly the stage the scene occupies, so the state rail
+   lands directly under the composition instead of drifting to the frame's
+   floor with a dead band above it. */
+@media (min-width: 64rem) {
+  .heroMid {
+    min-height: var(--stage-h);
+  }
+}
+
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .heroMid {
+    min-height: calc(var(--stage-h) * 0.92);
+  }
+}
+
 /* ------------------------------------------------------------------
    Field — dither texture + column rails, the depth under the chapter
 ------------------------------------------------------------------ */
@@ -107,18 +127,12 @@
   pointer-events: none;
   /* Ink only where the composition wants weight: strongest behind the board,
      gone behind the headline so type never fights texture. */
-  background-image:
-    radial-gradient(
-      62% 58% at 78% 44%,
-      color-mix(in oklab, var(--foreground) 34%, transparent) 0%,
-      color-mix(in oklab, var(--foreground) 14%, transparent) 46%,
-      transparent 78%
-    ),
-    radial-gradient(
-      44% 46% at 6% 88%,
-      color-mix(in oklab, var(--foreground) 16%, transparent) 0%,
-      transparent 72%
-    );
+  background-image: radial-gradient(
+    64% 60% at 78% 46%,
+    color-mix(in oklab, var(--foreground) 26%, transparent) 0%,
+    color-mix(in oklab, var(--foreground) 11%, transparent) 48%,
+    transparent 80%
+  );
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M8 6.5h4M30 6.5h2M57 6.5h5M82 6.5h2M3 14.5h2M21 14.5h5M44 14.5h3M70 14.5h4M90 14.5h3M12 22.5h3M38 22.5h2M61 22.5h4M86 22.5h2M5 30.5h5M27 30.5h3M52 30.5h2M74 30.5h5M17 38.5h2M41 38.5h4M66 38.5h3M88 38.5h4M2 46.5h3M31 46.5h5M55 46.5h2M79 46.5h3M10 54.5h4M36 54.5h2M63 54.5h5M85 54.5h2M22 62.5h3M47 62.5h4M71 62.5h2M92 62.5h3M6 70.5h2M29 70.5h3M58 70.5h4M81 70.5h5M15 78.5h5M43 78.5h2M68 78.5h3M90 78.5h2M1 86.5h4M25 86.5h2M50 86.5h5M76 86.5h3M11 94.5h3M34 94.5h4M60 94.5h2M84 94.5h4' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E");
   mask-size: 96px 96px;
   mask-repeat: repeat;
@@ -346,7 +360,7 @@
   --py: 0;
 
   --sw: 28rem; /* stage width  */
-  --sh: 36.5rem; /* stage height */
+  --sh: var(--stage-h); /* stage height */
   --col-gap: 2rem;
   --cw: calc((var(--sw) - var(--col-gap)) / 2); /* card width */
   --pp: 0.75rem; /* panel body padding */

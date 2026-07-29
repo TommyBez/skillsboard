@@ -85,7 +85,6 @@ export function SearchFilterVisual() {
             <span className={styles.searchQuery}>pdf</span>
             <span className={styles.searchCaret} />
           </span>
-          <span className={styles.fieldKbd}>⌘K</span>
         </div>
 
         <ul className={styles.resultList}>
@@ -95,6 +94,11 @@ export function SearchFilterVisual() {
             </span>
             <span className={styles.resultRepo}>anthropics/skills</span>
           </li>
+        </ul>
+
+        <p className={styles.resultCut}>filtered out</p>
+
+        <ul className={styles.resultList}>
           {libraryRows.map((row) => (
             <li key={row.name} className={styles.resultRow} data-match="false">
               <span className={styles.resultName}>{row.name}</span>
@@ -104,7 +108,6 @@ export function SearchFilterVisual() {
         </ul>
 
         <p className={styles.searchCount}>
-          <span className={styles.countPrev}>24 skills</span>
           <span className={styles.countNow}>1 match</span>
           <span className={styles.countTotal}>24 skills</span>
         </p>
@@ -116,7 +119,7 @@ export function SearchFilterVisual() {
 /* 03 — one saved skill branching into the four ways out of Skills Board. */
 const routes = [
   { key: "source", value: "anthropics/skills" },
-  { key: "install", value: "npx skills add …" },
+  { key: "install", value: "npx skills add" },
   { key: "zip", value: "skill.zip · 12 kB" },
   { key: "mcp", value: "tools/get_skill" },
 ] as const

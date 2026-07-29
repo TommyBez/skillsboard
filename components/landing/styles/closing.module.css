@@ -63,9 +63,10 @@
 }
 
 /* Top bracket: the chapter index, its rule drawn by base.chapterMark. */
-.closingMark {
-  font-size: 0.7rem;
-  color: var(--muted-foreground);
+.closingMark.closingMark {
+  font-size: 0.75rem;
+  letter-spacing: 0.24em;
+  color: color-mix(in oklch, var(--foreground) 66%, transparent);
 }
 
 .closingFrame {
@@ -90,7 +91,8 @@
     padding-bottom: 0;
   }
 
-  .closingMain {
+  .closingMain,
+  .plate {
     padding-bottom: 3.25rem;
   }
 }
@@ -159,9 +161,7 @@
 
 .closingCtaRow {
   display: flex;
-  width: 100%;
   align-items: center;
-  gap: 0;
   margin-top: 2.25rem;
 }
 
@@ -207,58 +207,6 @@
   outline-offset: 3px;
 }
 
-.closingTrack {
-  position: relative;
-  display: none;
-  flex: 1;
-  height: 1px;
-  margin-left: 1.5rem;
-  overflow: hidden;
-  background: linear-gradient(
-    to right,
-    var(--lp-grid-line),
-    var(--lp-hairline) 45%,
-    var(--lp-hairline-strong)
-  );
-}
-
-@media (min-width: 64rem) {
-  .closingTrack {
-    display: block;
-  }
-}
-
-.closingTrack::after {
-  content: "";
-  position: absolute;
-  inset-block: 0;
-  left: 0;
-  width: 26%;
-  background: linear-gradient(
-    to right,
-    transparent,
-    var(--primary),
-    transparent
-  );
-  opacity: 0;
-  transform: translate3d(-110%, 0, 0);
-}
-
-.closingCta:hover ~ .closingTrack::after,
-.closingCta:focus-within ~ .closingTrack::after {
-  opacity: 0.95;
-  animation: closingTrackPulse 720ms var(--lp-ease-out) both;
-}
-
-@keyframes closingTrackPulse {
-  from {
-    transform: translate3d(-110%, 0, 0);
-  }
-  to {
-    transform: translate3d(420%, 0, 0);
-  }
-}
-
 /* ---------------------------------------------------------------------------
    The plate — the index, filed and closed
 --------------------------------------------------------------------------- */
@@ -271,12 +219,7 @@
 
 @media (min-width: 64rem) {
   .plate {
-    align-self: stretch;
-    margin-top: -3rem;
-    border-left: 1px solid var(--lp-hairline);
-    padding-top: 3rem;
-    padding-bottom: 3.25rem;
-    padding-left: clamp(2.5rem, 4vw, 4.5rem);
+    padding-left: clamp(2.5rem, 5vw, 5.5rem);
   }
 }
 
@@ -337,7 +280,10 @@
   gap: 0.85rem;
 }
 
-/* Each leader runs out to where the entry came from, the way an index does. */
+/* Each leader runs out to where the entry came from, the way an index does.
+   Shown only where the plate is wide enough for the leader to still read as a
+   leader: the stacked layout, and desktops past the point where the right
+   column stops being narrow. */
 .plateSource {
   display: none;
   font-family: var(--font-mono);
@@ -347,9 +293,19 @@
   white-space: nowrap;
 }
 
-@media (min-width: 30rem) {
+@media (min-width: 30rem) and (max-width: 63.999rem) {
   .plateRow {
-    grid-template-columns: auto auto auto minmax(0, 1fr) auto;
+    grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
+  }
+
+  .plateSource {
+    display: block;
+  }
+}
+
+@media (min-width: 78rem) {
+  .plateRow {
+    grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
   }
 
   .plateSource {
@@ -457,7 +413,7 @@
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
   .closingHeading {
-  transform: translate3d(0, 30px, 0);
+  transform: translate3d(0, 38px, 0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -656,7 +612,4 @@
     translate: none;
   }
 
-  .closingTrack::after {
-    display: none;
-  }
 }

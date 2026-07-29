@@ -332,7 +332,7 @@
 /* Hover / keyboard focus — immediate, precise, no layout movement. */
 @media (hover: hover) and (pointer: fine) {
   .faqIndex .faqItem:has(> .faqSummary:hover) {
-    background-color: color-mix(in oklch, var(--foreground) 4%, transparent);
+    background-color: color-mix(in oklch, var(--foreground) 5%, transparent);
   }
 
   .faqIndex .faqItem:has(> .faqSummary:hover)::after {
@@ -343,14 +343,18 @@
     color: var(--foreground);
   }
 
+  /* The glyph fills in on hover: the row is not just highlighted, the control
+     inside it declares itself as the thing you are about to press. */
   .faqIndex .faqItem:has(> .faqSummary:hover) .faqGlyph {
     color: var(--foreground);
     border-color: var(--lp-hairline-strong);
+    background-color: color-mix(in oklch, var(--foreground) 9%, transparent);
   }
 
   .faqIndex .faqItem[open]:has(> .faqSummary:hover) .faqGlyph {
     color: var(--primary);
     border-color: color-mix(in oklch, var(--primary) 70%, transparent);
+    background-color: color-mix(in oklch, var(--primary) 20%, transparent);
   }
 }
 
@@ -415,14 +419,15 @@
       content-visibility 360ms allow-discrete;
   }
 
-  /* Opening, the answer fades in behind the box as it clears — closing, it
-     goes first so the row never collapses over live text. */
+  /* The fade is gated behind the height: the answer only starts resolving once
+     the row has most of the space for it, so no line is ever caught half-read
+     under a still-moving rule. Closing, the text goes first. */
   .faqIndex .faqItem[open]::details-content {
     block-size: auto;
     opacity: 1;
     transition:
       block-size 360ms var(--lp-ease-snap),
-      opacity 260ms var(--lp-ease-snap) 90ms,
+      opacity 200ms var(--lp-ease-out) 200ms,
       content-visibility 360ms allow-discrete;
   }
 }

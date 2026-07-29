@@ -31,7 +31,7 @@ export function ClosingSection() {
                 <span className={styles.onceStamp}>once.</span>
               </h2>
               <p
-                className={`${styles.closingCopy} mt-6 max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground`}
+                className={`${styles.closingCopy} mt-6 max-w-xl text-balance text-lg leading-relaxed text-muted-foreground`}
               >
                 Save the recommendation where the whole team can find it. The
                 next person can get started without asking where to look.
@@ -42,7 +42,6 @@ export function ClosingSection() {
                     <HomeFinalActions />
                   </Suspense>
                 </div>
-                <span className={styles.closingTrack} aria-hidden="true" />
               </div>
             </div>
 

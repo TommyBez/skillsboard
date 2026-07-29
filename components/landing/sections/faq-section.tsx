@@ -40,8 +40,12 @@ export function FaqSection() {
           <span className={styles.faqIndexRule} aria-hidden="true" />
 
           {landingFaqs.map((faq, index) => (
+            // Native exclusive disclosure: opening an entry closes the last
+            // one, so the register never sprawls and the closed rows stay a
+            // scannable index. No JS involved.
             <details
               key={faq.question}
+              name="faq-index"
               className={`faq-disclosure ${styles.faqItem}`}
             >
               <summary className={styles.faqSummary}>

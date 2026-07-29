@@ -55,9 +55,14 @@
 
 @media (min-width: 64rem) {
   .frame {
+    border-inline: 1px solid var(--lp-hairline);
+  }
+
+  /* Only the pinned version trades page padding for viewport height; the
+     static (no-JS / reduced-motion) spread keeps the page's normal rhythm. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .frame {
     height: 100%;
     padding-block: clamp(1.1rem, 2.4vh, 1.9rem);
-    border-inline: 1px solid var(--lp-hairline);
   }
 }
 
