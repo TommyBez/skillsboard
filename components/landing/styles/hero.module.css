@@ -22,7 +22,7 @@
      out against: the copy column's baseline, the scatter pitch, the panel's
      centring and the state rail all derive from it. Height-aware so short
      laptops never push the composition into the rail. */
-  --stage-h: min(39rem, calc(100dvh - 12.5rem));
+  --stage-h: min(39rem, calc(100dvh - 12rem));
 
   /* Load choreography — one authored sequence, every beat on the shared
      --lp-stagger grid so the entrance reads as a single take:
@@ -553,9 +553,9 @@
   --ls3: 0.28;
   --ls4: 0.41;
   --ls5: 0.54;
-  /* where each card visibly *lands* (the fold reads as done well before the
-     easing finishes): --ls + 0.79 * --win */
-  --dock: 0.88;
+  /* The scene is complete once the last card has docked (--ls5 + 0.79 * --win);
+     --done drives the small "arrived" beat the panel plays afterwards. */
+  --done: clamp(0, calc((var(--route-p) - 0.84) / 0.12), 1);
 
   position: absolute;
   top: 50%;
@@ -621,7 +621,12 @@
   top: var(--pt);
   width: var(--pw);
   height: var(--ph);
-  border: 1px solid var(--lp-hairline-strong);
+  border: 1px solid
+    color-mix(
+      in oklab,
+      var(--primary) calc(var(--done) * 30%),
+      var(--lp-hairline-strong)
+    );
   border-radius: 0.875rem;
   background: color-mix(in oklab, var(--card) 78%, transparent);
   box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
@@ -728,7 +733,9 @@
   left: var(--pp);
   right: var(--pp);
   top: calc(var(--hh) + var(--qh) + var(--pp));
-  height: calc(5 * var(--rh));
+  /* four separators, not five: the fifth would sit a padding-width above the
+     panel's own foot rule and read as a doubled edge */
+  height: calc(5 * var(--rh) - 1px);
   opacity: clamp(0, calc((var(--route-p) - 0.05) / 0.2), 1);
   background-image: repeating-linear-gradient(
     to bottom,
@@ -757,11 +764,19 @@
   color: var(--muted-foreground);
 }
 
+/* The last beat of the scene: once every dossier is filed, the library is
+   readable by the team's agents — so this is the one thing that lights up
+   after the deck lands rather than with it. */
 .libraryFootLive {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  color: color-mix(in oklab, var(--primary) 82%, var(--foreground));
+  color: color-mix(
+    in oklab,
+    color-mix(in oklab, var(--primary) 82%, var(--foreground))
+      calc(var(--done, 1) * 100%),
+    var(--muted-foreground)
+  );
 }
 
 .libraryFootLive::before {
@@ -1619,6 +1634,10 @@
     --frame-p: 1;
     translate: none;
     transition: none;
+  }
+
+  .heroBoard {
+    --done: 1;
   }
 
   .libraryRows {

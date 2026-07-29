@@ -225,7 +225,8 @@
    it is the same rule that separates the three absences below. */
 .statement {
   position: relative;
-  padding-bottom: clamp(1.5rem, 2.4vw, 2.1rem);
+  /* On a short viewport the air gives way before the ledger rows do. */
+  padding-bottom: min(clamp(1.5rem, 2.4vw, 2.1rem), 4vh);
 }
 
 .statement::after {
@@ -258,7 +259,7 @@
 }
 
 .lede {
-  margin-top: clamp(1rem, 1.8vw, 1.6rem);
+  margin-top: min(clamp(1rem, 1.8vw, 1.6rem), 3.2vh);
   max-width: 46ch;
   font-size: clamp(1rem, 1.45vw, 1.3rem);
   line-height: 1.4;
@@ -298,8 +299,7 @@
   --rd: calc(310ms + var(--i, 0) * 70ms);
 }
 
-/* --- Narrow: the plate fills the measure and the ledger runs its full width - */
-
+/* The last row is closed by the plate's own base rule, not by its own. */
 .specRow:last-child::after {
   display: none;
 }
@@ -312,7 +312,7 @@
        fixed, the numeral is drawn to the exact height of the body, and its
        width — the letterform's own 380 : 532 — *is* the first column. */
     --plate-frac: 1;
-    --plate-cap: min(70vh, 39rem);
+    --plate-cap: min(74vh, 39rem);
     --measure-w: calc(min(1440px, 100vw) - 2 * var(--gutter));
     --plate-w: min(
       calc(var(--measure-w) * var(--plate-frac)),
@@ -371,13 +371,15 @@
     --rd: 170ms;
   }
 
+  /* Three identical rows filling whatever the statement leaves. */
   .spec {
     grid-template-rows: repeat(3, minmax(0, 1fr));
-    margin-top: 0;
   }
 
   .specRow {
-    padding-block: 0 0.75rem;
+    /* Sits on its own rule; the gap gives way before the type does on a short
+       viewport, where the three rows are the tightest thing on the plate. */
+    padding-block: 0 clamp(0.4rem, 1.35vh, 0.75rem);
   }
 }
 
@@ -404,7 +406,7 @@
   }
 }
 
-/* --- Arrival: the plate is placed, ruled up, and the type is set ----------- */
+/* --- Arrival, part 1: the plate is ruled up ------------------------------- */
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"]
@@ -445,7 +447,7 @@
   transform: scaleY(0);
 }
 
-/* --- Arrival: the plate is placed, then the type is set -------------------- */
+/* --- Arrival, part 2: the plate is placed and the type is set -------------- */
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"]
