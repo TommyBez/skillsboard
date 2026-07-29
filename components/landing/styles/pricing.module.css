@@ -243,7 +243,10 @@
 
 .heading {
   max-width: 4.6em;
-  font-size: clamp(2.5rem, 9.4vw, 8.5rem);
+  font-size: min(
+    clamp(2.5rem, 9.4vw, 8.5rem),
+    calc(var(--col-w, 100em) / 3.2)
+  );
   font-weight: 650;
   line-height: 0.88;
   letter-spacing: -0.048em;
@@ -325,6 +328,11 @@
     --os-x: 7px;
     --num-h: calc(var(--body-h) + 2 * var(--os));
     --num-w: calc(var(--num-h) * 0.7142857);
+    /* The measure the statement is actually set on: plate, less four pads
+       (edge, gutter, rule inset, edge) and the numeral. The display size is
+       capped against it, so a short viewport can never push the headline past
+       its own column. */
+    --col-w: calc(var(--plate-w) - 4 * var(--pad) - var(--num-w));
   }
 
   .plate {

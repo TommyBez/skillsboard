@@ -518,11 +518,16 @@
   --cw: 12.75rem; /* card width */
   --pp: 0.75rem; /* panel body padding */
   --pw: calc(var(--cw) + 2 * var(--pp)); /* panel width */
-  --rh: 3.5rem; /* filed row height = card index-strip height */
+  /* Filed row height = the card's index-strip height. It tracks the stage so a
+     short window shrinks the panel and the deck together instead of jamming
+     one into the other. */
+  --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 3.5rem);
   --hh: 2.9rem; /* panel head height */
   --qh: 3.2rem; /* panel filter row height */
   --fh: 2.3rem; /* panel foot height */
-  --ch: 10.3rem; /* dossier card height — three of them make the scatter */
+  /* everything on the card below the index strip: body + foot + borders */
+  --cbody: 6.8rem;
+  --ch: calc(var(--rh) + var(--cbody)); /* dossier card height */
   --ph: calc(
     var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh) + var(--fh)
   );
@@ -569,11 +574,10 @@
   .heroBoard {
     --sw: 32rem;
     --cw: 14.5rem;
-    --rh: 3.85rem;
+    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 3.85rem);
     --hh: 3.1rem;
     --qh: 3.5rem;
     --fh: 2.6rem;
-    --ch: 10.65rem;
   }
 }
 
@@ -582,7 +586,7 @@
    load-bearing row on the card. */
 @media (min-width: 64rem) and (max-height: 46rem) {
   .heroBoard {
-    --ch: 8.9rem;
+    --cbody: 5.35rem;
   }
 
   .heroBoard .dossierDesc {
@@ -594,12 +598,11 @@
   .heroBoard {
     --sw: 36rem;
     --cw: 16.5rem;
-    --rh: 4rem;
+    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 4rem);
     --hh: 3.2rem;
     --qh: 3.6rem;
     --fh: 2.7rem;
     --pp: 0.85rem;
-    --ch: 10.8rem;
   }
 }
 
