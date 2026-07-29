@@ -8,6 +8,18 @@
 .root {
   --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --lp-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* Shared motion vocabulary. Every chapter reaches for these so the page
+     reads as one hand: emphasised decelerations for entrances, a restrained
+     overshoot for anything that "lands", quick easing for hover feedback. */
+  --lp-ease-emph: cubic-bezier(0.16, 1, 0.3, 1);
+  --lp-ease-spring: cubic-bezier(0.22, 1.16, 0.36, 1);
+  --lp-ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
+  --lp-dur-tap: 140ms;
+  --lp-dur-hover: 220ms;
+  --lp-dur-reveal: 560ms;
+  --lp-dur-scene: 820ms;
+  --lp-stagger: 72ms;
   --lp-hairline: color-mix(in oklch, var(--foreground) 16%, transparent);
   --lp-hairline-strong: color-mix(in oklch, var(--foreground) 30%, transparent);
   --lp-grid-line: color-mix(in oklch, var(--foreground) 7%, transparent);

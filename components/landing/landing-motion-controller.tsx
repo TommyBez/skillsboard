@@ -28,6 +28,7 @@ function chapterProgress(el: HTMLElement) {
  * - `data-scrolled` on the root (header command-strip background)
  * - `--route-progress` (hero sticky chapter: dossiers filing into the library)
  * - `--mcp-progress` (MCP sticky chapter: signal path drawing)
+ * - `--sp-*` / `--vp-*` (generic scroll- and viewport-linked channels)
  * - `--px` / `--py` pointer parallax on the hero board (capped, pointer-fine)
  * - `data-page-hidden` (pauses ambient pulses when the tab is not visible)
  * - `data-motion-state` viewport reveals for below-the-fold groups
@@ -49,6 +50,31 @@ export function LandingMotionController() {
 
     const hero = root.querySelector<HTMLElement>("[data-hero-scene]")
     const mcp = root.querySelector<HTMLElement>("[data-mcp-chapter]")
+
+    // Generic scroll-linked channels, so a chapter can drive its own
+    // choreography from CSS alone:
+    //
+    // - [data-scroll-chapter="x"] publishes --sp-x, the progress through a
+    //   tall sticky chapter's runway (0 as it pins, 1 as it releases).
+    // - [data-view-progress="x"] publishes --vp-x, how far the element has
+    //   travelled across the viewport (0 entering at the bottom, 1 leaving
+    //   at the top) — useful for parallax and hand-off between chapters.
+    //
+    // Both write onto the root, so any descendant can read them.
+    const scrollChapters = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-scroll-chapter]")
+    )
+    const viewTargets = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-view-progress]")
+    )
+
+    /** 0 while the element sits below the fold, 1 once it has fully left. */
+    const viewProgress = (el: HTMLElement) => {
+      const rect = el.getBoundingClientRect()
+      const span = window.innerHeight + rect.height
+      if (span <= 0) return 0
+      return clamp01((window.innerHeight - rect.top) / span)
+    }
 
     let frame = 0
     const update = () => {
@@ -85,6 +111,20 @@ export function LandingMotionController() {
           chapterProgress(mcp).toFixed(4)
         )
       }
+
+      scrollChapters.forEach((el) => {
+        root.style.setProperty(
+          `--sp-${el.dataset.scrollChapter}`,
+          chapterProgress(el).toFixed(4)
+        )
+      })
+
+      viewTargets.forEach((el) => {
+        root.style.setProperty(
+          `--vp-${el.dataset.viewProgress}`,
+          viewProgress(el).toFixed(4)
+        )
+      })
     }
 
     const requestUpdate = () => {
@@ -369,6 +409,12 @@ export function LandingMotionController() {
       root.style.removeProperty("--route-progress")
       root.style.removeProperty("--mcp-progress")
       root.style.removeProperty("--scroll-progress")
+      scrollChapters.forEach((el) =>
+        root.style.removeProperty(`--sp-${el.dataset.scrollChapter}`)
+      )
+      viewTargets.forEach((el) =>
+        root.style.removeProperty(`--vp-${el.dataset.viewProgress}`)
+      )
     }
   }, [])
 
