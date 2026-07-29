@@ -36,7 +36,7 @@
   pointer-events: none;
   background-image: radial-gradient(
     circle at center,
-    color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
+    color-mix(in oklab, var(--foreground) 6%, transparent) 1px,
     transparent 1.1px
   );
   background-size: 28px 28px;
@@ -153,7 +153,7 @@
 }
 
 .closingMarkSep {
-  color: color-mix(in oklch, var(--foreground) 34%, transparent);
+  color: color-mix(in oklab, var(--foreground) 34%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -251,7 +251,7 @@
   margin-bottom: 0;
   margin-left: -0.014em;
   text-indent: -0.0417em;
-  color: color-mix(in oklch, var(--foreground) 76%, transparent);
+  color: color-mix(in oklab, var(--foreground) 76%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -277,13 +277,13 @@
   padding: 0 0.249em 0.12em 0.173em;
   border-radius: 2px;
   line-height: 0.829em;
-  background: color-mix(in oklch, var(--primary) 84%, var(--background) 16%);
+  background: color-mix(in oklab, var(--primary) 84%, var(--background) 16%);
   color: var(--primary-foreground);
   transform: rotate(-1.4deg);
   box-shadow:
-    inset 0 1px 0 color-mix(in oklch, black 16%, transparent),
-    inset 0 -1px 0 color-mix(in oklch, white 14%, transparent),
-    0 1px 10px -8px color-mix(in oklch, var(--primary) 55%, transparent);
+    inset 0 1px 0 color-mix(in oklab, black 16%, transparent),
+    inset 0 -1px 0 color-mix(in oklab, white 14%, transparent),
+    0 1px 10px -8px color-mix(in oklab, var(--primary) 55%, transparent);
 }
 
 /* Ink grain: the impression is never perfectly even. */
@@ -335,7 +335,7 @@
   border-radius: 999px;
   background: radial-gradient(
     58% 100% at 50% 56%,
-    color-mix(in oklch, var(--primary) 46%, transparent),
+    color-mix(in oklab, var(--primary) 46%, transparent),
     transparent 72%
   );
   filter: blur(15px);
@@ -414,7 +414,7 @@
   padding: 20px 1.625rem 18px;
   border: 1px solid var(--lp-hairline);
   border-radius: 3px;
-  background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
+  background: color-mix(in oklab, var(--foreground) 2.5%, transparent);
 }
 
 @media (max-width: 24rem) {
@@ -523,7 +523,7 @@
 .plateRule {
   display: none;
   height: 1px;
-  background: color-mix(in oklch, var(--foreground) 9%, transparent);
+  background: color-mix(in oklab, var(--foreground) 9%, transparent);
   transform-origin: left center;
 }
 
@@ -532,7 +532,7 @@
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.02em;
-  color: color-mix(in oklch, var(--foreground) 48%, transparent);
+  color: color-mix(in oklab, var(--foreground) 48%, transparent);
   white-space: nowrap;
 }
 
@@ -559,14 +559,14 @@
 }
 
 .plateRow[data-marked] .plateSource {
-  color: color-mix(in oklch, var(--foreground) 66%, transparent);
+  color: color-mix(in oklab, var(--foreground) 66%, transparent);
 }
 
 .plateName {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: -0.005em;
-  color: color-mix(in oklch, var(--foreground) 62%, transparent);
+  color: color-mix(in oklab, var(--foreground) 62%, transparent);
   white-space: nowrap;
 }
 
@@ -590,7 +590,7 @@
   height: 6px;
   flex: none;
   border-radius: 1px;
-  background: color-mix(in oklch, var(--foreground) 26%, transparent);
+  background: color-mix(in oklab, var(--foreground) 26%, transparent);
 }
 
 .plateRow[data-marked] .plateMark,

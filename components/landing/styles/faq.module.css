@@ -105,7 +105,7 @@
      type and controls (the readout, the open ordinal, the open toggle), and
      this one on every rule and mark the state draws — the open row's segment,
      its leader, and its station on the index scale. */
-  --faq-accent-rule: color-mix(in oklch, var(--primary) 62%, transparent);
+  --faq-accent-rule: color-mix(in oklab, var(--primary) 62%, transparent);
 
   /* One dash language. The strip's connectors and the register's leaders are
      the same 2px mark on the same 6px pitch, phased from the left. */
@@ -833,8 +833,8 @@
 .faqItem[open] .faqGlyph {
   transform: rotate(90deg);
   color: var(--primary);
-  border-color: color-mix(in oklch, var(--primary) 52%, transparent);
-  background-color: color-mix(in oklch, var(--primary) 12%, transparent);
+  border-color: color-mix(in oklab, var(--primary) 52%, transparent);
+  background-color: color-mix(in oklab, var(--primary) 12%, transparent);
 }
 
 .faqItem[open] .faqGlyph::before {
@@ -848,7 +848,7 @@
 /* Hover / keyboard focus — immediate, precise, no layout movement. */
 @media (hover: hover) and (pointer: fine) {
   .faqIndex .faqItem:has(> .faqSummary:hover) {
-    background-color: color-mix(in oklch, var(--foreground) 5%, transparent);
+    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
   }
 
   .faqIndex .faqItem:has(> .faqSummary:hover)::after {
@@ -868,13 +868,13 @@
   .faqIndex .faqItem:has(> .faqSummary:hover) .faqGlyph {
     color: var(--foreground);
     border-color: var(--lp-hairline-strong);
-    background-color: color-mix(in oklch, var(--foreground) 9%, transparent);
+    background-color: color-mix(in oklab, var(--foreground) 9%, transparent);
   }
 
   .faqIndex .faqItem[open]:has(> .faqSummary:hover) .faqGlyph {
     color: var(--primary);
-    border-color: color-mix(in oklch, var(--primary) 70%, transparent);
-    background-color: color-mix(in oklch, var(--primary) 20%, transparent);
+    border-color: color-mix(in oklab, var(--primary) 70%, transparent);
+    background-color: color-mix(in oklab, var(--primary) 20%, transparent);
   }
 }
 
@@ -917,7 +917,7 @@
   max-width: 34rem;
   font-size: 1.05rem;
   line-height: 1.62;
-  color: color-mix(in oklch, var(--foreground) 45%, var(--muted-foreground));
+  color: color-mix(in oklab, var(--foreground) 45%, var(--muted-foreground));
   text-wrap: pretty;
 }
 

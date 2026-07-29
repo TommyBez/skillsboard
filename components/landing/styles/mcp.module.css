@@ -40,8 +40,8 @@
      `--pad`, so two stacked sections hold their content the same distance off
      their rules instead of 29px and 37px. */
   --rule-clear: 1.25rem;
-  --wire-casing: color-mix(in oklch, var(--foreground) 13%, transparent);
-  --wire-glow: color-mix(in oklch, var(--primary) 55%, transparent);
+  --wire-casing: color-mix(in oklab, var(--foreground) 13%, transparent);
+  --wire-glow: color-mix(in oklab, var(--primary) 55%, transparent);
 
   /* --- Three rule tones, measurably apart -----------------------------------
      Measured on the dark field the chapter used to draw only two: the frame's
@@ -84,7 +84,7 @@
      library-side collector that fills before the route exists: real, legible,
      and visibly a stage earlier. */
   --signal: var(--primary);
-  --signal-feed: color-mix(in oklch, var(--primary) 58%, transparent);
+  --signal-feed: color-mix(in oklab, var(--primary) 58%, transparent);
 }
 
 @media (min-width: 64rem) {
@@ -462,8 +462,8 @@
   border-radius: 3px;
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, var(--card) 82%, transparent),
-    color-mix(in oklch, var(--card) 46%, transparent)
+    color-mix(in oklab, var(--card) 82%, transparent),
+    color-mix(in oklab, var(--card) 46%, transparent)
   );
   font-family: var(--font-mono);
 }
@@ -667,10 +667,10 @@
   border-radius: 3px;
   background: linear-gradient(
     180deg,
-    color-mix(in oklch, var(--card) 82%, transparent),
-    color-mix(in oklch, var(--card) 46%, transparent)
+    color-mix(in oklab, var(--card) 82%, transparent),
+    color-mix(in oklab, var(--card) 46%, transparent)
   );
-  box-shadow: 0 1px 0 0 color-mix(in oklch, var(--foreground) 5%, transparent) inset;
+  box-shadow: 0 1px 0 0 color-mix(in oklab, var(--foreground) 5%, transparent) inset;
 }
 
 /* The collector bus. It sits *outboard* of the panel rather than on its right
@@ -1027,7 +1027,7 @@
   position: absolute;
   border-radius: 2px;
   background: var(--lp-alert);
-  box-shadow: 0 0 12px 2px color-mix(in oklch, var(--lp-alert) 55%, transparent);
+  box-shadow: 0 0 12px 2px color-mix(in oklab, var(--lp-alert) 55%, transparent);
 }
 
 .wire[data-axis="x"] > .packetTrack > .packetDot {
@@ -1084,7 +1084,7 @@
   border: 1px solid var(--primary);
   border-radius: 4px;
   box-shadow:
-    0 0 0 1px color-mix(in oklch, var(--primary) 14%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--primary) 14%, transparent),
     0 0 22px -12px var(--wire-glow),
     inset 0 0 18px -10px var(--wire-glow);
   opacity: 1;
@@ -1162,7 +1162,7 @@
   bottom: 0;
   width: 100%;
   height: 1px;
-  background: color-mix(in oklch, var(--primary) 46%, transparent);
+  background: color-mix(in oklab, var(--primary) 46%, transparent);
   transform: scaleX(1);
   transform-origin: left center;
 }
@@ -1179,7 +1179,7 @@
   margin-top: -3px;
   border: 1px solid var(--primary);
   background: var(--primary);
-  box-shadow: 0 0 0 2.5px color-mix(in oklch, var(--primary) 16%, transparent);
+  box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--primary) 16%, transparent);
 }
 
 .actionIndex {
@@ -1517,7 +1517,7 @@
       transparent
     );
     box-shadow: 0 0 0 2.5px
-      color-mix(in oklch, var(--primary) calc(var(--arm, 1) * 16%), transparent);
+      color-mix(in oklab, var(--primary) calc(var(--arm, 1) * 16%), transparent);
     transform: scale(calc(0.82 + 0.18 * var(--arm, 1)));
   }
 
