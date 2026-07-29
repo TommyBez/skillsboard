@@ -254,7 +254,7 @@
 
 .stepTitle {
   grid-column: 1;
-  margin: 0.85rem 0 0;
+  margin: 0.75rem 0 0;
   font-size: clamp(1.35rem, 1.7vw, 1.62rem);
   font-weight: 650;
   letter-spacing: -0.034em;
@@ -264,7 +264,7 @@
 .stepCopy {
   grid-column: 1;
   align-self: start;
-  margin: 0.62rem 0 0;
+  margin: 0.625rem 0 0;
   max-width: 32ch;
   font-size: 0.9375rem;
   line-height: 1.55;
@@ -316,14 +316,16 @@
 .vizBody {
   grid-column: 1;
   align-self: stretch;
-  margin-top: 0.85rem;
+  /* The caption's clear space is `--label-gap` in both directions: to the rule
+     that continues it, and to the diagram it opens. */
+  margin-top: var(--label-gap);
   display: flex;
   flex-direction: column;
   align-items: stretch;
 }
 
 .vizFoot {
-  margin-top: 1.35rem;
+  margin-top: 1.5rem;
 }
 
 .footVal {
@@ -600,7 +602,7 @@
 }
 
 .resultList {
-  margin: 0.85rem 0 0;
+  margin: var(--label-gap) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -634,7 +636,7 @@
 /* The cut is the same captioned rule as the column headings — same size,
    tracking, ink, gap and terminal — because it is the same object. */
 .resultCut {
-  margin-top: 1.35rem;
+  margin-top: 1.5rem;
 }
 
 .resultRow[data-match="true"]::before {

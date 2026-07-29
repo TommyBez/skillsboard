@@ -55,7 +55,8 @@
      banner's edge, the footer's measure rule — is the same 1px of the same
      ink across exactly the same span. Accent ink appears in chrome in one
      place only: the scroll playhead, where it reports state rather than
-     decorates a boundary. */
+     decorating a boundary.
+
      Weighted to render at the same strength as the frame's vertical rails
      (which are difference ink, so they cannot share a declaration) — the top
      rule, the bottom rule and the two side rails read as four edges of one
@@ -249,7 +250,7 @@
   align-self: center;
   width: 1px;
   flex: none;
-  background: var(--lp-chrome-rule);
+  background: var(--lp-hairline);
 }
 
 /* The brand lockup, pulled back onto the column by the mark's own side
@@ -684,7 +685,7 @@
    of the rule everything else lands on, which is how the page ended up with
    four different right-hand terminations. */
 .footerMark {
-  border: 1px solid var(--lp-chrome-rule);
+  border: 1px solid var(--lp-hairline);
   border-radius: 3px;
   color: var(--muted-foreground);
   transition:

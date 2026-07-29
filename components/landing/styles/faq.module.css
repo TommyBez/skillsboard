@@ -384,11 +384,17 @@
   .faqMap {
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: space-between;
     margin-top: auto;
     margin-inline: calc(-1 * var(--faq-cellx)) calc(-1 * var(--faq-inset));
     border-top: 1px solid var(--lp-grid-line);
     padding-inline: var(--faq-cellx) var(--faq-inset);
+    /* One register row of padding, corrected for the difference between a
+       mono label's ink centre and a question's, so the caption sits on the
+       same line as question 07 across the column rule. */
+    padding-top: calc(
+      var(--faq-row-pad) + var(--faq-q-inkc) - var(--faq-num-inkc)
+    );
     /* Ticks stand ON the foot rule, not across it. */
     padding-bottom: 1px;
     min-height: calc(2 * var(--faq-row));
@@ -397,7 +403,7 @@
 
 .faqMapLabel {
   display: block;
-  margin-bottom: 1rem;
+  line-height: 1;
   font-family: var(--font-mono);
   font-size: var(--faq-num-size);
   font-weight: 600;
