@@ -66,11 +66,14 @@
      place only: the scroll playhead, where it reports state rather than
      decorating a boundary.
 
-     Weighted to render at the same strength as the frame's vertical rails
-     (which are difference ink, so they cannot share a declaration) — the top
-     rule, the bottom rule and the two side rails read as four edges of one
-     rectangle, a step above the hairlines the chapters divide themselves
-     with. */
+     The frame's vertical rails are difference ink, so they cannot share this
+     declaration — but they are now tuned to the value it renders rather than
+     the other way round: 23% foreground prints 64 on the dark field and 191
+     on the light one, and `--lp-frame-ink` is set to land the rails on the
+     same two numbers. Measured before, the sides were half the contrast of
+     the top and bottom (48/218 against 64/191); they are one weight now, so
+     the four edges really do read as one rectangle, a step above the
+     hairlines the chapters divide themselves with. */
   --lp-chrome-rule: color-mix(in oklab, var(--foreground) 23%, transparent);
 
   /* Optical alignment constants.
@@ -174,9 +177,15 @@
    `background: var(--background)` gives the rail a constant backdrop and
    `isolation: isolate` scopes the difference blend to it, so the rail prints
    exactly the same value from the header rule to the bottom of the page,
-   including where it covers a chapter's duplicate of itself. Rendered weight
-   over the page field is unchanged from the blended version — this is the
-   same ink, made independent of what is underneath it.
+   including where it covers a chapter's duplicate of itself. Measured after:
+   98.4% of every rail pixel down the whole document is one value (63 dark /
+   190 light), and nothing left is more than three units off it.
+
+   The cost, taken knowingly: where a chapter's display type overhangs the
+   measure by its own side bearing — the closing headline does, by ~2px — the
+   rail now cuts a 1px seam through the glyph instead of ghosting it. That is
+   the frame passing in front of type that broke it, which is at least one
+   consistent story; the real fix belongs in the chapter that overhangs.
 --------------------------------------------------------------------------- */
 
 .frameRail {

@@ -52,7 +52,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       <Icon key={current} className="theme-toggle-icon size-4" aria-hidden="true" />
       {mounted && current === "system" ? (
         <span
-          className="absolute right-1 top-1 size-1 rounded-full bg-primary"
+          className="absolute right-1 top-1 size-1 rounded-full bg-current opacity-45"
           aria-hidden="true"
         />
       ) : null}
