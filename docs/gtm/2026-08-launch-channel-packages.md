@@ -36,7 +36,7 @@ The official Typefully resource is draft `10084598` in social set `266935`:
 - exact channel URLs from the campaign-link table;
 - private, unscheduled, and unpublished at the July 28 official readback.
 
-Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `bc8d9af0228c2bc71920cf2c7dc25d558a46fa5614b288d9b01e3c11e60f084a`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
+Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `cbb3728a5ec8cedfde33236429515ecfb38b537d5520b8ad342aa4d14ec3f911`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
 
 ## Product Hunt package
 
