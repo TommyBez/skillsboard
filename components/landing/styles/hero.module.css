@@ -54,7 +54,7 @@
      Three greys for one class of label is drift; two inks and a rule is a
      system. --------------------------------------------------------------- */
   --hero-label: var(--muted-foreground);
-  --hero-label-quiet: color-mix(in oklab, var(--muted-foreground) 74%, transparent);
+  --hero-label-quiet: color-mix(in oklab, var(--muted-foreground) 90%, transparent);
   --hero-label-live: var(--foreground);
 
   /* Card ink ramp — three steps, no more. Everything printed inside the board
@@ -201,7 +201,7 @@
        lands the block's optical centre on the chapter's own centre. The odd
        value is deliberate: it puts every box in this column on a whole pixel
        at the reference viewport, which is what keeps the two CTAs in register. */
-    padding-block-end: 5.3125rem;
+    padding-block-end: 5.25rem;
   }
 }
 
@@ -319,9 +319,20 @@
      *text*-size correction; at display size the face already carries its own
      fit, and this face is set at 93% width on top of that. */
   letter-spacing: -0.018em;
-  /* Optical overhang. Both lines open on a pointed cap (Y, A) whose apex meets
-     the column at a single point; set flush they read as notched against the
-     flat B of the paragraph below. Hung by roughly a third of a stem. */
+}
+
+/* Optical overhang. Both lines open on a pointed cap whose apex meets the
+   column at a single point; set flush they read as notched against the flat B
+   stem of the paragraph below, which is where the column's edge is actually
+   established. Each line is hung by its own glyph, not by one number for both:
+   the Y's top-left tip sits about 0.012em further inboard than the A's foot, so
+   hanging both by the same amount just moves the notch. Measured, the two lines
+   now start within half a pixel of each other and about 2.5px left of the B. */
+.heroLineMask:first-child {
+  margin-inline-start: -0.031em;
+}
+
+.heroLineMask:last-child {
   margin-inline-start: -0.019em;
 }
 
@@ -364,17 +375,16 @@
 }
 
 /* Keep the paragraph clear of the board's left column at every desktop width.
-   The four intervals in this column are authored as two registers: 130px
+   The five intervals down this column are authored as two registers: ~129px
    between blocks that belong to different registers (eyebrow → headline,
-   CTA → tally), 88 and 47 inside the one block of running copy. */
+   CTA → tally), then 82 and 56 inside the one block of running copy, and 53
+   from the tally to the rule it reports to. Measured ink to ink at 1440×900
+   the sequence is 129 / 82 / 56 / 128 / 53 — the largest interval is 2.4× the
+   smallest, and no interval is a hole. */
 @media (min-width: 64rem) {
   .heroLower {
-    margin-top: 4rem;
+    margin-top: 3.5rem;
     max-width: 30rem;
-  }
-
-  .heroCta {
-    margin-top: 2.375rem;
   }
 
   .heroBlurb {
@@ -409,6 +419,12 @@
   margin-top: 1.75rem;
   animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
     var(--lp-beat-5) both;
+}
+
+@media (min-width: 64rem) {
+  .heroCta {
+    margin-top: 2.75rem;
+  }
 }
 
 /* The secondary action — the only direct <a> child of the actions row; the
@@ -594,11 +610,14 @@
 }
 
 .heroRailLabel[data-state="scattered"] {
-  margin-inline-start: -0.11em;
+  /* the S carries almost no side bearing at this size, so it is given one */
+  margin-inline-start: 0.1em;
 }
 
 .heroRailLabel[data-state="filed"] {
-  margin-inline-end: -0.2em;
+  /* only the trailing letter-space of the tracked caps, so the D's ink stops on
+     the measure instead of 8px short of it */
+  margin-inline-end: -0.18em;
 }
 
 /* One treatment, two inks: whichever state the scene is in is set in the page's
@@ -671,14 +690,15 @@
      half pitch, so the deck reads as an arrangement rather than a spill: every
      card is whole, every gutter is deliberate, nothing occludes anything.
 
-     The right column holds a real margin off the frame — the same 1.5rem it
-     leaves as the gutter to the left column. It used to stop 6–9px short of the
-     page's right rail, which is the one distance that reads as neither flush
-     nor clear. The drawer the cards file into is the thing that docks flush;
-     loose paper does not. */
+     The right column stands on the drawer's own left edge. It used to stop 6–9px
+     short of the page's right rail — the one distance that reads as neither
+     flush nor clear — while leaving ~100px of dead air on the other side of the
+     deck. Hung off the panel instead, it keeps a real 25px margin inside the
+     frame, and the two loose cards on that side are visibly already over the
+     slot they are going into. The drawer is the thing that docks flush to the
+     frame; loose paper does not. */
   --scat-l: 0rem;
-  --scat-gut: 1.5rem;
-  --scat-r: calc(var(--sw) - var(--cw) - var(--scat-gut));
+  --scat-r: calc(var(--sw) - var(--pw));
   --pitch: calc((var(--sh) - var(--ch)) / 2);
 
   /* Fan. The deck is laid out around the drawer's mouth, so the tilt is a
