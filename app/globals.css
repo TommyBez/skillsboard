@@ -56,7 +56,11 @@
   --card-foreground: oklch(0.18 0.017 158);
   --popover: oklch(0.992 0.006 102);
   --popover-foreground: oklch(0.18 0.017 158);
-  --primary: oklch(0.49 0.145 148);
+  /* Chroma is the most this lightness and hue can carry inside sRGB. The
+     declared 0.145 was outside the gamut, so the browser clipped it to a
+     fully saturated green — same pixels, but nothing downstream could reason
+     about the value it would actually get. */
+  --primary: oklch(0.49 0.1418 148);
   --primary-foreground: oklch(0.985 0.008 103);
   --secondary: oklch(0.92 0.015 103);
   --secondary-foreground: oklch(0.23 0.018 158);

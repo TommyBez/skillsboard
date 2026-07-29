@@ -30,7 +30,10 @@ export function ThemeToggle({ className }: { className?: string }) {
   // icon — it says where the setting comes from, not what it produced. Show
   // sun or moon for the resolved theme, and mark "following the system" with a
   // dot on the corner.
-  const Icon = resolvedTheme === "dark" ? MoonIcon : SunIcon
+  //
+  // The resolved theme is only knowable in the browser, so the first client
+  // render has to match the server's: pick the glyph from it only once mounted.
+  const Icon = mounted && resolvedTheme === "dark" ? MoonIcon : SunIcon
   const label = mounted
     ? `Theme: ${current}. Switch to ${next}.`
     : "Toggle color theme"
