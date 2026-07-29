@@ -26,6 +26,7 @@ import {
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
 import {
+  findRecentTeammateRecommendation,
   getLibraryFilterState,
   getLibraryNavigationKey,
   isInvitePromptEligible,
@@ -102,7 +103,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     skillCount: allSkills.length,
   })
   const teammateRecommendation = !hasFilters && !showInvitePrompt
-    ? allSkills.find((item) => item.createdBy !== userId)
+    ? findRecentTeammateRecommendation(allSkills, userId)
     : undefined
   const libraryHref = (next: { q?: string; tag?: string | null }) => {
     const search = new URLSearchParams()
