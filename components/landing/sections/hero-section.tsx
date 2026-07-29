@@ -16,8 +16,8 @@ import styles from "@/components/landing/styles/hero.module.css"
  * on another line:
  *
  *   header rule   eyebrow → the chapter's right edge, one --joint after the
- *                 label, on the same vertical the drawer's right border stands
- *                 on 690px below
+ *                 label; its right end is the vertical the drawer's own right
+ *                 border stands on, 120px below
  *   spine         header rule → the state rail's track, on the 50% line
  *   drawer border the chapter's right edge, drawn once, by the drawer itself
  *
@@ -29,11 +29,12 @@ import styles from "@/components/landing/styles/hero.module.css"
  * Everything else in the chapter is an object outline or an internal
  * division, and each of those two roles has exactly one value.
  *
- * Nothing in the chapter touches the page frame. Every element's ink stands
- * 11px inboard of the rail beside it — the copy column and the SCATTERED
- * terminal on the left, the header rule, the drawer's right border and the
- * FILED terminal on the right — and headline line 1's terminal period stops
- * the same 11px short of the spine.
+ * Nothing in the chapter touches the page frame. Wherever the frame is drawn
+ * (from 64rem up) every element's ink stands 11px inboard of the rail beside it
+ * — the copy column and the SCATTERED terminal on the left, the header rule, the
+ * drawer's right border and the FILED terminal on the right — and headline
+ * line 1's terminal period stops the same 11px short of the spine. Below 64rem
+ * there is no frame to clear, and the chapter's ink is on the page gutter.
  */
 export function HeroSection() {
   return (

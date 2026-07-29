@@ -23,6 +23,19 @@ import styles from "@/components/landing/styles/hero.module.css"
  * nothing the provenance line two rows above it does not already state, and it
  * made the card a fourth level of nesting inside the page frame.
  *
+ * Five, and not three. A review asked for three, on the grounds that two of the
+ * five carried no information the first had not already established — which is
+ * why the strip is gone and why no two cards now share an owner, a domain or a
+ * tag. The count itself cannot go to three, because the drawer's row count has
+ * to equal the deck's and the two are not the same shape: a card is 168px and
+ * the row it folds into is 64, so three cards span 588 of stage while a
+ * three-row drawer is 348 tall. Cutting to three either leaves the drawer
+ * floating with 120px of void above and below it inside the stage the deck
+ * spans, or forces 150px "rows" that are cards rather than rows. Five is what
+ * lets the deck's extent, the drawer's extent and the copy column's extent share
+ * one vertical centre, and it is what puts two of the five cards over the drawer
+ * where they register on its head and foot rules.
+ *
  * The whole board is aria-hidden; the hero copy carries the message.
  */
 /* Star counts are three digits on every card on purpose. A thousands separator
@@ -35,9 +48,10 @@ const dossiers = [
     owner: "acme",
     repo: "eng-skills",
     stars: "412",
-    // One line at every card width down to 1024 — the scattered deck is a
-    // composition of five equal cards, so their heights must not vary.
-    description: "Reviews PRs for missing tests.",
+    // One line, and short enough that it never truncates, at every card width
+    // down to 1024 — the scattered deck is a composition of five equal cards,
+    // so their heights must not vary and none of them may end in an ellipsis.
+    description: "Flags PRs missing tests.",
     tags: ["review", "ci"],
     depth: "12px",
   },
@@ -46,7 +60,7 @@ const dossiers = [
     owner: "anthropic",
     repo: "skills",
     stars: "938",
-    description: "Pulls tables out of PDF files.",
+    description: "Pulls tables out of PDFs.",
     tags: ["documents"],
     depth: "7px",
   },
@@ -55,7 +69,7 @@ const dossiers = [
     owner: "acme",
     repo: "brand-kit",
     stars: "271",
-    description: "Rewrites copy to brand voice.",
+    description: "Rewrites copy on brand.",
     tags: ["writing", "brand"],
     depth: "14px",
   },
@@ -64,7 +78,7 @@ const dossiers = [
     owner: "drizzle",
     repo: "skills",
     stars: "864",
-    description: "Drafts safe schema migrations.",
+    description: "Drafts safe migrations.",
     tags: ["database"],
     depth: "6px",
   },
@@ -73,7 +87,7 @@ const dossiers = [
     owner: "vercel",
     repo: "skills",
     stars: "590",
-    description: "Turns merged PRs into notes.",
+    description: "Turns PRs into notes.",
     tags: ["shipping", "docs"],
     depth: "10px",
   },
