@@ -65,9 +65,24 @@
   --ink-mid: color-mix(in oklab, var(--muted-foreground) 62%, var(--foreground));
   --ink-lo: var(--muted-foreground);
 
-  /* Deck fan — see the board's scatter grammar. Declared here so the desktop
-     scatter and the phone deck fan by exactly the same rule. */
-  --fan: 0.9deg;
+  /* Deck fan — see the board's scatter grammar. It is now an *in-flight* value
+     only: a 1px hairline drawn at 0.9° smears itself over two device rows and
+     lands at a different fraction on every card, so five resting cards printed
+     at five apparent border weights. A card in transit can be tilted (nothing
+     is being measured mid-flight); a card at rest is axis-aligned, and every
+     border on the board is then one weight. */
+  --fan: 1.6deg;
+
+  /* Optical alignment ladder for the copy column, measured from the inside
+     face of the frame's left rail (x = 41 at 1440):
+       display type  −4px   pointed caps hang past the rule
+       body / fills    0px   flat stems and painted edges sit on it
+       micro caps     +2px   11px caps clear it, or they read as clipped
+     One rule, monotonic with size. Before this, a 102px 'Y' apex, a 17px 'B'
+     stem, a button's fill edge and an 11px mono cap all began within a pixel
+     of each other, which makes the largest thing on the page read indented. */
+  --optic-micro: 2px;
+  --optic-display: -0.029em;
 
   position: relative;
   isolation: isolate;
@@ -104,8 +119,14 @@
   }
 }
 
+/* `container-type: inline-size` makes 100cqw *the measure* — the frame's own
+   content box — rather than the viewport. Everything sized against the four-
+   column grid (the headline's line length above all) therefore lands on the
+   grid whether or not a classic scrollbar is eating 15px of the viewport.
+   `vw` cannot do that; it counts the scrollbar. */
 .heroFrame {
   position: relative;
+  container-type: inline-size;
   flex: 1;
   display: grid;
   grid-template-rows: auto auto auto;
@@ -126,7 +147,10 @@
        the rail reaches the floor in the un-pinned (no-JS / reduced) case too */
     grid-template-rows: auto minmax(var(--stage-h), 1fr) auto;
     align-content: normal;
-    padding-block: 2.5rem 1.5rem;
+    /* The rail's band is symmetric about its own content: 1rem of padding
+       above the labels, 1rem of frame below them. The chapter closes on the
+       rail instead of trailing a loose margin into the fold. */
+    padding-block: 2.5rem 1rem;
   }
 }
 
@@ -165,6 +189,9 @@
 /* Chapter index — identical spec to the other chapters' header marks. */
 .heroIndex {
   flex: none;
+  /* micro-cap step of the optical ladder: at 11px a cap set flush against a
+     1px rule reads clipped, so it clears the rail's inner face by 2px */
+  margin-inline-start: var(--optic-micro);
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
@@ -179,12 +206,29 @@
    of the measure. It is priced a step below the rules that actually divide the
    page (the state rail's rule, the chapter's bottom edge), which are
    --lp-hairline. Three weights, in order: grid → hairline → hairline-strong. */
+/* Three columns wide, hung off the frame's right rail — so it begins exactly on
+   the column-1/2 grid line and ends exactly on the measure. Letting it be
+   `flex: 1` made it start wherever the eyebrow happened to end (20px short of
+   the grid line it was visibly reaching for), which reads as arbitrary. The
+   auto margin absorbs the slack instead, so the rule's two ends are structural
+   and only the gap after the label varies. */
 .heroTopRule {
-  flex: 1;
+  flex: 0 1 auto;
+  width: 75%;
+  margin-inline-start: auto;
   height: 1px;
   background: var(--lp-grid-line);
   transform-origin: left center;
   animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-2) both;
+}
+
+/* Below the pinned layout there is no four-column field to reach for. */
+@media (max-width: 63.99rem) {
+  .heroTopRule {
+    flex: 1;
+    width: auto;
+    margin-inline-start: 0;
+  }
 }
 
 .heroMid {
@@ -208,8 +252,13 @@
        makes the two register gaps (eyebrow → headline, CTA → tally) equal and
        lands the block's optical centre on the chapter's own centre. The odd
        value is deliberate: it puts every box in this column on a whole pixel
-       at the reference viewport, which is what keeps the two CTAs in register. */
-    padding-block-end: 5.25rem;
+       at the reference viewport, which is what keeps the two CTAs in register.
+
+       Retuned for the floor strip: the copy column now terminates on the
+       board's floor line rather than trailing a lone micro-label into a void,
+       so the bias is the value that makes the two register gaps — eyebrow →
+       headline and CTA → floor strip — equal at the reference viewport. */
+    padding-block-end: 3.25rem;
   }
 }
 
@@ -237,9 +286,10 @@
     color-mix(in oklab, var(--foreground) 11%, transparent) 48%,
     transparent 80%
   );
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M8 6.5h4M30 6.5h2M57 6.5h5M82 6.5h2M3 14.5h2M21 14.5h5M44 14.5h3M70 14.5h4M90 14.5h3M12 22.5h3M38 22.5h2M61 22.5h4M86 22.5h2M5 30.5h5M27 30.5h3M52 30.5h2M74 30.5h5M17 38.5h2M41 38.5h4M66 38.5h3M88 38.5h4M2 46.5h3M31 46.5h5M55 46.5h2M79 46.5h3M10 54.5h4M36 54.5h2M63 54.5h5M85 54.5h2M22 62.5h3M47 62.5h4M71 62.5h2M92 62.5h3M6 70.5h2M29 70.5h3M58 70.5h4M81 70.5h5M15 78.5h5M43 78.5h2M68 78.5h3M90 78.5h2M1 86.5h4M25 86.5h2M50 86.5h5M76 86.5h3M11 94.5h3M34 94.5h4M60 94.5h2M84 94.5h4' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E");
-  mask-size: 96px 96px;
-  mask-repeat: repeat;
+  /* One texture in this chapter, not two. This used to be the same gradient
+     stencilled through a field of 1px dashes, which laid a second, coarser
+     pattern on top of the page's paper grain — two unrelated textures over one
+     hero. The grain is the page's; this is now pure tone. */
   translate: 0 calc(var(--vp-hero, 0) * -26px);
   animation: lp-hero-fade 900ms var(--lp-ease-out) var(--lp-beat-0) both;
 }
@@ -268,13 +318,17 @@
     transparent 1px
   );
   background-size: calc(100% / 4) 100%;
+  /* The verticals run from the top of the composition band down to the board's
+     floor and stop there, where the copy column's floor rule and card 05's
+     bottom edge draw the same horizontal. Ending them mid-band left three
+     lines hanging in air; ending them on the floor closes the corner. */
   mask-image:
     linear-gradient(
       to bottom,
       transparent 0%,
-      black 9%,
-      black 84%,
-      transparent 100%
+      black 7.6%,
+      black 87.4%,
+      transparent 91%
     ),
     linear-gradient(to right, transparent 0 2px, black 2px);
   mask-composite: intersect;
@@ -329,22 +383,16 @@
   letter-spacing: -0.018em;
 }
 
-/* Optical overhang. Both lines open on a pointed cap whose apex meets the
-   column at a single point; set flush they read as notched against the flat B
-   stem of the paragraph below, which is where the column's edge is actually
-   established. Each line is hung by its own glyph, not by one number for both:
-   the Y's top-left tip sits about 0.012em further inboard than the A's foot, so
-   hanging both by the same amount just moves the notch. Measured, the two lines
-   now start within half a pixel of each other and about 2.5px left of the B. */
-.heroLineMask:first-child {
-  margin-inline-start: -0.031em;
-}
-
-.heroLineMask:last-child {
-  margin-inline-start: -0.019em;
-}
-
+/* Optical overhang — one number, both lines.
+   Both lines open on a pointed cap (Y, A) whose apex meets the column at a
+   single point, so set flush they read as notched against the flat B stem of
+   the paragraph below. Hanging each line by its own glyph produced two
+   different accidental overhangs on the same edge (measured: 3px and 1px),
+   which reads as a mistake rather than as a hang. One value, tuned so both
+   apexes land within a quarter-pixel of each other, 4px outboard of the flat
+   line — the display step of the optical ladder. */
 .heroLineMask {
+  margin-inline-start: var(--optic-display);
   display: block;
   overflow: clip;
   padding-block-end: 0.09em;
@@ -369,18 +417,17 @@
   animation-delay: var(--lp-beat-3);
 }
 
-/* Between 1024 and 1280 the stage is at its widest relative to the measure, so
-   the display line has the least room: sized here so line 1 always terminates
-   clear of the deck's left column rather than running into it. */
+/* Sized off the grid, not off the viewport.
+   The measure is divided into four columns; the copy column is the first two
+   and the board stage is the last two. `7.627cqw` is the size at which line 1's
+   ink terminates exactly on the 50% rule — the composition's spine and the
+   board's left edge — at every width the pinned layout is used at. It was
+   overshooting that rule by 53px while line 2 fell 40px short of it, which is
+   what makes a drawn grid look decorative. `cqw` is the measure (see
+   `.heroFrame`), so the alignment survives a scrollbar; `vw` would not. */
 @media (min-width: 64rem) {
   .heroHeadline {
-    font-size: clamp(2.75rem, 6.3vw, 7rem);
-  }
-}
-
-@media (min-width: 80rem) {
-  .heroHeadline {
-    font-size: clamp(2.75rem, 7.8vw, 7rem);
+    font-size: clamp(2.75rem, 7.627cqw, 6.5rem);
   }
 }
 
@@ -401,18 +448,15 @@
 @media (min-width: 64rem) {
   .heroLower {
     margin-top: 3.5rem;
-    max-width: 30rem;
+    /* One and a half columns. The paragraph's rag and the button row's width
+       are intrinsic — you cannot align a rag to a rule — but the measure they
+       are set on is grid-derived, so the block they form is a column and a
+       half wide rather than an arbitrary 544px. */
+    max-width: 37.5%;
   }
 
   .heroBlurb {
-    max-width: 25.5rem;
-  }
-}
-
-@media (min-width: 80rem) {
-  .heroLower,
-  .heroBlurb {
-    max-width: 34rem;
+    max-width: 100%;
   }
 }
 
@@ -436,6 +480,14 @@
   margin-top: 1.75rem;
   animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
     var(--lp-beat-5) both;
+}
+
+/* The two actions were 12px apart — less than the 13px of padding inside a
+   dossier card and a quarter of their own height, so the two fills nearly
+   touched and the pair read as one split control. 20px is larger than any
+   padding in the chapter and still visibly a pair. */
+.heroCta > div {
+  gap: 1.25rem;
 }
 
 @media (min-width: 64rem) {
@@ -479,12 +531,46 @@
 }
 
 /* ------------------------------------------------------------------
-   Tally — the copy column's terminus, on the stage's own baseline.
-
-   The rail below reports the scene as a bar; this reports it as a count.
-   Same grammar as the MCP chapter's readout: a dimmed key, a stacked
-   numeral, a total. Numeric only, so it adds no prose to the page.
+   Floor strip — the copy column's terminus, and the exact mirror of the
+   header strip: a mark in column 1, then a rule from the column-1/2 grid
+   line. The header rule runs to the frame's right rail; this one runs to
+   the 50% rule, and the whole strip is centred on the board's floor — the
+   same line as card 05's bottom edge — so the two columns of the
+   composition end on one horizontal instead of at three heights.
 ------------------------------------------------------------------ */
+
+.heroFoot {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .heroFoot {
+    position: absolute;
+    inset-inline: 0;
+    /* 12px = half the strip's height: this centres the strip's rule on the
+       stage's floor, exactly as the header strip's rule is centred on its
+       own band. */
+    bottom: calc((100% - var(--stage-h)) / 2 - 12px);
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    height: 1.5rem;
+  }
+}
+
+/* One column wide, right edge on the 50% rule: `margin-inline-end: 50%` pins
+   the far end to the composition's spine and the auto start margin absorbs the
+   slack, so both of the rule's ends are grid positions. */
+.heroFootRule {
+  flex: 0 1 auto;
+  width: 25%;
+  margin-inline-start: auto;
+  margin-inline-end: 50%;
+  height: 1px;
+  background: var(--lp-grid-line);
+  transform-origin: left center;
+  animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-8) both;
+}
 
 .heroTally {
   display: none;
@@ -502,11 +588,9 @@
 
 @media (min-width: 64rem) {
   .heroTally {
-    position: absolute;
-    left: 0;
-    /* the stage is centred in the mid band, so this is the stage's floor */
-    bottom: calc((100% - var(--stage-h)) / 2);
-    z-index: 2;
+    flex: none;
+    /* micro-cap step of the optical ladder */
+    margin-inline-start: var(--optic-micro);
     display: flex;
   }
 }
@@ -521,7 +605,7 @@
 .heroTallyNum {
   position: relative;
   display: inline-block;
-  width: 2ch;
+  width: 1ch;
   height: 1em;
   letter-spacing: 0;
 }
@@ -627,40 +711,45 @@
 }
 
 .heroRailLabel[data-state="scattered"] {
-  /* the S carries almost no side bearing at this size, so it is given one */
-  margin-inline-start: 0.1em;
+  /* micro-cap step of the optical ladder — the S's ink clears the rail's inner
+     face by 2px instead of sitting on it */
+  margin-inline-start: var(--optic-micro);
+  /* and the trailing letter-space of the tracked caps is given back, so the
+     gap the eye reads between the D and the track equals the gap it reads
+     between the track and the F at the other end */
+  margin-inline-end: -1.1px;
 }
 
 .heroRailLabel[data-state="filed"] {
-  /* only the trailing letter-space of the tracked caps, so the D's ink stops on
-     the measure instead of 8px short of it */
-  margin-inline-end: -0.18em;
+  /* the D's ink lands 2px inboard of the frame's right rail — the same micro-
+     cap clearance the S is given on the left */
+  margin-inline-end: 0;
 }
 
-/* One treatment, two inks: whichever state the scene is in is set in the page's
-   ink, the other rests in the label grey, and the accent belongs to the state
-   the scene arrives at. Same formula at both ends. */
-.heroRailLabel[data-state="scattered"] {
+/* Both terminals are printed in one ink and one value. They used to be a
+   before/after pair at 16.3:1 and 6.9:1, which put the loudest micro-label in
+   the chapter on the *negative* state; the asymmetry was in the inks, not in
+   the device. Now the pair rests equal, the accent stays on the track's fill
+   where it reports progress, and the only lift in the row is FILED arriving —
+   which is the one thing in the scene worth announcing. */
+.heroRailLabel[data-state="filed"] {
   color: color-mix(
     in oklab,
-    var(--hero-label-live) calc((1 - var(--rail-p)) * 100%),
+    var(--hero-label-live) calc(var(--rail-p) * 100%),
     var(--hero-label)
   );
 }
 
-.heroRailLabel[data-state="filed"] {
-  color: color-mix(
-    in oklab,
-    var(--primary) calc(var(--rail-p) * 100%),
-    var(--hero-label)
-  );
-}
-
+/* Rule weight follows role, at the bottom of the chapter as everywhere else.
+   The band's divider is structure and takes the hairline; the track is an
+   instrument's ground and takes the grid ink, a step below it, so the accent
+   fill has something to read against. They used to be the same value doing
+   two different jobs 25px apart. */
 .heroRailTrack {
   position: relative;
   flex: 1;
   height: 2px;
-  background: var(--lp-hairline);
+  background: var(--lp-grid-line);
 }
 
 .heroRailFill {
@@ -680,18 +769,48 @@
   --px: 0;
   --py: 0;
 
-  --sw: 28rem; /* stage width  */
+  /* ---------------------------------------------------------------------
+     The stage IS the right half of the four-column measure, and every
+     horizontal in it is a column or a column's gutter:
+
+       column 3  [50% … 75%]  the loose deck, inset by the panel's own padding
+       column 4  [75% … 100%] the library drawer, docked to the frame's rail
+
+     So `--pw` (panel width) is one column, `--cw` (card width) is one column
+     less its two gutters, and filing a card is a translation of exactly one
+     column. Nothing in the board is an arbitrary length any more: the deck's
+     origin used to sit 103px right of one grid rule and 237px left of the
+     next, which is what makes a drawn grid look like scenery.
+
+     Percentages, not rem: the stage is a fraction of the measure at every
+     width, and the card-relative deltas below are percentages of the card,
+     so a scrollbar cannot knock the composition off the grid.
+  --------------------------------------------------------------------- */
   --sh: var(--stage-h); /* stage height */
-  --cw: 12.75rem; /* card width */
-  --pp: 0.75rem; /* panel body padding */
-  --pw: calc(var(--cw) + 2 * var(--pp)); /* panel width */
+  --pp: 0.75rem; /* panel body padding = the stage's gutter */
+  --pw: 50%; /* panel width  = one column */
+  --cw: calc(50% - 2 * var(--pp)); /* card width = a column less its gutters */
   /* Filed row height = the card's index-strip height. It tracks the stage so a
      short window shrinks the panel and the deck together instead of jamming
      one into the other. */
-  --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 3.5rem);
-  --hh: 2.9rem; /* panel head height */
-  --qh: 3.2rem; /* panel filter row height */
-  --fh: 2.3rem; /* panel foot height */
+  --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 4rem);
+  --hh: 3.1rem; /* panel head height */
+  --fh: 3.1rem; /* panel foot height */
+  /* The filter row's height is *derived*, not chosen, from the one relation
+     that makes the drawer read as a slot rather than as a stray wrapper: the
+     two loose cards standing over it must land exactly on its head rule and
+     its foot rule. Solving `pt + hh = pitch/2` for --qh gives this. Clamped so
+     a short window degrades the registration rather than the filter row. */
+  --qh: clamp(
+    2.6rem,
+    calc(
+      (
+          var(--sh) + 2 * var(--hh) - 4 * var(--pp) - 9 * var(--rh) - 2 *
+            var(--fh) + var(--cbody)
+        ) / 2
+    ),
+    4rem
+  );
   /* everything on the card below the index strip: body + foot + borders */
   --cbody: 6.8rem;
   --ch: calc(var(--rh) + var(--cbody)); /* dossier card height */
@@ -700,22 +819,21 @@
   );
   --pt: calc((var(--sh) - var(--ph)) / 2); /* panel centred in the stage */
 
-  --filed-x: calc(var(--sw) - var(--cw) - var(--pp));
+  --filed-x: calc(50% + var(--pp));
   --row0: calc(var(--pt) + var(--hh) + var(--qh) + var(--pp));
 
   /* Scatter grammar. Two exact columns, three cards left and two right at the
      half pitch, so the deck reads as an arrangement rather than a spill: every
      card is whole, every gutter is deliberate, nothing occludes anything.
 
-     The right column stands on the drawer's own left edge. It used to stop 6–9px
-     short of the page's right rail — the one distance that reads as neither
-     flush nor clear — while leaving ~100px of dead air on the other side of the
-     deck. Hung off the panel instead, it keeps a real 25px margin inside the
-     frame, and the two loose cards on that side are visibly already over the
-     slot they are going into. The drawer is the thing that docks flush to the
-     frame; loose paper does not. */
-  --scat-l: 0rem;
-  --scat-r: calc(var(--sw) - var(--pw));
+     Column 3 carries the loose deck, inset by the stage's gutter on both
+     sides; column 4 carries the drawer, and the two cards standing over it sit
+     in the drawer's own content column — the same inset, left and right, that
+     every filed row will have. They used to sit flush on the drawer's left
+     border, which stacked two rounded corners on one vertical line 38px apart
+     and read, correctly, as a bug. */
+  --scat-l: var(--pp);
+  --scat-r: var(--filed-x);
   --pitch: calc((var(--sh) - var(--ch)) / 2);
 
   /* Fan. The deck is laid out around the drawer's mouth, so the tilt is a

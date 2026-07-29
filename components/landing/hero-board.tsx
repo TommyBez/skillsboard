@@ -81,7 +81,12 @@ const dossiers = [
 
 type Dossier = (typeof dossiers)[number]
 
-const index = (i: number) => String(i + 1).padStart(2, "0")
+/* Single digits, deliberately. The page numbers its chapters 01…06 in the same
+   mono at the same size; a card printing "01" 780px from the chapter's own "01"
+   put two unrelated numbering systems on screen in one token. The deck counts
+   1–5, the page counts 01–06, and the hero's tally counts 0/5 — one register per
+   system. */
+const index = (i: number) => String(i + 1)
 
 /** owner / repo, set as a provenance line. */
 function SourceRef({

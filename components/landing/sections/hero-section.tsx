@@ -70,24 +70,32 @@ export function HeroSection() {
 
             <HeroBoard />
 
-            {/* Digital half of the scene's readout: the copy column ends on the
-                same baseline the board does, and reports the count the rail
-                reports as a bar. Numeric index only — no prose.
+            {/* The copy column's floor strip — the exact mirror of the header
+                strip above: a mark in column 1, then a rule that starts on the
+                column-1/2 grid line. The header rule runs to the frame's right
+                rail; this one runs to the composition's spine (the 50% rule),
+                and its own line sits on the board's floor — the same y as
+                card 05's bottom edge. The copy column and the card column
+                therefore terminate on one line rather than at three heights.
 
                 Keyed "Indexed", not "Filed": the rail below is the state
-                machine and owns that word. Two readouts printing the same word
-                76px apart made one micro-label look like three. */}
-            <p className={styles.heroTally} aria-hidden="true">
-              <span className={styles.heroTallyKey}>Indexed</span>
-              <span className={styles.heroTallyNum}>
-                {[0, 1, 2, 3, 4, 5].map((n) => (
-                  <span key={n} className={styles.heroTallyDigit} data-n={n}>
-                    {String(n).padStart(2, "0")}
-                  </span>
-                ))}
-              </span>
-              <span className={styles.heroTallyTotal}>/05</span>
-            </p>
+                machine and owns that word. Single digits throughout, so the
+                deck's count can never be mistaken for the page's chapter
+                numbering, which is always two digits. */}
+            <div className={styles.heroFoot} aria-hidden="true">
+              <p className={styles.heroTally}>
+                <span className={styles.heroTallyKey}>Indexed</span>
+                <span className={styles.heroTallyNum}>
+                  {[0, 1, 2, 3, 4, 5].map((n) => (
+                    <span key={n} className={styles.heroTallyDigit} data-n={n}>
+                      {n}
+                    </span>
+                  ))}
+                </span>
+                <span className={styles.heroTallyTotal}>/5</span>
+              </p>
+              <span className={styles.heroFootRule} />
+            </div>
           </div>
 
           <div className={styles.heroRail} aria-hidden="true">
