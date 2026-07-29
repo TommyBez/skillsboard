@@ -384,8 +384,9 @@
   );
 }
 
-/* Thresholds are the exact moments each card finishes docking into its row
-   (--ls<n> + --win), so the count changes on the landing, not near it. */
+/* Thresholds are the moments each card visibly lands in its row
+   (--ls<n> + 0.79 * --win — the fold reads as finished before the easing
+   does), so the count ticks on the landing rather than after it. */
 .heroTallyDigit[data-n="0"] {
   --lo: -1;
   --hi: 0.32;
@@ -455,8 +456,8 @@
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroRail {
-    /* reaches FILED exactly as the last card docks (--ls5 + --win), leaving
-       the tail of the runway as a settle rather than an unfinished bar */
+    /* reaches FILED just as the fifth card settles, leaving the tail of the
+       runway as a settle rather than an unfinished bar */
     --rail-p: clamp(0, calc(var(--route-p) / 0.88), 1);
   }
 }
@@ -889,6 +890,10 @@
   /* dock: the card stays a whole card the entire flight and only folds
      flat into its row on arrival, so nothing is ever half-a-card in mid-air */
   --dp: clamp(0, calc((var(--fp) - 0.72) / 0.28), 1);
+  /* lift: 0 at both ends, 1 at mid-flight. A card in transit has to cross the
+     ones still on the desk, so it is picked up off the surface first and set
+     back down on arrival rather than sliding through them. */
+  --lift: calc(4 * var(--fp) * (1 - var(--fp)));
 
   position: absolute;
   left: var(--filed-x);
@@ -899,7 +904,8 @@
       calc(var(--sy) * (1 - var(--fp))),
       0
     )
-    rotate(calc(var(--sr) * var(--fr)));
+    rotate(calc(var(--sr) * var(--fr)))
+    scale(calc(1 + var(--lift) * 0.035));
 }
 
 /* Scattered coordinates are written as (column, row) on the scatter grammar,
@@ -982,12 +988,22 @@
 /* Pointer parallax: real depth while the deck is loose, calm once filed. */
 .dossierParallax {
   --amp: calc(1 - var(--fp) * 0.82);
+  /* The card's own box-shadow would be trimmed away by its fold clip-path, so
+     the deck's drop shadow lives here, on the untrimmed wrapper. Two layers of
+     fixed geometry whose alpha is driven by --lift and --dp: the contact
+     shadow, and a wide soft one that only exists while a card is in the air. */
+  border-radius: calc(0.75rem * (1 - var(--dp, 0)));
+  box-shadow:
+    0 10px 22px hsl(var(--shadow-color) / calc(0.2 * (1 - var(--dp, 0)))),
+    0 28px 54px
+      hsl(var(--shadow-color) / calc(var(--lift, 0) * 0.24 * (1 - var(--dp, 0))));
   translate: calc(var(--px) * var(--depth, 8px) * var(--amp))
     calc(var(--py) * var(--depth, 8px) * 0.55 * var(--amp));
   rotate: calc(var(--px) * 0.55deg * var(--amp));
   transition:
     translate 420ms var(--lp-ease-out),
-    rotate 420ms var(--lp-ease-out);
+    rotate 420ms var(--lp-ease-out),
+    box-shadow 220ms var(--lp-ease-out);
 }
 
 /* ------------------------------------------------------------------
@@ -1002,9 +1018,12 @@
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
+  /* Elevation reads as a lighter surface, not just a shadow — on a near-black
+     field a drop shadow alone cannot say "this card is off the desk". */
   background: color-mix(
     in oklab,
-    var(--card) calc(100% - var(--dp, 0) * 100%),
+    color-mix(in oklab, var(--foreground) calc(var(--lift, 0) * 5%), var(--card))
+      calc(100% - var(--dp, 0) * 100%),
     transparent
   );
   border: 1px solid
@@ -1014,8 +1033,6 @@
       transparent
     );
   border-radius: calc(var(--radius) * (1 - var(--dp, 0)));
-  box-shadow: 0 14px 30px
-    hsl(var(--shadow-color) / calc(0.16 * (1 - var(--dp, 0))));
   clip-path: inset(
     0 0 calc(var(--dp, 0) * (100% - var(--rh))) 0 round
       calc(var(--radius) * (1 - var(--dp, 0)))
@@ -1275,8 +1292,12 @@
       var(--primary) calc(55% - var(--dp) * 55%),
       color-mix(in oklab, var(--border) calc(100% - var(--dp) * 100%), transparent)
     );
-    box-shadow: 0 22px 46px
-      hsl(var(--shadow-color) / calc(0.26 * (1 - var(--dp))));
+  }
+
+  .dossierSlot:hover .dossierParallax {
+    box-shadow:
+      0 10px 22px hsl(var(--shadow-color) / calc(0.2 * (1 - var(--dp, 0)))),
+      0 26px 50px hsl(var(--shadow-color) / calc(0.26 * (1 - var(--dp, 0))));
   }
 
   .dossierSlot:hover .dossierRow {
@@ -1357,6 +1378,7 @@
   --fp: 0;
   --dp: 0;
   clip-path: none;
+  box-shadow: 0 10px 24px hsl(var(--shadow-color) / 0.18);
 }
 
 /* Alternating sides, each card whole — the same grammar as the desktop
@@ -1627,6 +1649,7 @@
   .dossierSlot {
     --fp: 1;
     --fr: 0;
+    --lift: 0;
     transform: none;
   }
 
@@ -1651,6 +1674,7 @@
   .dossierParallax {
     translate: none;
     rotate: none;
+    box-shadow: none;
     transition: none;
   }
 
