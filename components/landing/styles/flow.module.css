@@ -20,11 +20,17 @@
      where its connector hangs), and `--row-pad`, where every row's text
      starts. All three columns use both.
 
-   • One right terminal: every rule that spans the column — captioned label
-     rules, list dividers, control borders, the match band — stops on the
-     cell's content edge, and every right-aligned value stops `--row-pad`
-     inside it. The only rules that stop anywhere else are the three closing
-     readouts' leaders, which are bounded by their own value; those three are
+   • Two classes of rule, each bracketing exactly what it belongs to. A rule
+     that spans the column — the captioned label rules, the control borders,
+     the card, the match band — runs to the cell's content edge. A rule that
+     divides rows starts and stops on `--row-pad`, the axis its rows' own text
+     starts on, so it brackets the block it divides instead of bleeding past
+     it and, in column 3, so it stops clear of the tree's spine instead of
+     crossing straight through it. Each list closes on one of these at the
+     column's bottom, which puts the terminal ink of all three columns on one
+     line and turns the space above the readouts into a measured 24px.
+     Right-aligned values stop `--row-pad` inside the content edge. The three
+     closing readouts' leaders are bounded by their own value; those three are
      identical to the pixel because the keys and values are the same length.
 
    Everything above the "motion" divider is the resting state — the diagrams
@@ -44,10 +50,12 @@
   --r-chip: 0.3rem;
   /* The connectors are annotation, so they rank BELOW the page's structure and
      above the rows they annotate. Measured on the dark field: page frame /
-     panel dividers 50.2, connectors 43.6, row dividers 30.2. At the old 38%
-     they rendered 97.9 — twice the frame and 3.5x the dividers, which made a
-     diagram's own scaffolding the brightest ink in the body of the page. */
-  --wire: color-mix(in oklab, var(--foreground) 13%, transparent);
+     panel dividers 55.2, connector lines 54.3 and 44.8, row dividers 35.9;
+     only the 6x5px arrowhead terminal reaches the frame's own 63.2. At the old
+     38% the connectors rendered 97.9 — twice the frame and 3.5x the dividers,
+     which made a diagram's own scaffolding the brightest ink in the body of
+     the page. */
+  --wire: color-mix(in oklab, var(--foreground) 11%, transparent);
 
   /* Three mono steps, each with a job: a typed value, machine text, meta. */
   --m-value: 0.75rem;
@@ -169,10 +177,19 @@
    of side bearing, so the box is pulled back by that much and the ink lands on
    the same x as the mono caption above it and the cell titles below it. */
 .flowTitle {
-  margin-top: 2.25rem;
+  /* The clear space above the headline lives INSIDE its box (5rem of padding,
+     pulled back out with the margin so the rendered gap to the caption is the
+     2.25rem it looks like). The heading is the chapter's anchor target, and a
+     56px sticky header sits over the top of the viewport: with the air outside
+     the box, any scroll that parks the viewport on this element buried the
+     first line under the header — 11px of clearance above the caps against
+     53px below, which is what made the chapter read as clipped at its top.
+     With the air inside the box the same landing gives 33px above and 40px
+     below, and nothing about the resting composition moves. */
+  margin-top: -2.75rem;
+  padding-top: 5rem;
   margin-left: -0.042em;
-  /* Anchored jumps must not park the headline under the sticky header. */
-  scroll-margin-top: calc(var(--lp-header-h, 3.5rem) + 2.75rem);
+  scroll-margin-top: calc(var(--lp-header-h, 3.5rem) + 2.5rem);
 }
 
 .launchDemo {
@@ -713,9 +730,10 @@
 .resultRest::after {
   content: "";
   position: absolute;
-  inset: auto 0 0 0;
+  inset: auto var(--row-pad) 0;
   height: 1px;
   background: var(--lp-grid-line);
+  transform-origin: left center;
 }
 
 /* Rows are flush with the cell — the match band spans the full column, because
@@ -869,9 +887,10 @@
 .fanList::after {
   content: "";
   position: absolute;
-  inset: auto 0 0 0;
+  inset: auto var(--row-pad) 0;
   height: 1px;
   background: var(--lp-grid-line);
+  transform-origin: left center;
 }
 
 /* The spine continues the stem down to the last branch's centre. Four rows of
@@ -1142,6 +1161,8 @@
 
   & .fanRow::before,
   & .resultMark::before,
+  & .resultRest::after,
+  & .fanList::after,
   & .resultRow[data-match="true"]::before {
     transform: scaleX(0);
   }
@@ -1259,6 +1280,12 @@
     --r: 4;
   }
 
+  /* The list's closing rule is drawn once its rows have landed, so the column
+     visibly terminates rather than starting with a rule under nothing. */
+  & .resultRest::after {
+    animation: flowDrawX 320ms var(--lp-ease-emph) calc(var(--t) + 700ms) both;
+  }
+
   & .searchQuery {
     animation: flowWipe 380ms steps(3, end) calc(var(--t) + 760ms) both;
   }
@@ -1321,6 +1348,10 @@
   & .fanRow {
     animation: flowSlideIn 420ms var(--lp-ease-emph)
       calc(var(--t) + 910ms + var(--r, 0) * 70ms) both;
+  }
+
+  & .fanList::after {
+    animation: flowDrawX 320ms var(--lp-ease-emph) calc(var(--t) + 1180ms) both;
   }
 
   & .fanRow:nth-child(2) {

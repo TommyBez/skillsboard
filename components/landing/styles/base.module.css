@@ -47,7 +47,16 @@
     var(--lp-gutter),
     calc(50% - var(--lp-measure) / 2 + var(--lp-gutter))
   );
-  --lp-frame-ink: 0.11;
+  /* The frame's ink, as an alpha of white differenced against the field.
+     One number, both themes, and it is not a guess: difference over a field
+     of luminance b renders `b + a(255 - 2b)`, so a = 0.226 lands 64 on the
+     dark field (b=12) and 191 on the light one (b=244) — the two values the
+     header rule and the footer rule already render at 23% foreground. The
+     four edges of the frame are now literally the same weight instead of the
+     sides being half the contrast of the top and bottom (measured before:
+     rails 48/218 against rules 64/191). `closing.module.css` draws its column
+     rail from the same token, so it follows. */
+  --lp-frame-ink: 0.226;
   --lp-footer-field: color-mix(in oklab, var(--foreground) 3.5%, var(--background));
 
   /* --- appended: one rule language for the chrome ---------------------------
@@ -92,7 +101,9 @@
   --pricing-field: oklch(0.945 0.011 103);
   --pricing-ink: oklch(0.17 0.017 158);
   --pricing-zero: oklch(0.5 0.15 148);
-  --lp-frame-ink: 0.16;
+  /* `--lp-frame-ink` is deliberately *not* re-keyed here any more: differenced
+     ink is already symmetric about mid-grey, so one alpha renders the same
+     contrast on both fields. */
 }
 
 .root[data-motion-enabled="true"] {

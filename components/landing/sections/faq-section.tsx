@@ -43,15 +43,23 @@ export function FaqSection() {
             </h2>
             <p className={styles.faqIntro}>
               Straight answers about what Skills Board is, how it fits mixed
-              agent setups, and what “recommended” means.
+              agent setups, and{" "}
+              <span className={styles.faqNoBreak}>what “recommended”</span>{" "}
+              means.
             </p>
 
-            {/* Counterweight: an eight-station scale standing on the foot
-                rule, one tick per entry, the open one raised and accented.
-                It is the register's position readout — the only place the
-                accent lives at rest besides the open row itself. */}
+            {/* Counterweight: the title column's footer, cut to whole register
+                rows so its rule lands ON a row rule rather than beside one.
+                A legend line, then eight stations — one per entry, on the
+                register's own pitch, standing on the foot rule. The open one
+                fills with the accent from the top down, the same gesture as
+                the open row's segment across the divider. */}
             <div className={styles.faqMap} aria-hidden="true">
-              <span className={styles.faqMapLabel}>index</span>
+              <p className={styles.faqMapLegend}>
+                <span className={styles.faqMapLabel}>index</span>
+                <span className={styles.faqMapLead} />
+                <span className={styles.faqMapTotal}>{entryCount}</span>
+              </p>
               <span className={styles.faqMapScale}>
                 {landingFaqs.map((faq) => (
                   <span key={faq.question} className={styles.faqMapTick} />
@@ -61,6 +69,10 @@ export function FaqSection() {
           </div>
 
           <div className={styles.faqIndex}>
+            {/* Minor vertical between the leader field and the control column,
+                so the toggles stand in a ruled cell instead of floating off
+                the right rail. */}
+            <span className={styles.faqCtrlRule} aria-hidden="true" />
             {landingFaqs.map((faq, index) => (
               // Native exclusive disclosure: opening an entry closes the last
               // one, so the register never sprawls and the closed rows stay a

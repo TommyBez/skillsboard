@@ -245,7 +245,9 @@
 
   /* The pane divider runs from the header rule to the frame's bottom edge, so
      it terminates on the same line as the two frame rails instead of stopping
-     in mid-air 46px short of them. */
+     in mid-air 46px short of them. Its track is 0 below 84rem — see the two
+     blocks that follow — so the rule simply is not drawn where it could not
+     be the page's own column rule. */
   .frameSpine {
     display: block;
     background: var(--lp-hairline);
@@ -290,9 +292,6 @@
   }
 }
 
-/* Narrow desktops: tighten the frame's own insets and give the copy pane the
-   extra, so the display line keeps a measure wide enough to hold its first
-   line whole. Below this the diagram would start truncating skill names. */
 /* Narrow desktops: one third of a 944px measure is 314px, and the chapter's
    primary action alone is 290px wide, so the copy pane cannot be page column 1
    here. Rather than park the divider 50-odd pixels off the page's rule — the
@@ -475,11 +474,14 @@
   color: var(--muted-foreground);
 }
 
+/* Leader rules on the diagram's own captions. They are annotation, so they
+   take the lightest ink in the chapter — one step under the frame rails and
+   the pane spine, never level with them. */
 .colLabel::after {
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--lp-hairline);
+  background: var(--lp-grid-line);
 }
 
 /* --- Library panel ------------------------------------------------------- */
@@ -1077,7 +1079,7 @@
 .hopRule {
   flex: 1;
   height: 1px;
-  background: var(--lp-hairline);
+  background: var(--lp-grid-line);
 }
 
 .schemaCaption {
