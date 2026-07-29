@@ -47,7 +47,7 @@ export function McpSection() {
                   id="mcp-heading"
                   className={`${styles.copyHeading} text-4xl font-semibold leading-[1.02] tracking-display md:text-5xl lg:text-[clamp(2.6rem,3.55vw,3.4rem)]`}
                 >
-                  Bring your team&apos;s skills into your agent.
+                  Bring your team’s skills into your agent.
                 </h2>
                 <p
                   className={`${styles.copyLede} mt-5 text-pretty text-base leading-relaxed text-muted-foreground lg:text-[1.0625rem]`}
@@ -64,7 +64,7 @@ export function McpSection() {
                     aria-hidden="true"
                   />
                   <p>
-                    Sign in securely through your browser—there&apos;s no API
+                    Sign in securely through your browser—there’s no API
                     key to copy.
                   </p>
                 </div>
