@@ -27,6 +27,10 @@ export function HeroSection() {
           <div className={styles.heroRules} aria-hidden="true" />
 
           <div className={styles.heroTop}>
+            {/* Chapter index, same grammar as 02–06. */}
+            <span className={styles.heroIndex} aria-hidden="true">
+              01
+            </span>
             <p className={styles.heroEyebrow} data-decode="">
               Skills selected by your team
             </p>
@@ -62,6 +66,21 @@ export function HeroSection() {
             </div>
 
             <HeroBoard />
+
+            {/* Digital half of the scene's readout: the copy column ends on the
+                same baseline the board does, and reports the count the rail
+                reports as a bar. Numeric index only — no prose. */}
+            <p className={styles.heroTally} aria-hidden="true">
+              <span className={styles.heroTallyKey}>Filed</span>
+              <span className={styles.heroTallyNum}>
+                {[0, 1, 2, 3, 4, 5].map((n) => (
+                  <span key={n} className={styles.heroTallyDigit} data-n={n}>
+                    {String(n).padStart(2, "0")}
+                  </span>
+                ))}
+              </span>
+              <span className={styles.heroTallyTotal}>/ 05</span>
+            </p>
           </div>
 
           <div className={styles.heroRail} aria-hidden="true">

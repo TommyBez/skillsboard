@@ -18,9 +18,32 @@
 
 .hero {
   --hero-px: 1.25rem;
-  /* the board stage's height, shared so the copy band and the state rail can
-     be laid out against the same measure the scene occupies */
-  --stage-h: 36.5rem;
+  /* The board stage's height — the single measure the whole chapter is laid
+     out against: the copy column's baseline, the scatter pitch, the panel's
+     centring and the state rail all derive from it. Height-aware so short
+     laptops never push the composition into the rail. */
+  --stage-h: min(39rem, calc(100dvh - 12.5rem));
+
+  /* Load choreography — one authored sequence, every beat on the shared
+     --lp-stagger grid so the entrance reads as a single take:
+       0 field + column rules      1 index + eyebrow
+       2 header rule + headline/1  3 headline/2
+       4 body copy + card 01       5 CTA + card 02
+       6 card 03                   7 card 04
+       8 card 05 + tally           9 state rail
+     Nothing is timed independently; changing --lp-cue re-times the whole hero. */
+  --lp-cue: 60ms;
+  --lp-beat-0: var(--lp-cue);
+  --lp-beat-1: calc(var(--lp-cue) + 1 * var(--lp-stagger));
+  --lp-beat-2: calc(var(--lp-cue) + 2 * var(--lp-stagger));
+  --lp-beat-3: calc(var(--lp-cue) + 3 * var(--lp-stagger));
+  --lp-beat-4: calc(var(--lp-cue) + 4 * var(--lp-stagger));
+  --lp-beat-5: calc(var(--lp-cue) + 5 * var(--lp-stagger));
+  --lp-beat-6: calc(var(--lp-cue) + 6 * var(--lp-stagger));
+  --lp-beat-7: calc(var(--lp-cue) + 7 * var(--lp-stagger));
+  --lp-beat-8: calc(var(--lp-cue) + 8 * var(--lp-stagger));
+  --lp-beat-9: calc(var(--lp-cue) + 9 * var(--lp-stagger));
+
   position: relative;
   isolation: isolate;
   border-bottom: 1px solid var(--lp-hairline);
@@ -68,11 +91,16 @@
   padding: 2.5rem var(--hero-px) 3rem;
 }
 
+/* Pinned: the frame owns the full viewport, so the three bands can be given
+   fixed ends. The composition floats in the middle band; the state rail is
+   nailed to the frame's floor, one small margin above the chapter's bottom
+   hairline, so the hero always *terminates* rather than trailing off. */
 @media (min-width: 64rem) {
   .heroFrame {
-    padding-block: 2.25rem 2.5rem;
-    align-content: center;
-    align-content: safe center;
+    height: 100%;
+    grid-template-rows: auto minmax(var(--stage-h), 1fr) auto;
+    align-content: normal;
+    padding-block: 2.5rem 1.5rem;
   }
 }
 
@@ -81,8 +109,21 @@
 .heroTop {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.1rem;
   padding-bottom: 0.35rem;
+}
+
+/* Chapter index — identical spec to the other chapters' header marks. */
+.heroIndex {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
+    var(--lp-beat-1) both;
 }
 
 .heroTopRule {
@@ -90,7 +131,7 @@
   height: 1px;
   background: var(--lp-hairline);
   transform-origin: left center;
-  animation: lp-hero-draw 760ms var(--lp-ease-emph) 240ms both;
+  animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-2) both;
 }
 
 .heroMid {
@@ -101,18 +142,11 @@
   min-width: 0;
 }
 
-/* The copy band spans exactly the stage the scene occupies, so the state rail
-   lands directly under the composition instead of drifting to the frame's
-   floor with a dead band above it. */
+/* The copy band stretches to the frame's middle row; the stage is centred
+   inside it, and the copy column is centred on the same axis. */
 @media (min-width: 64rem) {
   .heroMid {
     min-height: var(--stage-h);
-  }
-}
-
-@media (min-width: 64rem) and (max-height: 50rem) {
-  .heroMid {
-    min-height: calc(var(--stage-h) * 0.92);
   }
 }
 
@@ -137,7 +171,7 @@
   mask-size: 96px 96px;
   mask-repeat: repeat;
   translate: 0 calc(var(--vp-hero, 0) * -26px);
-  animation: lp-hero-fade 900ms var(--lp-ease-out) both;
+  animation: lp-hero-fade 900ms var(--lp-ease-out) var(--lp-beat-0) both;
 }
 
 .heroRules {
@@ -160,7 +194,7 @@
     transparent 100%
   );
   transform-origin: top center;
-  animation: lp-hero-rules 760ms var(--lp-ease-emph) 60ms both;
+  animation: lp-hero-rules 760ms var(--lp-ease-emph) var(--lp-beat-0) both;
 }
 
 /* ------------------------------------------------------------------
@@ -182,7 +216,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--primary);
-  animation: lp-hero-rise 520ms var(--lp-ease-emph) 120ms both;
+  animation: lp-hero-rise 520ms var(--lp-ease-emph) var(--lp-beat-1) both;
 }
 
 .heroEyebrow::before {
@@ -190,7 +224,7 @@
   width: 0.55rem;
   height: 0.55rem;
   background: var(--primary);
-  animation: lp-hero-tick 460ms var(--lp-ease-spring) 200ms both;
+  animation: lp-hero-tick 460ms var(--lp-ease-spring) var(--lp-beat-2) both;
 }
 
 .heroHeadline {
@@ -214,12 +248,12 @@
 }
 
 .heroLineFirst {
-  animation-delay: 200ms;
+  animation-delay: var(--lp-beat-2);
 }
 
 .heroLineSecond {
   color: var(--primary);
-  animation-delay: 282ms;
+  animation-delay: var(--lp-beat-3);
 }
 
 @media (min-width: 80rem) {

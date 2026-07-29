@@ -8,6 +8,12 @@ import styles from "@/components/landing/styles/hero.module.css"
  * SkillDossier information hierarchy (index, name, stars, source, description,
  * tags, install command) so the hero reads as the actual app UI.
  *
+ * `source` is split into owner / repo because it is a *provenance* line, not a
+ * caption: the fork mark is printed in the accent (as it is in the product),
+ * the owner is set back, and the repository carries the weight. The same
+ * treatment is used for the source feed that draws itself once a card is filed,
+ * so the "after" state reads as a list of sources rather than grey mono text.
+ *
  * The card's top strip is deliberately a complete, self-sufficient index row:
  * once the deck is filed the card folds shut on that strip and becomes a row
  * of the Team library listing. Same element, two legible states.
@@ -17,45 +23,52 @@ import styles from "@/components/landing/styles/hero.module.css"
 const dossiers = [
   {
     name: "code-review",
-    source: "acme/eng-skills",
+    owner: "acme",
+    repo: "eng-skills",
     stars: "1,204",
-    description: "Review PRs for correctness, style, and missing tests.",
+    // One line at every card width down to 1024 — the scattered deck is a
+    // composition of five equal cards, so their heights must not vary.
+    description: "Reviews PRs for missing tests.",
     tags: ["review", "ci"],
     command: "npx skills add acme/eng-skills",
     depth: "12px",
   },
   {
     name: "pdf-extraction",
-    source: "anthropic/skills",
+    owner: "anthropic",
+    repo: "skills",
     stars: "8,431",
-    description: "Pull text, tables, and metadata out of PDF documents.",
+    description: "Pulls tables out of PDF files.",
     tags: ["documents"],
     command: "npx skills add anthropic/skills",
     depth: "7px",
   },
   {
     name: "brand-voice",
-    source: "acme/brand-kit",
+    owner: "acme",
+    repo: "brand-kit",
     stars: "312",
-    description: "Rewrite copy to match the team brand voice guide.",
+    description: "Rewrites copy to brand voice.",
     tags: ["writing", "brand"],
     command: "npx skills add acme/brand-kit",
     depth: "14px",
   },
   {
     name: "sql-migrations",
-    source: "drizzle/skills",
+    owner: "drizzle",
+    repo: "skills",
     stars: "964",
-    description: "Draft safe schema migrations and rollback plans.",
+    description: "Drafts safe schema migrations.",
     tags: ["database"],
     command: "npx skills add drizzle/skills",
     depth: "6px",
   },
   {
     name: "release-notes",
-    source: "vercel/skills",
+    owner: "vercel",
+    repo: "skills",
     stars: "2,109",
-    description: "Turn merged PRs into customer-facing release notes.",
+    description: "Turns merged PRs into notes.",
     tags: ["shipping", "docs"],
     command: "npx skills add vercel/skills",
     depth: "10px",
@@ -65,6 +78,28 @@ const dossiers = [
 type Dossier = (typeof dossiers)[number]
 
 const index = (i: number) => String(i + 1).padStart(2, "0")
+
+/** owner / repo, set as a provenance line. */
+function SourceRef({
+  dossier,
+  className,
+  iconClassName,
+}: {
+  dossier: Dossier
+  className: string
+  iconClassName: string
+}) {
+  return (
+    <span className={className}>
+      <GitForkIcon className={iconClassName} aria-hidden="true" />
+      <span className={styles.sourceText}>
+        <span className={styles.sourceOwner}>{dossier.owner}</span>
+        <span className={styles.sourceSlash}>/</span>
+        <span className={styles.sourceRepo}>{dossier.repo}</span>
+      </span>
+    </span>
+  )
+}
 
 function DossierRow({ dossier, i }: { dossier: Dossier; i: number }) {
   return (
@@ -84,10 +119,11 @@ function DossierCard({ dossier, i }: { dossier: Dossier; i: number }) {
     <div className={styles.dossier}>
       <DossierRow dossier={dossier} i={i} />
       <div className={styles.dossierBody}>
-        <p className={styles.dossierSource}>
-          <GitForkIcon className={styles.dossierFork} aria-hidden="true" />
-          <span>{dossier.source}</span>
-        </p>
+        <SourceRef
+          dossier={dossier}
+          className={styles.dossierSource}
+          iconClassName={styles.dossierFork}
+        />
         <p className={styles.dossierDesc}>{dossier.description}</p>
         <div className={styles.dossierTags}>
           {dossier.tags.map((tag) => (
@@ -157,13 +193,11 @@ export function HeroBoard() {
                 className={styles.libraryFeedRow}
                 data-slot={i + 1}
               >
-                <span className={styles.libraryFeedLabel}>
-                  <GitForkIcon
-                    className={styles.libraryFeedIcon}
-                    aria-hidden="true"
-                  />
-                  <span>{dossier.source}</span>
-                </span>
+                <SourceRef
+                  dossier={dossier}
+                  className={styles.libraryFeedLabel}
+                  iconClassName={styles.libraryFeedIcon}
+                />
                 <span className={styles.libraryFeedLine} />
               </div>
             ))}
@@ -192,11 +226,13 @@ export function HeroBoard() {
         </div>
       </div>
 
-      {/* Small screens: the same story, told as a static before / after. */}
+      {/* Small screens: the same story, told as a static before / after.
+          All five dossiers appear in both halves so the index numbers on the
+          loose cards and on the filed rows describe the same five skills. */}
       <div className={styles.heroBoardMobile} aria-hidden="true">
         <p className={styles.mobileMark}>Scattered</p>
         <div className={styles.mobileChaos}>
-          {dossiers.slice(0, 3).map((dossier, i) => (
+          {dossiers.map((dossier, i) => (
             <div key={dossier.name} className={styles.mobileChaosCard}>
               <DossierCard dossier={dossier} i={i} />
             </div>

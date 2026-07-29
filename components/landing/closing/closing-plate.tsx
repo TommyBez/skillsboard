@@ -6,10 +6,11 @@ import styles from "@/components/landing/styles/closing.module.css"
  * The closing plate — the team library, written down and marked.
  *
  * The same example skills the hero scatters across the board, filed as a
- * compact index with one entry carrying the team's mark: the page's question
- * answered in the product's own vocabulary, which is what the copy beside it
- * says in words. Decorative, so the plate is hidden from assistive tech; its
- * static state is the finished index and the controller only adds the writing.
+ * compact index that opens on a legend and closes on the answer: the page's
+ * question resolved in the product's own vocabulary, which is what the copy
+ * beside it says in words. Decorative, so the plate is hidden from assistive
+ * tech; its static state is the finished index and the controller only adds
+ * the writing.
  */
 const entries = [
   { index: "01", name: "code-review", source: "acme", marked: true },
@@ -19,22 +20,20 @@ const entries = [
   { index: "05", name: "release-notes", source: "vercel", marked: false },
 ] as const
 
+const answer = entries.find((entry) => entry.marked) ?? entries[0]
+
 export function ClosingPlate() {
   return (
     <div className={styles.plate}>
-      <div
-        className={styles.plateFrame}
-        data-view-progress="closing"
-        aria-hidden="true"
-      >
-        <div className={styles.plateHead}>
-          <span className={styles.plateHeadLabel}>Team library</span>
+      <div className={styles.plateFrame} aria-hidden="true">
+        <div className={styles.plateBar}>
+          <span className={styles.plateLabel}>Team library</span>
           <span className={styles.plateLegend}>
             <span className={styles.plateMark} data-legend="" />
-            <span className={styles.plateHeadLabel}>Recommended</span>
+            <span className={styles.plateLabel}>Recommended</span>
           </span>
         </div>
-        <span className={styles.plateHeadRule} />
+        <span className={styles.plateEdge} data-edge="head" />
 
         <ul className={styles.plateRows}>
           {entries.map((entry, i) => (
@@ -52,6 +51,18 @@ export function ClosingPlate() {
             </li>
           ))}
         </ul>
+
+        {/* The index closes on the entry it recommends — the heading's
+            question, answered once and filed. Mirrors the bar above it
+            exactly, so the sheet is bracketed by two rules of one weight. */}
+        <span className={styles.plateEdge} data-edge="foot" />
+        <div className={styles.plateBar} data-foot="">
+          <span className={styles.plateLabel}>Answer</span>
+          <span className={styles.plateLegend}>
+            <span className={styles.plateMark} data-legend="" />
+            <span className={styles.plateAnswer}>{answer.name}</span>
+          </span>
+        </div>
       </div>
     </div>
   )

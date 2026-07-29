@@ -17,19 +17,19 @@ const flowSteps: ReadonlyArray<{
   visual: ReactNode
 }> = [
   {
-    index: "01",
+    index: "1",
     title: "Save the skill",
     copy: "Paste a GitHub skill URL you want the team to reuse. Skills Board keeps the name, description, and install command tied to it.",
     visual: <PasteResolveVisual />,
   },
   {
-    index: "02",
+    index: "2",
     title: "Find it later",
     copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
     visual: <SearchFilterVisual />,
   },
   {
-    index: "03",
+    index: "3",
     title: "Use it your way",
     copy: "Open the source, copy the install command, download a ZIP, or let your agent fetch it over MCP.",
     visual: <RouteFanVisual />,
@@ -80,15 +80,15 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
       >
         <div className={styles.flowHead}>
           <div className={styles.flowMarkRow}>
+            <span className={styles.flowIndex} aria-hidden="true">
+              02
+            </span>
             <p
               className={`${base.chapterMark} ${styles.flowMark} uppercase`}
               data-decode=""
             >
               How it works
             </p>
-            <span className={styles.flowMarkCount} aria-hidden="true">
-              01—03
-            </span>
           </div>
           <h2
             id="flow-heading"
@@ -110,6 +110,7 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
               <div className={styles.stepHead}>
                 <span className={styles.stepIndex} aria-hidden="true">
                   {step.index}
+                  <span className={styles.stepIndexOf}>/3</span>
                 </span>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
                 <p className={styles.stepCopy}>{step.copy}</p>

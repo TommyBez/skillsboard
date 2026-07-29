@@ -31,8 +31,11 @@ export function PasteResolveVisual() {
           </span>
         </div>
 
-        <span className={styles.pasteWire}>
-          <span className={styles.pasteWireHead} />
+        <span className={styles.pasteLink}>
+          <span className={styles.pasteWire}>
+            <span className={styles.pasteWireHead} />
+          </span>
+          <span className={styles.pasteWireNote}>resolve</span>
         </span>
 
         <div className={styles.miniCard}>
@@ -135,6 +138,7 @@ export function RouteFanVisual() {
           <GitForkIcon className={styles.fanMark} aria-hidden="true" />
           pdf-extraction
         </p>
+        <span className={styles.fanStem} />
         <ul className={styles.fanList}>
           {routes.map((route) => (
             <li key={route.key} className={styles.fanRow}>

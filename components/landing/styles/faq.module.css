@@ -1,21 +1,44 @@
 /* ---------------------------------------------------------------------------
-   FAQ — technical index
+   FAQ — chapter 05, set as a ruled register
 
-   Eight numbered entries in a register: mono index on the left, question set
-   flush against a hairline grid, a boxed glyph that turns from + to − as the
-   entry opens. Everything is a real <details>, so the chapter is complete and
-   operable with no JS at all; the height reveal, the glyph morph and the
-   staggered entrance are layered on top.
+   Structure, in the same grammar as chapter 03 (the MCP instrument frame) and
+   chapter 04 (the pricing plate):
+
+     ┌ strip ──────────────────────────────────────────────── 05 — FAQ … ┐
+     │ head rule, on the page measure                                    │
+     │ title cell        │ register: eight numbered <details> rows       │
+     │ foot rule, on the page measure                                    │
+     └───────────────────────────────────────────────────────────────────┘
+
+   Both horizontal rules span the shared content measure — the same span as
+   the page frame's header rule and footer rule — so the chapter is a closed
+   block bracketed by the frame rather than a list floating in the field. One
+   vertical rule divides the two cells and runs exactly between those two
+   horizontal rules. Nothing is full-bleed; nothing crosses the frame rails.
+
+   Every entry is a real <details>, so the chapter is complete and operable
+   with no JS at all. The height reveal, the glyph morph, the state readout in
+   the strip and the staggered entrance are layered on top of that.
 --------------------------------------------------------------------------- */
 
 .faqSection {
   position: relative;
-  border-bottom: 1px solid var(--lp-hairline);
 }
 
 .faqInner {
-  display: grid;
-  gap: 2.75rem;
+  /* Register geometry. Kept on the chapter root so the strip, the title cell
+     and the register all measure from one set of numbers. */
+  --faq-gap: 0.85rem;
+  --faq-num-w: 1.55rem;
+  --faq-row-pad: 1.15rem;
+  --faq-pad: 0rem;
+
+  /* Explicit length (never an em) so the ordinal and the glyph can both be
+     centred on the question's first line with the same arithmetic. */
+  --faq-q-size: clamp(1.15rem, 1.75vw, 1.55rem);
+  --faq-q-line: 1.2;
+  --faq-first-line-c: calc(var(--faq-q-size) * var(--faq-q-line) / 2);
+
   margin-inline: auto;
   width: 100%;
   max-width: 1440px;
@@ -25,6 +48,9 @@
 
 @media (min-width: 48rem) {
   .faqInner {
+    --faq-gap: 1.35rem;
+    --faq-row-pad: 1.2rem;
+
     padding-inline: 2.5rem;
     padding-block: 6rem;
   }
@@ -32,52 +58,212 @@
 
 @media (min-width: 64rem) {
   .faqInner {
-    grid-template-columns: minmax(14rem, 0.62fr) minmax(30rem, 1.38fr);
-    align-items: start;
-    gap: 0;
+    --faq-pad: clamp(2.25rem, 3.4vw, 4rem);
   }
 }
 
 /* ---------------------------------------------------------------------------
-   Left column — chapter plate. Tracks the index while entries expand.
+   Chapter strip — 05 — FAQ, and a readout of the register's state
+
+   Its rule is the register's head rule: full measure, one weight, one scope.
+--------------------------------------------------------------------------- */
+
+.faqStrip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 0;
+  padding-bottom: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Drawn, not a border, so the chapter can open by ruling itself. */
+.faqStrip::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline-strong);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.faqStripNum {
+  flex: none;
+  color: var(--foreground);
+  font-variant-numeric: tabular-nums;
+}
+
+.faqStripName {
+  flex: none;
+  white-space: nowrap;
+}
+
+.faqStripHair {
+  flex: none;
+  width: 2.25rem;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.faqStripHair[data-flex] {
+  flex: 1;
+  min-width: 1rem;
+}
+
+/* Readout: which entry is expanded, out of how many. Driven entirely by
+   :has() below — the same instrument language as the MCP signal readout. */
+.faqStripReadout {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.55rem;
+  letter-spacing: 0.2em;
+}
+
+.faqStripKey {
+  color: color-mix(in oklab, var(--muted-foreground) 74%, transparent);
+}
+
+.faqStripValue {
+  min-width: 2ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  transition: color 200ms var(--lp-ease-snap);
+}
+
+.faqStripValue::after {
+  content: var(--faq-open, "—");
+}
+
+.faqStripTotal {
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklab, var(--muted-foreground) 74%, transparent);
+}
+
+/* The register's state, read off the DOM with no script. */
+.faqInner:has(.faqItem:nth-of-type(1)[open]) {
+  --faq-open: "01";
+}
+.faqInner:has(.faqItem:nth-of-type(2)[open]) {
+  --faq-open: "02";
+}
+.faqInner:has(.faqItem:nth-of-type(3)[open]) {
+  --faq-open: "03";
+}
+.faqInner:has(.faqItem:nth-of-type(4)[open]) {
+  --faq-open: "04";
+}
+.faqInner:has(.faqItem:nth-of-type(5)[open]) {
+  --faq-open: "05";
+}
+.faqInner:has(.faqItem:nth-of-type(6)[open]) {
+  --faq-open: "06";
+}
+.faqInner:has(.faqItem:nth-of-type(7)[open]) {
+  --faq-open: "07";
+}
+.faqInner:has(.faqItem:nth-of-type(8)[open]) {
+  --faq-open: "08";
+}
+
+.faqInner:has(.faqItem[open]) .faqStripValue {
+  color: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+   Body — two cells and one divider, closed by the foot rule
+--------------------------------------------------------------------------- */
+
+.faqBody {
+  position: relative;
+  display: grid;
+  gap: 2.5rem;
+}
+
+/* Foot rule: same span and same weight as the strip's rule, so the chapter is
+   bracketed top and bottom on the page measure. */
+.faqBody::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline-strong);
+  transform: scaleX(1);
+  transform-origin: right center;
+  pointer-events: none;
+}
+
+/* Terminus. The page ends its blocks on a short accent segment at the left of
+   the closing rule (the colophon rule does the same); here it also gives the
+   title cell a floor to sit on. */
+.faqBody::after {
+  background-image: linear-gradient(
+    to right,
+    var(--primary) 0 2.25rem,
+    transparent 2.25rem
+  );
+}
+
+@media (min-width: 64rem) {
+  .faqBody {
+    grid-template-columns: minmax(13rem, 0.66fr) minmax(30rem, 1.34fr);
+    align-items: stretch;
+    gap: 0;
+  }
+
+  /* The divider. Drawn on the register cell's own leading edge, so it is the
+     column boundary by construction and runs exactly from the head rule to
+     the foot rule. */
+  .faqIndex::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 1px;
+    background: var(--lp-grid-line);
+    pointer-events: none;
+    transform: scaleY(1);
+    transform-origin: center top;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Title cell
 --------------------------------------------------------------------------- */
 
 .faqAside {
-  display: flex;
-  flex-direction: column;
+  padding-top: 2.25rem;
   max-width: 30rem;
 }
 
 @media (min-width: 64rem) {
-  .faqInner {
-    align-items: stretch;
-  }
-
-  /* Anchored at three points — the chapter mark on the register's head rule,
-     the legend on its foot rule, the title block centred between them — so the
-     column spans the chapter instead of trailing off into empty space. */
   .faqAside {
-    justify-content: space-between;
-    padding-right: clamp(1.5rem, 3vw, 3.25rem);
+    /* Same top inset as a register row, less the difference in half-leading
+       between the display heading (line-height 1) and a question line
+       (line-height 1.2), so the two columns' first lines share a cap line. */
+    padding-top: calc(var(--faq-row-pad) - 0.2rem);
+    padding-right: var(--faq-pad);
+    max-width: none;
   }
-
-  /* Optical alignment: the mark's hairline sits on the register's head rule,
-     the legend's on its foot rule. Both are half-leading corrections. */
-  .faqMark {
-    margin-top: -0.4rem;
-  }
-
-  .faqLegend {
-    margin-bottom: -0.4rem;
-  }
-}
-
-.faqMark {
-  margin: 0;
 }
 
 .faqHeading {
-  margin-top: 1.6rem;
+  margin: 0;
   max-width: 12ch;
   font-size: clamp(2.25rem, 4.4vw, 3.75rem);
   font-weight: 600;
@@ -95,63 +281,17 @@
   text-wrap: pretty;
 }
 
-/* Decorative register legend: how many entries this index holds. */
-.faqLegend {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin-top: 2.35rem;
-  max-width: 15rem;
-  font-family: var(--font-mono);
-  font-size: 0.675rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-}
-
-.faqLegendRule {
-  flex: 1;
-  height: 1px;
-  background: var(--lp-hairline);
-}
-
-.faqLegendCount {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.12em;
-  color: var(--foreground);
-}
-
 /* ---------------------------------------------------------------------------
-   Right column — the register itself
+   Register
 --------------------------------------------------------------------------- */
 
 .faqIndex {
-  --faq-gap: 0.85rem;
-  --faq-num-w: 1.55rem;
-  --faq-pad: 0rem;
-
-  /* Kept as an explicit length (never an em) so the ordinal and the glyph can
-     both be centred on the question's first line with the same arithmetic. */
-  --faq-q-size: clamp(1.15rem, 1.75vw, 1.55rem);
-  --faq-q-line: 1.2;
-  --faq-first-line-c: calc(var(--faq-q-size) * var(--faq-q-line) / 2);
-
   position: relative;
-}
-
-@media (min-width: 48rem) {
-  .faqIndex {
-    --faq-gap: 1.35rem;
-  }
 }
 
 @media (min-width: 64rem) {
   .faqIndex {
-    --faq-pad: clamp(2.25rem, 3.4vw, 4rem);
-
     padding-left: var(--faq-pad);
-    border-left: 1px solid var(--lp-grid-line);
   }
 }
 
@@ -168,22 +308,16 @@
     width: 1px;
     background: var(--lp-grid-line);
     pointer-events: none;
+    transform: scaleY(1);
+    transform-origin: center top;
   }
 }
 
-/* Head rule of the index — drawn left-to-right as the chapter arrives. */
-.faqIndexRule {
-  display: block;
-  height: 1px;
-  background: var(--lp-hairline-strong);
-  transform: scaleX(1);
-  transform-origin: left center;
-}
-
 .faqItem {
-  /* Colour of the rule that draws under the entry. Hover gets a neutral
-     emphasis; only an open entry earns the accent, so green means "expanded"
-     and nothing else on this page. */
+  /* Colour of the rule that draws under the entry. Hover and open both get a
+     neutral emphasis: the accent on this chapter is spent on the control and
+     on the open answer's own column segment, never on a rule that sits
+     directly above the next, unrelated entry. */
   --faq-rule: var(--lp-hairline-strong);
 
   position: relative;
@@ -192,13 +326,9 @@
   transition: background-color 170ms var(--lp-ease-snap);
 }
 
-/* Head and foot rules close the register; the entries between are lighter. */
+/* The body's foot rule closes the register; the last row does not double it. */
 .faqItem:last-of-type {
-  border-bottom-color: var(--lp-hairline-strong);
-}
-
-.faqItem[open] {
-  --faq-rule: var(--primary);
+  border-bottom-color: transparent;
 }
 
 .faqItem::after {
@@ -225,7 +355,10 @@
   grid-template-columns: var(--faq-num-w) minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--faq-gap);
-  padding-block: 1.2rem;
+  /* The glyph is held one register gap clear of the measure, so a boxed
+     control never lands on the page frame's rail. */
+  padding-right: var(--faq-gap);
+  padding-block: var(--faq-row-pad);
   font-size: var(--faq-q-size);
   cursor: pointer;
   list-style: none;
@@ -240,14 +373,15 @@
   content: "";
 }
 
+/* Inset ring: the rows run to the measure, so an outset ring would cross the
+   page frame's rail. */
 .faqSummary:focus-visible {
   outline: 2px solid var(--ring);
-  outline-offset: 3px;
+  outline-offset: -3px;
 }
 
 /* Ordinals are set tight and flush RIGHT against the column rule, the way a
-   contents page sets its folios — so they can never be confused with the
-   wide-tracked, left-flush chapter mark on the other side of the rail. */
+   contents page sets its folios. */
 .faqNum {
   align-self: start;
   text-align: right;
@@ -258,7 +392,7 @@
   line-height: 1;
   letter-spacing: 0.04em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  color: var(--muted-foreground);
   transition: color 170ms var(--lp-ease-snap);
 }
 
@@ -323,8 +457,6 @@
   transform: translate(-50%, -50%) scaleX(0);
 }
 
-/* Open state spends the accent twice — on the control and on the answer's
-   column segment. The ordinal just comes up to full ink. */
 .faqItem[open] .faqNum {
   color: var(--foreground);
 }
@@ -363,14 +495,13 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Answer — indented to sit under the question, bracketed by the index rule
+   Answer — set flush with the question, bracketed on the register's column
 --------------------------------------------------------------------------- */
 
-/* The answer sets flush with the question, never with the ordinal — the
-   register's columns hold at every width. */
 .faqAnswerWrap {
   position: relative;
   padding-left: calc(var(--faq-num-w) + var(--faq-gap));
+  padding-right: var(--faq-gap);
   padding-bottom: 1.45rem;
 }
 
@@ -433,139 +564,142 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Entrance — chapter plate first, then the register cascading down.
-   Defaults above are the finished composition, so no-JS renders complete.
+   Entrance — the chapter rules itself, then fills
+
+   Order: the head rule draws left to right, the strip's marks arrive, the
+   title sets, the divider drops from the head rule, the rows cascade, and the
+   foot rule closes the bracket right to left.
+
+   Every declaration outside the [data-motion-enabled] guards is the finished
+   composition, so no-JS and reduced motion both render complete.
 --------------------------------------------------------------------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="pending"]
-  .faqMark,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="pending"]
-  .faqHeading,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="pending"]
-  .faqIntro,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="pending"]
-  .faqLegend,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="pending"]
-  .faqItem {
-  opacity: 0;
-  translate: 0 15px;
+.faqStripName {
+  --faq-d: 60ms;
+}
+
+.faqStripReadout {
+  --faq-d: 120ms;
+}
+
+.faqHeading {
+  --faq-d: 110ms;
+}
+
+.faqIntro {
+  --faq-d: 175ms;
+}
+
+.faqItem {
+  --faq-d: calc(150ms + var(--faq-i, 0) * var(--lp-stagger) * 0.68);
+}
+
+.faqItem:nth-of-type(2) {
+  --faq-i: 1;
+}
+.faqItem:nth-of-type(3) {
+  --faq-i: 2;
+}
+.faqItem:nth-of-type(4) {
+  --faq-i: 3;
+}
+.faqItem:nth-of-type(5) {
+  --faq-i: 4;
+}
+.faqItem:nth-of-type(6) {
+  --faq-i: 5;
+}
+.faqItem:nth-of-type(7) {
+  --faq-i: 6;
+}
+.faqItem:nth-of-type(8) {
+  --faq-i: 7;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
-  .faqIndexRule {
+  :is(.faqStripNum, .faqStripName, .faqStripReadout, .faqHeading, .faqIntro, .faqItem) {
+  opacity: 0;
+  translate: 0 14px;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  :is(.faqStripNum, .faqStripName, .faqStripReadout, .faqHeading, .faqIntro, .faqItem) {
+  transition:
+    opacity var(--lp-dur-reveal) var(--lp-ease-emph) var(--faq-d, 0ms),
+    translate var(--lp-dur-reveal) var(--lp-ease-emph) var(--faq-d, 0ms);
+}
+
+/* The rules: drawn, not faded. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqStrip::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqBody::after {
   transform: scaleX(0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqMark,
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqStripHair {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqHeading,
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqIndex::before,
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqIntro,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqLegend,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem {
-  transition:
-    opacity var(--lp-dur-reveal) var(--lp-ease-emph),
-    translate var(--lp-dur-reveal) var(--lp-ease-emph);
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqIndex::after {
+  transform: scaleY(0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  .faqIndexRule {
-  transition: transform 620ms var(--lp-ease-emph) 60ms;
+  .faqStrip::after {
+  transition: transform 640ms var(--lp-ease-emph);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  .faqHeading {
-  transition-delay: 55ms;
+  .faqStripHair {
+  transform-origin: left center;
+  transition: transform 420ms var(--lp-ease-emph) 60ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  .faqIntro {
-  transition-delay: 120ms;
+  .faqIndex::before {
+  transition: transform 620ms var(--lp-ease-emph) 200ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  .faqLegend {
-  transition-delay: 185ms;
+  .faqIndex::after {
+  transition: transform 620ms var(--lp-ease-emph) 260ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(1) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 0);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(2) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 1);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(3) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 2);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(4) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 3);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(5) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 4);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(6) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 5);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(7) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 6);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="faq"][data-motion-state="visible"]
-  .faqItem:nth-of-type(8) {
-  transition-delay: calc(120ms + var(--lp-stagger) * 7);
+  .faqBody::after {
+  transition: transform 680ms var(--lp-ease-emph) 300ms;
 }
 
 /* ---------------------------------------------------------------------------
-   Reduced motion — the index rests in its finished state and toggles instantly
+   Reduced motion — the register rests finished and toggles instantly
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .faqIndexRule,
   .faqItem,
   .faqItem::after,
   .faqNum,
   .faqGlyph,
   .faqGlyph::before,
   .faqGlyph::after,
+  .faqStripValue,
   .faqAnswer {
     transition: none;
   }

@@ -24,19 +24,24 @@
   gap: 0.75rem;
 }
 
-.flowMark {
-  flex: 1;
-  min-width: 0;
-}
-
-.flowMarkCount {
+/* The chapter index, in the same slot and the same voice the other chapters
+   use for theirs (`03` before MCP ACCESS, `06` before the closing plate):
+   zero-padded, two digits, dimmer than the label it introduces. The step
+   numerals inside the panel are deliberately a different token — `1/3` — so
+   the two counting systems can never be read as one. */
+.flowIndex {
   flex: none;
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+}
+
+.flowMark {
+  flex: 1;
+  min-width: 0;
 }
 
 .launchDemo {
@@ -47,8 +52,16 @@
 
 /* The panel runs the full page measure, so its left and right edges land
    exactly on the fixed frame rails instead of sitting tangent to them. Only
-   the horizontal hairlines are ours; the verticals are the page frame. */
+   the horizontal hairlines are ours; the verticals are the page frame.
+
+   `--pad` is the single number the panel is built from: it is the panel's
+   inner margin AND half the column gutter, so the clear space between a cell
+   and the frame rail is exactly the clear space between a cell and the
+   hairline that divides it from its neighbour. Three structurally identical
+   cells, one inset, measured — not eyeballed. */
 .flowGrid {
+  --pad: 1.25rem;
+  --idx: 1.9rem;
   margin: 3.25rem 0 0;
   padding: 0;
   display: grid;
@@ -59,12 +72,24 @@
   background: color-mix(in oklch, var(--card) 34%, transparent);
 }
 
+/* 84rem is measured, not chosen: below it the three cells get narrow enough
+   that the install command in cell 1 needs an ellipsis and the skill names in
+   cell 2 start to truncate, so the panel trades a little of its inner margin
+   back to the columns. The invariant survives the trade — the panel's inset
+   and half its gutter are still the same number. */
+@media (min-width: 84rem) {
+  .flowGrid {
+    --pad: 1.75rem;
+    --idx: 2.2rem;
+  }
+}
+
 /* One gutter runs the full height of the cell: the index sits in it, the
    title, copy and diagram all hang off the same left rail. */
 .flowStep {
   position: relative;
   display: grid;
-  grid-template-columns: 1.75rem minmax(0, 1fr);
+  grid-template-columns: var(--idx) minmax(0, 1fr);
   grid-template-rows: auto auto 1fr;
   align-items: baseline;
   padding: 1.75rem 0 1.7rem;
@@ -81,7 +106,7 @@
 .flowStep::after {
   content: "";
   position: absolute;
-  inset: 0 -1.75rem;
+  inset: 0 calc(var(--pad) * -1);
   pointer-events: none;
   opacity: 0;
   background: color-mix(in oklch, var(--foreground) 3%, transparent);
@@ -102,7 +127,11 @@
   .flowGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto auto 1fr;
-    column-gap: 3.5rem;
+    column-gap: calc(var(--pad) * 2);
+    /* The panel's edges stay on the frame rails; its contents step inboard by
+       the same `--pad` that separates them from the dividers, so the first
+       step's numeral no longer sits on the rail. */
+    padding-inline: var(--pad);
   }
 
   .flowStep {
@@ -110,14 +139,14 @@
     border-top: none;
   }
 
-  /* The rails live in the gutters, so all three cells keep the same measure
-     and the outer two sit flush against the page frame. */
+  /* The dividers live in the gutters, halfway between two cells, so all three
+     cells keep the same measure and the same clear space on both sides. */
   .flowStep:not(:first-child)::before {
     content: "";
     position: absolute;
     top: 0;
     bottom: 0;
-    left: -1.75rem;
+    left: calc(var(--pad) * -1);
     width: 1px;
     background: var(--lp-hairline);
   }
@@ -138,6 +167,11 @@
   display: contents;
 }
 
+/* `1/3`, not `01` — the page numbers its chapters with zero-padded two-digit
+   numerals (`02` above, `03` on MCP, `06` on the closing plate), so the steps
+   inside a chapter get a visibly different token: a single digit against a
+   dimmed total. It also states the length of the sequence, which is the job
+   the old `01—03` readout was doing in the chapter head. */
 .stepIndex {
   position: relative;
   z-index: 1;
@@ -145,10 +179,15 @@
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 76%, transparent);
+  white-space: nowrap;
+  color: var(--foreground);
   transition: color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.stepIndexOf {
+  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
 }
 
 .stepTitle {
@@ -269,16 +308,41 @@
   color: var(--muted-foreground);
 }
 
-/* Drops from the field's text inset, so the wire, the pasted URL and the
-   resolved card's content all sit on one rail. */
-.pasteWire {
+/* The connector is the only elastic part of this diagram: the field is fixed
+   at the top, the card is fixed at the bottom, and the link spans whatever is
+   between them. That is what makes column 1 finish on the same baseline as
+   the other two at every width, instead of being hand-tuned to it. */
+.pasteLink {
   position: relative;
   align-self: center;
-  margin: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-height: 2.6rem;
+}
+
+.pasteWire {
+  position: relative;
   width: 1.5px;
-  height: 3.55rem;
   background: var(--wire);
   transform-origin: top center;
+}
+
+/* The connector carries its own caption, so the span it opens up reads as the
+   step the diagram is describing rather than as a hole in the column. Same
+   mono voice and same tracking as the diagram's own label. */
+.pasteWireNote {
+  position: absolute;
+  top: 50%;
+  left: 0.62rem;
+  translate: 0 -50%;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: color-mix(in oklch, var(--muted-foreground) 74%, transparent);
 }
 
 .pasteWireHead {
@@ -458,6 +522,13 @@
   list-style: none;
 }
 
+/* The library list absorbs any slack, so the count line stays welded to the
+   bottom of the diagram and its gap above never changes. Invisible: the slack
+   lands below the last row, under no rule. */
+.resultList:last-of-type {
+  flex: 1 0 auto;
+}
+
 .resultRow {
   position: relative;
   display: flex;
@@ -605,20 +676,38 @@
   color: var(--primary);
 }
 
+/* A short fixed stem out of the node, then a table that fills the rest of the
+   row: the four branches share the slack evenly, so the last branch's rule
+   lands on the same baseline as the other two columns' last edge whatever the
+   row height turns out to be — and no part of the column is left bare. */
+.fanStem {
+  flex: none;
+  align-self: flex-start;
+  width: 1px;
+  height: 1.3rem;
+  background: var(--wire);
+  transform-origin: top center;
+}
+
 .fanList {
   position: relative;
-  margin: 1.3rem 0 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0;
   padding: 0 0 0 1.15rem;
   list-style: none;
 }
 
-/* The spine: drops out of the node's dot, stops at the last row's centre. */
+/* The spine continues the stem down to the last branch's centre. Four rows of
+   equal height means half a row is exactly one eighth of the list, so this
+   stays exact without hard-coding the row height. */
 .fanList::before {
   content: "";
   position: absolute;
   left: 0;
-  top: -1.4rem;
-  bottom: 1.32rem;
+  top: 0;
+  bottom: 12.5%;
   width: 1px;
   background: var(--wire);
   transform-origin: top center;
@@ -627,19 +716,20 @@
 .fanRow {
   position: relative;
   display: flex;
+  flex: 1;
   align-items: center;
   gap: 0.6rem;
-  height: 2.64rem;
+  min-height: 2.4rem;
   padding-right: 0.6rem;
   border-bottom: 1px solid var(--lp-grid-line);
 }
 
-/* Each branch stub: from the spine to the key column. */
+/* Each branch stub: from the spine to the key column, on the row's centre. */
 .fanRow::before {
   content: "";
   position: absolute;
   left: -1.15rem;
-  top: 1.32rem;
+  top: 50%;
   width: 0.72rem;
   height: 1px;
   background: var(--wire);
@@ -844,7 +934,9 @@
   & .miniCard,
   & .miniMeta,
   & .miniName,
+  & .pasteWireNote,
   & .miniDesc,
+  & .miniTags,
   & .miniFoot,
   & .searchField,
   & .resultRow,
@@ -856,6 +948,7 @@
   }
 
   & .pasteWire,
+  & .fanStem,
   & .fanList::before {
     transform: scaleY(0);
   }
@@ -920,6 +1013,10 @@
     animation: flowDrawY 280ms var(--lp-ease-emph) calc(var(--t) + 720ms) both;
   }
 
+  & .pasteWireNote {
+    animation: flowFade 300ms var(--lp-ease-out) calc(var(--t) + 800ms) both;
+  }
+
   & .miniCard {
     animation: flowRiseSm 460ms var(--lp-ease-emph) calc(var(--t) + 900ms) both;
   }
@@ -937,28 +1034,11 @@
   }
 
   & .miniTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.28rem;
-  margin-top: 0.12rem;
-}
-
-.miniTag {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.3rem;
-  padding: 0.12rem 0.4rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-chip);
-  font-family: var(--font-mono);
-  font-size: 0.545rem;
-  letter-spacing: -0.005em;
-  white-space: nowrap;
-  color: var(--foreground);
-}
-
-.miniFoot {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
+  }
+
+  & .miniFoot {
+    animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1240ms) both;
   }
 
   /* 02 — a query filters the library */
@@ -1028,18 +1108,24 @@
     animation: flowPop 420ms var(--lp-ease-spring) calc(var(--t) + 320ms) both;
   }
 
+  /* One continuous draw: the stem leaves the node, the spine carries it down
+     the table, then each branch strikes out to its row. */
+  & .fanStem {
+    animation: flowDrawY 260ms var(--lp-ease-emph) calc(var(--t) + 500ms) both;
+  }
+
   & .fanList::before {
-    animation: flowDrawY 420ms var(--lp-ease-emph) calc(var(--t) + 520ms) both;
+    animation: flowDrawY 200ms var(--lp-ease-out) calc(var(--t) + 740ms) both;
   }
 
   & .fanRow::before {
     animation: flowDrawX 220ms var(--lp-ease-emph)
-      calc(var(--t) + 700ms + var(--r, 0) * 90ms) both;
+      calc(var(--t) + 880ms + var(--r, 0) * 70ms) both;
   }
 
   & .fanRow {
     animation: flowSlideIn 420ms var(--lp-ease-emph)
-      calc(var(--t) + 740ms + var(--r, 0) * 90ms) both;
+      calc(var(--t) + 910ms + var(--r, 0) * 70ms) both;
   }
 
   & .fanRow:nth-child(2) {

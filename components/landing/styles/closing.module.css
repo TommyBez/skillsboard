@@ -2,11 +2,16 @@
    Closing — the final plate
 
    The page has argued: scattered artifacts → an indexed library → routed into
-   an agent. The closing shows that argument at rest. A bracketed band (chapter
-   mark and rule on top, end mark and rule on the bottom), a vertical gutter
-   rail, the copy on the left, and the index — filed and closed — on the right.
-   Everything rests in its finished state without JS; the controller only adds
-   the arrival.
+   an agent. The closing shows that argument at rest: the chapter mark and its
+   measure rule across the top, the claim and the terminal action stacked in
+   the left column, and the index — filed, marked, closed on its answer —
+   holding the right column at exactly the same height.
+
+   The band is not bracketed by a rule of its own. The chapter mark's rule is
+   its top edge and the footer's measure rule is its bottom edge, so there is
+   never a second hairline of the same weight and scope a few dozen pixels from
+   the first. Everything rests in its finished state without JS; the controller
+   only adds the arrival.
 --------------------------------------------------------------------------- */
 
 .closing {
@@ -22,21 +27,21 @@
   pointer-events: none;
   background-image: radial-gradient(
     circle at center,
-    color-mix(in oklch, var(--foreground) 5%, transparent) 1px,
+    color-mix(in oklch, var(--foreground) 6%, transparent) 1px,
     transparent 1.1px
   );
   background-size: 28px 28px;
   -webkit-mask-image: linear-gradient(
     to top,
-    rgb(0 0 0 / 0.85) 0%,
-    rgb(0 0 0 / 0.4) 30%,
-    transparent 66%
+    rgb(0 0 0 / 0.9) 0%,
+    rgb(0 0 0 / 0.45) 34%,
+    transparent 72%
   );
   mask-image: linear-gradient(
     to top,
-    rgb(0 0 0 / 0.85) 0%,
-    rgb(0 0 0 / 0.4) 30%,
-    transparent 66%
+    rgb(0 0 0 / 0.9) 0%,
+    rgb(0 0 0 / 0.45) 34%,
+    transparent 72%
   );
 }
 
@@ -49,7 +54,7 @@
   justify-content: center;
   gap: 2.75rem;
   margin-inline: auto;
-  padding-block: 4.5rem 3.25rem;
+  padding-block: 4.5rem 4rem;
   padding-inline: 1.25rem;
 }
 
@@ -57,43 +62,69 @@
   .closingInner {
     gap: 3rem;
     min-height: min(70svh, 40rem);
-    padding-block: 4.5rem 3rem;
+    padding-block: 4.5rem 5rem;
     padding-inline: 2.5rem;
   }
 }
 
-/* Top bracket: the chapter index, its rule drawn by base.chapterMark. */
-.closingMark.closingMark {
-  font-size: 0.75rem;
-  letter-spacing: 0.24em;
-  color: color-mix(in oklch, var(--foreground) 66%, transparent);
+/* ---------------------------------------------------------------------------
+   Chapter mark — 06 · START, in the same voice as 03 · MCP and 05 / FAQ
+
+   Size, weight, tracking, colour and the trailing measure rule all come from
+   the shared `base.chapterMark`; this only sets the index/name pairing.
+--------------------------------------------------------------------------- */
+
+/* Own class, kept as the layout + arrival hook for the chapter mark row. */
+.closingMark {
+  flex: none;
 }
 
-.closingFrame {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 0;
+.closingMarkIndex {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
 }
+
+.closingMarkSep {
+  color: color-mix(in oklch, var(--foreground) 34%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   The band — claim over action on the left, the index beside them
+
+   Three grid children, deliberately: the action is a sibling of the copy, not
+   a child of it, so it is the last element on the page in the stacked layout
+   and the plate can span both rows beside it at desktop widths. That span is
+   what makes the sheet's top edge and the heading's top edge, and the sheet's
+   bottom edge and the button's bottom edge, the same two lines.
+--------------------------------------------------------------------------- */
 
 .closingGrid {
   display: grid;
-  gap: 3.5rem;
-  padding-bottom: 2.5rem;
+  gap: 3rem;
 }
 
 @media (min-width: 64rem) {
   .closingGrid {
-    flex: 1 1 auto;
     grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
-    align-items: center;
-    gap: 0;
-    padding-bottom: 0;
+    grid-template-rows: auto auto;
+    column-gap: 0;
+    row-gap: 2.25rem;
   }
 
-  .closingMain,
+  .closingMain {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .closingCta {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
   .plate {
-    padding-bottom: 3.25rem;
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 }
 
@@ -103,8 +134,17 @@
   align-items: flex-start;
 }
 
+/* Leading trim. Measured: the cap line of this face at this weight sits
+   0.152em below the top of its line box, which is what would otherwise leave
+   the sheet's top border floating 13px above the heading it aligns with. */
 .closingHeading {
+  margin-top: -0.152em;
   font-stretch: 93%;
+}
+
+.closingCopy {
+  margin-bottom: 0;
+  color: color-mix(in oklch, var(--foreground) 76%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -151,73 +191,104 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Terminal action — the CTA sits on a track that leaves the page
+   Terminal action
+
+   The button itself is the shared CTA component and keeps the shared press
+   model exactly — same hairline highlight, same hover lift, same arrow travel,
+   same focus ring as every other primary on the page. All this adds is the
+   size the last action on the page deserves and a bloom of the accent behind
+   it, painted on the wrapper so nothing about the button is overridden.
 --------------------------------------------------------------------------- */
 
-.closingCopy {
-  margin-bottom: 0;
-  color: color-mix(in oklch, var(--foreground) 76%, transparent);
-}
-
-.closingCtaRow {
-  display: flex;
-  align-items: center;
-  margin-top: 2.25rem;
-}
-
 .closingCta {
-  display: inline-flex;
   position: relative;
+  display: inline-flex;
+  justify-self: start;
 }
 
-/* The shared button component is owned elsewhere; this only dresses it as the
-   page's terminal action — bigger, seated, with a considered press. */
+.closingCta::before {
+  content: "";
+  position: absolute;
+  inset: -22% -10%;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: 999px;
+  background: radial-gradient(
+    58% 100% at 50% 56%,
+    color-mix(in oklch, var(--primary) 46%, transparent),
+    transparent 72%
+  );
+  filter: blur(15px);
+  opacity: 0.26;
+  transition: opacity var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+:global(.dark) .closingCta::before {
+  opacity: 0.5;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .closingCta:hover::before {
+    opacity: 0.5;
+  }
+
+  :global(.dark) .closingCta:hover::before {
+    opacity: 0.92;
+  }
+}
+
+.closingCta:active::before {
+  opacity: 0.2;
+  transition-duration: var(--lp-dur-tap);
+}
+
+:global(.dark) .closingCta:active::before {
+  opacity: 0.38;
+}
+
+/* The streamed fallback holds exactly the button's box, so the terminal
+   action never resizes as the session resolves — and so the chapter is still
+   composed if the stream never lands (no JS). */
+.closingCta > div {
+  height: 3.5rem;
+  width: 18rem;
+  max-width: 100%;
+  border-radius: 3px;
+}
+
+/* The last action on the page carries more weight than the ones above it. */
 .closingCta a {
   height: 3.5rem;
   padding-inline: 1.75rem;
   font-size: 1.125rem;
   letter-spacing: -0.01em;
-  box-shadow:
-    0 1px 0 color-mix(in oklch, black 28%, transparent),
-    0 12px 28px -22px color-mix(in oklch, var(--primary) 80%, transparent);
-  transition:
-    box-shadow var(--lp-dur-hover) var(--lp-ease-snap),
-    translate var(--lp-dur-tap) var(--lp-ease-snap),
-    filter var(--lp-dur-hover) var(--lp-ease-snap);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .closingCta a:hover {
-    filter: brightness(1.06);
-    box-shadow:
-      0 2px 0 color-mix(in oklch, black 30%, transparent),
-      0 18px 36px -20px color-mix(in oklch, var(--primary) 92%, transparent);
-  }
-}
-
-.closingCta a:active {
-  translate: 0 1px;
-  box-shadow:
-    0 0 0 color-mix(in oklch, black 30%, transparent),
-    0 8px 20px -16px color-mix(in oklch, var(--primary) 80%, transparent);
-}
-
-.closingCta a:focus-visible {
-  outline: 2px solid var(--foreground);
-  outline-offset: 3px;
 }
 
 /* ---------------------------------------------------------------------------
    The plate — the index, filed and closed
+
+   A sheet, bracketed by two rules of one weight and one scope: the legend bar
+   at the top, the answer bar at the bottom. Leaders inside it are drawn at
+   half that weight, so line weight tracks role instead of accident. At desktop
+   widths the sheet clears the fixed page-frame rail by exactly its own inner
+   gutter, so its border is never painted into that rail.
 --------------------------------------------------------------------------- */
 
 .plate {
-  position: relative;
   display: flex;
-  align-items: center;
 }
 
 @media (min-width: 64rem) {
+  .plate {
+    padding-left: 2rem;
+  }
+
+  .plateFrame {
+    margin-right: 1.625rem;
+  }
+}
+
+@media (min-width: 82rem) {
   .plate {
     padding-left: clamp(2.5rem, 5vw, 5.5rem);
   }
@@ -225,44 +296,82 @@
 
 .plateFrame {
   position: relative;
-  width: 100%;
-  padding: 1.5rem 1.625rem 1.375rem;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-direction: column;
+  padding: 1.5rem 1.625rem;
   border: 1px solid var(--lp-hairline);
   border-radius: 3px;
   background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
-  translate: 0 calc((var(--vp-closing, 0.5) - 0.5) * -20px);
 }
 
-/* Legend: the plate says what it is, so it reads as a diagram, not texture. */
-.plateHead {
+@media (max-width: 24rem) {
+  .plateFrame {
+    padding-inline: 1.125rem;
+  }
+}
+
+/* Legend at the top, answer at the bottom: the same bar, twice. */
+.plateBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1.25rem;
   padding-bottom: 0.9rem;
 }
 
-.plateHeadLabel {
+.plateBar[data-foot] {
+  padding-top: 0.9rem;
+  padding-bottom: 0;
+}
+
+/* Both bars carry the same line box, so the sheet's two edge rules sit the
+   same distance from the sheet's two edges. Measured: 57.4px, both ends. */
+.plateLabel,
+.plateAnswer {
+  line-height: 1.125rem;
+}
+
+.plateLabel {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted-foreground);
+  white-space: nowrap;
 }
 
 .plateLegend {
   display: flex;
   align-items: center;
   gap: 0.55rem;
+  min-width: 0;
 }
 
-.plateHeadRule {
+.plateAnswer {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: -0.005em;
+  color: var(--foreground);
+  white-space: nowrap;
+}
+
+/* Structural edges of the sheet: one weight, one scope, top and bottom. */
+.plateEdge {
   display: block;
   height: 1px;
-  margin-bottom: 1.25rem;
   background: var(--lp-hairline);
   transform-origin: left center;
+}
+
+.plateEdge[data-edge="head"] {
+  margin-bottom: 1.25rem;
+}
+
+.plateEdge[data-edge="foot"] {
+  margin-top: 1.25rem;
 }
 
 .plateRows {
@@ -273,6 +382,17 @@
   list-style: none;
 }
 
+/* Once the sheet is stretched to the height of the column beside it, the
+   entries take up the slack instead of leaving a hole under the last one. */
+@media (min-width: 64rem) {
+  .plateRows {
+    flex: 1 1 auto;
+    align-content: space-between;
+  }
+}
+
+/* Narrow: mark, number, name, then the source run out to the right edge.
+   No leader, because a leader that stops in empty space is not a leader. */
 .plateRow {
   display: grid;
   grid-template-columns: auto auto auto minmax(0, 1fr);
@@ -280,36 +400,42 @@
   gap: 0.85rem;
 }
 
-/* Each leader runs out to where the entry came from, the way an index does.
-   Shown only where the plate is wide enough for the leader to still read as a
-   leader: the stacked layout, and desktops past the point where the right
-   column stops being narrow. */
-.plateSource {
+@media (max-width: 24rem) {
+  .plateRow {
+    gap: 0.7rem;
+  }
+}
+
+.plateRule {
   display: none;
+  height: 1px;
+  background: color-mix(in oklch, var(--foreground) 9%, transparent);
+  transform-origin: left center;
+}
+
+.plateSource {
+  justify-self: end;
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   letter-spacing: 0.02em;
   color: color-mix(in oklch, var(--foreground) 38%, transparent);
   white-space: nowrap;
 }
 
-@media (min-width: 30rem) and (max-width: 63.999rem) {
+/* Wide enough for the leader to still read as a leader: it runs the entry out
+   to where it came from, the way an index does. */
+@media (min-width: 82rem) {
   .plateRow {
     grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
   }
 
-  .plateSource {
+  .plateRule {
     display: block;
-  }
-}
-
-@media (min-width: 78rem) {
-  .plateRow {
-    grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
   }
 
   .plateSource {
-    display: block;
+    justify-self: auto;
+    font-size: 0.6875rem;
   }
 }
 
@@ -319,10 +445,17 @@
 
 .plateName {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.75rem;
   letter-spacing: -0.005em;
   color: color-mix(in oklch, var(--foreground) 62%, transparent);
   white-space: nowrap;
+}
+
+@media (min-width: 82rem) {
+  .plateName,
+  .plateAnswer {
+    font-size: 0.8125rem;
+  }
 }
 
 .plateRow[data-marked] .plateName {
@@ -333,6 +466,7 @@
 .plateMark {
   width: 0.4375rem;
   height: 0.4375rem;
+  flex: none;
   border-radius: 1px;
   background: color-mix(in oklch, var(--foreground) 20%, transparent);
   scale: 0.42;
@@ -351,11 +485,17 @@
 
 .plateIndex {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.625rem;
   font-weight: 600;
   letter-spacing: 0.16em;
   color: var(--muted-foreground);
   opacity: 0.62;
+}
+
+@media (min-width: 82rem) {
+  .plateIndex {
+    font-size: 0.6875rem;
+  }
 }
 
 .plateRow[data-marked] .plateIndex {
@@ -363,49 +503,13 @@
   opacity: 0.88;
 }
 
-/* Leader rule, the way an index runs an entry out to its edge. */
-.plateRule {
-  display: block;
-  height: 1px;
-  background: var(--lp-hairline);
-  transform-origin: left center;
-}
-
 /* ---------------------------------------------------------------------------
-   Bottom bracket — the page signs off before the colophon
---------------------------------------------------------------------------- */
-
-.closingEnd {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin: 0;
-}
-
-/* Rhymes with the stamp: the band opens on an index and closes on a mark. */
-.closingEndMark {
-  width: 0.5625rem;
-  height: 0.5625rem;
-  flex: none;
-  border-radius: 2px;
-  background: color-mix(in oklch, var(--foreground) 52%, transparent);
-  rotate: -1.6deg;
-}
-
-.closingEndRule {
-  flex: 1;
-  height: 1px;
-  background: var(--lp-hairline-strong);
-  transform-origin: left center;
-}
-
-/* ---------------------------------------------------------------------------
-   Arrival — the frame stands, the ledger is written, the page is stamped
+   Arrival — the claim lands, the ledger is written, the answer is filed
 --------------------------------------------------------------------------- */
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.closingMark, .closingHeading, .closingCopy, .closingCtaRow) {
+  :is(.closingMark, .closingHeading, .closingCopy, .closingCta) {
   opacity: 0;
   transform: translate3d(0, 18px, 0);
 }
@@ -418,7 +522,7 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  :is(.closingMark, .closingHeading, .closingCopy, .closingCtaRow) {
+  :is(.closingMark, .closingHeading, .closingCopy, .closingCta) {
   transition:
     opacity var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms),
     transform var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms);
@@ -448,8 +552,21 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCtaRow {
+  .closingCta {
   --d: 560ms;
+}
+
+/* The bloom comes up under the button a beat after it has landed. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .closingCta::before {
+  opacity: 0;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingCta::before {
+  transition: opacity 520ms var(--lp-ease-out) 760ms;
 }
 
 /* The stamp: falls, hits, compresses, settles. */
@@ -511,7 +628,8 @@
   }
 }
 
-/* The plate: the sheet arrives, the entries are ruled in, the mark lands. */
+/* The plate: the sheet arrives, the entries are ruled in, the mark lands,
+   and the answer bar closes it. */
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
   .plateFrame {
@@ -526,28 +644,34 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateRule, .plateHeadRule, .closingEndRule) {
+  :is(.plateRule, .plateEdge) {
   transform: scaleX(0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateIndex, .plateName, .plateSource) {
+  :is(.plateIndex, .plateName, .plateSource, .plateLabel, .plateAnswer) {
   opacity: 0;
   transform: translate3d(-7px, 0, 0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateMark, .closingEndMark) {
+  .plateMark {
   opacity: 0;
   transform: scale(0.3);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateHeadRule {
+  .plateEdge[data-edge="head"] {
   transition: transform 520ms var(--lp-ease-emph) 280ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateEdge[data-edge="foot"] {
+  transition: transform 620ms var(--lp-ease-emph) 800ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -567,13 +691,30 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
+  .plateBar .plateLabel {
+  transition:
+    opacity 400ms var(--lp-ease-out) 240ms,
+    transform 400ms var(--lp-ease-emph) 240ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateBar[data-foot] :is(.plateLabel, .plateAnswer) {
+  transition:
+    opacity 400ms var(--lp-ease-out) 880ms,
+    transform 400ms var(--lp-ease-emph) 880ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
   .plateMark {
   transition:
     opacity 240ms var(--lp-ease-out) calc(400ms + var(--i, 0) * 76ms),
     transform 420ms var(--lp-ease-spring) calc(400ms + var(--i, 0) * 76ms);
 }
 
-/* The marked entry answers the stamp, a beat after it lands. */
+/* The marked entry answers the stamp, a beat after it lands; the answer bar's
+   mark lands last of all, once the sheet is closed. */
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
   .plateRow[data-marked]
@@ -584,18 +725,12 @@
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingEndRule {
-  transition: transform 700ms var(--lp-ease-emph) 700ms;
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="closing"][data-motion-state="visible"]
-  .closingEndMark {
+  .plateBar[data-foot]
+  .plateMark {
   transition:
-    opacity 240ms var(--lp-ease-out) 800ms,
-    transform 400ms var(--lp-ease-spring) 800ms;
+    opacity 220ms var(--lp-ease-out) 900ms,
+    transform 440ms var(--lp-ease-spring) 900ms;
 }
 
 /* ---------------------------------------------------------------------------
@@ -603,13 +738,7 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .closingCta a,
-  .plateFrame {
+  .closingCta::before {
     transition: none;
   }
-
-  .plateFrame {
-    translate: none;
-  }
-
 }

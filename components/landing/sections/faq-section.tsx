@@ -1,10 +1,9 @@
-import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/faq.module.css"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 
 const entryCount = String(landingFaqs.length).padStart(2, "0")
 
-/** FAQ — technical index. */
+/** FAQ — chapter 05, set as a ruled register. */
 export function FaqSection() {
   return (
     <section
@@ -14,13 +13,28 @@ export function FaqSection() {
       data-chapter-target="faq"
     >
       <div className={styles.faqInner} data-motion-group="faq">
-        <div className={styles.faqAside}>
-          {/* No decode scramble here: the label must be readable before the
-              entries it introduces, and this chapter's job is fast scanning. */}
-          <p className={`${base.chapterMark} ${styles.faqMark} uppercase`}>
-            05 / FAQ
-          </p>
-          <div className={styles.faqPlate}>
+        {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing): index,
+            hairline, name, then an instrument readout on the far end. Its
+            rule is the register's head rule and runs the whole measure, so
+            both columns hang from one edge. */}
+        <p className={styles.faqStrip} aria-hidden="true">
+          <span className={styles.faqStripNum} data-decode="">
+            05
+          </span>
+          <span className={styles.faqStripHair} />
+          <span className={styles.faqStripName}>FAQ</span>
+          <span className={styles.faqStripHair} data-flex="" />
+          <span className={styles.faqStripReadout}>
+            <span className={styles.faqStripKey}>entry</span>
+            {/* Value is set from CSS by :has() on the open entry — a real
+                readout of the register's state, with no JS. */}
+            <span className={styles.faqStripValue} />
+            <span className={styles.faqStripTotal}>/ {entryCount}</span>
+          </span>
+        </p>
+
+        <div className={styles.faqBody}>
+          <div className={styles.faqAside}>
             <h2 id="faq-heading" className={styles.faqHeading}>
               Common questions
             </h2>
@@ -29,37 +43,30 @@ export function FaqSection() {
               agent setups, and what “recommended” means.
             </p>
           </div>
-          <p className={styles.faqLegend} aria-hidden="true">
-            <span>Entries</span>
-            <span className={styles.faqLegendRule} />
-            <span className={styles.faqLegendCount}>{entryCount}</span>
-          </p>
-        </div>
 
-        <div className={styles.faqIndex}>
-          <span className={styles.faqIndexRule} aria-hidden="true" />
-
-          {landingFaqs.map((faq, index) => (
-            // Native exclusive disclosure: opening an entry closes the last
-            // one, so the register never sprawls and the closed rows stay a
-            // scannable index. No JS involved.
-            <details
-              key={faq.question}
-              name="faq-index"
-              className={`faq-disclosure ${styles.faqItem}`}
-            >
-              <summary className={styles.faqSummary}>
-                <span className={styles.faqNum} aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span className={styles.faqQuestion}>{faq.question}</span>
-                <span className={styles.faqGlyph} aria-hidden="true" />
-              </summary>
-              <div className={styles.faqAnswerWrap}>
-                <p className={styles.faqAnswer}>{faq.answer}</p>
-              </div>
-            </details>
-          ))}
+          <div className={styles.faqIndex}>
+            {landingFaqs.map((faq, index) => (
+              // Native exclusive disclosure: opening an entry closes the last
+              // one, so the register never sprawls and the closed rows stay a
+              // scannable index. No JS involved.
+              <details
+                key={faq.question}
+                name="faq-index"
+                className={`faq-disclosure ${styles.faqItem}`}
+              >
+                <summary className={styles.faqSummary}>
+                  <span className={styles.faqNum} aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className={styles.faqQuestion}>{faq.question}</span>
+                  <span className={styles.faqGlyph} aria-hidden="true" />
+                </summary>
+                <div className={styles.faqAnswerWrap}>
+                  <p className={styles.faqAnswer}>{faq.answer}</p>
+                </div>
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>
