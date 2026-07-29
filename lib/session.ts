@@ -9,9 +9,11 @@ export const getSession = cache(async () => {
   return auth.api.getSession({ headers: await headers() })
 })
 
-export async function requireSession() {
+export async function requireSession(returnTo?: string) {
   const session = await getSession()
-  if (!session?.user) redirect("/sign-in")
+  if (!session?.user) {
+    redirect(returnTo ? `/sign-in?returnTo=${encodeURIComponent(returnTo)}` : "/sign-in")
+  }
   return session
 }
 

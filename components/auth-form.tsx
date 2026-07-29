@@ -7,13 +7,20 @@ import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ArrowRightIcon, Loader2Icon } from "lucide-react"
 import posthog from "posthog-js"
 
+import { saveSignupProductCommunicationsConsent } from "@/app/actions/email-preferences"
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import {
+  queueSignupEmailPreferenceFailure,
+  showSignupEmailPreferenceFailure,
+} from "@/components/email-preference-toast-bridge"
+import { PRODUCT_COMMUNICATIONS_DISCLOSURE } from "@/lib/email/product-communications"
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up"
@@ -57,6 +64,7 @@ export function AuthForm({
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
   const [otp, setOtp] = useState("")
+  const [productCommunications, setProductCommunications] = useState(false)
   const [error, setError] = useState("")
   const [pendingAction, setPendingAction] = useState<"email" | "verify" | "resend" | null>(null)
   const [resendIn, setResendIn] = useState(0)
@@ -139,6 +147,9 @@ export function AuthForm({
         email,
         otp: nextOtp,
         name: displayName,
+        ...(isSignUp
+          ? { skillsboardProductCommunicationsChoice: productCommunications }
+          : {}),
       })
       if (result.error) {
         setError(result.error.message ?? "That code didn’t work. Request a new one and try again.")
@@ -161,10 +172,23 @@ export function AuthForm({
       } else {
         captureAnalyticsEvent("user_signed_in", { method: "email_otp" })
       }
+
+      let optionalPreferenceSaved = true
+      if (isSignUp && productCommunications) {
+        try {
+          const preferenceResult = await saveSignupProductCommunicationsConsent()
+          optionalPreferenceSaved = preferenceResult.saved
+        } catch {
+          optionalPreferenceSaved = false
+        }
+      }
+
       if (continueHref) {
+        if (!optionalPreferenceSaved) queueSignupEmailPreferenceFailure()
         window.location.assign(continueHref)
         return
       }
+      if (!optionalPreferenceSaved) showSignupEmailPreferenceFailure()
       router.push(returnTo)
       router.refresh()
     } catch {
@@ -244,9 +268,28 @@ export function AuthForm({
             </FieldDescription>
           </Field>
         </FieldGroup>
+        {isSignUp && productCommunications ? (
+          <p className="rounded-[16px] border border-primary/20 bg-primary/5 px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+            Because you selected product emails, verifying this code will also confirm that optional preference. You can
+            turn it off anytime in Email preferences.
+          </p>
+        ) : null}
         {error ? (
           <p className="rounded-[16px] border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
             {error}
+          </p>
+        ) : null}
+        {isSignUp ? (
+          <p className="text-center text-xs leading-relaxed text-muted-foreground">
+            By creating your account, you agree to the{" "}
+            <Link className="font-medium text-foreground underline underline-offset-4 hover:text-primary" href="/terms">
+              Terms
+            </Link>{" "}
+            and acknowledge the{" "}
+            <Link className="font-medium text-foreground underline underline-offset-4 hover:text-primary" href="/privacy">
+              Privacy Policy
+            </Link>
+            .
           </p>
         ) : null}
         <Button
@@ -343,10 +386,52 @@ export function AuthForm({
               : "We’ll email you a one-time code. No password needed."}
           </FieldDescription>
         </Field>
+        {isSignUp ? (
+          <Field
+            orientation="horizontal"
+            className="items-start rounded-[16px] border border-border bg-muted/20 p-4"
+          >
+            <Checkbox
+              id="product-communications"
+              checked={productCommunications}
+              onCheckedChange={setProductCommunications}
+              disabled={isPending}
+              aria-describedby="product-communications-description"
+              className="mt-0.5"
+            />
+            <div className="min-w-0">
+              <label htmlFor="product-communications" className="cursor-pointer text-sm font-medium text-foreground">
+                Product emails (optional)
+              </label>
+              <p id="product-communications-description" className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {PRODUCT_COMMUNICATIONS_DISCLOSURE}{" "}
+                <Link
+                  href="/privacy"
+                  className="font-medium text-foreground underline decoration-primary/50 underline-offset-4 hover:text-primary"
+                >
+                  Privacy details
+                </Link>
+              </p>
+            </div>
+          </Field>
+        ) : null}
       </FieldGroup>
       {error ? (
         <p className="rounded-[16px] border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
           {error}
+        </p>
+      ) : null}
+      {isSignUp ? (
+        <p className="text-center text-xs leading-relaxed text-muted-foreground">
+          By continuing, you agree to the{" "}
+          <Link className="font-medium text-foreground underline underline-offset-4 hover:text-primary" href="/terms">
+            Terms
+          </Link>{" "}
+          and acknowledge the{" "}
+          <Link className="font-medium text-foreground underline underline-offset-4 hover:text-primary" href="/privacy">
+            Privacy Policy
+          </Link>
+          .
         </p>
       ) : null}
       <Button

@@ -8,6 +8,7 @@ import {
   type NonTeamScopedCapturableAnalyticsEventName,
   type TeamScopedCapturableAnalyticsEventName,
 } from "@/analytics/posthog/events"
+import { withTeamAnalyticsScope } from "@/lib/team-analytics-properties"
 
 type ServerEvent<EventName extends NonTeamScopedCapturableAnalyticsEventName> =
   AnalyticsEventCapture<EventName> & {
@@ -70,9 +71,6 @@ export function captureTeamEvent<
   enqueueEvent({
     distinctId,
     event,
-    properties: {
-      ...properties,
-      team_id: teamId,
-    },
+    properties: withTeamAnalyticsScope(properties, teamId),
   })
 }

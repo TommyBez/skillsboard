@@ -27,12 +27,12 @@ function formatRole(role: string): string {
 }
 
 export default function TeamInvitation({
-  inviterName,
-  inviterEmail,
-  teamName,
-  role,
-  inviteUrl,
-  expiryDays,
+  inviterName = "Alex Morgan",
+  inviterEmail = "alex@example.com",
+  teamName = "Product Engineering",
+  role = "member",
+  inviteUrl = "https://skillsboard.example.com/invite/preview-invitation-id",
+  expiryDays = 2,
 }: TeamInvitationProps) {
   const formattedRole = formatRole(role)
 

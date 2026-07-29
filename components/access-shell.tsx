@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 
 import { Brand } from "@/components/brand"
+import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 
 interface AccessShellProps {
@@ -76,9 +77,12 @@ export function AccessShell({
             </div>
           </div>
 
-          <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-5 py-4 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground sm:px-9 lg:px-14 xl:px-20">
+          <footer className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-t border-border px-5 py-4 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground sm:px-9 lg:px-14 xl:px-20">
             <span>Skills Board</span>
-            <span>Hosted for free. Open source.</span>
+            <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2">
+              <LegalLinks ariaLabel="Legal pages" className="gap-x-4" />
+              <span>Hosted for free. Open source.</span>
+            </div>
           </footer>
         </section>
       </div>

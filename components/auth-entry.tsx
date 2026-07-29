@@ -23,13 +23,16 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
   if (session?.user) {
     if (oauthContinue) redirect(oauthContinue)
     if (returnTo === "/library") redirect("/library")
+    const destinationLabel = returnTo === "/settings/email"
+      ? "Continue to Email preferences"
+      : "Continue to invitation"
     return (
       <div className="grid gap-5 border-t border-border pt-6">
         <p className="text-sm leading-relaxed text-muted-foreground">
           You’re signed in as <span className="font-medium text-foreground">{session.user.email}</span>.
         </p>
         <Button size="lg" className="h-12 rounded-[16px]" nativeButton={false} render={<Link href={returnTo} />}>
-          Continue to invitation
+          {destinationLabel}
         </Button>
       </div>
     )

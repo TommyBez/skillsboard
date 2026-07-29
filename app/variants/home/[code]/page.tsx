@@ -8,6 +8,7 @@ import { Suspense } from "react"
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { JsonLd } from "@/components/json-ld"
+import { LegalLinks } from "@/components/legal-links"
 import { HeroBoard } from "@/components/landing/hero-board"
 import { LaunchDemoLoop } from "@/components/landing/launch-demo-loop"
 import { LandingMotionController } from "@/components/landing/landing-motion-controller"
@@ -691,6 +692,10 @@ export default async function HomePage({ params }: HomeVariantPageProps) {
                 Resources
               </Link>
             </nav>
+            <LegalLinks
+              ariaLabel="Legal pages"
+              className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            />
             <a
               href="https://github.com/TommyBez/skillsboard"
               target="_blank"

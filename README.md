@@ -105,10 +105,15 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
 | `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
 | `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain.com>`). |
+| `RESEND_WEBHOOK_SECRET` | Yes for hosted email delivery | Verifies Resend bounce, complaint, suppression, and unsubscribe webhooks. |
+| `EMAIL_PRIVACY_SECRET` | Yes in Vercel Production | At least 32 random bytes encoded as base64 or hex; the dedicated root for email hashes and encrypted unsubscribe links. Local/self-hosted environments can fall back to a domain-separated key derived from `BETTER_AUTH_SECRET`. |
+| `EMAIL_PRIVACY_SECRET_PREVIOUS` | Only during key rotation | JSON array of retained base64/hex roots used for dual-hash suppression lookup and unsubscribe-token decryption. A prior root cannot be removed while retained records still depend on it. |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
 Sign-in and sign-up use email one-time codes (no passwords). Outside development, configure both `RESEND_API_KEY` and a domain-verified `EMAIL_FROM`; the fallback Resend test sender only works for Resend’s own test recipients. In development, OTP emails are skipped and any 6-digit code works. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
+
+Product communications are separate from transactional OTP and invitation email. Signup consent is optional and off by default, can be changed under **Settings → Email**, and is enforced with local consent history, suppression records, signed unsubscribe links, and verified Resend delivery webhooks. See [`docs/email-compliance.md`](./docs/email-compliance.md) before configuring a product broadcast.
 
 ## MCP access
 

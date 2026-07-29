@@ -17,7 +17,10 @@ export interface SignInOtpProps {
   expiresInMinutes: number
 }
 
-export default function SignInOtp({ otp, expiresInMinutes }: SignInOtpProps) {
+export default function SignInOtp({
+  otp = "482913",
+  expiresInMinutes = 5,
+}: SignInOtpProps) {
   return (
     <Html lang="en">
       <Tailwind
