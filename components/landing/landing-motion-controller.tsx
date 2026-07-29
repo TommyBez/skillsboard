@@ -182,6 +182,9 @@ export function LandingMotionController() {
           const host = entry.target as HTMLElement
           observer.unobserve(host)
           targets.get(host)?.forEach((el, index) => {
+            if (el.dataset.rvDone === "1") {
+              return
+            }
             play(el, Math.min(index * REVEAL_STAGGER, REVEAL_STAGGER_MAX))
           })
         })
@@ -223,14 +226,27 @@ export function LandingMotionController() {
       })
     }
 
-    window.addEventListener("scroll", rescue, { passive: true })
-    window.addEventListener("resize", rescue, { passive: true })
+    let rescueFrame = 0
+    const requestRescue = () => {
+      if (!rescueFrame) {
+        rescueFrame = window.requestAnimationFrame(() => {
+          rescueFrame = 0
+          rescue()
+        })
+      }
+    }
+
+    window.addEventListener("scroll", requestRescue, { passive: true })
+    window.addEventListener("resize", requestRescue, { passive: true })
     const safety = window.setInterval(rescue, REVEAL_SAFETY)
 
     cleanups.push(() => {
-      window.removeEventListener("scroll", rescue)
-      window.removeEventListener("resize", rescue)
+      window.removeEventListener("scroll", requestRescue)
+      window.removeEventListener("resize", requestRescue)
       window.clearInterval(safety)
+      if (rescueFrame) {
+        window.cancelAnimationFrame(rescueFrame)
+      }
     })
 
     // Tab away mid-reveal and come back to a settled page rather than a

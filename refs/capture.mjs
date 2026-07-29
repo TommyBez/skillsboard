@@ -15,7 +15,8 @@ if (!url || !outBase) {
 }
 const flags = new Set(rest.filter((r) => r.startsWith('--')))
 const waitIdx = rest.indexOf('--wait')
-const waitMs = waitIdx >= 0 ? Number(rest[waitIdx + 1]) : 3500
+const parsedWait = waitIdx >= 0 ? Number(rest[waitIdx + 1]) : 3500
+const waitMs = Number.isFinite(parsedWait) && parsedWait >= 0 ? parsedWait : 3500
 const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)([:/]|$)/.test(url)
 
 const viewports = []

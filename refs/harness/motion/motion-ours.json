@@ -1,26 +1,22 @@
 {
   "label": "ours",
-  "url": "http://localhost:3000",
+  "url": "http://localhost:3010",
   "viewport": {
     "name": "desktop",
     "width": 1440,
     "height": 900
   },
-  "capturedAt": "2026-07-28T17:38:10.649Z",
+  "capturedAt": "2026-07-29T01:47:14.225Z",
   "reducedMotion": false,
   "entrance": {
     "animations": [],
     "strip": {
       "file": "entrance-strip.png",
       "frames": [
-        0,
-        23,
-        42,
-        60,
-        83
+        0
       ]
     },
-    "frameCount": 5
+    "frameCount": 1
   },
   "scrollReveal": {
     "section": {
@@ -38,7 +34,7 @@
         "delaysMs": [
           0
         ],
-        "firstAtMs": 146,
+        "firstAtMs": 133,
         "staggerMs": null
       }
     ],
@@ -46,18 +42,22 @@
       "file": "reveal-every-saved-skill-one-se-strip.png",
       "frames": [
         0,
-        163,
-        185,
-        204,
-        223,
-        262,
-        281,
-        300,
-        339
+        131,
+        134,
+        140,
+        164,
+        190,
+        206,
+        232,
+        255,
+        290
       ]
     },
-    "frameCount": 11,
-    "replaysOnScrollBack": true
+    "frameCount": 17,
+    "replayedGroups": [
+      "CSSTransition|border-bottom-color|160|cubic-bezier(0.4, 0, 0.2, 1)"
+    ],
+    "replaysReveal": false
   },
   "interactions": [
     {
@@ -79,7 +79,7 @@
         "scale": "none",
         "filter": "none",
         "backdropFilter": "none",
-        "outline": "lab(42.5974 -42.9476 31.9285) none 0px",
+        "outline": "lab(42.5974 -42.9476 31.9285) none 3px",
         "outlineOffset": "0px",
         "borderRadius": "6px",
         "letterSpacing": "normal",
@@ -112,7 +112,7 @@
             "delaysMs": [
               0
             ],
-            "firstAtMs": 248,
+            "firstAtMs": 208,
             "staggerMs": null
           },
           {
@@ -124,7 +124,7 @@
             "delaysMs": [
               0
             ],
-            "firstAtMs": 249,
+            "firstAtMs": 208,
             "staggerMs": null
           }
         ],
@@ -135,14 +135,15 @@
           "file": "data-harness-target-0-hover-strip.png",
           "frames": [
             0,
-            210,
-            245,
-            270,
-            295,
-            325,
-            354,
-            374,
-            397
+            195,
+            198,
+            215,
+            235,
+            255,
+            282,
+            301,
+            332,
+            364
           ]
         }
       },
@@ -156,23 +157,156 @@
           "file": "data-harness-target-0-press-strip.png",
           "frames": [
             0,
-            134
+            136
           ]
         }
       },
       "hoverInterrupt": {
         "leftAfterMs": 80,
-        "reverseAnimations": []
+        "reverseAnimations": [
+          {
+            "type": "CSSTransition",
+            "name": "transform",
+            "durationMs": 137,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 10,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "background-color",
+            "durationMs": 137,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 1,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 10,
+            "staggerMs": null
+          }
+        ]
       },
       "focus": {
-        "animations": [],
-        "changed": {},
+        "animations": [
+          {
+            "type": "CSSTransition",
+            "name": "border-bottom-color",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 3,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 130,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-left-color",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 3,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 130,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-right-color",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 3,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 130,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-top-color",
+            "durationMs": 160,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 3,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 130,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-bottom-color",
+            "durationMs": 0,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 137,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-left-color",
+            "durationMs": 0,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 137,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-right-color",
+            "durationMs": 0,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 137,
+            "staggerMs": null
+          },
+          {
+            "type": "CSSTransition",
+            "name": "border-top-color",
+            "durationMs": 0,
+            "easing": "cubic-bezier(0.4, 0, 0.2, 1)",
+            "count": 2,
+            "delaysMs": [
+              0
+            ],
+            "firstAtMs": 137,
+            "staggerMs": null
+          }
+        ],
+        "changed": {
+          "borderColor": "rgba(0, 0, 0, 0) → lab(42.5974 -42.9476 31.9285)",
+          "outline": "lab(42.5974 -42.9476 31.9285) none 3px → lab(42.5974 -42.9476 31.9285) solid 2px",
+          "outlineOffset": "0px → 3px"
+        },
         "strip": {
           "file": "data-harness-target-0-focus-strip.png",
           "frames": [
             0,
-            136,
-            159
+            133,
+            142,
+            166,
+            172,
+            199,
+            232,
+            252,
+            282,
+            334
           ]
         }
       }
@@ -180,10 +314,10 @@
     {
       "selector": "[data-harness-target=\"1\"]",
       "box": {
-        "x": 0,
-        "y": 0,
-        "w": 0,
-        "h": 0
+        "x": 1047,
+        "y": 12,
+        "w": 68,
+        "h": 32
       },
       "rest": {
         "backgroundColor": "rgba(0, 0, 0, 0)",
@@ -196,7 +330,7 @@
         "scale": "none",
         "filter": "none",
         "backdropFilter": "none",
-        "outline": "lab(42.5974 -42.9476 31.9285) none 0px",
+        "outline": "lab(42.5974 -42.9476 31.9285) none 3px",
         "outlineOffset": "0px",
         "borderRadius": "6px",
         "letterSpacing": "normal",
@@ -212,29 +346,35 @@
         "cursor": "pointer",
         "willChange": "auto",
         "_box": {
-          "x": 0,
-          "y": 0,
-          "w": 0,
-          "h": 0
+          "x": 1047,
+          "y": 12,
+          "w": 68,
+          "h": 32
         }
       },
       "hover": {
         "animations": [],
-        "changed": {},
+        "changed": {
+          "opacity": "1 → 0.8"
+        },
         "strip": {
           "file": "data-harness-target-1-hover-strip.png",
           "frames": [
-            0
+            0,
+            162
           ]
         }
       },
       "press": {
         "animations": [],
-        "changedFromHover": {},
+        "changedFromHover": {
+          "scale": "none → 1"
+        },
         "strip": {
           "file": "data-harness-target-1-press-strip.png",
           "frames": [
-            0
+            0,
+            127
           ]
         }
       },
@@ -244,13 +384,17 @@
       },
       "focus": {
         "animations": [],
-        "changed": {},
+        "changed": {
+          "borderColor": "rgba(0, 0, 0, 0) → lab(42.5974 -42.9476 31.9285)",
+          "outline": "lab(42.5974 -42.9476 31.9285) none 3px → lab(42.5974 -42.9476 31.9285) solid 2px",
+          "outlineOffset": "0px → 3px"
+        },
         "strip": {
           "file": "data-harness-target-1-focus-strip.png",
           "frames": [
             0,
-            149,
-            170
+            124,
+            134
           ]
         }
       }

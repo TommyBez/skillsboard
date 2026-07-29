@@ -27,18 +27,32 @@ await page.waitForTimeout(2500)
 // Discovered, not hardcoded. The old fixed list predated the proof strip and
 // the product slab, so the two sections the direction calls load-bearing were
 // never once captured by the standard verification run.
-const sections = await page.evaluate(() =>
-  [...document.querySelectorAll('main > section')].map((el, i) => {
-    const label =
+const sections = await page.evaluate(() => {
+  const seen = new Set()
+
+  return [...document.querySelectorAll('main > section')].map((el, i) => {
+    const labelledByText = (el.getAttribute('aria-labelledby') || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((id) => document.getElementById(id)?.textContent || '')
+      .join(' ')
+      .trim()
+    const accessibleLabel = el.getAttribute('aria-label') || labelledByText
+    const base =
       el.id ||
-      (el.getAttribute('aria-labelledby') || el.getAttribute('aria-label') || '')
-        .replace(/[^a-z0-9]+/gi, '-')
-        .toLowerCase() ||
+      accessibleLabel.replace(/[^a-z0-9]+/gi, '-').toLowerCase() ||
       `section-${i}`
+    let label = base
+    let suffix = 2
+    while (seen.has(label)) {
+      label = `${base}-${suffix}`
+      suffix += 1
+    }
+    seen.add(label)
     el.dataset.captureKey = label
     return label
   })
-)
+})
 // Walk the page in viewport-sized steps so scroll-driven motion settles.
 // behavior:'instant' is load-bearing — the site sets scroll-behavior: smooth,
 // so a plain scrollTo animates and never arrives between steps.

@@ -69,6 +69,7 @@
 .schematic {
   /* One measure keeps the wire endpoints and the action rows on one axis. */
   --wire-row-h: 64px;
+
   grid-column: 1 / -1;
 }
 

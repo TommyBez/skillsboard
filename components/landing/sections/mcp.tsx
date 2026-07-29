@@ -1,4 +1,4 @@
-import { ShieldCheckIcon } from "lucide-react"
+import { KeyRoundIcon } from "lucide-react"
 import type { ReactNode } from "react"
 
 import { McpSchematic } from "@/components/landing/mcp-schematic"
@@ -24,12 +24,11 @@ export function Mcp({ actions }: { actions: ReactNode }) {
             </h2>
             <p className={`${styles.lead} lp-lead`}>
               Connect over MCP once. Your agent then works from the skills your
-              team already trusts.
+              team already recommends.
             </p>
             <p className={`${styles.note} lp-small`}>
-              <ShieldCheckIcon className={styles.noteIcon} aria-hidden="true" />
-              Sign in securely through your browser—there&apos;s no API key to
-              copy.
+              <KeyRoundIcon className={styles.noteIcon} aria-hidden="true" />
+              Sign in through your browser. There&apos;s no API key to copy.
             </p>
             <div className={styles.actions}>{actions}</div>
           </div>

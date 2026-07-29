@@ -5,7 +5,7 @@
 //     --viewport 390x844     repeatable; default 1440x900 and 390x844
 //     --scheme light|dark|both   default both
 //     --out path.json        default refs/harness/out/audit.json
-//     --wait ms              settle time after load (default 2500)
+//     --wait ms              settle time after load (default 3500)
 //     --cap n                max items kept per finding list (default 25)
 //     --no-void              skip the pixel void scan (it is the slow part)
 //     --quiet                JSON only, no readable summary
@@ -13,13 +13,16 @@
 // External hosts are fetched through Node's env proxy and fulfilled into the
 // page: Chromium's own TLS to the egress proxy gets reset, Node's does not.
 // NODE_USE_ENV_PROXY must be set before node starts — use refs/harness/audit.sh.
-import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
+import { attachProxyRouting, launchBrowser, MOBILE_UA, settle } from './lib.mjs'
 import { probe } from './probe.mjs'
 
 const argv = process.argv.slice(2)
-const url = argv.find((a) => !a.startsWith('--'))
+const VALUE_FLAGS = ['--viewport', '--scheme', '--out', '--wait', '--cap']
+const url = argv.find(
+  (a, i) => !a.startsWith('--') && !VALUE_FLAGS.includes(argv[i - 1]),
+)
 if (!url) {
   console.error('usage: node refs/harness/audit.mjs <url> [--viewport WxH] [--scheme both] [--out f.json]')
   process.exit(1)
@@ -38,65 +41,12 @@ const viewports = (viewportArgs.length ? viewportArgs : ['1440x900', '390x844'])
 })
 const schemeArg = flag('scheme', 'both')
 const schemes = schemeArg === 'both' ? ['light', 'dark'] : [schemeArg]
-const waitMs = Number(flag('wait', 2500))
+const waitMs = Number(flag('wait', 3500))
 const cap = Number(flag('cap', 25))
 const outPath = resolve(flag('out', 'refs/harness/out/audit.json'))
 const quiet = has('quiet')
 const doVoid = !has('no-void')
-const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)([:/]|$)/.test(url)
-
-const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium',
-  args: ['--no-sandbox', '--force-color-profile=srgb', '--font-render-hinting=none'],
-})
-
-async function attachProxyRouting(ctx) {
-  if (isLocal) return
-  await ctx.route('**/*', async (route) => {
-    const req = route.request()
-    try {
-      // Strip hop-by-hop and encoding headers: undici sets its own, and a
-      // forwarded accept-encoding makes it hand back still-compressed bytes.
-      const headers = { ...req.headers() }
-      for (const k of ['host', 'connection', 'accept-encoding', 'content-length']) delete headers[k]
-      const res = await fetch(req.url(), {
-        method: req.method(),
-        headers,
-        body: ['GET', 'HEAD'].includes(req.method()) ? undefined : req.postDataBuffer(),
-        redirect: 'follow',
-      })
-      const body = Buffer.from(await res.arrayBuffer())
-      const outHeaders = {}
-      res.headers.forEach((v, k) => {
-        if (!['content-encoding', 'content-length', 'transfer-encoding', 'content-security-policy'].includes(k)) {
-          outHeaders[k] = v
-        }
-      })
-      await route.fulfill({ status: res.status, headers: outHeaders, body })
-    } catch (e) {
-      if (process.env.AUDIT_DEBUG) console.error('route fail', req.url().slice(0, 90), e.message)
-      await route.abort()
-    }
-  })
-}
-
-// A scroll pass is required before any measurement: reveal-on-scroll sections
-// are opacity:0 until they intersect. behavior:'instant' is load-bearing — the
-// site sets scroll-behavior: smooth, so a plain scrollTo animates, never
-// arrives between steps, and late sections stay unrevealed. That mistake is
-// what let a broken mobile page look fine for an afternoon.
-async function scrollPass(page, vpHeight) {
-  const h = await page.evaluate(() => document.documentElement.scrollHeight)
-  for (let y = 0; y < h; y += Math.floor(vpHeight * 0.7)) {
-    await page.evaluate((yy) => window.scrollTo({ top: yy, behavior: 'instant' }), y)
-    await page.waitForTimeout(220)
-  }
-  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }))
-  await page.waitForTimeout(400)
-  await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }))
-  await page.waitForTimeout(700)
-  return h
-}
+const browser = await launchBrowser()
 
 // ---------- focus visibility ----------
 
@@ -289,19 +239,17 @@ async function voidScan(browserRef, png, threshold = 12) {
 const runs = []
 for (const vp of viewports) {
   for (const scheme of schemes) {
+    const mobile = vp.width < 500
     const ctx = await browser.newContext({
       viewport: { width: vp.width, height: vp.height },
       deviceScaleFactor: 1,
-      isMobile: vp.width < 500,
-      hasTouch: vp.width < 500,
+      isMobile: mobile,
+      hasTouch: mobile,
       colorScheme: scheme,
       ignoreHTTPSErrors: true,
-      userAgent:
-        vp.width < 500
-          ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1'
-          : undefined,
+      userAgent: mobile ? MOBILE_UA : undefined,
     })
-    await attachProxyRouting(ctx)
+    await attachProxyRouting(ctx, url)
     const page = await ctx.newPage()
     const errors = []
     const badAssets = []
@@ -318,7 +266,10 @@ for (const vp of viewports) {
       errors.push(`goto: ${e.message.split('\n')[0]}`)
     }
     await page.waitForTimeout(waitMs)
-    const docHeight = await scrollPass(page, vp.height)
+    const docHeight = await settle(page, {
+      ...vp,
+      name: mobile ? 'mobile' : 'desktop',
+    })
 
     // A page whose stylesheets 404'd (a server mid-rebuild, say) measures
     // beautifully and means nothing — every later number would be about

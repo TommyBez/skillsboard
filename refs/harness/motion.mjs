@@ -343,6 +343,11 @@ for (const sel of targets) {
     report.interactions.push({ selector: sel, error: 'not found' })
     continue
   }
+  if (rest._box.w < 1 || rest._box.h < 1) {
+    console.log(`[${label}] selector has no box: ${sel}`)
+    report.interactions.push({ selector: sel, box: rest._box, error: 'zero-size box' })
+    continue
+  }
   const name = slug(sel, 28)
   const clip = clipFor(rest._box)
   const cx = rest._box.x + rest._box.w / 2

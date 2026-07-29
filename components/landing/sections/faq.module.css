@@ -121,7 +121,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  background: currentColor;
+  background: currentcolor;
 }
 
 .faqGlyph::before {

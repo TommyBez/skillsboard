@@ -4,7 +4,13 @@
 // profile.mjs, sections.mjs and motion.mjs open a page the *same* way. If two
 // tools settle a page differently, their numbers stop being comparable, which
 // is the whole failure mode this harness was built to remove.
-import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs'
+import { pathToFileURL } from 'node:url'
+
+const playwrightModulePath =
+  process.env.PLAYWRIGHT_MODULE_PATH || '/opt/node22/lib/node_modules/playwright/index.mjs'
+const playwrightChromiumPath =
+  process.env.PLAYWRIGHT_CHROMIUM_PATH || '/opt/pw-browsers/chromium'
+const { chromium } = await import(pathToFileURL(playwrightModulePath).href)
 
 export const VIEWPORTS = {
   desktop: { name: 'desktop', width: 1440, height: 900 },
@@ -18,7 +24,7 @@ export const isLocal = (url) => /^https?:\/\/(localhost|127\.0\.0\.1)([:/]|$)/.t
 
 export async function launchBrowser() {
   return chromium.launch({
-    executablePath: '/opt/pw-browsers/chromium',
+    executablePath: playwrightChromiumPath,
     args: ['--no-sandbox', '--force-color-profile=srgb', '--font-render-hinting=none'],
   })
 }

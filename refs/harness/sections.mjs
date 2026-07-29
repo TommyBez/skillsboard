@@ -27,7 +27,11 @@ if (!url || !label) {
   process.exit(1)
 }
 const outDir = flag('--out', 'refs/harness/sections')
-const maxFrames = Number(flag('--max-frames', 4))
+const maxFrames = Number(flag('--max-frames', '4'))
+if (!Number.isInteger(maxFrames) || maxFrames < 1) {
+  console.error('--max-frames must be a positive integer')
+  process.exit(1)
+}
 
 const viewports = []
 if (!has('--mobile-only')) viewports.push(VIEWPORTS.desktop)

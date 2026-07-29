@@ -94,7 +94,9 @@ function pieceRow(piece) {
     </article>`
 }
 
-const html = `<title>${esc(state.title)}</title>
+const html = `<!doctype html>
+<meta charset="utf-8">
+<title>${esc(state.title)}</title>
 <style>
   @font-face{font-family:Bricolage;src:url(data:font/woff2;base64,${faces.body}) format('woff2');font-weight:400;font-display:swap}
   @font-face{font-family:Bricolage;src:url(data:font/woff2;base64,${faces.bodyMed}) format('woff2');font-weight:500;font-display:swap}

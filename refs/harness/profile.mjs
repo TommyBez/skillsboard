@@ -492,7 +492,9 @@ function rhythm(sections, vp) {
 // Comparison renderer — the point of the whole exercise: four sites, one table.
 // ---------------------------------------------------------------------------
 function renderComparison() {
-  const files = argv.filter((a) => a.endsWith('.json'))
+  const files = argv.filter(
+    (a, i) => a.endsWith('.json') && !VALUE_FLAGS.includes(argv[i - 1]),
+  )
   const outFile = flag('--out')
   const sites = files.map((f) => ({ file: f, ...JSON.parse(readFileSync(f, 'utf8')) }))
   if (!sites.length) {
@@ -521,8 +523,8 @@ function renderComparison() {
     ['Families', (v) => v.type.families.slice(0, 3).map((f) => f.family).join(', ')],
     ['**Rhythm**', null],
     ['Top-level sections', (v) => v.sections.count],
-    ['Section height med/max', (v) => `${v.sections.heights.median}/${v.sections.heights.max}px`],
-    ['Section height CV', (v) => v.sections.heights.cv],
+    ['Section height med/max', (v) => `${v.sections.heights.median ?? 0}/${v.sections.heights.max ?? 0}px`],
+    ['Section height CV', (v) => v.sections.heights.cv ?? 0],
     ['Gap between sections', (v) => `${v.sections.gaps.median ?? 0}px med`],
     ['Internal padding med', (v) => `${v.sections.internalPadding.median ?? 0}px`],
     ['**Container**', null],
