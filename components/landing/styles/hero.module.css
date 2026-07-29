@@ -221,9 +221,22 @@
   max-width: 34rem;
 }
 
+/* Keep the paragraph clear of the board's left column at every desktop width. */
 @media (min-width: 64rem) {
   .heroLower {
     margin-top: 3.75rem;
+    max-width: 30rem;
+  }
+
+  .heroBlurb {
+    max-width: 25.5rem;
+  }
+}
+
+@media (min-width: 80rem) {
+  .heroLower,
+  .heroBlurb {
+    max-width: 34rem;
   }
 }
 

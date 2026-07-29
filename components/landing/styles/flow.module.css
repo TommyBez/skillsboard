@@ -54,6 +54,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   list-style: none;
+  overflow: clip;
   border-block: 1px solid var(--lp-hairline-strong);
   background: color-mix(in oklch, var(--card) 34%, transparent);
 }
@@ -80,7 +81,7 @@
 .flowStep::after {
   content: "";
   position: absolute;
-  inset: 0;
+  inset: 0 -1.75rem;
   pointer-events: none;
   opacity: 0;
   background: color-mix(in oklch, var(--foreground) 3%, transparent);
@@ -101,16 +102,24 @@
   .flowGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     grid-template-rows: auto auto 1fr;
+    column-gap: 3.5rem;
   }
 
   .flowStep {
-    padding: 2.1rem 1.75rem 1.95rem;
+    padding: 2.1rem 0 1.95rem;
     border-top: none;
-    border-left: 1px solid var(--lp-hairline);
   }
 
-  .flowStep:first-child {
-    border-left: none;
+  /* The rails live in the gutters, so all three cells keep the same measure
+     and the outer two sit flush against the page frame. */
+  .flowStep:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.75rem;
+    width: 1px;
+    background: var(--lp-hairline);
   }
 
   /* Share the panel's three rows across all three cells, so title, copy and
@@ -256,7 +265,7 @@
   color: var(--foreground);
 }
 
-/* Mirrors the search field's ⌘K badge, so both fields read as one system. */
+/* The search field's shortcut chip. */
 .fieldKbd {
   position: relative;
   flex: none;
@@ -277,8 +286,8 @@
    resolved card's content all sit on one rail. */
 .pasteWire {
   position: relative;
-  align-self: flex-start;
-  margin: 0 0 0 0.9rem;
+  align-self: center;
+  margin: 0;
   width: 1px;
   height: 3.9rem;
   background: var(--wire);
@@ -485,7 +494,7 @@
    below the fold stay exactly as strong as the one above it. */
 .resultRow[data-match="false"] .resultName,
 .resultRow[data-match="false"] .resultRepo {
-  opacity: 0.44;
+  opacity: 0.5;
 }
 
 .resultRow[data-match="true"]::before {
@@ -540,8 +549,11 @@
 
 .searchCount {
   position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   margin: 0.82rem 0 0;
-  padding-left: 1.81rem;
+  padding: 0 0.6rem 0 1.81rem;
   height: 0.85rem;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
@@ -557,6 +569,10 @@
   position: absolute;
   left: 1.81rem;
   top: 0;
+}
+
+.countTotal {
+  margin-left: auto;
 }
 
 /* The pre-filter readout only exists inside the transition; the resting,
@@ -622,7 +638,6 @@
   gap: 0.6rem;
   height: 2.8rem;
   padding-right: 0.6rem;
-  border-bottom: 1px solid var(--lp-grid-line);
 }
 
 /* Each branch stub: from the spine to the key column. */
@@ -806,7 +821,7 @@
   }
 
   to {
-    opacity: 0.44;
+    opacity: 0.5;
   }
 }
 

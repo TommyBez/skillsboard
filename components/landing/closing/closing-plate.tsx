@@ -12,11 +12,11 @@ import styles from "@/components/landing/styles/closing.module.css"
  * static state is the finished index and the controller only adds the writing.
  */
 const entries = [
-  { index: "01", name: "code-review", marked: true },
-  { index: "02", name: "pdf-extraction", marked: false },
-  { index: "03", name: "brand-voice", marked: false },
-  { index: "04", name: "sql-migrations", marked: false },
-  { index: "05", name: "release-notes", marked: false },
+  { index: "01", name: "code-review", source: "acme", marked: true },
+  { index: "02", name: "pdf-extraction", source: "anthropics", marked: false },
+  { index: "03", name: "brand-voice", source: "acme", marked: false },
+  { index: "04", name: "sql-migrations", source: "drizzle-team", marked: false },
+  { index: "05", name: "release-notes", source: "vercel", marked: false },
 ] as const
 
 export function ClosingPlate() {
@@ -48,6 +48,7 @@ export function ClosingPlate() {
               <span className={styles.plateIndex}>{entry.index}</span>
               <span className={styles.plateName}>{entry.name}</span>
               <span className={styles.plateRule} />
+              <span className={styles.plateSource}>{entry.source}</span>
             </li>
           ))}
         </ul>

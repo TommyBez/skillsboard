@@ -29,7 +29,6 @@ export function PasteResolveVisual() {
             <span className={styles.pasteDim}>github.com/</span>
             anthropics/skills
           </span>
-          <span className={styles.fieldKbd}>⌘V</span>
         </div>
 
         <span className={styles.pasteWire}>
@@ -106,7 +105,8 @@ export function SearchFilterVisual() {
 
         <p className={styles.searchCount}>
           <span className={styles.countPrev}>24 skills</span>
-          <span className={styles.countNow}>1 match / 24 skills</span>
+          <span className={styles.countNow}>1 match</span>
+          <span className={styles.countTotal}>24 skills</span>
         </p>
       </div>
     </div>
@@ -116,7 +116,7 @@ export function SearchFilterVisual() {
 /* 03 — one saved skill branching into the four ways out of Skills Board. */
 const routes = [
   { key: "source", value: "anthropics/skills" },
-  { key: "install", value: "npx skills add" },
+  { key: "install", value: "npx skills add …" },
   { key: "zip", value: "skill.zip · 12 kB" },
   { key: "mcp", value: "tools/get_skill" },
 ] as const

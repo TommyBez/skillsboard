@@ -181,6 +181,11 @@
 }
 
 .faqItem {
+  /* Colour of the rule that draws under the entry. Hover gets a neutral
+     emphasis; only an open entry earns the accent, so green means "expanded"
+     and nothing else on this page. */
+  --faq-rule: var(--lp-hairline-strong);
+
   position: relative;
   z-index: 1;
   border-bottom: 1px solid var(--lp-hairline);
@@ -190,12 +195,6 @@
 /* Head and foot rules close the register; the entries between are lighter. */
 .faqItem:last-of-type {
   border-bottom-color: var(--lp-hairline-strong);
-}
-
-/* Rule that draws under the entry. Hover is a neutral emphasis; only an open
-   entry earns the accent, so green means "expanded" and nothing else. */
-.faqItem {
-  --faq-rule: var(--lp-hairline-strong);
 }
 
 .faqItem[open] {
@@ -212,7 +211,7 @@
   transform: scaleX(0);
   transform-origin: left center;
   transition:
-    transform 260ms var(--lp-ease-out),
+    transform var(--lp-dur-hover) var(--lp-ease-out),
     background-color 200ms var(--lp-ease-snap);
   pointer-events: none;
 }

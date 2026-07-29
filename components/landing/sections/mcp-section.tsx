@@ -81,8 +81,12 @@ export function McpSection() {
               </div>
 
               <dl className={styles.specs} aria-hidden="true">
-                {specs.map((spec) => (
-                  <div key={spec.key} className={styles.specRow}>
+                {specs.map((spec, i) => (
+                  <div
+                    key={spec.key}
+                    className={styles.specRow}
+                    data-spec={i + 1}
+                  >
                     <dt className={styles.specKey}>{spec.key}</dt>
                     <dd className={styles.specValue}>{spec.value}</dd>
                   </div>
