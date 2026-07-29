@@ -380,6 +380,26 @@
   translate: 0 0;
 }
 
+/* The "following your system" marker.
+   The mark is load-bearing — in a three-state cycle, "dark because the system
+   is dark" and "dark because you chose dark" render the identical glyph, and
+   without it the next click looks like it did nothing. What was wrong was the
+   shape, not the presence: a 4px accent *circle* floating in the control's
+   padding is the notification-badge idiom, and it read as unexplained
+   decoration on a page whose entire mark language is square — 1px rules, 3px
+   corners, square index bullets, the square knob on the scroll gauge. Squared
+   and pulled tighter into the corner it reads as a registration mark on a
+   control that is in a tracked state, and it rhymes with the gauge knob:
+   small accent square = a state readout. The control keeps its own name in
+   the tooltip above for anyone who asks. */
+.headerToggle > span[aria-hidden="true"] {
+  inset-block-start: 3px;
+  inset-inline-end: 3px;
+  inline-size: 3px;
+  block-size: 3px;
+  border-radius: 0;
+}
+
 /* ---------------------------------------------------------------------------
    Shared CTA language — sharp, directional, routed
 

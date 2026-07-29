@@ -75,18 +75,23 @@
   /* --- rules: five weights, one meaning each ----------------------------- */
   /* The chapter's own bracket — head rule and foot rule, one span, one ink. */
   --faq-rule-bracket: color-mix(in oklab, var(--foreground) 30%, transparent);
-  /* The major split: title cell | register. The loudest line inside the
-     bracket, because it is the only structural division of the chapter. */
-  --faq-rule-major: color-mix(in oklab, var(--foreground) 22%, transparent);
-  /* The row repeat. Deliberately below the page frame's own rails (16%) so
-     the container edge never reads as one more repeat of the module. */
-  --faq-rule-row: color-mix(in oklab, var(--foreground) 11%, transparent);
+  /* The chapter's only structural split: title cell | register. Set at the
+     weight of the page's own frame rails, because it is the same kind of
+     line — a container edge — at chapter scope rather than page scope. */
+  --faq-rule-major: color-mix(in oklab, var(--foreground) 20%, transparent);
+  /* The row repeat. A step and a half under the split, and well under the
+     page frame's rails, so neither the container edge nor the major division
+     can be mistaken for one more repeat of the module. */
+  --faq-rule-row: color-mix(in oklab, var(--foreground) 12%, transparent);
   /* Minor verticals (numeral rule, control rule) and every dotted leader. */
   --faq-rule-minor: color-mix(in oklab, var(--foreground) 7%, transparent);
-  /* Drawn OVER the row repeat when a row is open or hovered; the two
-     composite to 17% — a step above the repeat, a step below the frame, two
-     steps below the bracket it must never out-shout. */
-  --faq-rule-state: color-mix(in oklab, var(--foreground) 6.7%, transparent);
+  /* Hover / focus only, and drawn OVER the row repeat rather than beside it,
+     weighted so the two composite to exactly the split's 20%. Stacking two
+     full-strength hairlines is what made this line brighter than the
+     chapter's own closing rule. Nothing in the RESTING composition uses it:
+     an open row is already marked by its accent segment, its lit ordinal and
+     its accent toggle, and does not also need a louder rule. */
+  --faq-rule-state: color-mix(in oklab, var(--foreground) 9.1%, transparent);
 
   /* One dash language. The strip's connectors and the register's leaders are
      the same 2px mark on the same 6px pitch, phased from the left. */
@@ -141,6 +146,10 @@
      the glyph's right side bearing minus the trailing letter-space. Lets the
      leader's first dot be placed off the ink, not off the box. */
   --faq-q-tail: 0.0216em;
+  /* Residual between the modelled cap line and the rasterised one at display
+     size, measured off the screen at 8× and expressed as a fraction of the
+     heading, so it holds at every step of the clamp. */
+  --faq-h-fit: calc(0.008 * var(--faq-h-size));
 
   margin-inline: auto;
   width: 100%;
@@ -399,7 +408,8 @@
        inside a 30px line box and where a 60px round cap starts inside a 60px
        one. Both are measured from the rasteriser, not guessed. */
     padding-top: calc(
-      var(--faq-row-pad) + var(--faq-q-captop) - var(--faq-h-captop)
+      var(--faq-row-pad) + var(--faq-q-captop) - var(--faq-h-captop) -
+        var(--faq-h-fit)
     );
     padding-inline: var(--faq-cellx) var(--faq-inset);
     max-width: none;
@@ -412,7 +422,7 @@
      serve both, so the block is set for the q and the first line takes the
      .0157em difference as an indent. Both lines then start .35px proud of
      the flat "INDEX" below them — the overshoot a round shape wants. */
-  margin: 0 0 0 -0.0104em;
+  margin: 0 0 0 -0.0146em;
   text-indent: -0.0157em;
   max-width: 12ch;
   font-size: var(--faq-h-size);
@@ -638,10 +648,6 @@
     transform var(--lp-dur-hover) var(--lp-ease-out),
     background-color 200ms var(--lp-ease-snap);
   pointer-events: none;
-}
-
-.faqItem[open]::after {
-  transform: scaleX(1);
 }
 
 /* The open row lights the numeral rule for its own full height — rule above to

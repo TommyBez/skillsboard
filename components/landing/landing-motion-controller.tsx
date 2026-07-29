@@ -299,9 +299,13 @@ export function LandingMotionController() {
       // Decode effect: mono chapter marks scramble into place once, the
       // first time they enter the viewport. The SSR text is the final text,
       // so the page never depends on this running.
+      // The effect rewrites `textContent`, which would flatten away any nested
+      // markup the label carries — a chapter that wrapped a value in a span
+      // inside its decoding mark lost the span on first scroll. Only decode
+      // labels that really are a single run of text.
       const decodeTargets = Array.from(
         root.querySelectorAll<HTMLElement>("[data-decode]")
-      )
+      ).filter((el) => el.childElementCount === 0)
 
       if (decodeTargets.length) {
         const DECODE_CHARS = "ABCDEFGHJKMNPQRSTVWXYZ0123456789#/<>*"

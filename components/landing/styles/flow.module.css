@@ -146,6 +146,7 @@
 }
 
 .flowMarkLine {
+  flex: 1;
   display: flex;
   align-items: center;
   min-width: 0;
@@ -189,7 +190,6 @@
   margin-top: -2.75rem;
   padding-top: 5rem;
   margin-left: -0.042em;
-  scroll-margin-top: calc(var(--lp-header-h, 3.5rem) + 2.5rem);
 }
 
 .launchDemo {
