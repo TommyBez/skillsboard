@@ -1,4 +1,4 @@
-import { GitForkIcon, SearchIcon } from "lucide-react"
+import { GitForkIcon, LinkIcon, SearchIcon } from "lucide-react"
 
 import styles from "@/components/landing/styles/flow.module.css"
 
@@ -9,22 +9,55 @@ import styles from "@/components/landing/styles/flow.module.css"
  * illustration, and each is decorative — the step copy carries the message, so
  * the whole visual is aria-hidden.
  *
+ * Every column is built from the same three registers, and they share grid rows
+ * with their neighbours, so the three diagrams line up register for register:
+ *
+ *   1. a captioned rule   (`URL -> SKILL` + hairline to the column's edge)
+ *   2. the diagram body   (absorbs all the slack, so the three bottom out level)
+ *   3. a key/value readout (a second captioned rule, closing the column)
+ *
+ * They also share two vertical axes inside the column: `--axis-mark` — the
+ * centre of the leading glyph in each column's opening control, which is also
+ * where the connectors hang — and `--row-pad`, where every row's text starts.
+ *
  * All three are pure markup + CSS. They render in their finished, composed
  * state by default; `flow.module.css` only re-stages them when the shared
  * motion controller has armed the `flow` group, so no-JS and reduced-motion
  * viewers get the resting diagram with nothing hidden.
  */
 
+/** A caption followed by a hairline that runs to the column's right edge. */
+function VizLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className={styles.vizLabel}>
+      <span className={styles.vizLabelText}>{children}</span>
+    </p>
+  )
+}
+
+/** The column's closing register: one measured fact about the diagram above. */
+function VizFoot({ label, value }: { label: string; value: string }) {
+  return (
+    <p className={styles.vizFoot}>
+      <span className={styles.footKey}>{label}</span>
+      <span className={styles.footVal}>{value}</span>
+    </p>
+  )
+}
+
+const Arrow = () => <span className={styles.vizArrow}>{"->"}</span>
+
 /* 01 — a pasted GitHub URL resolving into a populated skill card. */
 export function PasteResolveVisual() {
   return (
-    <div className={styles.viz} aria-hidden="true">
-      <p className={styles.vizLabel}>
-        url <span className={styles.vizArrow}>{"->"}</span> skill
-      </p>
+    <>
+      <VizLabel>
+        url <Arrow /> skill
+      </VizLabel>
       <div className={styles.vizBody}>
         <div className={styles.pasteField}>
           <span className={styles.pasteFlash} />
+          <LinkIcon className={styles.ctrlIcon} aria-hidden="true" />
           <span className={styles.pasteUrl}>
             <span className={styles.pasteDim}>github.com/</span>
             anthropics/skills
@@ -63,7 +96,8 @@ export function PasteResolveVisual() {
           </div>
         </div>
       </div>
-    </div>
+      <VizFoot label="kept" value="4 fields" />
+    </>
   )
 }
 
@@ -77,13 +111,13 @@ const libraryRows = [
 
 export function SearchFilterVisual() {
   return (
-    <div className={styles.viz} aria-hidden="true">
-      <p className={styles.vizLabel}>
-        query <span className={styles.vizArrow}>{"->"}</span> match
-      </p>
+    <>
+      <VizLabel>
+        query <Arrow /> match
+      </VizLabel>
       <div className={styles.vizBody}>
         <div className={styles.searchField}>
-          <SearchIcon className={styles.searchIcon} aria-hidden="true" />
+          <SearchIcon className={styles.ctrlIcon} aria-hidden="true" />
           <span className={styles.searchQueryWrap}>
             <span className={styles.searchQuery}>pdf</span>
             <span className={styles.searchCaret} />
@@ -99,9 +133,11 @@ export function SearchFilterVisual() {
           </li>
         </ul>
 
-        <p className={styles.resultCut}>filtered out</p>
+        <p className={`${styles.vizLabel} ${styles.resultCut}`}>
+          <span className={styles.vizLabelText}>filtered out</span>
+        </p>
 
-        <ul className={styles.resultList}>
+        <ul className={`${styles.resultList} ${styles.resultRest}`}>
           {libraryRows.map((row) => (
             <li key={row.name} className={styles.resultRow} data-match="false">
               <span className={styles.resultName}>{row.name}</span>
@@ -109,13 +145,9 @@ export function SearchFilterVisual() {
             </li>
           ))}
         </ul>
-
-        <p className={styles.searchCount}>
-          <span className={styles.countNow}>1 match</span>
-          <span className={styles.countTotal}>24 skills</span>
-        </p>
       </div>
-    </div>
+      <VizFoot label="matched" value="1 / 24" />
+    </>
   )
 }
 
@@ -129,13 +161,13 @@ const routes = [
 
 export function RouteFanVisual() {
   return (
-    <div className={styles.viz} aria-hidden="true">
-      <p className={styles.vizLabel}>
-        skill <span className={styles.vizArrow}>{"->"}</span> routes
-      </p>
+    <>
+      <VizLabel>
+        skill <Arrow /> routes
+      </VizLabel>
       <div className={styles.vizBody}>
         <p className={styles.fanNode}>
-          <GitForkIcon className={styles.fanMark} aria-hidden="true" />
+          <GitForkIcon className={styles.ctrlIcon} aria-hidden="true" />
           pdf-extraction
         </p>
         <span className={styles.fanStem} />
@@ -148,6 +180,7 @@ export function RouteFanVisual() {
           ))}
         </ul>
       </div>
-    </div>
+      <VizFoot label="routes" value="4 open" />
+    </>
   )
 }

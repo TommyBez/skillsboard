@@ -74,8 +74,10 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
       className={`${styles.flowSection} scroll-mt-14`}
       data-chapter-target="flow"
     >
+      {/* No bottom padding: the panel's own closing rule IS the chapter's, so
+          the chapter never ends with an empty band trapped between two rules. */}
       <div
-        className="relative mx-auto w-full max-w-[1440px] px-5 py-16 md:px-10 md:py-24"
+        className="relative mx-auto w-full max-w-[1440px] px-5 pt-16 md:px-10 md:pt-24"
         data-motion-group="flow"
       >
         <div className={styles.flowHead}>
@@ -107,14 +109,12 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
               className={styles.flowStep}
               style={{ "--c": i } as CSSProperties}
             >
-              <div className={styles.stepHead}>
-                <span className={styles.stepIndex} aria-hidden="true">
-                  {step.index}
-                  <span className={styles.stepIndexOf}>/3</span>
-                </span>
-                <h3 className={styles.stepTitle}>{step.title}</h3>
-                <p className={styles.stepCopy}>{step.copy}</p>
-              </div>
+              <span className={styles.stepIndex} aria-hidden="true">
+                {step.index}
+                <span className={styles.stepIndexOf}>/3</span>
+              </span>
+              <h3 className={styles.stepTitle}>{step.title}</h3>
+              <p className={styles.stepCopy}>{step.copy}</p>
               {step.visual}
             </li>
           ))}

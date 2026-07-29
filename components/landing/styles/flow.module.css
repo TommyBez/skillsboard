@@ -1,61 +1,106 @@
 /* ---------------------------------------------------------------------------
    Workflow chapter — three moves, indexed like a manual, each one demonstrated
 
-   Structure: one framed panel divided by hairline rails into three numbered
-   cells. Every cell carries a purpose-built micro-diagram built from the
-   product's own vocabulary (a pasted GitHub URL, a SkillDossier, the team
-   search field, the four consumption routes).
+   ONE GEOMETRY, stated once and obeyed everywhere:
 
-   Everything below the "static composition" divider is the resting state — the
-   diagrams are complete without JS and under reduced motion. The motion block
-   at the bottom only re-stages them once the shared `flow` group has armed.
+   • The panel's box sits exactly on the page frame. The frame draws a 1px rail
+     *inside* that box on each side, so the panel's usable interior is the box
+     minus those two rails. The three cells and the two dividers tile that
+     interior — hence the `- 1px` in the track sizes and the `+ 1px` paddings
+     below. Without them the dividers land on fractional pixels and the three
+     rule-to-rule spans render 453 / 454 / 452 instead of 453 / 453 / 453.
+
+   • `--pad` is the ONLY inset in the panel. It is the clear space between a
+     rule and the content beside it — on both sides of every rule, inner and
+     outer alike. Nothing hangs into a gutter, so all three cells present the
+     same measure and every gutter reads pad | rule | pad.
+
+   • Inside a cell there are exactly two vertical axes: `--axis-mark`, the
+     centre of the leading glyph of the cell's opening control (and therefore
+     where its connector hangs), and `--row-pad`, where every row's text
+     starts. All three columns use both.
+
+   • One right terminal: every rule in this chapter — captioned label rules,
+     list dividers, readout rules, control borders — stops on the cell's
+     content edge. Nothing stops anywhere else.
+
+   Everything above the "motion" divider is the resting state — the diagrams
+   are complete without JS and under reduced motion. The motion block at the
+   bottom only re-stages them once the shared `flow` group has armed.
 --------------------------------------------------------------------------- */
 
 .flowSection {
+  /* Panel measure. `--pad` is the clear space around every rule. */
+  --pad: 1.25rem;
+
+  /* Diagram vocabulary — one radius scale, one connector ink, one mono scale,
+     one set of vertical axes. Declared on the chapter so the head and the
+     three cells all read from the same numbers. */
+  --r-card: 0.7rem;
+  --r-control: 0.5rem;
+  --r-chip: 0.3rem;
+  --wire: color-mix(in oklab, var(--foreground) 38%, transparent);
+
+  /* Three mono steps, each with a job: a typed value, machine text, meta. */
+  --m-value: 0.75rem;
+  --m-text: 0.6875rem;
+  --m-meta: 0.625rem;
+
+  /* Two inks, both measured against the panel field: `--ink-1` at ~15:1 and
+     `--ink-2` at ~6.6:1 in dark, ~7.3:1 and ~4.9:1 in light. Hierarchy is
+     carried by size, weight and tracking — never by fading text toward the
+     background, which is what put four labels here under 4:1. */
+  --ink-1: var(--foreground);
+  --ink-2: var(--muted-foreground);
+
+  /* Control metrics, chosen so the numbers land on whole pixels at a 16px
+     root: 8px pad + 13px glyph → a 14.5px mark axis (a 1px rule centred on it
+     covers exactly one device pixel), + 9px gap → text at 30px. */
+  --ctrl-pad: 0.5rem;
+  --ctrl-icon: 0.8125rem;
+  --ctrl-gap: 0.5625rem;
+  --axis-mark: 0.90625rem;
+  --row-pad: 1.875rem;
+
+  /* The single gap between a caption and the rule that continues it. */
+  --label-gap: 0.75rem;
+
   position: relative;
 }
 
-/* The chapter's closing rule stops on the page frame instead of running
-   full-bleed past it — at 1920 a full-bleed hairline overshoots the frame by
-   280px on each side and breaks the one-measure reading the rails establish.
-   `--lp-frame-inset` is the shared measure token, so this tracks the frame at
-   every width without the chapter knowing anything about it. */
-.flowSection::after {
-  content: "";
-  position: absolute;
-  left: var(--lp-frame-inset);
-  right: var(--lp-frame-inset);
-  bottom: 0;
-  height: 1px;
-  background: var(--lp-hairline);
-  pointer-events: none;
+@media (min-width: 64rem) {
+  .flowSection {
+    --pad: 1.5rem;
+  }
+}
+
+@media (min-width: 84rem) {
+  .flowSection {
+    --pad: 1.75rem;
+  }
 }
 
 /* --- Chapter head ------------------------------------------------------- */
 
+/* `02` hangs in its own column of exactly one `--pad` (plus the frame rail it
+   sits on), so the chapter mark starts on the same x as the first cell's
+   content — the one vertical axis that ties the head to the panel. */
 .flowMarkRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: calc(var(--pad) + 1px) minmax(0, 1fr);
   align-items: center;
-  gap: 0.75rem;
 }
 
-/* The chapter index, in the same slot and the same voice the other chapters
-   use for theirs (`03` before MCP ACCESS, `06` before the closing plate):
-   zero-padded, two digits, dimmer than the label it introduces. The step
-   numerals inside the panel are deliberately a different token — `1/3` — so
-   the two counting systems can never be read as one. */
 .flowIndex {
-  flex: none;
   font-family: var(--font-mono);
-  font-size: 0.675rem;
+  font-size: var(--m-meta);
   font-weight: 600;
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+  color: var(--ink-2);
 }
 
 .flowMark {
-  flex: 1;
   min-width: 0;
 }
 
@@ -65,18 +110,7 @@
 
 /* --- The framed three-up panel ------------------------------------------ */
 
-/* The panel runs the full page measure, so its left and right edges land
-   exactly on the fixed frame rails instead of sitting tangent to them. Only
-   the horizontal hairlines are ours; the verticals are the page frame.
-
-   `--pad` is the single number the panel is built from: it is the panel's
-   inner margin AND half the column gutter, so the clear space between a cell
-   and the frame rail is exactly the clear space between a cell and the
-   hairline that divides it from its neighbour. Three structurally identical
-   cells, one inset, measured — not eyeballed. */
 .flowGrid {
-  --pad: 1.25rem;
-  --idx: 1.9rem;
   margin: 3.25rem 0 0;
   padding: 0;
   display: grid;
@@ -84,30 +118,16 @@
   list-style: none;
   overflow: clip;
   border-block: 1px solid var(--lp-hairline-strong);
-  background: color-mix(in oklch, var(--card) 34%, transparent);
+  background: color-mix(in oklab, var(--card) 34%, transparent);
 }
 
-/* 84rem is measured, not chosen: below it the three cells get narrow enough
-   that the install command in cell 1 needs an ellipsis and the skill names in
-   cell 2 start to truncate, so the panel trades a little of its inner margin
-   back to the columns. The invariant survives the trade — the panel's inset
-   and half its gutter are still the same number. */
-@media (min-width: 84rem) {
-  .flowGrid {
-    --pad: 1.75rem;
-    --idx: 2.2rem;
-  }
-}
-
-/* One gutter runs the full height of the cell: the index sits in it, the
-   title, copy and diagram all hang off the same left rail. */
 .flowStep {
   position: relative;
+  isolation: isolate;
   display: grid;
-  grid-template-columns: var(--idx) minmax(0, 1fr);
-  grid-template-rows: auto auto 1fr;
-  align-items: baseline;
-  padding: 1.75rem 0 1.7rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto auto auto 1fr auto;
+  padding: 1.75rem var(--pad) 1.7rem;
   border-top: 1px solid var(--lp-hairline);
   /* Per-cell entrance offset; consumed by every delay in the motion block. */
   --t: calc(var(--c, 0) * 90ms);
@@ -117,14 +137,16 @@
   border-top: none;
 }
 
-/* A whisper of lift on hover — no shadow, no scale, just field and index. */
+/* A whisper of lift on hover — no shadow, no scale, just field and index.
+   It fills the cell rule-to-rule and paints under the content. */
 .flowStep::after {
   content: "";
   position: absolute;
-  inset: 0 calc(var(--pad) * -1);
+  inset: 0;
+  z-index: -1;
   pointer-events: none;
   opacity: 0;
-  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  background: color-mix(in oklab, var(--foreground) 3%, transparent);
   transition: opacity var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
@@ -140,76 +162,79 @@
 
 @media (min-width: 64rem) {
   .flowGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: auto auto 1fr;
-    column-gap: calc(var(--pad) * 2);
-    /* The panel's edges stay on the frame rails; its contents step inboard by
-       the same `--pad` that separates them from the dividers, so the first
-       step's numeral no longer sits on the rail. */
-    padding-inline: var(--pad);
+    /* Three equal thirds of the interior *between* the frame rails, with the
+       two dividers accounted for. At the 1360px measure this is exactly
+       454 / 453 / 453, which puts the divider rules on x = 453 and x = 906
+       from the left rail: three 453px rule-to-rule spans, no rounding. */
+    grid-template-columns:
+      calc((100% - 1px) / 3 + 1px)
+      calc((100% - 1px) / 3)
+      1fr;
+    grid-template-rows: auto auto auto auto 1fr auto;
   }
 
   .flowStep {
-    padding: 2.1rem 0 1.95rem;
+    /* +1px wherever the neighbouring rule is drawn inside this cell's box —
+       the left rail for the first cell, the right rail / next divider for
+       every cell — so the clear space is `--pad` on both sides of every rule. */
+    padding: 2.1rem calc(var(--pad) + 1px) 1.95rem var(--pad);
     border-top: none;
   }
 
-  /* The dividers live in the gutters, halfway between two cells, so all three
-     cells keep the same measure and the same clear space on both sides. */
+  .flowStep:first-child {
+    padding-left: calc(var(--pad) + 1px);
+  }
+
+  /* The dividers are drawn on the cell's own leading edge, so they tile the
+     interior with the cells instead of floating in a gutter. */
   .flowStep:not(:first-child)::before {
     content: "";
     position: absolute;
     top: 0;
     bottom: 0;
-    left: calc(var(--pad) * -1);
+    left: -1px;
     width: 1px;
     background: var(--lp-hairline);
   }
 
-  /* Share the panel's three rows across all three cells, so title, copy and
-     diagram sit on the same baselines however the copy happens to wrap. */
+  /* Share the panel's six registers across all three cells, so index, title,
+     copy, caption, diagram and readout sit on the same baselines however the
+     copy happens to wrap. */
   @supports (grid-template-rows: subgrid) {
     .flowStep {
-      grid-row: span 3;
+      grid-row: span 6;
       grid-template-rows: subgrid;
     }
   }
 }
 
-/* --- Cell head: index in the gutter, title on its baseline --------------- */
-
-.stepHead {
-  display: contents;
-}
+/* --- Cell head ----------------------------------------------------------- */
 
 /* `1/3`, not `01` — the page numbers its chapters with zero-padded two-digit
    numerals (`02` above, `03` on MCP, `06` on the closing plate), so the steps
    inside a chapter get a visibly different token: a single digit against a
-   dimmed total. It also states the length of the sequence, which is the job
-   the old `01—03` readout was doing in the chapter head. */
+   dimmed total. It also states the length of the sequence. It sits on the
+   cell's own left edge like everything else; nothing hangs into a gutter. */
 .stepIndex {
-  position: relative;
-  z-index: 1;
   grid-column: 1;
+  justify-self: start;
   font-family: var(--font-mono);
-  font-size: 0.675rem;
+  font-size: var(--m-meta);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  color: var(--foreground);
+  color: var(--ink-1);
   transition: color var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
 .stepIndexOf {
-  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
+  color: var(--ink-2);
 }
 
 .stepTitle {
-  position: relative;
-  z-index: 1;
-  grid-column: 2;
-  margin: 0;
+  grid-column: 1;
+  margin: 0.85rem 0 0;
   font-size: clamp(1.35rem, 1.7vw, 1.62rem);
   font-weight: 650;
   letter-spacing: -0.034em;
@@ -217,44 +242,51 @@
 }
 
 .stepCopy {
-  position: relative;
-  z-index: 1;
-  grid-column: 2;
+  grid-column: 1;
   align-self: start;
   margin: 0.62rem 0 0;
   max-width: 32ch;
   font-size: 0.9rem;
   line-height: 1.55;
-  color: var(--muted-foreground);
+  color: var(--ink-2);
   text-wrap: pretty;
 }
 
-/* --- Shared diagram shell ------------------------------------------------ */
+/* --- Shared diagram registers ------------------------------------------- */
 
-/* The diagram row is a subgrid row shared by all three cells, so the mono
-   labels sit on one line and the three diagrams start on one line under them.
-   The diagrams are then tuned to within a few pixels of the same height, so
-   they bottom out together too. */
-.viz {
-  /* One radius scale for every diagram part, so nothing is a one-off. */
-  --r-card: 0.7rem;
-  --r-control: 0.5rem;
-  --r-chip: 0.3rem;
-  /* One ink for every connector on the page — the paste wire's stroke and the
-     route tree's trunk and branches are the same line, drawn once. */
-  --wire: color-mix(in oklch, var(--foreground) 38%, transparent);
-  /* Three mono steps, each with a job: a typed value, machine text, meta. */
-  --m-value: 0.7rem;
-  --m-text: 0.615rem;
-  --m-meta: 0.545rem;
-  position: relative;
-  z-index: 1;
-  grid-column: 2;
-  align-self: stretch;
-  padding-top: 2.1rem;
+/* Register 1 and register 3 are the same object: a mono caption followed by a
+   hairline that runs to the cell's content edge. Four instances in the
+   chapter — three column captions and the search demo's cut — all with the
+   same size, tracking, ink, gap and terminal. */
+.vizLabel,
+.vizFoot {
+  grid-column: 1;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  align-items: center;
+  gap: var(--label-gap);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.vizLabel {
+  margin-top: 2.25rem;
+}
+
+.vizLabelText,
+.footKey {
+  flex: none;
+}
+
+.vizLabel::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-grid-line);
 }
 
 .vizArrow {
@@ -263,22 +295,39 @@
   letter-spacing: -0.06em;
 }
 
+/* Register 2: the diagram. It absorbs every bit of slack in the panel, so the
+   three columns bottom out on the same line whatever their contents weigh. */
 .vizBody {
-  flex: 1;
+  grid-column: 1;
+  align-self: stretch;
+  margin-top: 0.85rem;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: stretch;
 }
 
-.vizLabel {
-  margin: 0 0 0.55rem;
-  font-family: var(--font-mono);
-  font-size: var(--m-meta);
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: color-mix(in oklch, var(--muted-foreground) 84%, transparent);
+/* Register 3: one measured fact per column, closing the diagram on a rule that
+   spans the full cell — the same terminal as every other rule here. */
+.vizFoot {
+  margin-top: 1.35rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--lp-grid-line);
+  justify-content: space-between;
+}
+
+.footVal {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-1);
+}
+
+/* --- Controls: the three columns all open with one ---------------------- */
+
+.ctrlIcon {
+  flex: none;
+  width: var(--ctrl-icon);
+  height: var(--ctrl-icon);
+  color: var(--muted-foreground);
 }
 
 /* ---------------------------------------------------------------------------
@@ -289,12 +338,13 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: var(--ctrl-gap);
   overflow: hidden;
   min-height: 2.2rem;
-  padding: 0 0.6rem;
+  padding: 0 var(--ctrl-pad);
   border: 1px solid var(--lp-hairline-strong);
   border-radius: var(--r-control);
-  background: color-mix(in oklch, var(--background) 55%, transparent);
+  background: color-mix(in oklab, var(--background) 55%, transparent);
 }
 
 .pasteFlash {
@@ -303,7 +353,7 @@
   opacity: 0;
   transform: scaleX(0);
   transform-origin: left center;
-  background: color-mix(in oklch, var(--primary) 24%, transparent);
+  background: color-mix(in oklab, var(--primary) 24%, transparent);
 }
 
 .pasteUrl {
@@ -316,11 +366,11 @@
   font-size: var(--m-text);
   line-height: 1;
   white-space: nowrap;
-  color: var(--foreground);
+  color: var(--ink-1);
 }
 
 .pasteDim {
-  color: var(--muted-foreground);
+  color: var(--ink-2);
 }
 
 /* The connector is the only elastic part of this diagram: the field is fixed
@@ -329,27 +379,30 @@
    the other two at every width, instead of being hand-tuned to it. */
 .pasteLink {
   position: relative;
-  align-self: center;
+  display: block;
   flex: 1;
-  display: flex;
-  justify-content: center;
   min-height: 2.6rem;
 }
 
+/* Hung on `--axis-mark`: the wire drops out of the centre of the field's own
+   glyph, and lands on the same x as column 3's route spine. */
 .pasteWire {
-  position: relative;
-  width: 1.5px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--axis-mark) - 0.5px);
+  width: 1px;
   background: var(--wire);
   transform-origin: top center;
 }
 
 /* The connector carries its own caption, so the span it opens up reads as the
-   step the diagram is describing rather than as a hole in the column. Same
-   mono voice and same tracking as the diagram's own label. */
+   step the diagram is describing rather than as a hole in the column. It sits
+   on `--row-pad` — the same x as every row of text in the other two columns. */
 .pasteWireNote {
   position: absolute;
   top: 50%;
-  left: 0.62rem;
+  left: var(--row-pad);
   translate: 0 -50%;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
@@ -357,7 +410,7 @@
   letter-spacing: 0.16em;
   text-transform: uppercase;
   white-space: nowrap;
-  color: color-mix(in oklch, var(--muted-foreground) 74%, transparent);
+  color: var(--ink-2);
 }
 
 .pasteWireHead {
@@ -375,7 +428,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  background: color-mix(in oklch, var(--card) 72%, transparent);
+  background: color-mix(in oklab, var(--card) 72%, transparent);
 }
 
 .miniBody {
@@ -403,7 +456,7 @@
   white-space: nowrap;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
-  color: var(--muted-foreground);
+  color: var(--ink-2);
 }
 
 .miniFork {
@@ -419,7 +472,7 @@
   font-size: var(--m-meta);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-  color: var(--muted-foreground);
+  color: var(--ink-2);
 }
 
 .miniName {
@@ -438,7 +491,7 @@
   overflow: hidden;
   font-size: 0.665rem;
   line-height: 1.4;
-  color: var(--muted-foreground);
+  color: var(--ink-2);
   text-wrap: pretty;
 }
 
@@ -460,7 +513,7 @@
   font-size: var(--m-meta);
   letter-spacing: -0.005em;
   white-space: nowrap;
-  color: var(--foreground);
+  color: var(--ink-1);
 }
 
 .miniFoot {
@@ -476,7 +529,7 @@
   white-space: nowrap;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
-  color: var(--muted-foreground);
+  color: var(--ink-2);
 }
 
 /* ---------------------------------------------------------------------------
@@ -486,19 +539,12 @@
 .searchField {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: var(--ctrl-gap);
   min-height: 2.2rem;
-  padding: 0 0.55rem;
+  padding: 0 var(--ctrl-pad);
   border: 1px solid var(--lp-hairline-strong);
   border-radius: var(--r-control);
-  background: color-mix(in oklch, var(--background) 55%, transparent);
-}
-
-.searchIcon {
-  flex: none;
-  width: 0.8rem;
-  height: 0.8rem;
-  color: var(--muted-foreground);
+  background: color-mix(in oklab, var(--background) 55%, transparent);
 }
 
 .searchQueryWrap {
@@ -514,7 +560,7 @@
 
 .searchQuery {
   display: inline-block;
-  color: var(--foreground);
+  color: var(--ink-1);
 }
 
 /* Parked one character past the query; `ch` resolves in the same mono face,
@@ -530,26 +576,27 @@
   transform: translateX(3ch);
 }
 
-
 .resultList {
-  margin: 0.7rem 0 0;
+  margin: 0.85rem 0 0;
   padding: 0;
   list-style: none;
 }
 
-/* The library list absorbs any slack, so the count line stays welded to the
-   bottom of the diagram and its gap above never changes. Invisible: the slack
-   lands below the last row, under no rule. */
-.resultList:last-of-type {
+/* The library list absorbs the column's slack, so the readout stays welded to
+   the bottom of the diagram and its gap above never changes. */
+.resultRest {
   flex: 1 0 auto;
 }
 
+/* Rows are flush with the cell: their dividers and the match band span the
+   full column, and their text is inset by `--row-pad` on BOTH sides, so the
+   name and its repo are equally clear of the band's edges. */
 .resultRow {
   position: relative;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
-  padding: 0.42rem 0.6rem 0.42rem 1.81rem;
+  padding: 0.42rem var(--row-pad);
 }
 
 .resultRow:not(:last-child)::after {
@@ -560,149 +607,107 @@
   background: var(--lp-grid-line);
 }
 
-/* The cut: everything under this line is library, not results. */
+/* The cut is the same captioned rule as the column headings — same size,
+   tracking, ink, gap and terminal — because it is the same object. */
 .resultCut {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.6rem 0.42rem 1.81rem;
-  font-family: var(--font-mono);
-  font-size: var(--m-meta);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: color-mix(in oklch, var(--muted-foreground) 60%, transparent);
-}
-
-.resultCut::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--lp-grid-line);
-}
-
-/* Filtered-out rows rest dimmed — that IS the finished state of a search.
-   The dimming lands on the row's text, never on its divider, so the rules
-   below the fold stay exactly as strong as the one above it. */
-.resultRow[data-match="false"] .resultName,
-.resultRow[data-match="false"] .resultRepo {
-  opacity: 0.5;
+  margin-top: 1.1rem;
 }
 
 .resultRow[data-match="true"]::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: color-mix(in oklch, var(--primary) 9%, transparent);
+  z-index: -1;
+  background: color-mix(in oklab, var(--primary) 9%, transparent);
   transform-origin: left center;
 }
 
 .resultName {
   flex: 1;
   min-width: 0;
-  position: relative;
-  z-index: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.765rem;
   font-weight: 600;
   letter-spacing: -0.022em;
+  line-height: 1.5;
+  color: var(--ink-1);
 }
 
+/* Filtered-out rows rest in the secondary ink — that IS the finished state of
+   a search. They are dimmed by ink, never by opacity: at 50% the source
+   labels measured 2.6:1 against the panel. */
+.resultRow[data-match="false"] .resultName {
+  color: var(--ink-2);
+}
+
+/* The match marker is a token, not a smear: it covers the row's full leading,
+   so nothing clips the descender of the `p`, and it carries the same radius
+   as the card's tags. */
 .resultMark {
   position: relative;
-  z-index: 0;
 }
 
 .resultMark::before {
   content: "";
   position: absolute;
-  inset: -0.16em -0.2em;
+  inset: -0.375em -0.22em;
   z-index: -1;
   border-radius: var(--r-chip);
-  background: color-mix(in oklch, var(--primary) 30%, transparent);
+  background: color-mix(in oklab, var(--primary) 30%, transparent);
   transform-origin: left center;
 }
 
 .resultRepo {
-  position: relative;
-  z-index: 1;
   flex: none;
   font-family: var(--font-mono);
-  width: 5.9rem;
+  max-width: 8rem;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--m-meta);
-  color: var(--muted-foreground);
-}
-
-.searchCount {
-  position: relative;
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin: 0.82rem 0 0;
-  padding: 0 0.6rem 0 1.81rem;
-  height: 0.85rem;
-  font-family: var(--font-mono);
-  font-size: var(--m-meta);
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
-}
-
-.countNow {
-  color: var(--foreground);
-}
-
-.countTotal {
-  margin-left: auto;
+  line-height: 1.5;
+  color: var(--ink-2);
 }
 
 /* ---------------------------------------------------------------------------
    03 — one saved skill branches into the four ways out
 --------------------------------------------------------------------------- */
 
-/* Same control height as the two fields that open the other diagrams, so the
-   three columns share a bottom edge on their first element as well as a top. */
+/* Same control height, same leading glyph and the same text axis as the two
+   fields that open the other diagrams. */
 .fanNode {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
-  gap: 0.42rem;
+  gap: var(--ctrl-gap);
   margin: 0;
   min-height: 2.2rem;
-  padding: 0.48rem 0.72rem 0.48rem 0.5rem;
+  padding: 0.48rem 0.72rem 0.48rem var(--ctrl-pad);
   border: 1px solid var(--lp-hairline-strong);
   border-radius: var(--r-control);
-  background: color-mix(in oklch, var(--card) 82%, transparent);
+  background: color-mix(in oklab, var(--card) 82%, transparent);
   font-size: 0.78rem;
   font-weight: 620;
   letter-spacing: -0.028em;
   line-height: 1.2;
 }
 
-.fanMark {
-  flex: none;
-  width: 0.8rem;
-  height: 0.8rem;
+.fanNode .ctrlIcon {
   color: var(--primary);
 }
 
 /* A short fixed stem out of the node, then a table that fills the rest of the
-   row: the four branches share the slack evenly, so the last branch's rule
-   lands on the same baseline as the other two columns' last edge whatever the
-   row height turns out to be — and no part of the column is left bare. */
+   register: the four branches share the slack evenly, so the last branch lands
+   on the same line as the other two columns' last element. */
 .fanStem {
   flex: none;
   align-self: flex-start;
   width: 1px;
   height: 1.3rem;
+  margin-left: calc(var(--axis-mark) - 0.5px);
   background: var(--wire);
   transform-origin: top center;
 }
@@ -713,7 +718,7 @@
   flex: 1;
   flex-direction: column;
   margin: 0;
-  padding: 0 0 0 1.15rem;
+  padding: 0;
   list-style: none;
 }
 
@@ -723,7 +728,7 @@
 .fanList::before {
   content: "";
   position: absolute;
-  left: 0;
+  left: calc(var(--axis-mark) - 0.5px);
   top: 0;
   bottom: 12.5%;
   width: 1px;
@@ -731,6 +736,8 @@
   transform-origin: top center;
 }
 
+/* Same padding, same terminal and the same trailing-divider rule as the search
+   results: no rule under the last row, so nothing is left dangling. */
 .fanRow {
   position: relative;
   display: flex;
@@ -740,17 +747,24 @@
   /* The stacked layout has no shared row to fill, so this is also the row's
      resting pitch on mobile. */
   min-height: 2.64rem;
-  padding-right: 0.6rem;
-  border-bottom: 1px solid var(--lp-grid-line);
+  padding-inline: var(--row-pad);
+}
+
+.fanRow:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--lp-grid-line);
 }
 
 /* Each branch stub: from the spine to the key column, on the row's centre. */
 .fanRow::before {
   content: "";
   position: absolute;
-  left: -1.15rem;
+  left: var(--axis-mark);
   top: 50%;
-  width: 0.72rem;
+  width: calc(var(--row-pad) - var(--axis-mark) - 0.3rem);
   height: 1px;
   background: var(--wire);
   transform-origin: left center;
@@ -758,26 +772,25 @@
 
 .fanKey {
   flex: none;
-  width: 3.5rem;
   font-family: var(--font-mono);
   font-size: var(--m-text);
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--foreground);
+  color: var(--ink-1);
 }
 
 .fanVal {
   flex: none;
   margin-left: auto;
-  width: 6.4rem;
+  max-width: 9rem;
   min-width: 0;
   overflow: hidden;
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--font-mono);
-  font-size: 0.6rem;
-  color: var(--muted-foreground);
+  font-size: var(--m-meta);
+  color: var(--ink-2);
 }
 
 /* ---------------------------------------------------------------------------
@@ -919,13 +932,15 @@
   }
 }
 
+/* The filter beat recedes the non-matches by ink, matching their resting
+   state, so nothing has to be faded to a contrast the page would not ship. */
 @keyframes flowDim {
   from {
-    opacity: 1;
+    color: var(--ink-1);
   }
 
   to {
-    opacity: 0.5;
+    color: var(--ink-2);
   }
 }
 
@@ -960,9 +975,8 @@
   & .miniFoot,
   & .searchField,
   & .resultRow,
-  & .resultCut,
-  & .countNow,
-  & .countTotal,
+  & .footKey,
+  & .footVal,
   & .fanNode,
   & .fanRow {
     opacity: 0;
@@ -988,7 +1002,6 @@
   & .searchCaret {
     opacity: 0;
   }
-
 }
 
 /* --- Visible: the chapter plays ---------------------------------------- */
@@ -1078,19 +1091,19 @@
     animation: flowFade 360ms var(--lp-ease-out) calc(var(--t) + 500ms) both;
   }
 
-  & .resultRow:nth-child(2) {
+  & .resultRest .resultRow:nth-child(1) {
     --r: 1;
   }
 
-  & .resultRow:nth-child(3) {
+  & .resultRest .resultRow:nth-child(2) {
     --r: 2;
   }
 
-  & .resultRow:nth-child(4) {
+  & .resultRest .resultRow:nth-child(3) {
     --r: 3;
   }
 
-  & .resultRow:nth-child(5) {
+  & .resultRest .resultRow:nth-child(4) {
     --r: 4;
   }
 
@@ -1108,9 +1121,8 @@
   }
 
   /* Filtering lands after the query is typed: everything but the match
-     recedes, the match gets its rail and its highlighted substring. */
-  & .resultRow[data-match="false"] .resultName,
-  & .resultRow[data-match="false"] .resultRepo {
+     recedes, the match gets its band and its highlighted substring. */
+  & .resultRow[data-match="false"] .resultName {
     animation: flowDim 340ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
   }
 
@@ -1122,13 +1134,13 @@
     animation: flowDrawX 260ms var(--lp-ease-emph) calc(var(--t) + 1200ms) both;
   }
 
-  /* The library total is a constant, so it arrives with the list; the match
-     count only exists once the query has resolved. */
-  & .countTotal {
+  /* The readout is the column's conclusion: its key arrives with the diagram,
+     its value only once the diagram has resolved. */
+  & .footKey {
     animation: flowRiseSm 400ms var(--lp-ease-out) calc(var(--t) + 700ms) both;
   }
 
-  & .countNow {
+  & .footVal {
     animation: flowCountIn 320ms var(--lp-ease-emph) calc(var(--t) + 1300ms)
       both;
   }
@@ -1182,11 +1194,9 @@
   }
 
   .flowHead,
-  .stepIndex,
-  .stepTitle,
-  .stepCopy,
-  .viz *,
-  .viz *::before {
+  .flowStep *,
+  .flowStep *::before,
+  .flowStep *::after {
     animation: none !important;
   }
 }

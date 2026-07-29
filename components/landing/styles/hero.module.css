@@ -22,7 +22,7 @@
      out against: the copy column's baseline, the scatter pitch, the panel's
      centring and the state rail all derive from it. Height-aware so short
      laptops never push the composition into the rail. */
-  --stage-h: min(39rem, calc(100dvh - 12rem));
+  --stage-h: min(39rem, calc(100dvh - 12.75rem));
 
   /* Load choreography — one authored sequence, every beat on the shared
      --lp-stagger grid so the entrance reads as a single take:
@@ -581,6 +581,18 @@
   }
 }
 
+@media (min-width: 90rem) {
+  .heroBoard {
+    --sw: 36rem;
+    --cw: 16.5rem;
+    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 4rem);
+    --hh: 3.2rem;
+    --qh: 3.6rem;
+    --fh: 2.7rem;
+    --pp: 0.85rem;
+  }
+}
+
 /* Short laptops: the stage shrinks with the viewport, so the cards have to
    shed a line or the scatter's gutters close up. The summary is the least
    load-bearing row on the card. */
@@ -591,18 +603,6 @@
 
   .heroBoard .dossierDesc {
     display: none;
-  }
-}
-
-@media (min-width: 90rem) {
-  .heroBoard {
-    --sw: 36rem;
-    --cw: 16.5rem;
-    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 4rem);
-    --hh: 3.2rem;
-    --qh: 3.6rem;
-    --fh: 2.7rem;
-    --pp: 0.85rem;
   }
 }
 
