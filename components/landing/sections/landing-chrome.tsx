@@ -34,13 +34,19 @@ export function ChapterRail() {
 /**
  * Sticky command strip.
  *
- * The scroll gauge is the strip's leading edge: a 2px run flush with the top
- * of the window, spanning exactly the measure, with a 4px square knob riding
- * its head. It has been at three heights now. On the measure rule's own row it
- * read as a border that changed colour partway across; four pixels above that
- * rule it read as a 1px mistake, because two parallel horizontals three pixels
- * apart always do. At the other end of the strip there is nothing within 53px
- * of it to be mistaken for.
+ * Two cells on one 56px row: the wordmark on the measure's left edge, the
+ * control cluster on its right, and the frame's top edge under both.
+ *
+ * The scroll gauge that used to ride the strip's leading edge is gone. Four
+ * treatments drew it in four positions and four separate reviews called it
+ * decoration; the fourth put it as well as it can be put — 2px, flush with the
+ * top of the window, spanning exactly the measure, 53px clear of anything else,
+ * terminating in a 4px accent knob — and the objection did not move, because the
+ * objection was never to its position. It reported a number the browser's own
+ * scrollbar already reports, it was absent without script and absent under
+ * reduced motion, and in a still it was a line that stopped mid-air. Cut, the
+ * way the chapter index was cut in round 3. See the retirement note in
+ * `base.module.css`.
  */
 export function LandingHeader() {
   return (
@@ -55,9 +61,6 @@ export function LandingHeader() {
             <HomeHeaderActions />
           </Suspense>
         </div>
-        <span className={base.scrollProgress} aria-hidden="true">
-          <span className={base.scrollHead} />
-        </span>
       </header>
     </>
   )

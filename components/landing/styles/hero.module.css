@@ -21,16 +21,26 @@
   /* The board stage's height — the single measure the whole chapter is laid
      out against: the copy column's baseline, the scatter pitch, the panel's
      centring and the state rail all derive from it. Height-aware so short
-     laptops never push the composition into the rail. */
-  --stage-h: min(39rem, calc(100dvh - 13.5rem));
+     laptops never push the composition into the rail.
+     40rem, not 39: the card lost its terminal strip (see `.dossier`), so the
+     drawer's derived filter band (`--qh`) needs the extra height to stay a
+     filter row rather than collapsing to its clamp. */
+  --stage-h: min(40rem, calc(100dvh - 13.5rem));
+
+  /* One joint. Both of the chapter's label strips — `01 ■ EYEBROW ————` at the
+     top and `SCATTERED ——— FILED` at the floor — set every gap between a mark
+     and the thing beside it to this, measured INK to INK. The top strip used to
+     run its rule off the right rail instead, which left 380px of void after the
+     label where its sibling had 15px: the same motif with two answers. */
+  --joint: 15px;
 
   /* Load choreography — one authored sequence, every beat on the shared
      --lp-stagger grid so the entrance reads as a single take:
-       0 field + column rules      1 index + eyebrow
+       0 field + spine             1 index + eyebrow marker
        2 header rule + headline/1  3 headline/2
        4 body copy + card 01       5 CTA + card 02
        6 card 03                   7 card 04
-       8 card 05 + tally           9 state rail
+       8 card 05                   9 state rail
      Nothing is timed independently; changing --lp-cue re-times the whole hero. */
   --lp-cue: 60ms;
   --lp-beat-0: var(--lp-cue);
@@ -47,7 +57,7 @@
   /* ---------------------------------------------------------------------
      One micro-label class for the whole chapter.
 
-     The chapter index, the eyebrow, the tally and the two rail terminals are
+     The chapter index, the eyebrow and the two rail terminals are
      the same class of mark and are printed with the same two inks: `rest` for
      anything reporting a state it is not in, `live` for the state the scene is
      actually in. The accent is reserved for the state the scene arrives at.
@@ -65,6 +75,24 @@
   --ink-mid: color-mix(in oklab, var(--muted-foreground) 62%, var(--foreground));
   --ink-lo: var(--muted-foreground);
 
+  /* Two roles, two values, for every surface the board draws.
+
+     `--hero-object` is the outline of anything that is a *thing*: a dossier
+     card, the drawer, the filter control. One weight, the page's chapter
+     hairline, deliberately a step below the chrome's own rule so five
+     decorative cards never outdraw the page frame.
+
+     `--hero-slot` is the drawer's fill, and it is derived from the card's own
+     surface rather than declared beside it: a recess one step below the thing
+     that sits in it. That is what carries the card outline's contrast. Stating
+     it as its own token was not enough — a card's border measured 1.49:1
+     against the old fill, i.e. it was legible because two independent tokens
+     happened to differ, and the whole card system would have vanished the day
+     they stopped differing. Now the difference is the declaration. */
+  --hero-object: var(--lp-hairline);
+  --hero-card: var(--card);
+  --hero-slot: color-mix(in oklab, var(--hero-card) 82%, #000);
+
   /* Deck fan — see the board's scatter grammar. It is now an *in-flight* value
      only: a 1px hairline drawn at 0.9° smears itself over two device rows and
      lands at a different fraction on every card, so five resting cards printed
@@ -74,27 +102,63 @@
   --fan: 1.6deg;
 
   /* ---------------------------------------------------------------------
-     One left edge for the whole copy column.
+     One left edge for the whole copy column — and it is not the rail.
 
      The frame's left rail is drawn at x = 40 and is 1px wide, so its inside
      face is x = 41. Every element in the copy column is set so that its INK
-     — not its box — begins there: five elements, one edge, measurable.
+     — not its box — begins 11px inboard of that face, at x = 52: the chapter
+     index, both headline lines, the paragraph, the primary button and the
+     SCATTERED terminal. Five elements, one edge, measurable.
 
-     Boxes therefore start at 41 (`--copy-x`), and anything whose glyphs carry
-     a left side bearing gives that bearing back with a negative margin. The
+     The previous round landed all of that ink ON x = 41 instead. It was
+     consistent, but the rail is a full-height frame rule rather than a short
+     tick or a bracket, so type sitting on it did not read as alignment — it
+     read as a rendering error, and the same was true at the other end, where
+     FILED's D terminated on the right rail. The chapter is inset from the
+     frame now and the frame is left to breathe.
+
+     11px, and 11 everywhere: the composition's right edge (the drawer's own
+     right border) stands 11px inboard of the right rail, and headline line 1's
+     terminal period stops 11px short of the spine. One clearance, six places.
+     Boxes therefore start 12px inside the frame's content box, which is where
+     the rail's ink is — hence `--copy-x` — and anything whose glyphs carry a
+     left side bearing gives that bearing back with a negative margin. The
      values below are measured, per element, at the reference viewport; they
      are not one block offset applied to everything, because a 'Y' apex, an
-     'A' leg, a 'B' stem and an '0' bowl do not share an optical left.
-
-     Previously the display type was hung 3px *outboard* of the rail, which
-     put a hairline through the middle of a 97px 'Y'. Nothing in this chapter
-     crosses the rail now. --------------------------------------------- */
-  --copy-x: 1px;
+     'A' leg, a 'B' stem and an '0' bowl do not share an optical left. */
+  --copy-x: 12px;
   --optic-index: -0.5px;
   --optic-line-1: -0.5px;
   --optic-line-2: -0.5px;
-  --optic-blurb: -1.5px;
+  --optic-blurb: -0.5px;
   --optic-rail: -0.5px;
+  /* Trailing compensations: tracked caps carry their letter-space after the
+     final glyph and mono numerals carry a right side bearing, so a joint
+     measured box-to-box reads wider than it is declared. Given back, so that
+     `01 → ■`, `■ → label` and `label → rule` are all one value. */
+  --optic-index-trail: -1.6px;
+  --optic-eyebrow-trail: -2.6px;
+  --optic-rail-trail: -1.8px;
+
+  /* ---------------------------------------------------------------------
+     The copy column's three vertical registers, named so they can be solved
+     together rather than nudged one at a time.
+
+       --copy-bias  how far the column sits above the geometric centre of its
+                    band (the board occupies the lower half of that band)
+       --reg-1      headline → running copy
+       --reg-2      running copy → action row
+
+     They are solved, not chosen. Every hard horizontal in the left column —
+     the two display baselines and the action slab's two edges — is held clear
+     of every visible horizontal in the right column (thirteen of them: three
+     card pairs, the drawer's four rules, one row separator). The previous round
+     left the action slab 7px under card 3's top border and the paragraph's
+     ascender 5px under card 2's, and at 5–7px across a 600px composition the
+     eye reads a failed intention rather than an accident. */
+  --copy-bias: 3.25rem;
+  --reg-1: 3.5rem;
+  --reg-2: 2.75rem;
 
   position: relative;
   isolation: isolate;
@@ -171,7 +235,10 @@
 .heroTop {
   display: flex;
   align-items: center;
-  gap: 1.1rem;
+  gap: var(--joint);
+  /* the chapter's right edge — 11px inboard of the frame's right rail, the
+     same edge the drawer's right border stands on */
+  padding-inline-end: var(--copy-x);
   /* A definite height, so the band below it starts on a whole pixel and the
      copy column's rhythm is authored against a fixed origin. */
   height: 1.5rem;
@@ -181,7 +248,7 @@
    gives back the tracking the rule needs to read as a rule. */
 @media (max-width: 47.99rem) {
   .heroTop {
-    gap: 0.8rem;
+    gap: 0.7rem;
   }
 
   .heroEyebrow {
@@ -204,6 +271,9 @@
   /* the mono '0' bowl carries a left side bearing; giving it back lands the
      ink on the same 41 as the headline, the paragraph and the button */
   margin-inline-start: calc(var(--copy-x) + var(--optic-index, 0px));
+  /* and the numeral's right side bearing is given back, so the gap the eye
+     reads between the '1' and the marker is the declared --joint */
+  margin-inline-end: var(--optic-index-trail, 0px);
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
@@ -214,30 +284,27 @@
     var(--lp-beat-1) both;
 }
 
-/* The chapter's header rule. Half the measure, hung off the frame's right rail,
-   so it begins exactly on the spine (x = 720 at 1440) and ends exactly on the
-   rail: it is the stage's width, drawn above the stage. The floor rule below is
-   the same length hung off the *left* rail, so the two of them and the spine
-   close the composition on three sides.
+/* The chapter's header rule. It starts one --joint after the eyebrow's last
+   glyph and runs to the chapter's right edge, so the strip is the same
+   label-plus-rule motif as `SCATTERED ——— FILED` at the chapter's floor, set
+   with the same gap. Its right end lands on the same vertical as the drawer's
+   right border, 690px below it.
+
+   It used to be half the measure hung off the frame's right rail — so it began
+   on the spine and left a 380px void between the label and the rule, where the
+   identical motif at the floor had 15px. One idea, two answers; the void was
+   the reading everyone got first.
 
    Weight: division, not object — --lp-grid-line, the same ink as the spine and
    as every other divider in the chapter. */
 .heroTopRule {
   flex: 1;
   height: 1px;
+  /* the label's trailing letter-space, given back */
+  margin-inline-start: var(--optic-eyebrow-trail, 0px);
   background: var(--lp-grid-line);
   transform-origin: left center;
   animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-2) both;
-}
-
-/* Only where the stage exists. Below the pinned layout there is no spine to
-   begin on, so the rule simply trails the label to the measure. */
-@media (min-width: 64rem) {
-  .heroTopRule {
-    flex: 0 1 auto;
-    width: 50%;
-    margin-inline-start: auto;
-  }
 }
 
 .heroMid {
@@ -253,21 +320,11 @@
 @media (min-width: 64rem) {
   .heroMid {
     min-height: var(--stage-h);
-    /* The copy column is centred in the band, then biased up by half of this,
-       because the band's lower half is *occupied* — the tally sits on the
-       board's floor and the state rail closes the frame — while its upper half
-       is empty. Centring the flow on geometry alone left the largest interval
-       on the page (eyebrow → headline) as a void 4.6× the smallest. The bias
-       makes the two register gaps (eyebrow → headline, CTA → tally) equal and
-       lands the block's optical centre on the chapter's own centre. The odd
-       value is deliberate: it puts every box in this column on a whole pixel
-       at the reference viewport, which is what keeps the two CTAs in register.
+    /* The copy column is centred in the band, then biased up by half of this.
 
-       Retuned for the floor strip: the copy column now terminates on the
-       board's floor line rather than trailing a lone micro-label into a void,
-       so the bias is the value that makes the two register gaps — eyebrow →
-       headline and CTA → floor strip — equal at the reference viewport. */
-    padding-block-end: 3.25rem;
+       Solved, with --reg-1 and --reg-2, against the right column's thirteen
+       visible horizontals — see the note on the tokens. */
+    padding-block-end: var(--copy-bias);
   }
 }
 
@@ -336,14 +393,24 @@
     position: absolute;
     display: block;
     left: 50%;
-    /* Top end on the header rule, bottom end on the floor rule. The header
-       strip is 1.5rem tall with its 1px rule centred in it, and it sits
+    /* Top end on the header rule, bottom end on the state rail's track. The
+       header strip is 1.5rem tall with its 1px rule centred in it, and it sits
        directly above this band, so the rule's own top edge is exactly
-       (1.5rem + 1px) / 2 above the band's origin. The bottom is the stage's
-       floor, which is where the floor rule and card 05's bottom edge are.
-       Both of this line's ends therefore terminate on another line. */
+       (1.5rem + 1px) / 2 above the band's origin. The rail band below opens
+       with 1rem + 1px of padding and then a 10px/1.7 line box with the 2px
+       track centred in it and lifted half a pixel onto the cap band, so its
+       top edge is 17 + 7.5 − 0.5 = 24px below this band's floor. Both of this
+       line's ends therefore terminate on another line, and the chapter's one
+       interior vertical now spans the chapter.
+
+       It used to stop on a floor rule drawn across the copy column at the
+       stage's floor — the same y as card 05's bottom border, 24px to its right
+       and at 1.8× its weight. Two segments of one apparent horizontal at two
+       weights with a gap in them read as a misaligned rule, not as a baseline
+       relationship, so the rule is gone: the spine carries straight past to the
+       rail instead, and the void below the CTA is left to be a void. */
     top: calc(-1 * (1.5rem + 1px) / 2);
-    bottom: calc(50% - var(--stage-h) / 2);
+    bottom: -24px;
     z-index: 0;
     width: 1px;
     pointer-events: none;
@@ -368,7 +435,9 @@
   flex: none;
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  /* --joint less the label's own left side bearing: the marker and the label
+     read exactly as far apart as the index and the marker do */
+  gap: 0.9rem;
   font-family: var(--font-mono);
   font-size: 0.7rem;
   font-weight: 600;
@@ -380,10 +449,14 @@
   animation: lp-hero-rise 520ms var(--lp-ease-emph) var(--lp-beat-1) both;
 }
 
+/* The marker is a cap, so it is the height of a cap: the 11.2px mono at 600
+   has an 8px cap band, and this was 0.55rem — 8.8px, which rasterises 9 device
+   rows against the label's 8. A square standing one row proud of the letters
+   beside it reads as a misprint, not as a mark. */
 .heroEyebrow::before {
   content: "";
-  width: 0.55rem;
-  height: 0.55rem;
+  width: 8px;
+  height: 8px;
   background: var(--primary);
   animation: lp-hero-tick 460ms var(--lp-ease-spring) var(--lp-beat-2) both;
 }
@@ -456,7 +529,7 @@
    `.heroFrame`), so the alignment survives a scrollbar; `vw` would not. */
 @media (min-width: 64rem) {
   .heroHeadline {
-    font-size: clamp(2.75rem, 7.2cqw, 6.5rem);
+    font-size: clamp(2.75rem, 6.88cqw, 6.5rem);
   }
 }
 
@@ -469,13 +542,13 @@
    allowed in one direction. */
 @media (min-width: 80rem) {
   .heroHeadline {
-    font-size: clamp(2.75rem, 7.5cqw, 6.5rem);
+    font-size: clamp(2.75rem, 7.23cqw, 6.5rem);
   }
 }
 
 @media (min-width: 90rem) {
   .heroHeadline {
-    font-size: clamp(2.75rem, 7.588cqw, 6.5rem);
+    font-size: clamp(2.75rem, 7.342cqw, 6.5rem);
   }
 }
 
@@ -488,15 +561,11 @@
 }
 
 /* Keep the paragraph clear of the board's left column at every desktop width.
-   The five intervals down this column are authored as two registers: ~129px
-   between blocks that belong to different registers (eyebrow → headline,
-   CTA → tally), then 82 and 56 inside the one block of running copy, and 53
-   from the tally to the rule it reports to. Measured ink to ink at 1440×900
-   the sequence is 129 / 82 / 56 / 128 / 53 — the largest interval is 2.4× the
-   smallest, and no interval is a hole. */
+   The column's two internal registers are --reg-1 and --reg-2; see the note on
+   those tokens for how all three of its vertical values are solved. */
 @media (min-width: 64rem) {
   .heroLower {
-    margin-top: 3.5rem;
+    margin-top: var(--reg-1);
     /* One and a half columns. The paragraph's rag and the button row's width
        are intrinsic — you cannot align a rag to a rule — but the measure they
        are set on is grid-derived, so the block they form is a column and a
@@ -553,7 +622,7 @@
 
 @media (min-width: 64rem) {
   .heroCta {
-    margin-top: 2.75rem;
+    margin-top: var(--reg-2);
   }
 }
 
@@ -592,44 +661,6 @@
 }
 
 /* ------------------------------------------------------------------
-   Floor rule — the copy column's terminus. Half the measure, left end on
-   the frame's left rail, right end on the spine: the exact mirror of the
-   header rule, which is the same length hung off the right rail. It sits
-   on the board's floor — the same line as card 05's bottom edge — so the
-   two columns of the composition end on one horizontal.
------------------------------------------------------------------- */
-
-.heroFoot {
-  display: none;
-}
-
-@media (min-width: 64rem) {
-  .heroFoot {
-    position: absolute;
-    inset-inline: 0;
-    /* Half the strip's height, less half a pixel: that lands the strip's own
-       rule on the same two device rows as card 05's bottom border, which is
-       drawn inside its box. Centring on the geometric floor instead put the
-       two halves of the same horizontal one device row apart. */
-    bottom: calc((100% - var(--stage-h)) / 2 - 11.5px);
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    height: 1.5rem;
-  }
-}
-
-/* Half the measure, left end on the frame's left rail. */
-.heroFootRule {
-  flex: 0 1 auto;
-  width: 50%;
-  height: 1px;
-  background: var(--lp-grid-line);
-  transform-origin: left center;
-  animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-8) both;
-}
-
-/* ------------------------------------------------------------------
    State rail — the scene's scrubber, anchored to the frame's baseline
 ------------------------------------------------------------------ */
 
@@ -640,6 +671,9 @@
   display: none;
   align-items: center;
   gap: 0.9rem;
+  /* the chapter's right edge; the left one is set by the terminal's own optical
+     margin below, because the S carries a side bearing the box does not */
+  padding-inline-end: var(--copy-x);
   margin-top: 2rem;
   /* The 1px is the divider's, given back: the rail band's height sets where
      the composition band above it ends, and the stage is centred in that band,
@@ -676,18 +710,19 @@
   }
 }
 
-/* The rail is flush-justified against the two frame rails: the S's left ink and
-   the D's right ink land on the measure, with each end compensated by its own
-   side bearing (and, on the right, by the trailing letter-space of the tracked
-   caps). The row used to start 1.6px inside the left rail and stop 8px short of
-   the right one, which read as a rule that had been dropped in rather than set. */
+/* The rail is justified on the chapter's own two edges, 11px inboard of the
+   frame's rails: the S's left ink lands on x = 52 with the copy column above
+   it, and the D's right ink lands on x = 1388 with the drawer's right border.
+   Each end is compensated by its own side bearing, and the right one also by
+   the trailing letter-space of the tracked caps. The terminals used to land
+   ON the two rails, which is where the frame's own ink is. */
 .heroRailLabel {
   flex-shrink: 0;
   transition: color 240ms var(--lp-ease-out);
 }
 
 .heroRailLabel[data-state="scattered"] {
-  /* the S's ink lands on x = 41 — the same edge as the chapter index, the
+  /* the S's ink lands on x = 52 — the same edge as the chapter index, the
      headline, the paragraph and the primary button, five rows above */
   margin-inline-start: calc(var(--copy-x) + var(--optic-rail, 0px));
   /* and the trailing letter-space of the tracked caps is given back, so the
@@ -697,9 +732,9 @@
 }
 
 .heroRailLabel[data-state="filed"] {
-  /* the D's ink lands 2px inboard of the frame's right rail — the same micro-
-     cap clearance the S is given on the left */
-  margin-inline-end: 0;
+  /* the D's ink lands on the chapter's right edge, its own trailing
+     letter-space given back so the box does not overshoot the ink */
+  margin-inline-end: var(--optic-rail-trail, 0px);
 }
 
 /* Both terminals are printed in one ink and one value. They used to be a
@@ -750,35 +785,50 @@
   --py: 0;
 
   /* ---------------------------------------------------------------------
-     The stage IS the right half of the four-column measure, and every
-     horizontal in it is a column or a column's gutter:
+     The stage is the right half of the measure, less the chapter's 11px
+     clearance off the frame's right rail, and it is divided into exactly four
+     lengths that sum to it:
 
-       column 3  [50% … 75%]  the loose deck, inset by the panel's own padding
-       column 4  [75% … 100%] the library drawer, docked to the frame's rail
+       --pp    the drawer's inner margin, and the deck column's own inset off
+               the spine, so the loose card and the filed card have the same
+               air on the side they share with a rule
+       --cw    the card. One width, loose or filed.
+       --gut   the gutter BETWEEN the two stacks
+       --pw    the drawer, docked 11px inboard of the frame's right rail
 
-     So `--pw` (panel width) is one column, `--cw` (card width) is one column
-     less its two gutters, and filing a card is a translation of exactly one
-     column. Nothing in the board is an arbitrary length any more: the deck's
-     origin used to sit 103px right of one grid rule and 237px left of the
-     next, which is what makes a drawn grid look like scenery.
+     `--gut` is the number this round exists for. It used to be implied rather
+     than declared — the deck sat one exact module left of the drawer, which
+     made the space between the two stacks equal to the drawer's own inner
+     margin plus its border: 17px, against 49px between two sibling cards in
+     the same stack and 16px inside the drawer. Two sibling stacks a hair
+     further apart than the inside of one of them read as z-stacked rather than
+     adjacent. It is now twice the drawer's inner margin, declared, and the card
+     width is solved from it:
 
-     Percentages, not rem: the stage is a fraction of the measure at every
-     width, and the card-relative deltas below are percentages of the card,
-     so a scrollbar cannot knock the composition off the grid.
+         B = pp + cw + gut + pw,   cw = pw − 2 − 2·pp
+       ⇒ pw = (B + pp + 2 − gut) / 2
+
+     At 1440 that is 327 / 293 / 32 / 16 and the four sum to the stage's 668 to
+     the pixel. Filing is then a translation of cw + pp + gut + 1 — the card's
+     own width plus the space it crosses plus the drawer's margin — which is
+     the same at every width the pinned layout is used at.
   --------------------------------------------------------------------- */
   --sh: var(--stage-h); /* stage height */
-  --pp: 1rem; /* panel body padding = the stage's gutter */
-  --pw: 50%; /* panel width  = one column */
-  /* Card width. One column, less its two gutters, less the two 1px lines that
-     bound the drawer's interior — its own left border and the page frame's
-     right rail, which is its right edge. Written this way the filed card has
-     exactly 16px of air on both sides inside the drawer, and the loose card in
-     column 3 is the same width to the pixel rather than one device pixel
-     narrower, which is what the old geometry produced. */
-  --cw: calc(50% - 2px - 2 * var(--pp));
-  /* Filing is a translation of exactly one module, 340px at the reference
-     viewport, at every width the pinned layout is used at. */
-  --col: calc(100% + 2px + 2 * var(--pp));
+  --pp: 1rem; /* the drawer's inner margin = the deck column's inset */
+  --gut: 2rem; /* the gutter between the two stacks */
+  --pw: calc((100% + var(--pp) + 2px - var(--gut)) / 2); /* drawer */
+  /* Card width — one value, loose or filed. The drawer's interior is its box
+     less its own two 1px borders; taking the inner margin off both sides of
+     that leaves this, so the filed card has exactly --pp of air left and right
+     and the loose card is the same width to the pixel. */
+  --cw: calc(var(--pw) - 2px - 2 * var(--pp));
+  /* Filing: out of the deck column, across the gutter, past the drawer's left
+     border and in by its inner margin. Written card-relative on purpose — it is
+     consumed inside `translate`, where a percentage resolves against the
+     element's own box, and the element's own box IS the card. Reaching for
+     `--cw` here instead resolved that variable's 100% against the card as well
+     and produced a travel of 154px against the correct 342. */
+  --col: calc(100% + var(--pp) + var(--gut) + 1px);
   /* Filed row height = the card's index-strip height. It tracks the stage so a
      short window shrinks the panel and the deck together instead of jamming
      one into the other. */
@@ -792,18 +842,21 @@
      borders counted, gives this. Clamped so a short window degrades the
      registration rather than the filter row. */
   --qh: clamp(
-    2.6rem,
+    2.625rem,
     calc(
       (var(--sh) + var(--ch)) / 2 - 2px - 2 * var(--pp) - 5 * var(--rh)
     ),
     4rem
   );
-  /* everything on the card below the index strip: body + foot + borders. The
-     card is given this height rather than growing to it, so `--ch` is the
-     truth and not an estimate — with an estimate the deck's pitch was 2.2px
-     out and card 05 hung 2.2px below the stage floor the copy column
-     terminates on. */
-  --cbody: 7rem;
+  /* Everything on the card below the index strip: body + borders. The card is
+     given this height rather than growing to it, so `--ch` is the truth and
+     not an estimate — with an estimate the deck's pitch was 2.2px out.
+
+     5.5rem, not 7: the card's terminal strip is gone. It was a fourth nesting
+     level (page frame → drawer → card → strip) printing the same `npx skills
+     add …` shape five times, and dropping it takes 24px off every card, which
+     opens the deck's own gaps from 48 to 92 without moving anything else. */
+  --cbody: 5.5rem;
   --ch: calc(var(--rh) + var(--cbody)); /* dossier card height */
   /* The drawer's own two horizontal borders are in the sum. Leaving them out
      put its head rule 1px below card 02's top edge and its foot rule 1px below
@@ -815,7 +868,7 @@
   );
   --pt: calc((var(--sh) - var(--ph)) / 2); /* panel centred in the stage */
 
-  --filed-x: calc(50% + 1px + var(--pp));
+  --filed-x: calc(100% - var(--pw) + 1px + var(--pp));
   --row0: calc(var(--pt) + 1px + var(--hh) + var(--qh) + var(--pp));
 
   /* Scatter grammar. Two exact columns, three cards left and two right at the
@@ -856,39 +909,41 @@
 
   position: absolute;
   top: 50%;
-  right: 0;
+  /* the chapter's 11px clearance off the frame's right rail: the drawer's own
+     right border stands here, so the drawer is a closed box on all four sides
+     instead of handing its fourth edge to the page frame */
+  right: var(--copy-x);
   /* above the copy column: the headline's block box spans the frame, and the
      board's cards must stay hoverable where they sit beside it */
   z-index: 3;
   display: none;
-  /* the last two of the measure's four columns */
-  width: 50%;
+  /* the right half of the measure, less that clearance */
+  width: calc(50% - var(--copy-x));
   height: var(--sh);
   translate: 0 -50%;
   pointer-events: none;
 }
 
-/* One gutter value at every pinned width. At the reference viewport it makes
-   every length in the stage a whole number of CSS pixels:
+/* Every length in the stage is a whole number of CSS pixels at the reference
+   viewport, and all of them are derived:
 
-     module        340   (measure 1360 ÷ 4)
-     drawer        340   column 4, docked into the frame's right rail
-     card          308   340 − 2 × 16
-     card height   176   row 64 + body 112
-     deck pitch    224   (624 − 176) ÷ 2
-     deck gap       48   224 − 176
+     stage         668   (measure 1360 ÷ 2, less the chapter's 12px box inset)
+     drawer        327   (668 + 16 + 2 − 32) ÷ 2
+     card          293   327 − 2 − 2 × 16
+     stack gutter   32   declared: 2 × the drawer's inner margin
+     card height   152   row 64 + body 88
+     deck pitch    244   (640 − 152) ÷ 2
+     deck gap       92   244 − 152
+     file travel   342   293 + 16 + 32 + 1
 
-   The old values put the card at 312.8 wide on a 13.6px gutter, so the two
-   card columns rendered 625 and 624 device pixels wide — identical in CSS and
-   a pixel apart on screen, which is the worst of both. And the repeated gap
-   between deck cards alternated 99 / 100 for the same reason. */
+   16 + 293 + 32 + 327 = 668. */
 
 /* Short laptops: the stage shrinks with the viewport, so the cards have to
    shed a line or the scatter's gutters close up. The summary is the least
    load-bearing row on the card. */
 @media (min-width: 64rem) and (max-height: 46rem) {
   .heroBoard {
-    --cbody: 5.35rem;
+    --cbody: 4rem;
   }
 
   .heroBoard .dossierDesc {
@@ -922,12 +977,17 @@
    4. Its contents were tied to a scroll variable, so without script — where
       there is no runway to scroll — the drawer rendered as an empty outline.
 
-   Now: one column wide, docked into the frame's right rail (no border and no
-   radius on that side, so the rail *is* its right edge rather than sitting a
-   pixel away from one), fully drawn at rest, and registered to the two cards
-   standing over it on all four sides — the panel's own gutter left and right,
-   its head rule and its foot rule top and bottom. The scene's event is the
-   deck arriving in the rows, not the drawer fading up. */
+   Now: fully drawn at rest, and registered to the two cards standing over it on
+   all four sides — the panel's own inner margin left and right, its head rule
+   and its foot rule top and bottom. The scene's event is the deck arriving in
+   the rows, not the drawer fading up.
+
+   And it is a closed box. Docking it *into* the frame's right rail — no border,
+   no radius, the rail standing in as its fourth edge — cost the panel its
+   containment on the one side where you could least afford to lose it: you
+   could not tell where the drawer ended and the page began. It now stands 11px
+   inboard of the rail, the same clearance the copy column takes on the other
+   side, and draws its own right border there. */
 /* Weight and radius, both by role.
 
    Weight: the drawer is an object, so its outline is --lp-hairline, the same
@@ -939,11 +999,10 @@
    Radius: concentric with the cards standing inside it. The gutter between
    the drawer's inside face and a filed card is 16px, and the card's radius is
    12px, so the drawer's is 28px — not 14px, which read as equal to the card's
-   across 28 device pixels of padding. Only the left corners are drawn: the
-   right side is docked into the page frame's rail, which is that edge. */
+   across 28 device pixels of padding. All four corners now. */
 .libraryFrame {
   position: absolute;
-  left: 50%;
+  inset-inline-end: 0;
   top: var(--pt);
   width: var(--pw);
   height: var(--ph);
@@ -951,11 +1010,27 @@
     color-mix(
       in oklab,
       var(--primary) calc(var(--done) * 30%),
-      var(--lp-hairline)
+      var(--hero-object)
     );
-  border-inline-end: none;
-  border-radius: 1.75rem 0 0 1.75rem;
-  background: color-mix(in oklab, var(--card) 72%, transparent);
+  border-radius: 1.75rem;
+  /* The slot is a recess, so it is darker than the card that sits in it — and
+     the differential is declared here rather than left to two tokens that
+     happen to differ. A card's 1px outline measured 1.49:1 against this fill;
+     it was legible because the two fills also differed, which means a token
+     change could have erased the whole card system without touching a border.
+     The fill is now derived from the card's own surface, one step down, so the
+     relationship cannot flatten. */
+  /* Two layers, so the drawer's outline is drawn on the same ground a card's
+     outline is drawn on and the chapter's one object weight renders one number.
+     It did not: declared identically at 16%, the drawer's border composited over
+     its own recessed fill and printed 52 while a card's printed 57 — one ink,
+     two values, on two objects 16px apart. The recess is the padding box; the
+     card's own surface is the border box. */
+  background-image:
+    linear-gradient(var(--hero-slot), var(--hero-slot)),
+    linear-gradient(var(--hero-card), var(--hero-card));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
   box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
   translate: calc(var(--px) * -5px) calc(var(--py) * -4px);
   transition: translate 420ms var(--lp-ease-out);
@@ -967,10 +1042,10 @@
   align-items: center;
   gap: 0.55rem;
   height: var(--hh);
-  /* the head's label sits in the filed rows' text column: one gutter plus the
-     card's own inner padding, and one more pixel on the closing side because
-     the frame's rail, not a border of the drawer's, is that edge */
-  padding-inline: calc(var(--pp) + 0.75rem) calc(var(--pp) + 0.75rem + 1px);
+  /* the head's label sits in the filed rows' text column: the drawer's inner
+     margin plus the card's own inner padding, symmetric now that the drawer
+     owns both of its vertical borders */
+  padding-inline: calc(var(--pp) + 0.75rem);
   border-bottom: 1px solid var(--lp-grid-line);
 }
 
@@ -1006,16 +1081,24 @@
 /* Filter row: the library is searchable, so the panel says so. */
 .libraryFilter {
   position: absolute;
-  inset-inline: var(--pp) calc(var(--pp) + 1px);
+  inset-inline: var(--pp);
   top: calc(var(--hh) + 0.5rem);
   display: flex;
   align-items: center;
   gap: 0.45rem;
   height: 2rem;
   padding-inline: 0.55rem;
-  border: 1px solid var(--lp-hairline);
+  border: 1px solid var(--hero-object);
   border-radius: 0.5rem;
-  background: color-mix(in oklab, var(--muted) 32%, transparent);
+  /* same two layers, same reason */
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--muted) 32%, var(--hero-slot)),
+      color-mix(in oklab, var(--muted) 32%, var(--hero-slot))
+    ),
+    linear-gradient(var(--hero-card), var(--hero-card));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
   font-family: var(--font-mono);
   font-size: 0.625rem;
   color: var(--ink-mid);
@@ -1051,7 +1134,7 @@
 .libraryRows {
   position: absolute;
   left: var(--pp);
-  right: calc(var(--pp) + 1px);
+  right: var(--pp);
   top: calc(var(--hh) + var(--qh) + var(--pp));
   /* four separators, not five: the fifth would sit a padding-width above the
      panel's own foot rule and read as a doubled edge */
@@ -1074,13 +1157,19 @@
   justify-content: space-between;
   gap: 0.75rem;
   height: var(--fh);
-  padding-inline: calc(var(--pp) + 0.75rem) calc(var(--pp) + 0.75rem + 1px);
+  padding-inline: calc(var(--pp) + 0.75rem);
   border-top: 1px solid var(--lp-grid-line);
   font-family: var(--font-mono);
   font-size: 0.5875rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-mid);
+}
+
+/* The base label stands in the same text column as a filed row's name and the
+   head's status dot: the numeral's own side bearing, given back. */
+.libraryFoot > span:first-child {
+  margin-inline-start: -0.5px;
 }
 
 /* ------------------------------------------------------------------
@@ -1097,7 +1186,8 @@
 .libraryFeed {
   display: none;
   position: absolute;
-  right: 50%;
+  /* the leaders stop on the drawer's left border — the thing they point at */
+  right: var(--pw);
   top: var(--row0);
   width: 13.5rem;
   height: calc(5 * var(--rh));
@@ -1347,21 +1437,25 @@
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  --surface: var(--card);
+  --surface: var(--hero-card);
   height: var(--ch, auto);
   background: color-mix(
     in oklab,
     var(--surface) calc(100% - var(--merge, 0) * 100%),
     transparent
   );
-  /* Object weight — the same --lp-hairline the drawer and the filter control
+  /* Object weight — the same --hero-object the drawer and the filter control
      carry. It used to be --border, which measured 90/255 on the dark field:
      50% louder than the page frame's own rail, so the loudest lines in the
-     composition belonged to five decorative cards. */
+     composition belonged to five decorative cards. The contrast this outline
+     needs comes from the ground it is drawn on (see --hero-slot), not from
+     making the outline heavier: at a heavier weight it would have landed within
+     a few points of the page frame's own rule, which is a worse problem than
+     the one it solves. */
   border: 1px solid
     color-mix(
       in oklab,
-      var(--lp-hairline) calc(100% - var(--merge, 0) * 100%),
+      var(--hero-object) calc(100% - var(--merge, 0) * 100%),
       transparent
     );
   border-radius: calc(var(--radius) * (1 - var(--dp, 0)));
@@ -1379,7 +1473,7 @@
   --surface: color-mix(
     in oklab,
     var(--foreground) calc(var(--lift, 0) * 6%),
-    var(--card)
+    var(--hero-card)
   );
 }
 
@@ -1392,13 +1486,19 @@
   transition: background-color 200ms var(--lp-ease-snap);
 }
 
+/* The index strip's two ends are the card's declared 12px inset, measured as
+   INK. They were 14 left and 13 right on all five cards — consistent, and
+   consistently not the number the padding says, because the name's first glyph
+   and the star count's last numeral each carry a side bearing into the joint.
+   Both bearings are given back, so the inset you measure is the inset that is
+   declared and the two ends of the row agree. */
 .dossierName {
   flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  margin: 0;
+  margin: 0 0 0 -1.75px;
   font-size: 0.92rem;
   font-weight: 650;
   letter-spacing: -0.03em;
@@ -1407,6 +1507,7 @@
 }
 
 .dossierStars {
+  margin-inline-end: -1.25px;
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -1430,14 +1531,16 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  padding: 0 0.75rem 0.7rem;
+  padding: 0.6rem 0.75rem 0.7rem;
+  /* the card's one internal division. There were two — this and the terminal
+     strip's — which with the card's own outline and the drawer's made four
+     concentric horizontals inside a 176px object. */
   border-top: 1px solid
     color-mix(
       in oklab,
       var(--lp-grid-line) calc(100% - var(--dp, 0) * 100%),
       transparent
     );
-  padding-top: 0.6rem;
 }
 
 /* ------------------------------------------------------------------
@@ -1524,46 +1627,12 @@
   white-space: nowrap;
 }
 
-.dossierFoot {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.42rem 0.75rem;
-  border-top: 1px solid
-    color-mix(
-      in oklab,
-      var(--lp-grid-line) calc(100% - var(--dp, 0) * 100%),
-      transparent
-    );
-  background: color-mix(
-    in oklab,
-    var(--muted) calc(38% - var(--dp, 0) * 38%),
-    transparent
-  );
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  line-height: 1;
-  color: var(--ink-mid);
-}
-
-/* The prompt is punctuation on a command line, not a call to action. */
-.dossierPrompt {
-  color: var(--ink-lo);
-}
-
-/* The one string on the card a developer is meant to read and copy. It was the
-   weakest text in the chapter at 5.6:1 — quieter than the card's own summary —
-   which is exactly backwards. It takes the top step of the card's three-step
-   ink ramp; the `$` beside it stays punctuation. */
-.dossierCmd {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-family: inherit;
-  font-size: inherit;
-  color: var(--ink-hi);
-}
+/* The card's terminal strip is gone. It printed `$ npx skills add owner/repo`
+   five times in the same 10px mono, which is one string in five instances
+   carrying no fact the provenance line above it does not already carry — and
+   it was a fourth level of nesting inside the page frame (frame → drawer →
+   card → strip) on an object 176px tall. The card is two zones now, divided
+   once: the index strip that survives the fold, and the body that does not. */
 
 /* ------------------------------------------------------------------
    Hover — the hero's playable moment.
@@ -1690,7 +1759,8 @@
 .mobileMark {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  /* the chapter's one joint, here too */
+  gap: var(--joint);
   font-family: var(--font-mono);
   font-size: 0.6rem;
   font-weight: 600;
@@ -1703,7 +1773,10 @@
   content: "";
   flex: 1;
   height: 1px;
-  background: var(--lp-hairline);
+  /* the label's trailing letter-space, given back, and the same division ink
+     the chapter's header rule takes */
+  margin-inline-start: var(--optic-eyebrow-trail, 0px);
+  background: var(--lp-grid-line);
 }
 
 .mobileMarkFiled {
@@ -1789,9 +1862,15 @@
   position: relative;
   margin-top: 0.9rem;
   overflow: hidden;
-  border: 1px solid var(--lp-hairline);
+  border: 1px solid var(--hero-object);
   border-radius: 0.875rem;
-  background: color-mix(in oklab, var(--card) 78%, transparent);
+  /* the same recess, drawn the same way, so the drawer is one object across
+     both layouts and its outline renders the chapter's one object weight */
+  background-image:
+    linear-gradient(var(--hero-slot), var(--hero-slot)),
+    linear-gradient(var(--hero-card), var(--hero-card));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
 }
 
 /* The stage's gutter is a desktop quantity (`--pp` lives on the board), and the
@@ -1960,13 +2039,8 @@
   .heroIndex,
   .heroBlurb,
   .heroCta,
-  .heroFootRule,
   .heroRail {
     animation: lp-hero-fade 140ms linear both;
-  }
-
-  .heroFootRule {
-    scale: none;
   }
 
   /* the scene rests filed, so the diagram that explains the filing is drawn */

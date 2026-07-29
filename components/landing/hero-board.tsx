@@ -5,8 +5,8 @@ import styles from "@/components/landing/styles/hero.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — they mirror the real
- * SkillDossier information hierarchy (name, stars, source, description, tags,
- * install command) so the hero reads as the actual app UI.
+ * SkillDossier information hierarchy (name, stars, source, description, tags)
+ * so the hero reads as the actual app UI.
  *
  * `source` is split into owner / repo because it is a *provenance* line, not a
  * caption: the fork mark is printed in the accent (as it is in the product),
@@ -17,6 +17,11 @@ import styles from "@/components/landing/styles/hero.module.css"
  * The card's top strip is deliberately a complete, self-sufficient index row:
  * once the deck is filed the card folds shut on that strip and becomes a row
  * of the Team library listing. Same element, two legible states.
+ *
+ * There is no terminal strip under the body any more. `$ npx skills add
+ * owner/repo` was one string set five times in the same 10px mono, stating
+ * nothing the provenance line two rows above it does not already state, and it
+ * made the card a fourth level of nesting inside the page frame.
  *
  * The whole board is aria-hidden; the hero copy carries the message.
  */
@@ -34,7 +39,6 @@ const dossiers = [
     // composition of five equal cards, so their heights must not vary.
     description: "Reviews PRs for missing tests.",
     tags: ["review", "ci"],
-    command: "npx skills add acme/eng-skills",
     depth: "12px",
   },
   {
@@ -44,7 +48,6 @@ const dossiers = [
     stars: "938",
     description: "Pulls tables out of PDF files.",
     tags: ["documents"],
-    command: "npx skills add anthropic/skills",
     depth: "7px",
   },
   {
@@ -54,7 +57,6 @@ const dossiers = [
     stars: "271",
     description: "Rewrites copy to brand voice.",
     tags: ["writing", "brand"],
-    command: "npx skills add acme/brand-kit",
     depth: "14px",
   },
   {
@@ -64,7 +66,6 @@ const dossiers = [
     stars: "864",
     description: "Drafts safe schema migrations.",
     tags: ["database"],
-    command: "npx skills add drizzle/skills",
     depth: "6px",
   },
   {
@@ -74,7 +75,6 @@ const dossiers = [
     stars: "590",
     description: "Turns merged PRs into notes.",
     tags: ["shipping", "docs"],
-    command: "npx skills add vercel/skills",
     depth: "10px",
   },
 ] as const
@@ -136,10 +136,6 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
             </span>
           ))}
         </div>
-      </div>
-      <div className={styles.dossierFoot}>
-        <span className={styles.dossierPrompt}>$</span>
-        <code className={styles.dossierCmd}>{dossier.command}</code>
       </div>
     </div>
   )

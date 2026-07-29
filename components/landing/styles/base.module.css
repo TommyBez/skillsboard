@@ -111,6 +111,48 @@
      and the ascender-band centre; derived in the `.brandLockup` note. */
   --lp-mark-rise: 0.75px;
 
+  /* --- appended: one construction for every outlined control ---------------
+
+     Measured at 1440 on the dark field before this pass, the page drew its 1px
+     control edge at THREE values from ONE declaration:
+
+       frame rail / header rule / footer rule / theme toggle   60,65,60
+       secondary CTA ("See MCP access")                        64,69,64
+       footer GitHub mark                                      65,70,65
+
+     All three declare `--lp-chrome-rule`. They render differently because a
+     border composites over whatever the element paints *under* it: the
+     secondary carries a 3%-of-foreground field (declared by the hero chapter,
+     which needs the control to occlude the ground it stands on), and the mark
+     sits on the colophon plate. 23% over a 3% field is 25.3% over the page —
+     hence 64 instead of 60, and 65 over the 3.5% plate.
+
+     So the fix is not a second token, it is a construction: an outlined control
+     paints an opaque copy of its own ground under the *border box* and its
+     field inside the *padding box*. The edge then always composites over the
+     page's own field and always renders the number the frame renders, whatever
+     field the control or a chapter gives it. One value: 60,65,60 dark,
+     191,191,191 light.
+
+     `--lp-control-field` is the interior: 3% of foreground over the page field,
+     which is what the hero already declares for the secondary. The footer's
+     ground is the plate, so its mark takes the same 3% over *that* — one
+     relationship, not one number. */
+  --lp-control-field: color-mix(in oklab, var(--foreground) 3%, var(--background));
+  --lp-footer-control-field: color-mix(
+    in oklab,
+    var(--foreground) 3%,
+    var(--lp-footer-field)
+  );
+
+  /* The command strip's action — the one place accent ink appears in the
+     chrome, now that the scroll gauge is gone. See `.ctaHeaderAction`. The edge
+     is deliberately in the accent rather than in `--lp-chrome-rule`: it has to
+     say "this is the go action" without carrying a filled slab's mass. */
+  --lp-accent-edge: color-mix(in oklab, var(--primary) 45%, transparent);
+  --lp-accent-edge-hover: color-mix(in oklab, var(--primary) 70%, transparent);
+  --lp-accent-field: color-mix(in oklab, var(--primary) 12%, var(--background));
+
   position: relative;
 }
 
@@ -147,7 +189,19 @@
    only.
 
    It also stops at the frame. The rails are meant to read as the page's
-   boundary, not as a line drawn on top of a field that carries on past them. */
+   boundary, not as a line drawn on top of a field that carries on past them.
+
+   A review reported grain "doubled at the frame edge" — standard deviation
+   1.7–2.1 inside the frame against 1.05 outside — and read that as two
+   overlays. Measured at 1440 on a full-document capture: the noise outside the
+   frame is 0.000 in the LEFT gutter at every depth, and 0.26–0.45 in the right
+   gutter for exactly the band y=106–765. That is not grain. It is Chrome's
+   8-bit dither of the hero chapter's radial field, which was 1440 wide — i.e.
+   40px past the frame on each side — and only ever bright on the right, where
+   its centre is (78% of the measure). `.grain::after` was correctly inset; the
+   texture outside the frame was a *gradient*, not a second overlay. The frame
+   matte contains it, and the gutter now measures 0.000 on both sides at every
+   depth. The one overlay is this one. */
 .grain {
   position: relative;
 }
@@ -184,23 +238,42 @@
    anything, sits above section fields but below the command strip so the
    header rule reads as the frame's top edge.
 
-   ONE RECTANGLE, ONE NUMBER, FOUR EDGES. The header rule, the two rails and
-   the footer rule are now the same declaration — `--lp-chrome-rule` over an
-   opaque layer of the page's own field — so they cannot drift apart. Measured
-   at 1440 after: 64 / 64 / 64 / 64 on the dark field and 191 / 191 / 191 / 191
-   on the light one. Before, the top edge sat at 0.75 opacity until the strip
-   had a field (50), the sides were differenced ink tuned to approximate it
-   (63), and the bottom was the same ink laid on the footer plate (69) — the
-   same structural element at three values.
+   ONE RECTANGLE, ONE NUMBER, FOUR EDGES — and, now, ONE GROUND.
 
-   The opaque layer is what keeps a rail one value for its whole length rather
-   than one value per band. Several chapters draw their own vertical border on
-   exactly this measure (the MCP instrument frame at 40/1399, the closing
-   sheet), and a translucent rail landing on one of those rendered a different
-   number than the same rail two hundred pixels higher: measured, 46.8 down the
-   hero and 71.9 through the MCP chapter. With its own backdrop, 98.6% of every
-   rail pixel down the whole document is one value in both themes and the
-   remainder is grain dither.
+   Round 3 made the rails opaque (`--lp-chrome-rule` over a backdrop of the
+   page's own field) because a translucent rail landing on a chapter's own
+   vertical border rendered half again as heavy as the same rail a band earlier:
+   measured, 46.8 down the hero against 71.9 through the MCP chapter, on a line
+   that is meant to be one continuous edge.
+
+   Round 5 found the other half of the same problem. The rails printed a
+   constant 60,65,60, but the *ground* they were drawn against did not: the
+   left gutter measured 7,14,10 at every depth while the right measured up to
+   25,31,27, so one rule read 1.87:1 against its surroundings on the left and
+   1.59:1 on the right. Every other hairline on the page is alpha, i.e. a
+   constant step over its local ground; an opaque rail is a constant number
+   instead, and where the ground moves the two are not the same thing.
+
+   The two requirements only conflict when the ground moves. So fix the ground.
+   `.frameMatte` lays the page's own field over both outer gutters *and* over
+   the rail's own column, and the rails go back to being what every other
+   hairline is — plain `--lp-chrome-rule`, no backdrop, alpha over its local
+   ground. Because that ground is now uniform by construction, the rail is
+   simultaneously one rendered value down the whole document and one constant
+   step over the field beside it. Measured after: 60,65,60 at every depth, left
+   and right, 1.871:1 both sides; the gutters read 7,14,10 with standard
+   deviation 0.000 at every depth. The chapter borders that used to double under
+   a translucent rail are now *behind* the matte, so they cannot.
+
+   What the matte covers, measured on a full-document capture at 1440: the hero
+   chapter's radial field (1440 wide, so 40px past the frame; visible in the
+   right gutter y=106–765), one full-bleed 1px horizontal on the hero's bottom
+   border at y=1855, and the closing chapter's 28px dot raster from y=7752 down.
+   All three are chapter-owned and all three crossed a boundary the page claims
+   is a boundary. Nothing else lives out there — no chapter paints a deliberate
+   full-bleed plate — and the matte sits below `z-index: 21`, which is where the
+   closing headline's 2px optical overhang lives, so the type that deliberately
+   breaks the measure still paints in front.
 
    The cost, taken knowingly: where a chapter's display type overhangs the
    measure by its own side bearing — the closing headline does, by ~2px — the
@@ -208,6 +281,40 @@
    frame passing in front of type that broke it, which is at least one
    consistent story; the real fix belongs in the chapter that overhangs.
 --------------------------------------------------------------------------- */
+
+/* The matte: outside the frame is the page's own field, full stop.
+   Two jobs, one element. It makes the frame a boundary rather than a line drawn
+   on a field that carries on past it, and it gives the rails a ground that
+   cannot move — which is what lets them be alpha. `top: 0` rather than the
+   header height because the strip is transparent at rest, so the gutter above
+   the frame's top edge would otherwise show a chapter's field too. */
+.frameMatte {
+  position: absolute;
+  top: 0;
+  bottom: var(--lp-frame-end, 0px);
+  z-index: 19;
+  display: none;
+  /* The rail's own column, so the rail composites over this and nothing else.
+     Same expression as `left: var(--lp-frame-inset)` on the rail — the 50% in
+     that token resolves against the same containing block either way. */
+  width: calc(var(--lp-frame-inset) + 1px);
+  background: var(--background);
+  pointer-events: none;
+}
+
+.frameMatte[data-side="start"] {
+  left: 0;
+}
+
+.frameMatte[data-side="end"] {
+  right: 0;
+}
+
+@media (min-width: 64rem) {
+  .frameMatte {
+    display: block;
+  }
+}
 
 /* Absolute, not fixed. Fixed rails cannot know where the page ends, so they
    ran from the header rule to the *viewport's* bottom edge: at the end of the
@@ -225,25 +332,18 @@
   z-index: 20;
   display: none;
   width: 1px;
-  /* Literally the same ink as the rule at the top of the page and the rule at
-     the bottom of it: `--lp-chrome-rule` over an opaque backdrop of the page's
-     own field. Two layers, not a blend.
+  /* Alpha, like every other hairline on the page — one ink, no backdrop. It can
+     be, because `.frameMatte` guarantees the field underneath it: the rail is
+     drawn on the page's own ground for its whole length, so 23% of foreground
+     over that ground is both one rendered number (60,65,60 dark, 191 light) and
+     one constant step over the field beside it.
 
-     The rails used to be differenced white at `--lp-frame-ink`, tuned by hand
-     to *approximate* what the horizontals rendered. It got close — 63 against
-     64 — but "close" is the wrong relationship between the four edges of one
-     rectangle, and every future change to the chrome ink would have needed the
-     approximation re-tuned. Same declaration, same number, by construction.
-
-     The opaque layer is not decoration: it is what keeps the rail one value
-     for its whole length. Three chapters draw their own vertical border on
-     exactly this measure, and a translucent rail landing on one of those
-     rendered half again as heavy as the same rail a band earlier — measured,
-     46.8 down the hero against 71.9 through the MCP chapter, on a line that is
-     meant to be one continuous edge. */
-  background:
-    linear-gradient(var(--lp-chrome-rule), var(--lp-chrome-rule)),
-    var(--background);
+     It was opaque for two rounds, for a real reason — three chapters draw their
+     own vertical border on exactly this measure and a translucent rail landing
+     on one of those rendered 71.9 where the same rail rendered 46.8 a band
+     earlier. Those borders are behind the matte now. The invariant is kept by
+     controlling the ground rather than by hard-coding the ink. */
+  background: var(--lp-chrome-rule);
   pointer-events: none;
 }
 
@@ -358,23 +458,53 @@
   translate: 0 calc(-1 * var(--lp-mark-rise));
 }
 
-/* Theme toggle sits in the CTA cluster: same 3px language, same optical
-   height as the primary action, never a stray pill. */
+/* Theme toggle — a real container, matched to the action beside it.
+   36×36, 3px corner, `--lp-chrome-rule` edge, and its own field: it occludes
+   the ground it stands on instead of being an outline drawn on the page.
+
+   A review called it "the weakest object in the header": a border faint enough
+   to read as a smudge, next to a solid green control the two didn't even share
+   a height with. Measured at 1440 dark, the two controls' *boxes* were both
+   exactly 36 tall at y=10–46 — but the action was a filled slab standing on the
+   press model's 1px plinth, so its painted extent was 10–47, 37 rows, centred on
+   28.5 against the toggle's 28.0. Two fixes, neither of them "make the border
+   louder": the action next to it is no longer a filled slab and no longer casts
+   (see `.ctaHeaderAction`), so both controls now paint exactly 36 rows from 10
+   to 46 on one centre; and this one gets a field, so it reads as a container at
+   rest rather than as four hairlines.
+
+   The interior and the edge are painted as two background layers rather than as
+   a background-colour, so the edge composites over the page's own field and not
+   over the interior — see `--lp-control-field`. Without that the edge printed
+   64,69,64 while the frame printed 60,65,60 from the same token. */
 .headerToggle {
   position: relative;
   border-radius: 3px;
   /* Every outlined control on the page draws its edge at the same weight as
      the rules the page is built from. */
   border-color: var(--lp-chrome-rule);
-  background-color: transparent;
+  background-image:
+    linear-gradient(var(--lp-control-field), var(--lp-control-field)),
+    linear-gradient(var(--background), var(--background));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
   transition:
     border-color var(--lp-dur-hover) var(--lp-ease-snap),
-    background-color var(--lp-dur-hover) var(--lp-ease-snap);
+    translate var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
+/* Hover and press are the CTA cluster's, because this control lives in it:
+   a pixel of lift under the pointer, a pixel of give under the press. It used
+   to lighten its field instead, which it can no longer do (the field is a
+   background image now — see `.ctaSecondary`) and which never matched the
+   controls either side of it anyway. */
 .headerToggle:hover {
   border-color: var(--lp-hairline-strong);
-  background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+}
+
+.headerToggle:active {
+  translate: 0 1px;
+  transition-duration: var(--lp-dur-tap);
 }
 
 .headerToggle:focus-visible {
@@ -528,15 +658,89 @@
    and not on the top: measured 105 / 105 / 105 against 84, an outline that
    read as lit from below standing next to a primary lit from above. One light
    direction now — every CTA catches it on the top edge and casts one pixel
-   beneath. */
+   beneath.
+
+   Round 5 correction. The edge printed 64,69,64 while the page frame it stands
+   inside printed 60,65,60 — from the *same* `--lp-chrome-rule`. A border
+   composites over whatever the element paints under it, and this control paints
+   a field there (the hero chapter declares an opaque 3%-of-foreground fill so
+   the button occludes the ground it stands on). 23% over a 3% field is 25.3%
+   over the page.
+
+   So the field and the edge's ground are separate layers now: the interior is
+   `--lp-control-field` clipped to the padding box, and an opaque copy of the
+   page's own field is clipped to the border box under the edge. The edge then
+   renders exactly what the frame renders, and it does so whatever field this
+   control — or a chapter overriding it — happens to carry. Both layers are
+   background *images*, so a chapter's `background-color` override paints
+   beneath them and is a harmless no-op rather than a source of drift. */
 .ctaSecondary {
   border-color: var(--lp-chrome-rule);
-  background-clip: border-box;
-  background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+  background-image:
+    linear-gradient(var(--lp-control-field), var(--lp-control-field)),
+    linear-gradient(var(--background), var(--background));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
 }
 
+/* A ghost stays fieldless, at rest and on hover. It used to gain a 5%-of-
+   foreground wash on hover, and its hovered edge — declared as the same
+   `--lp-chrome-rule` the toggle beside it wears — then composited over that wash
+   and printed 63 instead of 60. A ghost that has no field has nothing under its
+   edge but the page, so the edge is the page's rule weight by construction.
+   Hover is carried by the edge appearing at all, plus the shared 1px lift. */
 .ctaGhost {
   border-color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   The command strip's action — demoted, deliberately, not deleted.
+
+   Two independent reviews measured the same defect: the primary CTA appeared
+   twice in one fold with the same green fill and the same label, a 199×36 pill
+   in the header and a 247×48 pill in the hero, 570px apart. Measured at 1440
+   dark by summing each control's luminance excess over its local ground, the
+   header instance carried 64% of the hero instance's mass and 60% of its green
+   excess — two solid calls to action in the one hue the page reserves for
+   "click here", neither of them obviously the primary.
+
+   A sticky header action is a real conversion surface and the label is fixed
+   copy, so the demotion has to be visual. It keeps the shape, the size, the
+   press model, the arrow and the accent; it gives up the filled slab. Green now
+   lives in a 45% edge and a 12% field instead of in 7,164 square pixels of
+   fill — measured after: 9% of the hero action's green excess. The hero's is
+   unmistakably the primary and this one is still unmistakably the action.
+
+   It also settles three other findings at once. It has no plinth, so its
+   painted extent is exactly its box — 36 rows, y=10–46 — which is exactly the
+   theme toggle's, on one centre (28.0); as a filled slab it painted 37 rows
+   centred on 28.5 while the toggle painted 36 centred on 28.0. And the label's
+   line box centres on 27.998, so label, box and painted extent now share one
+   centre.
+
+   The missing plinth is the point, not an omission. The strip is 56 rows and its
+   controls are 36: both even, so a flush control centres on a whole pixel. Add
+   the press model's 1px cast and the painted object is 37 rows — an odd height
+   in an even row, which can only ever land on a half pixel, which is precisely
+   what a review measured as "fractional pixel bounds" on this control. The
+   chapter actions are raised slabs on a plinth because they sit on a chapter's
+   field; the strip's controls are flush with the strip.
+
+   The residual half pixel a review flagged in the label is not removable: at
+   12.8px the cap band runs 23.0–32.0 (centre 27.5) and the x-height band
+   25.5–32.0 (centre 28.75). No single placement can centre both. The label sits
+   on 27.998 — within 0.13px of the mean of the two optical centres (28.125),
+   which is the same rule `.brandLockup` uses for the mark. Centring the cap band
+   exactly would drop the label's visual mass 1.25px low in a 36px pill.
+--------------------------------------------------------------------------- */
+.ctaHeaderAction {
+  border-color: var(--lp-accent-edge);
+  color: var(--foreground);
+  background-image:
+    linear-gradient(var(--lp-accent-field), var(--lp-accent-field)),
+    linear-gradient(var(--background), var(--background));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -555,17 +759,35 @@
       0 12px 24px -14px color-mix(in oklab, var(--primary) 75%, transparent);
   }
 
+  /* Hover on an outlined control is carried by its edge and the shared 1px
+     lift, not by its fill. Its fill cannot move: the interior is a background
+     *image* now (so the edge composites over the page's field rather than over
+     the interior — see `.ctaSecondary`), and `background-image` is not an
+     animatable property. A wash faked with `inset 0 0 0 999px` would be, but the
+     hero chapter owns `box-shadow` on this control. Given the choice between one
+     mechanism with a slightly quieter hover and two mechanisms doing the same
+     job, this file takes the first: edge steps 23% → 30%, control lifts a pixel,
+     arrow slides four. */
   .ctaSecondary:hover {
     border-color: var(--lp-hairline-strong);
-    background-color: color-mix(in oklab, var(--foreground) 7%, transparent);
   }
 
   /* A hovered ghost becomes an outlined control, so it takes the outlined
      control's resting edge — the same edge the toggle two cells to its left
-     is already wearing. */
+     is already wearing, and now at the same rendered value. */
   .ctaGhost:hover {
     border-color: var(--lp-chrome-rule);
-    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+
+  /* Same light, same halo as the filled action — a fraction of the strength,
+     because it is a fraction of the mass. */
+  .ctaHeaderAction:hover {
+    border-color: var(--lp-accent-edge-hover);
+    box-shadow: 0 8px 18px -14px color-mix(in oklab, var(--primary) 55%, transparent);
+  }
+
+  .headerToggle:hover {
+    translate: 0 -1px;
   }
 }
 
@@ -611,93 +833,41 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Scroll progress — a gauge inside the strip, on its own row
+   Scroll gauge — retired
 
-   Three earlier versions failed on the same axis. The first two drew the
-   travelled distance in the *same 1px row as the header rule*, so the first
-   reading was always "a border that changes colour partway across": one
-   stroke doing two jobs, and the eye resolves a full-width 1px line at the
-   bottom edge of a bar as an edge long before it resolves it as a gauge. The
-   third moved the gauge off that row by four pixels — which left a 2px gauge
-   and a 1px rule as two parallel horizontals with three pixels between them.
-   Three pixels is not clearance; at that distance the pair reads as one line
-   that has gone wrong, and the fix reads as the bug.
+   Four treatments, four reviews, the same verdict every time.
 
-   So it goes properly clear, to the other end of the strip: the gauge is the
-   command strip's *leading* edge, flush with the top of the window, 53px away
-   from the rule and with nothing else in that band to be confused with. It is
-   2px thick — twice any rule the chrome draws — and it spans exactly the
-   measure, starting above the frame's left rail and ending above its right
-   one. It never spans that measure except at the very bottom of the page,
-   which is the one place where "you are at the end" is the correct reading of
-   a full-width run.
+   v1 and v2 drew the travelled distance in the *same 1px row as the header
+   rule*, so the first reading was always "a border that changes colour partway
+   across". v3 moved it off that row by four pixels, leaving a 2px gauge and a
+   1px rule as two parallel horizontals three pixels apart, which reads as one
+   line that has gone wrong. v4 moved it to the strip's leading edge, flush with
+   the top of the window, 53px clear of anything else: 2px tall, spanning the
+   measure, terminating in a 4px accent knob. The fourth reviewer's note was
+   "it's inset to the frame correctly, but it's a flourish that stops mid-air and
+   does no work in a static frame."
 
-   The head is a real terminal: a 4×4 accent knob, centred on the 2px track,
-   riding the leading edge — the previous 1px riser was 8px of hairline
-   standing on the rule with a flat open top, which read as a rendering
-   artefact rather than a playhead. The knob has a top, a bottom and a width;
-   it is the mark that says "here", and the quieter trace behind it is the
-   distance it has covered. Absent without JS and under reduced motion, where
-   it could never advance.
+   That is the correct reading and no fifth position fixes it, because the
+   objection is not to where it sits. A gauge whose only content is a number the
+   browser's own scrollbar already reports, which is *absent* without script and
+   *absent* under reduced motion — two of the four states this page has to be
+   composed in — is not part of the page's structure. It is an animation that
+   happens to be drawn in the chrome. Every still of this page has to be
+   composed, and in a still it is 597 pixels of accent-tinted line ending in a
+   brighter square, pointing at nothing.
+
+   So it goes, the way the chapter rail went in round 3: cut, not moved. The
+   page keeps one honest position signal — the frame, which tells you where the
+   measure is — and the footer keeps the links. The accent's one appearance in
+   the chrome moves to the command strip's action, where it reports what a
+   control does rather than decorating a boundary.
+
+   The class names survive as no-ops so any stale reference still resolves.
 --------------------------------------------------------------------------- */
 
-.scrollProgress {
-  position: absolute;
-  left: var(--lp-frame-inset);
-  right: var(--lp-frame-inset);
-  /* 1px down, so the 4px knob that rides 1px proud of the 2px track lands
-     flush on the window's top edge rather than being clipped by it. */
-  top: 1px;
-  height: 2px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity var(--lp-dur-reveal) var(--lp-ease-out);
-}
-
-/* Distance covered — flat, deliberately quieter than the head. Inset by the
-   knob's half-width on the trailing side so the run's end and the knob's
-   centre agree at both ends of the travel. */
-.scrollProgress::after {
-  content: "";
-  position: absolute;
-  inset: 0 2px 0 0;
-  background: color-mix(in oklab, var(--primary) 45%, transparent);
-  transform: scaleX(var(--scroll-progress, 0));
-  transform-origin: left center;
-}
-
-/* The knob. The element spans the whole track and carries the mark on its
-   trailing edge, so it can be moved with a percentage translate of its own
-   width — transform only, no per-frame layout — and `100% - 4px` lands the
-   knob flush inside the left frame rail at 0 and flush inside the right frame
-   rail at 1 rather than half off the end. */
+.scrollProgress,
 .scrollHead {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 4px;
-  margin-block-start: -2px;
-  border-inline-end: 4px solid var(--primary);
-  translate: calc((var(--scroll-progress, 0) - 1) * (100% - 4px)) 0;
-}
-
-/* Snapped to whole CSS pixels. The knob is declared 4×4 but a continuous
-   progress value puts its edges at arbitrary fractions of a device pixel, so
-   it rasterised 9 device px wide against 8 tall — a knob that is not square,
-   with two soft columns, which is exactly the kind of detail this page cannot
-   afford. Rounding the translate costs nothing perceptible (the track is 1360
-   px wide, so the knob still has 1360 stops) and buys a mark whose edges land
-   on the pixel grid at every one of them. */
-@supports (translate: round(10%, 1px) 0) {
-  .scrollHead {
-    translate: round(calc((var(--scroll-progress, 0) - 1) * (100% - 4px)), 1px)
-      0;
-  }
-}
-
-.root[data-scrolled][data-motion-enabled="true"] .scrollProgress {
-  opacity: 1;
+  display: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -812,7 +982,15 @@
 /* The frame's bottom edge. Painted over the page's own field rather than over
    the footer plate: the plate is `--foreground` at 3.5%, and a translucent
    rule laid on it rendered 69 where the same declaration rendered 64 at the
-   top of the page and 63 down the sides. Same two layers as the rails. */
+   top of the page and 63 down the sides.
+
+   The two rails went back to plain alpha in round 5, because `.frameMatte` gives
+   them a ground the page controls. This edge is the one of the four that cannot:
+   the colophon plate is authored to reach full strength exactly here, so the
+   rule crosses it whatever order the two are painted in. It keeps its own copy
+   of the page field, which is what makes it print the same 60,65,60 (191 light)
+   as the other three rather than 65. Same ink, same rendered number, one extra
+   layer where the page put a field under it. */
 .footerRule {
   position: absolute;
   left: var(--lp-frame-inset);
@@ -868,21 +1046,36 @@
    page. That is what makes the last mark on the page terminate *on* the
    column: a bare 20px glyph inside a 36px hit target stopped ten pixels short
    of the rule everything else lands on, which is how the page ended up with
-   four different right-hand terminations. */
+   four different right-hand terminations.
+
+   Same construction as the toggle and the outline CTA, for the same reason: this
+   edge printed 65,70,65 because it composited over the colophon plate, against
+   60,65,60 everywhere else from the same token. Its ground is the plate rather
+   than the page field, so its interior takes the shared 3% over *that*
+   (`--lp-footer-control-field`) while the border's own layer is the page field —
+   one relationship, one rendered edge value at both ends of the page. */
 .footerMark {
   border: 1px solid var(--lp-chrome-rule);
   border-radius: 3px;
   color: var(--muted-foreground);
+  background-image:
+    linear-gradient(
+      var(--lp-footer-control-field),
+      var(--lp-footer-control-field)
+    ),
+    linear-gradient(var(--background), var(--background));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
   transition:
     border-color var(--lp-dur-hover) var(--lp-ease-snap),
     color var(--lp-dur-hover) var(--lp-ease-snap),
-    background-color var(--lp-dur-hover) var(--lp-ease-snap);
+    translate var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
 .footerMark:hover {
   border-color: var(--lp-hairline-strong);
-  background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
   color: var(--foreground);
+  translate: 0 -1px;
 }
 
 .footerMark:focus-visible {
@@ -923,8 +1116,7 @@
   .footerNavLink::after,
   .footerMark,
   .headerToggle,
-  .headerToggle::after,
-  .scrollProgress {
+  .headerToggle::after {
     transition: none;
     transition-delay: 0s;
   }
@@ -934,7 +1126,10 @@
   }
 
   .ctaButton:hover,
-  .ctaButton:active {
+  .ctaButton:active,
+  .headerToggle:hover,
+  .headerToggle:active,
+  .footerMark:hover {
     translate: none;
   }
 
@@ -947,11 +1142,5 @@
   .ctaButton:active {
     scale: 1 !important;
     transform: none;
-  }
-
-  /* The controller never advances this without motion; a playhead parked at
-     zero forever is worse than none. */
-  .scrollProgress {
-    display: none;
   }
 }

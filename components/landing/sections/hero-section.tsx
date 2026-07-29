@@ -12,16 +12,28 @@ import styles from "@/components/landing/styles/hero.module.css"
  * state rail) so both edges of the viewport are held by structure and the
  * composition never floats in dead space.
  *
- * Four lines hold the composition, and every end of every one of them lands
+ * Three lines hold the composition, and every end of every one of them lands
  * on another line:
  *
- *   header rule   spine → right rail, at the top band
- *   spine         header rule → floor rule, on the 50% line of the measure
- *   floor rule    left rail → spine, on the stage's floor
- *   drawer border the 75% line, drawn once, by the drawer that stands on it
+ *   header rule   eyebrow → the chapter's right edge, one --joint after the
+ *                 label, on the same vertical the drawer's right border stands
+ *                 on 690px below
+ *   spine         header rule → the state rail's track, on the 50% line
+ *   drawer border the chapter's right edge, drawn once, by the drawer itself
+ *
+ * The copy column's floor rule is gone. It shared a y with card 05's bottom
+ * border, 24px to its right and at 1.8× its weight, which reads as one
+ * misaligned horizontal rather than as two things on a baseline; the spine runs
+ * straight past to the rail instead.
  *
  * Everything else in the chapter is an object outline or an internal
  * division, and each of those two roles has exactly one value.
+ *
+ * Nothing in the chapter touches the page frame. Every element's ink stands
+ * 11px inboard of the rail beside it — the copy column and the SCATTERED
+ * terminal on the left, the header rule, the drawer's right border and the
+ * FILED terminal on the right — and headline line 1's terminal period stops
+ * the same 11px short of the spine.
  */
 export function HeroSection() {
   return (
@@ -49,15 +61,16 @@ export function HeroSection() {
 
           <div className={styles.heroMid}>
             {/* The one interior vertical. It stands on the composition's spine
-                — the 50% line of the four-column measure — and it runs the
-                stage's full height at one constant value, top end on the deck's
-                top edge, bottom end on the floor rule. Three things land on it:
-                headline line 1's terminal period, the stage's left edge, and
-                the floor rule's right end. The other two lines the old grid
-                drew (25% and 75%) are gone: 25% held nothing and sliced both
-                the headline and the secondary button, and 75% is held by the
-                drawer's own left border, so drawing it there produced two
-                different greys pretending to be one line. */}
+                — the 50% line of the measure — and runs the chapter's full
+                height at one constant value: top end on the header rule, bottom
+                end on the state rail's track. Two things register to it without
+                touching it: headline line 1's terminal period stops 11px short
+                of it, and the deck column starts 16px past it — the same margin
+                a filed card is given inside the drawer.
+
+                The period used to end ON it. At a 100px cap height the dot's
+                ink and a 1px rule at the same x are one shape; verified
+                visually, it read as a defect. */}
             <span className={styles.heroSpine} aria-hidden="true" />
 
             <div className={`${styles.heroCopyCol} ${styles.heroExit}`}>
@@ -91,20 +104,6 @@ export function HeroSection() {
             </div>
 
             <HeroBoard />
-
-            {/* The copy column's floor. Half the measure, left end on the
-                frame's left rail, right end on the spine — the exact mirror of
-                the header rule above, which is the same length hung off the
-                right rail. Its own line sits on the board's floor, the same y
-                as card 05's bottom edge, so the copy column and the card
-                column terminate on one horizontal.
-
-                It used to carry an "INDEXED 0/5" counter. Six numerals of
-                machinery reporting what the state rail 60px below already
-                reports; the rule alone closes the column. */}
-            <div className={styles.heroFoot} aria-hidden="true">
-              <span className={styles.heroFootRule} />
-            </div>
           </div>
 
           <div className={styles.heroRail} aria-hidden="true">

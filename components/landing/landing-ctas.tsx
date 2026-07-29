@@ -74,6 +74,24 @@ export function HomeCtaFallback({ className }: { className?: string }) {
   )
 }
 
+/**
+ * The command strip's controls.
+ *
+ * The strip's action is the *same* action as the hero's, with the same fixed
+ * label, and for four rounds it was the same filled slab too — two solid green
+ * calls to action 570px apart in one fold, the header instance carrying 64% of
+ * the hero instance's luminance mass and 60% of its green. Two independent
+ * reviews measured that and called it a competition rather than a hierarchy.
+ *
+ * A sticky header action is a deliberate conversion surface, so it is not
+ * deleted and not shrunk (the label is fixed copy, so it cannot be). It is
+ * demoted: `variant="outline"` for the geometry and `ctaHeaderAction` for the
+ * accent, which keeps the shape, the size, the press model, the arrow and the
+ * green — as a 45% edge and a 12% field rather than as 7,164 square pixels of
+ * fill. Measured after: 9% of the hero action's green excess, and a painted
+ * extent that is exactly its box, so it finally shares the theme toggle's 36
+ * rows and its centre.
+ */
 function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
@@ -94,7 +112,8 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
         ) : null}
         <Button
           size="sm"
-          className={`${base.ctaButton} ${base.ctaPrimary} sm:h-9`}
+          variant="outline"
+          className={`${base.ctaButton} ${base.ctaHeaderAction} sm:h-9`}
           nativeButton={false}
           render={(
             <TrackedLink
