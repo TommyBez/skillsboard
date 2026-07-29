@@ -462,7 +462,9 @@
 }
 
 .schemaStackTitle {
-  font-size: clamp(0.95rem, 1.06vw, 1.08rem);
+  /* Capped so the title stays on one line for as long as the panel is wide
+     enough to hold it — otherwise it is one line at 1440 and two at 1920. */
+  font-size: clamp(0.9rem, 1.02vw, 0.94rem);
   font-weight: 650;
   letter-spacing: -0.022em;
   line-height: 1.22;
