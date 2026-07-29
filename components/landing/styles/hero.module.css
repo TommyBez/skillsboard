@@ -22,7 +22,7 @@
      out against: the copy column's baseline, the scatter pitch, the panel's
      centring and the state rail all derive from it. Height-aware so short
      laptops never push the composition into the rail. */
-  --stage-h: min(39rem, calc(100dvh - 12.75rem));
+  --stage-h: min(39rem, calc(100dvh - 13.5rem));
 
   /* Load choreography — one authored sequence, every beat on the shared
      --lp-stagger grid so the entrance reads as a single take:
@@ -359,6 +359,15 @@
    an event rather than as a rag. */
 .heroLineSecond {
   animation-delay: var(--lp-beat-3);
+}
+
+/* Between 1024 and 1280 the stage is at its widest relative to the measure, so
+   the display line has the least room: sized here so line 1 always terminates
+   clear of the deck's left column rather than running into it. */
+@media (min-width: 64rem) {
+  .heroHeadline {
+    font-size: clamp(2.75rem, 6.3vw, 7rem);
+  }
 }
 
 @media (min-width: 80rem) {

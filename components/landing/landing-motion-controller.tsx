@@ -137,6 +137,18 @@ export function LandingMotionController() {
     // heights include their scroll runways (otherwise progress clamps to 1).
     if (!reducedMotion) {
       root.dataset.motionEnabled = "true"
+
+      // Arming the chapters grows the document, so a deep link the browser
+      // already jumped to is now pointing at the wrong offset. Re-resolve it
+      // once, against the heights that actually shipped. In-page clicks are
+      // unaffected — by then the runways exist.
+      const hash = window.location.hash.slice(1)
+      if (hash) {
+        const target = document.getElementById(hash)
+        if (target) {
+          target.scrollIntoView({ block: "start", behavior: "instant" })
+        }
+      }
     }
 
     window.addEventListener("scroll", requestUpdate, { passive: true })
