@@ -26,9 +26,9 @@ The shared team library leads the message. MCP is a supporting access path.
 
 ## Due work
 
-Resolve `strategy.launch` and materialize the current due items in selected work. Advance the highest-impact due item before creating unrelated generic content, then continue the normal fixed-point loop across independent lanes.
+Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. In each frozen snapshot, execute only the first candidate in the scheduler's deterministic selected order, then rebuild before any further launch action. The ordering below is planning information, not an automatic total dependency chain or precedence over SEO, social, or another positive candidate. Emit a directed prerequisite only when an atomic effect cannot truthfully or physically execute before its prerequisite; otherwise sequence and deadline affect rank only.
 
-The critical path is:
+The candidate sequence and dependencies are:
 
 1. production journey and mobile/desktop interaction QA;
 2. production funnel and campaign-attribution QA;
@@ -37,6 +37,8 @@ The critical path is:
 5. native LinkedIn, X, consented email, Product Hunt, Hacker News, and community packages through their exact available routes;
 6. final truth/provider preflight and launch-day execution;
 7. launch support, qualitative learning, and the 14-day cohort report on August 25.
+
+Production-journey and funnel/attribution QA are independent positive candidate inventory whose findings affect rank and information gain; missing or incomplete QA never gates publication or another lane. An effect that uses the demo or landing treatment requires that exact asset to be complete. Launch-day publication requires its channel package plus preflight of the exact provider. Support and cohort reporting require the corresponding launch effect, and the 14-day report also requires its observation window to close. Asset preparation and independent lanes remain selectable whenever they do not require one of those facts.
 
 Provider lanes remain independent. Product Hunt, Hacker News, email, or another unavailable operation never pauses compatible launch work.
 
@@ -48,12 +50,12 @@ Record at least five structured objections or confusion points and locate the la
 
 ## Selection rule
 
-Prefer launch content that names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity guides ranking but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, or publication prohibition. Prevent only an exact duplicate provider effect.
+Launch content contributes most directly when it names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity informs contribution estimates but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, output quota, or publication prohibition. Prevent only an exact duplicate provider effect.
 
-Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem, but it must not outrank a compatible due product-launch item.
+Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate enters the same finite `pulse.scheduler` snapshot with exact effect keys, sorted directed prerequisite IDs for true prerequisites, and separate resource, timing, or provider conflict edges. Prerequisites affect eligibility and are never normalized as conflicts. Exact duplicates are ineligible, but they are not the only possible collision; the shared deterministic algorithm selects the compatible set.
 
 ## Contract boundaries
 
 Use only current shipped claims from `product.truth`. Law, consent, privacy, binding terms, authority, spend/overage, exact-operation availability, contract pins, and owner approval immediately before merging an exact PR/head SHA remain the only blockers.
 
-The detailed working checklist and launch-day run of show live in `docs/gtm/2026-08-product-launch.md`. That document does not authorize a new gate; this reference owns the routed campaign identity and priority.
+The detailed working inventory and launch-day run of show live in `docs/gtm/2026-08-product-launch.md`. That document does not authorize a new gate or priority override; this reference owns the routed campaign identity.

@@ -2,7 +2,7 @@
 
 **Node:** `growth.pseo`
 
-This is an aggressive publish-and-learn lane. It is independent of PostHog, Search Console, keyword volume, scorecard maturity, and existing page checkpoints.
+This is a near-zero-cost audience-led candidate family. It is independent of PostHog, Search Console, keyword volume, scorecard maturity, and existing page checkpoints.
 
 ## Audience-led research
 
@@ -12,7 +12,7 @@ Use public SERPs, official vendor material, primary research, attributable publi
 
 ## Continuous publication
 
-Every strategic run publishes or opens a PR for at least one useful distinct audience-led asset, and operational runs may continue across further distinct or related intents. There is no rolling PR cap, page cap, problem-cluster lock, sibling limit, checkpoint gate, maturity wait, or requirement that earlier pages prove value first.
+Synthesize every useful distinct audience-led asset with an explicit plausibly positive contribution path through acquisition, activation, retention, or reactivation to the governing `AAT-28` objective. Emit a finite asset list with exact repository effects and explicit search-intent, canonical, route, or shared-resource conflicts into the `pulse.scheduler` model; exact duplicate paths are not the only possible collision. Repository work has near-zero marginal cost, so every candidate selected by the deterministic compatible-set algorithm remains actionable. There is no per-run output quota, and one publication never discharges another positive candidate. There is no rolling PR cap, page cap, problem-cluster lock, sibling limit, checkpoint gate, maturity wait, or requirement that earlier pages prove value first.
 
 Content must be useful rather than deceptive doorway/spam content, preserve product truth, use safe canonicals/metadata/indexation/structured data, and respect source/platform terms. These are truth and platform-compliance requirements.
 

@@ -1,7 +1,7 @@
 {
   "artifacts": {
     "orchestrator": {
-      "content_sha256": "e09bf235953ace12ed0e8fe5673e51c0feea5c89791ea853f9e545fb8c57f8c5",
+      "content_sha256": "837dfd8e5aa535d3b110cb7c859349f6e30df7d482604ba7932453dae8c4dfc1",
       "file": ".agents/skills/skillsboard-pulse/SKILL.md"
     },
     "validator": {
@@ -65,14 +65,14 @@
     "max_kernel_bytes": 32768,
     "max_node_bytes": 24576
   },
-  "contract_version": 16,
+  "contract_version": 18,
   "execution_limits": {
     "executor_result_schema_version": 1,
     "max_executor_result_bytes": 4096
   },
   "integrity": {
     "algorithm": "sha256-merkle-v1",
-    "root_sha256": "b7e3bf1d7de50dea9c157fe845b0221eeb1b7c9871e936d0e56d78dc12deb319"
+    "root_sha256": "77c09ba14affef1131ef779307f26f628eb953158e63d6d3efc10415af130090"
   },
   "interference_keys": [
     "channel.community",
@@ -112,7 +112,7 @@
     },
     "analytics.scorecard": {
       "conflicts_with": [],
-      "content_sha256": "50c18edc1df5915b5fa809d29d6b0fed6685cc78fc6922f96d017044d49dc932",
+      "content_sha256": "f07a61fee153d3c7cd5cbf7e3750f8e02b5e77ec6d053fe3e4048ec1ed087031",
       "kind": "policy",
       "provides": [
         "measurement"
@@ -124,7 +124,7 @@
     },
     "channels.distribution": {
       "conflicts_with": [],
-      "content_sha256": "19ff63dcade8126c57c5a083d24d58f84a3c5d21522c2a7ef44312b8692e9572",
+      "content_sha256": "963462cd64923e1a9d5412e707a0a37ac7b43c7d3b421031978232926e16dca4",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -139,7 +139,7 @@
     },
     "channels.social": {
       "conflicts_with": [],
-      "content_sha256": "33f5f9e01c47eb96e5f5a24c9381f82758aae6e8416d58148b4ca4905eddd54f",
+      "content_sha256": "652a3bc86e0aa27ecc69fc43648d758b8e2057dfc2d278b92f460c8810cd1ad9",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -210,7 +210,7 @@
     },
     "growth.pseo": {
       "conflicts_with": [],
-      "content_sha256": "7d3d1f5c00e0747596e8b4bfe488779d81000afb5b3a2ac35256b0ba10433dda",
+      "content_sha256": "91246cececf201415cabd130f873b0118e3d3e8668423c3bf5b4fad04bcb2adf",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -226,7 +226,7 @@
     },
     "launch.campaign": {
       "conflicts_with": [],
-      "content_sha256": "790be5648822c4cbd708221987df6a029f0b27cb88cbc5c7d1e25dad9c410372",
+      "content_sha256": "ab440339be2617421bb0701e3af8b1ca92ee065f9b48f65e188bc6758d5302a4",
       "kind": "policy",
       "provides": [
         "launch_plan"
@@ -239,7 +239,7 @@
     },
     "learning.opportunities": {
       "conflicts_with": [],
-      "content_sha256": "c6a010332007468d80644ddd10eda44e5130738de75d5b374448030af549cb0f",
+      "content_sha256": "212ae4ccc0837d47432f4984c5b3447b66292b26e76965499cf13bc74c53eebb",
       "kind": "policy",
       "provides": [
         "evidence"
@@ -251,7 +251,7 @@
     },
     "product.lifecycle": {
       "conflicts_with": [],
-      "content_sha256": "f55a05e96fa78cd254af32cd3e473daf2929661a429e006320823b8ce7853006",
+      "content_sha256": "5e851434bf80482320cea6b972ea9a66eafca7e82c3339bc81765ee29a421815",
       "kind": "policy",
       "provides": [
         "eligibility",
@@ -298,7 +298,7 @@
     },
     "pulse.scheduler": {
       "conflicts_with": [],
-      "content_sha256": "92284a04c272afdf56dc3ebe9155f395b68e13789e62912505e4278d6e01668c",
+      "content_sha256": "170c17423a5d50ca986c521583a32a80987c8b2ac59770640fe9ed5d5e8d1898",
       "kind": "policy",
       "provides": [
         "idempotency",
@@ -915,18 +915,30 @@
         ],
         "must_include_nodes": [
           "analytics.control_plane",
+          "analytics.scorecard",
+          "channels.distribution",
+          "channels.social",
+          "email.inbound",
+          "email.outbound",
+          "growth.pseo",
+          "learning.opportunities",
+          "product.lifecycle",
           "pulse.scheduler"
         ],
         "must_include_operations": [
           "pulse.state.persist"
-        ]
-      },
-      "operational": {
-        "must_include_nodes": [
-          "learning.opportunities"
         ],
         "must_include_state_views": [
-          "opportunities"
+          "budgets",
+          "delivery",
+          "distribution",
+          "email",
+          "inbound",
+          "opportunities",
+          "product",
+          "pseo",
+          "scorecard",
+          "social"
         ]
       }
     }
@@ -1903,9 +1915,16 @@
     "operational": {
       "entry_nodes": [
         "analytics.control_plane",
+        "analytics.scorecard",
+        "channels.distribution",
+        "channels.social",
         "communications.attention",
+        "email.inbound",
+        "email.outbound",
+        "growth.pseo",
         "launch.campaign",
         "learning.opportunities",
+        "product.lifecycle",
         "pulse.scheduler"
       ],
       "max_known_context_bytes": 131072,
@@ -1921,12 +1940,20 @@
         "active_index",
         "analytics",
         "attention",
+        "budgets",
         "core",
+        "delivery",
         "digest",
+        "distribution",
+        "email",
+        "inbound",
         "incidents",
         "opportunities",
         "product",
-        "selected_work"
+        "pseo",
+        "scorecard",
+        "selected_work",
+        "social"
       ]
     },
     "strategic": {
@@ -1935,6 +1962,8 @@
         "analytics.scorecard",
         "channels.distribution",
         "channels.social",
+        "email.inbound",
+        "email.outbound",
         "growth.pseo",
         "launch.campaign",
         "learning.opportunities",
@@ -1956,8 +1985,11 @@
         "attention",
         "budgets",
         "core",
+        "delivery",
         "digest",
         "distribution",
+        "email",
+        "inbound",
         "incidents",
         "opportunities",
         "product",

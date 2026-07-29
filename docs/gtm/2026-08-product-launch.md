@@ -195,17 +195,17 @@ Product Hunt, Show HN, email, or another individual provider lane may be unavail
 
 ## Launch content selection
 
-The already-scheduled July 27 post remains a one-time exception. When choosing among compatible launch-period actions, prefer the candidate that best satisfies these four properties:
+The already-scheduled July 27 post remains a historical provider fact. Estimate each launch candidate's contribution to the governing `AAT-28` objective using these properties:
 
 1. It explicitly names or visibly demonstrates Skills Board.
 2. It maps to one distinct product proof or launch phase.
-3. Its core angle is not substantially the same as an item published or scheduled in the previous seven days.
+3. It is a distinct provider effect rather than an exact duplicate.
 4. It has a measurable role in the launch funnel or a documented learning objective.
 
-This is a prioritization rule, not an editorial, cooldown, WIP, evidence, or readiness gate. Thematic similarity alone cannot block action. Exact provider-effect deduplication still prevents accidental duplicate publication. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem, but it must not outrank compatible product-launch work.
+These properties inform expected contribution, time to effect, and confidence; they are not an editorial, cooldown, WIP, evidence, readiness, or output gate. Launch membership creates no automatic precedence over SEO, social, or another positive compatible candidate. Every due item enters the finite `pulse.scheduler` snapshot with directed prerequisites kept separate from explicit cross-lane conflicts; exact provider-effect deduplication remains mandatory but is not the only possible collision. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem.
 
 ## Ownership and decision boundaries
 
 Codex and the Pulse execute the routed, zero-cost workstreams, produce assets, verify providers, schedule eligible communications, and report evidence. Tommaso is required only at a genuine owner boundary, especially approval immediately before merging an exact repository PR/head SHA or where identity, law, consent, privacy, binding terms, or spend require it.
 
-The remaining critical path is: production journey QA → measurement QA → channel packages → owner-approved PR merge → final preflight → PostHog flag activation → launch execution.
+The remaining planning inventory is production journey QA, measurement QA, channel packages, the exact PR merge, final provider preflight, homepage-treatment flag activation, and launch execution. Sequence and dates inform rank only. A directed prerequisite exists only for the exact effect that physically or truthfully depends on an asset, provider preflight, flag state, observation window, or owner approval immediately before its exact PR merge.

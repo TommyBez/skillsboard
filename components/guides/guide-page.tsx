@@ -188,7 +188,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   Skills Board keeps the source, install path, notes, and team recommendation in one searchable library.
                 </p>
                 <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
-                  It does not silently synchronize every agent. Your team keeps control of the reviewed source and chooses the path that fits each setup.
+                  It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
                 </p>
                 <div className="mt-7">
                   <ResourceCta landingPath={guide.path} location="guide_inline" />
@@ -224,8 +224,8 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                       <CopyButton
                         value={guide.copyTemplate}
                         label="Copy template"
-                        ariaLabel="Copy AI coding guidelines template"
-                        copiedAriaLabel="AI coding guidelines template copied"
+                        ariaLabel={`Copy ${guide.templateTitle.toLowerCase()}`}
+                        copiedAriaLabel={`${guide.templateTitle} copied`}
                         className="border-white/20 bg-white/10 text-[var(--surface-ink-foreground)] hover:border-white/35 hover:bg-white/15 hover:text-[var(--surface-ink-foreground)]"
                       />
                     </div>

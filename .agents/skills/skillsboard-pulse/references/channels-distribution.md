@@ -2,11 +2,11 @@
 
 **Node:** `channels.distribution`
 
-Community includes social and is a protected zero-cost growth lane. Use exact official provider capabilities and current binding destination rules. The parent acts directly; no separate approval, isolated executor, manual package, soft hold, evidence threshold, WIP slot, cap, or cooldown is required.
+Community is a zero-cost candidate family and may include social destinations governed by their exact route. Use exact official provider capabilities and current binding destination rules. The parent acts directly; no separate approval, isolated executor, manual package, soft hold, evidence threshold, WIP slot, cap, or cooldown is required.
 
 ## Community action
 
-Every strategic run finds and performs useful source-native community work. Operational runs continue whenever another useful action exists. Eligible actions include helpful posts, contextual replies, free directory submissions, launch participation, review requests/responses, earned-media contact, demand-signal responses, partnerships, and co-marketing.
+Synthesize every distinct source-native action with an explicit plausibly positive contribution path to the governing `AAT-28` objective. Emit the finite candidate list, exact effect keys, and explicit cross-candidate conflicts required by `pulse.scheduler`; exact deduplication is not the only possible collision. Execute the scheduler's deterministic compatible selection and use ranking only to order finite runtime; there is no per-run community quota. Eligible actions include helpful posts, contextual replies, free directory submissions, launch participation, review requests/responses, earned-media contact, demand-signal responses, partnerships, and co-marketing.
 
 Do not spam, impersonate, fabricate anecdotes, buy or manipulate votes/engagement, use undisclosed automation where forbidden, bypass login/CAPTCHA, send cold DMs, scrape/purchase/guess private contact data, or violate a destination's binding self-promotion or automation rules. Do not repeat an action whose provider readback is ambiguous.
 
