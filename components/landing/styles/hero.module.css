@@ -213,21 +213,21 @@
    auto margin absorbs the slack instead, so the rule's two ends are structural
    and only the gap after the label varies. */
 .heroTopRule {
-  flex: 0 1 auto;
-  width: 75%;
-  margin-inline-start: auto;
+  flex: 1;
   height: 1px;
   background: var(--lp-grid-line);
   transform-origin: left center;
   animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-2) both;
 }
 
-/* Below the pinned layout there is no four-column field to reach for. */
-@media (max-width: 63.99rem) {
+/* Only where column 1 is actually wide enough to hold the mark: below the full
+   measure the eyebrow would reach past the grid line and the rule would have
+   to start inside it, so there it simply trails the label. */
+@media (min-width: 90rem) {
   .heroTopRule {
-    flex: 1;
-    width: auto;
-    margin-inline-start: 0;
+    flex: 0 1 auto;
+    width: 75%;
+    margin-inline-start: auto;
   }
 }
 
@@ -346,6 +346,8 @@
 }
 
 .heroEyebrow {
+  /* the strip's slack belongs to the rule, never to the label */
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 0.65rem;
@@ -427,6 +429,25 @@
    `.heroFrame`), so the alignment survives a scrollbar; `vw` would not. */
 @media (min-width: 64rem) {
   .heroHeadline {
+    font-size: clamp(2.75rem, 7.25cqw, 6.5rem);
+  }
+}
+
+/* Three coefficients, not one, because the face carries an optical-size axis:
+   its glyphs narrow as it grows, so a line's length is not proportional to its
+   size and one number cannot land the line on the rule at every width. Each
+   band is tuned to reach the rule from below — exactly at the full measure,
+   a few pixels short of it otherwise. Short of the rule is a rag; past it is
+   a collision with the deck's first column, so the error is only ever
+   allowed in one direction. */
+@media (min-width: 80rem) {
+  .heroHeadline {
+    font-size: clamp(2.75rem, 7.55cqw, 6.5rem);
+  }
+}
+
+@media (min-width: 90rem) {
+  .heroHeadline {
     font-size: clamp(2.75rem, 7.627cqw, 6.5rem);
   }
 }
@@ -490,6 +511,15 @@
   gap: 1.25rem;
 }
 
+/* The paragraph's measure is a grid quantity; the button row's width is
+   intrinsic and is allowed to exceed it rather than break into two rows —
+   a stacked pair of actions is a different composition, not a narrower one. */
+@media (min-width: 64rem) {
+  .heroCta > div {
+    flex-wrap: nowrap;
+  }
+}
+
 @media (min-width: 64rem) {
   .heroCta {
     margin-top: 2.75rem;
@@ -547,10 +577,11 @@
   .heroFoot {
     position: absolute;
     inset-inline: 0;
-    /* 12px = half the strip's height: this centres the strip's rule on the
-       stage's floor, exactly as the header strip's rule is centred on its
-       own band. */
-    bottom: calc((100% - var(--stage-h)) / 2 - 12px);
+    /* Half the strip's height, less half a pixel: that lands the strip's own
+       rule on the same two device rows as card 05's bottom border, which is
+       drawn inside its box. Centring on the geometric floor instead put the
+       two halves of the same horizontal one device row apart. */
+    bottom: calc((100% - var(--stage-h)) / 2 - 11.5px);
     z-index: 2;
     display: flex;
     align-items: center;
@@ -750,6 +781,10 @@
   flex: 1;
   height: 2px;
   background: var(--lp-grid-line);
+  /* flex centring aligns the track to the labels' line boxes; the cap band
+     inside those boxes sits half a pixel higher, and the bar is read against
+     the caps, not against the leading */
+  translate: 0 -0.5px;
 }
 
 .heroRailFill {
@@ -811,8 +846,12 @@
     ),
     4rem
   );
-  /* everything on the card below the index strip: body + foot + borders */
-  --cbody: 6.8rem;
+  /* everything on the card below the index strip: body + foot + borders. The
+     card is given this height rather than growing to it, so `--ch` is the
+     truth and not an estimate — with an estimate the deck's pitch was 2.2px
+     out and card 05 hung 2.2px below the stage floor the copy column
+     terminates on. */
+  --cbody: 6.95rem;
   --ch: calc(var(--rh) + var(--cbody)); /* dossier card height */
   --ph: calc(
     var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh) + var(--fh)
@@ -832,8 +871,6 @@
      every filed row will have. They used to sit flush on the drawer's left
      border, which stacked two rounded corners on one vertical line 38px apart
      and read, correctly, as a bug. */
-  --scat-l: var(--pp);
-  --scat-r: var(--filed-x);
   --pitch: calc((var(--sh) - var(--ch)) / 2);
 
   /* Fan. The deck is laid out around the drawer's mouth, so the tilt is a
@@ -867,31 +904,15 @@
      board's cards must stay hoverable where they sit beside it */
   z-index: 3;
   display: none;
-  width: var(--sw);
+  /* the last two of the measure's four columns */
+  width: 50%;
   height: var(--sh);
   translate: 0 -50%;
   pointer-events: none;
 }
 
-@media (min-width: 80rem) {
-  .heroBoard {
-    --sw: 32rem;
-    --cw: 14.5rem;
-    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 3.85rem);
-    --hh: 3.1rem;
-    --qh: 3.5rem;
-    --fh: 2.6rem;
-  }
-}
-
 @media (min-width: 90rem) {
   .heroBoard {
-    --sw: 36rem;
-    --cw: 16.5rem;
-    --rh: clamp(2.9rem, calc((var(--stage-h) - 13.4rem) / 5), 4rem);
-    --hh: 3.2rem;
-    --qh: 3.6rem;
-    --fh: 2.7rem;
     --pp: 0.85rem;
   }
 }
@@ -922,11 +943,28 @@
    reach are *for*: they are the drawer's own margins, not leftovers. It also
    states the scene before a single pixel has scrolled: five loose cards, and
    the shape they are going into. */
+/* Four things were wrong with this panel and all four had the same cause: it
+   was drawn as a *pending* object rather than as a finished one.
+
+   1. It rested at 22% opacity, so two of its four borders measured at or below
+      the value of the field behind them — a half-drawn box.
+   2. It carried a 14px entrance offset at rest, which broke the only symmetry
+      it had: the two loose cards standing over it sat 38px from its top rule
+      and 63px from its bottom one.
+   3. Its right edge landed on the page frame's own rail, doubling the most
+      conspicuous hairline in the composition.
+   4. Its contents were tied to a scroll variable, so without script — where
+      there is no runway to scroll — the drawer rendered as an empty outline.
+
+   Now: one column wide, docked into the frame's right rail (no border and no
+   radius on that side, so the rail *is* its right edge rather than sitting a
+   pixel away from one), fully drawn at rest, and registered to the two cards
+   standing over it on all four sides — the panel's own gutter left and right,
+   its head rule and its foot rule top and bottom. The scene's event is the
+   deck arriving in the rows, not the drawer fading up. */
 .libraryFrame {
-  /* the drawer is open and waiting well before the first card arrives */
-  --frame-p: clamp(0, calc((var(--route-p) - 0.01) / 0.2), 1);
   position: absolute;
-  left: calc(var(--sw) - var(--pw));
+  left: 50%;
   top: var(--pt);
   width: var(--pw);
   height: var(--ph);
@@ -936,26 +974,12 @@
       var(--primary) calc(var(--done) * 30%),
       var(--lp-hairline-strong)
     );
-  border-radius: 0.875rem;
-  background: color-mix(
-    in oklab,
-    var(--card) calc(var(--frame-p) * 78%),
-    transparent
-  );
-  box-shadow: 0 1px 0
-    color-mix(in oklab, var(--foreground) calc(var(--frame-p) * 4%), transparent);
-  opacity: calc(0.22 + 0.78 * var(--frame-p));
-  translate: calc(var(--px) * -5px) calc(
-      (1 - var(--frame-p)) * 14px + var(--py) * -4px
-    );
+  border-inline-end: none;
+  border-radius: 0.875rem 0 0 0.875rem;
+  background: color-mix(in oklab, var(--card) 72%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
+  translate: calc(var(--px) * -5px) calc(var(--py) * -4px);
   transition: translate 420ms var(--lp-ease-out);
-}
-
-/* The panel's contents arrive with the field, not with the outline. */
-.libraryHead,
-.libraryFilter,
-.libraryFoot {
-  opacity: var(--frame-p, 1);
 }
 
 .libraryHead {
@@ -1057,7 +1081,6 @@
   /* four separators, not five: the fifth would sit a padding-width above the
      panel's own foot rule and read as a doubled edge */
   height: calc(5 * var(--rh) - 1px);
-  opacity: clamp(0, calc((var(--route-p) - 0.05) / 0.2), 1);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
@@ -1113,13 +1136,24 @@
    space the deck vacates into the diagram that explains the scene.
 ------------------------------------------------------------------ */
 
+/* This diagram exists to fill the space the deck vacates, so it belongs to the
+   scrolled scene and to nothing else. Without script the deck never vacates:
+   the leaders would then be drawn across five cards that are still lying on
+   the desk, pointing at rows that are still empty. It is therefore not part of
+   the unarmed composition at all — not rendered, rather than rendered at zero
+   opacity. Reduced motion rests the scene filed, so it is drawn there. */
 .libraryFeed {
+  display: none;
   position: absolute;
-  right: var(--pw);
+  right: 50%;
   top: var(--row0);
   width: 13.5rem;
   height: calc(5 * var(--rh));
   transition: opacity 220ms var(--lp-ease-snap);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"]) .libraryFeed {
+  display: block;
 }
 
 /* Each leader is drawn as its own card docks: the source label takes the place
@@ -1205,8 +1239,6 @@
   --t: clamp(0, calc((var(--route-p) - var(--ls, 0)) / var(--win)), 1);
   /* smoothstep: cards ease in and settle instead of tracking scroll linearly */
   --fp: calc(var(--t) * var(--t) * (3 - 2 * var(--t)));
-  /* rotation resolves ahead of position — secondary action */
-  --fr: clamp(0, calc(1 - var(--fp) * 1.35), 1);
   /* dock: the card stays a whole card the entire flight and only folds
      flat into its row on arrival, so nothing is ever half-a-card in mid-air */
   --dp: clamp(0, calc((var(--fp) - 0.72) / 0.28), 1);
@@ -1223,24 +1255,35 @@
   left: var(--filed-x);
   width: var(--cw);
   pointer-events: none;
+  /* The tilt is driven by --lift, so it is zero at both ends of the flight and
+     maximal in the middle. A 1px hairline drawn at an angle is spread across
+     two device rows at a different fraction on every card, which is why five
+     resting cards measured five different apparent border weights; a card in
+     transit is the one place a tilt costs nothing, because nothing is being
+     read off it. Rest and filed are both axis-aligned and both crisp. */
   transform: translate3d(
       calc(var(--sx) * (1 - var(--fp))),
       calc(var(--sy) * (1 - var(--fp))),
       0
     )
-    rotate(calc(var(--sr) * var(--fr)))
+    rotate(calc(var(--sr) * var(--lift)))
     scale(calc(1 + var(--lift) * 0.035));
 }
 
 /* Scattered coordinates are written as (column, row) on the scatter grammar,
-   then expressed as the delta from the card's filed slot. Left column leans
-   away from the drawer, right column toward it; the tilt grows with the
-   distance the card has to travel, so the fan is a rule, not a jitter. */
+   then expressed as the delta from the card's filed slot.
+
+   The horizontal delta is `-100% - 2 * --pp` — the card's own width plus its
+   two gutters, which is exactly one column of the page's four. Filing a card
+   from column 3 to column 4 is therefore a translation of precisely one
+   column, at every viewport width, with no length written down anywhere. The
+   two cards already standing in column 4 travel vertically only: they are over
+   their slot to begin with, and the composition says so. */
 .dossierSlot[data-slot="1"] {
   top: var(--row0);
   z-index: 9;
   --ls: var(--ls1);
-  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sx: calc(-100% - 2 * var(--pp));
   --sy: calc(0px - var(--row0));
   --sr: calc(-1 * var(--fan));
 }
@@ -1249,7 +1292,7 @@
   top: calc(var(--row0) + var(--rh));
   z-index: 8;
   --ls: var(--ls2);
-  --sx: calc(var(--scat-r) - var(--filed-x));
+  --sx: 0px;
   --sy: calc(0.5 * var(--pitch) - var(--row0) - var(--rh));
   --sr: calc(-0.5 * var(--fan));
 }
@@ -1258,7 +1301,7 @@
   top: calc(var(--row0) + 2 * var(--rh));
   z-index: 7;
   --ls: var(--ls3);
-  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sx: calc(-100% - 2 * var(--pp));
   --sy: calc(var(--pitch) - var(--row0) - 2 * var(--rh));
   --sr: 0deg;
 }
@@ -1267,7 +1310,7 @@
   top: calc(var(--row0) + 3 * var(--rh));
   z-index: 6;
   --ls: var(--ls4);
-  --sx: calc(var(--scat-r) - var(--filed-x));
+  --sx: 0px;
   --sy: calc(1.5 * var(--pitch) - var(--row0) - 3 * var(--rh));
   --sr: calc(0.5 * var(--fan));
 }
@@ -1276,7 +1319,7 @@
   top: calc(var(--row0) + 4 * var(--rh));
   z-index: 5;
   --ls: var(--ls5);
-  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sx: calc(-100% - 2 * var(--pp));
   --sy: calc(2 * var(--pitch) - var(--row0) - 4 * var(--rh));
   --sr: var(--fan);
 }
@@ -1287,6 +1330,16 @@
    hand laying paper down. */
 .dossierEnter {
   animation: lp-hero-deal 700ms var(--lp-ease-emph) both;
+}
+
+/* Below the pinned layout the desk is `display: none`, so this animation never
+   runs and `both` would pin its subtree at the from-state — five elements
+   parked at opacity 0 inside a hidden board. Nothing in the chapter should be
+   holding an unplayed from-state. */
+@media (max-width: 63.99rem) {
+  .dossierEnter {
+    animation: none;
+  }
 }
 
 .dossierSlot[data-slot="1"] .dossierEnter {
@@ -1343,6 +1396,7 @@
   width: 100%;
   pointer-events: auto;
   --surface: var(--card);
+  height: var(--ch, auto);
   background: color-mix(
     in oklab,
     var(--surface) calc(100% - var(--merge, 0) * 100%),
@@ -1427,6 +1481,7 @@
 }
 
 .dossierBody {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -1543,6 +1598,10 @@
   color: var(--ink-lo);
 }
 
+/* The one string on the card a developer is meant to read and copy. It was the
+   weakest text in the chapter at 5.6:1 — quieter than the card's own summary —
+   which is exactly backwards. It takes the top step of the card's three-step
+   ink ramp; the `$` beside it stays punctuation. */
 .dossierCmd {
   min-width: 0;
   overflow: hidden;
@@ -1550,6 +1609,7 @@
   white-space: nowrap;
   font-family: inherit;
   font-size: inherit;
+  color: var(--ink-hi);
 }
 
 /* ------------------------------------------------------------------
@@ -1563,9 +1623,12 @@
 .dossierPeek {
   position: absolute;
   top: calc(var(--rh) / 2);
-  right: calc(var(--cw) + var(--pp) + 1.9rem);
+  /* pulled out into the slot the loose deck occupied — column 3, inset by the
+     stage's gutter — so the drawer gives the card back exactly where it came
+     from rather than to a floating offset */
+  right: calc(100% + 2 * var(--pp));
   z-index: 20;
-  width: var(--cw);
+  width: 100%;
   opacity: 0;
   translate: 0.75rem -50%;
   pointer-events: none;
@@ -1589,8 +1652,8 @@
 .dossierLeader {
   position: absolute;
   top: 50%;
-  right: -1.9rem;
-  width: 1.9rem;
+  right: calc(-2 * var(--pp));
+  width: calc(2 * var(--pp));
   height: 1px;
   background: color-mix(in oklab, var(--primary) 60%, transparent);
 }
@@ -1718,38 +1781,25 @@
 }
 
 /* Alternating sides, each card whole — the same grammar as the desktop
-   scatter, folded into one column, and the same fan: the tilt is a function of
-   how far the card sits from the middle of the deck, nothing else. */
+   scatter, folded into one column. No tilt, for the same reason the desktop
+   deck has none at rest: a rotated 1px border is antialiased across two device
+   rows and every card ends up at a different apparent weight. The deck reads
+   as loose from its offsets alone. */
 .mobileChaosCard:nth-child(odd) {
   align-self: flex-start;
 }
 
 .mobileChaosCard:nth-child(even) {
   align-self: flex-end;
-  /* the tilt must not push a corner past the column rule */
   margin-right: 2%;
-}
-
-.mobileChaosCard:nth-child(1) {
-  rotate: calc(-1 * var(--fan));
-}
-
-.mobileChaosCard:nth-child(2) {
-  rotate: calc(-0.5 * var(--fan));
 }
 
 .mobileChaosCard:nth-child(3) {
   margin-left: 8%;
-  rotate: 0deg;
-}
-
-.mobileChaosCard:nth-child(4) {
-  rotate: calc(0.5 * var(--fan));
 }
 
 .mobileChaosCard:nth-child(5) {
   margin-left: 5%;
-  rotate: var(--fan);
 }
 
 .mobileArrow {
@@ -1949,8 +1999,18 @@
   .heroBlurb,
   .heroCta,
   .heroTally,
+  .heroFootRule,
   .heroRail {
     animation: lp-hero-fade 140ms linear both;
+  }
+
+  .heroFootRule {
+    scale: none;
+  }
+
+  /* the scene rests filed, so the diagram that explains the filing is drawn */
+  .libraryFeed {
+    display: block;
   }
 
   /* the scene rests filed, so the count rests filed too */
@@ -1995,24 +2055,18 @@
 
   .dossierSlot {
     --fp: 1;
-    --fr: 0;
     --lift: 0;
     --merge: 1;
     transform: none;
   }
 
   .libraryFrame {
-    --frame-p: 1;
     translate: none;
     transition: none;
   }
 
   .heroBoard {
     --done: 1;
-  }
-
-  .libraryRows {
-    opacity: 1;
   }
 
   .libraryScan {
