@@ -106,10 +106,6 @@
   .mcpChapter {
     --lib-row-h: 3.75rem;
   }
-
-  .connect {
-    display: none;
-  }
 }
 
 /* The tall scroll chapter only exists when the controller is live; without
@@ -222,9 +218,9 @@
 .readout {
   display: flex;
   align-items: center;
-  /* 0.75rem ink-to-ink: SIGNAL's trailing tracking (0.154em) is added back
-     into the gap so the joint measures what it says. */
-  gap: calc(0.75rem + 0.154em);
+  /* 0.75rem measured from SIGNAL's last *glyph*: the run carries 0.154em of
+     trailing letter-space, so the nominal gap gives it back. */
+  gap: calc(0.75rem - 0.154em);
   margin-left: 0.75rem;
   font-family: var(--font-mono);
   font-size: 0.6rem;
@@ -476,6 +472,15 @@
   .connect {
     height: var(--lib-row-h);
     margin-top: 1.75rem;
+  }
+}
+
+/* On a short desktop the copy block cannot carry a fourth object and still
+   clear the footer rule, so the plate stands down and the two columns rest at
+   the same height without it. */
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .connect {
+    display: none;
   }
 }
 
