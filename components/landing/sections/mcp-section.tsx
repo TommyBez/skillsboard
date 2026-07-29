@@ -30,6 +30,7 @@ export function McpSection() {
             </p>
             <p className={styles.readout} aria-hidden="true">
               <span className={styles.readoutKey}>signal</span>
+              <span className={styles.readoutSep} />
               <span className={styles.readoutStack}>
                 <span data-phase="0">standby</span>
                 <span data-phase="1">indexing</span>
@@ -73,6 +74,22 @@ export function McpSection() {
                     <HomeMcpActions />
                   </Suspense>
                 </div>
+
+                {/* The step after the button, in the chapter's instrument
+                    voice. It is one library-row module tall, so the copy
+                    column's last object is measured by the diagram's unit. */}
+                <div className={styles.connect} aria-hidden="true">
+                  <p className={styles.connectHead}>
+                    <span>add the server</span>
+                    <span className={styles.connectClient}>claude code</span>
+                  </p>
+                  <p className={styles.connectLine}>
+                    <span className={styles.connectPrompt}>$</span>
+                    <span className={styles.connectCmd}>
+                      claude mcp add --transport http skills-board
+                    </span>
+                  </p>
+                </div>
               </div>
 
               {/* Decorative annotation: the connection this chapter describes,
@@ -80,7 +97,7 @@ export function McpSection() {
               <div className={styles.endpoint} aria-hidden="true">
                 <p className={styles.endpointHead}>
                   <span>endpoint</span>
-                  <span>12 tools</span>
+                  <span className={styles.endpointCount}>12 tools</span>
                 </p>
                 <p className={styles.endpointValue}>/api/mcp</p>
                 <p className={styles.endpointMeta}>

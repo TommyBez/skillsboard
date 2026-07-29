@@ -2,9 +2,24 @@ import styles from "@/components/landing/styles/mcp.module.css"
 
 /** The three tools this chapter promises, with the real MCP tool they map to. */
 const mcpTools = [
-  { name: "Search team skills", tool: "search_skills", arg: "(query)" },
-  { name: "Find saved recommendations", tool: "search_collections", arg: "(query)" },
-  { name: "Get install commands", tool: "get_skill_command", arg: "(skillId)" },
+  {
+    name: "Search team skills",
+    tool: "search_skills",
+    arg: "(query: string)",
+    ret: "\u2192 skill[]",
+  },
+  {
+    name: "Find saved recommendations",
+    tool: "search_collections",
+    arg: "(query: string)",
+    ret: "\u2192 collection[]",
+  },
+  {
+    name: "Get install commands",
+    tool: "get_skill_command",
+    arg: "(skillId: uuid)",
+    ret: "\u2192 install command",
+  },
 ] as const
 
 /** Decorative library rows echoing the hero dossiers. Visual examples only. */
@@ -68,7 +83,6 @@ export function McpSchematic() {
                   </span>
                   <span className={styles.schemaRowName}>{row.name}</span>
                   <span className={styles.schemaRowTag}>{row.tag}</span>
-                  <span className={styles.schemaRowTick} />
                 </li>
               ))}
             </ul>
@@ -155,6 +169,9 @@ export function McpSchematic() {
                   <span data-state="off">idle</span>
                   <span data-state="on">ready</span>
                 </span>
+                <span className={styles.actionRet} aria-hidden="true">
+                  {tool.ret}
+                </span>
               </li>
             ))}
           </ul>
@@ -162,7 +179,7 @@ export function McpSchematic() {
 
         <p className={styles.hopMeasure} aria-hidden="true">
           <span className={styles.hopRule} />
-          <span>one hop</span>
+          <span className={styles.hopLabel}>one hop</span>
           <span className={styles.hopRule} />
         </p>
       </div>

@@ -24,7 +24,6 @@ export function HeroSection() {
       <div className={`${styles.heroSticky} ${base.grain}`}>
         <div className={styles.heroFrame}>
           <div className={styles.heroField} aria-hidden="true" />
-          <div className={styles.heroRules} aria-hidden="true" />
 
           <div className={styles.heroTop}>
             {/* Chapter index, same grammar as 02–06. */}
@@ -38,6 +37,18 @@ export function HeroSection() {
           </div>
 
           <div className={styles.heroMid}>
+            {/* The one interior vertical. It stands on the composition's spine
+                — the 50% line of the four-column measure — and it runs the
+                stage's full height at one constant value, top end on the deck's
+                top edge, bottom end on the floor rule. Three things land on it:
+                headline line 1's terminal period, the stage's left edge, and
+                the floor rule's right end. The other two lines the old grid
+                drew (25% and 75%) are gone: 25% held nothing and sliced both
+                the headline and the secondary button, and 75% is held by the
+                drawer's own left border, so drawing it there produced two
+                different greys pretending to be one line. */}
+            <span className={styles.heroSpine} aria-hidden="true" />
+
             <div className={`${styles.heroCopyCol} ${styles.heroExit}`}>
               <h1 className={styles.heroHeadline}>
                 <span className={styles.heroLineMask}>
@@ -70,30 +81,17 @@ export function HeroSection() {
 
             <HeroBoard />
 
-            {/* The copy column's floor strip — the exact mirror of the header
-                strip above: a mark in column 1, then a rule that starts on the
-                column-1/2 grid line. The header rule runs to the frame's right
-                rail; this one runs to the composition's spine (the 50% rule),
-                and its own line sits on the board's floor — the same y as
-                card 05's bottom edge. The copy column and the card column
-                therefore terminate on one line rather than at three heights.
+            {/* The copy column's floor. Half the measure, left end on the
+                frame's left rail, right end on the spine — the exact mirror of
+                the header rule above, which is the same length hung off the
+                right rail. Its own line sits on the board's floor, the same y
+                as card 05's bottom edge, so the copy column and the card
+                column terminate on one horizontal.
 
-                Keyed "Indexed", not "Filed": the rail below is the state
-                machine and owns that word. Single digits throughout, so the
-                deck's count can never be mistaken for the page's chapter
-                numbering, which is always two digits. */}
+                It used to carry an "INDEXED 0/5" counter. Six numerals of
+                machinery reporting what the state rail 60px below already
+                reports; the rule alone closes the column. */}
             <div className={styles.heroFoot} aria-hidden="true">
-              <p className={styles.heroTally}>
-                <span className={styles.heroTallyKey}>Indexed</span>
-                <span className={styles.heroTallyNum}>
-                  {[0, 1, 2, 3, 4, 5].map((n) => (
-                    <span key={n} className={styles.heroTallyDigit} data-n={n}>
-                      {n}
-                    </span>
-                  ))}
-                </span>
-                <span className={styles.heroTallyTotal}>/5</span>
-              </p>
               <span className={styles.heroFootRule} />
             </div>
           </div>

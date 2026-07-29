@@ -32,11 +32,15 @@ export function ChapterRail() {
 }
 
 /**
- * Sticky command strip. The scroll gauge sits on its own row *inside* the
- * strip, four pixels above the measure rule that closes the frame's top edge —
- * it used to share that rule's 1px row, where the travelled run read as a
- * border that inexplicably changed colour partway across rather than as a
- * position.
+ * Sticky command strip.
+ *
+ * The scroll gauge is the strip's leading edge: a 2px run flush with the top
+ * of the window, spanning exactly the measure, with a 4px square knob riding
+ * its head. It has been at three heights now. On the measure rule's own row it
+ * read as a border that changed colour partway across; four pixels above that
+ * rule it read as a 1px mistake, because two parallel horizontals three pixels
+ * apart always do. At the other end of the strip there is nothing within 53px
+ * of it to be mistaken for.
  */
 export function LandingHeader() {
   return (

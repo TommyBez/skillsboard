@@ -81,13 +81,6 @@ const dossiers = [
 
 type Dossier = (typeof dossiers)[number]
 
-/* Single digits, deliberately. The page numbers its chapters 01…06 in the same
-   mono at the same size; a card printing "01" 780px from the chapter's own "01"
-   put two unrelated numbering systems on screen in one token. The deck counts
-   1–5, the page counts 01–06, and the hero's tally counts 0/5 — one register per
-   system. */
-const index = (i: number) => String(i + 1)
-
 /** owner / repo, set as a provenance line. */
 function SourceRef({
   dossier,
@@ -110,10 +103,12 @@ function SourceRef({
   )
 }
 
-function DossierRow({ dossier, i }: { dossier: Dossier; i: number }) {
+/* No index badge. The page already numbers its chapters 01…06 in this exact
+   mono at this exact size; five more numerals 780px away were a second
+   numbering system saying nothing the row's own position does not. */
+function DossierRow({ dossier }: { dossier: Dossier }) {
   return (
     <div className={styles.dossierRow}>
-      <span className={styles.dossierIndex}>{index(i)}</span>
       <span className={styles.dossierName}>{dossier.name}</span>
       <span className={styles.dossierStars}>
         <StarIcon className={styles.dossierStar} aria-hidden="true" />
@@ -123,10 +118,10 @@ function DossierRow({ dossier, i }: { dossier: Dossier; i: number }) {
   )
 }
 
-function DossierCard({ dossier, i }: { dossier: Dossier; i: number }) {
+function DossierCard({ dossier }: { dossier: Dossier }) {
   return (
     <div className={styles.dossier}>
-      <DossierRow dossier={dossier} i={i} />
+      <DossierRow dossier={dossier} />
       <div className={styles.dossierBody}>
         <SourceRef
           dossier={dossier}
@@ -150,12 +145,16 @@ function DossierCard({ dossier, i }: { dossier: Dossier; i: number }) {
   )
 }
 
+/* The panel says three things and each of them is a different fact: what it is
+   (head), that it is searchable (filter), and how many repositories feed it
+   (base). It used to say "5 SKILLS" in the head as well, 40px above a filter
+   row already reading "Filter 5 skills" — the same number three times in one
+   340px column. */
 function LibraryHead() {
   return (
     <div className={styles.libraryHead}>
       <span className={styles.libraryDot} />
       <span className={styles.libraryLabel}>Team library</span>
-      <span className={styles.libraryCount}>5 skills</span>
       <span className={styles.libraryScan} />
     </div>
   )
@@ -171,11 +170,14 @@ function LibraryFilter() {
   )
 }
 
+/* One mark, not two. The base used to print "5 SOURCES" and "MCP READY", the
+   second of which carried the chapter's *second* green dot 620px from the
+   first — two status lights doing two different jobs inside one panel. The
+   sources count is the one fact the head does not already state. */
 function LibraryFoot() {
   return (
     <div className={styles.libraryFoot}>
       <span>5 sources</span>
-      <span className={styles.libraryFootLive}>mcp ready</span>
     </div>
   )
 }
@@ -223,9 +225,9 @@ export function HeroBoard() {
                   className={styles.dossierParallax}
                   style={{ "--depth": dossier.depth } as CSSProperties}
                 >
-                  <DossierCard dossier={dossier} i={i} />
+                  <DossierCard dossier={dossier} />
                   <div className={styles.dossierPeek}>
-                    <DossierCard dossier={dossier} i={i} />
+                    <DossierCard dossier={dossier} />
                     <span className={styles.dossierLeader} />
                   </div>
                 </div>
@@ -236,14 +238,13 @@ export function HeroBoard() {
       </div>
 
       {/* Small screens: the same story, told as a static before / after.
-          All five dossiers appear in both halves so the index numbers on the
-          loose cards and on the filed rows describe the same five skills. */}
+          All five dossiers appear in both halves, in the same order. */}
       <div className={styles.heroBoardMobile} aria-hidden="true">
         <p className={styles.mobileMark}>Scattered</p>
         <div className={styles.mobileChaos}>
-          {dossiers.map((dossier, i) => (
+          {dossiers.map((dossier) => (
             <div key={dossier.name} className={styles.mobileChaosCard}>
-              <DossierCard dossier={dossier} i={i} />
+              <DossierCard dossier={dossier} />
             </div>
           ))}
         </div>
@@ -259,9 +260,8 @@ export function HeroBoard() {
             <LibraryFilter />
           </div>
           <div className={styles.mobileRows}>
-            {dossiers.map((dossier, i) => (
+            {dossiers.map((dossier) => (
               <div key={dossier.name} className={styles.mobileRow}>
-                <span className={styles.dossierIndex}>{index(i)}</span>
                 <span className={styles.dossierName}>{dossier.name}</span>
                 <span className={styles.dossierStars}>
                   <StarIcon className={styles.dossierStar} aria-hidden="true" />

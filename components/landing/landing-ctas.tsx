@@ -50,6 +50,13 @@ export function HomeHeaderActionsFallback() {
  * a dead grey box. Render the anonymous action instead: it is a working link
  * to the same place the resolved button sends a signed-out visitor, and for a
  * signed-in one it is replaced the moment the session lands.
+ *
+ * It carries `ctaPrimary` for the same reason it carries an href: without
+ * script this is what a visitor sees, and it has to be the same button as the
+ * one beside it. Without that class it rendered as the bare filled variant —
+ * fill clipped to the padding box, so two pixels shorter than its neighbours,
+ * and with no lit top edge — three chapters' primary actions quietly a
+ * different control from the hero's.
  */
 export function HomeCtaFallback({ className }: { className?: string }) {
   const primary = primaryAction(false)
@@ -57,7 +64,7 @@ export function HomeCtaFallback({ className }: { className?: string }) {
   return (
     <Button
       size="lg"
-      className={`${base.ctaButton} ${className ?? ""}`}
+      className={`${base.ctaButton} ${base.ctaPrimary} ${className ?? ""}`}
       nativeButton={false}
       render={<Link href={primary.href} />}
     >
