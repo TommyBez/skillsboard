@@ -14,10 +14,12 @@ export function FaqSection() {
     >
       <div className={styles.faqInner} data-motion-group="faq">
         {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). It is
-            symmetric by construction: a tabular numeral on each frame rail,
-            a 36px hair inboard of each, and one long hair spanning the rest.
-            Its rule is the register's head rule and runs the whole measure,
-            so both columns hang from one edge. */}
+            symmetric by construction: a tabular numeral at each end, a 36px
+            dotted connector inboard of each, and one long connector spanning
+            the rest. Its marks stand on the same inset as the headline and the
+            toggles below them; only its RULE runs the whole measure, because
+            that rule is the register's head rule and both columns hang from
+            it. */}
         <p className={styles.faqStrip} aria-hidden="true">
           <span className={styles.faqStripNum} data-decode="">
             05
@@ -91,8 +93,8 @@ export function FaqSection() {
                   <span className={styles.faqQuestion}>{faq.question}</span>
                   {/* Leader: ties the entry to its control the way a contents
                       page ties a title to its folio. Its dots are phased from
-                      the right edge, so eight ragged lengths still resolve
-                      into one aligned field of columns. */}
+                      the LEFT, off the ink of the question's final "?", so the
+                      first dot stands one inset clear on all eight rows. */}
                   <span className={styles.faqLead} aria-hidden="true" />
                   <span className={styles.faqGlyph} aria-hidden="true" />
                 </summary>

@@ -24,16 +24,27 @@
        rail — so it starts and ends on a structural edge and crosses the two
        minor verticals instead of stopping in mid-air;
      · row pitch is an integer at every breakpoint (69px at ≥90rem: a 30px
-       line box, 19px of padding either side, 1px of rule). Every horizontal
-       edge in the left column lands on one of those row boundaries;
-     · rules carry five weights and one meaning each, brightest first:
-       bracket (the chapter's head and foot) → major column split → open-row
-       marker → row repeat → minor verticals and leaders. The container's own
-       frame rails sit between the split and the repeat, so the edge of the
-       page never reads as one more row;
+       line box, 19px of padding either side, 1px of rule) — and the OPEN row
+       is exactly three of them, because the answer bay is pinned to two. So
+       every horizontal edge in the chapter, in all eight states, lands on the
+       same 69px lattice; the index cell's rule in the left column stays on it
+       whichever entry is open; and the chapter is 911.44px tall no matter
+       which one that is, so nothing below it moves when you toggle;
+     · rules carry four weights at rest and one meaning each, brightest first:
+       bracket (the chapter's head and foot) → major column split → row repeat
+       → minor verticals and leaders. The container's own frame rails sit
+       between the split and the repeat, so the edge of the page never reads
+       as one more row. A fifth, transient weight belongs to hover alone; an
+       open row is marked by its accent segment, its lit ordinal and its
+       accent toggle, and is not given a louder rule as well;
      · the ordinal sits on the question's BASELINE; the leader and the toggle
        sit on the centre of its cap band. Type aligns to type, marks align to
        the optical centre of the type they mark.
+
+   Measured luminances at 1440, dark, over a field of 12.2 — bracket 79.5,
+   page frame rails 63.2, column split 56.6, row repeat 39.4, minor verticals
+   and leader dots 28.2. The same ladder inverts intact in light: 175.1 /
+   189.9 / 198.2 / 215.5 / 226.7 over a field of 243.6.
 
    Every entry is a real <details>, so the chapter is complete and operable
    with no JS at all. Entry 01 rests open, so the resting composition already
@@ -86,12 +97,15 @@
   /* Minor verticals (numeral rule, control rule) and every dotted leader. */
   --faq-rule-minor: color-mix(in oklab, var(--foreground) 7%, transparent);
   /* Hover / focus only, and drawn OVER the row repeat rather than beside it,
-     weighted so the two composite to exactly the split's 20%. Stacking two
-     full-strength hairlines is what made this line brighter than the
-     chapter's own closing rule. Nothing in the RESTING composition uses it:
-     an open row is already marked by its accent segment, its lit ordinal and
-     its accent toggle, and does not also need a louder rule. */
-  --faq-rule-state: color-mix(in oklab, var(--foreground) 9.1%, transparent);
+     weighted so that the two of them, plus the row's own hover tint, come to
+     the split's weight and no further. Stacking two full-strength hairlines
+     is what made this line brighter than the chapter's own closing rule. */
+  --faq-rule-state: color-mix(in oklab, var(--foreground) 6%, transparent);
+  /* The accent appears at exactly two strengths in this chapter: full ink on
+     type and controls (the readout, the open ordinal, the open toggle), and
+     this one on every rule and mark the state draws — the open row's segment,
+     its leader, and its station on the index scale. */
+  --faq-accent-rule: color-mix(in oklch, var(--primary) 62%, transparent);
 
   /* One dash language. The strip's connectors and the register's leaders are
      the same 2px mark on the same 6px pitch, phased from the left. */
@@ -227,8 +241,8 @@
 .faqStrip::after {
   content: "";
   position: absolute;
-  left: calc(-1 * var(--faq-cellx));
-  right: calc(-1 * var(--faq-cellx));
+  left: 0;
+  right: 0;
   bottom: 0;
   height: 1px;
   background: var(--faq-rule-bracket);
@@ -555,7 +569,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: var(--primary);
+  background: var(--faq-accent-rule);
   transform: scaleY(0);
   transform-origin: center top;
   transition: transform 420ms var(--lp-ease-emph);
@@ -663,7 +677,7 @@
     bottom: -1px;
     left: calc(var(--faq-cellx) + var(--faq-ord-w) + var(--faq-inset));
     width: 1px;
-    background: color-mix(in oklch, var(--primary) 62%, transparent);
+    background: var(--faq-accent-rule);
     transform: scaleY(0);
     transform-origin: center top;
     transition: transform 340ms var(--lp-ease-emph);
@@ -759,7 +773,7 @@
 }
 
 .faqItem[open] .faqLead {
-  background-color: color-mix(in oklch, var(--primary) 46%, transparent);
+  background-color: var(--faq-accent-rule);
 }
 
 @media (min-width: 80rem) {
