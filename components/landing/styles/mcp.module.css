@@ -47,7 +47,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: min(100%, 84rem);
+  /* Sit exactly on the page frame's measure. An independent 84rem box landed
+     its rails ~8px inboard of the frame's, which read as a doubled edge. */
+  max-width: calc(var(--lp-measure) - 2 * var(--lp-gutter));
   margin-inline: auto;
   padding-inline: clamp(1.25rem, 2.6vw, 2.25rem);
   padding-block: clamp(3rem, 7vw, 4.25rem);

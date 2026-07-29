@@ -20,7 +20,7 @@ export function McpSection() {
     <section
       id="mcp"
       aria-labelledby="mcp-heading"
-      className={`${styles.mcpChapter} scroll-mt-14 border-b border-border/70`}
+      className={`${styles.mcpChapter} scroll-mt-14`}
       data-mcp-chapter
       data-chapter-target="mcp"
     >

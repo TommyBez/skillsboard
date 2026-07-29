@@ -196,12 +196,13 @@ export function LandingMotionController() {
       root.querySelectorAll<HTMLElement>("[data-chapter-target]")
     )
 
-    if (
-      railLinks.length &&
-      chapters.length &&
-      "IntersectionObserver" in window
-    ) {
+    if (railLinks.length && chapters.length) {
+      let currentChapter = ""
       const setCurrentChapter = (name: string) => {
+        if (name === currentChapter) {
+          return
+        }
+        currentChapter = name
         railLinks.forEach((link) => {
           if (link.dataset.railLink === name) {
             link.setAttribute("aria-current", "true")
@@ -211,21 +212,29 @@ export function LandingMotionController() {
         })
       }
 
-      const chapterObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return
-            }
-            const target = entry.target as HTMLElement
-            setCurrentChapter(target.dataset.chapterTarget ?? "")
-          })
-        },
-        { rootMargin: "-46% 0px -46% 0px", threshold: 0 }
-      )
+      // Whichever chapter spans the middle of the viewport is the current one.
+      // An observer band would work only for chapters tall enough to cross it —
+      // the short ones (FAQ) never reported, so the rail stalled on the chapter
+      // above them.
+      const syncChapter = () => {
+        const middle = window.innerHeight / 2
+        let best = chapters[0]
+        chapters.forEach((chapter) => {
+          const rect = chapter.getBoundingClientRect()
+          if (rect.top <= middle) {
+            best = chapter
+          }
+        })
+        setCurrentChapter(best?.dataset.chapterTarget ?? "")
+      }
 
-      chapters.forEach((chapter) => chapterObserver.observe(chapter))
-      cleanups.push(() => chapterObserver.disconnect())
+      window.addEventListener("scroll", syncChapter, { passive: true })
+      window.addEventListener("resize", syncChapter)
+      syncChapter()
+      cleanups.push(() => {
+        window.removeEventListener("scroll", syncChapter)
+        window.removeEventListener("resize", syncChapter)
+      })
     }
 
     if (!reducedMotion && "IntersectionObserver" in window) {
@@ -240,10 +249,21 @@ export function LandingMotionController() {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (
-              !entry.isIntersecting ||
-              entry.intersectionRatio < VIEWPORT_THRESHOLD
-            ) {
+            if (!entry.isIntersecting) {
+              return
+            }
+
+            // A ratio threshold alone cannot fire for a group taller than
+            // 1/threshold viewports — it can never show that fraction of
+            // itself at once. Accept either a quarter of the group or a
+            // quarter of the viewport filled by it, whichever comes first.
+            const covered = entry.intersectionRect.height
+            const enough =
+              covered >= entry.target.getBoundingClientRect().height *
+                VIEWPORT_THRESHOLD ||
+              covered >= window.innerHeight * VIEWPORT_THRESHOLD
+
+            if (!enough) {
               return
             }
 
@@ -253,7 +273,7 @@ export function LandingMotionController() {
           })
         },
         {
-          threshold: VIEWPORT_THRESHOLD,
+          threshold: [0, VIEWPORT_THRESHOLD],
           rootMargin: "0px 0px -8% 0px",
         }
       )
