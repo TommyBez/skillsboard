@@ -1,4 +1,7 @@
 export const guidePaths = {
+  sharedMcpSkillLibrary: "/guides/shared-mcp-skill-library-for-teams",
+  aiSkillUseCases: "/guides/ai-skill-use-cases-for-teams",
+  onboardNewTeammateSkills: "/guides/onboard-new-teammate-ai-skills-checklist",
   chooseFirstTeamSkill: "/guides/choose-first-ai-agent-skill-for-your-team",
   shareTeamSkills: "/guides/share-agent-skills-with-your-team",
   manageCrossAgentSkills: "/guides/manage-skills-across-claude-codex-cursor",
@@ -52,6 +55,611 @@ export interface GuideDefinition {
   }[]
   publishedAt: string
   modifiedAt: string
+}
+
+export const sharedMcpSkillLibraryGuide: GuideDefinition = {
+  path: guidePaths.sharedMcpSkillLibrary,
+  contentType: "guide",
+  topics: ["MCP", "team operations", "skill sharing", "AI agent skills", "agent access"],
+  eyebrow: "MCP team access",
+  title: "How to use a shared AI skill library through MCP",
+  description:
+    "Connect an MCP-compatible agent to a shared team skill library, authorize access in the browser, search recommendations, and verify a useful handoff.",
+  intro:
+    "A shared skill library should remain useful when a teammate works inside an agent. MCP gives a compatible client an authenticated path to the same team recommendations, so the teammate can search the library, retrieve a command, and, with the required scope, contribute skills or organize collections without copying an API key.",
+  corePrinciple:
+    "Keep the team recommendation central. Use MCP as one authenticated access path.",
+  problem:
+    "Connecting an MCP server is not the same as sharing a useful skill. The connection still needs the correct team account, a current recommendation, an understood permission set, and a real retrieval test. It also needs an honest boundary: Skills Board exposes library tools, but it does not install or execute a skill, certify compatibility, or preserve a historical source version.",
+  decisionTitle: "Use MCP for agent access, not as a universal installer",
+  decisionIntro:
+    "Choose MCP when the teammate's client supports Streamable HTTP and browser-based OAuth. Keep the web library, original source, compatible command, and ZIP available for teammates whose setup does not support that connection.",
+  comparisonColumns: ["MCP task", "What the connection provides", "Boundary to keep visible"],
+  comparisonRows: [
+    {
+      label: "Find team recommendations",
+      cells: [
+        "List or search the saved skills and collections visible to the account that authorized the connection.",
+        "The result reflects that account's team memberships. It is not a public approval catalog or a security review.",
+      ],
+    },
+    {
+      label: "Choose a use path",
+      cells: [
+        "Retrieve a compatible install command for a saved skill while keeping its original source visible.",
+        "Returning a command does not run it, install the skill, or prove that it works in every agent environment.",
+      ],
+    },
+    {
+      label: "Contribute and organize",
+      cells: [
+        "With the skills:write scope, save a skill from GitHub, create collections, and add or remove saved skills from collections.",
+        "The connection cannot edit or delete saved team skills. A recommendation still needs team-owned review and context.",
+      ],
+    },
+  ],
+  stepsTitle: "A six-step MCP team-library test",
+  stepsIntro:
+    "Start with one existing team recommendation and one teammate. The goal is to prove that the teammate can reach the right library, understand the granted access, and retrieve a useful path without private setup guidance.",
+  steps: [
+    {
+      title: "Prepare one real recommendation",
+      body: "Confirm that the team library contains one skill for a repeated task. Check its title, tags, note, original source, and known limits before testing a new access path. MCP can expose the record, but it cannot repair unclear team context.",
+      output: "One current recommendation with a clear task, source, owner, and expected result.",
+    },
+    {
+      title: "Confirm the client can make the connection",
+      body: "Open Skills Board Settings, choose MCP, and follow the instructions for the teammate's actual client. The hosted endpoint uses Streamable HTTP and browser-based OAuth. A client that accepts only a static API key or only the older SSE transport is not a compatible path.",
+      output: "One supported client path and the Skills Board MCP endpoint from the signed-in product.",
+    },
+    {
+      title: "Authorize the intended account and access",
+      body: "Complete sign-in in the browser and read the consent screen before approving it. Confirm the Skills Board account, requested scopes, and team membership. Never copy access tokens into the handoff record or use a different teammate's session.",
+      output: "An authenticated connection tied to the intended account and understood permission set.",
+    },
+    {
+      title: "Verify the library before the task",
+      body: "Ask the connected agent to list or search team skills using the task language or a known team tag. Check that the expected recommendation appears and that the source, note, and team context match the web library. An empty result can mean the wrong account or team membership, not an empty global catalog.",
+      output: "One expected recommendation found through the connected agent and matched to the web library.",
+    },
+    {
+      title: "Retrieve, inspect, and test one path",
+      body: "Ask for the saved skill's install command, then inspect the original source and supporting files before using it. Run only a compatible path in the teammate's environment and compare the result with the task's acceptance criteria. Skills Board returns the path; the teammate and agent perform the installation or use.",
+      output: "One retrieved path plus a pass, partial, or fail result from a safe fixture.",
+    },
+    {
+      title: "Record limits and the fallback path",
+      body: "If the team needs contribution or collection tools, confirm that the connection has skills:write before using them. Record what worked, which account and client were tested, and which web, source, command, or ZIP path teammates should use when MCP is unavailable.",
+      output: "A small connection record with verified capabilities, known limits, owner, and fallback.",
+    },
+  ],
+  templateTitle: "MCP team access verification record",
+  templateIntro:
+    "Keep this record free of tokens, authorization codes, and personal data. It should prove the team path without storing credentials or implying permanent compatibility.",
+  templateFields: [
+    {
+      label: "Team and account",
+      value: "The intended team library and the role of the account that authorized access.",
+    },
+    {
+      label: "Client and transport",
+      value: "The observed MCP client, environment, Streamable HTTP endpoint, and test date.",
+    },
+    {
+      label: "Granted access",
+      value: "The scopes shown during consent and whether write operations were intentionally included.",
+    },
+    {
+      label: "Library proof",
+      value: "The task query or tag used and the expected recommendation found in both MCP and the web library.",
+    },
+    {
+      label: "Use-path proof",
+      value: "The retrieved command, inspected source state, safe fixture, and observed result without storing credentials.",
+    },
+    {
+      label: "Limits and fallback",
+      value: "Unsupported operations, untested clients, alternative web or file path, owner, and review trigger.",
+    },
+  ],
+  copyTemplate: `# MCP team library verification
+
+Owner: [person or team]
+Test date: [date]
+
+## 1. Team and account
+- Team library: [name]
+- Account role: [role, not personal data]
+- Membership confirmed: [yes/no]
+
+## 2. Client and connection
+- MCP client and environment: [observed setup]
+- Endpoint copied from Skills Board Settings: [yes/no]
+- Streamable HTTP supported: [yes/no]
+- Browser sign-in completed: [yes/no]
+
+## 3. Consent
+- Requested scopes reviewed: [yes/no]
+- skills:read present: [yes/no]
+- skills:write intentionally present: [yes/no/not needed]
+- No token or authorization code stored here: [confirmed]
+
+## 4. Library proof
+- Search task or tag: [query]
+- Expected recommendation: [skill]
+- MCP and web records match: [yes/no plus gap]
+
+## 5. Use-path proof
+- Original source inspected: [yes/no]
+- Command retrieved: [yes/no]
+- Safe fixture and expected result: [fixture and criteria]
+- Result: [pass/partial/fail plus evidence]
+
+## 6. Limits and fallback
+- Unsupported or untested behavior: [limits]
+- Fallback path: [web/source/compatible command/ZIP]
+- Owner and review trigger: [owner and event]`,
+  pitfallsTitle: "What breaks an MCP team handoff",
+  pitfalls: [
+    {
+      title: "Treating connection as adoption",
+      body: "A green connection proves transport and authorization. It does not prove that a teammate found the right recommendation or completed useful work.",
+    },
+    {
+      title: "Using the wrong account",
+      body: "The connection sees the libraries available to the approving account. Verify identity and membership before diagnosing missing skills or collections.",
+    },
+    {
+      title: "Confusing a command with installation",
+      body: "Skills Board can return a command, but the connected agent or teammate still decides whether that command fits the environment and whether to run it.",
+    },
+    {
+      title: "Overstating write access",
+      body: "The skills:write scope permits specific save and collection operations. It does not permit editing or deleting saved team skills, and it does not turn a recommendation into an approval.",
+    },
+  ],
+  checklist: [
+    "The test starts from one current team recommendation and a real task.",
+    "The client supports Streamable HTTP and browser-based OAuth for this connection.",
+    "The intended account, team membership, and requested scopes were reviewed.",
+    "The teammate found the expected recommendation through MCP and matched it to the web library.",
+    "The original source was inspected before a compatible use path was tested.",
+    "The record names unsupported behavior, a non-MCP fallback, an owner, and a review trigger.",
+  ],
+  sources: [
+    {
+      label: "Skills Board: Open-source repository",
+      href: "https://github.com/TommyBez/skillsboard",
+      note: "Documents the OAuth-protected endpoint, team-library tools, write-scope boundary, source visibility, and alternative use paths implemented by Skills Board.",
+    },
+    {
+      label: "Model Context Protocol: Authorization",
+      href: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
+      note: "Defines authorization for HTTP-based MCP connections, including OAuth discovery, access-token handling, and scope requirements.",
+    },
+    {
+      label: "Model Context Protocol: Transports",
+      href: "https://modelcontextprotocol.io/specification/2025-11-25/basic/transports",
+      note: "Defines Streamable HTTP as a standard MCP transport and explains its single-endpoint request model.",
+    },
+    {
+      label: "Anthropic: Connect Claude Code to tools via MCP",
+      href: "https://code.claude.com/docs/en/mcp",
+      note: "Documents remote HTTP server setup and browser authentication for OAuth-protected MCP connections in Claude Code.",
+    },
+  ],
+  publishedAt: "2026-07-29",
+  modifiedAt: "2026-07-29",
+}
+
+export const aiSkillUseCasesGuide: GuideDefinition = {
+  path: guidePaths.aiSkillUseCases,
+  contentType: "guide",
+  topics: ["AI agent skills", "team workflows", "use cases", "team operations", "AI coding tools"],
+  eyebrow: "Team skill use cases",
+  title: "AI agent skill use cases for teams: 8 repeatable workflows",
+  description:
+    "Explore eight practical AI agent skill use cases for teams, with clear triggers, safe inputs, reviewable outputs, human checks, and stop boundaries.",
+  intro:
+    "The most useful agent skills do not start as clever prompts. They start as recurring team workflows with recognizable inputs, a result someone can review, and enough stable guidance to help a second person repeat the work. These eight use cases show what that pattern looks like across engineering, product, research, design, and go-to-market work.",
+  corePrinciple:
+    "A skill-worthy use case repeats, starts from known inputs, and ends in a reviewable result.",
+  problem:
+    "Teams often collect broad ideas such as research assistant, coding helper, or marketing agent. Those labels hide the trigger, context, output, and human decision that make a workflow reusable. A useful use case is narrower: it names when the work starts, which approved sources the agent can use, what it must produce, and where a person must review or stop it.",
+  decisionTitle: "Separate reusable workflows from one-off requests and human decisions",
+  decisionIntro:
+    "Use a skill when the procedure will recur and the output can be checked. Use a one-off prompt for temporary exploration. Keep consequential decisions with an authorized person even when a skill prepares evidence or a draft.",
+  comparisonColumns: ["Work type", "Good fit", "Boundary"],
+  comparisonRows: [
+    {
+      label: "Reusable skill",
+      cells: [
+        "A repeated trigger, bounded approved inputs, stable steps, a reviewable output, and a known reviewer.",
+        "The skill prepares or verifies work; it does not erase permissions, source review, or human accountability.",
+      ],
+    },
+    {
+      label: "One-off prompt",
+      cells: [
+        "A temporary question, exploratory draft, or unusual task whose procedure is unlikely to repeat.",
+        "Do not force a permanent workflow around an exception or store private context merely to make it reusable.",
+      ],
+    },
+    {
+      label: "Human-owned decision",
+      cells: [
+        "Approval, hiring, legal judgment, production access, customer commitments, or another accountable decision.",
+        "A skill may organize evidence, but the authorized person keeps the decision and its consequences.",
+      ],
+    },
+  ],
+  stepsTitle: "Eight practical team skill use cases",
+  stepsIntro:
+    "Treat these as workflow patterns, not claims that a particular public skill is available or approved. For each one, define the team's own sources, constraints, fixture, and reviewer before recommending an implementation.",
+  steps: [
+    {
+      title: "Pull-request preflight",
+      body: "Trigger the workflow when a focused change is ready for review. Give it the diff, repository instructions, and approved check commands. Ask for a concise summary of scope, failed checks, risky assumptions, and missing evidence, while keeping approval and merge with the reviewer.",
+      output: "A review packet with changed behavior, check results, risks, and unresolved questions tied to repository evidence.",
+    },
+    {
+      title: "Release-note drafting",
+      body: "Start from merged changes, issue references, and the product's approved language. Produce a customer-safe draft that separates shipped behavior from internal implementation and flags anything unsupported by the source. A product owner reviews claims before publication.",
+      output: "A scoped changelog draft with source links, audience language, and unsupported claims called out.",
+    },
+    {
+      title: "Bug triage and reproduction planning",
+      body: "Use an authorized report, relevant logs, and known environment details to extract observed behavior, expected behavior, reproduction steps, and missing information. Do not let the workflow invent a root cause or expose private diagnostics outside the approved context.",
+      output: "A reproducible issue brief that separates observations, hypotheses, unknowns, and the next safe diagnostic step.",
+    },
+    {
+      title: "Source-backed research synthesis",
+      body: "Give the workflow a bounded question and an approved source set or search boundary. Require citations near each material claim, separate source facts from inference, preserve contradictions, and state what remains unproven instead of smoothing uncertainty away.",
+      output: "A decision-ready research brief with attributable evidence, competing interpretations, and explicit unknowns.",
+    },
+    {
+      title: "Customer-feedback triage",
+      body: "Use only feedback the team is authorized to process, with personal or sensitive information removed when it is not needed. Group comments by the underlying job or friction, retain traceable evidence, and leave product priority and individual follow-up to the responsible team.",
+      output: "A privacy-safe theme map with evidence counts, representative paraphrases, contradictions, and no invented customer conclusions.",
+    },
+    {
+      title: "Product-spec completeness review",
+      body: "Provide the current spec, product contract, dependencies, and acceptance format. Ask the workflow to find missing states, conflicting requirements, unowned decisions, and verification gaps. It should produce questions and checks, not silently choose product behavior.",
+      output: "A structured gap review covering states, dependencies, acceptance criteria, owners, and open decisions.",
+    },
+    {
+      title: "Design and accessibility review",
+      body: "Supply the relevant interface, design-system rules, supported breakpoint, and named accessibility criteria. Ask for observable issues, evidence, severity, and a suggested check. A designer or engineer confirms context and owns any final design change.",
+      output: "An evidence-based review list with affected elements, applicable rules, severity, and verification steps.",
+    },
+    {
+      title: "Content and launch QA",
+      body: "Start from a draft plus the current product-truth, brand, channel, and legal sources. Check claims, links, dates, voice, consent-sensitive language, and channel limits. Return corrections and unresolved approvals without publishing or inventing proof.",
+      output: "A source-linked QA report with corrected copy, unsupported claims removed, and owner decisions still visible.",
+    },
+  ],
+  templateTitle: "A compact team skill use-case brief",
+  templateIntro:
+    "Use one row per recurring workflow. Keep it small enough to compare across the team, and do not include secrets, unnecessary personal data, or unapproved customer material.",
+  templateFields: [
+    {
+      label: "Trigger",
+      value: "The recurring event that starts the workflow and how often it happens.",
+    },
+    {
+      label: "Approved inputs",
+      value: "The minimum authoritative sources, safe fixture, and data boundary the workflow needs.",
+    },
+    {
+      label: "Reviewable output",
+      value: "The exact artifact, format, and observable conditions for a useful result.",
+    },
+    {
+      label: "Human checkpoint",
+      value: "The person or role that verifies, approves, publishes, merges, sends, or decides.",
+    },
+    {
+      label: "Stop boundary",
+      value: "The permission, uncertainty, sensitive data, or consequential decision that ends autonomous work.",
+    },
+    {
+      label: "Team recommendation",
+      value: "The reviewed source, tested environment, owner, limits, and event that triggers another review.",
+    },
+  ],
+  copyTemplate: `# Team skill use-case brief
+
+Owner: [person or team]
+Review date: [date]
+
+## Workflow
+- Use case: [specific repeated task]
+- Trigger: [event that starts it]
+- Frequency: [how often it occurs]
+- Current friction: [failure, delay, or repeated effort]
+
+## Approved inputs
+- Authoritative sources: [files, URLs, systems, or records]
+- Safe fixture: [representative input]
+- Data that must not be used: [boundary]
+
+## Reviewable output
+- Artifact and format: [expected result]
+- Acceptance checks: [observable conditions]
+- Evidence required: [citations, commands, screenshots only when authorized, or logs]
+
+## Human checkpoint
+- Reviewer: [person or role]
+- Decision they retain: [approval, merge, publication, send, or other effect]
+
+## Stop boundary
+- Stop when: [permission, requirement, sensitive data, or consequential decision is unclear]
+- Escalate to: [owner]
+
+## Recommendation record
+- Canonical source: [URL and reviewed source state]
+- Tested environment: [observed agent and setup]
+- Known limits: [unsupported or untested behavior]
+- Review trigger: [source, tool, policy, or workflow change]`,
+  pitfallsTitle: "What weakens a use-case library",
+  pitfalls: [
+    {
+      title: "Listing vague agent roles",
+      body: "Researcher, coding assistant, and marketer are categories, not repeatable workflows. Name the trigger, source, output, and reviewer for each use case.",
+    },
+    {
+      title: "Turning examples into availability claims",
+      body: "A useful workflow pattern does not prove that a matching public skill exists, passed review, or works in the team's environment.",
+    },
+    {
+      title: "Using sensitive data by default",
+      body: "Customer feedback, logs, incidents, and internal research may contain protected material. Minimize, redact, or keep it outside the workflow when authorization is absent.",
+    },
+    {
+      title: "Automating the accountable decision",
+      body: "A skill can prepare evidence and drafts. It should not silently own approval, hiring, legal judgment, production access, publication, or customer commitments.",
+    },
+  ],
+  checklist: [
+    "Every use case has a recurring trigger and a bounded, team-relevant outcome.",
+    "Approved sources and prohibited data are explicit before the workflow runs.",
+    "The output has observable checks and a named human reviewer.",
+    "The stop boundary preserves permissions and consequential decisions.",
+    "Examples are presented as patterns, not as catalog availability or compatibility claims.",
+    "A saved team recommendation records the reviewed source, tested setup, limits, owner, and review trigger.",
+  ],
+  sources: [
+    {
+      label: "OpenAI: Using skills",
+      href: "https://openai.com/academy/skills/",
+      note: "Introduces skills as reusable workflows and starts skill creation from a repeatable task with a clear input and output.",
+    },
+    {
+      label: "Anthropic: Agent Skills in the SDK",
+      href: "https://code.claude.com/docs/en/agent-sdk/skills",
+      note: "Documents SKILL.md, supporting resources, discovery, and the environment in which a reusable skill runs.",
+    },
+    {
+      label: "GitHub: About agent skills",
+      href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
+      note: "Describes Agent Skills as folders of instructions, scripts, and resources that improve repeatable specialized tasks.",
+    },
+    {
+      label: "Google Cloud and DORA: AI Capabilities Model",
+      href: "https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model",
+      note: "Connects stronger AI-assisted outcomes with clear policy, versioned work, user focus, and small, reviewable batches.",
+    },
+  ],
+  publishedAt: "2026-07-29",
+  modifiedAt: "2026-07-29",
+}
+
+export const onboardNewTeammateSkillsGuide: GuideDefinition = {
+  path: guidePaths.onboardNewTeammateSkills,
+  contentType: "guide",
+  topics: [
+    "team onboarding",
+    "AI agent skills",
+    "skill sharing",
+    "AI coding tools",
+    "mixed-agent teams",
+  ],
+  eyebrow: "New teammate handoff",
+  title: "AI skills onboarding checklist for a new teammate",
+  description:
+    "Use this AI skills onboarding checklist to help a new teammate find one team-recommended skill, choose a suitable path, and verify it on a real task.",
+  intro:
+    "Onboarding a new teammate to AI skills should not begin with a catalog tour or a folder of setup notes. Give them one real task, one recommendation the team already uses, and enough context to choose a suitable path. The handoff works when they can find, inspect, and use the skill without private guidance.",
+  corePrinciple:
+    "Give one teammate one real task and let them complete the handoff themselves.",
+  problem:
+    "An invitation, copied command, or installed file proves access, not useful onboarding. The teammate still needs to know which problem the skill addresses, why the team recommends it, where its latest source lives, and what a good result looks like. A bounded handoff makes each of those decisions visible and tests whether the recommendation works without the original author filling in missing context.",
+  decisionTitle: "Choose a handoff that ends in independent use",
+  decisionIntro:
+    "A useful handoff gives the teammate enough context to make a real choice without doing the task for them. Use one existing recommendation, one representative fixture, and one observable result instead of treating account access or installation as completion.",
+  comparisonColumns: ["Handoff model", "What the teammate receives", "Main risk"],
+  comparisonRows: [
+    {
+      label: "Links in chat",
+      cells: [
+        "A direct link and a short explanation from an experienced teammate.",
+        "The context disappears into conversation, and the next person has to ask again.",
+      ],
+    },
+    {
+      label: "Agent setup tour",
+      cells: [
+        "A working configuration and a walkthrough for one agent environment.",
+        "Setup becomes the goal, and the handoff may not transfer to a teammate using another agent.",
+      ],
+    },
+    {
+      label: "Library-led handoff",
+      cells: [
+        "One findable recommendation, its visible source, available use paths, and a real test task.",
+        "It requires a bounded first task and an honest result instead of a quick access check.",
+      ],
+    },
+  ],
+  stepsTitle: "A six-step new teammate handoff",
+  stepsIntro:
+    "Assume the team library and at least one recommendation already exist. The new teammate should make the important discovery and usage decisions while an owner supplies the task, boundaries, and review criteria.",
+  steps: [
+    {
+      title: "Choose one real first task",
+      body: "Pick a task the teammate will actually encounter soon, with a clear input and reviewable output. Keep the first task narrow, free of sensitive data, and small enough to complete in one session. Define the acceptable result before introducing the skill.",
+      output: "One task brief with a trigger, safe fixture, expected result, and reviewer.",
+    },
+    {
+      title: "Prepare one team recommendation",
+      body: "Choose one skill the team already recommends for that task. Confirm that its description, tags, original source, notes, and available use paths are current. Explain why it was selected without presenting the recommendation as a security review or compatibility guarantee.",
+      output: "One complete, searchable recommendation tied to the first task.",
+    },
+    {
+      title: "Invite the teammate and set the boundary",
+      body: "Invite the teammate to the team library and explain the task, expected result, and human review point. Make the product contract explicit: Skills Board points to the latest source, and the teammate still needs to inspect that source and choose a path that fits their setup.",
+      output: "Confirmed library access plus a short brief covering purpose, limits, and review.",
+    },
+    {
+      title: "Ask them to find and inspect the skill",
+      body: "Give the teammate the task language or expected tag, then let them search the library instead of sending a private deep link. Ask them to open the original source and review SKILL.md, supporting files, required tools, permissions, and data paths before use.",
+      output: "An independently found recommendation with the relevant source and limits identified.",
+    },
+    {
+      title: "Let them choose and test a use path",
+      body: "The teammate chooses the original source, a compatible install command, the latest files as a ZIP, or authenticated MCP access when available for their setup. They run the same safe fixture and compare the result with the acceptance criteria.",
+      output: "One observed use path and a pass, partial, or fail result from the fixture.",
+    },
+    {
+      title: "Record the result and next step",
+      body: "Capture the path and environment used, what the teammate could complete without help, and where the recommendation or setup was unclear. Keep, revise, or replace the recommendation, then name the owner and the source, agent, or workflow change that should trigger another review.",
+      output: "A handoff decision with evidence, an owner, and a review trigger.",
+    },
+  ],
+  templateTitle: "New teammate AI skills handoff checklist",
+  templateIntro:
+    "Use one copy per teammate and first workflow. Record only the context needed to improve the handoff, and keep personal or sensitive information out of the checklist.",
+  templateFields: [
+    {
+      label: "First task",
+      value: "The trigger, safe fixture, expected output, and person who will review the result.",
+    },
+    {
+      label: "Team recommendation",
+      value: "The skill, why the team recommends it, its search tags, source, and known limits.",
+    },
+    {
+      label: "Access and boundary",
+      value: "Library access, allowed data and tools, human review point, and explicit stop conditions.",
+    },
+    {
+      label: "Independent discovery",
+      value: "The task language used to search and whether the teammate found the recommendation without a private link.",
+    },
+    {
+      label: "Use path and fixture",
+      value: "The source, compatible command, ZIP, or MCP path chosen, plus the observed fixture result.",
+    },
+    {
+      label: "Outcome and owner",
+      value: "Keep, revise, or replace, with gaps, next action, owner, and review trigger.",
+    },
+  ],
+  copyTemplate: `# New teammate AI skills handoff
+
+Owner: [person or team]
+Teammate role: [role, not personal data]
+Handoff date: [date]
+
+## 1. First task
+- Trigger: [when this task starts]
+- Safe fixture: [representative, non-sensitive input]
+- Expected output: [observable result]
+- Reviewer: [person or role]
+
+## 2. Team recommendation
+- Skill: [name]
+- Why the team recommends it: [specific task fit]
+- Search terms or tags: [terms the teammate should try]
+- Original source: [canonical URL]
+- Known limits: [what is untested or unsupported]
+
+## 3. Access and boundary
+- Team library access confirmed: [yes/no]
+- Allowed tools and data: [scope]
+- Human review point: [decision before use]
+- Stop when: [permission, data, or requirement is unclear]
+- Reminder: a saved skill is a team recommendation, not a security review or compatibility guarantee.
+
+## 4. Independent discovery and review
+- Found without a private link: [yes/no]
+- Source files inspected: [SKILL.md, scripts, references, templates]
+- Required permissions and data paths understood: [yes/no plus notes]
+- Latest-source behavior understood: [yes/no]
+
+## 5. Use path and fixture
+- Path chosen: [source / compatible command / ZIP / MCP]
+- Agent and environment: [observed setup]
+- Acceptance criteria: [pass conditions]
+- Result: [pass / partial / fail plus evidence]
+
+## 6. Outcome and follow-up
+- What worked without help: [evidence]
+- What was unclear: [gap]
+- Decision: [keep / revise / replace]
+- Next action and owner: [action]
+- Review again when: [source, agent, permissions, or workflow changes]`,
+  pitfallsTitle: "What weakens a new teammate handoff",
+  pitfalls: [
+    {
+      title: "Showing the whole catalog",
+      body: "A long list shifts the work of choosing onto the newest person. Start with one real task and one recommendation the team can explain.",
+    },
+    {
+      title: "Completing the handoff for them",
+      body: "A deep link, copied setup, and guided run can hide gaps in search terms, source notes, and instructions. Let the teammate complete the important steps.",
+    },
+    {
+      title: "Treating recommendation as approval",
+      body: "A saved skill records the team’s choice. It does not certify security, guarantee compatibility, or preserve the exact upstream version someone used before.",
+    },
+    {
+      title: "Stopping at installation",
+      body: "A command completing or a ZIP downloading does not prove useful work. End the handoff with a representative task and a reviewed result.",
+    },
+  ],
+  checklist: [
+    "The handoff starts with one real task, safe fixture, expected result, and reviewer.",
+    "One team recommendation has current tags, notes, source, use paths, and known limits.",
+    "The teammate has library access and understands the data, tool, and human review boundaries.",
+    "The teammate found the recommendation by task or tag and inspected its original source.",
+    "The teammate chose a suitable use path and ran the fixture in their actual environment.",
+    "The team recorded the result, remaining gap, decision, owner, and review trigger.",
+  ],
+  sources: [
+    {
+      label: "Skills Board: Open-source repository",
+      href: "https://github.com/TommyBez/skillsboard",
+      note: "Documents the team library, source visibility, available handoff paths, recommendation limits, and optional MCP access implemented by Skills Board.",
+    },
+    {
+      label: "OpenAI: Using skills",
+      href: "https://openai.com/academy/skills/",
+      note: "Introduces skills as reusable workflows and starts skill design from a repeatable task with a clear input and output.",
+    },
+    {
+      label: "Anthropic: Agent Skills in the SDK",
+      href: "https://code.claude.com/docs/en/agent-sdk/skills",
+      note: "Documents SKILL.md, supporting files, skill discovery, and the environment in which a skill runs.",
+    },
+    {
+      label: "GitHub: About agent skills",
+      href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
+      note: "Describes the open Agent Skills standard and the repository and personal locations supported by Copilot coding agent.",
+    },
+  ],
+  publishedAt: "2026-07-29",
+  modifiedAt: "2026-07-29",
 }
 
 export const chooseFirstTeamSkillGuide: GuideDefinition = {

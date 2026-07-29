@@ -23,6 +23,48 @@ export const resourcesOgContent: OgTemplateContent = {
   chips: ["Guides", "Workflows", "Templates"],
 }
 
+export const sharedMcpSkillLibraryGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · MCP team access",
+  title: [
+    { text: "Your team’s skill library," },
+    { text: "inside your agent.", accent: true },
+  ],
+  description:
+    "Connect through browser-based OAuth, search team recommendations, retrieve a command, and keep MCP’s limits visible.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["MCP access test", "Scope-aware workflow"],
+}
+
+export const aiSkillUseCasesGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · Team skill use cases",
+  title: [
+    { text: "Eight workflows worth" },
+    { text: "turning into skills.", accent: true },
+  ],
+  description:
+    "Practical examples with clear triggers, safe inputs, reviewable outputs, human checks, and stop boundaries.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["8 use cases", "Copyable brief"],
+}
+
+export const onboardNewTeammateSkillsGuideOgContent: OgTemplateContent = {
+  variant: "ink",
+  eyebrow: "Guide · New teammate handoff",
+  title: [
+    { text: "Onboard one teammate" },
+    { text: "through one useful skill.", accent: true },
+  ],
+  description:
+    "A copyable checklist for finding, inspecting, testing, and improving one team-recommended skill handoff.",
+  contextLabel: "skillsboard.sh/guides",
+  titleSize: 76,
+  chips: ["Copyable checklist", "Independent handoff"],
+}
+
 export const chooseFirstTeamSkillGuideOgContent: OgTemplateContent = {
   variant: "ink",
   eyebrow: "Guide · First team skill",

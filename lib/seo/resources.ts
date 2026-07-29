@@ -1,8 +1,11 @@
 import {
   aiCodingGuidelinesTemplateGuide,
   aiCodingTeamOnboardingGuide,
+  aiSkillUseCasesGuide,
   chooseFirstTeamSkillGuide,
   manageCrossAgentSkillsGuide,
+  onboardNewTeammateSkillsGuide,
+  sharedMcpSkillLibraryGuide,
   shareTeamSkillsGuide,
 } from "@/lib/seo/guides"
 
@@ -24,6 +27,9 @@ export interface ResourceIndexEntry {
 }
 
 export const resourceEntries = [
+  sharedMcpSkillLibraryGuide,
+  aiSkillUseCasesGuide,
+  onboardNewTeammateSkillsGuide,
   chooseFirstTeamSkillGuide,
   aiCodingGuidelinesTemplateGuide,
   aiCodingTeamOnboardingGuide,
