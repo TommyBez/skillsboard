@@ -30,16 +30,18 @@ import styles from "@/components/landing/styles/flow.module.css"
 function VizLabel({ children }: { children: React.ReactNode }) {
   return (
     <p className={styles.vizLabel}>
-      <span className={styles.vizLabelText}>{children}</span>
+      <span className={styles.labelText}>{children}</span>
+      <span className={styles.labelRule} />
     </p>
   )
 }
 
-/** The column's closing register: one measured fact about the diagram above. */
+/** The same object, closing the column: one measured fact about the diagram. */
 function VizFoot({ label, value }: { label: string; value: string }) {
   return (
-    <p className={styles.vizFoot}>
-      <span className={styles.footKey}>{label}</span>
+    <p className={`${styles.vizLabel} ${styles.vizFoot}`}>
+      <span className={styles.labelText}>{label}</span>
+      <span className={styles.labelRule} />
       <span className={styles.footVal}>{value}</span>
     </p>
   )
@@ -134,7 +136,8 @@ export function SearchFilterVisual() {
         </ul>
 
         <p className={`${styles.vizLabel} ${styles.resultCut}`}>
-          <span className={styles.vizLabelText}>filtered out</span>
+          <span className={styles.labelText}>filtered out</span>
+          <span className={styles.labelRule} />
         </p>
 
         <ul className={`${styles.resultList} ${styles.resultRest}`}>

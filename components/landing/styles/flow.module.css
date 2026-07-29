@@ -254,17 +254,17 @@
 
 /* --- Shared diagram registers ------------------------------------------- */
 
-/* Register 1 and register 3 are the same object: a mono caption followed by a
-   hairline that runs to the cell's content edge. Four instances in the
-   chapter — three column captions and the search demo's cut — all with the
-   same size, tracking, ink, gap and terminal. */
-.vizLabel,
-.vizFoot {
+/* Registers 1 and 3 are ONE object: a mono caption, a `--label-gap`, and a
+   hairline that runs on to the cell's content edge. Six instances in the
+   chapter — three column captions, the search demo's cut, and the three
+   closing readouts, which simply park a value at the end of the rule. Same
+   size, tracking, ink, gap and terminal in every one of them. */
+.vizLabel {
   grid-column: 1;
   display: flex;
   align-items: center;
   gap: var(--label-gap);
-  margin: 0;
+  margin: 2.25rem 0 0;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
   font-weight: 600;
@@ -273,18 +273,14 @@
   color: var(--ink-2);
 }
 
-.vizLabel {
-  margin-top: 2.25rem;
-}
-
-.vizLabelText,
-.footKey {
+.labelText,
+.footVal {
   flex: none;
 }
 
-.vizLabel::after {
-  content: "";
+.labelRule {
   flex: 1;
+  min-width: 1rem;
   height: 1px;
   background: var(--lp-grid-line);
 }
@@ -306,17 +302,11 @@
   align-items: stretch;
 }
 
-/* Register 3: one measured fact per column, closing the diagram on a rule that
-   spans the full cell — the same terminal as every other rule here. */
 .vizFoot {
   margin-top: 1.35rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--lp-grid-line);
-  justify-content: space-between;
 }
 
 .footVal {
-  flex: none;
   font-variant-numeric: tabular-nums;
   color: var(--ink-1);
 }
@@ -593,6 +583,7 @@
    name and its repo are equally clear of the band's edges. */
 .resultRow {
   position: relative;
+  isolation: isolate;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
@@ -647,6 +638,7 @@
    as the card's tags. */
 .resultMark {
   position: relative;
+  isolation: isolate;
 }
 
 .resultMark::before {
