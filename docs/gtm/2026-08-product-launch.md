@@ -192,14 +192,14 @@ Product Hunt, Show HN, email, or another individual provider lane may be unavail
 
 ## Launch content selection
 
-The already-scheduled July 27 post remains a one-time exception. When choosing among compatible launch-period actions, prefer the candidate that best satisfies these four properties:
+The already-scheduled July 27 post remains a historical provider fact. Estimate each launch candidate's contribution to the governing `AAT-28` objective using these properties:
 
 1. It explicitly names or visibly demonstrates Skills Board.
 2. It maps to one distinct product proof or launch phase.
-3. Its core angle is not substantially the same as an item published or scheduled in the previous seven days.
+3. It is a distinct provider effect rather than an exact duplicate.
 4. It has a measurable role in the launch funnel or a documented learning objective.
 
-This is a prioritization rule, not an editorial, cooldown, WIP, evidence, or readiness gate. Thematic similarity alone cannot block action. Exact provider-effect deduplication still prevents accidental duplicate publication. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem, but it must not outrank compatible product-launch work.
+These properties inform expected contribution, time to effect, and confidence; they are not an editorial, cooldown, WIP, evidence, readiness, or output gate. Launch membership creates no automatic precedence over SEO, social, or another positive compatible candidate. Thematic similarity alone cannot block action, while exact provider-effect deduplication still prevents accidental duplicate publication. Generic AI-coding guidance may support the launch when it creates a clear bridge to a product problem.
 
 ## Ownership and decision boundaries
 

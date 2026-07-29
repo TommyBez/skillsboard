@@ -24,9 +24,9 @@ The draft or post ID identifies a resource; it does not prove that a timed-out `
 
 ## Continuous action
 
-Owned social is a protected organic lane. Every strategic run senses current audience problems and publishes the strongest truthful useful unit. Operational runs may create and publish more units whenever the lane can produce useful content. Missing analytics, team activation maturity, prior queue content, or quantitative evidence never blocks publication.
+Owned social is a near-zero-cost candidate family. Synthesize every distinct truthful useful unit with an explicit plausibly positive contribution path through acquisition, activation, retention, or reactivation to the governing `AAT-28` objective. Execute all mutually compatible positive units through the official capability; when runtime or binding provider limits require ordering, rank them by expected marginal contribution, time to effect, confidence or information gain, and runtime cost. There is no per-run publication quota, and completing one unit does not make another positive compatible unit ineligible. Missing analytics, team activation maturity, prior queue content, or quantitative evidence changes confidence but never blocks synthesis or publication.
 
-When selected work belongs to an active `launch.campaign`, prefer the due product-launch unit over unrelated generic advice: name or visibly demonstrate Skills Board, use one distinct shipped product proof, and connect the action to the campaign conversion or learning objective. Thematic similarity informs ranking but is not an editorial cap or cooldown; exact provider-effect deduplication remains mandatory.
+When a unit belongs to an active `launch.campaign`, preserve its campaign identity: name or visibly demonstrate Skills Board, use one distinct shipped product proof, and connect it to the campaign conversion or learning objective. Its deadline informs time to effect and urgency but creates no automatic precedence over a stronger non-launch unit. Thematic similarity informs contribution estimates but is not an editorial cap or cooldown; exact provider-effect deduplication remains mandatory.
 
 ## Replies
 

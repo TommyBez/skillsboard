@@ -26,9 +26,9 @@ The shared team library leads the message. MCP is a supporting access path.
 
 ## Due work
 
-Resolve `strategy.launch` and materialize the current due items in selected work. Advance the highest-impact due item before creating unrelated generic content, then continue the normal fixed-point loop across independent lanes.
+Resolve `strategy.launch` and keep the current due items as candidate inventory. Evaluate each distinct item by its truthful plausibly positive marginal contribution to the governing `AAT-28` objective, time to effect, confidence or information gain, runtime cost, and compatibility. Execute every positive compatible item; use the ordering below as dependency and timing information, not as automatic precedence over SEO, social, or another positive candidate.
 
-The critical path is:
+The candidate sequence and dependencies are:
 
 1. production journey and mobile/desktop interaction QA;
 2. production funnel and campaign-attribution QA;
@@ -48,12 +48,12 @@ Record at least five structured objections or confusion points and locate the la
 
 ## Selection rule
 
-Prefer launch content that names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity guides ranking but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, or publication prohibition. Prevent only an exact duplicate provider effect.
+Launch content contributes most directly when it names or visibly demonstrates Skills Board, uses a distinct shipped product proof, and maps to the campaign conversion or a documented learning objective. Thematic similarity informs contribution estimates but is not an editorial cap, cooldown, readiness state, evidence threshold, WIP limit, output quota, or publication prohibition. Prevent only an exact duplicate provider effect.
 
-Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem, but it must not outrank a compatible due product-launch item.
+Generic AI-coding guidance may support the campaign when it bridges clearly to the product problem. Launch membership alone does not determine rank; every candidate is ordered by the same objective-led criteria.
 
 ## Contract boundaries
 
 Use only current shipped claims from `product.truth`. Law, consent, privacy, binding terms, authority, spend/overage, exact-operation availability, contract pins, and owner approval immediately before merging an exact PR/head SHA remain the only blockers.
 
-The detailed working checklist and launch-day run of show live in `docs/gtm/2026-08-product-launch.md`. That document does not authorize a new gate; this reference owns the routed campaign identity and priority.
+The detailed working inventory and launch-day run of show live in `docs/gtm/2026-08-product-launch.md`. That document does not authorize a new gate or priority override; this reference owns the routed campaign identity.
