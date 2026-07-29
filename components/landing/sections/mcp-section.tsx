@@ -6,6 +6,14 @@ import { McpSchematic } from "@/components/landing/mcp-schematic"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/mcp.module.css"
 
+/** Decorative annotation for the copy column — a legend for the diagram. */
+const specs = [
+  { key: "endpoint", value: "/api/mcp" },
+  { key: "transport", value: "streamable http" },
+  { key: "auth", value: "oauth 2.1 · browser" },
+  { key: "tools", value: "12 registered" },
+] as const
+
 /** MCP — the signature routing chapter. */
 export function McpSection() {
   return (
@@ -17,40 +25,73 @@ export function McpSection() {
       data-chapter-target="mcp"
     >
       <div className={styles.mcpSticky}>
-        <div className="mx-auto grid w-full max-w-[1440px] gap-12 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(19rem,0.8fr)_minmax(0,1.2fr)] lg:items-center lg:gap-16 lg:py-0">
-          <div className="w-full">
-            <p className={`${base.chapterMark} uppercase`} data-decode="">
+        <div className={styles.frame}>
+          <div className={styles.frameTop}>
+            <span className={styles.frameIndex} aria-hidden="true">
+              03
+            </span>
+            <p
+              className={`${base.chapterMark} ${styles.frameMark} uppercase`}
+              data-decode=""
+            >
               MCP access
             </p>
-            <h2
-              id="mcp-heading"
-              className="mt-5 max-w-[16ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
-            >
-              Bring your team&apos;s skills into your agent.
-            </h2>
-            <p className="mt-5 max-w-lg text-pretty text-lg leading-relaxed text-muted-foreground">
-              Connect Skills Board through MCP. Your agent can search the shared
-              library, retrieve install commands, and save new skills it
-              discovers.
+            <p className={styles.readout} aria-hidden="true">
+              <span className={styles.readoutKey}>signal</span>
+              <span className={styles.readoutStack}>
+                <span data-phase="0">standby</span>
+                <span data-phase="1">indexing</span>
+                <span data-phase="2">linking</span>
+                <span data-phase="3">routing</span>
+                <span data-phase="4">live</span>
+              </span>
+              <span className={styles.readoutBar} />
             </p>
-            <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
-              <ShieldCheckIcon
-                className="mt-0.5 size-4 shrink-0 text-primary"
-                aria-hidden="true"
-              />
-              <p>
-                Sign in securely through your browser—there&apos;s no API key to
-                copy.
-              </p>
-            </div>
-            <div className="mt-7">
-              <Suspense fallback={<HomeCtaFallback />}>
-                <HomeMcpActions />
-              </Suspense>
-            </div>
           </div>
 
-          <McpSchematic />
+          <div className={styles.frameBody}>
+            <div className={styles.copyCol}>
+              <div className={styles.copyBody}>
+                <h2
+                  id="mcp-heading"
+                  className="max-w-[16ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-5xl lg:text-[clamp(2.6rem,3.6vw,3.4rem)]"
+                >
+                  Bring your team&apos;s skills into your agent.
+                </h2>
+                <p className="mt-5 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground lg:text-[1.0625rem]">
+                  Connect Skills Board through MCP. Your agent can search the
+                  shared library, retrieve install commands, and save new skills
+                  it discovers.
+                </p>
+                <div className="mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground">
+                  <ShieldCheckIcon
+                    className="mt-0.5 size-4 shrink-0 text-primary"
+                    aria-hidden="true"
+                  />
+                  <p>
+                    Sign in securely through your browser—there&apos;s no API key
+                    to copy.
+                  </p>
+                </div>
+                <div className="mt-7">
+                  <Suspense fallback={<HomeCtaFallback />}>
+                    <HomeMcpActions />
+                  </Suspense>
+                </div>
+              </div>
+
+              <dl className={styles.specs} aria-hidden="true">
+                {specs.map((spec) => (
+                  <div key={spec.key} className={styles.specRow}>
+                    <dt className={styles.specKey}>{spec.key}</dt>
+                    <dd className={styles.specValue}>{spec.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            <McpSchematic />
+          </div>
         </div>
       </div>
     </section>

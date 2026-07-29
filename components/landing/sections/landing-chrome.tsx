@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Suspense } from "react"
 
 import { Brand } from "@/components/brand"
+import { PageFrame } from "@/components/landing/chrome/page-frame"
 import {
   HomeHeaderActions,
   HomeHeaderActionsFallback,
@@ -41,30 +42,37 @@ export function ChapterRail() {
 /** Sticky command strip with the scroll-progress hairline. */
 export function LandingHeader() {
   return (
-    <header className={base.header}>
-      <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
-        <Brand compactOnMobile />
-        <Suspense fallback={<HomeHeaderActionsFallback />}>
-          <HomeHeaderActions />
-        </Suspense>
-      </div>
-      <span className={base.scrollProgress} aria-hidden="true" />
-    </header>
+    <>
+      <PageFrame />
+      <header className={base.header}>
+        <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
+          <Brand compactOnMobile />
+          <Suspense fallback={<HomeHeaderActionsFallback />}>
+            <HomeHeaderActions />
+          </Suspense>
+        </div>
+        <span className={base.scrollProgress} aria-hidden="true" />
+      </header>
+    </>
   )
 }
 
 export function LandingLaunchBanner() {
   return (
-    <aside className="relative z-30 border-b border-primary/25 bg-primary/10">
+    <aside className={base.banner}>
       <a
         href="#launch-demo"
-        className="mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2 px-5 py-3 text-center text-sm font-semibold transition-colors hover:bg-primary/8 md:px-10"
+        className={`${base.bannerLink} mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2.5 px-5 py-3 text-center text-sm font-semibold md:px-10`}
       >
         <span className="font-mono text-xs uppercase tracking-[0.16em] text-primary">
           Product walkthrough
         </span>
+        <span aria-hidden="true" className="h-3 w-px shrink-0 bg-primary/35" />
         <span>See how a team shares one useful skill in 14 seconds.</span>
-        <ArrowRightIcon className="size-4 shrink-0" aria-hidden="true" />
+        <ArrowRightIcon
+          className={`${base.ctaArrow} size-4 shrink-0`}
+          aria-hidden="true"
+        />
       </a>
     </aside>
   )
@@ -86,33 +94,35 @@ function GitHubMark() {
 /** Footer — open-source colophon. */
 export function LandingFooter() {
   return (
-    <footer className="border-t border-border/70">
-      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 py-10 md:flex-row md:items-center md:justify-between md:px-10">
+    <footer className={base.footer}>
+      <span className={base.footerRule} aria-hidden="true" />
+      <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-10 md:py-14">
         <Brand />
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 md:justify-end">
+        <div className="flex flex-wrap items-center gap-x-7 gap-y-4 md:justify-end">
           <nav
             aria-label="Footer"
-            className="flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground"
+            className="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
           >
-            <a href="#pricing" className="transition-colors hover:text-foreground">
+            <a href="#pricing" className={base.footerNavLink}>
               Pricing
             </a>
-            <a href="#faq" className="transition-colors hover:text-foreground">
+            <a href="#faq" className={base.footerNavLink}>
               FAQ
             </a>
-            <Link
-              href="/resources"
-              className="transition-colors hover:text-foreground"
-            >
+            <Link href="/resources" className={base.footerNavLink}>
               Resources
             </Link>
           </nav>
+          <span
+            aria-hidden="true"
+            className={`${base.headerCellRule} hidden h-4 self-center sm:block`}
+          />
           <a
             href="https://github.com/TommyBez/skillsboard"
             target="_blank"
             rel="noreferrer"
             aria-label="Skills Board on GitHub"
-            className="inline-flex size-9 shrink-0 items-center justify-center rounded-[3px] text-muted-foreground transition-colors hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            className={`${base.footerMark} inline-flex size-9 shrink-0 items-center justify-center`}
           >
             <GitHubMark />
           </a>

@@ -1,12 +1,32 @@
 /* ---------------------------------------------------------------------------
-   MCP chapter — the signature routing moment
+   MCP chapter — the signature routing moment.
+
+   Structure: a full-height instrument frame (vertical rails, a header strip
+   and a footer strip) split into a copy column and a routing schematic.
+   The schematic is a real signal diagram: five library rows collect onto the
+   panel's edge bus, the bus feeds a gateway node, the node fans out through a
+   splitter to three agent ports.
+
+   Every declaration outside a `[data-motion-enabled="true"]` guard is the
+   FINISHED state, so no-JS and reduced-motion both render a fully drawn,
+   fully composed diagram. `--mcp-p` defaults to 1 on the landing root.
 --------------------------------------------------------------------------- */
+
+.mcpChapter {
+  --wire-row-h: 7.85rem;
+  --lib-row-h: 3.9rem;
+  --gw: clamp(7rem, 13.4vw, 12rem);
+  --schema-gap: clamp(0.85rem, 1.6vw, 1.45rem);
+  --wire-casing: color-mix(in oklch, var(--foreground) 13%, transparent);
+  --wire-glow: color-mix(in oklch, var(--primary) 55%, transparent);
+  --schema-rule: color-mix(in oklch, var(--foreground) 9%, transparent);
+}
 
 /* The tall scroll chapter only exists when the controller is live; without
    JS or with reduced motion the section is a normal static spread. */
 @media (min-width: 64rem) {
   :global([data-landing-motion-root][data-motion-enabled="true"]) .mcpChapter {
-    height: 240vh;
+    height: 220vh;
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .mcpSticky {
@@ -14,191 +34,802 @@
     top: var(--lp-header-h);
     height: calc(100dvh - var(--lp-header-h));
     display: flex;
-    align-items: center;
+    align-items: stretch;
     overflow: clip;
   }
 }
 
-.schematic {
+/* ---------------------------------------------------------------------------
+   Frame — rails, header strip, footer strip
+--------------------------------------------------------------------------- */
+
+.frame {
+  display: flex;
+  flex-direction: column;
   width: 100%;
+  max-width: min(100%, 84rem);
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 2.6vw, 2.25rem);
+  padding-block: clamp(3rem, 7vw, 4.25rem);
 }
 
-.schematicGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  border-block: 1px solid var(--lp-hairline-strong);
-  padding-block: 2rem;
+@media (min-width: 64rem) {
+  .frame {
+    height: 100%;
+    padding-block: clamp(1.1rem, 2.4vh, 1.9rem);
+    border-inline: 1px solid var(--lp-hairline);
+  }
 }
 
-.schemaEyebrow {
+/* Header strip: chapter mark on the left, live signal readout on the right. */
+.frameTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.frameIndex {
+  flex: none;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.675rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+}
+
+.frameMark {
+  flex: 1;
+  min-width: 0;
+}
+
+.readout {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.readoutKey {
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+}
+
+.readoutStack {
+  display: grid;
+  min-width: 5.1rem;
+}
+
+.readoutStack > span {
+  grid-area: 1 / 1;
   color: var(--primary);
 }
 
-.schemaStackTitle {
-  margin-top: 0.6rem;
-  max-width: 14ch;
-  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
-  font-weight: 650;
-  letter-spacing: -0.04em;
-  line-height: 1.02;
+.readoutStack > span[data-phase="0"] {
+  color: var(--muted-foreground);
 }
 
-.schemaRows {
-  margin-top: 1.25rem;
+/* Static / no-JS rest state: the chapter is finished, so it reads "live". */
+.readoutStack > span[data-phase] {
+  opacity: 0;
+}
+
+.readoutStack > span[data-phase="4"] {
+  opacity: 1;
+}
+
+.readoutBar {
+  position: relative;
+  display: block;
+  width: clamp(2.5rem, 5vw, 4.5rem);
+  height: 2px;
+  overflow: hidden;
+  background: var(--wire-casing);
+}
+
+.readoutBar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--primary);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Body: copy column | hairline | schematic column */
+.frameBody {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+@media (min-width: 64rem) {
+  .frameBody {
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(15rem, 0.68fr) minmax(0, 1.32fr);
+    gap: 0;
+    align-items: stretch;
+    padding-block: clamp(1.25rem, 2.6vh, 2rem);
+  }
+}
+
+@media (min-width: 84rem) {
+  .frameBody {
+    grid-template-columns: minmax(16rem, 0.75fr) minmax(0, 1.25fr);
+  }
+}
+
+.copyCol {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .copyCol {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding-right: clamp(1.5rem, 3vw, 2.75rem);
+  }
+}
+
+.copyBody {
+  align-self: center;
+  min-width: 0;
+}
+
+/* Technical annotation pinned to the bottom of the copy column so its top
+   rule lines up with the figcaption rule and the frame reads as one panel. */
+.specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.35rem 1.5rem;
+  margin-top: 2rem;
+  padding-top: 0.95rem;
   border-top: 1px solid var(--lp-hairline);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+}
+
+@media (min-width: 64rem) {
+  .specs {
+    margin-top: 0;
+    min-height: 5rem;
+    align-content: center;
+  }
+}
+
+.specRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.specKey {
+  flex: none;
+  width: 3.9rem;
+  color: color-mix(in oklch, var(--muted-foreground) 78%, transparent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.specValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Schematic
+--------------------------------------------------------------------------- */
+
+.schematic {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+@media (min-width: 64rem) {
+  .schematic {
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding-left: clamp(1.5rem, 3vw, 2.75rem);
+    border-left: 1px solid var(--lp-hairline);
+  }
+}
+
+.schematicGrid {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  gap: 0;
+}
+
+/* Drawing-surface grid: makes the diagram's negative space read as a field
+   rather than as an empty hole. Faded at the edges so it never boxes in. */
+.schematicGrid::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -1rem;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, var(--schema-rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--schema-rule) 1px, transparent 1px);
+  background-size: 2.25rem 2.25rem;
+  background-position: 50% 50%;
+  -webkit-mask-image: radial-gradient(
+    ellipse 82% 78% at 50% 50%,
+    #000 34%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    ellipse 82% 78% at 50% 50%,
+    #000 34%,
+    transparent 100%
+  );
+}
+
+/* Registration marks at the corners of the drawing field: the diagram sits
+   inside a measured surface, so its breathing room reads as composition. */
+.schematicGrid::after {
+  content: "";
+  position: absolute;
+  inset: -0.65rem -0.25rem;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 0 / 13px 1px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 0 / 1px 13px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 0 / 13px 1px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 0 / 1px 13px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 100% / 13px 1px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 100% / 1px 13px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 100% / 13px 1px,
+    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 100% / 1px 13px;
+  background-repeat: no-repeat;
+}
+
+.libCol,
+.agentCol {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.colLabel {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.colLabel::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+/* --- Library panel ------------------------------------------------------- */
+
+.libraryPanel,
+.agentActions {
+  position: relative;
+  z-index: 1;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 3px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--card) 82%, transparent),
+    color-mix(in oklch, var(--card) 46%, transparent)
+  );
+  box-shadow: 0 1px 0 0 color-mix(in oklch, var(--foreground) 5%, transparent) inset;
+}
+
+/* The panel's right border is the collector bus: it energises top-to-bottom
+   as the library is indexed, then hands off to the trunk. */
+.libraryBus {
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  right: -1.5px;
+  width: 2px;
+  background: var(--primary);
+  transform: scaleY(1);
+  transform-origin: top center;
+}
+
+.libraryHead {
+  padding: 0.8rem 0.95rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.schemaStackTitle {
+  font-size: clamp(0.95rem, 1.05vw, 1.05rem);
+  font-weight: 650;
+  letter-spacing: -0.022em;
+  line-height: 1.25;
 }
 
 .schemaRow {
+  position: relative;
   display: flex;
-  align-items: baseline;
-  gap: 0.7rem;
-  padding: 0.5rem 0.1rem;
+  align-items: center;
+  gap: 0.55rem;
+  height: var(--lib-row-h);
+  padding-inline: 0.85rem;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+.schemaRow:last-child {
+  border-bottom: 0;
+}
+
+/* Stub that carries a row onto the collector bus. */
+.schemaRow::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 50%;
+  width: 0.9rem;
+  height: 2px;
+  margin-top: -1px;
+  background: var(--primary);
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.schemaRowIndex {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
 }
 
 .schemaRowName {
   flex: 1;
-  font-size: 0.92rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
   font-weight: 600;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+}
+
+.schemaRowTag {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+/* Below ~1200px the library column is too narrow for a trailing tag before
+   the skill names start truncating; the tag is the least load-bearing part. */
+@media (min-width: 64rem) and (max-width: 74.9975rem) {
+  .schemaRowTag {
+    display: none;
+  }
 }
 
 .schemaRowTick {
-  width: 0.45rem;
-  height: 0.45rem;
-  align-self: center;
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
   border: 1px solid var(--primary);
-}
-
-/* Gateway column */
-
-.schemaGateway {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-block: 0.5rem 0.35rem;
-}
-
-/* Vertical signal route on small screens */
-.schemaGateway::before,
-.schemaGateway::after {
-  content: "";
-  width: 2px;
-  height: 2rem;
   background: var(--primary);
 }
 
-/* One shared measure keeps wires and action rows on the same axis. */
-.schematic {
-  --wire-row-h: 4rem;
-}
+/* --- Gateway ------------------------------------------------------------- */
 
-.schemaWires {
-  display: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  /* viewBox is 108 units tall; 100 units span two row heights. */
-  height: calc(var(--wire-row-h) * 2 * 1.08);
-  width: 100%;
-  transform: translateY(-50%);
-  overflow: visible;
-}
-
-.schemaTrunk,
-.schemaBranch {
-  stroke: var(--primary);
-  stroke-width: 1.75px;
-  fill: none;
-  vector-effect: non-scaling-stroke;
-  /* Gap > pathLength so offset=1 can't leak a repeating-dash speck at the
-     path end (visible as tiny stubs right of the MCP node at progress 0). */
-  stroke-dasharray: 1 2;
-  stroke-dashoffset: 0;
-}
-
-.schemaPulse {
-  stroke: var(--lp-alert);
-  stroke-width: 2.5px;
-  fill: none;
-  vector-effect: non-scaling-stroke;
-  /* Dash parked fully before path start; opacity stays 0 until --mcp-p > 0. */
-  stroke-dasharray: 0.06 2;
-  stroke-dashoffset: 0.07;
-  opacity: 0;
-}
-
-.schemaNode {
+.schemaGateway {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.3rem;
-  margin: 0.6rem 0;
-  padding: 0.7rem 0.85rem 0.6rem;
-  background: var(--card);
-  border: 1px solid var(--lp-hairline-strong);
-  border-radius: 2px;
+  justify-content: center;
+  padding-block: 0.25rem;
 }
 
+/* Vertical conduit used by the small-screen route. */
+.conduit {
+  position: relative;
+  display: block;
+  width: 5px;
+  height: 2.75rem;
+  background: var(--wire-casing);
+}
+
+.conduit::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  background: var(--primary);
+  transform: scaleY(1);
+  transform-origin: top center;
+}
+
+/* ---------------------------------------------------------------------------
+   Wires.
+
+   Laid out as absolutely positioned boxes rather than an SVG: every segment
+   is axis-aligned, so plain elements give exact geometry, crisp rules and
+   pure-transform drawing. (An SVG with a stretched viewBox cannot:
+   `non-scaling-stroke` and a pathLength-normalised dash disagree about which
+   axis scale to use, and any route that turns a corner silently under-draws.)
+
+   The box spans library-panel edge → agent-port line and is exactly two
+   action rows tall, so:  x 0% = library edge, 50% = node centre, 100% = ports;
+                          y 0% / 50% / 100% = the three action-row centres.
+   The node is always 58% of the gateway column and the column gap is a fixed
+   fraction of it, so the node's edges land at ~26.7% / ~73.3% at every width.
+--------------------------------------------------------------------------- */
+
+.schemaWireBox {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .schemaWireBox {
+    display: block;
+    position: absolute;
+    left: calc(-1 * var(--schema-gap));
+    right: calc(-1 * var(--schema-gap));
+    top: 50%;
+    height: calc(var(--wire-row-h) * 2);
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+}
+
+.wire {
+  position: absolute;
+  background: var(--wire-casing);
+}
+
+.wire::after {
+  content: "";
+  position: absolute;
+  background: var(--primary);
+  box-shadow: 0 0 7px color-mix(in oklch, var(--primary) 42%, transparent);
+}
+
+.wire[data-axis="x"] {
+  height: 5px;
+  margin-top: -2.5px;
+}
+
+.wire[data-axis="x"]::after {
+  inset: 1.5px 0;
+  transform: scaleX(var(--w, 1));
+  transform-origin: left center;
+}
+
+.wire[data-axis="y"] {
+  width: 5px;
+  margin-left: -2.5px;
+}
+
+.wire[data-axis="y"]::after {
+  inset: 0 1.5px;
+  transform: scaleY(var(--w, 1));
+  transform-origin: top center;
+}
+
+.wTrunk {
+  top: 50%;
+  left: 0;
+  width: 28%;
+}
+
+.wSpur {
+  top: 50%;
+  left: 71%;
+  width: 13%;
+}
+
+.wBusUp {
+  left: 84%;
+  bottom: 50%;
+  height: 50%;
+}
+
+.wBusUp::after {
+  transform-origin: bottom center;
+}
+
+.wBusDown {
+  left: 84%;
+  top: 50%;
+  height: 50%;
+}
+
+.wFeedA {
+  top: 0;
+  left: 84%;
+  right: 0;
+}
+
+.wFeedB {
+  top: 50%;
+  left: 84%;
+  right: 0;
+}
+
+.wFeedC {
+  top: 100%;
+  left: 84%;
+  right: 0;
+}
+
+/* Junction marks: the splitter and the two turns out to the outer ports. */
+.junction {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .junction {
+    display: block;
+    position: absolute;
+    left: 84%;
+    width: 7px;
+    height: 7px;
+    margin-left: -3.5px;
+    margin-top: -3.5px;
+    background: var(--primary);
+    transform: scale(1);
+  }
+
+  .junctionUp {
+    top: 0;
+  }
+
+  .junctionMid {
+    top: 50%;
+  }
+
+  .junctionDown {
+    top: 100%;
+  }
+}
+
+/* One request in flight. The track is the full length of its segment, so
+   translating it by 100% walks the dot from the segment's start to its end. */
+.packetTrack {
+  position: absolute;
+  opacity: 0;
+}
+
+.wire[data-axis="x"] > .packetTrack {
+  left: 0;
+  top: 50%;
+  width: 100%;
+  height: 0;
+  transform: translateX(calc(var(--leg, 0) * 100%));
+}
+
+.wire[data-axis="y"] > .packetTrack {
+  top: 0;
+  left: 50%;
+  height: 100%;
+  width: 0;
+  transform: translateY(calc(var(--leg, 0) * 100%));
+}
+
+.wBusUp > .packetTrack {
+  top: auto;
+  bottom: 0;
+  transform: translateY(calc(var(--leg, 0) * -100%));
+}
+
+.packetDot {
+  position: absolute;
+  border-radius: 3px;
+  background: var(--lp-alert);
+  box-shadow: 0 0 14px 3px color-mix(in oklch, var(--lp-alert) 55%, transparent);
+}
+
+.wire[data-axis="x"] > .packetTrack > .packetDot {
+  left: -10px;
+  top: -3px;
+  width: 20px;
+  height: 6px;
+}
+
+.wire[data-axis="y"] > .packetTrack > .packetDot {
+  top: -10px;
+  left: -3px;
+  height: 20px;
+  width: 6px;
+}
+
+.wBusUp > .packetTrack > .packetDot {
+  top: auto;
+  bottom: -10px;
+}
+
+/* The hub. Opaque, so the wires visually terminate on its edges. */
+.schemaNode {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.35rem;
+  width: 6.25rem;
+  aspect-ratio: 1;
+  background: var(--background);
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: 3px;
+}
+
+@media (min-width: 64rem) {
+  .schemaNode {
+    width: min(7.5rem, 58%);
+  }
+}
+
+/* Powered ring + glow. */
 .schemaNode::after {
   content: "";
   position: absolute;
-  inset: -1px;
+  inset: -6px;
   border: 1px solid var(--primary);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--primary) 14%, transparent),
+    0 0 22px -12px var(--wire-glow),
+    inset 0 0 18px -10px var(--wire-glow);
   opacity: 1;
   pointer-events: none;
 }
 
+/* Corner ticks — drafting marks, not decoration for its own sake. */
+.schemaNode::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  pointer-events: none;
+  background:
+    linear-gradient(var(--primary), var(--primary)) 0 0 / 9px 1px,
+    linear-gradient(var(--primary), var(--primary)) 0 0 / 1px 9px,
+    linear-gradient(var(--primary), var(--primary)) 100% 0 / 9px 1px,
+    linear-gradient(var(--primary), var(--primary)) 100% 0 / 1px 9px,
+    linear-gradient(var(--primary), var(--primary)) 0 100% / 9px 1px,
+    linear-gradient(var(--primary), var(--primary)) 0 100% / 1px 9px,
+    linear-gradient(var(--primary), var(--primary)) 100% 100% / 9px 1px,
+    linear-gradient(var(--primary), var(--primary)) 100% 100% / 1px 9px;
+  background-repeat: no-repeat;
+  transform: scale(1);
+}
+
+.nodeFlash {
+  position: absolute;
+  inset: -6px;
+  border: 1px solid var(--primary);
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .schemaNodeMark {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.6rem;
+  height: 1.6rem;
   color: var(--primary);
 }
 
 .schemaNodeLabel {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.26em;
+  text-indent: 0.26em;
   color: var(--foreground);
 }
 
-/* Agent column */
-
-.schemaAgentLabel {
+.nodeStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.85rem;
   font-family: var(--font-mono);
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 600;
-  letter-spacing: 0.2em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--muted-foreground);
-  /* Small screens: the vertical route is centered, so the label centers
-     with it to keep the signal path visually continuous. */
-  text-align: center;
+  white-space: nowrap;
 }
 
+@media (min-width: 64rem) {
+  .nodeStatus {
+    position: absolute;
+    left: 50%;
+    top: calc(50% + min(3.75rem, 29%) + 1.4rem);
+    margin-top: 0;
+    transform: translateX(-50%);
+  }
+}
+
+.nodeStatusDot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 18%, transparent);
+}
+
+.nodeStatusStack {
+  display: grid;
+  min-width: 4.6rem;
+}
+
+.nodeStatusStack > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+}
+
+.nodeStatusStack > span[data-state="on"] {
+  opacity: 1;
+  color: var(--foreground);
+}
+
+/* --- Agent actions ------------------------------------------------------- */
+
 .agentActions {
-  margin-top: 0.9rem;
+  min-width: 0;
 }
 
 .agentAction {
   position: relative;
-  display: flex;
-  align-items: baseline;
-  gap: 0.85rem;
-  padding-block: 0.95rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    "idx name name"
+    "idx tool state";
+  align-content: center;
+  gap: 0.22rem 0.6rem;
+  padding: 0.85rem 0.95rem;
   border-bottom: 1px solid var(--lp-hairline);
 }
 
+.agentAction:last-child {
+  border-bottom: 0;
+}
+
+/* Activation rule: hairline by default, primary once the port is armed. */
 .agentAction::after {
   content: "";
   position: absolute;
@@ -206,171 +837,508 @@
   bottom: -1px;
   width: 100%;
   height: 1px;
+  background: color-mix(in oklch, var(--primary) 46%, transparent);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* Input port on the row's leading edge — where the wire lands. */
+.actionPort {
+  position: absolute;
+  left: -4px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border: 1px solid var(--primary);
   background: var(--primary);
-  transform: scaleX(var(--a, 1));
-  transform-origin: left;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 16%, transparent);
+}
+
+.actionIndex {
+  grid-area: idx;
+  align-self: center;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.08em;
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
 }
 
 .agentActionName {
-  font-size: clamp(1.1rem, 1.45vw, 1.5rem);
+  grid-area: name;
+  font-size: clamp(0.95rem, 1.12vw, 1.1rem);
   font-weight: 650;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.actionTool {
+  grid-area: tool;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: var(--muted-foreground);
+}
+
+.actionState {
+  grid-area: state;
+  justify-self: end;
+  display: grid;
+  min-width: 2.4rem;
+  padding-left: 0.7rem;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: right;
+}
+
+.actionState > span {
+  grid-area: 1 / 1;
+  opacity: 0;
+}
+
+.actionState > span[data-state="on"] {
+  opacity: 1;
+  color: var(--primary);
+}
+
+/* Narrower desktops: drop the argument list rather than truncate the tool
+   name. The signature is a detail; the tool name is the information. */
+@media (min-width: 64rem) and (max-width: 83.9975rem) {
+  .actionTool {
+    font-size: 0.58rem;
+  }
+
+  .actionArg {
+    display: none;
+  }
+
+  .actionState {
+    font-size: 0.55rem;
+    padding-left: 0.5rem;
+  }
+}
+
+/* --- Annotations --------------------------------------------------------- */
+
+/* Dimension line: a drafting measurement across the whole route. */
+.hopMeasure {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--muted-foreground) 82%, transparent);
+}
+
+.hopRule {
+  position: relative;
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.hopRule::before,
+.hopRule::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 1px;
+  height: 9px;
+  background: var(--lp-hairline-strong);
+}
+
+.hopRule::before {
+  left: 0;
+}
+
+.hopRule::after {
+  right: 0;
 }
 
 .schemaCaption {
-  margin-top: 1.1rem;
-  font-size: 0.875rem;
+  margin-top: 1.5rem;
+  padding-top: 0.95rem;
+  border-top: 1px solid var(--lp-hairline);
+  font-size: 0.8rem;
   line-height: 1.6;
   color: var(--muted-foreground);
 }
 
-/* Desktop schematic: horizontal wires, scroll-driven drawing. */
+@media (min-width: 64rem) {
+  .schemaCaption {
+    display: flex;
+    align-items: center;
+    min-height: 5rem;
+    margin-top: 0;
+    max-width: 46ch;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Desktop layout + scroll-linked choreography
+--------------------------------------------------------------------------- */
+
 @media (min-width: 64rem) {
   .schematicGrid {
-    grid-template-columns: minmax(0, 1fr) clamp(7.5rem, 12vw, 11rem) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 0.9fr) var(--gw) minmax(0, 1.1fr);
+    grid-template-rows: minmax(0, auto);
+    column-gap: var(--schema-gap);
     align-items: center;
-    column-gap: 1.25rem;
-    padding-block: 2.75rem;
+    padding-bottom: 3.25rem;
+  }
+
+  .libCol {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   .schemaGateway {
+    grid-column: 2;
+    grid-row: 1;
     align-self: stretch;
-    min-height: 21rem;
-    justify-content: center;
     padding-block: 0;
   }
 
-  .schemaGateway::before,
-  .schemaGateway::after {
-    display: none;
+  .agentCol {
+    grid-column: 3;
+    grid-row: 1;
   }
 
-  .schemaWires {
-    display: block;
-  }
-
-  .schemaNode {
-    margin: 0;
-  }
-
-  /* The actions list is the alignment anchor: the label is lifted out of
-     flow so the list centers on the exact axis the wires are drawn on,
-     and fixed row heights put each branch endpoint at a row center. */
-  .schemaAgent {
-    align-self: center;
-    position: relative;
-  }
-
-  .schemaAgentLabel {
+  /* Each label is lifted out of flow so its block stays centred on the wire
+     axis; both blocks are sized to land the labels on the same baseline. */
+  .colLabel {
     position: absolute;
-    bottom: 100%;
     left: 0;
-    margin-bottom: 1.1rem;
-    text-align: left;
+    right: 0;
+    bottom: 100%;
+    margin-bottom: 0.85rem;
   }
 
-  .agentActions {
+  .hopMeasure {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.6rem;
     margin-top: 0;
+  }
+
+  .conduit {
+    display: none;
   }
 
   .agentAction {
     height: var(--wire-row-h);
-    align-items: center;
     padding-block: 0;
   }
 
-  /* Scroll-driven drawing + activation, only when the controller is live. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaTrunk {
-    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.04) / 0.22, 1));
-  }
+  /* --- scroll-linked windows (controller live only) --- */
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaBranchA {
-    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.3) / 0.16, 1));
-  }
-
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaBranchB {
-    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.38) / 0.16, 1));
-  }
-
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaBranchC {
-    stroke-dashoffset: calc(1 - clamp(0, (var(--mcp-p) - 0.46) / 0.18, 1));
-  }
-
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaPulse {
-    stroke-dashoffset: calc(0.07 - var(--mcp-p) * 1.12);
-    opacity: calc(
-      min(1, var(--mcp-p) * 14) *
-        (1 - clamp(0, (var(--mcp-p) - 0.88) / 0.12, 1))
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schematic {
+    /* Library indexing */
+    --scan: clamp(0, (var(--mcp-p) - 0.05) / 0.2, 1);
+    /* Trunk into the gateway */
+    --trunk: clamp(0, (var(--mcp-p) - 0.24) / 0.14, 1);
+    /* Gateway ignition */
+    --ignite: clamp(0, (var(--mcp-p) - 0.37) / 0.06, 1);
+    /* Fan-out: spur out of the node, bus grows both ways, ports land in order */
+    --spur: clamp(0, (var(--mcp-p) - 0.42) / 0.05, 1);
+    --bus: clamp(0, (var(--mcp-p) - 0.47) / 0.06, 1);
+    --feed-a: clamp(0, (var(--mcp-p) - 0.53) / 0.035, 1);
+    --feed-b: clamp(0, (var(--mcp-p) - 0.565) / 0.035, 1);
+    --feed-c: clamp(0, (var(--mcp-p) - 0.6) / 0.035, 1);
+    /* Ports arming */
+    --arm-1: clamp(0, (var(--mcp-p) - 0.565) / 0.04, 1);
+    --arm-2: clamp(0, (var(--mcp-p) - 0.6) / 0.04, 1);
+    --arm-3: clamp(0, (var(--mcp-p) - 0.635) / 0.04, 1);
+    /* One round trip: request in, node hit, response out to port 01 */
+    --leg-trunk: clamp(0, (var(--mcp-p) - 0.7) / 0.07, 1);
+    --leg-spur: clamp(0, (var(--mcp-p) - 0.82) / 0.025, 1);
+    --leg-bus: clamp(0, (var(--mcp-p) - 0.845) / 0.05, 1);
+    --leg-feed: clamp(0, (var(--mcp-p) - 0.895) / 0.035, 1);
+    --hit-ramp: clamp(0, (var(--mcp-p) - 0.77) / 0.09, 1);
+    --hit: calc(
+      clamp(0, (var(--mcp-p) - 0.77) / 0.02, 1) *
+        (1 - clamp(0, (var(--mcp-p) - 0.83) / 0.06, 1))
     );
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
-    opacity: clamp(0, (var(--mcp-p) - 0.24) / 0.08, 1);
+  /* Library rows index one at a time, then the collector bus fills. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .libraryBus {
+    transform: scaleY(var(--scan));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction {
-    opacity: calc(0.3 + 0.7 * var(--a, 1));
-    transform: translate3d(calc((1 - var(--a, 1)) * 14px), 0, 0);
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow::after {
+    transform: scaleX(var(--r, 1));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRowTick {
+    background: color-mix(
+      in oklch,
+      var(--primary) calc(var(--r, 1) * 100%),
+      transparent
+    );
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="1"] {
+    --r: clamp(0, (var(--mcp-p) - 0.05) / 0.05, 1);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="2"] {
+    --r: clamp(0, (var(--mcp-p) - 0.09) / 0.05, 1);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="3"] {
+    --r: clamp(0, (var(--mcp-p) - 0.13) / 0.05, 1);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="4"] {
+    --r: clamp(0, (var(--mcp-p) - 0.17) / 0.05, 1);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="5"] {
+    --r: clamp(0, (var(--mcp-p) - 0.21) / 0.05, 1);
+  }
+
+  /* Wires draw, one axis-aligned segment at a time. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wTrunk {
+    --w: var(--trunk);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wSpur {
+    --w: var(--spur);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wBusUp,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wBusDown {
+    --w: var(--bus);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedA {
+    --w: var(--feed-a);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedB {
+    --w: var(--feed-b);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedC {
+    --w: var(--feed-c);
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionMid {
+    transform: scale(clamp(0, (var(--spur) - 0.6) / 0.4, 1));
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionUp,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionDown {
+    transform: scale(clamp(0, (var(--bus) - 0.7) / 0.3, 1));
+  }
+
+  /* Gateway ignition. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
+    opacity: var(--ignite);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::before {
+    transform: scale(calc(0.86 + 0.14 * var(--ignite)));
+    opacity: calc(0.25 + 0.75 * var(--ignite));
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .nodeStatusDot {
+    background: color-mix(
+      in oklch,
+      var(--primary) calc(var(--ignite) * 100%),
+      var(--wire-casing)
+    );
+    box-shadow: 0 0 0 3px
+      color-mix(in oklch, var(--primary) calc(var(--ignite) * 18%), transparent);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .nodeStatusStack
+    > span[data-state="off"] {
+    opacity: calc(1 - clamp(0, (var(--ignite) - 0.5) / 0.06, 1));
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .nodeStatusStack
+    > span[data-state="on"] {
+    opacity: clamp(0, (var(--ignite) - 0.5) / 0.06, 1);
+  }
+
+  /* Ports arm. The action names never dim — activation is carried by the
+     port, the state chip and the underline, so a dormant row still reads as
+     a deliberate pre-flight state instead of disabled text. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .actionPort {
+    background: color-mix(
+      in oklch,
+      var(--primary) calc(var(--arm, 1) * 100%),
+      transparent
+    );
+    border-color: color-mix(
+      in oklch,
+      var(--primary) calc(38% + var(--arm, 1) * 62%),
+      transparent
+    );
+    box-shadow: 0 0 0 3px
+      color-mix(in oklch, var(--primary) calc(var(--arm, 1) * 16%), transparent);
+    transform: scale(calc(0.82 + 0.18 * var(--arm, 1)));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction::after {
+    transform: scaleX(var(--arm, 1));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .actionState
+    > span[data-state="off"] {
+    opacity: calc(1 - clamp(0, (var(--arm, 1) - 0.5) / 0.06, 1));
+    color: var(--muted-foreground);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .actionState
+    > span[data-state="on"] {
+    opacity: clamp(0, (var(--arm, 1) - 0.5) / 0.06, 1);
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="1"] {
-    --a: clamp(0, (var(--mcp-p) - 0.48) / 0.1, 1);
+    --arm: var(--arm-1);
   }
-
   :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="2"] {
-    --a: clamp(0, (var(--mcp-p) - 0.58) / 0.1, 1);
+    --arm: var(--arm-2);
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="3"] {
+    --arm: var(--arm-3);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="3"] {
-    --a: clamp(0, (var(--mcp-p) - 0.68) / 0.1, 1);
+  /* One packet, handed from segment to segment so it never stalls at a
+     corner: trunk → (the gateway registers the hit) → spur → bus → port 01. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .legTrunk {
+    --leg: var(--leg-trunk);
+    opacity: calc(
+      clamp(0, var(--leg-trunk) / 0.02, 1) *
+        (1 - clamp(0, (var(--leg-trunk) - 0.98) / 0.02, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .legSpur {
+    --leg: var(--leg-spur);
+    opacity: calc(
+      clamp(0, var(--leg-spur) / 0.02, 1) *
+        (1 - clamp(0, (var(--leg-spur) - 0.98) / 0.02, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .legBus {
+    --leg: var(--leg-bus);
+    opacity: calc(
+      clamp(0, var(--leg-bus) / 0.02, 1) *
+        (1 - clamp(0, (var(--leg-bus) - 0.98) / 0.02, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .legFeed {
+    --leg: var(--leg-feed);
+    opacity: calc(
+      clamp(0, var(--leg-feed) / 0.02, 1) *
+        (1 - clamp(0, (var(--leg-feed) - 0.98) / 0.02, 1))
+    );
+  }
+
+  /* The node registers the hit: one outward ring, then gone. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .nodeFlash {
+    opacity: var(--hit);
+    transform: scale(calc(1 + 0.18 * var(--hit-ramp)));
+  }
+
+  /* Header readout tracks the phase the diagram is actually in. */
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .readoutBar::after {
+    transform: scaleX(var(--mcp-p));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .readoutStack
+    > span[data-phase="0"] {
+    opacity: calc(1 - clamp(0, (var(--mcp-p) - 0.05) / 0.006, 1));
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .readoutStack
+    > span[data-phase="1"] {
+    opacity: calc(
+      clamp(0, (var(--mcp-p) - 0.05) / 0.006, 1) *
+        (1 - clamp(0, (var(--mcp-p) - 0.24) / 0.006, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .readoutStack
+    > span[data-phase="2"] {
+    opacity: calc(
+      clamp(0, (var(--mcp-p) - 0.24) / 0.006, 1) *
+        (1 - clamp(0, (var(--mcp-p) - 0.42) / 0.006, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .readoutStack
+    > span[data-phase="3"] {
+    opacity: calc(
+      clamp(0, (var(--mcp-p) - 0.42) / 0.006, 1) *
+        (1 - clamp(0, (var(--mcp-p) - 0.7) / 0.006, 1))
+    );
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .readoutStack
+    > span[data-phase="4"] {
+    opacity: clamp(0, (var(--mcp-p) - 0.7) / 0.006, 1);
   }
 }
 
-/* Small screens: reveal the vertical route when the section enters view. */
+/* ---------------------------------------------------------------------------
+   Small screens — a vertical route, revealed on entry
+--------------------------------------------------------------------------- */
+
 @media (max-width: 63.9975rem) {
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    [data-motion-group="mcp"][data-motion-state="pending"]
-    .schemaGateway::before,
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    [data-motion-group="mcp"][data-motion-state="pending"]
-    .schemaGateway::after {
-    transform: scaleY(0);
+  .colLabelLib {
+    margin-bottom: 0.85rem;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaGateway::before {
-    transform-origin: top;
-    transition: transform 420ms var(--lp-ease-in-out) 80ms;
+  .colLabelAgent {
+    margin-top: 1.4rem;
+    margin-bottom: 0.85rem;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaGateway::after {
-    transform-origin: top;
-    transition: transform 420ms var(--lp-ease-in-out) 380ms;
+  /* The route runs vertically here, so the horizontal collector furniture
+     would point at nothing. Rows still tick as they are indexed. */
+  .libraryBus,
+  .schemaRow::after {
+    display: none;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    [data-motion-group="mcp"][data-motion-state="pending"]
-    .agentAction {
-    opacity: 0;
-    transform: translate3d(0, 10px, 0);
+  .schemaRow {
+    height: auto;
+    padding-block: 0.72rem;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction {
+  .agentAction {
+    padding-block: 0.9rem;
+  }
+
+  .schemaNode {
+    margin-block: 0.55rem;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduit::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRowTick,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .actionPort,
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
     transition:
-      opacity 380ms var(--lp-ease-out),
-      transform 380ms var(--lp-ease-out);
+      transform 460ms var(--lp-ease-out),
+      opacity 460ms var(--lp-ease-out);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="1"] {
-    transition-delay: 560ms;
-  }
-
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="2"] {
-    transition-delay: 660ms;
-  }
-
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="3"] {
-    transition-delay: 760ms;
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .conduit::after {
+    transform: scaleY(0);
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -379,25 +1347,87 @@
     transform: scaleX(0);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction::after {
-    transition: transform 420ms var(--lp-ease-out);
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaRowTick {
+    transform: scale(0.3);
+    opacity: 0;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="1"]::after {
-    transition-delay: 640ms;
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .schemaNode::after {
+    opacity: 0;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="2"]::after {
-    transition-delay: 740ms;
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="mcp"][data-motion-state="pending"]
+    .actionPort {
+    transform: scale(0.5);
+    opacity: 0.35;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="3"]::after {
-    transition-delay: 840ms;
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="1"] .schemaRowTick {
+    transition-delay: 60ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="2"] .schemaRowTick {
+    transition-delay: 130ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="3"] .schemaRowTick {
+    transition-delay: 200ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="4"] .schemaRowTick {
+    transition-delay: 270ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="5"] .schemaRowTick {
+    transition-delay: 340ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduitIn::after {
+    transition-delay: 420ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
+    transition-delay: 600ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduitOut::after {
+    transition-delay: 700ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="1"]::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="1"] .actionPort {
+    transition-delay: 860ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="2"]::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="2"] .actionPort {
+    transition-delay: 940ms;
+  }
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="3"]::after,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .agentAction[data-action="3"] .actionPort {
+    transition-delay: 1020ms;
   }
 }
 
+/* ---------------------------------------------------------------------------
+   Reduced motion — the diagram rests fully drawn and fully composed
+--------------------------------------------------------------------------- */
+
 @media (prefers-reduced-motion: reduce) {
-  .schemaPulse {
+  .packetTrack,
+  .nodeFlash {
     opacity: 0;
+  }
+
+  .conduit::after,
+  .libraryBus,
+  .schemaRow::after,
+  .schemaRowTick,
+  .agentAction::after,
+  .actionPort,
+  .schemaNode::after {
+    transition: none;
   }
 }

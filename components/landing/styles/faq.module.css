@@ -1,46 +1,292 @@
 /* ---------------------------------------------------------------------------
    FAQ — technical index
+
+   Eight numbered entries in a register: mono index on the left, question set
+   flush against a hairline grid, a boxed glyph that turns from + to − as the
+   entry opens. Everything is a real <details>, so the chapter is complete and
+   operable with no JS at all; the height reveal, the glyph morph and the
+   staggered entrance are layered on top.
 --------------------------------------------------------------------------- */
 
-.faqItem {
+.faqSection {
+  position: relative;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+.faqInner {
+  display: grid;
+  gap: 2.75rem;
+  margin-inline: auto;
+  width: 100%;
+  max-width: 1440px;
+  padding-inline: 1.25rem;
+  padding-block: 4rem;
+}
+
+@media (min-width: 48rem) {
+  .faqInner {
+    padding-inline: 2.5rem;
+    padding-block: 6rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .faqInner {
+    grid-template-columns: minmax(14rem, 0.62fr) minmax(30rem, 1.38fr);
+    align-items: start;
+    gap: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Left column — chapter plate. Tracks the index while entries expand.
+--------------------------------------------------------------------------- */
+
+.faqAside {
+  display: flex;
+  flex-direction: column;
+  max-width: 30rem;
+}
+
+@media (min-width: 64rem) {
+  .faqInner {
+    align-items: stretch;
+  }
+
+  /* Anchored at three points — the chapter mark on the register's head rule,
+     the legend on its foot rule, the title block centred between them — so the
+     column spans the chapter instead of trailing off into empty space. */
+  .faqAside {
+    justify-content: space-between;
+    padding-right: clamp(1.5rem, 3vw, 3.25rem);
+  }
+
+  /* Optical alignment: the mark's hairline sits on the register's head rule,
+     the legend's on its foot rule. Both are half-leading corrections. */
+  .faqMark {
+    margin-top: -0.4rem;
+  }
+
+  .faqLegend {
+    margin-bottom: -0.4rem;
+  }
+}
+
+.faqMark {
+  margin: 0;
+}
+
+.faqHeading {
+  margin-top: 1.6rem;
+  max-width: 12ch;
+  font-size: clamp(2.25rem, 4.4vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: var(--tracking-display, -0.03em);
+  text-wrap: balance;
+}
+
+.faqIntro {
+  margin-top: 1.25rem;
+  max-width: 27rem;
+  font-size: 1.0625rem;
+  line-height: 1.62;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+/* Decorative register legend: how many entries this index holds. */
+.faqLegend {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 2.35rem;
+  max-width: 15rem;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.faqLegendRule {
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.faqLegendCount {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: var(--foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Right column — the register itself
+--------------------------------------------------------------------------- */
+
+.faqIndex {
+  --faq-gap: 0.85rem;
+  --faq-num-w: 1.55rem;
+  --faq-pad: 0rem;
+
+  /* Kept as an explicit length (never an em) so the ordinal and the glyph can
+     both be centred on the question's first line with the same arithmetic. */
+  --faq-q-size: clamp(1.15rem, 1.75vw, 1.55rem);
+  --faq-q-line: 1.2;
+  --faq-first-line-c: calc(var(--faq-q-size) * var(--faq-q-line) / 2);
+
+  position: relative;
+}
+
+@media (min-width: 48rem) {
+  .faqIndex {
+    --faq-gap: 1.35rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .faqIndex {
+    --faq-pad: clamp(2.25rem, 3.4vw, 4rem);
+
+    padding-left: var(--faq-pad);
+    border-left: 1px solid var(--lp-grid-line);
+  }
+}
+
+/* Column rule between the ordinal and the question: the register reads as a
+   ruled table rather than a stack of collapsible bars. It runs the whole
+   height of the index, and each open answer lights its own segment. */
+@media (min-width: 40rem) {
+  .faqIndex::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--faq-pad) + var(--faq-num-w) + var(--faq-gap) / 2);
+    width: 1px;
+    background: var(--lp-grid-line);
+    pointer-events: none;
+  }
+}
+
+/* Head rule of the index — drawn left-to-right as the chapter arrives. */
+.faqIndexRule {
+  display: block;
+  height: 1px;
+  background: var(--lp-hairline-strong);
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.faqItem {
+  position: relative;
+  z-index: 1;
+  border-bottom: 1px solid var(--lp-hairline);
+  transition: background-color 170ms var(--lp-ease-snap);
+}
+
+/* Head and foot rules close the register; the entries between are lighter. */
+.faqItem:last-of-type {
+  border-bottom-color: var(--lp-hairline-strong);
+}
+
+/* Rule that draws under the entry. Hover is a neutral emphasis; only an open
+   entry earns the accent, so green means "expanded" and nothing else. */
+.faqItem {
+  --faq-rule: var(--lp-hairline-strong);
+}
+
+.faqItem[open] {
+  --faq-rule: var(--primary);
+}
+
+.faqItem::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--faq-rule);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    transform 260ms var(--lp-ease-out),
+    background-color 200ms var(--lp-ease-snap);
+  pointer-events: none;
+}
+
+.faqItem[open]::after {
+  transform: scaleX(1);
 }
 
 .faqSummary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: var(--faq-num-w) minmax(0, 1fr) auto;
   align-items: baseline;
-  gap: 0.85rem;
-  padding-block: 1.4rem;
+  column-gap: var(--faq-gap);
+  padding-block: 1.2rem;
+  font-size: var(--faq-q-size);
   cursor: pointer;
   list-style: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .faqSummary::-webkit-details-marker {
   display: none;
 }
 
+.faqSummary::marker {
+  content: "";
+}
+
 .faqSummary:focus-visible {
   outline: 2px solid var(--ring);
-  outline-offset: 4px;
+  outline-offset: 3px;
+}
+
+/* Ordinals are set tight and flush RIGHT against the column rule, the way a
+   contents page sets its folios — so they can never be confused with the
+   wide-tracked, left-flush chapter mark on the other side of the rail. */
+.faqNum {
+  align-self: start;
+  text-align: right;
+  margin-top: calc(var(--faq-first-line-c) - 0.33rem);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  transition: color 170ms var(--lp-ease-snap);
 }
 
 .faqQuestion {
-  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
-  font-weight: 650;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  font-size: 1em;
+  font-weight: 600;
+  line-height: var(--faq-q-line);
+  letter-spacing: -0.028em;
+  text-wrap: pretty;
 }
 
+/* Boxed +/− glyph, optically centred on the question's first line. */
 .faqGlyph {
   position: relative;
-  align-self: center;
-  width: 1.05rem;
-  height: 1.05rem;
+  align-self: start;
+  margin-top: calc(var(--faq-first-line-c) - 0.75rem);
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 3px;
   color: var(--muted-foreground);
+  background-color: transparent;
   transition:
-    transform 200ms var(--lp-ease-in-out),
-    color 200ms var(--lp-ease-in-out);
+    color 170ms var(--lp-ease-snap),
+    border-color 170ms var(--lp-ease-snap),
+    background-color 170ms var(--lp-ease-snap),
+    transform 340ms var(--lp-ease-emph);
 }
 
 .faqGlyph::before,
@@ -50,38 +296,281 @@
   top: 50%;
   left: 50%;
   background: currentColor;
+  transition: transform 340ms var(--lp-ease-emph);
 }
 
 .faqGlyph::before {
-  width: 100%;
-  height: 2px;
-  transform: translate(-50%, -50%);
+  width: 0.625rem;
+  height: 1.5px;
+  transform: translate(-50%, -50%) scaleX(1);
 }
 
 .faqGlyph::after {
-  width: 2px;
-  height: 100%;
+  width: 1.5px;
+  height: 0.625rem;
   transform: translate(-50%, -50%);
 }
 
+/* Open: the box quarter-turns while the horizontal stroke retracts, so the
+   plus resolves into a minus rather than snapping to a different mark. */
 .faqItem[open] .faqGlyph {
-  transform: rotate(135deg);
+  transform: rotate(90deg);
   color: var(--primary);
+  border-color: color-mix(in oklch, var(--primary) 52%, transparent);
+  background-color: color-mix(in oklch, var(--primary) 12%, transparent);
 }
 
-.faqAnswer {
-  padding-bottom: 1.6rem;
+.faqItem[open] .faqGlyph::before {
+  transform: translate(-50%, -50%) scaleX(0);
 }
 
-@media (min-width: 40rem) {
-  .faqAnswer {
-    padding-left: 1.1rem;
-    border-left: 2px solid color-mix(in oklch, var(--primary) 45%, transparent);
+/* Open state spends the accent twice — on the control and on the answer's
+   column segment. The ordinal just comes up to full ink. */
+.faqItem[open] .faqNum {
+  color: var(--foreground);
+}
+
+/* Hover / keyboard focus — immediate, precise, no layout movement. */
+@media (hover: hover) and (pointer: fine) {
+  .faqIndex .faqItem:has(> .faqSummary:hover) {
+    background-color: color-mix(in oklch, var(--foreground) 4%, transparent);
+  }
+
+  .faqIndex .faqItem:has(> .faqSummary:hover)::after {
+    transform: scaleX(1);
+  }
+
+  .faqIndex .faqItem:has(> .faqSummary:hover) .faqNum {
+    color: var(--foreground);
+  }
+
+  .faqIndex .faqItem:has(> .faqSummary:hover) .faqGlyph {
+    color: var(--foreground);
+    border-color: var(--lp-hairline-strong);
+  }
+
+  .faqIndex .faqItem[open]:has(> .faqSummary:hover) .faqGlyph {
+    color: var(--primary);
+    border-color: color-mix(in oklch, var(--primary) 70%, transparent);
   }
 }
 
+.faqIndex .faqItem:has(> .faqSummary:focus-visible)::after {
+  transform: scaleX(1);
+}
+
+/* ---------------------------------------------------------------------------
+   Answer — indented to sit under the question, bracketed by the index rule
+--------------------------------------------------------------------------- */
+
+/* The answer sets flush with the question, never with the ordinal — the
+   register's columns hold at every width. */
+.faqAnswerWrap {
+  position: relative;
+  padding-left: calc(var(--faq-num-w) + var(--faq-gap));
+  padding-bottom: 1.45rem;
+}
+
+/* The open answer lights the register's column rule for exactly its own
+   length — the structure carries the state, not a decorative badge. */
+.faqAnswerWrap::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--faq-num-w) + var(--faq-gap) / 2);
+  top: 0;
+  bottom: 1.45rem;
+  width: 1px;
+  background: color-mix(in oklch, var(--primary) 62%, transparent);
+}
+
+/* The answers are the chapter's actual payload — they read a step brighter and
+   a step larger than ordinary supporting copy. */
+.faqAnswer {
+  margin: 0;
+  max-width: 33rem;
+  font-size: 1.05rem;
+  line-height: 1.62;
+  color: color-mix(in oklch, var(--foreground) 45%, var(--muted-foreground));
+  text-wrap: pretty;
+}
+
+/* Animated disclosure height. Progressive enhancement: browsers without
+   interpolate-size keep the instant native toggle, and the glyph, accent rule
+   and colour states still animate. */
+@supports (interpolate-size: allow-keywords) {
+  .faqIndex .faqItem {
+    interpolate-size: allow-keywords;
+  }
+
+  /* Symmetric easing: the box picks up immediately and settles gently, so the
+     open and the close read as the same gesture in reverse. An "expo out" here
+     covers 90% of the height in the first quarter of the duration and lands as
+     a snap, which is exactly what a disclosure must not feel like. */
+  .faqIndex .faqItem::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    opacity: 0;
+    transition:
+      block-size 360ms var(--lp-ease-snap),
+      opacity 170ms var(--lp-ease-snap),
+      content-visibility 360ms allow-discrete;
+  }
+
+  /* Opening, the answer fades in behind the box as it clears — closing, it
+     goes first so the row never collapses over live text. */
+  .faqIndex .faqItem[open]::details-content {
+    block-size: auto;
+    opacity: 1;
+    transition:
+      block-size 360ms var(--lp-ease-snap),
+      opacity 260ms var(--lp-ease-snap) 90ms,
+      content-visibility 360ms allow-discrete;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Entrance — chapter plate first, then the register cascading down.
+   Defaults above are the finished composition, so no-JS renders complete.
+--------------------------------------------------------------------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqMark,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqHeading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqIntro,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqLegend,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqItem {
+  opacity: 0;
+  translate: 0 15px;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqIndexRule {
+  transform: scaleX(0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqMark,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqHeading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqIntro,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqLegend,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem {
+  transition:
+    opacity var(--lp-dur-reveal) var(--lp-ease-emph),
+    translate var(--lp-dur-reveal) var(--lp-ease-emph);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqIndexRule {
+  transition: transform 620ms var(--lp-ease-emph) 60ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqHeading {
+  transition-delay: 55ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqIntro {
+  transition-delay: 120ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqLegend {
+  transition-delay: 185ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(1) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(2) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 1);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(3) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 2);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(4) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 3);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(5) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 4);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(6) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 5);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(7) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 6);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqItem:nth-of-type(8) {
+  transition-delay: calc(120ms + var(--lp-stagger) * 7);
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the index rests in its finished state and toggles instantly
+--------------------------------------------------------------------------- */
+
 @media (prefers-reduced-motion: reduce) {
-  .faqGlyph {
+  .faqIndexRule,
+  .faqItem,
+  .faqItem::after,
+  .faqNum,
+  .faqGlyph,
+  .faqGlyph::before,
+  .faqGlyph::after,
+  .faqAnswer {
     transition: none;
+  }
+
+  @supports (interpolate-size: allow-keywords) {
+    .faqIndex .faqItem::details-content,
+    .faqIndex .faqItem[open]::details-content {
+      transition-duration: 0ms;
+      transition-delay: 0ms;
+    }
   }
 }

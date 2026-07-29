@@ -20,9 +20,9 @@
   --lp-dur-reveal: 560ms;
   --lp-dur-scene: 820ms;
   --lp-stagger: 72ms;
-  --lp-hairline: color-mix(in oklch, var(--foreground) 16%, transparent);
-  --lp-hairline-strong: color-mix(in oklch, var(--foreground) 30%, transparent);
-  --lp-grid-line: color-mix(in oklch, var(--foreground) 7%, transparent);
+  --lp-hairline: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --lp-hairline-strong: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --lp-grid-line: color-mix(in oklab, var(--foreground) 7%, transparent);
   --lp-alert: oklch(0.62 0.15 55);
   --lp-header-h: 3.5rem;
 
@@ -35,7 +35,28 @@
   --pricing-ink: var(--surface-ink-foreground);
   --pricing-zero: oklch(0.72 0.145 148);
 
+  /* --- appended: the page measure -----------------------------------------
+     Every chapter lays its content out as `max-w-[1440px] mx-auto px-5 md:px-10`.
+     `--lp-frame-inset` is the distance from the viewport edge to that content
+     edge, so the chrome (frame rails, header rule, scroll progress, footer
+     rule, chapter rail) can align to the same measure without touching a
+     single section file. */
+  --lp-measure: 1440px;
+  --lp-gutter: 1.25rem;
+  --lp-frame-inset: max(
+    var(--lp-gutter),
+    calc(50% - var(--lp-measure) / 2 + var(--lp-gutter))
+  );
+  --lp-frame-ink: 0.11;
+  --lp-footer-field: color-mix(in oklab, var(--foreground) 3.5%, var(--background));
+
   position: relative;
+}
+
+@media (min-width: 48rem) {
+  .root {
+    --lp-gutter: 2.5rem;
+  }
 }
 
 :global(.dark) .root {
@@ -43,13 +64,16 @@
   --pricing-field: oklch(0.945 0.011 103);
   --pricing-ink: oklch(0.17 0.017 158);
   --pricing-zero: oklch(0.5 0.15 148);
+  --lp-frame-ink: 0.16;
 }
 
 .root[data-motion-enabled="true"] {
   --mcp-p: var(--mcp-progress, 0);
 }
 
-/* Paper grain: print texture at very low opacity, never over readability. */
+/* Paper grain: print texture at very low opacity, never over readability.
+   Tuned so it actually reads as tooth on the field — multiply darkens the
+   paper in light, overlay lifts it out of the near-black in dark. */
 .grain {
   position: relative;
 }
@@ -61,59 +85,217 @@
   z-index: 1;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
-  opacity: 0.05;
+  background-size: 140px 140px;
+  opacity: 0.2;
   mix-blend-mode: multiply;
 }
 
 :global(.dark) .grain::after {
-  opacity: 0.08;
-  mix-blend-mode: soft-light;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+}
+
+/* ---------------------------------------------------------------------------
+   Page frame — two continuous hairlines on the content edge
+
+   The single strongest structural signal on the page: every chapter is seen
+   to live inside one deliberate measure. Fixed, so the rails are continuous
+   by construction; `difference` ink, so they survive the inverted pricing
+   monument without a second theme-keyed layer. Never hit-tests, never
+   reflows anything, sits above section fields but below the command strip so
+   the header rule reads as the frame's top edge.
+--------------------------------------------------------------------------- */
+
+.frameRail {
+  position: fixed;
+  top: var(--lp-header-h);
+  bottom: 0;
+  z-index: 20;
+  display: none;
+  width: 1px;
+  background: #fff;
+  opacity: var(--lp-frame-ink);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+
+.frameRail[data-side="start"] {
+  left: var(--lp-frame-inset);
+}
+
+.frameRail[data-side="end"] {
+  right: var(--lp-frame-inset);
+}
+
+@media (min-width: 64rem) {
+  .frameRail {
+    display: block;
+  }
 }
 
 /* ---------------------------------------------------------------------------
    Header — compact command strip
+
+   Rest: no field at all, just the measure rule, so the hero owns the screen.
+   Scrolled: a near-opaque frosted band that cuts cleanly, so headings pass
+   under the strip instead of being ghosted in half by it.
 --------------------------------------------------------------------------- */
 
 .header {
   position: sticky;
   top: 0;
   z-index: 40;
-  border-bottom: 1px solid var(--lp-hairline);
   background-color: transparent;
   transition:
-    background-color 240ms var(--lp-ease-out),
-    border-color 240ms var(--lp-ease-out),
-    box-shadow 240ms var(--lp-ease-out);
+    background-color var(--lp-dur-hover) var(--lp-ease-snap),
+    box-shadow var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+/* The frame's top edge: a hairline on the measure, not edge to edge. */
+.header::before {
+  content: "";
+  position: absolute;
+  left: var(--lp-frame-inset);
+  right: var(--lp-frame-inset);
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
+  opacity: 0.75;
+  transition:
+    background-color var(--lp-dur-hover) var(--lp-ease-snap),
+    opacity var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
 .root[data-scrolled] .header {
-  background-color: color-mix(in oklch, var(--background) 88%, transparent);
-  backdrop-filter: blur(12px);
-  border-color: var(--lp-hairline-strong);
+  /* Opaque on purpose. A frosted strip is the fashionable answer, but this
+     page runs display type and an inverted plate underneath it: at any alpha
+     that still reads as glass, headings ghost through the wordmark as they
+     pass beneath. The strip cuts, the rule marks the cut, and a tight cast
+     shadow says which one is on top. */
+  background-color: var(--background);
+  box-shadow: 0 14px 24px -24px color-mix(in oklab, var(--foreground) 80%, transparent);
+}
+
+.root[data-scrolled] .header::before {
+  background: var(--lp-hairline-strong);
+  opacity: 1;
 }
 
 .headerCellRule {
   align-self: stretch;
   width: 1px;
+  flex: none;
   background: var(--lp-hairline);
+}
+
+/* Theme toggle sits in the CTA cluster: same 3px language, same optical
+   height as the primary action, never a stray pill. */
+.headerToggle {
+  border-radius: 3px;
+  border-color: var(--lp-hairline);
+  background-color: transparent;
+  transition:
+    border-color var(--lp-dur-hover) var(--lp-ease-snap),
+    background-color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.headerToggle:hover {
+  border-color: var(--lp-hairline-strong);
+  background-color: color-mix(in oklab, var(--foreground) 6%, transparent);
+}
+
+.headerToggle:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 
 /* ---------------------------------------------------------------------------
    Shared CTA language — sharp, directional, routed
+
+   One press model across primary / secondary / ghost: 1px of lift on hover,
+   1px of give on press, a directional arrow, and a square focus ring that
+   matches the 3px corner. The conversion surface should feel like the best
+   built thing on the page.
 --------------------------------------------------------------------------- */
 
 .ctaButton {
+  position: relative;
   border-radius: 3px;
+  transition:
+    translate var(--lp-dur-hover) var(--lp-ease-snap),
+    background-color var(--lp-dur-hover) var(--lp-ease-snap),
+    border-color var(--lp-dur-hover) var(--lp-ease-snap),
+    color var(--lp-dur-hover) var(--lp-ease-snap),
+    box-shadow var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.ctaButton:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+  box-shadow: none;
 }
 
 .ctaArrow {
-  transition: transform 180ms var(--lp-ease-out);
+  transition:
+    transform var(--lp-dur-hover) var(--lp-ease-out),
+    opacity var(--lp-dur-hover) var(--lp-ease-out);
+}
+
+/* Primary — filled ink. A hairline top highlight at rest, a cast shadow in
+   the accent hue on hover, and it sits back down under the finger. */
+.ctaPrimary,
+.ctaPrimary:focus-visible {
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #fff 26%, transparent),
+    0 1px 0 color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+
+/* Secondary — outline. The border does the work; the field only warms. */
+.ctaSecondary {
+  border-color: var(--lp-hairline-strong);
+  background-color: color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+
+.ctaGhost {
+  border-color: transparent;
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .ctaButton:hover {
+    translate: 0 -1px;
+  }
+
   .ctaButton:hover .ctaArrow {
     transform: translate3d(4px, 0, 0);
   }
+
+  .ctaPrimary:hover {
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, #fff 34%, transparent),
+      0 2px 0 color-mix(in oklab, var(--foreground) 16%, transparent),
+      0 12px 24px -14px color-mix(in oklab, var(--primary) 75%, transparent);
+  }
+
+  .ctaSecondary:hover {
+    border-color: color-mix(in oklab, var(--foreground) 45%, transparent);
+    background-color: color-mix(in oklab, var(--foreground) 7%, transparent);
+  }
+
+  .ctaGhost:hover {
+    border-color: var(--lp-hairline);
+    background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  }
+}
+
+.ctaButton:active {
+  translate: 0 1px;
+  transition-duration: var(--lp-dur-tap);
+}
+
+.ctaPrimary:active {
+  box-shadow:
+    inset 0 1px 2px color-mix(in oklab, var(--foreground) 22%, transparent),
+    0 0 0 color-mix(in oklab, var(--foreground) 0%, transparent);
 }
 
 .ctaButton:active .ctaArrow {
@@ -140,36 +322,64 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Scroll progress — a hairline of primary ink under the command strip
+   Scroll progress — the playhead, riding the measure rule under the strip
+
+   Drawn on the same 1px row as the header rule and clipped to the same
+   measure, so it reads as that rule filling in rather than a green bar
+   stapled to the viewport. Fades in with the strip's field; absent without
+   JS and under reduced motion, where it could never advance.
 --------------------------------------------------------------------------- */
 
 .scrollProgress {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -1px;
-  height: 2px;
-  background: var(--primary);
+  left: var(--lp-frame-inset);
+  right: var(--lp-frame-inset);
+  bottom: 0;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--lp-dur-reveal) var(--lp-ease-out);
+}
+
+.scrollProgress::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--primary) 30%, transparent),
+    var(--primary)
+  );
   transform: scaleX(var(--scroll-progress, 0));
   transform-origin: left center;
-  pointer-events: none;
+}
+
+.root[data-scrolled][data-motion-enabled="true"] .scrollProgress {
+  opacity: 1;
 }
 
 /* ---------------------------------------------------------------------------
-   Chapter rail — fixed section index, printed in difference ink
+   Chapter rail — a section index that behaves like an index
+
+   Lives in the outer gutter, just past the frame's right rail, at every
+   width. At rest it is a spine with six nodes and a fill that tracks how far
+   down the page you are — so it reads as a position indicator, not as six
+   stray dashes. The marks are difference ink, so they survive the inverted
+   pricing plate; the labels are opaque chips, because a blended chip lets the
+   content behind it ghost through and an index has to be readable.
 --------------------------------------------------------------------------- */
 
 .rail {
   position: fixed;
   top: 50%;
-  right: clamp(0.9rem, 1.6vw, 1.6rem);
+  right: calc(var(--lp-frame-inset) - 1.7rem);
   z-index: 30;
   display: none;
   translate: 0 -50%;
   flex-direction: column;
   align-items: flex-end;
-  gap: 0.9rem;
-  mix-blend-mode: difference;
+  gap: 0.55rem;
 }
 
 @media (min-width: 80rem) {
@@ -178,69 +388,310 @@
   }
 }
 
-.railLink {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding-block: 0.25rem;
-  color: #fff;
-  opacity: 0.38;
-  text-decoration: none;
-  transition: opacity 220ms var(--lp-ease-out);
+/* the spine */
+.rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: #fff;
+  opacity: 0.3;
+  mix-blend-mode: difference;
 }
 
-.railLink:hover,
-.railLink[aria-current] {
-  opacity: 1;
+/* how far down the page you are, drawn on the spine */
+.rail::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 1px;
+  background: #fff;
+  opacity: 0;
+  mix-blend-mode: difference;
+  transform: scaleY(var(--scroll-progress, 0));
+  transform-origin: top center;
+}
+
+.root[data-motion-enabled="true"] .rail::after {
+  opacity: 0.9;
+}
+
+.railLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding-block: 0.4rem;
+  border-radius: 3px;
+  text-decoration: none;
 }
 
 .railLink:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 4px;
-  opacity: 1;
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
 }
 
 .railTick {
-  width: 1.4rem;
+  position: relative;
+  width: 0.85rem;
   height: 1px;
-  background: currentcolor;
-  transform: scaleX(0.5);
+  background: #fff;
+  opacity: 0.38;
+  mix-blend-mode: difference;
+  transform: scaleX(0.55);
   transform-origin: right center;
-  transition: transform 260ms var(--lp-ease-out);
+  transition:
+    transform var(--lp-dur-hover) var(--lp-ease-out),
+    opacity var(--lp-dur-hover) var(--lp-ease-out);
 }
 
+.railLink[aria-current] .railTick,
 .railLink:hover .railTick,
 .railLink:focus-visible .railTick {
+  opacity: 1;
   transform: scaleX(1);
 }
 
-.railLabel {
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  opacity: 0;
-  translate: 6px 0;
-  transition:
-    opacity 220ms var(--lp-ease-out),
-    translate 220ms var(--lp-ease-out);
+/* you are here — the same filled square the chapters mark themselves with */
+.railLink[aria-current] .railTick::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 3px;
+  height: 3px;
+  background: #fff;
 }
 
-.railLink:hover .railLabel,
-.railLink:focus-visible .railLabel {
+/* Opaque chip, revealed for the whole index at once so approaching the rail
+   gives you the table of contents rather than one label at a time. */
+.railLabel {
+  display: block;
+  padding: 0.22rem 0.45rem 0.2rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 3px;
+  background: var(--background);
+  box-shadow: 0 4px 12px -8px color-mix(in oklab, var(--foreground) 60%, transparent);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  translate: 5px 0;
+  transition:
+    opacity var(--lp-dur-hover) var(--lp-ease-out),
+    translate var(--lp-dur-hover) var(--lp-ease-out),
+    color var(--lp-dur-hover) var(--lp-ease-out),
+    border-color var(--lp-dur-hover) var(--lp-ease-out);
+}
+
+.rail:hover .railLabel,
+.rail:focus-within .railLabel {
   opacity: 1;
   translate: 0 0;
 }
 
+/* the index unrolls top to bottom rather than snapping in as a block */
+.rail:hover .railLink:nth-child(2) .railLabel,
+.rail:focus-within .railLink:nth-child(2) .railLabel {
+  transition-delay: 18ms;
+}
+
+.rail:hover .railLink:nth-child(3) .railLabel,
+.rail:focus-within .railLink:nth-child(3) .railLabel {
+  transition-delay: 36ms;
+}
+
+.rail:hover .railLink:nth-child(4) .railLabel,
+.rail:focus-within .railLink:nth-child(4) .railLabel {
+  transition-delay: 54ms;
+}
+
+.rail:hover .railLink:nth-child(5) .railLabel,
+.rail:focus-within .railLink:nth-child(5) .railLabel {
+  transition-delay: 72ms;
+}
+
+.rail:hover .railLink:nth-child(6) .railLabel,
+.rail:focus-within .railLink:nth-child(6) .railLabel {
+  transition-delay: 90ms;
+}
+
+.railLink[aria-current] .railLabel {
+  border-color: color-mix(in oklab, var(--primary) 45%, transparent);
+  color: var(--primary);
+}
+
+.railLink:hover .railLabel,
+.railLink:focus-visible .railLabel {
+  border-color: var(--lp-hairline-strong);
+  color: var(--foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Launch banner — a routed strip, not a coloured bar
+--------------------------------------------------------------------------- */
+
+.banner {
+  position: relative;
+  z-index: 30;
+  background: color-mix(in oklab, var(--primary) 9%, var(--background));
+}
+
+.banner::after {
+  content: "";
+  position: absolute;
+  left: var(--lp-frame-inset);
+  right: var(--lp-frame-inset);
+  bottom: 0;
+  height: 1px;
+  background: color-mix(in oklab, var(--primary) 32%, transparent);
+}
+
+.bannerLink {
+  transition: background-color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.bannerLink:hover {
+  background-color: color-mix(in oklab, var(--primary) 8%, transparent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bannerLink:hover .ctaArrow {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.bannerLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -3px;
+}
+
+/* ---------------------------------------------------------------------------
+   Footer — the closing plate
+
+   The last chapter dissolves into a slightly recessed field, the measure rule
+   returns as the frame's bottom edge, and the accent punctuates its left end
+   so the page ends on the same mark it opened with.
+--------------------------------------------------------------------------- */
+
+.footer {
+  position: relative;
+  background: var(--lp-footer-field);
+}
+
+/* hand-off: the closing chapter fades into the footer plate above the rule */
+.footer::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5rem;
+  height: 5rem;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, var(--lp-footer-field));
+}
+
+.footerRule {
+  position: absolute;
+  left: var(--lp-frame-inset);
+  right: var(--lp-frame-inset);
+  top: 0;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.footerRule::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 2.25rem;
+  height: 1px;
+  background: var(--primary);
+}
+
+.footerNavLink {
+  position: relative;
+  padding-block: 0.15rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  transition: color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.footerNavLink::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentcolor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform var(--lp-dur-hover) var(--lp-ease-out);
+}
+
+.footerNavLink:hover {
+  color: var(--foreground);
+}
+
+.footerNavLink:hover::after {
+  transform: scaleX(1);
+}
+
+.footerNavLink:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 4px;
+  border-radius: 1px;
+  color: var(--foreground);
+}
+
+.footerMark {
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--muted-foreground);
+  transition:
+    border-color var(--lp-dur-hover) var(--lp-ease-snap),
+    color var(--lp-dur-hover) var(--lp-ease-snap),
+    background-color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.footerMark:hover {
+  border-color: var(--lp-hairline-strong);
+  background-color: color-mix(in oklab, var(--foreground) 5%, transparent);
+  color: var(--foreground);
+}
+
+.footerMark:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  color: var(--foreground);
+}
+
 /* ---------------------------------------------------------------------------
    Magnetic CTAs — a few pixels of pull, pointer-fine only
+
+   Fast to follow the pointer, slow to settle back: the lead is what makes it
+   feel attached rather than laggy.
 --------------------------------------------------------------------------- */
 
 .magnetic {
   display: inline-flex;
   translate: calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px);
-  transition: translate 300ms var(--lp-ease-out);
+  transition: translate 420ms var(--lp-ease-out);
+}
+
+.magnetic:hover {
+  transition-duration: 90ms;
 }
 
 /* ---------------------------------------------------------------------------
@@ -249,21 +700,43 @@
 
 @media (prefers-reduced-motion: reduce) {
   .header,
+  .header::before,
   .ctaArrow,
+  .ctaButton,
   .magnetic,
+  .bannerLink,
+  .footerNavLink,
+  .footerNavLink::after,
+  .footerMark,
+  .headerToggle,
   .railLink,
   .railTick,
-  .railLabel {
+  .railLabel,
+  .scrollProgress {
     transition: none;
+    transition-delay: 0s;
+  }
+
+  .ctaButton:hover,
+  .ctaButton:active {
+    translate: none;
   }
 
   .ctaButton:hover .ctaArrow,
-  .ctaButton:active .ctaArrow {
+  .ctaButton:active .ctaArrow,
+  .bannerLink:hover .ctaArrow {
     transform: none;
   }
 
   .ctaButton:active {
     scale: 1 !important;
     transform: none;
+  }
+
+  /* The controller never advances these without motion; a permanently empty
+     indicator is worse than none. */
+  .scrollProgress,
+  .rail::after {
+    display: none;
   }
 }

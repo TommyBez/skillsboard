@@ -5,7 +5,13 @@ import { HomeCtaFallback, HomeHeroActions } from "@/components/landing/landing-c
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/hero.module.css"
 
-/** Hero — sticky chapter: scattered dossiers file into the team library. */
+/**
+ * Hero — sticky chapter: scattered dossiers file into the team library.
+ *
+ * The frame is a three-band grid (standing header rule / composition /
+ * state rail) so both edges of the viewport are held by structure and the
+ * composition never floats in dead space.
+ */
 export function HeroSection() {
   return (
     <section
@@ -13,50 +19,62 @@ export function HeroSection() {
       className={styles.hero}
       data-hero-scene
       data-chapter-target="intro"
+      data-view-progress="hero"
     >
       <div className={`${styles.heroSticky} ${base.grain}`}>
-        <div className="relative mx-auto flex h-full w-full max-w-[1440px] flex-col justify-center px-5 py-14 md:px-10 lg:py-16">
-          <div className={styles.heroGridLines} aria-hidden="true" />
+        <div className={styles.heroFrame}>
+          <div className={styles.heroField} aria-hidden="true" />
+          <div className={styles.heroRules} aria-hidden="true" />
 
-          <div className={`${styles.heroExit} relative z-0`}>
+          <div className={styles.heroTop}>
             <p className={styles.heroEyebrow} data-decode="">
               Skills selected by your team
             </p>
-            <h1
-              className={`${styles.heroHeadline} mt-6 text-[clamp(2.75rem,8.4vw,8.75rem)] font-semibold leading-[0.92] tracking-[-0.045em]`}
-            >
-              <span className={styles.heroLineMask}>
-                <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
-                  Your team&apos;s skills.
-                </span>
-              </span>
-              <span className={styles.heroLineMask}>
-                <span
-                  className={`${styles.heroLine} ${styles.heroLineSecond} text-primary`}
-                >
-                  All in one place.
-                </span>
-              </span>
-            </h1>
+            <span className={styles.heroTopRule} aria-hidden="true" />
           </div>
 
-          <div
-            className={`${styles.heroExit} relative z-10 mt-9 lg:mt-12 lg:max-w-[34rem]`}
-          >
-            <p
-              className={`${styles.heroCopy} max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl`}
-            >
-              Build a shared, searchable library so everyone knows which skills
-              to use and where to find them.
-            </p>
-            <div className={`${styles.heroCta} mt-7`}>
-              <Suspense fallback={<HomeCtaFallback />}>
-                <HomeHeroActions />
-              </Suspense>
+          <div className={styles.heroMid}>
+            <div className={`${styles.heroCopyCol} ${styles.heroExit}`}>
+              <h1 className={styles.heroHeadline}>
+                <span className={styles.heroLineMask}>
+                  <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
+                    Your team&apos;s skills.
+                  </span>
+                </span>
+                <span className={styles.heroLineMask}>
+                  <span className={`${styles.heroLine} ${styles.heroLineSecond}`}>
+                    All in one place.
+                  </span>
+                </span>
+              </h1>
             </div>
+
+            <div className={`${styles.heroLower} ${styles.heroExit}`}>
+              <p className={styles.heroBlurb}>
+                Build a shared, searchable library so everyone knows which skills
+                to use and where to find them.
+              </p>
+              <div className={styles.heroCta}>
+                <Suspense fallback={<HomeCtaFallback />}>
+                  <HomeHeroActions />
+                </Suspense>
+              </div>
+            </div>
+
+            <HeroBoard />
           </div>
 
-          <HeroBoard />
+          <div className={styles.heroRail} aria-hidden="true">
+            <span className={styles.heroRailLabel} data-state="scattered">
+              Scattered
+            </span>
+            <span className={styles.heroRailTrack}>
+              <span className={styles.heroRailFill} />
+            </span>
+            <span className={styles.heroRailLabel} data-state="filed">
+              Filed
+            </span>
+          </div>
         </div>
       </div>
     </section>

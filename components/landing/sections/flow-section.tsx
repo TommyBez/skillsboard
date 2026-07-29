@@ -1,30 +1,46 @@
-import { Suspense } from "react"
+import { Suspense, type CSSProperties, type ReactNode } from "react"
 
+import {
+  PasteResolveVisual,
+  RouteFanVisual,
+  SearchFilterVisual,
+} from "@/components/landing/flow/flow-visuals"
 import { HomeCtaFallback, HomeLaunchActions } from "@/components/landing/landing-ctas"
 import { LaunchDemoLoop } from "@/components/landing/launch-demo-loop"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/flow.module.css"
 
-const flowSteps = [
+const flowSteps: ReadonlyArray<{
+  index: string
+  title: string
+  copy: string
+  visual: ReactNode
+}> = [
   {
+    index: "01",
     title: "Save the skill",
     copy: "Paste a GitHub skill URL you want the team to reuse. Skills Board keeps the name, description, and install command tied to it.",
+    visual: <PasteResolveVisual />,
   },
   {
+    index: "02",
     title: "Find it later",
     copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
+    visual: <SearchFilterVisual />,
   },
   {
+    index: "03",
     title: "Use it your way",
     copy: "Open the source, copy the install command, download a ZIP, or let your agent fetch it over MCP.",
+    visual: <RouteFanVisual />,
   },
-] as const
+]
 
 function HomeLaunchDemo() {
   return (
     <div
       id="launch-demo"
-      className="surface-shadow mt-12 grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]"
+      className={`surface-shadow ${styles.launchDemo} grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]`}
     >
       <LaunchDemoLoop />
       <div className="flex flex-col justify-center border-t border-border p-6 md:p-8 lg:border-l lg:border-t-0 lg:p-10">
@@ -49,7 +65,7 @@ function HomeLaunchDemo() {
   )
 }
 
-/** Workflow — three moves, indexed like a manual. */
+/** Workflow — three moves, indexed like a manual, each one demonstrated. */
 export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: boolean }) {
   return (
     <section
@@ -63,9 +79,17 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
         data-motion-group="flow"
       >
         <div className={styles.flowHead}>
-          <p className={`${base.chapterMark} uppercase`} data-decode="">
-            How it works
-          </p>
+          <div className={styles.flowMarkRow}>
+            <p
+              className={`${base.chapterMark} ${styles.flowMark} uppercase`}
+              data-decode=""
+            >
+              How it works
+            </p>
+            <span className={styles.flowMarkCount} aria-hidden="true">
+              01—03
+            </span>
+          </div>
           <h2
             id="flow-heading"
             className="mt-5 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
@@ -76,11 +100,21 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
 
         {showLaunchTreatment ? <HomeLaunchDemo /> : null}
 
-        <ol className={styles.flowRows}>
-          {flowSteps.map((step) => (
-            <li key={step.title} className={styles.flowRow}>
-              <h3 className={styles.flowTitle}>{step.title}</h3>
-              <p className={styles.flowCopy}>{step.copy}</p>
+        <ol className={styles.flowGrid}>
+          {flowSteps.map((step, i) => (
+            <li
+              key={step.title}
+              className={styles.flowStep}
+              style={{ "--c": i } as CSSProperties}
+            >
+              <div className={styles.stepHead}>
+                <span className={styles.stepIndex} aria-hidden="true">
+                  {step.index}
+                </span>
+                <h3 className={styles.stepTitle}>{step.title}</h3>
+                <p className={styles.stepCopy}>{step.copy}</p>
+              </div>
+              {step.visual}
             </li>
           ))}
         </ol>

@@ -1,14 +1,38 @@
 /* ---------------------------------------------------------------------------
-   Hero — sticky chapter: dossiers file into the team library
+   Hero — sticky chapter: scattered dossiers file into the team library.
+
+   Scene contract
+   --------------
+   `--route-p` (published by LandingMotionController as `--route-progress`)
+   runs 0 → 1 across the hero's sticky runway. Every card owns a slice of that
+   runway: it glides from its scattered position on the desk into its row in
+   the Team library panel, straightening early (secondary action) and folding
+   shut — clip-path only — into a single index row on arrival.
+
+   Rest states
+   -----------
+   • no JS / controller never arms → `--route-p` is 0: the composed scatter,
+     which is a finished picture on its own. Nothing is hidden by default.
+   • prefers-reduced-motion → the scene rests filed: a tidy library listing.
 --------------------------------------------------------------------------- */
 
 .hero {
+  --hero-px: 1.25rem;
   position: relative;
+  isolation: isolate;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+@media (min-width: 48rem) {
+  .hero {
+    --hero-px: 2.5rem;
+  }
 }
 
 .heroSticky {
   position: relative;
+  display: flex;
+  align-items: stretch;
   /* Resting / no-JS / reduced-motion: one viewport of hero. */
   min-height: calc(100dvh - var(--lp-header-h));
 }
@@ -17,31 +41,121 @@
    reduced motion the hero is a normal one-viewport spread. */
 @media (min-width: 64rem) {
   :global([data-landing-motion-root][data-motion-enabled="true"]) .hero {
-    height: 180vh;
+    height: 200vh;
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroSticky {
     position: sticky;
     top: var(--lp-header-h);
     height: calc(100dvh - var(--lp-header-h));
-    display: flex;
-    align-items: stretch;
+    min-height: 0;
     overflow: clip;
   }
 }
 
-.heroGridLines {
+.heroFrame {
+  position: relative;
+  flex: 1;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  align-content: center;
+  width: 100%;
+  max-width: 90rem;
+  margin-inline: auto;
+  padding: 2.5rem var(--hero-px) 3rem;
+}
+
+@media (min-width: 64rem) {
+  .heroFrame {
+    padding-block: 2.25rem 4.5rem;
+  }
+}
+
+/* Top strip — the hero's standing header rule. The eyebrow sits on the rule
+   (same annotation grammar as the other chapters' marks); one line, not two. */
+.heroTop {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding-bottom: 0.35rem;
+}
+
+.heroTopRule {
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+  transform-origin: left center;
+  animation: lp-hero-draw 760ms var(--lp-ease-emph) 240ms both;
+}
+
+.heroMid {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------------
+   Field — dither texture + column rails, the depth under the chapter
+------------------------------------------------------------------ */
+
+.heroField {
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
+  /* Ink only where the composition wants weight: strongest behind the board,
+     gone behind the headline so type never fights texture. */
+  background-image:
+    radial-gradient(
+      62% 58% at 78% 44%,
+      color-mix(in oklab, var(--foreground) 34%, transparent) 0%,
+      color-mix(in oklab, var(--foreground) 14%, transparent) 46%,
+      transparent 78%
+    ),
+    radial-gradient(
+      44% 46% at 6% 88%,
+      color-mix(in oklab, var(--foreground) 16%, transparent) 0%,
+      transparent 72%
+    );
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cpath d='M8 6.5h4M30 6.5h2M57 6.5h5M82 6.5h2M3 14.5h2M21 14.5h5M44 14.5h3M70 14.5h4M90 14.5h3M12 22.5h3M38 22.5h2M61 22.5h4M86 22.5h2M5 30.5h5M27 30.5h3M52 30.5h2M74 30.5h5M17 38.5h2M41 38.5h4M66 38.5h3M88 38.5h4M2 46.5h3M31 46.5h5M55 46.5h2M79 46.5h3M10 54.5h4M36 54.5h2M63 54.5h5M85 54.5h2M22 62.5h3M47 62.5h4M71 62.5h2M92 62.5h3M6 70.5h2M29 70.5h3M58 70.5h4M81 70.5h5M15 78.5h5M43 78.5h2M68 78.5h3M90 78.5h2M1 86.5h4M25 86.5h2M50 86.5h5M76 86.5h3M11 94.5h3M34 94.5h4M60 94.5h2M84 94.5h4' stroke='%23fff' stroke-width='1'/%3E%3C/svg%3E");
+  mask-size: 96px 96px;
+  mask-repeat: repeat;
+  translate: 0 calc(var(--vp-hero, 0) * -26px);
+  animation: lp-hero-fade 900ms var(--lp-ease-out) both;
+}
+
+.heroRules {
+  position: absolute;
+  inset: 0 var(--hero-px);
+  z-index: 0;
+  pointer-events: none;
+  border-inline: 1px solid var(--lp-grid-line);
   background-image: linear-gradient(
     to right,
     var(--lp-grid-line) 1px,
     transparent 1px
   );
-  background-size: calc(100% / 6) 100%;
-  mask-image: linear-gradient(to bottom, black 55%, transparent 96%);
-  animation: lp-fade-in 700ms var(--lp-ease-out) both;
+  background-size: calc(100% / 4) 100%;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    black 9%,
+    black 84%,
+    transparent 100%
+  );
+  transform-origin: top center;
+  animation: lp-hero-rules 760ms var(--lp-ease-emph) 60ms both;
+}
+
+/* ------------------------------------------------------------------
+   Copy column
+------------------------------------------------------------------ */
+
+.heroCopyCol {
+  position: relative;
+  z-index: 2;
 }
 
 .heroEyebrow {
@@ -54,7 +168,7 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--primary);
-  animation: lp-rise-in 400ms var(--lp-ease-out) 140ms both;
+  animation: lp-hero-rise 520ms var(--lp-ease-emph) 120ms both;
 }
 
 .heroEyebrow::before {
@@ -62,10 +176,15 @@
   width: 0.55rem;
   height: 0.55rem;
   background: var(--primary);
+  animation: lp-hero-tick 460ms var(--lp-ease-spring) 200ms both;
 }
 
 .heroHeadline {
+  font-size: clamp(2.75rem, 7vw, 7rem);
+  font-weight: 600;
   font-stretch: 93%;
+  line-height: 0.94;
+  letter-spacing: -0.045em;
 }
 
 .heroLineMask {
@@ -77,72 +196,195 @@
 
 .heroLine {
   display: block;
-  animation: lp-line-rise 720ms var(--lp-ease-out) both;
+  animation: lp-hero-line 720ms var(--lp-ease-emph) both;
 }
 
 .heroLineFirst {
-  animation-delay: 230ms;
+  animation-delay: 200ms;
 }
 
 .heroLineSecond {
-  animation-delay: 330ms;
+  color: var(--primary);
+  animation-delay: 282ms;
 }
 
-.heroCopy {
-  animation: lp-rise-in 460ms var(--lp-ease-out) 600ms both;
+@media (min-width: 80rem) {
+  .heroHeadline {
+    font-size: clamp(2.75rem, 7.8vw, 7rem);
+  }
+}
+
+.heroLower {
+  position: relative;
+  z-index: 2;
+  margin-top: 2.25rem;
+  max-width: 34rem;
+}
+
+@media (min-width: 64rem) {
+  .heroLower {
+    margin-top: 3.75rem;
+  }
+}
+
+.heroBlurb {
+  max-width: 34rem;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+  color: var(--muted-foreground);
+  animation: lp-hero-rise 560ms var(--lp-ease-emph) 400ms both;
+}
+
+@media (min-width: 48rem) {
+  .heroBlurb {
+    font-size: 1.25rem;
+  }
 }
 
 .heroCta {
-  animation: lp-rise-in 420ms var(--lp-ease-out) 690ms both;
-}
-
-@keyframes lp-fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes lp-rise-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 12px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-line-rise {
-  from {
-    transform: translate3d(0, 108%, 0);
-  }
-
-  to {
-    transform: translate3d(0, 0, 0);
-  }
+  margin-top: 1.75rem;
+  animation: lp-hero-rise 560ms var(--lp-ease-emph) 472ms both;
 }
 
 /* ------------------------------------------------------------------
-   Hero board: scattered dossiers filing into the team library panel
+   State rail — the scene's scrubber, anchored to the frame's baseline
+------------------------------------------------------------------ */
+
+.heroRail {
+  --rail-p: 0;
+  position: relative;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  gap: 0.9rem;
+  margin-top: 2rem;
+  padding-top: 1.05rem;
+  border-top: 1px solid var(--lp-hairline);
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  animation: lp-hero-rise 560ms var(--lp-ease-emph) 560ms both;
+}
+
+@media (min-width: 64rem) {
+  .heroRail {
+    display: flex;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .heroRail {
+    --rail-p: clamp(0, var(--route-p), 1);
+  }
+}
+
+.heroRailLabel {
+  flex-shrink: 0;
+  transition: color 240ms var(--lp-ease-out);
+}
+
+.heroRailLabel[data-state="filed"] {
+  /* discount the trailing letter-space, then hold a real optical margin so the
+     label reads as inside the frame rather than clipped by its rail */
+  margin-inline-end: calc(0.5rem - 0.18em);
+}
+
+/* Both ends stay legible; the accent simply travels from one to the other. */
+.heroRailLabel[data-state="scattered"] {
+  color: color-mix(
+    in oklab,
+    var(--foreground) calc((1 - var(--rail-p)) * 100%),
+    var(--muted-foreground)
+  );
+}
+
+.heroRailLabel[data-state="filed"] {
+  color: color-mix(
+    in oklab,
+    var(--primary) calc(var(--rail-p) * 100%),
+    var(--muted-foreground)
+  );
+}
+
+.heroRailTrack {
+  position: relative;
+  flex: 1;
+  height: 2px;
+  background: var(--lp-hairline);
+}
+
+.heroRailFill {
+  position: absolute;
+  inset: 0;
+  background: var(--primary);
+  transform: scaleX(var(--rail-p));
+  transform-origin: left center;
+}
+
+/* ------------------------------------------------------------------
+   Board stage — geometry is authored once, in absolute lengths, so the
+   scatter → filed delta can live entirely in `transform`.
 ------------------------------------------------------------------ */
 
 .heroBoard {
   --px: 0;
   --py: 0;
+
+  --sw: 28rem; /* stage width  */
+  --sh: 36.5rem; /* stage height */
+  --col-gap: 2rem;
+  --cw: calc((var(--sw) - var(--col-gap)) / 2); /* card width */
+  --pp: 0.75rem; /* panel body padding */
+  --pw: calc(var(--cw) + 2 * var(--pp)); /* panel width */
+  --rh: 3.4rem; /* filed row height */
+  --hh: 2.85rem; /* panel head height */
+  --qh: 3.1rem; /* panel filter row height */
+  --fh: 2.2rem; /* panel foot height */
+  --ph: calc(
+    var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh) + var(--fh)
+  );
+  --pt: calc((var(--sh) - var(--ph)) / 2); /* panel centred in the stage */
+
+  --filed-x: calc(var(--sw) - var(--cw) - var(--pp));
+  --row0: calc(var(--pt) + var(--hh) + var(--qh) + var(--pp));
+
   position: absolute;
-  top: 6%;
-  bottom: 4%;
-  right: max(-2rem, -2vw);
-  width: min(46%, 42rem);
+  top: 50%;
+  right: 0;
+  /* above the copy column: the headline's block box spans the frame, and the
+     board's cards must stay hoverable where they sit beside it */
+  z-index: 3;
   display: none;
-  z-index: 2;
+  width: var(--sw);
+  height: var(--sh);
+  translate: 0 -50%;
   pointer-events: none;
+}
+
+@media (min-width: 80rem) {
+  .heroBoard {
+    --sw: 32rem;
+    --rh: 3.75rem;
+    --hh: 3.1rem;
+    --qh: 3.4rem;
+    --fh: 2.5rem;
+  }
+}
+
+/* Short laptops: keep the whole stage inside the pinned viewport. */
+@media (min-width: 64rem) and (max-height: 50rem) {
+  .heroBoard {
+    scale: 0.92;
+  }
+}
+
+@media (min-width: 90rem) {
+  .heroBoard {
+    --sw: 36rem;
+    --col-gap: 2.25rem;
+  }
 }
 
 .heroCards {
@@ -150,32 +392,33 @@
   inset: 0;
 }
 
-/* The landing target: a quiet product-library panel that materializes
-   ahead of the cards, so the deck visibly files *into* something. */
+/* The landing target: a quiet product panel that materialises ahead of the
+   cards, so the deck visibly files *into* something. */
 .libraryFrame {
+  --frame-p: clamp(0, calc((var(--route-p) - 0.05) / 0.28), 1);
   position: absolute;
-  left: calc(18% - 1.1rem);
-  top: calc(17% - 3.6rem);
-  width: calc(16.5rem + 2.2rem);
-  height: 27.25rem;
+  left: calc(var(--sw) - var(--pw));
+  top: var(--pt);
+  width: var(--pw);
+  height: var(--ph);
   border: 1px solid var(--lp-hairline-strong);
-  border-radius: 1rem;
-  background: color-mix(in oklch, var(--card) 72%, transparent);
-  box-shadow: 0 1px 0 color-mix(in oklch, var(--foreground) 4%, transparent);
-  /* Defaults with --route-p at 0 (pre-controller / top of runway). Do not
-     force opacity:1 while data-motion-enabled is unset — that paints the
-     settled shell on first load, then flashes off when the controller arms. */
-  --frame-p: clamp(0, calc((var(--route-p) - 0.12) / 0.4), 1);
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--card) 78%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 4%, transparent);
   opacity: var(--frame-p);
-  transform: translate3d(0, calc((1 - var(--frame-p)) * 12px), 0);
+  translate: calc(var(--px) * -5px) calc(
+      (1 - var(--frame-p)) * 14px + var(--py) * -4px
+    );
+  transition: translate 420ms var(--lp-ease-out);
 }
 
 .libraryHead {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  height: 3rem;
-  padding: 0 1.1rem;
+  gap: 0.55rem;
+  height: var(--hh);
+  padding-inline: 0.85rem;
   border-bottom: 1px solid var(--lp-hairline);
 }
 
@@ -188,7 +431,7 @@
 
 .libraryLabel {
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -198,236 +441,426 @@
 .libraryCount {
   margin-left: auto;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   font-variant-numeric: tabular-nums;
   color: var(--muted-foreground);
 }
 
-/* Converged (filed) positions are the base; scatter is a transform scaled
-   by (1 - landing progress). Each slot gets its own progress window so
-   cards file into the panel one after another across the sticky runway. */
-.dossierSlot {
-  --lp: clamp(0, calc((var(--route-p) - var(--ls, 0)) / 0.72), 1);
+/* Indexing hairline: the panel head reports how much of the deck is filed. */
+.libraryScan {
   position: absolute;
-  left: 18%;
-  pointer-events: auto;
-  transform: translate3d(
-      calc(var(--sx) * (1 - var(--lp))),
-      calc(var(--sy) * (1 - var(--lp))),
-      0
-    )
-    rotate(calc(var(--sr) * (1 - var(--lp))));
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: var(--primary);
+  transform: scaleX(clamp(0, var(--route-p), 1));
+  transform-origin: left center;
 }
 
-/* Taller SkillDossier-like cards: start higher and step less so the
-   converged stack overlaps and still fits a ~900px-tall viewport. */
-.dossierSlot[data-slot="1"] {
-  top: 17%;
-  z-index: 1;
-  --ls: 0.05;
-  --sx: -70px;
-  --sy: -130px;
-  --sr: -6deg;
+/* Filter row: the library is searchable, so the panel says so. */
+.libraryFilter {
+  position: absolute;
+  inset-inline: var(--pp);
+  top: calc(var(--hh) + 0.55rem);
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2rem;
+  padding-inline: 0.55rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 0.4rem;
+  background: color-mix(in oklab, var(--muted) 32%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted-foreground);
 }
 
-.dossierSlot[data-slot="2"] {
-  top: calc(17% + 2.55rem);
-  z-index: 2;
-  --ls: 0.1;
-  --sx: 160px;
-  --sy: -150px;
-  --sr: 5deg;
+.libraryFilterIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.75;
 }
 
-.dossierSlot[data-slot="3"] {
-  top: calc(17% + 5.1rem);
-  z-index: 3;
-  --ls: 0.15;
-  --sx: -50px;
-  --sy: -45px;
-  --sr: -4deg;
+.libraryFilterText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.dossierSlot[data-slot="4"] {
-  top: calc(17% + 7.65rem);
-  z-index: 4;
-  --ls: 0.2;
-  --sx: 175px;
-  --sy: -55px;
-  --sr: 7deg;
+.libraryKbd {
+  flex-shrink: 0;
+  padding: 0.05rem 0.25rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 0.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  line-height: 1.35;
 }
 
-.dossierSlot[data-slot="5"] {
-  top: calc(17% + 10.2rem);
-  z-index: 5;
-  --ls: 0.25;
-  --sx: 35px;
-  --sy: 40px;
-  --sr: -3deg;
-}
-
-.dossierEnter {
-  animation-duration: 680ms;
-  animation-timing-function: var(--lp-ease-out);
-  animation-fill-mode: both;
-}
-
-.dossierEnter[data-dir="left"] {
-  animation-name: lp-dossier-left;
-}
-
-.dossierEnter[data-dir="right"] {
-  animation-name: lp-dossier-right;
-}
-
-.dossierEnter[data-dir="top"] {
-  animation-name: lp-dossier-top;
-}
-
-.dossierEnter[data-dir="bottom"] {
-  animation-name: lp-dossier-bottom;
-}
-
-.dossierSlot[data-slot="1"] .dossierEnter {
-  animation-delay: 480ms;
-}
-
-.dossierSlot[data-slot="2"] .dossierEnter {
-  animation-delay: 550ms;
-}
-
-.dossierSlot[data-slot="3"] .dossierEnter {
-  animation-delay: 620ms;
-}
-
-.dossierSlot[data-slot="4"] .dossierEnter {
-  animation-delay: 690ms;
-}
-
-.dossierSlot[data-slot="5"] .dossierEnter {
-  animation-delay: 760ms;
-}
-
-@keyframes lp-dossier-left {
-  from {
-    opacity: 0;
-    transform: translate3d(-72px, 0, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-right {
-  from {
-    opacity: 0;
-    transform: translate3d(72px, 0, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-top {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -64px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lp-dossier-bottom {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 64px, 0);
-  }
-
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-.dossierParallax {
-  transform: translate3d(
-    calc(var(--px) * var(--depth, 3px)),
-    calc(var(--py) * var(--depth, 3px)),
-    0
+/* Row separators live on the panel, not on the cards, so a filed row always
+   sits on a crisp baseline no matter where its card was clipped. */
+.libraryRows {
+  position: absolute;
+  left: var(--pp);
+  right: var(--pp);
+  top: calc(var(--hh) + var(--qh) + var(--pp));
+  height: calc(5 * var(--rh));
+  opacity: clamp(0, calc((var(--route-p) - 0.12) / 0.3), 1);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent calc(var(--rh) - 1px),
+    var(--lp-hairline) calc(var(--rh) - 1px),
+    var(--lp-hairline) var(--rh)
   );
-  transition: transform 320ms var(--lp-ease-out);
+}
+
+.libraryFoot {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  height: var(--fh);
+  padding-inline: 0.85rem;
+  border-top: 1px solid var(--lp-hairline);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.libraryFootLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: color-mix(in oklab, var(--primary) 82%, var(--foreground));
+}
+
+.libraryFootLive::before {
+  content: "";
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: currentcolor;
 }
 
 /* ------------------------------------------------------------------
-   Skill dossier — mirrors SkillDossier (compact, decorative)
+   Source feed — one leader per row, drawn as its card lands. Turns the
+   space the deck vacates into the diagram that explains the scene.
+------------------------------------------------------------------ */
+
+.libraryFeed {
+  position: absolute;
+  right: var(--pw);
+  top: var(--row0);
+  width: 13.5rem;
+  height: calc(5 * var(--rh));
+  transition: opacity 220ms var(--lp-ease-snap);
+}
+
+.libraryFeedRow {
+  --t: clamp(0, calc((var(--route-p) - var(--ls, 0) - 0.16) / 0.34), 1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--rh);
+}
+
+.libraryFeedRow[data-slot="1"] {
+  --ls: 0.03;
+}
+
+.libraryFeedRow[data-slot="2"] {
+  --ls: 0.09;
+}
+
+.libraryFeedRow[data-slot="3"] {
+  --ls: 0.15;
+}
+
+.libraryFeedRow[data-slot="4"] {
+  --ls: 0.21;
+}
+
+.libraryFeedRow[data-slot="5"] {
+  --ls: 0.27;
+}
+
+.libraryFeedLabel {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.32rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  opacity: var(--t);
+  translate: calc((1 - var(--t)) * -8px) 0;
+}
+
+.libraryFeedLabel span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.libraryFeedIcon {
+  width: 0.75rem;
+  height: 0.75rem;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+.libraryFeedLine {
+  position: relative;
+  flex-shrink: 0;
+  width: 3.5rem;
+  height: 1px;
+  background: color-mix(in oklab, var(--primary) 62%, transparent);
+  transform: scaleX(var(--t));
+  transform-origin: left center;
+}
+
+/* Arrowhead, not a dot: the source feeds the library, and the diagram says
+   which way. */
+.libraryFeedLine::after {
+  content: "";
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  translate: 0 -50%;
+  border-left: 5px solid var(--primary);
+  border-block: 3px solid transparent;
+}
+
+/* ------------------------------------------------------------------
+   Slots — filed position is the base; the scatter is a transform that
+   decays to zero across each card's slice of the runway.
+------------------------------------------------------------------ */
+
+.dossierSlot {
+  --win: 0.5;
+  --t: clamp(0, calc((var(--route-p) - var(--ls, 0)) / var(--win)), 1);
+  /* smoothstep: cards ease in and settle instead of tracking scroll linearly */
+  --fp: calc(var(--t) * var(--t) * (3 - 2 * var(--t)));
+  /* rotation resolves ahead of position — secondary action */
+  --fr: clamp(0, calc(1 - var(--fp) * 1.35), 1);
+  /* dock: the card stays a whole card the entire flight and only folds
+     flat into its row on arrival, so nothing is ever half-a-card in mid-air */
+  --dp: clamp(0, calc((var(--fp) - 0.72) / 0.28), 1);
+
+  position: absolute;
+  left: var(--filed-x);
+  width: var(--cw);
+  pointer-events: none;
+  transform: translate3d(
+      calc(var(--sx) * (1 - var(--fp))),
+      calc(var(--sy) * (1 - var(--fp))),
+      0
+    )
+    rotate(calc(var(--sr) * var(--fr)));
+}
+
+.dossierSlot[data-slot="1"] {
+  top: var(--row0);
+  z-index: 5;
+  --ls: 0.03;
+  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.35rem);
+  --sy: calc(0.15rem - var(--row0));
+  --sr: -1.7deg;
+}
+
+.dossierSlot[data-slot="2"] {
+  top: calc(var(--row0) + var(--rh));
+  z-index: 6;
+  --ls: 0.09;
+  --sx: calc(var(--pp) - 0.35rem);
+  --sy: calc(6.1rem - var(--row0) - var(--rh));
+  --sr: 2.1deg;
+}
+
+.dossierSlot[data-slot="3"] {
+  top: calc(var(--row0) + 2 * var(--rh));
+  z-index: 7;
+  --ls: 0.15;
+  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.1rem);
+  --sy: calc(12.2rem - var(--row0) - 2 * var(--rh));
+  --sr: 1.3deg;
+}
+
+.dossierSlot[data-slot="4"] {
+  top: calc(var(--row0) + 3 * var(--rh));
+  z-index: 8;
+  --ls: 0.21;
+  --sx: calc(var(--pp) - 0.15rem);
+  --sy: calc(18.3rem - var(--row0) - 3 * var(--rh));
+  --sr: -2.3deg;
+}
+
+.dossierSlot[data-slot="5"] {
+  top: calc(var(--row0) + 4 * var(--rh));
+  z-index: 9;
+  --ls: 0.27;
+  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.45rem);
+  --sy: calc(24.4rem - var(--row0) - 4 * var(--rh));
+  --sr: -1deg;
+}
+
+/* Load entrance: the deck lands on the desk, staggered, after the copy. */
+.dossierEnter {
+  animation: lp-hero-deal 700ms var(--lp-ease-emph) both;
+}
+
+.dossierSlot[data-slot="1"] .dossierEnter {
+  animation-delay: 400ms;
+}
+
+.dossierSlot[data-slot="2"] .dossierEnter {
+  animation-delay: 472ms;
+}
+
+.dossierSlot[data-slot="3"] .dossierEnter {
+  animation-delay: 544ms;
+}
+
+.dossierSlot[data-slot="4"] .dossierEnter {
+  animation-delay: 616ms;
+}
+
+.dossierSlot[data-slot="5"] .dossierEnter {
+  animation-delay: 688ms;
+}
+
+/* Pointer parallax: real depth while the deck is loose, calm once filed. */
+.dossierParallax {
+  --amp: calc(1 - var(--fp) * 0.82);
+  translate: calc(var(--px) * var(--depth, 8px) * var(--amp))
+    calc(var(--py) * var(--depth, 8px) * 0.55 * var(--amp));
+  rotate: calc(var(--px) * 0.55deg * var(--amp));
+  transition:
+    translate 420ms var(--lp-ease-out),
+    rotate 420ms var(--lp-ease-out);
+}
+
+/* ------------------------------------------------------------------
+   Skill dossier — one card that reads as a card while loose and as an
+   index row once filed. The fold is clip-path only.
 ------------------------------------------------------------------ */
 
 .dossier {
+  --radius: 0.75rem;
+  position: relative;
   display: flex;
   flex-direction: column;
-  width: 16.5rem;
-  overflow: hidden;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  box-shadow:
-    0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
-    0 14px 28px hsl(var(--shadow-color) / 0.1);
+  width: 100%;
+  pointer-events: auto;
+  background: color-mix(
+    in oklab,
+    var(--card) calc(100% - var(--dp, 0) * 100%),
+    transparent
+  );
+  border: 1px solid
+    color-mix(
+      in oklab,
+      var(--border) calc(100% - var(--dp, 0) * 100%),
+      transparent
+    );
+  border-radius: calc(var(--radius) * (1 - var(--dp, 0)));
+  box-shadow: 0 14px 30px
+    hsl(var(--shadow-color) / calc(0.16 * (1 - var(--dp, 0))));
+  clip-path: inset(
+    0 0 calc(var(--dp, 0) * (100% - var(--rh))) 0 round
+      calc(var(--radius) * (1 - var(--dp, 0)))
+  );
   transition:
-    opacity 190ms var(--lp-ease-out),
-    box-shadow 190ms var(--lp-ease-out),
-    border-color 190ms var(--lp-ease-out);
+    opacity 200ms var(--lp-ease-snap),
+    box-shadow 220ms var(--lp-ease-out);
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .heroCards:hover .dossier {
-    opacity: 0.55;
-  }
+.dossierRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  height: var(--rh);
+  padding-inline: 0.7rem;
+  transition: background-color 200ms var(--lp-ease-snap);
+}
 
-  .dossierSlot:hover {
-    z-index: 7;
-  }
+.dossierIndex {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  color: color-mix(in oklab, var(--muted-foreground) 82%, transparent);
+  transition: color 200ms var(--lp-ease-snap);
+}
 
-  .dossierSlot:hover .dossier {
-    opacity: 1;
-    border-color: var(--primary);
-    box-shadow:
-      0 1px 0 color-mix(in oklch, var(--foreground) 6%, transparent),
-      0 20px 40px hsl(var(--shadow-color) / 0.16);
-  }
+.dossierName {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  transition: translate 200ms var(--lp-ease-snap);
+}
+
+.dossierStars {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+
+.dossierStar {
+  width: 0.65rem;
+  height: 0.65rem;
+  fill: currentcolor;
+  opacity: 0.7;
 }
 
 .dossierBody {
   display: flex;
-  flex: 1;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.85rem 0.9rem 0.75rem;
-}
-
-.dossierMeta {
-  display: flex;
-  min-width: 0;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.65rem;
+  gap: 0.4rem;
+  padding: 0 0.7rem 0.65rem;
+  border-top: 1px solid
+    color-mix(in oklab, var(--border) calc(100% - var(--dp, 0) * 100%), transparent);
+  padding-top: 0.6rem;
 }
 
 .dossierSource {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.32rem;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 0.62rem;
+  font-size: 0.6rem;
   letter-spacing: 0.01em;
   color: var(--muted-foreground);
 }
@@ -439,27 +872,10 @@
 }
 
 .dossierFork {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 0.8rem;
+  height: 0.8rem;
   flex-shrink: 0;
-  color: var(--primary);
-}
-
-.dossierStars {
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 0.62rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-.dossierName {
-  margin: 0;
-  font-size: 1.05rem;
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  opacity: 0.7;
 }
 
 .dossierDesc {
@@ -467,142 +883,317 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  min-height: 2.1em;
   overflow: hidden;
   font-size: 0.72rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
 
 .dossierTags {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-top: 0.15rem;
+  flex-wrap: nowrap;
+  gap: 0.28rem;
+  overflow: hidden;
 }
 
 .dossierTag {
   display: inline-flex;
   align-items: center;
-  min-height: 1.25rem;
-  padding: 0.1rem 0.4rem;
+  min-height: 1.15rem;
+  padding: 0.05rem 0.35rem;
   border: 1px solid var(--border);
-  border-radius: 0.375rem;
+  border-radius: 0.3rem;
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   color: var(--foreground);
   white-space: nowrap;
 }
 
-.dossierFooter {
-  border-top: 1px solid var(--border);
-  background: color-mix(in oklch, var(--muted) 40%, transparent);
-  padding: 0.55rem 0.65rem;
-}
-
-.dossierCmdStrip {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 0.5rem;
-  background: color-mix(in oklch, var(--background) 75%, transparent);
-  padding: 0.35rem 0.55rem;
-}
-
-.dossierCmd {
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.dossierFoot {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.7rem;
+  border-top: 1px solid
+    color-mix(in oklab, var(--border) calc(100% - var(--dp, 0) * 100%), transparent);
+  background: color-mix(
+    in oklab,
+    var(--muted) calc(38% - var(--dp, 0) * 38%),
+    transparent
+  );
   font-family: var(--font-mono);
-  font-size: 0.58rem;
+  font-size: 0.56rem;
+  line-height: 1;
   color: var(--muted-foreground);
 }
 
+.dossierPrompt {
+  color: var(--primary);
+}
+
+.dossierCmd {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: inherit;
+}
+
 /* ------------------------------------------------------------------
-   Hero board, small screens: static before/after field manual
+   Hover — the hero's playable moment.
+
+   Loose deck: the pointed card lifts, the rest recede.
+   Filed library: the row lights up and its full dossier is pulled out
+   of the drawer, docked beside the panel with a leader line.
+------------------------------------------------------------------ */
+
+.dossierPeek {
+  position: absolute;
+  top: calc(var(--rh) / 2);
+  right: calc(var(--cw) + var(--pp) + 1.9rem);
+  z-index: 20;
+  width: var(--cw);
+  opacity: 0;
+  translate: 0.75rem -50%;
+  pointer-events: none;
+  transition:
+    opacity 220ms var(--lp-ease-snap),
+    translate 260ms var(--lp-ease-emph);
+}
+
+.dossierPeek .dossier {
+  --fp: 0;
+  --dp: 0;
+  pointer-events: none;
+  clip-path: none;
+  border-color: color-mix(in oklab, var(--primary) 42%, var(--border));
+  box-shadow:
+    0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 24px 48px hsl(var(--shadow-color) / 0.28);
+}
+
+.dossierLeader {
+  position: absolute;
+  top: 50%;
+  right: -1.9rem;
+  width: 1.9rem;
+  height: 1px;
+  background: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+
+.dossierLeader::after {
+  content: "";
+  position: absolute;
+  right: -0.16rem;
+  top: 50%;
+  width: 0.32rem;
+  height: 0.32rem;
+  translate: 0 -50%;
+  border-radius: 50%;
+  background: var(--primary);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .heroCards:hover .dossier {
+    opacity: 0.48;
+  }
+
+  .heroCards:hover .libraryFeed {
+    opacity: 0.2;
+  }
+
+  .dossierSlot:hover {
+    z-index: 12;
+  }
+
+  .dossierSlot:hover .dossier {
+    opacity: 1;
+    border-color: color-mix(
+      in oklab,
+      var(--primary) calc(55% - var(--dp) * 55%),
+      color-mix(in oklab, var(--border) calc(100% - var(--dp) * 100%), transparent)
+    );
+    box-shadow: 0 22px 46px
+      hsl(var(--shadow-color) / calc(0.26 * (1 - var(--dp))));
+  }
+
+  .dossierSlot:hover .dossierRow {
+    background: color-mix(
+      in oklab,
+      var(--primary) calc(var(--dp) * 10%),
+      transparent
+    );
+  }
+
+  .dossierSlot:hover .dossierIndex {
+    color: var(--primary);
+  }
+
+  .dossierSlot:hover .dossierName {
+    translate: calc(var(--dp) * 2px) 0;
+  }
+
+  .dossierSlot:hover .dossierPeek {
+    opacity: var(--dp);
+    translate: 0 -50%;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Small screens: a static before / after field manual
 ------------------------------------------------------------------ */
 
 .heroBoardMobile {
+  --rh: 2.9rem;
+  position: relative;
+  z-index: 2;
   display: block;
-  margin-top: 3rem;
   width: 100%;
-  max-width: 24rem;
+  max-width: 26rem;
+  margin-top: 3rem;
+}
+
+.mobileMark {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.mobileMark::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+.mobileMarkFiled {
+  color: var(--primary);
+}
+
+.mobileMarkFiled::after {
+  background: color-mix(in oklab, var(--primary) 40%, transparent);
 }
 
 .mobileChaos {
-  position: relative;
   display: flex;
-  justify-content: center;
-  min-height: 14.5rem;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
 }
 
 .mobileChaosCard {
-  position: absolute;
-  top: 0;
+  width: 84%;
 }
 
 .mobileChaosCard .dossier {
-  width: 13.25rem;
+  --fp: 0;
+  --dp: 0;
+  clip-path: none;
 }
 
 .mobileChaosCard:nth-child(1) {
-  left: 0;
-  transform: rotate(-5deg);
-  z-index: 1;
+  align-self: flex-start;
+  rotate: -1.8deg;
 }
 
 .mobileChaosCard:nth-child(2) {
-  right: 0;
-  top: 1.35rem;
-  transform: rotate(4deg);
-  z-index: 2;
+  align-self: flex-end;
+  rotate: 2deg;
 }
 
 .mobileChaosCard:nth-child(3) {
-  left: 12%;
-  top: 2.9rem;
-  transform: rotate(-2deg);
-  z-index: 3;
+  align-self: flex-start;
+  margin-left: 8%;
+  rotate: -1deg;
 }
 
-/* The mobile “after” state: the same team library panel, at rest. */
+.mobileArrow {
+  display: flex;
+  justify-content: center;
+  margin: 1.35rem 0 1.1rem;
+}
+
+.mobileArrowLine {
+  position: relative;
+  width: 1px;
+  height: 1.75rem;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--primary) 65%, transparent)
+  );
+}
+
+.mobileArrowLine::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  translate: -50% 0;
+  rotate: 45deg;
+  border-right: 1px solid var(--primary);
+  border-bottom: 1px solid var(--primary);
+}
+
 .mobileLibrary {
-  margin-top: 1.5rem;
+  position: relative;
+  margin-top: 0.9rem;
   overflow: hidden;
   border: 1px solid var(--lp-hairline-strong);
-  border-radius: 1rem;
-  background: color-mix(in oklch, var(--card) 72%, transparent);
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--card) 78%, transparent);
 }
 
 .mobileLibrary .libraryHead {
   height: 2.75rem;
-  padding: 0 1rem;
 }
 
-.mobileStack {
-  padding: 0.25rem 1rem 0.5rem;
+.mobileLibrary .libraryScan {
+  transform: none;
 }
 
-.mobileStackRow {
+.mobileFilter {
+  position: relative;
+  height: 3rem;
+}
+
+.mobileFilter .libraryFilter {
+  inset-inline: 0.75rem;
+  top: 0.55rem;
+}
+
+.mobileRows {
+  padding: 0 0.75rem 0.25rem;
+}
+
+.mobileRow {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  padding: 0.55rem 0.15rem;
+  align-items: center;
+  gap: 0.55rem;
+  height: var(--rh);
   border-bottom: 1px solid var(--lp-hairline);
 }
 
-.mobileStackRow:last-child {
+.mobileRow:last-child {
   border-bottom: none;
 }
 
-.mobileStackName {
-  flex: 1;
-  font-size: 0.95rem;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+.mobileLibrary .libraryFoot {
+  position: static;
+  height: 2.1rem;
 }
 
 @media (min-width: 64rem) {
@@ -616,49 +1207,166 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Hero exit — copy recedes slightly as the dossiers finish filing
+   Hero exit — copy recedes a touch as the deck finishes filing
 --------------------------------------------------------------------------- */
 
 @media (min-width: 64rem) {
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroExit {
-    --hx: clamp(0, calc((var(--route-p) - 0.45) / 0.55), 1);
-    translate: 0 calc(var(--hx) * -18px);
-    opacity: calc(1 - var(--hx) * 0.28);
+    --hx: clamp(0, calc((var(--route-p) - 0.5) / 0.5), 1);
+    translate: 0 calc(var(--hx) * -16px);
+    opacity: calc(1 - var(--hx) * 0.22);
   }
 }
 
 /* ---------------------------------------------------------------------------
-   Reduced motion — the hero stays complete and beautiful, at rest
+   Keyframes
+--------------------------------------------------------------------------- */
+
+@keyframes lp-hero-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lp-hero-draw {
+  from {
+    opacity: 0;
+    scale: 0 1;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+@keyframes lp-hero-rules {
+  from {
+    opacity: 0;
+    scale: 1 0.86;
+  }
+
+  to {
+    opacity: 1;
+    scale: 1 1;
+  }
+}
+
+@keyframes lp-hero-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-hero-tick {
+  from {
+    scale: 0 1;
+  }
+
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes lp-hero-line {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes lp-hero-deal {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the hero rests filed: a finished library listing
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .heroGridLines,
+  .heroField,
+  .heroRules,
   .heroEyebrow,
-  .heroCopy,
-  .heroCta {
-    animation: lp-fade-in 140ms var(--lp-ease-out) both;
+  .heroBlurb,
+  .heroCta,
+  .heroRail {
+    animation: lp-hero-fade 140ms linear both;
   }
 
+  .heroField,
+  .heroRules {
+    translate: none;
+    scale: none;
+  }
+
+  .heroEyebrow::before,
   .heroLine,
   .dossierEnter {
     animation: none;
     transform: none;
-    opacity: 1;
   }
 
-  /* Static “after”: the stack rests filed inside the library panel. */
+  .heroRail {
+    --rail-p: 1;
+  }
+
+  .heroTopRule {
+    animation: lp-hero-fade 140ms linear both;
+    scale: none;
+  }
+
+  .libraryFeedRow {
+    --t: 1;
+  }
+
+  .libraryFeed {
+    transition: none;
+  }
+
   .dossierSlot {
+    --fp: 1;
+    --fr: 0;
     transform: none;
-    will-change: auto;
   }
 
   .libraryFrame {
+    --frame-p: 1;
+    translate: none;
+    transition: none;
+  }
+
+  .libraryRows {
     opacity: 1;
+  }
+
+  .libraryScan {
     transform: none;
   }
 
   .dossierParallax {
-    transform: none;
+    translate: none;
+    rotate: none;
     transition: none;
   }
 
@@ -666,5 +1374,9 @@
   .heroCards:hover .dossier {
     opacity: 1;
     transition: none;
+  }
+
+  .dossierPeek {
+    display: none;
   }
 }

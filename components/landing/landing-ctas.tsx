@@ -36,11 +36,11 @@ export function primaryCtaEventProperties(
 
 export function HomeHeaderActionsFallback() {
   return (
-    <div className="flex items-center gap-1.5">
-      <ThemeToggle />
-      <nav className="flex items-center gap-1.5" aria-label="Main navigation" aria-busy="true">
-        <Skeleton className="hidden h-8 w-16 rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-10 sm:w-40" />
+    <div className="flex items-center gap-2">
+      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
+      <nav className="flex items-center gap-2" aria-label="Main navigation" aria-busy="true">
+        <Skeleton className="hidden h-9 w-[4.75rem] rounded-[3px] sm:block" />
+        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-9 sm:w-[13.5rem]" />
       </nav>
     </div>
   )
@@ -54,14 +54,14 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
   const primary = primaryAction(signedIn)
 
   return (
-    <div className="flex items-center gap-1.5">
-      <ThemeToggle />
-      <nav className="flex items-center gap-1.5" aria-label="Main navigation">
+    <div className="flex items-center gap-2">
+      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
+      <nav className="flex items-center gap-2" aria-label="Main navigation">
         {!signedIn ? (
           <Button
             size="sm"
             variant="ghost"
-            className="hidden rounded-[3px] sm:inline-flex"
+            className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 px-3.5 sm:inline-flex`}
             nativeButton={false}
             render={<Link href="/sign-in" />}
           >
@@ -70,7 +70,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
         ) : null}
         <Button
           size="sm"
-          className={`${base.ctaButton} px-2.5 sm:h-10 sm:px-4`}
+          className={`${base.ctaButton} ${base.ctaPrimary} px-2.5 sm:h-9 sm:px-4`}
           nativeButton={false}
           render={(
             <TrackedLink
@@ -107,7 +107,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
       <span className={base.magnetic} data-magnetic>
         <Button
           size="lg"
-          className={base.ctaButton}
+          className={`${base.ctaButton} ${base.ctaPrimary}`}
           nativeButton={false}
           render={(
             <TrackedLink
@@ -126,7 +126,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
       <Button
         size="lg"
         variant="outline"
-        className={base.ctaButton}
+        className={`${base.ctaButton} ${base.ctaSecondary}`}
         nativeButton={false}
         render={(
           <TrackedLink
@@ -157,7 +157,7 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
     <span className={base.magnetic} data-magnetic>
       <Button
         size="lg"
-        className={base.ctaButton}
+        className={`${base.ctaButton} ${base.ctaPrimary}`}
         nativeButton={false}
         render={(
           <TrackedLink
@@ -189,7 +189,7 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
     <span className={base.magnetic} data-magnetic>
       <Button
         size="lg"
-        className={base.ctaButton}
+        className={`${base.ctaButton} ${base.ctaPrimary}`}
         nativeButton={false}
         render={(
           <TrackedLink
@@ -219,7 +219,7 @@ function HomeLaunchActionsView({ signedIn }: { signedIn: boolean }) {
   return (
     <Button
       size="lg"
-      className={base.ctaButton}
+      className={`${base.ctaButton} ${base.ctaPrimary}`}
       nativeButton={false}
       render={(
         <TrackedLink

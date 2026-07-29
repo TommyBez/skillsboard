@@ -1,68 +1,623 @@
 /* ---------------------------------------------------------------------------
-   Closing — one final action
+   Closing — the final plate
+
+   The page has argued: scattered artifacts → an indexed library → routed into
+   an agent. The closing shows that argument at rest. A bracketed band (chapter
+   mark and rule on top, end mark and rule on the bottom), a vertical gutter
+   rail, the copy on the left, and the index — filed and closed — on the right.
+   Everything rests in its finished state without JS; the controller only adds
+   the arrival.
 --------------------------------------------------------------------------- */
+
+.closing {
+  position: relative;
+}
+
+/* Field: a fine raster that settles toward the footer, so the band has a
+   floor and the hand-off into the colophon is a fade rather than a cut. */
+.closingField {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(
+      circle at center,
+      color-mix(in oklch, var(--foreground) 5%, transparent) 1px,
+      transparent 1.1px
+    );
+  background-size: 28px 28px;
+  -webkit-mask-image: linear-gradient(
+    to top,
+    rgb(0 0 0 / 0.85) 0%,
+    rgb(0 0 0 / 0.4) 30%,
+    transparent 66%
+  );
+  mask-image: linear-gradient(
+    to top,
+    rgb(0 0 0 / 0.85) 0%,
+    rgb(0 0 0 / 0.4) 30%,
+    transparent 66%
+  );
+}
+
+.closingInner {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 1440px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2.75rem;
+  margin-inline: auto;
+  padding-block: 4.5rem 3.25rem;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 48rem) {
+  .closingInner {
+    gap: 3rem;
+    min-height: min(70svh, 40rem);
+    padding-block: 4.5rem 3rem;
+    padding-inline: 2.5rem;
+  }
+}
+
+/* Top bracket: the chapter index, its rule drawn by base.chapterMark. */
+.closingMark {
+  color: color-mix(in oklch, var(--muted-foreground) 88%, transparent);
+}
+
+.closingFrame {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0;
+}
+
+.closingGrid {
+  display: grid;
+  gap: 3.5rem;
+  padding-bottom: 2.5rem;
+}
+
+@media (min-width: 64rem) {
+  .closingGrid {
+    flex: 1 1 auto;
+    grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+    align-items: center;
+    gap: 0;
+    padding-bottom: 0;
+  }
+
+  .closingMain {
+    padding-bottom: 3.25rem;
+  }
+}
+
+.closingMain {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
 .closingHeading {
   font-stretch: 93%;
 }
 
+/* ---------------------------------------------------------------------------
+   The stamp — ink pressed into the page, then settled
+--------------------------------------------------------------------------- */
+
 .onceStamp {
+  position: relative;
   display: inline-block;
-  padding: 0 0.16em 0.06em;
-  background: var(--primary);
-  color: var(--primary-foreground);
+  margin-left: 0.1em;
+  padding: 0 0.17em 0.06em 0.19em;
   border-radius: 2px;
-  transform: rotate(-1.5deg);
+  background: color-mix(in oklch, var(--primary) 84%, var(--background) 16%);
+  color: var(--primary-foreground);
+  transform: rotate(-1.6deg);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, black 16%, transparent),
+    inset 0 -1px 0 color-mix(in oklch, white 14%, transparent),
+    0 1px 10px -8px color-mix(in oklch, var(--primary) 55%, transparent);
 }
+
+/* Ink grain: the impression is never perfectly even. */
+.onceStamp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 2px;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23s)' opacity='0.5'/%3E%3C/svg%3E");
+  opacity: 0.2;
+  mix-blend-mode: overlay;
+}
+
+/* Impact halo: a single ring of displaced ink on landing, invisible at rest. */
+.onceStamp::before {
+  content: "";
+  position: absolute;
+  inset: -0.11em -0.07em;
+  border: 1px solid var(--primary);
+  border-radius: 3px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------------------
+   Terminal action — the CTA sits on a track that leaves the page
+--------------------------------------------------------------------------- */
+
+.closingCopy {
+  margin-bottom: 0;
+  color: color-mix(in oklch, var(--foreground) 76%, transparent);
+}
+
+.closingCtaRow {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0;
+  margin-top: 2.25rem;
+}
+
+.closingCta {
+  display: inline-flex;
+  position: relative;
+}
+
+/* The shared button component is owned elsewhere; this only dresses it as the
+   page's terminal action — bigger, seated, with a considered press. */
+.closingCta a {
+  height: 3.5rem;
+  padding-inline: 1.75rem;
+  font-size: 1.125rem;
+  letter-spacing: -0.01em;
+  box-shadow:
+    0 1px 0 color-mix(in oklch, black 28%, transparent),
+    0 12px 28px -22px color-mix(in oklch, var(--primary) 80%, transparent);
+  transition:
+    box-shadow var(--lp-dur-hover) var(--lp-ease-snap),
+    translate var(--lp-dur-tap) var(--lp-ease-snap),
+    filter var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .closingCta a:hover {
+    filter: brightness(1.06);
+    box-shadow:
+      0 2px 0 color-mix(in oklch, black 30%, transparent),
+      0 18px 36px -20px color-mix(in oklch, var(--primary) 92%, transparent);
+  }
+}
+
+.closingCta a:active {
+  translate: 0 1px;
+  box-shadow:
+    0 0 0 color-mix(in oklch, black 30%, transparent),
+    0 8px 20px -16px color-mix(in oklch, var(--primary) 80%, transparent);
+}
+
+.closingCta a:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 3px;
+}
+
+.closingTrack {
+  position: relative;
+  display: none;
+  flex: 1;
+  height: 1px;
+  margin-left: 1.5rem;
+  overflow: hidden;
+  background: linear-gradient(
+    to right,
+    var(--lp-grid-line),
+    var(--lp-hairline) 45%,
+    var(--lp-hairline-strong)
+  );
+}
+
+@media (min-width: 64rem) {
+  .closingTrack {
+    display: block;
+  }
+}
+
+.closingTrack::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 26%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--primary),
+    transparent
+  );
+  opacity: 0;
+  transform: translate3d(-110%, 0, 0);
+}
+
+.closingCta:hover ~ .closingTrack::after,
+.closingCta:focus-within ~ .closingTrack::after {
+  opacity: 0.95;
+  animation: closingTrackPulse 720ms var(--lp-ease-out) both;
+}
+
+@keyframes closingTrackPulse {
+  from {
+    transform: translate3d(-110%, 0, 0);
+  }
+  to {
+    transform: translate3d(420%, 0, 0);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The plate — the index, filed and closed
+--------------------------------------------------------------------------- */
+
+.plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+@media (min-width: 64rem) {
+  .plate {
+    align-self: stretch;
+    margin-top: -3rem;
+    border-left: 1px solid var(--lp-hairline);
+    padding-top: 3rem;
+    padding-bottom: 3.25rem;
+    padding-left: clamp(2.5rem, 4vw, 4.5rem);
+  }
+}
+
+.plateFrame {
+  position: relative;
+  width: 100%;
+  padding: 1.5rem 1.625rem 1.375rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 3px;
+  background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
+  translate: 0 calc((var(--vp-closing, 0.5) - 0.5) * -20px);
+}
+
+/* Legend: the plate says what it is, so it reads as a diagram, not texture. */
+.plateHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-bottom: 0.9rem;
+}
+
+.plateHeadLabel {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.plateLegend {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.plateHeadRule {
+  display: block;
+  height: 1px;
+  margin-bottom: 1.25rem;
+  background: var(--lp-hairline);
+  transform-origin: left center;
+}
+
+.plateRows {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plateRow {
+  display: grid;
+  grid-template-columns: auto auto auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.plateName {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  letter-spacing: -0.005em;
+  color: color-mix(in oklch, var(--foreground) 62%, transparent);
+  white-space: nowrap;
+}
+
+.plateRow[data-marked] .plateName {
+  color: var(--foreground);
+}
+
+/* Every entry keeps the same slot; one entry carries the mark. */
+.plateMark {
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 1px;
+  background: color-mix(in oklch, var(--foreground) 20%, transparent);
+  scale: 0.42;
+}
+
+.plateRow[data-marked] .plateMark,
+.plateMark[data-legend] {
+  background: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 16%, transparent);
+  scale: 1;
+}
+
+.plateIndex {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--muted-foreground);
+  opacity: 0.62;
+}
+
+.plateRow[data-marked] .plateIndex {
+  color: var(--foreground);
+  opacity: 0.88;
+}
+
+/* Leader rule, the way an index runs an entry out to its edge. */
+.plateRule {
+  display: block;
+  height: 1px;
+  background: var(--lp-hairline);
+  transform-origin: left center;
+}
+
+/* ---------------------------------------------------------------------------
+   Bottom bracket — the page signs off before the colophon
+--------------------------------------------------------------------------- */
+
+.closingEnd {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+/* Rhymes with the stamp: the band opens on an index and closes on a mark. */
+.closingEndMark {
+  width: 0.5625rem;
+  height: 0.5625rem;
+  flex: none;
+  border-radius: 2px;
+  background: color-mix(in oklch, var(--foreground) 52%, transparent);
+  rotate: -1.6deg;
+}
+
+.closingEndRule {
+  flex: 1;
+  height: 1px;
+  background: var(--lp-hairline-strong);
+  transform-origin: left center;
+}
+
+/* ---------------------------------------------------------------------------
+   Arrival — the frame stands, the ledger is written, the page is stamped
+--------------------------------------------------------------------------- */
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  .onceStamp {
+  :is(.closingMark, .closingHeading, .closingCopy, .closingCtaRow) {
   opacity: 0;
-  transform: rotate(-1.5deg) scale(1.14);
+  transform: translate3d(0, 18px, 0);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  .onceStamp {
+  :is(.closingMark, .closingHeading, .closingCopy, .closingCtaRow) {
   transition:
-    opacity 300ms var(--lp-ease-out) 340ms,
-    transform 300ms var(--lp-ease-out) 340ms;
+    opacity var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms),
+    transform var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingHeading,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCopy,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCta {
-  opacity: 0;
-  transform: translate3d(0, 16px, 0);
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingMark {
+  --d: 0ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
   .closingHeading {
-  transition:
-    opacity 520ms var(--lp-ease-out) 140ms,
-    transform 520ms var(--lp-ease-out) 140ms;
+  --d: 90ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
   .closingCopy {
-  transition:
-    opacity 420ms var(--lp-ease-out) 240ms,
-    transform 420ms var(--lp-ease-out) 240ms;
+  --d: 320ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta {
+  .closingCtaRow {
+  --d: 560ms;
+}
+
+/* The stamp: falls, hits, compresses, settles. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .onceStamp {
+  opacity: 0;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .onceStamp {
+  animation: closingStamp 620ms var(--lp-ease-out) 460ms both;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .onceStamp::before {
+  animation: closingStampHalo 620ms var(--lp-ease-out) 460ms both;
+}
+
+@keyframes closingStamp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -11px, 0) rotate(-8deg) scale(1.32);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translate3d(0, 1px, 0) rotate(-1.6deg) scale(0.964);
+  }
+
+  62% {
+    transform: translate3d(0, 0, 0) rotate(-1.6deg) scale(1.014);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(-1.6deg) scale(1);
+  }
+}
+
+@keyframes closingStampHalo {
+  0%,
+  32% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+
+  44% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+
+  84%,
+  100% {
+    opacity: 0;
+    transform: scale(1.1);
+  }
+}
+
+/* The plate: the sheet arrives, the entries are ruled in, the mark lands. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  .plateFrame {
+  opacity: 0;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateFrame {
+  transition: opacity 480ms var(--lp-ease-out) 200ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  :is(.plateRule, .plateHeadRule, .closingEndRule) {
+  transform: scaleX(0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  :is(.plateIndex, .plateName) {
+  opacity: 0;
+  transform: translate3d(-7px, 0, 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="pending"]
+  :is(.plateMark, .closingEndMark) {
+  opacity: 0;
+  transform: scale(0.3);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateHeadRule {
+  transition: transform 520ms var(--lp-ease-emph) 280ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateRule {
+  transition: transform 620ms var(--lp-ease-emph)
+    calc(360ms + var(--i, 0) * 76ms);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  :is(.plateIndex, .plateName) {
   transition:
-    opacity 380ms var(--lp-ease-out) 320ms,
-    transform 380ms var(--lp-ease-out) 320ms;
+    opacity 400ms var(--lp-ease-out) calc(320ms + var(--i, 0) * 76ms),
+    transform 400ms var(--lp-ease-emph) calc(320ms + var(--i, 0) * 76ms);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateMark {
+  transition:
+    opacity 240ms var(--lp-ease-out) calc(400ms + var(--i, 0) * 76ms),
+    transform 420ms var(--lp-ease-spring) calc(400ms + var(--i, 0) * 76ms);
+}
+
+/* The marked entry answers the stamp, a beat after it lands. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .plateRow[data-marked] .plateMark {
+  transition:
+    opacity 220ms var(--lp-ease-out) 700ms,
+    transform 440ms var(--lp-ease-spring) 700ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingEndRule {
+  transition: transform 700ms var(--lp-ease-emph) 700ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="closing"][data-motion-state="visible"]
+  .closingEndMark {
+  transition:
+    opacity 240ms var(--lp-ease-out) 800ms,
+    transform 400ms var(--lp-ease-spring) 800ms;
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the plate is already finished
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .closingCta a,
+  .plateFrame {
+    transition: none;
+  }
+
+  .plateFrame {
+    translate: none;
+  }
+
+  .closingTrack::after {
+    display: none;
+  }
 }

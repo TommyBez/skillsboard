@@ -1,5 +1,14 @@
 /* ---------------------------------------------------------------------------
-   Workflow chapter — three moves, indexed like a manual
+   Workflow chapter — three moves, indexed like a manual, each one demonstrated
+
+   Structure: one framed panel divided by hairline rails into three numbered
+   cells. Every cell carries a purpose-built micro-diagram built from the
+   product's own vocabulary (a pasted GitHub URL, a SkillDossier, the team
+   search field, the four consumption routes).
+
+   Everything below the "static composition" divider is the resting state — the
+   diagrams are complete without JS and under reduced motion. The motion block
+   at the bottom only re-stages them once the shared `flow` group has armed.
 --------------------------------------------------------------------------- */
 
 .flowSection {
@@ -7,83 +16,1065 @@
   border-bottom: 1px solid var(--lp-hairline);
 }
 
-.flowRows {
-  margin-top: 3rem;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid var(--lp-hairline);
+/* --- Chapter head ------------------------------------------------------- */
+
+.flowMarkRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.flowRow {
-  position: relative;
+.flowMark {
+  flex: 1;
+  min-width: 0;
+}
+
+.flowMarkCount {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+}
+
+.launchDemo {
+  margin-top: 3rem;
+}
+
+/* --- The framed three-up panel ------------------------------------------ */
+
+/* The panel runs the full page measure, so its left and right edges land
+   exactly on the fixed frame rails instead of sitting tangent to them. Only
+   the horizontal hairlines are ours; the verticals are the page frame. */
+.flowGrid {
+  margin: 3.25rem 0 0;
+  padding: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0.65rem 2.5rem;
-  padding-block: 1.9rem;
-  border-bottom: 1px solid var(--lp-hairline);
+  list-style: none;
+  border-block: 1px solid var(--lp-hairline-strong);
+  background: color-mix(in oklch, var(--card) 34%, transparent);
 }
 
-@media (min-width: 64rem) {
-  .flowRow {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-    align-items: baseline;
-    padding-block: 2.7rem;
+/* One gutter runs the full height of the cell: the index sits in it, the
+   title, copy and diagram all hang off the same left rail. */
+.flowStep {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.75rem minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  align-items: baseline;
+  padding: 1.75rem 0 1.7rem;
+  border-top: 1px solid var(--lp-hairline);
+  /* Per-cell entrance offset; consumed by every delay in the motion block. */
+  --t: calc(var(--c, 0) * 90ms);
+}
+
+.flowStep:first-child {
+  border-top: none;
+}
+
+/* A whisper of lift on hover — no shadow, no scale, just field and index. */
+.flowStep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: color-mix(in oklch, var(--foreground) 3%, transparent);
+  transition: opacity var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .flowStep:hover::after {
+    opacity: 1;
+  }
+
+  .flowStep:hover .stepIndex {
+    color: var(--primary);
   }
 }
 
-.flowTitle {
-  margin: 0;
-  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
-  font-weight: 650;
-  letter-spacing: -0.035em;
-  line-height: 1.02;
+@media (min-width: 64rem) {
+  .flowGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .flowStep {
+    padding: 2.1rem 1.75rem 1.95rem;
+    border-top: none;
+    border-left: 1px solid var(--lp-hairline);
+  }
+
+  .flowStep:first-child {
+    border-left: none;
+  }
+
+  /* Share the panel's three rows across all three cells, so title, copy and
+     diagram sit on the same baselines however the copy happens to wrap. */
+  @supports (grid-template-rows: subgrid) {
+    .flowStep {
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+    }
+  }
 }
 
-.flowCopy {
+/* --- Cell head: index in the gutter, title on its baseline --------------- */
+
+.stepHead {
+  display: contents;
+}
+
+.stepIndex {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 76%, transparent);
+  transition: color var(--lp-dur-hover) var(--lp-ease-snap);
+}
+
+.stepTitle {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
   margin: 0;
-  max-width: 34rem;
-  font-size: 1.05rem;
-  line-height: 1.6;
+  font-size: clamp(1.35rem, 1.7vw, 1.62rem);
+  font-weight: 650;
+  letter-spacing: -0.034em;
+  line-height: 1.06;
+}
+
+.stepCopy {
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  align-self: start;
+  margin: 0.62rem 0 0;
+  max-width: 32ch;
+  font-size: 0.9rem;
+  line-height: 1.55;
   color: var(--muted-foreground);
   text-wrap: pretty;
 }
 
-/* Staggered reveal, driven by the shared motion-group state machine. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="pending"]
-  .flowHead,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="pending"]
-  .flowRow {
+/* --- Shared diagram shell ------------------------------------------------ */
+
+/* The diagram row is a subgrid row shared by all three cells, so the mono
+   labels sit on one line and the three diagrams start on one line under them.
+   The diagrams are then tuned to within a few pixels of the same height, so
+   they bottom out together too. */
+.viz {
+  /* One radius scale for every diagram part, so nothing is a one-off. */
+  --r-card: 0.7rem;
+  --r-control: 0.5rem;
+  --r-chip: 0.3rem;
+  /* One ink for every connector on the page — the paste wire's stroke and the
+     route tree's trunk and branches are the same line, drawn once. */
+  --wire: color-mix(in oklch, var(--foreground) 38%, transparent);
+  /* Three mono steps, each with a job: a typed value, machine text, meta. */
+  --m-value: 0.7rem;
+  --m-text: 0.615rem;
+  --m-meta: 0.545rem;
+  position: relative;
+  z-index: 1;
+  grid-column: 2;
+  align-self: stretch;
+  padding-top: 2.1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.vizArrow {
+  display: inline-block;
+  margin: 0 0.12em;
+  letter-spacing: -0.06em;
+}
+
+.vizBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.vizLabel {
+  margin: 0 0 0.55rem;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
+}
+
+/* ---------------------------------------------------------------------------
+   01 — pasted URL resolves into a populated skill card
+--------------------------------------------------------------------------- */
+
+.pasteField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  min-height: 2.2rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: var(--r-control);
+  background: color-mix(in oklch, var(--background) 55%, transparent);
+}
+
+.pasteFlash {
+  position: absolute;
+  inset: 0;
   opacity: 0;
-  translate: 0 18px;
+  transform: scaleX(0);
+  transform-origin: left center;
+  background: color-mix(in oklch, var(--primary) 24%, transparent);
 }
 
+.pasteUrl {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-size: var(--m-text);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+
+/* Mirrors the search field's ⌘K badge, so both fields read as one system. */
+.fieldKbd {
+  position: relative;
+  flex: none;
+  margin-left: 0.5rem;
+  padding: 0.08rem 0.28rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: var(--r-chip);
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  color: color-mix(in oklch, var(--muted-foreground) 80%, transparent);
+}
+
+.pasteDim {
+  color: var(--muted-foreground);
+}
+
+/* Drops from the field's text inset, so the wire, the pasted URL and the
+   resolved card's content all sit on one rail. */
+.pasteWire {
+  position: relative;
+  align-self: flex-start;
+  margin: 0 0 0 0.9rem;
+  width: 1px;
+  height: 3.9rem;
+  background: var(--wire);
+  transform-origin: top center;
+}
+
+.pasteWireHead {
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 0.42rem;
+  height: 0.34rem;
+  translate: -50% 0;
+  background: var(--wire);
+  clip-path: polygon(50% 100%, 0 0, 100% 0);
+}
+
+.miniCard {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  background: color-mix(in oklch, var(--card) 72%, transparent);
+}
+
+.miniBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+  padding: 0.62rem 0.68rem;
+}
+
+.miniMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.miniSource {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  color: var(--muted-foreground);
+}
+
+.miniFork {
+  flex: none;
+  width: 0.72rem;
+  height: 0.72rem;
+  color: var(--primary);
+}
+
+.miniStars {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+}
+
+.miniName {
+  margin: 0;
+  font-size: 0.88rem;
+  font-weight: 650;
+  letter-spacing: -0.032em;
+  line-height: 1.15;
+}
+
+.miniDesc {
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 0.665rem;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+.miniTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.12rem;
+}
+
+.miniTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.15rem;
+  padding: 0.05rem 0.36rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+
+.miniFoot {
+  padding: 0.58rem 0.68rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklch, var(--muted) 34%, transparent);
+}
+
+.miniCmd {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  color: var(--muted-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   02 — a query filters the library down to one match
+--------------------------------------------------------------------------- */
+
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.2rem;
+  padding: 0 0.55rem;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: var(--r-control);
+  background: color-mix(in oklch, var(--background) 55%, transparent);
+}
+
+.searchIcon {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+.searchQueryWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--m-value);
+  line-height: 1;
+}
+
+.searchQuery {
+  display: inline-block;
+  color: var(--foreground);
+}
+
+/* Parked one character past the query; `ch` resolves in the same mono face,
+   so the caret and the typed characters stay locked together. */
+.searchCaret {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 0.85rem;
+  margin-top: -0.425rem;
+  background: var(--primary);
+  transform: translateX(3ch);
+}
+
+
+.resultList {
+  margin: 0.7rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.resultRow {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.42rem 0.6rem 0.42rem 1.81rem;
+}
+
+.resultRow:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 1.81rem;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-grid-line);
+}
+
+/* Filtered-out rows rest dimmed — that IS the finished state of a search.
+   The dimming lands on the row's text, never on its divider, so the rules
+   below the fold stay exactly as strong as the one above it. */
+.resultRow[data-match="false"] .resultName,
+.resultRow[data-match="false"] .resultRepo {
+  opacity: 0.44;
+}
+
+.resultRow[data-match="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklch, var(--primary) 9%, transparent);
+  transform-origin: left center;
+}
+
+.resultName {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.765rem;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+}
+
+.resultMark {
+  position: relative;
+  z-index: 0;
+}
+
+.resultMark::before {
+  content: "";
+  position: absolute;
+  inset: -0.16em -0.2em;
+  z-index: -1;
+  border-radius: var(--r-chip);
+  background: color-mix(in oklch, var(--primary) 30%, transparent);
+  transform-origin: left center;
+}
+
+.resultRepo {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  font-family: var(--font-mono);
+  width: 5.9rem;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--m-meta);
+  color: var(--muted-foreground);
+}
+
+.searchCount {
+  position: relative;
+  margin: 0.82rem 0 0;
+  padding-left: 1.81rem;
+  height: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: var(--m-meta);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+}
+
+.countPrev,
+.countNow {
+  position: absolute;
+  left: 1.81rem;
+  top: 0;
+}
+
+/* The pre-filter readout only exists inside the transition; the resting,
+   no-JS truth is `1 match`. Decorative and aria-hidden by its container. */
+.countPrev {
+  opacity: 0;
+}
+
+.countNow {
+  color: var(--foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   03 — one saved skill branches into the four ways out
+--------------------------------------------------------------------------- */
+
+.fanNode {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  margin: 0;
+  padding: 0.48rem 0.72rem 0.48rem 0.5rem;
+  border: 1px solid var(--lp-hairline-strong);
+  border-radius: var(--r-control);
+  background: color-mix(in oklch, var(--card) 82%, transparent);
+  font-size: 0.78rem;
+  font-weight: 620;
+  letter-spacing: -0.028em;
+  line-height: 1.2;
+}
+
+.fanMark {
+  flex: none;
+  width: 0.8rem;
+  height: 0.8rem;
+  color: var(--primary);
+}
+
+.fanList {
+  position: relative;
+  margin: 1.4rem 0 0;
+  padding: 0 0 0 1.78rem;
+  list-style: none;
+}
+
+/* The spine: drops out of the node's dot, stops at the last row's centre. */
+.fanList::before {
+  content: "";
+  position: absolute;
+  left: 0.9rem;
+  top: -1.55rem;
+  bottom: 1.4rem;
+  width: 1px;
+  background: var(--wire);
+  transform-origin: top center;
+}
+
+.fanRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 2.8rem;
+  padding-right: 0.6rem;
+  border-bottom: 1px solid var(--lp-grid-line);
+}
+
+/* Each branch stub: from the spine to the key column. */
+.fanRow::before {
+  content: "";
+  position: absolute;
+  left: -0.88rem;
+  top: 1.4rem;
+  width: 0.68rem;
+  height: 1px;
+  background: var(--wire);
+  transform-origin: left center;
+}
+
+.fanKey {
+  flex: none;
+  width: 3.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--m-text);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--foreground);
+}
+
+.fanVal {
+  flex: none;
+  margin-left: auto;
+  width: 6.4rem;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--muted-foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   Motion — staged only when the shared controller has armed the `flow` group.
+   Nothing here changes the resting composition above.
+--------------------------------------------------------------------------- */
+
+@keyframes flowRise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flowRiseSm {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flowFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes flowSlideIn {
+  from {
+    opacity: 0;
+    transform: translate3d(-10px, 0, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flowPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes flowDrawY {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes flowDrawX {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes flowWipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* Paste highlight: a selection bar sweeps the field, then lifts. */
+@keyframes flowPasteFlash {
+  0% {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+
+  46% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes flowCaretIn {
+  from {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(3ch);
+  }
+}
+
+@keyframes flowCaretBlink {
+  0%,
+  44% {
+    opacity: 1;
+  }
+
+  50%,
+  94% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes flowDim {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.44;
+  }
+}
+
+@keyframes flowCountOut {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+@keyframes flowCountIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- Pending: stage everything the reveal will play --------------------- */
+
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="visible"]
+  [data-motion-group="flow"][data-motion-state="pending"] {
+  & .flowHead,
+  & .stepIndex,
+  & .stepTitle,
+  & .stepCopy,
+  & .vizLabel,
+  & .pasteField,
+  & .miniCard,
+  & .miniMeta,
+  & .miniName,
+  & .miniDesc,
+  & .miniFoot,
+  & .searchField,
+  & .resultRow,
+  & .countNow,
+  & .fanNode,
+  & .fanRow {
+    opacity: 0;
+  }
+
+  & .pasteWire,
+  & .fanList::before {
+    transform: scaleY(0);
+  }
+
+  & .fanRow::before,
+  & .resultMark::before,
+  & .resultRow[data-match="true"]::before {
+    transform: scaleX(0);
+  }
+
+  & .pasteUrl,
+  & .searchQuery {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  & .searchCaret {
+    opacity: 0;
+  }
+
+  & .countPrev {
+    opacity: 1;
+  }
+}
+
+/* --- Visible: the chapter plays ---------------------------------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"] {
+  & .flowHead {
+    animation: flowRise var(--lp-dur-reveal) var(--lp-ease-emph) both;
+  }
+
+  /* Cell head */
+  & .stepIndex {
+    animation: flowFade 420ms var(--lp-ease-out) calc(var(--t) + 150ms) both;
+  }
+
+  & .stepTitle {
+    animation: flowRiseSm 500ms var(--lp-ease-emph) calc(var(--t) + 150ms) both;
+  }
+
+  & .stepCopy {
+    animation: flowRiseSm 500ms var(--lp-ease-emph) calc(var(--t) + 210ms) both;
+  }
+
+  & .vizLabel {
+    animation: flowFade 380ms var(--lp-ease-out) calc(var(--t) + 320ms) both;
+  }
+
+  /* 01 — paste resolves */
+  & .pasteField {
+    animation: flowRiseSm 420ms var(--lp-ease-emph) calc(var(--t) + 320ms) both;
+  }
+
+  & .pasteFlash {
+    animation: flowPasteFlash 520ms var(--lp-ease-out) calc(var(--t) + 470ms)
+      both;
+  }
+
+  & .pasteUrl {
+    animation: flowWipe 200ms var(--lp-ease-snap) calc(var(--t) + 480ms) both;
+  }
+
+  & .pasteWire {
+    animation: flowDrawY 280ms var(--lp-ease-emph) calc(var(--t) + 720ms) both;
+  }
+
+  & .miniCard {
+    animation: flowRiseSm 460ms var(--lp-ease-emph) calc(var(--t) + 900ms) both;
+  }
+
+  & .miniMeta {
+    animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1000ms) both;
+  }
+
+  & .miniName {
+    animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1060ms) both;
+  }
+
+  & .miniDesc {
+    animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1120ms) both;
+  }
+
+  & .miniTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.12rem;
+}
+
+.miniTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.15rem;
+  padding: 0.05rem 0.36rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-chip);
+  font-family: var(--font-mono);
+  font-size: 0.545rem;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--foreground);
+}
+
+.miniFoot {
+    animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
+  }
+
+  /* 02 — a query filters the library */
+  & .searchField {
+    animation: flowRiseSm 420ms var(--lp-ease-emph) calc(var(--t) + 320ms) both;
+  }
+
+  & .resultRow {
+    animation: flowRiseSm 400ms var(--lp-ease-out)
+      calc(var(--t) + 440ms + var(--r, 0) * 55ms) both;
+  }
+
+  & .resultRow:nth-child(2) {
+    --r: 1;
+  }
+
+  & .resultRow:nth-child(3) {
+    --r: 2;
+  }
+
+  & .resultRow:nth-child(4) {
+    --r: 3;
+  }
+
+  & .resultRow:nth-child(5) {
+    --r: 4;
+  }
+
+  & .searchQuery {
+    animation: flowWipe 380ms steps(3, end) calc(var(--t) + 760ms) both;
+  }
+
+  & .searchCaret {
+    animation:
+      flowCaretIn 380ms steps(3, end) calc(var(--t) + 760ms) both,
+      flowCaretBlink 1080ms steps(1, end) calc(var(--t) + 1140ms) 4 both;
+  }
+
+  /* Filtering lands after the query is typed: everything but the match
+     recedes, the match gets its rail and its highlighted substring. */
+  & .resultRow[data-match="false"] .resultName,
+  & .resultRow[data-match="false"] .resultRepo {
+    animation: flowDim 340ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
+  }
+
+  & .resultRow[data-match="true"]::before {
+    animation: flowDrawX 300ms var(--lp-ease-emph) calc(var(--t) + 1180ms) both;
+  }
+
+  & .resultMark::before {
+    animation: flowDrawX 260ms var(--lp-ease-emph) calc(var(--t) + 1200ms) both;
+  }
+
+  & .countPrev {
+    animation: flowCountOut 280ms var(--lp-ease-out) calc(var(--t) + 1240ms)
+      both;
+  }
+
+  & .countNow {
+    animation: flowCountIn 320ms var(--lp-ease-emph) calc(var(--t) + 1300ms)
+      both;
+  }
+
+  /* 03 — the fan of routes */
+  & .fanNode {
+    animation: flowPop 420ms var(--lp-ease-spring) calc(var(--t) + 320ms) both;
+  }
+
+  & .fanList::before {
+    animation: flowDrawY 420ms var(--lp-ease-emph) calc(var(--t) + 520ms) both;
+  }
+
+  & .fanRow::before {
+    animation: flowDrawX 220ms var(--lp-ease-emph)
+      calc(var(--t) + 700ms + var(--r, 0) * 90ms) both;
+  }
+
+  & .fanRow {
+    animation: flowSlideIn 420ms var(--lp-ease-emph)
+      calc(var(--t) + 740ms + var(--r, 0) * 90ms) both;
+  }
+
+  & .fanRow:nth-child(2) {
+    --r: 1;
+  }
+
+  & .fanRow:nth-child(3) {
+    --r: 2;
+  }
+
+  & .fanRow:nth-child(4) {
+    --r: 3;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion — the chapter is already complete at rest; hold it there.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .flowStep::after,
+  .stepIndex {
+    transition: none;
+  }
+
   .flowHead,
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow {
-  transition:
-    opacity 500ms var(--lp-ease-out),
-    translate 500ms var(--lp-ease-out);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(1) {
-  transition-delay: 110ms;
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(2) {
-  transition-delay: 190ms;
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="flow"][data-motion-state="visible"]
-  .flowRow:nth-child(3) {
-  transition-delay: 270ms;
+  .stepIndex,
+  .stepTitle,
+  .stepCopy,
+  .viz *,
+  .viz *::before {
+    animation: none !important;
+  }
 }

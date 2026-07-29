@@ -1,132 +1,668 @@
 /* ---------------------------------------------------------------------------
-   Pricing — the zero monument
+   Pricing — the zero monument, pulled as a three-plate proof.
+
+   The chapter inverts, but as an *object*, not as a band: a printed plate laid
+   on the page's own field, with crop marks, a registration target and the
+   chapter rails running past it. Two offset contours sit out of register when
+   the plate pins; scrolling brings them home and pulls the key ink across the
+   numeral. Everything rests finished without JS or with reduced motion.
 --------------------------------------------------------------------------- */
 
 .pricingSection {
+  --sb-pad: clamp(1.25rem, 3.6vw, 2.5rem);
+  --plate-pad: clamp(1.5rem, 2.6vw, 2.75rem);
+  --plate-gap: clamp(1.25rem, 2.2vw, 2rem);
+
+  /* Light page → ink plate. The key is the dark theme's primary green, so the
+     accent still reads as the same green once the field flips. */
+  --plate-field: oklch(0.155 0.016 158);
+  --plate-ink: oklch(0.955 0.009 103);
+  --plate-key: oklch(0.72 0.145 148);
+  --plate-warm: oklch(0.73 0.14 62);
+  --plate-cool: color-mix(in oklch, var(--plate-ink) 55%, transparent);
+  --plate-cool-ink: var(--plate-ink);
+  --plate-line: color-mix(in oklch, var(--plate-ink) 16%, transparent);
+  --plate-line-strong: color-mix(in oklch, var(--plate-ink) 34%, transparent);
+
+  /* Registration progress. 1 = fully printed; the controller drives it down to
+     0 and back only where a scroll runway exists. */
+  --p: 1;
+  --p-reg: clamp(0, calc((var(--p) - 0.04) / 0.3), 1);
+  --p-reg-e: calc(var(--p-reg) * var(--p-reg) * (3 - 2 * var(--p-reg)));
+  --off: calc(1 - var(--p-reg-e));
+  --p-ink: clamp(0, calc((var(--p) - 0.37) / 0.34), 1);
+  --p-ink-e: calc(var(--p-ink) * var(--p-ink) * (3 - 2 * var(--p-ink)));
+
   position: relative;
-  overflow: clip;
-  background: var(--pricing-field);
-  color: var(--pricing-ink);
   border-bottom: 1px solid var(--lp-hairline);
 }
 
-.pricingZeroWrap {
-  position: relative;
-  z-index: 0;
-  line-height: 0.72;
+:global(.dark) .pricingSection {
+  /* Dark page → paper plate. The key is the light theme's primary green. */
+  --plate-field: oklch(0.955 0.01 103);
+  --plate-ink: oklch(0.16 0.018 158);
+  --plate-key: oklch(0.49 0.145 148);
+  --plate-warm: oklch(0.6 0.16 50);
 }
 
-.pricingZero,
-.pricingZeroLayer {
-  font-size: clamp(15rem, 56vw, 50rem);
-  font-weight: 650;
-  font-stretch: 90%;
-  letter-spacing: -0.06em;
-  line-height: 0.72;
-  margin-left: -0.07em;
-  color: transparent;
-  user-select: none;
-}
+/* --- Chapter rails: the plate's trim edges, continued through the field ---- */
 
-.pricingZero {
-  -webkit-text-stroke: 2.5px var(--pricing-zero);
-}
-
-.pricingZeroLayer {
+.rails {
   position: absolute;
   inset: 0;
-  -webkit-text-stroke: 1.25px currentColor;
+  z-index: 0;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--sb-pad);
   pointer-events: none;
 }
 
-.pricingZeroLayer[data-layer="alert"] {
-  color: transparent;
-  -webkit-text-stroke-color: var(--lp-alert);
-  opacity: 0.5;
+.rail {
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--lp-hairline) 12%,
+    var(--lp-hairline) 88%,
+    transparent
+  );
 }
 
-.pricingZeroLayer[data-layer="ink"] {
-  -webkit-text-stroke-color: var(--pricing-ink);
-  opacity: 0.35;
-}
+/* --- The pinned stage ------------------------------------------------------ */
 
-/* Offset print layers align and the counter fills once the section lands. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingZero {
-  transition: color 850ms var(--lp-ease-out) 180ms;
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingZeroLayer {
-  transition:
-    transform 720ms var(--lp-ease-in-out),
-    opacity 720ms var(--lp-ease-in-out);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingZeroLayer[data-layer="alert"] {
-  transform: translate3d(1.1rem, -0.8rem, 0);
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingZeroLayer[data-layer="ink"] {
-  transform: translate3d(-0.8rem, 0.7rem, 0);
-}
-
-.pricingZeroFilled,
-[data-motion-group="pricing"][data-motion-state="visible"] .pricingZero {
-  color: var(--pricing-zero);
-}
-
-/* Without the controller the monument rests solid. */
-:global([data-landing-motion-root]:not([data-motion-enabled="true"])) .pricingZero {
-  color: var(--pricing-zero);
-}
-
-:global([data-landing-motion-root]:not([data-motion-enabled="true"])) .pricingZeroLayer {
-  transform: none;
-  opacity: 0.22;
-}
-
-.pricingCopy {
+.sticky {
   position: relative;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--sb-pad);
+}
+
+/* --- Printer's marks ------------------------------------------------------- */
+
+.crop {
+  position: absolute;
+  z-index: 2;
+  width: 0;
+  height: 0;
+  color: var(--lp-hairline-strong);
+}
+
+.crop::before,
+.crop::after {
+  content: "";
+  position: absolute;
+  background: currentcolor;
+}
+
+.crop::before {
+  width: 15px;
+  height: 1px;
+}
+
+.crop::after {
+  width: 1px;
+  height: 15px;
+}
+
+.crop[data-corner="tl"] {
+  top: 0;
+  left: var(--sb-pad);
+}
+
+.crop[data-corner="tl"]::before {
+  top: 0;
+  right: 8px;
+}
+
+.crop[data-corner="tl"]::after {
+  left: 0;
+  bottom: 8px;
+}
+
+.crop[data-corner="tr"] {
+  top: 0;
+  right: var(--sb-pad);
+}
+
+.crop[data-corner="tr"]::before {
+  top: 0;
+  left: 8px;
+}
+
+.crop[data-corner="tr"]::after {
+  right: 0;
+  bottom: 8px;
+}
+
+.crop[data-corner="bl"] {
+  bottom: 0;
+  left: var(--sb-pad);
+}
+
+.crop[data-corner="bl"]::before {
+  bottom: 0;
+  right: 8px;
+}
+
+.crop[data-corner="bl"]::after {
+  left: 0;
+  top: 8px;
+}
+
+.crop[data-corner="br"] {
+  bottom: 0;
+  right: var(--sb-pad);
+}
+
+.crop[data-corner="br"]::before {
+  bottom: 0;
+  left: 8px;
+}
+
+.crop[data-corner="br"]::after {
+  right: 0;
+  top: 8px;
+}
+
+.regTarget {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  translate: -50% 0;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: var(--lp-hairline-strong);
+  stroke-width: 1;
+}
+
+.regTarget[data-pos="t"] {
+  top: -21px;
+}
+
+.regTarget[data-pos="b"] {
+  bottom: -21px;
+}
+
+/* --- The plate ------------------------------------------------------------- */
+
+.plate {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  gap: var(--plate-gap);
+  padding: var(--plate-pad);
+  border-radius: 3px;
+  background: var(--plate-field);
+  color: var(--plate-ink);
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--foreground) 10%, transparent),
+    0 26px 64px -34px oklch(0 0 0 / 0.65);
+}
+
+/* Paper: a fixed grain on the plate itself, so nothing shimmers while pinned. */
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.055;
+  mix-blend-mode: soft-light;
+}
+
+/* --- Plate index strip ----------------------------------------------------- */
+
+.plateIndex {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklch, var(--plate-ink) 58%, transparent);
+}
+
+.plateNum {
+  color: var(--plate-key);
+}
+
+.plateName {
+  white-space: nowrap;
+}
+
+.plateHair {
+  flex: none;
+  width: 2.25rem;
+  height: 1px;
+  background: var(--plate-line-strong);
+}
+
+.plateHair[data-flex] {
+  flex: 1;
+  min-width: 1rem;
+}
+
+.plateSwatches {
+  display: flex;
+  gap: 0.32rem;
+}
+
+.swatch {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+
+.swatch[data-plate="warm"] {
+  background: var(--plate-warm);
+}
+
+.swatch[data-plate="cool"] {
+  background: var(--plate-cool);
+}
+
+.swatch[data-plate="key"] {
+  background: var(--plate-key);
+}
+
+/* --- Composition ----------------------------------------------------------- */
+
+.body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  gap: clamp(1.75rem, 3vw, 3.5rem);
+  align-items: center;
+}
+
+.monument {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+
+.zero {
+  display: block;
+  width: min(70vw, 18rem);
+  height: auto;
+  overflow: visible;
+}
+
+/* --- Copy ------------------------------------------------------------------ */
+
+.copy {
+  min-width: 0;
+}
+
+.heading {
+  max-width: 8ch;
+  font-size: clamp(3rem, 6.4vw, 6.5rem);
+  font-weight: 650;
+  line-height: 0.88;
+  letter-spacing: -0.048em;
+}
+
+.lede {
+  margin-top: clamp(1.1rem, 1.9vw, 1.75rem);
+  max-width: 44ch;
+  font-size: clamp(1.05rem, 1.4vw, 1.35rem);
+  line-height: 1.42;
+  text-wrap: balance;
+  color: color-mix(in oklch, var(--plate-ink) 80%, transparent);
+}
+
+/* Spec footer: three absences, ruled across the foot of the plate. */
+.ledger {
+  display: grid;
+  border-top: 1px solid var(--plate-line-strong);
+  list-style: none;
+}
+
+.ledgerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-block: 0.62rem;
+  border-bottom: 1px solid var(--plate-line);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 0.9vw, 0.8rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 48rem) {
+  .ledger {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .ledgerRow {
+    padding-block: 0.9rem 0.1rem;
+    border-bottom: 0;
+  }
+
+  .ledgerRow + .ledgerRow {
+    padding-left: clamp(1rem, 2.4vw, 2.5rem);
+    border-left: 1px solid var(--plate-line);
+  }
+}
+
+.ledgerTick {
+  flex: none;
+  width: 0.85rem;
+  height: 1px;
+  background: var(--plate-key);
+}
+
+/* --- The numeral ----------------------------------------------------------- */
+
+.zeroPlate,
+.zeroGhost {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.zeroEdge {
+  fill: none;
+  stroke: var(--plate-key);
+  stroke-width: 4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 900ms var(--lp-ease-emph);
+}
+
+.zeroInk {
+  fill: var(--plate-key);
+}
+
+/* Underplates: real ink, overprinting the paper. They sit out of register at
+   the head of the run and recede as the key ink is pulled. */
+.zeroGhost {
+  mix-blend-mode: screen;
+}
+
+:global(.dark) .zeroGhost {
+  mix-blend-mode: multiply;
+}
+
+.zeroGhost[data-plate="warm"] {
+  opacity: calc(0.26 * (1 - var(--p-ink-e)));
+}
+
+.zeroGhost[data-plate="cool"] {
+  opacity: calc(0.16 * (1 - var(--p-ink-e)));
+}
+
+.zeroGhost[data-plate="warm"] {
+  fill: var(--plate-warm);
+}
+
+.zeroGhost[data-plate="cool"] {
+  fill: var(--plate-cool-ink);
+}
+
+/* The nip: the wet leading edge of the ink, present only during the pull. */
+.zeroNip {
+  fill: var(--plate-key);
+  transform-box: fill-box;
+  transform-origin: 0 50%;
+  transform: translateX(calc(400px * var(--p-ink-e)));
+  opacity: calc(3.2 * var(--p-ink-e) * (1 - var(--p-ink-e)));
+}
+
+/* The squeegee: plate-coloured, retreating to the right as the ink is pulled. */
+.zeroSqueegee {
+  fill: var(--plate-field);
+  transform-box: fill-box;
+  transform-origin: 100% 50%;
+  transform: scaleX(0);
+}
+
+/* --- Reveal: contours scribe in as the chapter arrives --------------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .zeroEdge {
+  stroke-dashoffset: 1;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingMessage {
+  [data-motion-group="pricing"]
+  .plate {
   transition:
-    opacity 520ms var(--lp-ease-out) 120ms,
-    transform 520ms var(--lp-ease-out) 120ms;
-}
-
-:global([data-landing-motion-root][data-motion-enabled="true"])
-  [data-motion-group="pricing"][data-motion-state="visible"]
-  .pricingNote {
-  transition:
-    opacity 400ms var(--lp-ease-out) 260ms,
-    transform 400ms var(--lp-ease-out) 260ms;
+    opacity var(--lp-dur-scene) var(--lp-ease-emph),
+    transform var(--lp-dur-scene) var(--lp-ease-emph);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingMessage {
+  .plate {
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
+  transform: translate3d(0, 20px, 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .heading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .lede,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .ledgerRow,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .plateIndex {
+  transition:
+    opacity var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms),
+    transform var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms);
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .pricingNote {
+  .heading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .lede,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .ledgerRow,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .plateIndex {
   opacity: 0;
-  transform: translate3d(0, 10px, 0);
+  transform: translate3d(0, 12px, 0);
 }
 
-.pricingNoteRule {
-  border-top: 1px solid color-mix(in oklch, var(--pricing-ink) 32%, transparent);
+.plateIndex {
+  --d: 60ms;
+}
+
+.heading {
+  --d: 180ms;
+}
+
+.lede {
+  --d: 260ms;
+}
+
+.ledgerRow {
+  --d: calc(340ms + var(--i, 0) * var(--lp-stagger));
+}
+
+/* --- Registration + ink: transition-timed on narrow viewports -------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .zeroGhost {
+  transition:
+    transform 860ms var(--lp-ease-emph) 420ms,
+    opacity 640ms var(--lp-ease-out) 1240ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .zeroGhost[data-plate="warm"] {
+  transform: translate(15px, -12px) rotate(0.9deg);
+  opacity: 0.26;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .zeroGhost[data-plate="cool"] {
+  transform: translate(-13px, 11px) rotate(-0.65deg);
+  opacity: 0.16;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .zeroSqueegee,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .zeroNip {
+  transition:
+    transform 900ms var(--lp-ease-in-out) 1100ms,
+    opacity 900ms linear 1100ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .zeroSqueegee {
+  transform: scaleX(1);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .zeroNip {
+  transform: translateX(0);
+  opacity: 0;
+}
+
+/* --- Desktop: the plate pins and the press run is scroll-linked ------------ */
+
+@media (min-width: 64rem) {
+  /* One grid for the whole plate: the body divider sits on the same third
+     as the spec footer's first rule, so every vertical lines up. */
+  .body {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .monument {
+    grid-column: 1;
+  }
+
+  .zero {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Column rule: runs the full height of the plate, from the index strip
+     down to the spec footer, on the same third as the footer's first rule. */
+  .body::before {
+    content: "";
+    position: absolute;
+    left: calc(100% / 3);
+    top: calc(-1 * var(--plate-gap) - 0.5rem);
+    bottom: calc(-1 * var(--plate-gap));
+    width: 1px;
+    background: var(--plate-line);
+  }
+
+  .copy {
+    grid-column: 2 / span 2;
+    align-self: start;
+    padding-left: clamp(1rem, 2.4vw, 2.5rem);
+    /* Cap-height of the headline lands on the numeral's shoulder. */
+    margin-top: -0.085em;
+  }
+
+  .plate {
+    height: min(68vh, 38rem);
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .pricingSection {
+    height: 200vh;
+    --p: var(--sp-pricing, 0);
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .sticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    padding-block: 0;
+  }
+
+  /* Scroll-linked from here: no transitions, or every frame would restart one. */
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection[data-motion-group][data-motion-state]
+    .zeroGhost {
+    transition: none;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection[data-motion-group][data-motion-state]
+    .zeroGhost[data-plate="warm"] {
+    transform: translate(calc(15px * var(--off)), calc(-12px * var(--off)))
+      rotate(calc(0.9deg * var(--off)));
+    opacity: calc(0.26 * (1 - var(--p-ink-e)));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection[data-motion-group][data-motion-state]
+    .zeroGhost[data-plate="cool"] {
+    transform: translate(calc(-13px * var(--off)), calc(11px * var(--off)))
+      rotate(calc(-0.65deg * var(--off)));
+    opacity: calc(0.16 * (1 - var(--p-ink-e)));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection[data-motion-group][data-motion-state]
+    .zeroSqueegee {
+    transition: none;
+    transform: scaleX(calc(1 - var(--p-ink-e)));
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection[data-motion-group][data-motion-state]
+    .zeroNip {
+    transition: none;
+  }
+}
+
+/* --- Reduced motion: the proof rests printed ------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .plate,
+  .plateIndex,
+  .heading,
+  .lede,
+  .ledgerRow,
+  .zeroEdge,
+  .zeroGhost,
+  .zeroSqueegee,
+  .zeroNip {
+    transition: none !important;
+  }
 }
