@@ -11,6 +11,17 @@ import styles from "@/components/landing/styles/hero.module.css"
  * The frame is a three-band grid (standing header rule / composition /
  * state rail) so both edges of the viewport are held by structure and the
  * composition never floats in dead space.
+ *
+ * Four lines hold the composition, and every end of every one of them lands
+ * on another line:
+ *
+ *   header rule   spine → right rail, at the top band
+ *   spine         header rule → floor rule, on the 50% line of the measure
+ *   floor rule    left rail → spine, on the stage's floor
+ *   drawer border the 75% line, drawn once, by the drawer that stands on it
+ *
+ * Everything else in the chapter is an object outline or an internal
+ * division, and each of those two roles has exactly one value.
  */
 export function HeroSection() {
   return (

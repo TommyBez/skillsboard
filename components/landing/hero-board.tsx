@@ -5,8 +5,8 @@ import styles from "@/components/landing/styles/hero.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — they mirror the real
- * SkillDossier information hierarchy (index, name, stars, source, description,
- * tags, install command) so the hero reads as the actual app UI.
+ * SkillDossier information hierarchy (name, stars, source, description, tags,
+ * install command) so the hero reads as the actual app UI.
  *
  * `source` is split into owner / repo because it is a *provenance* line, not a
  * caption: the fork mark is printed in the accent (as it is in the product),
