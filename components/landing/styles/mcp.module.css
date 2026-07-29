@@ -21,9 +21,9 @@
 .mcpChapter {
   /* The module. lib row == lib head == agent row / 2, so
      5 lib rows + 1 head == 3 agent rows, exactly. */
-  --agent-row-h: 8.5rem;
-  --lib-row-h: 4.25rem;
-  --lib-head-h: 4.25rem;
+  --agent-row-h: 8rem;
+  --lib-row-h: 4rem;
+  --lib-head-h: 4rem;
   --wire-row-h: var(--agent-row-h);
 
   --gw: clamp(7rem, 13.4vw, 12rem);
@@ -38,7 +38,7 @@
 
 /* Short desktop viewports: step the module down rather than clip the
    diagram. The 1 : 1 : 2 relationship is preserved. */
-@media (min-width: 64rem) and (max-height: 48rem) {
+@media (min-width: 64rem) and (max-height: 46rem) {
   .mcpChapter {
     --agent-row-h: 6.5rem;
     --lib-row-h: 3.25rem;
