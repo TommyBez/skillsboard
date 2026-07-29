@@ -20,12 +20,16 @@ import styles from "@/components/landing/styles/hero.module.css"
  *
  * The whole board is aria-hidden; the hero copy carries the message.
  */
+/* Star counts are three digits on every card on purpose. A thousands separator
+   set in the card's 10px mono reads as a decimal point — "1,204" was being read
+   as 1.2 — and mixing separated and unseparated values in the same column makes
+   the whole set ambiguous. One numeral width, one column, no punctuation. */
 const dossiers = [
   {
     name: "code-review",
     owner: "acme",
     repo: "eng-skills",
-    stars: "1,204",
+    stars: "412",
     // One line at every card width down to 1024 — the scattered deck is a
     // composition of five equal cards, so their heights must not vary.
     description: "Reviews PRs for missing tests.",
@@ -37,7 +41,7 @@ const dossiers = [
     name: "pdf-extraction",
     owner: "anthropic",
     repo: "skills",
-    stars: "8,431",
+    stars: "938",
     description: "Pulls tables out of PDF files.",
     tags: ["documents"],
     command: "npx skills add anthropic/skills",
@@ -47,7 +51,7 @@ const dossiers = [
     name: "brand-voice",
     owner: "acme",
     repo: "brand-kit",
-    stars: "312",
+    stars: "271",
     description: "Rewrites copy to brand voice.",
     tags: ["writing", "brand"],
     command: "npx skills add acme/brand-kit",
@@ -57,7 +61,7 @@ const dossiers = [
     name: "sql-migrations",
     owner: "drizzle",
     repo: "skills",
-    stars: "964",
+    stars: "864",
     description: "Drafts safe schema migrations.",
     tags: ["database"],
     command: "npx skills add drizzle/skills",
@@ -67,7 +71,7 @@ const dossiers = [
     name: "release-notes",
     owner: "vercel",
     repo: "skills",
-    stars: "2,109",
+    stars: "590",
     description: "Turns merged PRs into notes.",
     tags: ["shipping", "docs"],
     command: "npx skills add vercel/skills",

@@ -41,8 +41,11 @@ export function HeroSection() {
             <div className={`${styles.heroCopyCol} ${styles.heroExit}`}>
               <h1 className={styles.heroHeadline}>
                 <span className={styles.heroLineMask}>
+                  {/* U+2019, not the typewriter prime: at a 74px cap height a
+                      straight vertical tick is the loudest wrong mark on the
+                      page. Same words, correct glyph. */}
                   <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
-                    Your team&apos;s skills.
+                    Your team’s skills.
                   </span>
                 </span>
                 <span className={styles.heroLineMask}>
@@ -69,9 +72,13 @@ export function HeroSection() {
 
             {/* Digital half of the scene's readout: the copy column ends on the
                 same baseline the board does, and reports the count the rail
-                reports as a bar. Numeric index only — no prose. */}
+                reports as a bar. Numeric index only — no prose.
+
+                Keyed "Indexed", not "Filed": the rail below is the state
+                machine and owns that word. Two readouts printing the same word
+                76px apart made one micro-label look like three. */}
             <p className={styles.heroTally} aria-hidden="true">
-              <span className={styles.heroTallyKey}>Filed</span>
+              <span className={styles.heroTallyKey}>Indexed</span>
               <span className={styles.heroTallyNum}>
                 {[0, 1, 2, 3, 4, 5].map((n) => (
                   <span key={n} className={styles.heroTallyDigit} data-n={n}>

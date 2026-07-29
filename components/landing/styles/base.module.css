@@ -468,6 +468,10 @@
   flex: 1;
   height: 1px;
   background: var(--lp-hairline);
+  /* Tracked caps carry their letter-space after the final glyph, so a 0.75rem
+     gap measured box-to-box reads as 0.75rem + 0.22em of air. Take the
+     trailing space back so the joint is the size it says it is. */
+  margin-left: -0.22em;
 }
 
 /* ---------------------------------------------------------------------------

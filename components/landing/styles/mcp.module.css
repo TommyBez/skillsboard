@@ -128,9 +128,8 @@
   min-width: 0;
 }
 
-.frameTop .frameMark {
-  gap: calc(1rem - 0.22em);
-}
+/* The trailing-tracking pull now lives on the shared `.chapterMark::after`, so
+   this chapter uses the page's joint rather than compensating for it locally. */
 
 .readout {
   display: flex;
