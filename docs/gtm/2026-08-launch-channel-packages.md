@@ -32,11 +32,11 @@ The official Typefully resource is draft `10084598` in social set `266935`:
 
 - one natural Italian LinkedIn post and one English four-post X thread;
 - the same shipped add → find → use product demonstration;
-- the pre-Remotion 31-second cut currently attached to both platforms;
+- the final Remotion 31-second cut attached to both platforms as media `41c7f571-b728-498d-a70d-1e19a0af1264`, with SHA-256 `cbb3728a5ec8cedfde33236429515ecfb38b537d5520b8ad342aa4d14ec3f911`;
 - exact channel URLs from the campaign-link table;
-- private, unscheduled, and unpublished at the July 28 official readback.
+- scheduled for August 11 at 09:15 Europe/Rome (`2026-08-11T07:15:00Z`) and unpublished at the July 29 official readback.
 
-Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. Before scheduling, replace only the draft media with the final `public/launch/skills-board-product-demo.mp4` whose expected SHA-256 is `cbb3728a5ec8cedfde33236429515ecfb38b537d5520b8ad342aa4d14ec3f911`, then reread the exact draft and confirm that media ID. During August 8–10, bind the current account, social set, copy, media, timing, quota, IDs, and publication state before scheduling the eligible platforms for 09:15 Europe/Rome on August 11.
+Do not duplicate or overwrite the copy in this repository. User edits in Typefully are authoritative. The final `public/launch/skills-board-product-demo.mp4` is attached and the eligible X and LinkedIn platforms are scheduled for 09:15 Europe/Rome on August 11. Immediately before publication, reread the exact draft and bind the current account, social set, copy, media, timing, quota, schedule ID, parent/reply IDs, and publication state; fail closed if any value differs.
 
 ## Product Hunt package
 
@@ -182,7 +182,7 @@ Immediately before each exact effect:
 
 | Package | Prepared state | Remaining exact boundary |
 | --- | --- | --- |
-| LinkedIn and X | Existing official Typefully draft reconciled; final Remotion media hash pinned | Replace draft media through the official capability, read it back, then complete August 8–10 scheduling |
+| LinkedIn and X | Official Typefully draft reconciled; final Remotion media attached and X/LinkedIn scheduled for August 11 at 09:15 Europe/Rome | Reread the immutable publication envelope immediately before publication; fail closed on any mismatch |
 | Product Hunt | Listing copy, Remotion-enhanced 60-second master, asset order, and human facts brief prepared | Current platform eligibility, personal account, and human publication/comments |
 | Show HN | Title options and human facts brief prepared | Current rules, prior-submission check, maker availability, and human publication/comments |
 | Product email | English copy prepared | Eligible consent/suppression projection, official provider route, unsubscribe, and send readback |
