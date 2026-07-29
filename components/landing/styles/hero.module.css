@@ -452,7 +452,6 @@
     display: flex;
     /* nailed to the frame's floor by the grid, not floated under the stage */
     margin-top: 0;
-    align-self: end;
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroRail {
@@ -890,6 +889,10 @@
   /* dock: the card stays a whole card the entire flight and only folds
      flat into its row on arrival, so nothing is ever half-a-card in mid-air */
   --dp: clamp(0, calc((var(--fp) - 0.72) / 0.28), 1);
+  /* merge: the card only gives up its own surface at the very end of the fold.
+     Tying that to --dp made a half-docked card translucent in mid-air, so any
+     card it happened to cross showed straight through it. */
+  --merge: clamp(0, calc((var(--dp) - 0.6) / 0.4), 1);
   /* lift: 0 at both ends, 1 at mid-flight. A card in transit has to cross the
      ones still on the desk, so it is picked up off the surface first and set
      back down on arrival rather than sliding through them. */
@@ -1018,18 +1021,16 @@
   flex-direction: column;
   width: 100%;
   pointer-events: auto;
-  /* Elevation reads as a lighter surface, not just a shadow — on a near-black
-     field a drop shadow alone cannot say "this card is off the desk". */
+  --surface: var(--card);
   background: color-mix(
     in oklab,
-    color-mix(in oklab, var(--foreground) calc(var(--lift, 0) * 5%), var(--card))
-      calc(100% - var(--dp, 0) * 100%),
+    var(--surface) calc(100% - var(--merge, 0) * 100%),
     transparent
   );
   border: 1px solid
     color-mix(
       in oklab,
-      var(--border) calc(100% - var(--dp, 0) * 100%),
+      var(--border) calc(100% - var(--merge, 0) * 100%),
       transparent
     );
   border-radius: calc(var(--radius) * (1 - var(--dp, 0)));
@@ -1037,9 +1038,18 @@
     0 0 calc(var(--dp, 0) * (100% - var(--rh))) 0 round
       calc(var(--radius) * (1 - var(--dp, 0)))
   );
-  transition:
-    opacity 200ms var(--lp-ease-snap),
-    box-shadow 220ms var(--lp-ease-out);
+  transition: opacity 200ms var(--lp-ease-snap);
+}
+
+/* Dark field: a drop shadow on near-black cannot say "this card is off the
+   desk", so elevation is carried by the surface getting lighter instead.
+   In the light theme the shadow does that job on its own. */
+:global(.dark) .dossier {
+  --surface: color-mix(
+    in oklab,
+    var(--foreground) calc(var(--lift, 0) * 6%),
+    var(--card)
+  );
 }
 
 .dossierRow {
@@ -1243,6 +1253,7 @@
 .dossierPeek .dossier {
   --fp: 0;
   --dp: 0;
+  --merge: 0;
   pointer-events: none;
   clip-path: none;
   border-color: color-mix(in oklab, var(--primary) 42%, var(--border));
@@ -1377,6 +1388,7 @@
 .mobileChaosCard .dossier {
   --fp: 0;
   --dp: 0;
+  --merge: 0;
   clip-path: none;
   box-shadow: 0 10px 24px hsl(var(--shadow-color) / 0.18);
 }
@@ -1650,6 +1662,7 @@
     --fp: 1;
     --fr: 0;
     --lift: 0;
+    --merge: 1;
     transform: none;
   }
 
