@@ -1,0 +1,132 @@
+/* ---------------------------------------------------------------------------
+   Pricing — the zero monument
+--------------------------------------------------------------------------- */
+
+.pricingSection {
+  position: relative;
+  overflow: clip;
+  background: var(--pricing-field);
+  color: var(--pricing-ink);
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.pricingZeroWrap {
+  position: relative;
+  z-index: 0;
+  line-height: 0.72;
+}
+
+.pricingZero,
+.pricingZeroLayer {
+  font-size: clamp(15rem, 56vw, 50rem);
+  font-weight: 650;
+  font-stretch: 90%;
+  letter-spacing: -0.06em;
+  line-height: 0.72;
+  margin-left: -0.07em;
+  color: transparent;
+  user-select: none;
+}
+
+.pricingZero {
+  -webkit-text-stroke: 2.5px var(--pricing-zero);
+}
+
+.pricingZeroLayer {
+  position: absolute;
+  inset: 0;
+  -webkit-text-stroke: 1.25px currentColor;
+  pointer-events: none;
+}
+
+.pricingZeroLayer[data-layer="alert"] {
+  color: transparent;
+  -webkit-text-stroke-color: var(--lp-alert);
+  opacity: 0.5;
+}
+
+.pricingZeroLayer[data-layer="ink"] {
+  -webkit-text-stroke-color: var(--pricing-ink);
+  opacity: 0.35;
+}
+
+/* Offset print layers align and the counter fills once the section lands. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingZero {
+  transition: color 850ms var(--lp-ease-out) 180ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingZeroLayer {
+  transition:
+    transform 720ms var(--lp-ease-in-out),
+    opacity 720ms var(--lp-ease-in-out);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="alert"] {
+  transform: translate3d(1.1rem, -0.8rem, 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingZeroLayer[data-layer="ink"] {
+  transform: translate3d(-0.8rem, 0.7rem, 0);
+}
+
+.pricingZeroFilled,
+[data-motion-group="pricing"][data-motion-state="visible"] .pricingZero {
+  color: var(--pricing-zero);
+}
+
+/* Without the controller the monument rests solid. */
+:global([data-landing-motion-root]:not([data-motion-enabled="true"])) .pricingZero {
+  color: var(--pricing-zero);
+}
+
+:global([data-landing-motion-root]:not([data-motion-enabled="true"])) .pricingZeroLayer {
+  transform: none;
+  opacity: 0.22;
+}
+
+.pricingCopy {
+  position: relative;
+  z-index: 1;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingMessage {
+  transition:
+    opacity 520ms var(--lp-ease-out) 120ms,
+    transform 520ms var(--lp-ease-out) 120ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="visible"]
+  .pricingNote {
+  transition:
+    opacity 400ms var(--lp-ease-out) 260ms,
+    transform 400ms var(--lp-ease-out) 260ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingMessage {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .pricingNote {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+.pricingNoteRule {
+  border-top: 1px solid color-mix(in oklch, var(--pricing-ink) 32%, transparent);
+}

@@ -1,0 +1,89 @@
+/* ---------------------------------------------------------------------------
+   Workflow chapter — three moves, indexed like a manual
+--------------------------------------------------------------------------- */
+
+.flowSection {
+  position: relative;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+.flowRows {
+  margin-top: 3rem;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--lp-hairline);
+}
+
+.flowRow {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.65rem 2.5rem;
+  padding-block: 1.9rem;
+  border-bottom: 1px solid var(--lp-hairline);
+}
+
+@media (min-width: 64rem) {
+  .flowRow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: baseline;
+    padding-block: 2.7rem;
+  }
+}
+
+.flowTitle {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.5vw, 2.35rem);
+  font-weight: 650;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.flowCopy {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+/* Staggered reveal, driven by the shared motion-group state machine. */
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="pending"]
+  .flowHead,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="pending"]
+  .flowRow {
+  opacity: 0;
+  translate: 0 18px;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowHead,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow {
+  transition:
+    opacity 500ms var(--lp-ease-out),
+    translate 500ms var(--lp-ease-out);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(1) {
+  transition-delay: 110ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(2) {
+  transition-delay: 190ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="flow"][data-motion-state="visible"]
+  .flowRow:nth-child(3) {
+  transition-delay: 270ms;
+}

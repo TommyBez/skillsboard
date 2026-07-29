@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react"
 import { GitForkIcon } from "lucide-react"
 
-import styles from "@/components/landing/landing-motion.module.css"
+import styles from "@/components/landing/styles/hero.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — they mirror the real
