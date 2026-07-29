@@ -27,9 +27,12 @@ export function ThemeToggle({ className }: { className?: string }) {
   const next = modes[(modes.indexOf(current) + 1) % modes.length]
   // Show the theme the visitor is actually looking at. A monitor glyph is the
   // conventional mark for "system", but on its own it reads as an unexplained
-  // icon — it says where the setting comes from, not what it produced. Show
-  // sun or moon for the resolved theme, and mark "following the system" with a
-  // dot on the corner.
+  // icon — it names where the setting came from, not what it produced.
+  //
+  // Following the system is carried by the accessible name and the tooltip
+  // rather than by a mark: three separate design reviews read a corner dot here
+  // as a notification badge or a rendering artefact, and a control this small
+  // cannot afford a second element competing with its glyph.
   //
   // The resolved theme is only knowable in the browser, so the first client
   // render has to match the server's: pick the glyph from it only once mounted.
@@ -50,12 +53,6 @@ export function ThemeToggle({ className }: { className?: string }) {
       onClick={() => setTheme(next)}
     >
       <Icon key={current} className="theme-toggle-icon size-4" aria-hidden="true" />
-      {mounted && current === "system" ? (
-        <span
-          className="absolute right-1 top-1 size-1 rounded-full bg-current opacity-45"
-          aria-hidden="true"
-        />
-      ) : null}
     </Button>
   )
 }
