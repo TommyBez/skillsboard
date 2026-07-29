@@ -345,21 +345,16 @@
 }
 
 .faqHeading {
-  margin: 0;
+  /* Optical: a round cap carries ~3.2% of its size in left side bearing.
+     Pulled back so the display line and the body line below it start on the
+     same x rather than 2px apart. */
+  margin: 0 0 0 -0.032em;
   max-width: 12ch;
   font-size: var(--faq-h-size);
   font-weight: 600;
   line-height: 1;
   letter-spacing: var(--tracking-display, -0.03em);
   text-wrap: balance;
-}
-
-@media (min-width: 64rem) {
-  /* Optical: a 60px round cap carries ~2px of left side bearing. Pulled back
-     so the display line and the body line below it start on the same x. */
-  .faqHeading {
-    margin-left: -0.032em;
-  }
 }
 
 .faqIntro {

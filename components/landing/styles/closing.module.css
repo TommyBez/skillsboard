@@ -587,8 +587,10 @@
   background: var(--primary);
 }
 
-/* In the two bars the square is centred on the label's cap band rather than
-   on its line box, which sits 1.25px lower. */
+/* In the two bars the square is centred on the type it labels rather than on
+   its line box, which sits 0.75px lower. Measured after: the legend square is
+   within 0.5px of the caps of RECOMMENDED, the answer square within 0.13px of
+   the x-height of code-review. */
 .plateBar .plateMark {
   margin-bottom: 1.5px;
 }

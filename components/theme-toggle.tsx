@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { MonitorIcon, MoonIcon, SunIcon } from "lucide-react"
+import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +25,12 @@ export function ThemeToggle({ className }: { className?: string }) {
 
   const current: Mode = isMode(theme) ? theme : "system"
   const next = modes[(modes.indexOf(current) + 1) % modes.length]
-  const Icon = current === "system" ? MonitorIcon : resolvedTheme === "dark" ? MoonIcon : SunIcon
+  // Show the theme the visitor is actually looking at. A monitor glyph is the
+  // conventional mark for "system", but on its own it reads as an unexplained
+  // icon — it says where the setting comes from, not what it produced. Show
+  // sun or moon for the resolved theme, and mark "following the system" with a
+  // dot on the corner.
+  const Icon = resolvedTheme === "dark" ? MoonIcon : SunIcon
   const label = mounted
     ? `Theme: ${current}. Switch to ${next}.`
     : "Toggle color theme"
@@ -35,13 +40,19 @@ export function ThemeToggle({ className }: { className?: string }) {
       type="button"
       variant="outline"
       size="icon-sm"
-      className={cn("size-10 rounded-xl border-border bg-card/65", className)}
+      className={cn("relative size-10 rounded-xl border-border bg-card/65", className)}
       aria-label={label}
       title={mounted ? `Theme: ${current}` : "Theme"}
       disabled={!mounted}
       onClick={() => setTheme(next)}
     >
       <Icon key={current} className="theme-toggle-icon size-4" aria-hidden="true" />
+      {mounted && current === "system" ? (
+        <span
+          className="absolute right-1 top-1 size-1 rounded-full bg-primary"
+          aria-hidden="true"
+        />
+      ) : null}
     </Button>
   )
 }
