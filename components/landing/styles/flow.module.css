@@ -42,7 +42,12 @@
   --r-card: 0.7rem;
   --r-control: 0.5rem;
   --r-chip: 0.3rem;
-  --wire: color-mix(in oklab, var(--foreground) 38%, transparent);
+  /* The connectors are annotation, so they rank BELOW the page's structure and
+     above the rows they annotate. Measured on the dark field: page frame /
+     panel dividers 50.2, connectors 43.6, row dividers 30.2. At the old 38%
+     they rendered 97.9 — twice the frame and 3.5x the dividers, which made a
+     diagram's own scaffolding the brightest ink in the body of the page. */
+  --wire: color-mix(in oklab, var(--foreground) 13%, transparent);
 
   /* Three mono steps, each with a job: a typed value, machine text, meta. */
   --m-value: 0.75rem;
@@ -90,6 +95,16 @@
 
 /* --- Chapter head ------------------------------------------------------- */
 
+/* The head sits on the panel's content axis, not on the frame. Everything in
+   the chapter — mark, heading, cell index, cell title, every diagram row —
+   starts on the same x; only the chapter numeral hangs outside it, in a column
+   of exactly one `--pad` (plus the frame rail it sits on). Before this the
+   headline was the one element on the page frame itself, a 26px jog with no
+   intermediate step. */
+.flowHead {
+  padding-left: var(--pad);
+}
+
 /* `02` hangs in its own column of exactly one `--pad` (plus the frame rail it
    sits on), so the chapter mark starts on the same x as the first cell's
    content — the one vertical axis that ties the head to the panel. */
@@ -100,10 +115,16 @@
 }
 
 @media (min-width: 64rem) {
+  .flowHead {
+    padding-left: calc(var(--pad) + 1px);
+  }
+
   .flowMarkRow {
     display: grid;
     grid-template-columns: calc(var(--pad) + 1px) minmax(0, 1fr);
     gap: 0;
+    /* Pull the numeral back out onto the frame; the mark stays on the axis. */
+    margin-left: calc(-1 * (var(--pad) + 1px));
   }
 }
 
@@ -116,8 +137,42 @@
   color: var(--ink-2);
 }
 
-.flowMark {
+.flowMarkLine {
+  display: flex;
+  align-items: center;
   min-width: 0;
+}
+
+.flowMark {
+  flex: 1;
+  min-width: 0;
+}
+
+/* `.chapterMark::after` is the rule that continues the caption; this parks the
+   value at the end of it. The clear space is deliberately unequal: 12px from
+   the caption to the rule, 20px from the rule to the value, so the rule reads
+   as belonging to the word it continues rather than to the number it
+   terminates. The three column footers carry the same asymmetry. */
+.flowMarkVal {
+  flex: none;
+  margin-left: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.675rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-1);
+}
+
+/* Optically aligned, not box-aligned: at 60px the leading glyph carries ~2.5px
+   of side bearing, so the box is pulled back by that much and the ink lands on
+   the same x as the mono caption above it and the cell titles below it. */
+.flowTitle {
+  margin-top: 2.25rem;
+  margin-left: -0.042em;
+  /* Anchored jumps must not park the headline under the sticky header. */
+  scroll-margin-top: calc(var(--lp-header-h, 3.5rem) + 2.75rem);
 }
 
 .launchDemo {
@@ -127,7 +182,7 @@
 /* --- The framed three-up panel ------------------------------------------ */
 
 .flowGrid {
-  margin: 3.25rem 0 0;
+  margin: 2.5rem 0 0;
   padding: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -139,7 +194,11 @@
      rendered (78,83,77) and made the frame change weight where the horizontal
      met the vertical. Only the diagrams' own rules are lighter. */
   border-block: 1px solid var(--lp-hairline);
-  background: color-mix(in oklab, var(--card) 34%, transparent);
+  /* Either the band reads or it should not exist. At 34% it rendered (9,17,12)
+     against the (7,14,10) of the bands above and below — 2–3 per channel, under
+     the just-noticeable threshold, so it cost a token and bought nothing. Full
+     card gives a 9-point luminance step: the panel is now visibly a plate. */
+  background: var(--card);
 }
 
 .flowStep {
@@ -333,7 +392,12 @@
   margin-top: 1.5rem;
 }
 
+/* Unequal on purpose: 12px caption -> rule, 20px rule -> value. The rule is a
+   continuation of the caption, so it must read as attached to the word and
+   detached from the number. Symmetric 12/12 made the leader look like it was
+   underlining the value. */
 .footVal {
+  margin-left: 0.5rem;
   font-variant-numeric: tabular-nums;
   color: var(--ink-1);
 }
@@ -454,21 +518,36 @@
   clip-path: polygon(50% 100%, 0 0, 100% 0);
 }
 
+/* The band under it is now the full card surface, so in dark the card carries
+   its own step above it rather than being a translucent copy of it. The ladder
+   measures page 12.2 / field 15.9 / band 20.9 / card 25.9 / card foot 33.2.
+   In light the band is already the top surface (252.6 against a 243.6 page),
+   so the card holds `--card` and its border does the separating; lifting it
+   there would only take it away from the plate it sits on. */
 .miniCard {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-card);
-  background: color-mix(in oklab, var(--card) 72%, transparent);
+  background: var(--card);
 }
 
+:global(.dark) .miniCard {
+  background: color-mix(in oklab, var(--foreground) 3%, var(--card));
+}
+
+/* The card is inset on `--row-pad`, both sides — the same measure the search
+   rows and the route rows use, so all three columns present one text edge. The
+   old 8px inset put the description a hair off the border and left the source
+   line ragging 21px right of the name, because the fork glyph was in flow. */
 .miniBody {
   display: flex;
   flex-direction: column;
-  gap: 0.38rem;
-  padding: 0.62rem var(--ctrl-pad);
+  gap: 0.4rem;
+  padding: 0.85rem var(--row-pad);
 }
 
 .miniMeta {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -489,7 +568,17 @@
   color: var(--ink-2);
 }
 
+/* Hung on `--axis-mark`, out of the text flow: the connector still lands on the
+   card's fork glyph, and the source line starts on the same x as the name, the
+   description, the tags and the install command. Measured from the card's
+   border box — hence the 1px for its own border. */
 .miniFork {
+  position: absolute;
+  top: 50%;
+  left: calc(
+    var(--axis-mark) - var(--ctrl-icon) / 2 - 1px - var(--row-pad)
+  );
+  translate: 0 -50%;
   flex: none;
   width: var(--ctrl-icon);
   height: var(--ctrl-icon);
@@ -547,7 +636,7 @@
 }
 
 .miniFoot {
-  padding: 0.58rem var(--ctrl-pad);
+  padding: 0.72rem var(--row-pad);
   border-top: 1px solid var(--border);
   background: color-mix(in oklab, var(--foreground) 4%, transparent);
 }
@@ -613,27 +702,42 @@
 }
 
 /* The library list absorbs the column's slack, so the readout stays welded to
-   the bottom of the diagram and its gap above never changes. */
+   the bottom of the diagram and its gap above never changes. It closes on a
+   rule at the column's terminal, so all three columns end on the same line and
+   the space above the readout is a bracketed 24px rather than leftover. */
 .resultRest {
+  position: relative;
   flex: 1 0 auto;
 }
 
-/* Rows are flush with the cell: their dividers and the match band span the
-   full column, and their text is inset by `--row-pad` on BOTH sides, so the
-   name and its repo are equally clear of the band's edges. */
+.resultRest::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--lp-grid-line);
+}
+
+/* Rows are flush with the cell — the match band spans the full column, because
+   a band marks the row — but the dividers bracket what they divide: they start
+   and stop on `--row-pad`, the same axis the row's own text does. Full-bleed
+   dividers under inset text read as belonging to the cell, not the list.
+   The pitch is an exact 32px (7 + 18 + 7); at 0.42rem padding against a 1.5
+   line-height it computed to 31.78 and rendered 31 / 32 / 32 down the list. */
 .resultRow {
   position: relative;
   isolation: isolate;
   display: flex;
   align-items: baseline;
   gap: 0.6rem;
-  padding: 0.42rem var(--row-pad);
+  height: 2rem;
+  padding: 7px var(--row-pad);
 }
 
 .resultRow:not(:last-child)::after {
   content: "";
   position: absolute;
-  inset: auto 0 0 0;
+  inset: auto var(--row-pad) 0;
   height: 1px;
   background: var(--lp-grid-line);
 }
@@ -662,7 +766,7 @@
   font-size: 0.765rem;
   font-weight: 600;
   letter-spacing: -0.022em;
-  line-height: 1.5;
+  line-height: 18px;
   color: var(--ink-1);
 }
 
@@ -700,7 +804,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: var(--m-meta);
-  line-height: 1.5;
+  line-height: 18px;
   color: var(--ink-2);
 }
 
@@ -708,19 +812,23 @@
    03 — one saved skill branches into the four ways out
 --------------------------------------------------------------------------- */
 
-/* Same control height, same leading glyph and the same text axis as the two
-   fields that open the other diagrams. */
+/* The same control as the two fields that open the other diagrams: same box,
+   same height, same field, same leading glyph on `--axis-mark`, same text on
+   `--row-pad`. As a shrink-wrapped chip it was the only opening control in the
+   chapter that did not span its column, which made the stem hanging off its
+   icon look arbitrary — it aligned to neither the chip's edge nor its centre.
+   Full measure, and the stem is obviously on the mark axis, exactly as the
+   connector in column 1 is. */
 .fanNode {
-  align-self: flex-start;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--ctrl-gap);
   margin: 0;
   min-height: 2.2rem;
-  padding: 0.48rem 0.72rem 0.48rem var(--ctrl-pad);
+  padding: 0 var(--ctrl-pad);
   border: 1px solid var(--lp-hairline-strong);
   border-radius: var(--r-control);
-  background: color-mix(in oklab, var(--card) 82%, transparent);
+  background: color-mix(in oklab, var(--background) 55%, transparent);
   font-size: 0.78rem;
   font-weight: 620;
   letter-spacing: -0.028em;
@@ -731,14 +839,16 @@
   color: var(--primary);
 }
 
-/* A short fixed stem out of the node, then a table that fills the rest of the
-   register: the four branches share the slack evenly, so the last branch lands
-   on the same line as the other two columns' last element. */
+/* The stem is the elastic part of this diagram, exactly as the connector is in
+   column 1: node fixed at the top, table fixed at the bottom, wire spanning
+   whatever is between. Sharing the slack across the four branches instead made
+   the row pitch fractional — 50.28px, rendering 51 / 50 / 49, no two gaps in
+   the tree equal. */
 .fanStem {
-  flex: none;
+  flex: 1 1 auto;
   align-self: flex-start;
   width: 1px;
-  height: 1.3rem;
+  min-height: 1.3rem;
   margin-left: calc(var(--axis-mark) - 0.5px);
   background: var(--wire);
   transform-origin: top center;
@@ -747,11 +857,21 @@
 .fanList {
   position: relative;
   display: flex;
-  flex: 1;
+  flex: none;
   flex-direction: column;
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* The list closes on a rule at the column's terminal, level with the card's
+   bottom border in column 1 and the library's closing rule in column 2. */
+.fanList::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--lp-grid-line);
 }
 
 /* The spine continues the stem down to the last branch's centre. Four rows of
@@ -770,22 +890,23 @@
 
 /* Same padding, same terminal and the same trailing-divider rule as the search
    results: no rule under the last row, so nothing is left dangling. */
+/* Fixed pitch, one number, every width. */
 .fanRow {
   position: relative;
   display: flex;
-  flex: 1;
+  flex: none;
   align-items: center;
   gap: 0.6rem;
-  /* The stacked layout has no shared row to fill, so this is also the row's
-     resting pitch on mobile. */
-  min-height: 2.64rem;
+  height: 3rem;
   padding-inline: var(--row-pad);
 }
 
+/* Bracketed on `--row-pad` like the library's dividers, which also keeps them
+   off the spine: at full bleed they ran straight through the tree's stem. */
 .fanRow:not(:last-child)::after {
   content: "";
   position: absolute;
-  inset: auto 0 0 0;
+  inset: auto var(--row-pad) 0;
   height: 1px;
   background: var(--lp-grid-line);
 }

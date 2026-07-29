@@ -154,6 +154,14 @@
   }
 }
 
+/* Below the pinned layout the strip is not a band of its own — it sits directly
+   over the headline — so it carries the register gap as a margin instead. */
+@media (max-width: 63.99rem) {
+  .heroTop {
+    margin-bottom: 1.25rem;
+  }
+}
+
 /* Chapter index — identical spec to the other chapters' header marks. */
 .heroIndex {
   flex: none;
@@ -818,7 +826,7 @@
   );
   box-shadow: 0 1px 0
     color-mix(in oklab, var(--foreground) calc(var(--frame-p) * 4%), transparent);
-  opacity: calc(0.3 + 0.7 * var(--frame-p));
+  opacity: calc(0.22 + 0.78 * var(--frame-p));
   translate: calc(var(--px) * -5px) calc(
       (1 - var(--frame-p)) * 14px + var(--py) * -4px
     );
@@ -1341,7 +1349,6 @@
 
 .sourceSlash {
   color: var(--ink-lo);
-  opacity: 0.6;
 }
 
 .sourceRepo {

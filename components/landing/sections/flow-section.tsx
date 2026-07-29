@@ -85,16 +85,26 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
             <span className={styles.flowIndex} aria-hidden="true">
               02
             </span>
-            <p
-              className={`${base.chapterMark} ${styles.flowMark} uppercase`}
-              data-decode=""
-            >
-              How it works
-            </p>
+            {/* The chapter head is the same object the three columns close
+                with: caption, hairline, measured value. Top and bottom of the
+                chapter now rhyme instead of the top being bare text. The value
+                sits outside the decoded label — `data-decode` rewrites that
+                element's text, so anything nested inside it is destroyed. */}
+            <div className={styles.flowMarkLine}>
+              <p
+                className={`${base.chapterMark} ${styles.flowMark} uppercase`}
+                data-decode=""
+              >
+                How it works
+              </p>
+              <span className={styles.flowMarkVal} aria-hidden="true">
+                3 steps
+              </span>
+            </div>
           </div>
           <h2
             id="flow-heading"
-            className="mt-5 max-w-[18ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl"
+            className={`${styles.flowTitle} max-w-[18ch] text-balance text-4xl font-semibold leading-[1.0] tracking-display md:text-6xl`}
           >
             Save once. Find fast. Use it your way.
           </h2>

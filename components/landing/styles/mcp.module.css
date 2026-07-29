@@ -32,8 +32,35 @@
   --col-label-gap: 0.85rem;
   --footer-band: 6rem;
   --frame-pad: clamp(3rem, 7vw, 4.25rem);
+  /* Clear space either side of every vertical rule in the chapter — the frame
+     rails and the pane spine alike. Same three steps as the chapter above's
+     `--pad`, so two stacked sections hold their content the same distance off
+     their rules instead of 29px and 37px. */
+  --rule-clear: 1.25rem;
   --wire-casing: color-mix(in oklch, var(--foreground) 13%, transparent);
   --wire-glow: color-mix(in oklch, var(--primary) 55%, transparent);
+
+  /* Two grades of signal ink, so the diagram's brightest lines are the ones
+     carrying the most meaning. `--signal` is the route the chapter is about —
+     library edge → gateway → the three agent ports. `--signal-feed` is the
+     library-side collector that fills before the route exists: real, legible,
+     and visibly a stage earlier. Everything used to be at full strength at
+     once, which left the diagram with no internal rank and put more light on
+     the page than the page's own structure carried. */
+  --signal: var(--primary);
+  --signal-feed: color-mix(in oklch, var(--primary) 58%, transparent);
+}
+
+@media (min-width: 64rem) {
+  .mcpChapter {
+    --rule-clear: 1.5rem;
+  }
+}
+
+@media (min-width: 84rem) {
+  .mcpChapter {
+    --rule-clear: 1.75rem;
+  }
 }
 
 /* Short desktop viewports: step the module down rather than clip the
@@ -75,7 +102,10 @@
      its rails ~8px inboard of the frame's, which read as a doubled edge. */
   max-width: calc(var(--lp-measure) - 2 * var(--lp-gutter));
   margin-inline: auto;
-  padding-inline: clamp(1.25rem, 2.6vw, 2.25rem);
+  /* Below the frame's breakpoint the chapter is a normal page-width spread, so
+     it takes the page's own gutter — `px-5 / md:px-10` — rather than a private
+     clamp that ran 20px wide where every other chapter ran 40. */
+  padding-inline: var(--lp-gutter);
   padding-block: var(--frame-pad);
 }
 
@@ -89,6 +119,10 @@
 
   .frame {
     border-inline: 1px solid var(--lp-hairline);
+    /* Nothing is inset by the frame itself. Every band inside it carries the
+       page's own `--rule-clear`, measured from the rule beside it, so the
+       chapter's content column is the chapter above's content column. */
+    padding-inline: 0;
   }
 
   /* Only the pinned version trades page padding for viewport height; the
@@ -110,6 +144,17 @@
   gap: 1rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--lp-hairline);
+}
+
+@media (min-width: 64rem) {
+  /* The strip's rule runs rail to rail — it is one of the frame's own edges,
+     like the panel rules in the chapter above — while its type keeps the
+     page's clear space off the rails. Two right-hand terminations in the
+     header, not four: the rule ends on the frame, the type ends on the
+     content column. */
+  .frameTop {
+    padding-inline: var(--rule-clear);
+  }
 }
 
 .frameIndex {
@@ -147,9 +192,16 @@
   color: var(--muted-foreground);
 }
 
+/* The stack is sized to hold its longest phase, so a short phase used to leave
+   up to 31px of slack and the word ended nowhere in particular. It is set from
+   the right instead, and pulled back by its own trailing letter-space, so every
+   phase — STANDBY, INDEXING, LIVE — terminates on the same column edge as the
+   caption and the endpoint plate below it. */
 .readoutStack {
   display: grid;
+  justify-items: end;
   min-width: 5.1rem;
+  margin-right: -0.18em;
 }
 
 .readoutStack > span {
@@ -185,7 +237,7 @@
   .frameBody {
     flex: 1;
     min-height: 0;
-    grid-template-columns: minmax(15rem, 0.76fr) 1px minmax(0, 1.24fr);
+    grid-template-columns: minmax(15rem, 0.78fr) 0px minmax(0, 1.22fr);
     gap: 0;
     align-items: stretch;
     padding-block: 0;
@@ -206,34 +258,61 @@
   }
 }
 
+/* The chapter's divider IS the page's first column rule.
+   ------------------------------------------------------
+   The chapter above tiles the measure into three equal rule-to-rule spans and
+   draws its dividers at x = 493 and x = 946 (1440 viewport). This chapter's
+   spine used to sit at 540: a 47px near-miss, which reads as a mistake rather
+   than a decision. It is now derived from the same arithmetic, so it lands on
+   x = 493 exactly, at every width where the page draws that rule.
+
+     page measure M   = frame border box              (1360)
+     page column rule = rail + (M - 1) / 3            (40 + 453 = 493)
+     this grid starts = rail + 1 (inside the frame's own rail)
+     => track A       = (M - 1) / 3 - 1 = (100% + 1px) / 3 - 1px
+
+   The copy pane is therefore page column 1 and the schematic is page columns
+   2–3, with `--rule-clear` either side of every rule. */
 @media (min-width: 84rem) {
   .frameBody {
-    grid-template-columns: minmax(16rem, 0.72fr) 1px minmax(0, 1.28fr);
+    grid-template-columns:
+      calc((100% + 1px) / 3 - 1px)
+      1px
+      minmax(0, 1fr);
+  }
+
+  .copyCol {
+    padding-inline: var(--rule-clear);
+  }
+
+  .schematic {
+    padding-inline: var(--rule-clear);
   }
 }
 
 /* Narrow desktops: tighten the frame's own insets and give the copy pane the
    extra, so the display line keeps a measure wide enough to hold its first
    line whole. Below this the diagram would start truncating skill names. */
+/* Narrow desktops: one third of a 944px measure is 314px, and the chapter's
+   primary action alone is 290px wide, so the copy pane cannot be page column 1
+   here. Rather than park the divider 50-odd pixels off the page's rule — the
+   same near-miss one breakpoint down — the chapter drops the divider entirely
+   in this band and separates the panes with air. The rule exists only where it
+   can be the page's own rule. Content still clears every rail by
+   `--rule-clear`, so the inset story is unchanged. */
 @media (min-width: 64rem) and (max-width: 83.9975rem) {
   .mcpChapter {
     --gw: clamp(6rem, 10.8vw, 9.5rem);
   }
 
-  .frame {
-    padding-inline: 1.25rem;
-  }
-
-  .frameBody {
-    grid-template-columns: minmax(15rem, 0.76fr) 1px minmax(0, 1.24fr);
-  }
-
   .copyCol {
-    padding-right: 1.5rem;
+    padding-left: var(--rule-clear);
+    padding-right: 2rem;
   }
 
   .schematic {
-    padding-left: 1.5rem;
+    padding-left: 2rem;
+    padding-right: var(--rule-clear);
   }
 
   .libraryHead,
@@ -256,7 +335,6 @@
   .copyCol {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
-    padding-right: clamp(1.5rem, 3vw, 2.75rem);
   }
 }
 
@@ -363,7 +441,6 @@
   .schematic {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
-    padding-left: clamp(1.5rem, 3vw, 2.75rem);
   }
 }
 
@@ -407,11 +484,17 @@
 
 /* --- Library panel ------------------------------------------------------- */
 
+/* Card edges carry the frame's value, never more. Measured on the dark field
+   the page rails render (44,49,47) at L=0.029; these used to render (83,83,78)
+   at L=0.086 — a diagram's container outranking the page's own boundary by
+   3×. They are the same rule as the frame now, and the rows they hold are
+   divided by the lighter grid ink, which gives the diagram two steps of
+   structure that both sit *under* the page's one. */
 .libraryPanel,
 .agentActions {
   position: relative;
   z-index: 1;
-  border: 1px solid var(--lp-hairline-strong);
+  border: 1px solid var(--lp-hairline);
   border-radius: 3px;
   background: linear-gradient(
     180deg,
@@ -433,7 +516,7 @@
      lay the bus back over the 1px border it is supposed to sit beside. */
   right: -3px;
   width: 2px;
-  background: var(--primary);
+  background: var(--signal-feed);
   transform: scaleY(1);
   transform-origin: top center;
 }
@@ -457,7 +540,7 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--lp-hairline);
+  background: var(--lp-grid-line);
 }
 
 .schemaStackTitle {
@@ -488,7 +571,7 @@
   width: calc(0.9rem + 3px);
   height: 2px;
   margin-top: -1px;
-  background: var(--primary);
+  background: var(--signal-feed);
   transform: scaleX(1);
   transform-origin: right center;
 }
@@ -536,8 +619,8 @@
   flex: none;
   width: 0.4rem;
   height: 0.4rem;
-  border: 1px solid var(--primary);
-  background: var(--primary);
+  border: 1px solid var(--signal-feed);
+  background: var(--signal-feed);
 }
 
 /* --- Gateway ------------------------------------------------------------- */
@@ -569,7 +652,7 @@
   width: 2px;
   height: 100%;
   margin-left: -1px;
-  background: var(--primary);
+  background: var(--signal);
   transform: scaleY(1);
   transform-origin: top center;
 }
@@ -612,11 +695,14 @@
   background: var(--wire-casing);
 }
 
+/* The route. No halo: a 7px bloom on every run is what made a diagram
+   annotation throw more light than the page frame does. The one glow left in
+   the chapter belongs to the gateway, which is the only element reporting
+   state. */
 .wire::after {
   content: "";
   position: absolute;
-  background: var(--primary);
-  box-shadow: 0 0 7px color-mix(in oklch, var(--primary) 42%, transparent);
+  background: var(--signal);
 }
 
 .wire[data-axis="x"] {
@@ -701,7 +787,7 @@
     height: 7px;
     margin-left: -3.5px;
     margin-top: -3.5px;
-    background: var(--primary);
+    background: var(--signal);
     transform: scale(1);
   }
 
@@ -784,7 +870,7 @@
   width: 6.25rem;
   aspect-ratio: 1;
   background: var(--background);
-  border: 1px solid var(--lp-hairline-strong);
+  border: 1px solid var(--lp-hairline);
   border-radius: 3px;
 }
 
@@ -866,7 +952,7 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--lp-hairline);
+  background: var(--lp-grid-line);
 }
 
 /* Activation rule: hairline by default, primary once the port is armed. */
@@ -1120,7 +1206,7 @@
   :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRowTick {
     background: color-mix(
       in oklch,
-      var(--primary) calc(var(--r, 1) * 100%),
+      var(--primary) calc(var(--r, 1) * 58%),
       transparent
     );
   }

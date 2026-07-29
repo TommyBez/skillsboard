@@ -167,6 +167,15 @@ export async function HomeHeroActions() {
   return <HomeHeroActionsView signedIn={Boolean(session?.user)} />
 }
 
+/**
+ * The hero offers two actions, so its placeholder has to as well — the generic
+ * one renders a single button, which without script left the hero permanently
+ * missing its secondary route into the MCP chapter.
+ */
+export function HomeHeroActionsFallback() {
+  return <HomeHeroActionsView signedIn={false} />
+}
+
 function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
   const href = signedIn ? "/settings/mcp" : "/sign-up"
 

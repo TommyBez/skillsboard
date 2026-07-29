@@ -73,6 +73,10 @@
      button edge as a leading cap does. */
   --lp-mark-bearing: calc(3 / 32 * 1.75rem);
   --lp-arrow-bearing: 0.2084em;
+  /* `--lp-mark-rise`: how far the brand mark has to come up to centre on the
+     wordmark's type rather than on its line box. Mean of the cap-band centre
+     and the ascender-band centre; derived in the `.brandLockup` note. */
+  --lp-mark-rise: 0.75px;
 
   position: relative;
 }
@@ -141,10 +145,27 @@
 
    The single strongest structural signal on the page: every chapter is seen
    to live inside one deliberate measure. Fixed, so the rails are continuous
-   by construction; `difference` ink, so they survive the inverted pricing
-   monument without a second theme-keyed layer. Never hit-tests, never
-   reflows anything, sits above section fields but below the command strip so
-   the header rule reads as the frame's top edge.
+   by construction. Never hit-tests, never reflows anything, sits above section
+   fields but below the command strip so the header rule reads as the frame's
+   top edge.
+
+   ONE FRAME, ONE VALUE. The ink is still `difference` over white — that is
+   what keeps it theme-agnostic — but it is now composited against the rail's
+   *own* field rather than against whatever band happens to be behind it. That
+   matters because several chapters draw their own vertical border on exactly
+   this measure (the MCP instrument frame at 40/1399, the closing sheet), and
+   a translucent or blended rail landing on top of one of those renders as a
+   different value than the same rail two hundred pixels higher: measured, the
+   left rail ran 46.8 down the hero and the columns and 71.9 through the MCP
+   chapter — a 54% jump at a band boundary, on a line that is meant to be one
+   continuous edge of one rectangle.
+
+   `background: var(--background)` gives the rail a constant backdrop and
+   `isolation: isolate` scopes the difference blend to it, so the rail prints
+   exactly the same value from the header rule to the bottom of the page,
+   including where it covers a chapter's duplicate of itself. Rendered weight
+   over the page field is unchanged from the blended version — this is the
+   same ink, made independent of what is underneath it.
 --------------------------------------------------------------------------- */
 
 .frameRail {
@@ -154,10 +175,19 @@
   z-index: 20;
   display: none;
   width: 1px;
+  /* the rail's own field: the constant backdrop the ink is measured against */
+  background: var(--background);
+  isolation: isolate;
+  pointer-events: none;
+}
+
+.frameRail::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background: #fff;
   opacity: var(--lp-frame-ink);
   mix-blend-mode: difference;
-  pointer-events: none;
 }
 
 .frameRail[data-side="start"] {
@@ -261,6 +291,21 @@
 .brandLockup {
   display: inline-flex;
   margin-inline-start: calc(-1 * var(--lp-mark-bearing));
+}
+
+/* The lockup is centred on its type, not on its line box.
+   `align-items: center` centres the 28px mark box on the centre of the
+   wordmark's 16.8px line box — but the wordmark's ink is not centred in that
+   line box. Bricolage sets a 5/16.8 descent that no letter in "Skills Board"
+   uses, so at 1440 the visible ink runs from the ascender line (y=21.06) to
+   the baseline (y=33.0) with the cap band at 21.94–33.0, while the mark's own
+   ink (path y 3→29 of a 32 viewBox, symmetric) centres dead on the box at
+   y=28.0. Measured: 0.53px below the cap centre, 0.97px below the ascender
+   centre — small, but on an 11px cap height it is the difference between a
+   lockup and two things next to each other. Lift by the mean of the two
+   optical centres so the mark sits within a quarter pixel of both. */
+.brandLockup :global(.brand-mark) {
+  translate: 0 calc(-1 * var(--lp-mark-rise));
 }
 
 /* Theme toggle sits in the CTA cluster: same 3px language, same optical
@@ -475,55 +520,70 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Scroll progress — a playhead on the measure rule, not a second border
+   Scroll progress — a gauge inside the strip, on its own row
 
-   The old indicator was a green ramp filling the same 1px row as the header
-   rule, brightening left to right and then cutting to flat grey wherever the
-   page happened to be. As a still it read as a broken border: a rule that
-   changes colour two thirds of the way across, at a coordinate that aligns to
-   nothing.
+   Two earlier versions of this failed the same way. Both drew the travelled
+   distance in the *same 1px row as the header rule*, so whatever else changed,
+   the first reading was always "a border that changes colour partway across":
+   one stroke doing two jobs, and the eye resolves a full-width 1px line at the
+   bottom edge of a bar as an edge long before it resolves it as a gauge.
 
-   It reads as a *position* now because it has a head. A flat, quiet accent
-   trace covers the distance travelled; a full-strength 8px riser stands on the
-   rule at the leading edge and travels from the left frame rail to the right
-   frame rail across the page. Wherever it stops there is a mark saying "here",
-   so the change of ink is an event and not an edge. Absent without JS and
-   under reduced motion, where it could never advance.
+   Sharing the row was the fault, so the gauge leaves the row. It sits four
+   pixels up inside the strip's own field, clear of the 36px control cluster
+   above and of the rule below, and it is 2px thick — twice any rule the chrome
+   draws, so it cannot be mistaken for one even where the two are read
+   together. It also never spans the measure except at the very bottom of the
+   page, which is the one place where "you are at the end" is the correct
+   reading of a full-width run.
+
+   The head is a real terminal now: a 4×4 accent knob, centred on the 2px
+   track, riding the leading edge — the previous 1px riser was 8px of hairline
+   standing on the rule with a flat open top, which read as a rendering
+   artefact rather than a playhead. The knob has a top, a bottom and a width;
+   it is the mark that says "here", and the quieter trace behind it is the
+   distance it has covered. Absent without JS and under reduced motion, where
+   it could never advance.
 --------------------------------------------------------------------------- */
 
 .scrollProgress {
   position: absolute;
   left: var(--lp-frame-inset);
   right: var(--lp-frame-inset);
-  bottom: 0;
-  height: 1px;
+  /* off the rule's row: rule occupies the bottom 1px, gauge is 2px tall with
+     2px of air under it and the knob clearing the controls above by 3px */
+  bottom: 4px;
+  height: 2px;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--lp-dur-reveal) var(--lp-ease-out);
 }
 
-/* distance covered — flat, deliberately quieter than the head */
+/* Distance covered — flat, deliberately quieter than the head. Inset by the
+   knob's half-width on the trailing side so the run's end and the knob's
+   centre agree at both ends of the travel. */
 .scrollProgress::after {
   content: "";
   position: absolute;
-  inset: 0;
-  background: color-mix(in oklab, var(--primary) 50%, transparent);
+  inset: 0 2px 0 0;
+  background: color-mix(in oklab, var(--primary) 45%, transparent);
   transform: scaleX(var(--scroll-progress, 0));
   transform-origin: left center;
 }
 
-/* The head. The element spans the whole track and carries the mark on its
+/* The knob. The element spans the whole track and carries the mark on its
    trailing edge, so it can be moved with a percentage translate of its own
-   width — transform only, no per-frame layout, and it lands exactly on the
-   left frame rail at 0 and the right frame rail at 1. */
+   width — transform only, no per-frame layout — and `100% - 4px` lands the
+   knob flush inside the left frame rail at 0 and flush inside the right frame
+   rail at 1 rather than half off the end. */
 .scrollHead {
   position: absolute;
-  bottom: 0;
+  top: 50%;
   left: 0;
-  right: 1px;
-  height: 0.5rem;
-  border-inline-end: 1px solid var(--primary);
-  translate: calc((var(--scroll-progress, 0) - 1) * 100% + 1px) 0;
+  right: 0;
+  height: 4px;
+  margin-block-start: -2px;
+  border-inline-end: 4px solid var(--primary);
+  translate: calc((var(--scroll-progress, 0) - 1) * (100% - 4px)) 0;
 }
 
 .root[data-scrolled][data-motion-enabled="true"] .scrollProgress {
