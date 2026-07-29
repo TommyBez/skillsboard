@@ -1794,6 +1794,15 @@
   background: color-mix(in oklab, var(--card) 78%, transparent);
 }
 
+/* The stage's gutter is a desktop quantity (`--pp` lives on the board), and the
+   +1px on the closing side pays for the page frame's rail, which is the desktop
+   drawer's right edge. Neither applies here: this panel has four borders of its
+   own, so its head and base take the same padding as its rows. */
+.mobileLibrary .libraryHead,
+.mobileLibrary .libraryFoot {
+  padding-inline: 0.75rem;
+}
+
 .mobileLibrary .libraryHead {
   height: 2.75rem;
 }

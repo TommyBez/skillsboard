@@ -1274,7 +1274,8 @@
 
   .actionState {
     font-size: 0.55rem;
-    padding-left: 0.5rem;
+    min-width: 0;
+    padding-left: 0.45rem;
   }
 }
 

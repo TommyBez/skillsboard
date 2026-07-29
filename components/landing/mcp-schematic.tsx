@@ -18,7 +18,7 @@ const mcpTools = [
     name: "Get install commands",
     tool: "get_skill_command",
     arg: "(skillId: uuid)",
-    ret: "\u2192 install command",
+    ret: "\u2192 string",
   },
 ] as const
 
