@@ -130,7 +130,7 @@
 }
 
 .faqStripKey {
-  color: color-mix(in oklab, var(--muted-foreground) 74%, transparent);
+  color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
 }
 
 .faqStripValue {
@@ -149,7 +149,7 @@
 .faqStripTotal {
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklab, var(--muted-foreground) 74%, transparent);
+  color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
 }
 
 /* The register's state, read off the DOM with no script. */
@@ -193,7 +193,9 @@
 }
 
 /* Foot rule: same span and same weight as the strip's rule, so the chapter is
-   bracketed top and bottom on the page measure. */
+   bracketed top and bottom on the page measure. Its left end carries a short
+   accent segment — the same terminus the page's colophon rule uses — which
+   also gives the title cell a floor to sit on. */
 .faqBody::after {
   content: "";
   position: absolute;
@@ -201,21 +203,15 @@
   right: 0;
   bottom: 0;
   height: 1px;
-  background: var(--lp-hairline-strong);
-  transform: scaleX(1);
-  transform-origin: right center;
-  pointer-events: none;
-}
-
-/* Terminus. The page ends its blocks on a short accent segment at the left of
-   the closing rule (the colophon rule does the same); here it also gives the
-   title cell a floor to sit on. */
-.faqBody::after {
+  background-color: var(--lp-hairline-strong);
   background-image: linear-gradient(
     to right,
     var(--primary) 0 2.25rem,
     transparent 2.25rem
   );
+  transform: scaleX(1);
+  transform-origin: right center;
+  pointer-events: none;
 }
 
 @media (min-width: 64rem) {
@@ -404,6 +400,41 @@
   text-wrap: pretty;
 }
 
+/* Leader. Ruled at grid weight so a closed register still reads as a table;
+   it comes up to hairline on hover, focus and open — the same "wire between a
+   source and its port" the routing chapter uses.
+
+   It only exists where the row has slack to give it. Below 80rem the longest
+   question already fills its column, and a fourth track would cost a gap the
+   question needs — two of the eight rows would wrap and the register's row
+   rhythm would break. A leader is worth less than an even rhythm. */
+.faqLead {
+  display: none;
+  align-self: start;
+  margin-top: var(--faq-first-line-c);
+  height: 1px;
+  background: var(--lp-grid-line);
+  transform: scaleX(1);
+  transform-origin: left center;
+  transition: background-color 200ms var(--lp-ease-snap);
+}
+
+.faqItem[open] .faqLead {
+  background: color-mix(in oklch, var(--primary) 38%, transparent);
+}
+
+@media (min-width: 80rem) {
+  .faqSummary {
+    grid-template-columns:
+      var(--faq-num-w) minmax(0, max-content)
+      minmax(0, 1fr) auto;
+  }
+
+  .faqLead {
+    display: block;
+  }
+}
+
 /* Boxed +/− glyph, optically centred on the question's first line. */
 .faqGlyph {
   position: relative;
@@ -475,6 +506,10 @@
     color: var(--foreground);
   }
 
+  .faqIndex .faqItem:has(> .faqSummary:hover) .faqLead {
+    background: var(--lp-hairline);
+  }
+
   /* The glyph fills in on hover: the row is not just highlighted, the control
      inside it declares itself as the thing you are about to press. */
   .faqIndex .faqItem:has(> .faqSummary:hover) .faqGlyph {
@@ -492,6 +527,10 @@
 
 .faqIndex .faqItem:has(> .faqSummary:focus-visible)::after {
   transform: scaleX(1);
+}
+
+.faqIndex .faqItem:has(> .faqSummary:focus-visible) .faqLead {
+  background: var(--lp-hairline);
 }
 
 /* ---------------------------------------------------------------------------
@@ -700,6 +739,7 @@
   .faqGlyph::before,
   .faqGlyph::after,
   .faqStripValue,
+  .faqLead,
   .faqAnswer {
     transition: none;
   }

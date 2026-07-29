@@ -59,6 +59,9 @@ export function FaqSection() {
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span className={styles.faqQuestion}>{faq.question}</span>
+                  {/* Leader: ties the entry to its control the way a contents
+                      page ties a title to its folio. */}
+                  <span className={styles.faqLead} aria-hidden="true" />
                   <span className={styles.faqGlyph} aria-hidden="true" />
                 </summary>
                 <div className={styles.faqAnswerWrap}>

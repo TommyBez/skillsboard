@@ -418,7 +418,7 @@
   font-family: var(--font-mono);
   font-size: 0.625rem;
   letter-spacing: 0.02em;
-  color: color-mix(in oklch, var(--foreground) 38%, transparent);
+  color: color-mix(in oklch, var(--foreground) 48%, transparent);
   white-space: nowrap;
 }
 
@@ -440,7 +440,7 @@
 }
 
 .plateRow[data-marked] .plateSource {
-  color: color-mix(in oklch, var(--foreground) 58%, transparent);
+  color: color-mix(in oklch, var(--foreground) 66%, transparent);
 }
 
 .plateName {
@@ -489,7 +489,7 @@
   font-weight: 600;
   letter-spacing: 0.16em;
   color: var(--muted-foreground);
-  opacity: 0.62;
+  opacity: 0.78;
 }
 
 @media (min-width: 82rem) {

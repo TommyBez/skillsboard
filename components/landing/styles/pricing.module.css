@@ -35,21 +35,17 @@
   --rule-gap: 0.85rem;
   --os: 0px;
   --os-x: 4px;
-  --num-w: min(46vw, 12.5rem);
+  --num-w: min(76vw, 17rem);
   --num-h: calc(var(--num-w) * 1.4);
 
   /* --- Press run ---------------------------------------------------------
-     1 = fully printed. The controller drives it down to 0 and back only where
-     a scroll runway exists; every default here is the finished state. */
+     The plate is ruled up on arrival; the key ink is pulled across the numeral
+     on the scroll runway. `--p` is 1 = fully printed, and the controller drives
+     it down to 0 and back only where a runway exists, so every default here is
+     the finished state. Before the ink arrives the numeral shows as a blind
+     impression, never as a hole. */
   --p: 1;
-
-  --p-rule: clamp(0, calc((var(--p) - 0.03) / 0.22), 1);
-  --e-rule: calc(var(--p-rule) * var(--p-rule) * (3 - 2 * var(--p-rule)));
-  --p-div: clamp(0, calc((var(--p) - 0.11) / 0.22), 1);
-  --e-div: calc(var(--p-div) * var(--p-div) * (3 - 2 * var(--p-div)));
-  --p-base: clamp(0, calc((var(--p) - 0.19) / 0.22), 1);
-  --e-base: calc(var(--p-base) * var(--p-base) * (3 - 2 * var(--p-base)));
-  --p-ink: clamp(0, calc((var(--p) - 0.34) / 0.42), 1);
+  --p-ink: clamp(0, calc((var(--p) - 0.06) / 0.5), 1);
   --e-ink: calc(var(--p-ink) * var(--p-ink) * (3 - 2 * var(--p-ink)));
 
   position: relative;
@@ -157,12 +153,12 @@
 
 .ruleTop {
   top: calc(var(--pad) + var(--index-h) + var(--rule-gap));
-  transform: scaleX(var(--e-rule));
+  --rd: 90ms;
 }
 
 .ruleBase {
   bottom: var(--pad);
-  transform: scaleX(var(--e-base));
+  --rd: 400ms;
 }
 
 /* --- The numeral ----------------------------------------------------------- */
@@ -187,12 +183,14 @@
   fill: var(--plate-key);
 }
 
-/* The pull: plate-coloured, retreating right as the key ink is laid down. */
+/* The pull: near plate-coloured, retreating right as the key ink is laid down.
+   It is not fully opaque, so what it covers reads as a blind impression of the
+   numeral waiting for ink rather than as an empty cell. */
 .wipe {
   position: absolute;
   z-index: 2;
   inset: 0;
-  background: var(--plate-field);
+  background: color-mix(in oklab, var(--plate-field) 88%, transparent);
   transform-origin: 100% 50%;
   transform: scaleX(calc(1 - var(--e-ink)));
 }
@@ -223,14 +221,35 @@
   margin-top: clamp(1.75rem, 5vw, 2.5rem);
 }
 
+/* The statement is the first cell of the right column's ledger; the rule under
+   it is the same rule that separates the three absences below. */
+.statement {
+  position: relative;
+  padding-bottom: clamp(1.5rem, 2.4vw, 2.1rem);
+}
+
+.statement::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  left: calc(-1 * var(--pad));
+  right: calc(-1 * var(--pad));
+  bottom: 0;
+  height: 1px;
+  background: var(--plate-rule);
+  transform-origin: left center;
+  --rd: 250ms;
+}
+
 .heading {
   max-width: 4.6em;
   font-size: clamp(2.5rem, 9.4vw, 8.5rem);
   font-weight: 650;
   line-height: 0.88;
   letter-spacing: -0.048em;
-  /* Side-bearing correction: the display line is the one that needs it. */
-  margin-left: -0.035em;
+  /* Side-bearing correction: the display line is the one that needs it, so
+     its stem lands on the same column line as the mono and the lede. */
+  margin-left: -0.038em;
   /* Pull the cap-height of the first line onto the top rule. */
   margin-top: -0.1em;
 }
@@ -248,7 +267,6 @@
 .spec {
   display: grid;
   list-style: none;
-  margin-top: clamp(1.5rem, 3vw, 2.25rem);
 }
 
 .specRow {
@@ -274,9 +292,7 @@
   height: 1px;
   background: var(--plate-rule);
   transform-origin: left center;
-  transform: scaleX(
-    clamp(0, calc((var(--p) - (0.14 + var(--i, 0) * 0.055)) / 0.22), 1)
-  );
+  --rd: calc(310ms + var(--i, 0) * 70ms);
 }
 
 /* --- Narrow: the plate fills the measure and the ledger runs its full width - */
@@ -285,19 +301,22 @@
   display: none;
 }
 
-/* --- Desktop: an inset plate, pinned, printed on scroll -------------------- */
+/* --- Wide: two columns, and every measurement derived from the numeral ----- */
 
-@media (min-width: 64rem) {
+@media (min-width: 48rem) {
   .pricingSection {
-    /* Every column below is derived from these five numbers. */
+    /* Every column below is derived from these numbers. The plate's aspect is
+       fixed, the numeral is drawn to the exact height of the body, and its
+       width — the letterform's own 380 : 532 — *is* the first column. */
+    --plate-frac: 1;
     --plate-cap: min(70vh, 39rem);
     --measure-w: calc(min(1440px, 100vw) - 2 * var(--gutter));
     --plate-w: min(
-      calc(var(--measure-w) * 0.75),
+      calc(var(--measure-w) * var(--plate-frac)),
       calc(var(--plate-cap) / 0.612)
     );
     --plate-h: calc(var(--plate-w) * 0.612);
-    --pad: clamp(1.5rem, calc(var(--plate-w) * 0.0392), 2.5rem);
+    --pad: clamp(1.35rem, calc(var(--plate-w) * 0.0392), 2.5rem);
     --rule-gap: 0.9rem;
     --body-h: calc(
       var(--plate-h) - 2 * var(--pad) - var(--index-h) - var(--rule-gap) - 1px
@@ -341,7 +360,7 @@
     width: 1px;
     background: var(--plate-rule);
     transform-origin: center top;
-    transform: scaleY(var(--e-div));
+    --rd: 170ms;
   }
 
   .spec {
@@ -351,6 +370,16 @@
 
   .specRow {
     padding-block: 0 0.75rem;
+  }
+}
+
+/* --- Desktop: the plate is inset inside the page frame, pinned, and printed
+   as you scroll. Three quarters of the measure, so the frame's rails run past
+   it on both sides instead of being erased by it. --------------------------- */
+
+@media (min-width: 64rem) {
+  .pricingSection {
+    --plate-frac: 0.75;
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -365,6 +394,47 @@
     height: calc(100dvh - var(--lp-header-h));
     padding-block: 0;
   }
+}
+
+/* --- Arrival: the plate is placed, ruled up, and the type is set ----------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .ruleTop,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .ruleBase,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .statement::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .specRow::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .column::before {
+  transition: transform 640ms var(--lp-ease-emph) var(--rd, 0ms);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .ruleTop,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .ruleBase,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .statement::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .specRow::after {
+  transform: scaleX(0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .column::before {
+  transform: scaleY(0);
 }
 
 /* --- Arrival: the plate is placed, then the type is set -------------------- */
@@ -490,6 +560,11 @@
   .heading,
   .lede,
   .specRow,
+  .specRow::after,
+  .statement::after,
+  .ruleTop,
+  .ruleBase,
+  .column::before,
   .wipe,
   .nip {
     transition: none !important;

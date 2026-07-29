@@ -13,7 +13,22 @@
 
 .flowSection {
   position: relative;
-  border-bottom: 1px solid var(--lp-hairline);
+}
+
+/* The chapter's closing rule stops on the page frame instead of running
+   full-bleed past it — at 1920 a full-bleed hairline overshoots the frame by
+   280px on each side and breaks the one-measure reading the rails establish.
+   `--lp-frame-inset` is the shared measure token, so this tracks the frame at
+   every width without the chapter knowing anything about it. */
+.flowSection::after {
+  content: "";
+  position: absolute;
+  left: var(--lp-frame-inset);
+  right: var(--lp-frame-inset);
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
+  pointer-events: none;
 }
 
 /* --- Chapter head ------------------------------------------------------- */
@@ -653,12 +668,15 @@
    03 — one saved skill branches into the four ways out
 --------------------------------------------------------------------------- */
 
+/* Same control height as the two fields that open the other diagrams, so the
+   three columns share a bottom edge on their first element as well as a top. */
 .fanNode {
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 0.42rem;
   margin: 0;
+  min-height: 2.2rem;
   padding: 0.48rem 0.72rem 0.48rem 0.5rem;
   border: 1px solid var(--lp-hairline-strong);
   border-radius: var(--r-control);
@@ -719,7 +737,9 @@
   flex: 1;
   align-items: center;
   gap: 0.6rem;
-  min-height: 2.4rem;
+  /* The stacked layout has no shared row to fill, so this is also the row's
+     resting pitch on mobile. */
+  min-height: 2.64rem;
   padding-right: 0.6rem;
   border-bottom: 1px solid var(--lp-grid-line);
 }
@@ -931,15 +951,16 @@
   & .stepCopy,
   & .vizLabel,
   & .pasteField,
+  & .pasteWireNote,
   & .miniCard,
   & .miniMeta,
   & .miniName,
-  & .pasteWireNote,
   & .miniDesc,
   & .miniTags,
   & .miniFoot,
   & .searchField,
   & .resultRow,
+  & .resultCut,
   & .countNow,
   & .countTotal,
   & .fanNode,
@@ -1051,6 +1072,12 @@
       calc(var(--t) + 440ms + var(--r, 0) * 55ms) both;
   }
 
+  /* The cut belongs to the list, so it arrives with it rather than sitting
+     alone in an otherwise empty panel while the rows stagger in. */
+  & .resultCut {
+    animation: flowFade 360ms var(--lp-ease-out) calc(var(--t) + 500ms) both;
+  }
+
   & .resultRow:nth-child(2) {
     --r: 1;
   }
@@ -1074,7 +1101,10 @@
   & .searchCaret {
     animation:
       flowCaretIn 380ms steps(3, end) calc(var(--t) + 760ms) both,
-      flowCaretBlink 1080ms steps(1, end) calc(var(--t) + 1140ms) 4 both;
+      /* Three blinks, then rest. The caret is the last thing in the chapter
+         still moving, so it stops a beat after the slowest column lands
+         instead of ticking on under a finished composition. */
+      flowCaretBlink 1080ms steps(1, end) calc(var(--t) + 1140ms) 3 both;
   }
 
   /* Filtering lands after the query is typed: everything but the match

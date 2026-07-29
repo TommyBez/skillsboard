@@ -79,7 +79,7 @@ export function HeroSection() {
                   </span>
                 ))}
               </span>
-              <span className={styles.heroTallyTotal}>/ 05</span>
+              <span className={styles.heroTallyTotal}>/05</span>
             </p>
           </div>
 

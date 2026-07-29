@@ -97,7 +97,8 @@
    hairline, so the hero always *terminates* rather than trailing off. */
 @media (min-width: 64rem) {
   .heroFrame {
-    height: 100%;
+    /* no explicit height: the flex parent stretches it, which is the only way
+       the rail reaches the floor in the un-pinned (no-JS / reduced) case too */
     grid-template-rows: auto minmax(var(--stage-h), 1fr) auto;
     align-content: normal;
     padding-block: 2.5rem 1.5rem;
@@ -111,6 +112,19 @@
   align-items: center;
   gap: 1.1rem;
   padding-bottom: 0.35rem;
+}
+
+/* Phones: the strip carries an index, a mark and a rule in 350px, so the mark
+   gives back the tracking the rule needs to read as a rule. */
+@media (max-width: 47.99rem) {
+  .heroTop {
+    gap: 0.8rem;
+  }
+
+  .heroEyebrow {
+    font-size: 0.64rem;
+    letter-spacing: 0.15em;
+  }
 }
 
 /* Chapter index — identical spec to the other chapters' header marks. */
@@ -294,7 +308,8 @@
   line-height: 1.6;
   text-wrap: pretty;
   color: var(--muted-foreground);
-  animation: lp-hero-rise 560ms var(--lp-ease-emph) 400ms both;
+  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
+    var(--lp-beat-4) both;
 }
 
 @media (min-width: 48rem) {
@@ -305,7 +320,106 @@
 
 .heroCta {
   margin-top: 1.75rem;
-  animation: lp-hero-rise 560ms var(--lp-ease-emph) 472ms both;
+  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
+    var(--lp-beat-5) both;
+}
+
+/* ------------------------------------------------------------------
+   Tally — the copy column's terminus, on the stage's own baseline.
+
+   The rail below reports the scene as a bar; this reports it as a count.
+   Same grammar as the MCP chapter's readout: a dimmed key, a stacked
+   numeral, a total. Numeric only, so it adds no prose to the page.
+------------------------------------------------------------------ */
+
+.heroTally {
+  display: none;
+  align-items: baseline;
+  gap: 0.15rem;
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted-foreground);
+  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
+    var(--lp-beat-8) both;
+}
+
+@media (min-width: 64rem) {
+  .heroTally {
+    position: absolute;
+    left: 0;
+    /* the stage is centred in the mid band, so this is the stage's floor */
+    bottom: calc((100% - var(--stage-h)) / 2);
+    z-index: 2;
+    display: flex;
+  }
+}
+
+.heroTallyKey {
+  margin-inline-end: 0.7rem;
+  letter-spacing: 0.18em;
+  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
+}
+
+/* A fixed-width slot the six numerals share, so nothing shifts as it counts. */
+.heroTallyNum {
+  position: relative;
+  display: inline-block;
+  width: 2ch;
+  height: 1em;
+  letter-spacing: 0;
+}
+
+.heroTallyDigit {
+  --lo: 2;
+  --hi: 3;
+  position: absolute;
+  inset: 0;
+  color: var(--foreground);
+  opacity: calc(
+    clamp(0, (var(--route-p) - var(--lo)) / 0.012, 1) -
+      clamp(0, (var(--route-p) - var(--hi)) / 0.012, 1)
+  );
+}
+
+/* Thresholds are the exact moments each card finishes docking into its row
+   (--ls<n> + --win), so the count changes on the landing, not near it. */
+.heroTallyDigit[data-n="0"] {
+  --lo: -1;
+  --hi: 0.32;
+  color: var(--muted-foreground);
+}
+
+.heroTallyDigit[data-n="1"] {
+  --lo: 0.32;
+  --hi: 0.45;
+}
+
+.heroTallyDigit[data-n="2"] {
+  --lo: 0.45;
+  --hi: 0.58;
+}
+
+.heroTallyDigit[data-n="3"] {
+  --lo: 0.58;
+  --hi: 0.71;
+}
+
+.heroTallyDigit[data-n="4"] {
+  --lo: 0.71;
+  --hi: 0.84;
+}
+
+.heroTallyDigit[data-n="5"] {
+  --lo: 0.84;
+  --hi: 2;
+  color: var(--primary);
+}
+
+.heroTallyTotal {
+  color: color-mix(in oklch, var(--muted-foreground) 62%, transparent);
 }
 
 /* ------------------------------------------------------------------
@@ -328,16 +442,22 @@
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted-foreground);
-  animation: lp-hero-rise 560ms var(--lp-ease-emph) 560ms both;
+  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
+    var(--lp-beat-9) both;
 }
 
 @media (min-width: 64rem) {
   .heroRail {
     display: flex;
+    /* nailed to the frame's floor by the grid, not floated under the stage */
+    margin-top: 0;
+    align-self: end;
   }
 
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroRail {
-    --rail-p: clamp(0, var(--route-p), 1);
+    /* reaches FILED exactly as the last card docks (--ls5 + --win), leaving
+       the tail of the runway as a settle rather than an unfinished bar */
+    --rail-p: clamp(0, calc(var(--route-p) / 0.88), 1);
   }
 }
 
@@ -395,14 +515,14 @@
 
   --sw: 28rem; /* stage width  */
   --sh: var(--stage-h); /* stage height */
-  --col-gap: 2rem;
-  --cw: calc((var(--sw) - var(--col-gap)) / 2); /* card width */
+  --cw: 12.75rem; /* card width */
   --pp: 0.75rem; /* panel body padding */
   --pw: calc(var(--cw) + 2 * var(--pp)); /* panel width */
-  --rh: 3.4rem; /* filed row height */
-  --hh: 2.85rem; /* panel head height */
-  --qh: 3.1rem; /* panel filter row height */
-  --fh: 2.2rem; /* panel foot height */
+  --rh: 3.5rem; /* filed row height = card index-strip height */
+  --hh: 2.9rem; /* panel head height */
+  --qh: 3.2rem; /* panel filter row height */
+  --fh: 2.3rem; /* panel foot height */
+  --ch: 10.3rem; /* dossier card height — three of them make the scatter */
   --ph: calc(
     var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh) + var(--fh)
   );
@@ -410,6 +530,27 @@
 
   --filed-x: calc(var(--sw) - var(--cw) - var(--pp));
   --row0: calc(var(--pt) + var(--hh) + var(--qh) + var(--pp));
+
+  /* Scatter grammar. Two exact columns, three cards left and two right at the
+     half pitch, so the deck reads as an arrangement rather than a spill: every
+     card is whole, every gutter is deliberate, nothing occludes anything. */
+  --scat-l: 0rem;
+  --scat-r: calc(var(--sw) - var(--cw) - 0.5rem);
+  --pitch: calc((var(--sh) - var(--ch)) / 2);
+
+  /* Filing schedule. Each card owns a --win-long slice of the runway starting
+     at its --ls; the cues are spaced wide enough that no more than three are
+     ever in the air, so a still frame mid-flight is still readable. The last
+     card docks at 0.92, leaving the tail of the runway as a settle. */
+  --win: 0.38;
+  --ls1: 0.02;
+  --ls2: 0.15;
+  --ls3: 0.28;
+  --ls4: 0.41;
+  --ls5: 0.54;
+  /* where each card visibly *lands* (the fold reads as done well before the
+     easing finishes): --ls + 0.79 * --win */
+  --dock: 0.88;
 
   position: absolute;
   top: 50%;
@@ -427,24 +568,38 @@
 @media (min-width: 80rem) {
   .heroBoard {
     --sw: 32rem;
-    --rh: 3.75rem;
+    --cw: 14.5rem;
+    --rh: 3.85rem;
     --hh: 3.1rem;
-    --qh: 3.4rem;
-    --fh: 2.5rem;
+    --qh: 3.5rem;
+    --fh: 2.6rem;
+    --ch: 10.65rem;
   }
 }
 
-/* Short laptops: keep the whole stage inside the pinned viewport. */
-@media (min-width: 64rem) and (max-height: 50rem) {
+/* Short laptops: the stage shrinks with the viewport, so the cards have to
+   shed a line or the scatter's gutters close up. The summary is the least
+   load-bearing row on the card. */
+@media (min-width: 64rem) and (max-height: 46rem) {
   .heroBoard {
-    scale: 0.92;
+    --ch: 8.9rem;
+  }
+
+  .heroBoard .dossierDesc {
+    display: none;
   }
 }
 
 @media (min-width: 90rem) {
   .heroBoard {
     --sw: 36rem;
-    --col-gap: 2.25rem;
+    --cw: 16.5rem;
+    --rh: 4rem;
+    --hh: 3.2rem;
+    --qh: 3.6rem;
+    --fh: 2.7rem;
+    --pp: 0.85rem;
+    --ch: 10.8rem;
   }
 }
 
@@ -456,7 +611,8 @@
 /* The landing target: a quiet product panel that materialises ahead of the
    cards, so the deck visibly files *into* something. */
 .libraryFrame {
-  --frame-p: clamp(0, calc((var(--route-p) - 0.05) / 0.28), 1);
+  /* the drawer is open and waiting well before the first card arrives */
+  --frame-p: clamp(0, calc((var(--route-p) - 0.01) / 0.2), 1);
   position: absolute;
   left: calc(var(--sw) - var(--pw));
   top: var(--pt);
@@ -515,7 +671,7 @@
   bottom: -1px;
   height: 1px;
   background: var(--primary);
-  transform: scaleX(clamp(0, var(--route-p), 1));
+  transform: scaleX(clamp(0, calc(var(--route-p) / 0.88), 1));
   transform-origin: left center;
 }
 
@@ -570,7 +726,7 @@
   right: var(--pp);
   top: calc(var(--hh) + var(--qh) + var(--pp));
   height: calc(5 * var(--rh));
-  opacity: clamp(0, calc((var(--route-p) - 0.12) / 0.3), 1);
+  opacity: clamp(0, calc((var(--route-p) - 0.05) / 0.2), 1);
   background-image: repeating-linear-gradient(
     to bottom,
     transparent 0,
@@ -627,8 +783,14 @@
   transition: opacity 220ms var(--lp-ease-snap);
 }
 
+/* Each leader is drawn as its own card docks: the source label takes the place
+   the dossier just left. */
 .libraryFeedRow {
-  --t: clamp(0, calc((var(--route-p) - var(--ls, 0) - 0.16) / 0.34), 1);
+  --t: clamp(
+    0,
+    calc((var(--route-p) - var(--ls, 0) - var(--win) + 0.1) / 0.13),
+    1
+  );
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -636,51 +798,39 @@
 }
 
 .libraryFeedRow[data-slot="1"] {
-  --ls: 0.03;
+  --ls: var(--ls1);
 }
 
 .libraryFeedRow[data-slot="2"] {
-  --ls: 0.09;
+  --ls: var(--ls2);
 }
 
 .libraryFeedRow[data-slot="3"] {
-  --ls: 0.15;
+  --ls: var(--ls3);
 }
 
 .libraryFeedRow[data-slot="4"] {
-  --ls: 0.21;
+  --ls: var(--ls4);
 }
 
 .libraryFeedRow[data-slot="5"] {
-  --ls: 0.27;
+  --ls: var(--ls5);
 }
 
 .libraryFeedLabel {
   flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
   justify-content: flex-end;
-  gap: 0.32rem;
-  font-family: var(--font-mono);
   font-size: 0.62rem;
-  letter-spacing: 0.02em;
-  color: color-mix(in oklab, var(--foreground) 72%, transparent);
   opacity: var(--t);
   translate: calc((1 - var(--t)) * -8px) 0;
-}
-
-.libraryFeedLabel span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .libraryFeedIcon {
   width: 0.75rem;
   height: 0.75rem;
   flex-shrink: 0;
-  opacity: 0.6;
+  color: var(--primary);
+  opacity: 0.8;
 }
 
 .libraryFeedLine {
@@ -713,7 +863,6 @@
 ------------------------------------------------------------------ */
 
 .dossierSlot {
-  --win: 0.5;
   --t: clamp(0, calc((var(--route-p) - var(--ls, 0)) / var(--win)), 1);
   /* smoothstep: cards ease in and settle instead of tracking scroll linearly */
   --fp: calc(var(--t) * var(--t) * (3 - 2 * var(--t)));
@@ -735,74 +884,81 @@
     rotate(calc(var(--sr) * var(--fr)));
 }
 
+/* Scattered coordinates are written as (column, row) on the scatter grammar,
+   then expressed as the delta from the card's filed slot. Left column leans
+   away from the drawer, right column toward it; the tilt grows with the
+   distance the card has to travel, so the fan is a rule, not a jitter. */
 .dossierSlot[data-slot="1"] {
   top: var(--row0);
-  z-index: 5;
-  --ls: 0.03;
-  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.35rem);
-  --sy: calc(0.15rem - var(--row0));
-  --sr: -1.7deg;
+  z-index: 9;
+  --ls: var(--ls1);
+  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sy: calc(0px - var(--row0));
+  --sr: -2.4deg;
 }
 
 .dossierSlot[data-slot="2"] {
   top: calc(var(--row0) + var(--rh));
-  z-index: 6;
-  --ls: 0.09;
-  --sx: calc(var(--pp) - 0.35rem);
-  --sy: calc(6.1rem - var(--row0) - var(--rh));
-  --sr: 2.1deg;
+  z-index: 8;
+  --ls: var(--ls2);
+  --sx: calc(var(--scat-r) - var(--filed-x));
+  --sy: calc(0.5 * var(--pitch) - var(--row0) - var(--rh));
+  --sr: 1.3deg;
 }
 
 .dossierSlot[data-slot="3"] {
   top: calc(var(--row0) + 2 * var(--rh));
   z-index: 7;
-  --ls: 0.15;
-  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.1rem);
-  --sy: calc(12.2rem - var(--row0) - 2 * var(--rh));
-  --sr: 1.3deg;
+  --ls: var(--ls3);
+  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sy: calc(var(--pitch) - var(--row0) - 2 * var(--rh));
+  --sr: -1.6deg;
 }
 
 .dossierSlot[data-slot="4"] {
   top: calc(var(--row0) + 3 * var(--rh));
-  z-index: 8;
-  --ls: 0.21;
-  --sx: calc(var(--pp) - 0.15rem);
-  --sy: calc(18.3rem - var(--row0) - 3 * var(--rh));
-  --sr: -2.3deg;
+  z-index: 6;
+  --ls: var(--ls4);
+  --sx: calc(var(--scat-r) - var(--filed-x));
+  --sy: calc(1.5 * var(--pitch) - var(--row0) - 3 * var(--rh));
+  --sr: 1.9deg;
 }
 
 .dossierSlot[data-slot="5"] {
   top: calc(var(--row0) + 4 * var(--rh));
-  z-index: 9;
-  --ls: 0.27;
-  --sx: calc(var(--cw) + var(--pp) - var(--sw) - 0.45rem);
-  --sy: calc(24.4rem - var(--row0) - 4 * var(--rh));
-  --sr: -1deg;
+  z-index: 5;
+  --ls: var(--ls5);
+  --sx: calc(var(--scat-l) - var(--filed-x));
+  --sy: calc(2 * var(--pitch) - var(--row0) - 4 * var(--rh));
+  --sr: -2.8deg;
 }
 
-/* Load entrance: the deck lands on the desk, staggered, after the copy. */
+/* Load entrance: the deck is dealt onto the desk one card per beat, opening
+   with the body copy and closing before the rail. Each card rocks into its own
+   scatter tilt (`--sr`) rather than dropping straight, so the deal reads as a
+   hand laying paper down. */
 .dossierEnter {
   animation: lp-hero-deal 700ms var(--lp-ease-emph) both;
 }
 
 .dossierSlot[data-slot="1"] .dossierEnter {
-  animation-delay: 400ms;
+  animation-delay: var(--lp-beat-4);
 }
 
 .dossierSlot[data-slot="2"] .dossierEnter {
-  animation-delay: 472ms;
+  animation-delay: var(--lp-beat-5);
 }
 
 .dossierSlot[data-slot="3"] .dossierEnter {
-  animation-delay: 544ms;
+  animation-delay: var(--lp-beat-6);
 }
 
 .dossierSlot[data-slot="4"] .dossierEnter {
-  animation-delay: 616ms;
+  animation-delay: var(--lp-beat-7);
 }
 
 .dossierSlot[data-slot="5"] .dossierEnter {
-  animation-delay: 688ms;
+  animation-delay: var(--lp-beat-8);
 }
 
 /* Pointer parallax: real depth while the deck is loose, calm once filed. */
@@ -914,42 +1070,64 @@
   padding-top: 0.6rem;
 }
 
-.dossierSource {
+/* ------------------------------------------------------------------
+   Provenance line — owner / repo, printed the way the product prints it:
+   the fork mark in the accent, the owner set back, the repository carrying
+   the weight. It must read as a *source*, not as a caption.
+------------------------------------------------------------------ */
+
+.dossierSource,
+.libraryFeedLabel {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 0.32rem;
+  gap: 0.34rem;
   margin: 0;
   font-family: var(--font-mono);
   font-size: 0.6rem;
-  letter-spacing: 0.01em;
-  color: var(--muted-foreground);
+  letter-spacing: 0.005em;
 }
 
-.dossierSource span {
+.sourceText {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dossierFork {
-  width: 0.8rem;
-  height: 0.8rem;
-  flex-shrink: 0;
-  opacity: 0.7;
+.sourceOwner {
+  color: color-mix(in oklab, var(--muted-foreground) 78%, transparent);
 }
 
+.sourceSlash {
+  color: color-mix(in oklab, var(--muted-foreground) 48%, transparent);
+}
+
+.sourceRepo {
+  font-weight: 600;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+
+.dossierFork {
+  width: 0.78rem;
+  height: 0.78rem;
+  flex-shrink: 0;
+  color: var(--primary);
+  opacity: 0.9;
+}
+
+/* One line, at every card width the scatter uses: five cards of identical
+   height are what make the arrangement read as an arrangement. */
 .dossierDesc {
   margin: 0;
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  min-height: 2.1em;
+  -webkit-line-clamp: 1;
+  min-height: 1.45em;
   overflow: hidden;
   font-size: 0.72rem;
   line-height: 1.45;
   color: var(--muted-foreground);
-  text-wrap: pretty;
 }
 
 .dossierTags {
@@ -1163,20 +1341,28 @@
   clip-path: none;
 }
 
-.mobileChaosCard:nth-child(1) {
+/* Alternating sides, each card whole — the same grammar as the desktop
+   scatter, folded into one column. */
+.mobileChaosCard:nth-child(odd) {
   align-self: flex-start;
-  rotate: -1.8deg;
+  rotate: -1.6deg;
 }
 
-.mobileChaosCard:nth-child(2) {
+.mobileChaosCard:nth-child(even) {
   align-self: flex-end;
-  rotate: 2deg;
+  /* the tilt must not push a corner past the column rule */
+  margin-right: 2%;
+  rotate: 1.8deg;
 }
 
 .mobileChaosCard:nth-child(3) {
-  align-self: flex-start;
   margin-left: 8%;
   rotate: -1deg;
+}
+
+.mobileChaosCard:nth-child(5) {
+  margin-left: 5%;
+  rotate: -2.2deg;
 }
 
 .mobileArrow {
@@ -1273,9 +1459,11 @@
 
 @media (min-width: 64rem) {
   :global([data-landing-motion-root][data-motion-enabled="true"]) .heroExit {
-    --hx: clamp(0, calc((var(--route-p) - 0.5) / 0.5), 1);
-    translate: 0 calc(var(--hx) * -16px);
-    opacity: calc(1 - var(--hx) * 0.22);
+    --hx: clamp(0, calc((var(--route-p) - 0.45) / 0.46), 1);
+    translate: 0 calc(var(--hx) * -14px);
+    /* enough to hand focus to the board, not enough to grey the headline out
+       in the state the chapter comes to rest in */
+    opacity: calc(1 - var(--hx) * 0.1);
   }
 }
 
@@ -1352,12 +1540,13 @@
 @keyframes lp-hero-deal {
   from {
     opacity: 0;
-    transform: translate3d(0, 22px, 0) scale(0.985);
+    transform: translate3d(0, 24px, 0) rotate(calc(var(--sr, 0deg) * -0.8))
+      scale(0.985);
   }
 
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
   }
 }
 
@@ -1369,10 +1558,21 @@
   .heroField,
   .heroRules,
   .heroEyebrow,
+  .heroIndex,
   .heroBlurb,
   .heroCta,
+  .heroTally,
   .heroRail {
     animation: lp-hero-fade 140ms linear both;
+  }
+
+  /* the scene rests filed, so the count rests filed too */
+  .heroTallyDigit {
+    opacity: 0;
+  }
+
+  .heroTallyDigit[data-n="5"] {
+    opacity: 1;
   }
 
   .heroField,
@@ -1390,6 +1590,7 @@
 
   .heroRail {
     --rail-p: 1;
+    margin-top: 0;
   }
 
   .heroTopRule {
