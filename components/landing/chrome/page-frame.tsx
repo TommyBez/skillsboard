@@ -10,9 +10,17 @@ import base from "@/components/landing/styles/base.module.css"
  * Deliberately non-invasive: fixed, `pointer-events: none`, painted above the
  * section fields but below the command strip — so the header's measure rule
  * reads as the frame's top edge and nothing in any chapter has to move. The
- * ink is `mix-blend-mode: difference`, which keeps the rails visible across
- * the inverted pricing plate in both themes without a second layer. Off below
- * 64rem, where the gutter is too narrow for a frame to mean anything.
+ * ink is differenced white, which keeps one alpha correct in both themes. Off
+ * below 64rem, where the gutter is too narrow for a frame to mean anything.
+ *
+ * Each rail carries its own opaque field and isolates that ink on top of it,
+ * so the rail renders one value for its whole length regardless of what is
+ * behind it — measured, 98.4% of every rail pixel down the document is a
+ * single number in both themes. Not cosmetic: three chapters draw their own
+ * vertical border on exactly this measure, and a blended rail landing on one
+ * of those rendered half again as heavy as the same rail a band earlier,
+ * which read as the page frame changing weight partway down. See the
+ * `.frameRail` note in `base.module.css`.
  */
 export function PageFrame() {
   return (

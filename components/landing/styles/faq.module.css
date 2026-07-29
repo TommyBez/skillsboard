@@ -148,7 +148,9 @@
   --faq-q-tail: 0.0216em;
   /* Residual between the modelled cap line and the rasterised one at display
      size, measured off the screen at 8× and expressed as a fraction of the
-     heading, so it holds at every step of the clamp. */
+     heading, so it holds at every step of the clamp. The heading's line box
+     quantises to whole pixels, so the round C lands half a pixel ABOVE
+     question 01's flat W — which is the overshoot a round cap wants. */
   --faq-h-fit: calc(0.008 * var(--faq-h-size));
 
   margin-inline: auto;

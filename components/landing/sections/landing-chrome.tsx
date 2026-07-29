@@ -21,8 +21,8 @@ import base from "@/components/landing/styles/base.module.css"
  * positions of the chapters they stood for. An index whose labels only appear
  * on hover, in a gutter with no room to show them, is not navigation — and at
  * this measure there is no room to make it navigation. The page keeps one
- * honest position signal (the playhead on the header's measure rule) and the
- * footer keeps the links.
+ * honest position signal (the gauge on its own row inside the command strip)
+ * and the footer keeps the links.
  *
  * Kept as an export because the page composes it; the motion controller
  * already no-ops when no `[data-rail-link]` exists.
@@ -31,7 +31,13 @@ export function ChapterRail() {
   return null
 }
 
-/** Sticky command strip with the scroll playhead on its measure rule. */
+/**
+ * Sticky command strip. The scroll gauge sits on its own row *inside* the
+ * strip, four pixels above the measure rule that closes the frame's top edge —
+ * it used to share that rule's 1px row, where the travelled run read as a
+ * border that inexplicably changed colour partway across rather than as a
+ * position.
+ */
 export function LandingHeader() {
   return (
     <>
