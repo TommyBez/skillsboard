@@ -121,14 +121,6 @@ export function McpSchematic() {
             <span className={styles.nodeFlash} aria-hidden="true" />
           </span>
 
-          <p className={styles.nodeStatus} aria-hidden="true">
-            <span className={styles.nodeStatusDot} />
-            <span className={styles.nodeStatusStack}>
-              <span data-state="off">standby</span>
-              <span data-state="on">connected</span>
-            </span>
-          </p>
-
           <span
             className={`${styles.conduit} ${styles.conduitOut}`}
             aria-hidden="true"
@@ -175,9 +167,11 @@ export function McpSchematic() {
         </p>
       </div>
 
-      <figcaption className={`${styles.schemaCaption} text-pretty`}>
-        Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
-        same library remains available in Skills Board.
+      <figcaption className={styles.schemaCaption}>
+        <span className={`${styles.schemaCaptionText} text-pretty`}>
+          Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
+          same library remains available in Skills Board.
+        </span>
       </figcaption>
     </figure>
   )

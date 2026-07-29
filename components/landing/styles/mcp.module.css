@@ -1,11 +1,17 @@
 /* ---------------------------------------------------------------------------
    MCP chapter — the signature routing moment.
 
-   Structure: a full-height instrument frame (vertical rails, a header strip
-   and a footer strip) split into a copy column and a routing schematic.
-   The schematic is a real signal diagram: five library rows collect onto the
-   panel's edge bus, the bus feeds a gateway node, the node fans out through a
-   splitter to three agent ports.
+   Structure: a full-height instrument frame (two rails, a header strip, a
+   full-height spine between the two panes and a footer band on each side)
+   split into a copy column and a routing schematic. The schematic is a real
+   signal diagram: five library rows collect onto the panel's edge bus, the bus
+   feeds a gateway node, the node fans out through a splitter to three agent
+   ports.
+
+   One modular unit governs the diagram: an agent row is exactly two library
+   rows, and the library head is one. Six library units == three agent units,
+   so the two card stacks are the same height *by construction* and every row
+   boundary lands on an integer pixel.
 
    Every declaration outside a `[data-motion-enabled="true"]` guard is the
    FINISHED state, so no-JS and reduced-motion both render a fully drawn,
@@ -13,13 +19,31 @@
 --------------------------------------------------------------------------- */
 
 .mcpChapter {
-  --wire-row-h: 7.2rem;
-  --lib-row-h: 3.72rem;
+  /* The module. lib row == lib head == agent row / 2, so
+     5 lib rows + 1 head == 3 agent rows, exactly. */
+  --agent-row-h: 8rem;
+  --lib-row-h: 4rem;
+  --lib-head-h: 4rem;
+  --wire-row-h: var(--agent-row-h);
+
   --gw: clamp(7rem, 13.4vw, 12rem);
   --schema-gap: clamp(0.85rem, 1.6vw, 1.45rem);
+  --col-label-h: 0.93rem;
+  --col-label-gap: 0.85rem;
+  --footer-band: 6rem;
+  --frame-pad: clamp(3rem, 7vw, 4.25rem);
   --wire-casing: color-mix(in oklch, var(--foreground) 13%, transparent);
   --wire-glow: color-mix(in oklch, var(--primary) 55%, transparent);
-  --schema-rule: color-mix(in oklch, var(--foreground) 9%, transparent);
+}
+
+/* Short desktop viewports: step the module down rather than clip the
+   diagram. The 1 : 1 : 2 relationship is preserved. */
+@media (min-width: 64rem) and (max-height: 46rem) {
+  .mcpChapter {
+    --agent-row-h: 6.5rem;
+    --lib-row-h: 3.25rem;
+    --lib-head-h: 3.25rem;
+  }
 }
 
 /* The tall scroll chapter only exists when the controller is live; without
@@ -40,7 +64,7 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Frame — rails, header strip, footer strip
+   Frame — rails, header strip, spine, footer band
 --------------------------------------------------------------------------- */
 
 .frame {
@@ -52,10 +76,17 @@
   max-width: calc(var(--lp-measure) - 2 * var(--lp-gutter));
   margin-inline: auto;
   padding-inline: clamp(1.25rem, 2.6vw, 2.25rem);
-  padding-block: clamp(3rem, 7vw, 4.25rem);
+  padding-block: var(--frame-pad);
 }
 
 @media (min-width: 64rem) {
+  /* The frame's rails have to land *on* the page measure, not outboard of it:
+     without the gutter the chapter's content started 12px left of every other
+     chapter's between 1024 and 1440. */
+  .mcpSticky {
+    padding-inline: var(--lp-gutter);
+  }
+
   .frame {
     border-inline: 1px solid var(--lp-hairline);
   }
@@ -64,33 +95,41 @@
      static (no-JS / reduced-motion) spread keeps the page's normal rhythm. */
   :global([data-landing-motion-root][data-motion-enabled="true"]) .frame {
     height: 100%;
-    padding-block: clamp(1.1rem, 2.4vh, 1.9rem);
+    --frame-pad: clamp(1.1rem, 2.4vh, 1.9rem);
   }
 }
 
-/* Header strip: chapter mark on the left, live signal readout on the right. */
+/* Header strip: chapter mark on the left, live signal readout on the right.
+   One gap value governs all three joints. The two mono runs carry trailing
+   letter-space, so each is pulled back by its own tracking — otherwise the
+   same joint measures 14px on one side of the rule and 17px on the other. */
 .frameTop {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.1rem;
+  gap: 1rem;
   padding-bottom: 0.85rem;
   border-bottom: 1px solid var(--lp-hairline);
 }
 
 .frameIndex {
   flex: none;
+  margin-right: -0.1em;
   font-family: var(--font-mono);
   font-size: 0.675rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 65%, transparent);
+  color: var(--foreground);
 }
 
 .frameMark {
   flex: 1;
   min-width: 0;
+}
+
+.frameTop .frameMark {
+  gap: calc(1rem - 0.22em);
 }
 
 .readout {
@@ -106,7 +145,7 @@
 }
 
 .readoutKey {
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  color: var(--muted-foreground);
 }
 
 .readoutStack {
@@ -132,45 +171,79 @@
   opacity: 1;
 }
 
-.readoutBar {
-  position: relative;
-  display: block;
-  width: clamp(2.5rem, 5vw, 4.5rem);
-  height: 2px;
-  overflow: hidden;
-  background: var(--wire-casing);
-}
-
-.readoutBar::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--primary);
-  transform: scaleX(1);
-  transform-origin: left center;
-}
-
-/* Body: copy column | hairline | schematic column */
+/* Body: copy column | spine | schematic column */
 .frameBody {
   display: grid;
   gap: 2.5rem;
   padding-block: clamp(1.75rem, 4vw, 2.75rem);
 }
 
+.frameSpine {
+  display: none;
+}
+
 @media (min-width: 64rem) {
   .frameBody {
     flex: 1;
     min-height: 0;
-    grid-template-columns: minmax(15rem, 0.68fr) minmax(0, 1.32fr);
+    grid-template-columns: minmax(15rem, 0.76fr) 1px minmax(0, 1.24fr);
     gap: 0;
     align-items: stretch;
+    padding-block: 0;
+  }
+
+  /* The pane divider runs from the header rule to the frame's bottom edge, so
+     it terminates on the same line as the two frame rails instead of stopping
+     in mid-air 46px short of them. */
+  .frameSpine {
+    display: block;
+    background: var(--lp-hairline);
+    margin-bottom: calc(-1 * var(--frame-pad));
+  }
+
+  .copyCol,
+  .schematic {
     padding-block: clamp(1.25rem, 2.6vh, 2rem);
   }
 }
 
 @media (min-width: 84rem) {
   .frameBody {
-    grid-template-columns: minmax(16rem, 0.72fr) minmax(0, 1.28fr);
+    grid-template-columns: minmax(16rem, 0.72fr) 1px minmax(0, 1.28fr);
+  }
+}
+
+/* Narrow desktops: tighten the frame's own insets and give the copy pane the
+   extra, so the display line keeps a measure wide enough to hold its first
+   line whole. Below this the diagram would start truncating skill names. */
+@media (min-width: 64rem) and (max-width: 83.9975rem) {
+  .mcpChapter {
+    --gw: clamp(6rem, 10.8vw, 9.5rem);
+  }
+
+  .frame {
+    padding-inline: 1.25rem;
+  }
+
+  .frameBody {
+    grid-template-columns: minmax(15rem, 0.76fr) 1px minmax(0, 1.24fr);
+  }
+
+  .copyCol {
+    padding-right: 1.5rem;
+  }
+
+  .schematic {
+    padding-left: 1.5rem;
+  }
+
+  .libraryHead,
+  .schemaRow {
+    padding-inline: 0.7rem;
+  }
+
+  .schemaRow {
+    gap: 0.45rem;
   }
 }
 
@@ -193,49 +266,88 @@
   min-width: 0;
 }
 
-/* Technical annotation pinned to the bottom of the copy column so its top
-   rule lines up with the figcaption rule and the frame reads as one panel. */
-.specs {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: 0.35rem 1.5rem;
-  margin-top: 2rem;
-  padding-top: 0.95rem;
-  border-top: 1px solid var(--lp-hairline);
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  letter-spacing: 0.06em;
+/* The display line. `max-width` is set in em so the wrap is scale-invariant:
+   at every size the measure is just wide enough to take "Bring your team's",
+   which gives a descending rag instead of a widening wedge. The negative
+   first-line indent cancels the B's left sidebearing, so the largest element
+   on the page is flush with the column like everything else. */
+.copyHeading {
+  max-width: 7.75em;
+  text-indent: -0.058em;
+  text-wrap: wrap;
 }
 
-@media (min-width: 64rem) {
-  .specs {
-    margin-top: 0;
-    min-height: 5rem;
-    align-content: center;
+/* The supporting paragraph must not out-measure the line it supports. */
+.copyLede {
+  max-width: 23.5rem;
+}
+
+@media (min-width: 64rem) and (max-width: 83.9975rem) {
+  .copyLede {
+    max-width: 19.5rem;
   }
 }
 
-.specRow {
+/* Otherwise line 2 is the single 34px word "copy." under a 392px line. The
+   measure is set where the natural break falls two words earlier, which gives
+   a descending pair instead of an orphan. */
+.copyShield p {
+  max-width: 19rem;
+  text-wrap: pretty;
+}
+
+/* ---------------------------------------------------------------------------
+   Endpoint plate — the copy column's footer band
+
+   Decorative annotation, but it carries the one concrete fact the chapter
+   never states in prose, and it gives the type scale the tier it was missing
+   between the 34px display cap and the 11px labels.
+--------------------------------------------------------------------------- */
+
+.endpoint {
+  margin-top: 2rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--lp-hairline);
+  font-family: var(--font-mono);
+}
+
+.endpointHead {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  min-width: 0;
-}
-
-.specKey {
-  flex: none;
-  width: 3.9rem;
-  color: color-mix(in oklch, var(--muted-foreground) 78%, transparent);
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
 }
 
-.specValue {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.endpointValue {
+  margin-top: 0.42rem;
+  font-size: clamp(1.3rem, 1.85vw, 1.6rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.015em;
   color: var(--foreground);
+}
+
+.endpointMeta {
+  margin-top: 0.55rem;
+  font-size: 0.6rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@media (min-width: 64rem) {
+  .endpoint {
+    height: var(--footer-band);
+    margin-top: 0;
+  }
 }
 
 /* ---------------------------------------------------------------------------
@@ -253,7 +365,6 @@
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
     padding-left: clamp(1.5rem, 3vw, 2.75rem);
-    border-left: 1px solid var(--lp-hairline);
   }
 }
 
@@ -264,51 +375,6 @@
   grid-template-columns: minmax(0, 1fr);
   align-content: center;
   gap: 0;
-}
-
-/* Drawing-surface grid: makes the diagram's negative space read as a field
-   rather than as an empty hole. Faded at the edges so it never boxes in. */
-.schematicGrid::before {
-  content: "";
-  position: absolute;
-  inset: -1.5rem -1rem;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(to right, var(--schema-rule) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--schema-rule) 1px, transparent 1px);
-  background-size: 2.25rem 2.25rem;
-  background-position: 50% 50%;
-  -webkit-mask-image: radial-gradient(
-    ellipse 82% 78% at 50% 50%,
-    #000 34%,
-    transparent 100%
-  );
-  mask-image: radial-gradient(
-    ellipse 82% 78% at 50% 50%,
-    #000 34%,
-    transparent 100%
-  );
-}
-
-/* Registration marks at the corners of the drawing field: the diagram sits
-   inside a measured surface, so its breathing room reads as composition. */
-.schematicGrid::after {
-  content: "";
-  position: absolute;
-  inset: -0.65rem -0.25rem;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 0 / 13px 1px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 0 / 1px 13px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 0 / 13px 1px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 0 / 1px 13px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 100% / 13px 1px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 0 100% / 1px 13px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 100% / 13px 1px,
-    linear-gradient(var(--lp-hairline-strong), var(--lp-hairline-strong)) 100% 100% / 1px 13px;
-  background-repeat: no-repeat;
 }
 
 .libCol,
@@ -327,6 +393,7 @@
   font-family: var(--font-mono);
   font-size: 0.62rem;
   font-weight: 600;
+  line-height: 1.5;
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted-foreground);
@@ -355,13 +422,15 @@
   box-shadow: 0 1px 0 0 color-mix(in oklch, var(--foreground) 5%, transparent) inset;
 }
 
-/* The panel's right border is the collector bus: it energises top-to-bottom
+/* The collector bus. It sits *outboard* of the panel rather than on its right
+   border: the card keeps two 1px edges of equal weight, and the bus reads as
+   plumbing hung on the card, which is what it is. It energises top-to-bottom
    as the library is indexed, then hands off to the trunk. */
 .libraryBus {
   position: absolute;
   top: -1px;
   bottom: -1px;
-  right: -1.5px;
+  right: -2px;
   width: 2px;
   background: var(--primary);
   transform: scaleY(1);
@@ -369,15 +438,33 @@
 }
 
 .libraryHead {
-  padding: 0.85rem 0.85rem;
-  border-bottom: 1px solid var(--lp-hairline);
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: var(--lib-head-h);
+  padding-inline: 0.85rem;
+}
+
+/* Row dividers are drawn, not bordered: a border would shrink each row's
+   percentage-resolution box by 1px and push every nub and stub half a pixel
+   off its own row centre. */
+.libraryHead::after,
+.schemaRow:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
 }
 
 .schemaStackTitle {
-  font-size: clamp(0.9rem, 1vw, 1rem);
+  font-size: clamp(0.95rem, 1.06vw, 1.08rem);
   font-weight: 650;
   letter-spacing: -0.022em;
-  line-height: 1.25;
+  line-height: 1.22;
+  text-wrap: balance;
 }
 
 .schemaRow {
@@ -387,20 +474,15 @@
   gap: 0.55rem;
   height: var(--lib-row-h);
   padding-inline: 0.85rem;
-  border-bottom: 1px solid var(--lp-hairline);
-}
-
-.schemaRow:last-child {
-  border-bottom: 0;
 }
 
 /* Stub that carries a row onto the collector bus. */
 .schemaRow::after {
   content: "";
   position: absolute;
-  right: 0;
+  right: -2px;
   top: 50%;
-  width: 0.9rem;
+  width: calc(0.9rem + 2px);
   height: 2px;
   margin-top: -1px;
   background: var(--primary);
@@ -415,7 +497,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   font-variant-numeric: tabular-nums;
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  color: var(--muted-foreground);
 }
 
 .schemaRowName {
@@ -433,6 +515,7 @@
   flex: none;
   font-family: var(--font-mono);
   font-size: 0.55rem;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted-foreground);
@@ -708,7 +791,13 @@
   }
 }
 
-/* Powered ring + glow. */
+@media (min-width: 64rem) and (max-width: 83.9975rem) {
+  .schemaNode {
+    width: min(7.5rem, 76%);
+  }
+}
+
+/* Powered ring + glow — the gateway's one piece of state. */
 .schemaNode::after {
   content: "";
   position: absolute;
@@ -720,26 +809,8 @@
     0 0 22px -12px var(--wire-glow),
     inset 0 0 18px -10px var(--wire-glow);
   opacity: 1;
-  pointer-events: none;
-}
-
-/* Corner ticks — drafting marks, not decoration for its own sake. */
-.schemaNode::before {
-  content: "";
-  position: absolute;
-  inset: -6px;
-  pointer-events: none;
-  background:
-    linear-gradient(var(--primary), var(--primary)) 0 0 / 9px 1px,
-    linear-gradient(var(--primary), var(--primary)) 0 0 / 1px 9px,
-    linear-gradient(var(--primary), var(--primary)) 100% 0 / 9px 1px,
-    linear-gradient(var(--primary), var(--primary)) 100% 0 / 1px 9px,
-    linear-gradient(var(--primary), var(--primary)) 0 100% / 9px 1px,
-    linear-gradient(var(--primary), var(--primary)) 0 100% / 1px 9px,
-    linear-gradient(var(--primary), var(--primary)) 100% 100% / 9px 1px,
-    linear-gradient(var(--primary), var(--primary)) 100% 100% / 1px 9px;
-  background-repeat: no-repeat;
   transform: scale(1);
+  pointer-events: none;
 }
 
 .nodeFlash {
@@ -766,53 +837,6 @@
   color: var(--foreground);
 }
 
-.nodeStatus {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.85rem;
-  font-family: var(--font-mono);
-  font-size: 0.58rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted-foreground);
-  white-space: nowrap;
-}
-
-@media (min-width: 64rem) {
-  .nodeStatus {
-    position: absolute;
-    left: 50%;
-    top: calc(50% + min(3.75rem, 29%) + 1.4rem);
-    margin-top: 0;
-    transform: translateX(-50%);
-  }
-}
-
-.nodeStatusDot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 18%, transparent);
-}
-
-.nodeStatusStack {
-  display: grid;
-  min-width: 4.6rem;
-}
-
-.nodeStatusStack > span {
-  grid-area: 1 / 1;
-  opacity: 0;
-}
-
-.nodeStatusStack > span[data-state="on"] {
-  opacity: 1;
-  color: var(--foreground);
-}
-
 /* --- Agent actions ------------------------------------------------------- */
 
 .agentActions {
@@ -829,11 +853,17 @@
   align-content: center;
   gap: 0.3rem 0.6rem;
   padding: 0.85rem 0.95rem;
-  border-bottom: 1px solid var(--lp-hairline);
 }
 
-.agentAction:last-child {
-  border-bottom: 0;
+/* Base divider (drawn, not bordered — see the library note). */
+.agentAction:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
 }
 
 /* Activation rule: hairline by default, primary once the port is armed. */
@@ -841,7 +871,7 @@
   content: "";
   position: absolute;
   left: 0;
-  bottom: -1px;
+  bottom: 0;
   width: 100%;
   height: 1px;
   background: color-mix(in oklch, var(--primary) 46%, transparent);
@@ -870,7 +900,7 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.08em;
-  color: color-mix(in oklch, var(--muted-foreground) 72%, transparent);
+  color: var(--muted-foreground);
 }
 
 .agentActionName {
@@ -921,18 +951,6 @@
 /* Narrower desktops: drop the argument list rather than truncate the tool
    name. The signature is a detail; the tool name is the information. */
 @media (min-width: 64rem) and (max-width: 83.9975rem) {
-  /* The copy column is too narrow here for a two-up spec grid without
-     truncating values, and the footer rules must stay level with the
-     figcaption, so the annotation drops to its two load-bearing lines. */
-  .specs {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .specRow[data-spec="2"],
-  .specRow[data-spec="4"] {
-    display: none;
-  }
-
   .actionTool {
     font-size: 0.58rem;
   }
@@ -949,7 +967,7 @@
 
 /* --- Annotations --------------------------------------------------------- */
 
-/* Dimension line: a drafting measurement across the whole route. */
+/* Dimension line across the whole route: library edge to agent ports. */
 .hopMeasure {
   position: relative;
   z-index: 1;
@@ -962,38 +980,26 @@
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--muted-foreground) 82%, transparent);
+  color: var(--muted-foreground);
 }
 
 .hopRule {
-  position: relative;
   flex: 1;
   height: 1px;
   background: var(--lp-hairline);
 }
 
-.hopRule::before,
-.hopRule::after {
-  content: "";
-  position: absolute;
-  top: -4px;
-  width: 1px;
-  height: 9px;
-  background: var(--lp-hairline-strong);
-}
-
-.hopRule::before {
-  left: 0;
-}
-
-.hopRule::after {
-  right: 0;
-}
-
 .schemaCaption {
   margin-top: 1.5rem;
-  padding-top: 0.95rem;
+  padding-top: 1.1rem;
   border-top: 1px solid var(--lp-hairline);
+}
+
+/* The rule belongs to the column; the prose keeps its own measure. Before,
+   the rule inherited the 46ch measure and died in open space at x=967. */
+.schemaCaptionText {
+  display: block;
+  max-width: 46ch;
   font-size: 0.8rem;
   line-height: 1.6;
   color: var(--muted-foreground);
@@ -1001,11 +1007,8 @@
 
 @media (min-width: 64rem) {
   .schemaCaption {
-    display: flex;
-    align-items: center;
-    min-height: 5rem;
+    height: var(--footer-band);
     margin-top: 0;
-    max-width: 46ch;
   }
 }
 
@@ -1016,10 +1019,15 @@
 @media (min-width: 64rem) {
   .schematicGrid {
     grid-template-columns: minmax(0, 0.9fr) var(--gw) minmax(0, 1.1fr);
-    grid-template-rows: minmax(0, auto);
+    grid-template-rows: auto auto;
     column-gap: var(--schema-gap);
+    row-gap: 1.75rem;
     align-items: center;
-    padding-bottom: 3.25rem;
+    align-content: center;
+    /* The column labels are lifted out of flow, so the grid reserves their
+       band as padding. That puts the *visual* centre of the diagram — labels
+       included — on the same axis as the copy column's centre. */
+    padding-top: calc(var(--col-label-h) + var(--col-label-gap));
   }
 
   .libCol {
@@ -1046,14 +1054,12 @@
     left: 0;
     right: 0;
     bottom: 100%;
-    margin-bottom: 0.85rem;
+    margin-bottom: var(--col-label-gap);
   }
 
   .hopMeasure {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.6rem;
+    grid-column: 1 / -1;
+    grid-row: 2;
     margin-top: 0;
   }
 
@@ -1062,7 +1068,7 @@
   }
 
   .agentAction {
-    height: var(--wire-row-h);
+    height: var(--agent-row-h);
     padding-block: 0;
   }
 
@@ -1162,29 +1168,7 @@
   /* Gateway ignition. */
   :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
     opacity: var(--ignite);
-  }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::before {
-    transform: scale(calc(0.86 + 0.14 * var(--ignite)));
-    opacity: calc(0.25 + 0.75 * var(--ignite));
-  }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .nodeStatusDot {
-    background: color-mix(
-      in oklch,
-      var(--primary) calc(var(--ignite) * 100%),
-      var(--wire-casing)
-    );
-    box-shadow: 0 0 0 3px
-      color-mix(in oklch, var(--primary) calc(var(--ignite) * 18%), transparent);
-  }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .nodeStatusStack
-    > span[data-state="off"] {
-    opacity: calc(1 - clamp(0, (var(--ignite) - 0.5) / 0.06, 1));
-  }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .nodeStatusStack
-    > span[data-state="on"] {
-    opacity: clamp(0, (var(--ignite) - 0.5) / 0.06, 1);
+    transform: scale(calc(0.9 + 0.1 * var(--ignite)));
   }
 
   /* Ports arm. The action names never dim — activation is carried by the
@@ -1270,10 +1254,6 @@
   }
 
   /* Header readout tracks the phase the diagram is actually in. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .readoutBar::after {
-    transform: scaleX(var(--mcp-p));
-  }
-
   :global([data-landing-motion-root][data-motion-enabled="true"])
     .readoutStack
     > span[data-phase="0"] {
@@ -1324,11 +1304,18 @@
     margin-bottom: 0.85rem;
   }
 
-  /* The route runs vertically here, so the horizontal collector furniture
-     would point at nothing. Rows still tick as they are indexed. */
+  /* The route runs vertically here, so the horizontal collector furniture —
+     and the horizontal dimension line across it — would measure nothing.
+     Rows still tick as they are indexed. */
   .libraryBus,
-  .schemaRow::after {
+  .schemaRow::after,
+  .hopMeasure {
     display: none;
+  }
+
+  .libraryHead {
+    height: auto;
+    padding-block: 0.85rem;
   }
 
   .schemaRow {

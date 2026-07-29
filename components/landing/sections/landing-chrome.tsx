@@ -10,48 +10,44 @@ import {
 } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
 
-const railChapters = [
-  { id: "intro", label: "Library" },
-  { id: "flow", label: "Workflow" },
-  { id: "mcp", label: "MCP" },
-  { id: "pricing", label: "Pricing" },
-  { id: "faq", label: "FAQ" },
-  { id: "start", label: "Start" },
-] as const
-
-/** Fixed section index, printed in difference ink. */
+/**
+ * Retired chapter index.
+ *
+ * It rendered a fixed six-tick spine with hover-revealed labels in the 40px
+ * outer gutter, *past* the frame's right rail. Read without knowing what it
+ * was, it read as ornament: outside the frame it belonged to, breaking the
+ * page's left/right symmetry, pinned against the viewport edge, duplicating
+ * the browser scrollbar, and with ticks spaced evenly rather than at the
+ * positions of the chapters they stood for. An index whose labels only appear
+ * on hover, in a gutter with no room to show them, is not navigation — and at
+ * this measure there is no room to make it navigation. The page keeps one
+ * honest position signal (the playhead on the header's measure rule) and the
+ * footer keeps the links.
+ *
+ * Kept as an export because the page composes it; the motion controller
+ * already no-ops when no `[data-rail-link]` exists.
+ */
 export function ChapterRail() {
-  return (
-    <nav className={base.rail} aria-label="Page chapters">
-      {railChapters.map((chapter) => (
-        <a
-          key={chapter.id}
-          href={`#${chapter.id}`}
-          className={base.railLink}
-          data-rail-link={chapter.id}
-          aria-current={chapter.id === "intro" ? "true" : undefined}
-        >
-          <span className={base.railLabel}>{chapter.label}</span>
-          <span className={base.railTick} aria-hidden="true" />
-        </a>
-      ))}
-    </nav>
-  )
+  return null
 }
 
-/** Sticky command strip with the scroll-progress hairline. */
+/** Sticky command strip with the scroll playhead on its measure rule. */
 export function LandingHeader() {
   return (
     <>
       <PageFrame />
       <header className={base.header}>
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
-          <Brand compactOnMobile />
+          <span className={base.brandLockup}>
+            <Brand compactOnMobile />
+          </span>
           <Suspense fallback={<HomeHeaderActionsFallback />}>
             <HomeHeaderActions />
           </Suspense>
         </div>
-        <span className={base.scrollProgress} aria-hidden="true" />
+        <span className={base.scrollProgress} aria-hidden="true">
+          <span className={base.scrollHead} />
+        </span>
       </header>
     </>
   )
@@ -95,9 +91,12 @@ function GitHubMark() {
 export function LandingFooter() {
   return (
     <footer className={base.footer}>
+      <span className={base.footerField} aria-hidden="true" />
       <span className={base.footerRule} aria-hidden="true" />
       <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-10 md:py-14">
-        <Brand />
+        <span className={base.brandLockup}>
+          <Brand />
+        </span>
         <div className="flex flex-wrap items-center gap-x-7 gap-y-4 md:justify-end">
           <nav
             aria-label="Footer"

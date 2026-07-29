@@ -50,6 +50,29 @@
   --lp-frame-ink: 0.11;
   --lp-footer-field: color-mix(in oklab, var(--foreground) 3.5%, var(--background));
 
+  /* --- appended: one rule language for the chrome ---------------------------
+     Every horizontal rule the chrome draws — the header's measure rule, the
+     banner's edge, the footer's measure rule — is the same 1px of the same
+     ink across exactly the same span. Accent ink appears in chrome in one
+     place only: the scroll playhead, where it reports state rather than
+     decorates a boundary. */
+     Weighted to render at the same strength as the frame's vertical rails
+     (which are difference ink, so they cannot share a declaration) — the top
+     rule, the bottom rule and the two side rails read as four edges of one
+     rectangle, a step above the hairlines the chapters divide themselves
+     with. */
+  --lp-chrome-rule: color-mix(in oklab, var(--foreground) 23%, transparent);
+
+  /* Optical alignment constants.
+     `--lp-mark-bearing`: the brand glyph's own padding inside its box
+     (path starts at x=3 of a 32 viewBox on a 1.75rem mark), so the lockup can
+     be pulled back onto the column by its own side bearing.
+     `--lp-arrow-bearing`: the trailing arrow's side bearing (5 of 24), in em
+     of the arrow, so a trailing icon lands the same optical distance from the
+     button edge as a leading cap does. */
+  --lp-mark-bearing: calc(3 / 32 * 1.75rem);
+  --lp-arrow-bearing: 0.2084em;
+
   position: relative;
 }
 
@@ -73,7 +96,17 @@
 
 /* Paper grain: print texture at very low opacity, never over readability.
    Tuned so it actually reads as tooth on the field — multiply darkens the
-   paper in light, overlay lifts it out of the near-black in dark. */
+   paper in light, overlay lifts it out of the near-black in dark.
+
+   The turbulence is desaturated on the way out (`feColorMatrix saturate 0`).
+   Raw fractal noise is *chromatic* — it perturbs R, G and B independently —
+   so an undesaturated grain sprays random hue over every surface it covers
+   and an eyedropper on a card comes back warm while the field beside it comes
+   back cool. The page runs one neutral ramp; its tooth has to be luminance
+   only.
+
+   It also stops at the frame. The rails are meant to read as the page's
+   boundary, not as a line drawn on top of a field that carries on past them. */
 .grain {
   position: relative;
 }
@@ -84,10 +117,17 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
   background-size: 140px 140px;
   opacity: 0.2;
   mix-blend-mode: multiply;
+}
+
+@media (min-width: 64rem) {
+  .grain::after {
+    left: var(--lp-frame-inset);
+    right: var(--lp-frame-inset);
+  }
 }
 
 :global(.dark) .grain::after {
@@ -159,7 +199,7 @@
   right: var(--lp-frame-inset);
   bottom: 0;
   height: 1px;
-  background: var(--lp-hairline);
+  background: var(--lp-chrome-rule);
   opacity: 0.75;
   transition:
     background-color var(--lp-dur-hover) var(--lp-ease-snap),
@@ -170,10 +210,14 @@
   /* Opaque on purpose. A frosted strip is the fashionable answer, but this
      page runs display type and an inverted plate underneath it: at any alpha
      that still reads as glass, headings ghost through the wordmark as they
-     pass beneath. The strip cuts, the rule marks the cut, and a tight cast
-     shadow says which one is on top. */
+     pass beneath. The strip cuts and the rule marks the cut.
+
+     The cast shadow is keyed to the app's shadow colour, which is dark in
+     both themes. Deriving it from `--foreground` made it *light* in dark
+     mode: a 1400-wide halo landing a pixel under the measure rule, which read
+     as a second, wider rule doubling the first at the very top of the page. */
   background-color: var(--background);
-  box-shadow: 0 14px 24px -24px color-mix(in oklab, var(--foreground) 80%, transparent);
+  box-shadow: 0 12px 22px -20px hsl(var(--shadow-color) / 0.55);
 }
 
 .root[data-scrolled] .header::before {
@@ -181,16 +225,46 @@
   opacity: 1;
 }
 
+/* Without scripting there is nothing to tell the strip it has been scrolled
+   past, so it would stay transparent for the whole page and let display type
+   pass straight through the wordmark. It keeps its field instead: one less
+   dramatic first screen, but never an illegible one. */
+@media (scripting: none) {
+  .header {
+    background-color: var(--background);
+  }
+
+  .header::before {
+    background: var(--lp-hairline-strong);
+    opacity: 1;
+  }
+}
+
+/* A short vertical divider between two cells of a control row. It centres on
+   the row's optical centre — the same centre the caps and the icon cell sit
+   on. (It used to declare `align-self: stretch`, which a definite height
+   cancels, dropping it back to flex-start and leaving it 10px high in a
+   36px row.) */
 .headerCellRule {
-  align-self: stretch;
+  align-self: center;
   width: 1px;
   flex: none;
-  background: var(--lp-hairline);
+  background: var(--lp-chrome-rule);
+}
+
+/* The brand lockup, pulled back onto the column by the mark's own side
+   bearing so the first ink of the page starts on the measure rather than
+   three pixels inside it. Header and footer use the same wrapper, so the
+   wordmark reads as hanging from one column top to bottom. */
+.brandLockup {
+  display: inline-flex;
+  margin-inline-start: calc(-1 * var(--lp-mark-bearing));
 }
 
 /* Theme toggle sits in the CTA cluster: same 3px language, same optical
    height as the primary action, never a stray pill. */
 .headerToggle {
+  position: relative;
   border-radius: 3px;
   border-color: var(--lp-hairline);
   background-color: transparent;
@@ -209,6 +283,45 @@
   outline-offset: 2px;
 }
 
+/* The one control on the page whose glyph cannot say what it does: a monitor
+   outline means "follow the system", which nothing about the shape tells you.
+   The button already carries its own name and state in `title`
+   ("Theme: system"); this prints that name, so pointing at it or tabbing to
+   it answers the question immediately instead of a second later via the OS
+   tooltip. No JS, no invented copy — the control's own label, made visible. */
+.headerToggle::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 2;
+  padding: 0.24rem 0.4rem 0.2rem;
+  border: 1px solid var(--lp-hairline);
+  border-radius: 3px;
+  background: var(--background);
+  box-shadow: 0 4px 12px -8px hsl(var(--shadow-color) / 0.6);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 -3px;
+  transition:
+    opacity var(--lp-dur-hover) var(--lp-ease-out),
+    translate var(--lp-dur-hover) var(--lp-ease-out);
+}
+
+.headerToggle:hover::after,
+.headerToggle:focus-visible::after {
+  opacity: 1;
+  translate: 0 0;
+}
+
 /* ---------------------------------------------------------------------------
    Shared CTA language — sharp, directional, routed
 
@@ -218,8 +331,18 @@
    built thing on the page.
 --------------------------------------------------------------------------- */
 
+/* One geometry for every instance, expressed in the button's own type size so
+   a 12.8px nav action and a 16px chapter action are the *same* button at two
+   scales rather than two buttons. The utility layer shipped a trailing-icon
+   padding compensation (`pr-2.5` at sm, `pr-4.5` at lg) that is applied on one
+   axis in one size and both axes in another; measured, that left the nav
+   action leaning right and the chapter action leaning left. Padding is
+   symmetric here and the *icon* is compensated instead, by its own side
+   bearing, which is where the asymmetry actually comes from. */
 .ctaButton {
   position: relative;
+  padding-inline: 1.25em;
+  gap: 0.5em;
   border-radius: 3px;
   transition:
     translate var(--lp-dur-hover) var(--lp-ease-snap),
@@ -235,16 +358,40 @@
   box-shadow: none;
 }
 
+/* The arrow is set like a glyph: it takes the button's type size, and its
+   trailing side bearing is taken back out of the padding so its ink sits the
+   same distance from the edge as the label's first cap does on the other
+   side. */
 .ctaArrow {
+  inline-size: 1em;
+  block-size: 1em;
+  flex: none;
   transition:
     transform var(--lp-dur-hover) var(--lp-ease-out),
     opacity var(--lp-dur-hover) var(--lp-ease-out);
 }
 
+.ctaButton .ctaArrow[data-icon="inline-end"] {
+  margin-inline-end: calc(-1 * var(--lp-arrow-bearing));
+}
+
+.ctaButton svg[data-icon="inline-start"] {
+  inline-size: 1em;
+  block-size: 1em;
+  flex: none;
+  margin-inline-start: -0.084em;
+}
+
 /* Primary — filled ink. A hairline top highlight at rest, a cast shadow in
-   the accent hue on hover, and it sits back down under the finger. */
+   the accent hue on hover, and it sits back down under the finger.
+
+   `background-clip: border-box` on purpose: the shared button paints its fill
+   to the padding box, so a 36px control with a 1px transparent border showed
+   34px of ink — two pixels shorter than the 36px icon button standing right
+   next to it in the same bar. */
 .ctaPrimary,
 .ctaPrimary:focus-visible {
+  background-clip: border-box;
   box-shadow:
     inset 0 1px 0 color-mix(in oklab, #fff 26%, transparent),
     0 1px 0 color-mix(in oklab, var(--foreground) 14%, transparent);
@@ -322,12 +469,20 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Scroll progress — the playhead, riding the measure rule under the strip
+   Scroll progress — a playhead on the measure rule, not a second border
 
-   Drawn on the same 1px row as the header rule and clipped to the same
-   measure, so it reads as that rule filling in rather than a green bar
-   stapled to the viewport. Fades in with the strip's field; absent without
-   JS and under reduced motion, where it could never advance.
+   The old indicator was a green ramp filling the same 1px row as the header
+   rule, brightening left to right and then cutting to flat grey wherever the
+   page happened to be. As a still it read as a broken border: a rule that
+   changes colour two thirds of the way across, at a coordinate that aligns to
+   nothing.
+
+   It reads as a *position* now because it has a head. A flat, quiet accent
+   trace covers the distance travelled; a full-strength 8px riser stands on the
+   rule at the leading edge and travels from the left frame rail to the right
+   frame rail across the page. Wherever it stops there is a mark saying "here",
+   so the change of ink is an event and not an edge. Absent without JS and
+   under reduced motion, where it could never advance.
 --------------------------------------------------------------------------- */
 
 .scrollProgress {
@@ -336,23 +491,33 @@
   right: var(--lp-frame-inset);
   bottom: 0;
   height: 1px;
-  overflow: hidden;
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--lp-dur-reveal) var(--lp-ease-out);
 }
 
+/* distance covered — flat, deliberately quieter than the head */
 .scrollProgress::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    color-mix(in oklab, var(--primary) 30%, transparent),
-    var(--primary)
-  );
+  background: color-mix(in oklab, var(--primary) 50%, transparent);
   transform: scaleX(var(--scroll-progress, 0));
   transform-origin: left center;
+}
+
+/* The head. The element spans the whole track and carries the mark on its
+   trailing edge, so it can be moved with a percentage translate of its own
+   width — transform only, no per-frame layout, and it lands exactly on the
+   left frame rail at 0 and the right frame rail at 1. */
+.scrollHead {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 1px;
+  height: 0.5rem;
+  border-inline-end: 1px solid var(--primary);
+  translate: calc((var(--scroll-progress, 0) - 1) * 100% + 1px) 0;
 }
 
 .root[data-scrolled][data-motion-enabled="true"] .scrollProgress {
@@ -360,180 +525,28 @@
 }
 
 /* ---------------------------------------------------------------------------
-   Chapter rail — a section index that behaves like an index
+   Chapter rail — retired
 
-   Lives in the outer gutter, just past the frame's right rail, at every
-   width. At rest it is a spine with six nodes and a fill that tracks how far
-   down the page you are — so it reads as a position indicator, not as six
-   stray dashes. The marks are difference ink, so they survive the inverted
-   pricing plate; the labels are opaque chips, because a blended chip lets the
-   content behind it ghost through and an index has to be readable.
+   It was a fixed spine of six ticks with hover-revealed labels, living in the
+   40px outer gutter *past* the frame's right rail. Read cold it was a
+   decorative scroll-rail: outside the frame it was supposed to belong to,
+   breaking the page's left/right symmetry, jammed against the viewport edge,
+   duplicating the browser scrollbar, and with ticks spaced evenly rather than
+   at the positions of the chapters they stood for. An index whose labels only
+   appear on hover, in a gutter too narrow to ever show them, is not
+   navigation; at this measure there is no room to make it navigation. The
+   page keeps one honest position signal — the playhead on the measure rule —
+   and the footer keeps the links.
+
+   The class names survive as no-ops so any stale reference still resolves,
+   and the controller already guards on `railLinks.length`.
 --------------------------------------------------------------------------- */
 
-.rail {
-  position: fixed;
-  top: 50%;
-  right: calc(var(--lp-frame-inset) - 1.7rem);
-  z-index: 30;
-  display: none;
-  translate: 0 -50%;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.55rem;
-}
-
-@media (min-width: 80rem) {
-  .rail {
-    display: flex;
-  }
-}
-
-/* the spine */
-.rail::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 1px;
-  background: #fff;
-  opacity: 0.3;
-  mix-blend-mode: difference;
-}
-
-/* how far down the page you are, drawn on the spine */
-.rail::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 1px;
-  background: #fff;
-  opacity: 0;
-  mix-blend-mode: difference;
-  transform: scaleY(var(--scroll-progress, 0));
-  transform-origin: top center;
-}
-
-.root[data-motion-enabled="true"] .rail::after {
-  opacity: 0.9;
-}
-
-.railLink {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  padding-block: 0.4rem;
-  border-radius: 3px;
-  text-decoration: none;
-}
-
-.railLink:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 3px;
-}
-
-.railTick {
-  position: relative;
-  width: 0.85rem;
-  height: 1px;
-  background: #fff;
-  opacity: 0.38;
-  mix-blend-mode: difference;
-  transform: scaleX(0.55);
-  transform-origin: right center;
-  transition:
-    transform var(--lp-dur-hover) var(--lp-ease-out),
-    opacity var(--lp-dur-hover) var(--lp-ease-out);
-}
-
-.railLink[aria-current] .railTick,
-.railLink:hover .railTick,
-.railLink:focus-visible .railTick {
-  opacity: 1;
-  transform: scaleX(1);
-}
-
-/* you are here — the same filled square the chapters mark themselves with */
-.railLink[aria-current] .railTick::after {
-  content: "";
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  width: 3px;
-  height: 3px;
-  background: #fff;
-}
-
-/* Opaque chip, revealed for the whole index at once so approaching the rail
-   gives you the table of contents rather than one label at a time. */
+.rail,
+.railLink,
+.railTick,
 .railLabel {
-  display: block;
-  padding: 0.22rem 0.45rem 0.2rem;
-  border: 1px solid var(--lp-hairline);
-  border-radius: 3px;
-  background: var(--background);
-  box-shadow: 0 4px 12px -8px color-mix(in oklab, var(--foreground) 60%, transparent);
-  color: var(--muted-foreground);
-  font-family: var(--font-mono);
-  font-size: 0.5625rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  opacity: 0;
-  translate: 5px 0;
-  transition:
-    opacity var(--lp-dur-hover) var(--lp-ease-out),
-    translate var(--lp-dur-hover) var(--lp-ease-out),
-    color var(--lp-dur-hover) var(--lp-ease-out),
-    border-color var(--lp-dur-hover) var(--lp-ease-out);
-}
-
-.rail:hover .railLabel,
-.rail:focus-within .railLabel {
-  opacity: 1;
-  translate: 0 0;
-}
-
-/* the index unrolls top to bottom rather than snapping in as a block */
-.rail:hover .railLink:nth-child(2) .railLabel,
-.rail:focus-within .railLink:nth-child(2) .railLabel {
-  transition-delay: 18ms;
-}
-
-.rail:hover .railLink:nth-child(3) .railLabel,
-.rail:focus-within .railLink:nth-child(3) .railLabel {
-  transition-delay: 36ms;
-}
-
-.rail:hover .railLink:nth-child(4) .railLabel,
-.rail:focus-within .railLink:nth-child(4) .railLabel {
-  transition-delay: 54ms;
-}
-
-.rail:hover .railLink:nth-child(5) .railLabel,
-.rail:focus-within .railLink:nth-child(5) .railLabel {
-  transition-delay: 72ms;
-}
-
-.rail:hover .railLink:nth-child(6) .railLabel,
-.rail:focus-within .railLink:nth-child(6) .railLabel {
-  transition-delay: 90ms;
-}
-
-.railLink[aria-current] .railLabel {
-  border-color: color-mix(in oklab, var(--primary) 45%, transparent);
-  color: var(--primary);
-}
-
-.railLink:hover .railLabel,
-.railLink:focus-visible .railLabel {
-  border-color: var(--lp-hairline-strong);
-  color: var(--foreground);
+  display: none;
 }
 
 /* ---------------------------------------------------------------------------
@@ -553,7 +566,7 @@
   right: var(--lp-frame-inset);
   bottom: 0;
   height: 1px;
-  background: color-mix(in oklab, var(--primary) 32%, transparent);
+  background: var(--lp-chrome-rule);
 }
 
 .bannerLink {
@@ -578,26 +591,42 @@
 /* ---------------------------------------------------------------------------
    Footer — the closing plate
 
-   The last chapter dissolves into a slightly recessed field, the measure rule
-   returns as the frame's bottom edge, and the accent punctuates its left end
-   so the page ends on the same mark it opened with.
+   The last chapter dissolves into a slightly recessed field and the measure
+   rule returns as the frame's bottom edge. The rule is the same 1px of the
+   same ink across the same span as the rule at the top of the page: it used
+   to carry a 36px accent stub whose right end landed on nothing, which made
+   three chrome rules on one page with three different treatments.
+
+   Where the frame exists, the plate stops at it — the page's last field is
+   inside the frame like everything else, instead of running out under it.
 --------------------------------------------------------------------------- */
 
 .footer {
   position: relative;
-  background: var(--lp-footer-field);
 }
 
-/* hand-off: the closing chapter fades into the footer plate above the rule */
-.footer::before {
-  content: "";
+/* The plate, plus the hand-off: the closing chapter fades into it over the
+   last 5rem before the rule. */
+.footerField {
   position: absolute;
   left: 0;
   right: 0;
   top: -5rem;
-  height: 5rem;
+  bottom: 0;
+  z-index: 0;
   pointer-events: none;
-  background: linear-gradient(to bottom, transparent, var(--lp-footer-field));
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    var(--lp-footer-field) 5rem
+  );
+}
+
+@media (min-width: 64rem) {
+  .footerField {
+    left: var(--lp-frame-inset);
+    right: var(--lp-frame-inset);
+  }
 }
 
 .footerRule {
@@ -606,21 +635,15 @@
   right: var(--lp-frame-inset);
   top: 0;
   height: 1px;
-  background: var(--lp-hairline);
-}
-
-.footerRule::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 2.25rem;
-  height: 1px;
-  background: var(--primary);
+  z-index: 1;
+  background: var(--lp-chrome-rule);
 }
 
 .footerNavLink {
   position: relative;
+  /* Take back the trailing letter-space of the tracked caps so the optical
+     gap to the next cell matches the gap between the links themselves. */
+  margin-inline-end: -0.18em;
   padding-block: 0.15rem;
   color: var(--muted-foreground);
   text-decoration: none;
@@ -655,8 +678,13 @@
   color: var(--foreground);
 }
 
+/* Carries its hairline at rest, like the theme toggle at the other end of the
+   page. That is what makes the last mark on the page terminate *on* the
+   column: a bare 20px glyph inside a 36px hit target stopped ten pixels short
+   of the rule everything else lands on, which is how the page ended up with
+   four different right-hand terminations. */
 .footerMark {
-  border: 1px solid transparent;
+  border: 1px solid var(--lp-chrome-rule);
   border-radius: 3px;
   color: var(--muted-foreground);
   transition:
@@ -709,12 +737,14 @@
   .footerNavLink::after,
   .footerMark,
   .headerToggle,
-  .railLink,
-  .railTick,
-  .railLabel,
+  .headerToggle::after,
   .scrollProgress {
     transition: none;
     transition-delay: 0s;
+  }
+
+  .headerToggle::after {
+    translate: none;
   }
 
   .ctaButton:hover,
@@ -733,10 +763,9 @@
     transform: none;
   }
 
-  /* The controller never advances these without motion; a permanently empty
-     indicator is worse than none. */
-  .scrollProgress,
-  .rail::after {
+  /* The controller never advances this without motion; a playhead parked at
+     zero forever is worse than none. */
+  .scrollProgress {
     display: none;
   }
 }

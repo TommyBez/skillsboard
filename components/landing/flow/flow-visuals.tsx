@@ -29,7 +29,7 @@ import styles from "@/components/landing/styles/flow.module.css"
 /** A caption followed by a hairline that runs to the column's right edge. */
 function VizLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className={styles.vizLabel}>
+    <p className={styles.vizLabel} aria-hidden="true">
       <span className={styles.labelText}>{children}</span>
       <span className={styles.labelRule} />
     </p>
@@ -39,7 +39,7 @@ function VizLabel({ children }: { children: React.ReactNode }) {
 /** The same object, closing the column: one measured fact about the diagram. */
 function VizFoot({ label, value }: { label: string; value: string }) {
   return (
-    <p className={`${styles.vizLabel} ${styles.vizFoot}`}>
+    <p className={`${styles.vizLabel} ${styles.vizFoot}`} aria-hidden="true">
       <span className={styles.labelText}>{label}</span>
       <span className={styles.labelRule} />
       <span className={styles.footVal}>{value}</span>
@@ -56,7 +56,7 @@ export function PasteResolveVisual() {
       <VizLabel>
         url <Arrow /> skill
       </VizLabel>
-      <div className={styles.vizBody}>
+      <div className={styles.vizBody} aria-hidden="true">
         <div className={styles.pasteField}>
           <span className={styles.pasteFlash} />
           <LinkIcon className={styles.ctrlIcon} aria-hidden="true" />
@@ -98,7 +98,9 @@ export function PasteResolveVisual() {
           </div>
         </div>
       </div>
-      <VizFoot label="kept" value="4 fields" />
+      {/* All three readouts carry a six-character key and a six-character
+          value, so the three leader rules start and stop on the same x. */}
+      <VizFoot label="fields" value="4 kept" />
     </>
   )
 }
@@ -117,7 +119,7 @@ export function SearchFilterVisual() {
       <VizLabel>
         query <Arrow /> match
       </VizLabel>
-      <div className={styles.vizBody}>
+      <div className={styles.vizBody} aria-hidden="true">
         <div className={styles.searchField}>
           <SearchIcon className={styles.ctrlIcon} aria-hidden="true" />
           <span className={styles.searchQueryWrap}>
@@ -135,7 +137,7 @@ export function SearchFilterVisual() {
           </li>
         </ul>
 
-        <p className={`${styles.vizLabel} ${styles.resultCut}`}>
+        <p className={`${styles.vizLabel} ${styles.resultCut}`} aria-hidden="true">
           <span className={styles.labelText}>filtered out</span>
           <span className={styles.labelRule} />
         </p>
@@ -149,7 +151,7 @@ export function SearchFilterVisual() {
           ))}
         </ul>
       </div>
-      <VizFoot label="matched" value="1 / 24" />
+      <VizFoot label="result" value="1 / 24" />
     </>
   )
 }
@@ -168,7 +170,7 @@ export function RouteFanVisual() {
       <VizLabel>
         skill <Arrow /> routes
       </VizLabel>
-      <div className={styles.vizBody}>
+      <div className={styles.vizBody} aria-hidden="true">
         <p className={styles.fanNode}>
           <GitForkIcon className={styles.ctrlIcon} aria-hidden="true" />
           pdf-extraction

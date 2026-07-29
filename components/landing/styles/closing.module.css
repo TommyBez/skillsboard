@@ -15,6 +15,10 @@
 --------------------------------------------------------------------------- */
 
 .closing {
+  /* The column line, as a fraction of the band's own measure. The grid, the
+     rail that draws it and the sheet that sits on it all read this. */
+  --closing-split: 0.61;
+
   position: relative;
 }
 
@@ -45,25 +49,76 @@
   );
 }
 
+/* Vertical scheme of the band, all of it derived from two rules that already
+   exist on the page: the chapter's measure rule at the top and the footer's
+   measure rule at the bottom.
+
+   `--closing-lead` is the distance from the chapter rule down to the top of
+   the sheet; `--closing-tail` is the distance from the bottom of the sheet
+   down to the footer rule. They are set equal, so the band's one object is
+   centred between the only two lines that bound it. Because the chapter rule
+   sits on the mark's own centre line, `--closing-tail` = `--closing-lead`
+   + half the mark's line box — that is the whole arithmetic.
+
+   Nothing is centred by free space any more: the layout is deterministic, so
+   the vertical rail below can be placed on the chapter rule to the pixel. */
 .closingInner {
+  --closing-mark-h: 1rem;
+  --closing-lead: 2.75rem;
+  --closing-tail: calc(var(--closing-lead) + var(--closing-mark-h) / 2);
+
   position: relative;
   display: flex;
   width: 100%;
   max-width: 1440px;
   flex-direction: column;
-  justify-content: center;
-  gap: 2.75rem;
+  gap: var(--closing-lead);
   margin-inline: auto;
-  padding-block: 4.5rem 4rem;
+  padding-block: 4.5rem var(--closing-tail);
   padding-inline: 1.25rem;
 }
 
 @media (min-width: 48rem) {
   .closingInner {
-    gap: 3rem;
-    min-height: min(70svh, 40rem);
-    padding-block: 4.5rem 5rem;
+    --closing-lead: 5rem;
+
+    padding-block: 6.9375rem var(--closing-tail);
     padding-inline: 2.5rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The column rail
+
+   The gutter between the claim and the sheet was the one large area on a page
+   built from rules that had no rule in it. This is that rule: the same
+   hairline, at the same ink, as the two fixed page rails on the content edge —
+   so it reads as a third rail of the page frame rather than as a divider
+   invented for this band. It starts on the chapter rule and ends on the
+   footer rule; neither end floats. The sheet's own left border is drawn on it.
+--------------------------------------------------------------------------- */
+
+.closingSplit {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .closingSplit {
+    display: block;
+    position: absolute;
+    top: calc(6.9375rem + var(--closing-mark-h) / 2);
+    bottom: 0;
+    left: calc(2.5rem + (100% - 5rem) * var(--closing-split));
+    width: 1px;
+    pointer-events: none;
+    /* Drawn exactly the way the two fixed page rails are drawn — white ink,
+       difference blend, the same `--lp-frame-ink` — so it is the same line at
+       the same weight in both themes rather than a second, softer idea of a
+       rail. The sheet paints over it, so it survives only where it is needed:
+       above the sheet and below it. */
+    background: #fff;
+    opacity: var(--lp-frame-ink);
+    mix-blend-mode: difference;
   }
 }
 
@@ -74,15 +129,22 @@
    the shared `base.chapterMark`; this only sets the index/name pairing.
 --------------------------------------------------------------------------- */
 
-/* Own class, kept as the layout + arrival hook for the chapter mark row. */
+/* Own class, kept as the layout + arrival hook for the chapter mark row.
+   The line box is pinned to a round 16px so the measure rule it carries sits
+   on an exact half-pixel of the band, which is what the column rail below is
+   positioned from. */
 .closingMark {
   flex: none;
+  line-height: 1rem;
 }
 
+/* Optical: the mono zero is round, so its ink is set a hair left of the
+   column's stem line — the same correction the display and body copy carry. */
 .closingMarkIndex {
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
+  margin-left: -0.65px;
 }
 
 .closingMarkSep {
@@ -106,7 +168,11 @@
 
 @media (min-width: 64rem) {
   .closingGrid {
-    grid-template-columns: minmax(0, 1.22fr) minmax(0, 0.78fr);
+    /* One number owns the column line: the grid split and the rail that draws
+       it are the same value, so the rule can never drift off the boundary. */
+    grid-template-columns:
+      minmax(0, calc(var(--closing-split) * 100%))
+      minmax(0, 1fr);
     grid-template-rows: auto auto;
     column-gap: 0;
     row-gap: 2.25rem;
@@ -136,14 +202,39 @@
 
 /* Leading trim. Measured: the cap line of this face at this weight sits
    0.152em below the top of its line box, which is what would otherwise leave
-   the sheet's top border floating 13px above the heading it aligns with. */
+   the sheet's top border floating 13px above the heading it aligns with.
+
+   Optical left edge. The column's stem line is the left edge of the terminal
+   button's fill; every text block in the column is set from that line by its
+   own leading glyph rather than by its box. Measured side bearings at this
+   size: "A" 0.75px, "s" 2.25px. Left flush by box, the round "s" of line two
+   would sit 1.5px to the right of the pointed "A" of line one — it has to sit
+   to the left of it. The block is pulled out by the "s" bearing plus its
+   overhang; `text-indent` puts line one — which always starts on the "A" —
+   back on the stem line. */
 .closingHeading {
   margin-top: -0.152em;
+  margin-left: -0.0085em;
   font-stretch: 93%;
 }
 
+@media (min-width: 64rem) {
+  .closingHeading {
+    margin-left: -0.037em;
+    text-indent: 0.0285em;
+  }
+}
+
+/* Same correction, body scale: line one opens on a round "S", line two on a
+   flat-stemmed "T", so the "T" holds the stem line and the "S" overhangs it.
+
+   Measures down the column are a ladder on one unit of 144px: 720px of
+   display, 576px of body, 288px of action — 5 : 4 : 2. The paragraph is not
+   stopping wherever it ran out; it is set to four fifths of the line above it. */
 .closingCopy {
   margin-bottom: 0;
+  margin-left: -0.014em;
+  text-indent: -0.0417em;
   color: color-mix(in oklch, var(--foreground) 76%, transparent);
 }
 
@@ -151,15 +242,28 @@
    The stamp — ink pressed into the page, then settled
 --------------------------------------------------------------------------- */
 
+/* Geometry, all of it measured on the ink rather than on the box:
+
+   - horizontal: the "o" carries a 2.06px left bearing and the period a 1.93px
+     right one, so the two paddings are set unequal in order to *land* equal —
+     18.7px of clear space on each side of the word;
+   - vertical: the line box is trimmed to 0.829em and the shortfall put back as
+     padding under the baseline, which centres the x-height band in the block
+     (18px above, 18px below) and drops the block's top edge clear of the line
+     above it instead of crowding it;
+   - horizontal placement: the block is pulled back so the gap from the closing
+     quote's ink to the word's ink reads as one and a half word spaces rather
+     than two, and the stamp stays part of the line it interrupts. */
 .onceStamp {
   position: relative;
   display: inline-block;
-  margin-left: 0.1em;
-  padding: 0 0.17em 0.06em 0.19em;
+  margin-left: -0.045em;
+  padding: 0 0.249em 0.12em 0.173em;
   border-radius: 2px;
+  line-height: 0.829em;
   background: color-mix(in oklch, var(--primary) 84%, var(--background) 16%);
   color: var(--primary-foreground);
-  transform: rotate(-1.6deg);
+  transform: rotate(-1.4deg);
   box-shadow:
     inset 0 1px 0 color-mix(in oklch, black 16%, transparent),
     inset 0 -1px 0 color-mix(in oklch, white 14%, transparent),
@@ -269,29 +373,17 @@
 
    A sheet, bracketed by two rules of one weight and one scope: the legend bar
    at the top, the answer bar at the bottom. Leaders inside it are drawn at
-   half that weight, so line weight tracks role instead of accident. At desktop
-   widths the sheet clears the fixed page-frame rail by exactly its own inner
-   gutter, so its border is never painted into that rail.
+   half that weight, so line weight tracks role instead of accident.
+
+   The sheet is a cell of the page grid, not an object floating inside one: its
+   left border is drawn on the column rail and its right border on the fixed
+   page rail, so it terminates on exactly the same line as the chapter rule
+   above it and the footer rule below it. Nothing on this band stops short of
+   the frame.
 --------------------------------------------------------------------------- */
 
 .plate {
   display: flex;
-}
-
-@media (min-width: 64rem) {
-  .plate {
-    padding-left: 2rem;
-  }
-
-  .plateFrame {
-    margin-right: 1.625rem;
-  }
-}
-
-@media (min-width: 82rem) {
-  .plate {
-    padding-left: clamp(2.5rem, 5vw, 5.5rem);
-  }
 }
 
 .plateFrame {
@@ -300,7 +392,10 @@
   flex: 1 1 auto;
   min-width: 0;
   flex-direction: column;
-  padding: 1.5rem 1.625rem;
+  /* Head band: 20px + the label's 18px line box + 18px = 56px to the rule.
+     Foot band mirrors it exactly, which is what puts both labels' cap centres
+     on their own band's centre line instead of 3px low and 6px high. */
+  padding: 20px 1.625rem 18px;
   border: 1px solid var(--lp-hairline);
   border-radius: 3px;
   background: color-mix(in oklch, var(--foreground) 2.5%, transparent);
@@ -312,22 +407,25 @@
   }
 }
 
-/* Legend at the top, answer at the bottom: the same bar, twice. */
+/* Legend at the top, answer at the bottom: the same bar, twice — and the
+   mirror is exact: 20px on the outside of the label row and 18px on the rule
+   side at both ends, so both bands measure 57px and both labels' cap centres
+   land on their own band's centre line. The two used to disagree by 9.5px. */
 .plateBar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.25rem;
-  padding-bottom: 0.9rem;
+  padding-bottom: 18px;
 }
 
 .plateBar[data-foot] {
-  padding-top: 0.9rem;
+  padding-top: 20px;
   padding-bottom: 0;
 }
 
 /* Both bars carry the same line box, so the sheet's two edge rules sit the
-   same distance from the sheet's two edges. Measured: 57.4px, both ends. */
+   same distance from the sheet's two edges. Measured: 57px, both ends. */
 .plateLabel,
 .plateAnswer {
   line-height: 1.125rem;
@@ -424,7 +522,7 @@
 
 /* Wide enough for the leader to still read as a leader: it runs the entry out
    to where it came from, the way an index does. */
-@media (min-width: 82rem) {
+@media (min-width: 64rem) {
   .plateRow {
     grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
   }
@@ -435,6 +533,11 @@
 
   .plateSource {
     justify-self: auto;
+  }
+}
+
+@media (min-width: 82rem) {
+  .plateSource {
     font-size: 0.6875rem;
   }
 }
@@ -462,25 +565,27 @@
   color: var(--foreground);
 }
 
-/* Every entry keeps the same slot; one entry carries the mark. */
+/* Every entry keeps the same slot and the same mark: one square, one size,
+   everywhere on the sheet. State is carried by colour alone — a marker that
+   changes size is a different marker, and a 3px one is dust rather than a
+   mark. */
 .plateMark {
-  width: 0.4375rem;
-  height: 0.4375rem;
+  width: 6px;
+  height: 6px;
   flex: none;
   border-radius: 1px;
-  background: color-mix(in oklch, var(--foreground) 20%, transparent);
-  scale: 0.42;
+  background: color-mix(in oklch, var(--foreground) 26%, transparent);
 }
 
-.plateRow[data-marked] .plateMark {
-  background: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in oklch, var(--primary) 16%, transparent);
-  scale: 1;
-}
-
+.plateRow[data-marked] .plateMark,
 .plateMark[data-legend] {
   background: var(--primary);
-  scale: 1;
+}
+
+/* In the two bars the square is centred on the label's cap band rather than
+   on its line box, which sits 1.25px lower. */
+.plateBar .plateMark {
+  margin-bottom: 1.5px;
 }
 
 .plateIndex {
@@ -596,16 +701,16 @@
 
   40% {
     opacity: 1;
-    transform: translate3d(0, 1px, 0) rotate(-1.6deg) scale(0.964);
+    transform: translate3d(0, 1px, 0) rotate(-1.4deg) scale(0.964);
   }
 
   62% {
-    transform: translate3d(0, 0, 0) rotate(-1.6deg) scale(1.014);
+    transform: translate3d(0, 0, 0) rotate(-1.4deg) scale(1.014);
   }
 
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) rotate(-1.6deg) scale(1);
+    transform: translate3d(0, 0, 0) rotate(-1.4deg) scale(1);
   }
 }
 

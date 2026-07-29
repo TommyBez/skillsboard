@@ -39,8 +39,10 @@ export function HomeHeaderActionsFallback() {
     <div className="flex items-center gap-2">
       <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
       <nav className="flex items-center gap-2" aria-label="Main navigation" aria-busy="true">
+        {/* Widths are the measured widths of the resolved controls, so the
+            strip does not reflow when the session lands. */}
         <Skeleton className="hidden h-9 w-[4.75rem] rounded-[3px] sm:block" />
-        <Skeleton className="h-8 w-14 rounded-[3px] sm:h-9 sm:w-[13.5rem]" />
+        <Skeleton className="h-8 w-[4.1rem] rounded-[3px] sm:h-9 sm:w-[12.6rem]" />
       </nav>
     </div>
   )
@@ -61,7 +63,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           <Button
             size="sm"
             variant="ghost"
-            className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 px-3.5 sm:inline-flex`}
+            className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 sm:inline-flex`}
             nativeButton={false}
             render={<Link href="/sign-in" />}
           >
@@ -70,7 +72,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
         ) : null}
         <Button
           size="sm"
-          className={`${base.ctaButton} ${base.ctaPrimary} px-2.5 sm:h-9 sm:px-4`}
+          className={`${base.ctaButton} ${base.ctaPrimary} sm:h-9`}
           nativeButton={false}
           render={(
             <TrackedLink

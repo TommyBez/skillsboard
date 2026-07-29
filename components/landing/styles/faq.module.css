@@ -4,21 +4,34 @@
    Structure, in the same grammar as chapter 03 (the MCP instrument frame) and
    chapter 04 (the pricing plate):
 
-     ┌ strip ──────────────────────────────────────────────── 05 — FAQ … ┐
-     │ head rule, on the page measure                                    │
-     │ title cell        │ register: eight numbered <details> rows       │
-     │ foot rule, on the page measure                                    │
-     └───────────────────────────────────────────────────────────────────┘
+     ┌ strip ── 05 — FAQ ─────────────────────── entry — 01 / 08 ┐
+     │ head rule, on the page measure                            │
+     │ title cell        │ register: eight numbered rows         │
+     │ index scale       │                                       │
+     │ foot rule, on the page measure                            │
+     └───────────────────────────────────────────────────────────┘
 
-   Both horizontal rules span the shared content measure — the same span as
-   the page frame's header rule and footer rule — so the chapter is a closed
-   block bracketed by the frame rather than a list floating in the field. One
-   vertical rule divides the two cells and runs exactly between those two
-   horizontal rules. Nothing is full-bleed; nothing crosses the frame rails.
+   The measured contract, at 1440 (frame rails at x=40 and x=1399):
+
+     · body columns are a true 1 : 2 — title cell 453.33, register 906.67,
+       the column rule landing on x=493.33;
+     · ONE inset governs every cell in the body: --faq-inset (24px at ≥90rem).
+       Title copy stands 24px clear of the left rail; the ordinal stands 24px
+       clear of the column rule and 24px clear of the numeral rule; the
+       question stands 24px clear of the numeral rule; the toggle stands 24px
+       clear of the right rail. Four cells, one number;
+     · every row rule spans the register cell entire — column rule to right
+       rail — so it starts and ends on a structural edge and crosses the
+       numeral rule instead of stopping in mid-air;
+     · row pitch is an integer at every breakpoint (69px at ≥90rem: a 30px
+       line box, 19px of padding either side, 1px of rule);
+     · the ordinal, the leader and the toggle are centred on the question's
+       INK band (ascender line to baseline), not on its line box — the line
+       box carries half-leading the eye cannot see.
 
    Every entry is a real <details>, so the chapter is complete and operable
-   with no JS at all. The height reveal, the glyph morph, the state readout in
-   the strip and the staggered entrance are layered on top of that.
+   with no JS at all. Entry 01 rests open, so the resting composition already
+   shows the grid surviving its own primary interaction.
 --------------------------------------------------------------------------- */
 
 .faqSection {
@@ -26,18 +39,67 @@
 }
 
 .faqInner {
-  /* Register geometry. Kept on the chapter root so the strip, the title cell
-     and the register all measure from one set of numbers. */
+  /* --- register geometry ------------------------------------------------ */
+  /* Gap between the register's flexible tracks (question · leader · toggle).
+     Held at 1.35rem so the leader keeps its 22px shoulders on both sides. */
   --faq-gap: 0.85rem;
-  --faq-num-w: 1.55rem;
-  --faq-row-pad: 1.15rem;
-  --faq-pad: 0rem;
+  /* The one inset. Distance from any rule bounding a body cell to the ink
+     inside it. */
+  --faq-inset: 0.7rem;
+  /* Same, measured from the ink edge of a 1px rule rather than its box. */
+  --faq-cellx: 0px;
+  /* Advance width of a tabular two-digit ordinal in the mono face. */
+  --faq-num-size: 0.66rem;
+  --faq-ord-w: 0.82rem;
+  /* First register track: ordinal + the slack that puts the numeral rule one
+     inset off the ordinal and the question one inset off the rule. */
+  --faq-num-w: calc(
+    var(--faq-ord-w) + 2 * var(--faq-inset) + 1px - var(--faq-gap)
+  );
+  --faq-row-pad: 1rem;
+  /* One closed register row, rule included. The title cell's footer is cut to
+     exactly two of these, so the left column is ruled on the register's own
+     module rather than on a number of its own. */
+  --faq-row: calc(var(--faq-q-lh) + 2 * var(--faq-row-pad) + 1px);
 
-  /* Explicit length (never an em) so the ordinal and the glyph can both be
-     centred on the question's first line with the same arithmetic. */
-  --faq-q-size: clamp(1.15rem, 1.75vw, 1.55rem);
-  --faq-q-line: 1.2;
-  --faq-first-line-c: calc(var(--faq-q-size) * var(--faq-q-line) / 2);
+  /* --- type -------------------------------------------------------------- */
+  --faq-q-size: 1.125rem;
+  --faq-q-lh: 1.5rem;
+  --faq-h-size: clamp(2.25rem, 4.4vw, 3.75rem);
+
+  /* --- optical metrics, from the two faces actually in use ---------------- */
+  /* Bricolage Grotesque: ascent .93, descent .27, lowercase ascender ink
+     .762, cap ink .6875 (round caps, overshoot included). */
+  --faq-face-asc: 0.93;
+  --faq-face-desc: 0.27;
+  --faq-face-ink: 0.762;
+  --faq-face-cap: 0.6875;
+  /* Geist Mono: ascent 1.005, descent .295, figure height .734. */
+  --faq-mono-inkc: 0.488;
+
+  /* Baseline, ink top and ink centre of a question's first line, measured
+     down from the top of its line box. Everything that has to look level
+     with a question hangs off these three. */
+  --faq-q-base: calc(
+    (
+        var(--faq-q-lh) - (var(--faq-face-asc) + var(--faq-face-desc)) *
+          var(--faq-q-size)
+      ) / 2 + var(--faq-face-asc) * var(--faq-q-size)
+  );
+  --faq-q-inktop: calc(
+    var(--faq-q-base) - var(--faq-face-ink) * var(--faq-q-size)
+  );
+  --faq-q-inkc: calc(
+    var(--faq-q-base) - var(--faq-face-ink) * var(--faq-q-size) / 2
+  );
+  /* Same two numbers for the display heading (line-height 1), so the title
+     cell's cap line can be set on the first question's ink line. */
+  --faq-h-inktop: calc(
+    (1 - var(--faq-face-asc) - var(--faq-face-desc)) * var(--faq-h-size) / 2 +
+      (var(--faq-face-asc) - var(--faq-face-cap)) * var(--faq-h-size)
+  );
+  /* Ink centre of a mono ordinal, measured down from its line-box top. */
+  --faq-num-inkc: calc(var(--faq-mono-inkc) * var(--faq-num-size));
 
   margin-inline: auto;
   width: 100%;
@@ -49,7 +111,10 @@
 @media (min-width: 48rem) {
   .faqInner {
     --faq-gap: 1.35rem;
-    --faq-row-pad: 1.2rem;
+    --faq-inset: 0.85rem;
+    --faq-row-pad: 1.125rem;
+    --faq-q-size: 1.25rem;
+    --faq-q-lh: 1.625rem;
 
     padding-inline: 2.5rem;
     padding-block: 6rem;
@@ -58,7 +123,18 @@
 
 @media (min-width: 64rem) {
   .faqInner {
-    --faq-pad: clamp(2.25rem, 3.4vw, 4rem);
+    --faq-inset: 1.5rem;
+    --faq-cellx: calc(var(--faq-inset) + 1px);
+    --faq-q-size: 1.375rem;
+    --faq-q-lh: 1.75rem;
+  }
+}
+
+@media (min-width: 90rem) {
+  .faqInner {
+    --faq-row-pad: 1.1875rem;
+    --faq-q-size: 1.5rem;
+    --faq-q-lh: 1.875rem;
   }
 }
 
@@ -66,6 +142,8 @@
    Chapter strip — 05 — FAQ, and a readout of the register's state
 
    Its rule is the register's head rule: full measure, one weight, one scope.
+   The bar itself is a palindrome: numeral · hair · word · long hair · word ·
+   hair · numeral, so both ends terminate the same way, on their own rail.
 --------------------------------------------------------------------------- */
 
 .faqStrip {
@@ -76,7 +154,7 @@
   margin: 0;
   padding-bottom: 0.85rem;
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--faq-num-size);
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -96,15 +174,29 @@
   transform-origin: left center;
 }
 
+/* Tracked uppercase carries a trailing letter-space after its last glyph.
+   Left in, it makes every gap that follows a word 2.3px wider than every gap
+   that follows a rule. Pulled back, all six gaps in the bar measure alike. */
+.faqStripNum,
+.faqStripName,
+.faqStripKey {
+  margin-right: -0.22em;
+}
+
 .faqStripNum {
   flex: none;
   color: var(--foreground);
   font-variant-numeric: tabular-nums;
 }
 
-.faqStripName {
+.faqStripName,
+.faqStripKey {
   flex: none;
   white-space: nowrap;
+}
+
+.faqStripKey {
+  color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
 }
 
 .faqStripHair {
@@ -124,31 +216,28 @@
 .faqStripReadout {
   display: flex;
   flex: none;
-  align-items: center;
-  gap: 0.55rem;
-  letter-spacing: 0.2em;
-}
-
-.faqStripKey {
-  color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
+  align-items: baseline;
+  gap: 0.5rem;
+  letter-spacing: 0.1em;
+  font-variant-numeric: tabular-nums;
 }
 
 .faqStripValue {
   min-width: 2ch;
   text-align: center;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.1em;
   color: var(--muted-foreground);
   transition: color 200ms var(--lp-ease-snap);
 }
 
+/* Rests on a value, never on a placeholder. */
 .faqStripValue::after {
-  content: var(--faq-open, "—");
+  content: var(--faq-open, "00");
 }
 
 .faqStripTotal {
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
+  /* Pulls the trailing letter-space off the last glyph so the bar's right end
+     lands on the right rail exactly as "05" lands on the left one. */
+  margin-right: -0.1em;
   color: color-mix(in oklab, var(--muted-foreground) 88%, transparent);
 }
 
@@ -193,9 +282,7 @@
 }
 
 /* Foot rule: same span and same weight as the strip's rule, so the chapter is
-   bracketed top and bottom on the page measure. Its left end carries a short
-   accent segment — the same terminus the page's colophon rule uses — which
-   also gives the title cell a floor to sit on. */
+   bracketed top and bottom on the page measure, in one colour. */
 .faqBody::after {
   content: "";
   position: absolute;
@@ -204,11 +291,6 @@
   bottom: 0;
   height: 1px;
   background-color: var(--lp-hairline-strong);
-  background-image: linear-gradient(
-    to right,
-    var(--primary) 0 2.25rem,
-    transparent 2.25rem
-  );
   transform: scaleX(1);
   transform-origin: right center;
   pointer-events: none;
@@ -216,7 +298,8 @@
 
 @media (min-width: 64rem) {
   .faqBody {
-    grid-template-columns: minmax(13rem, 0.66fr) minmax(30rem, 1.34fr);
+    /* A true third. The column rule lands on 493.33 at a 1440 viewport. */
+    grid-template-columns: 1fr 2fr;
     align-items: stretch;
     gap: 0;
   }
@@ -232,9 +315,8 @@
     left: 0;
     width: 1px;
     background: var(--lp-grid-line);
+    opacity: 1;
     pointer-events: none;
-    transform: scaleY(1);
-    transform-origin: center top;
   }
 }
 
@@ -243,17 +325,21 @@
 --------------------------------------------------------------------------- */
 
 .faqAside {
+  display: flex;
+  flex-direction: column;
   padding-top: 2.25rem;
   max-width: 30rem;
 }
 
 @media (min-width: 64rem) {
   .faqAside {
-    /* Same top inset as a register row, less the difference in half-leading
-       between the display heading (line-height 1) and a question line
-       (line-height 1.2), so the two columns' first lines share a cap line. */
-    padding-top: calc(var(--faq-row-pad) - 0.2rem);
-    padding-right: var(--faq-pad);
+    /* The heading's cap line is set on the first question's ink line: one row
+       of padding, plus the difference between where ink starts inside a 24px
+       line box and where it starts inside a 60px one. */
+    padding-top: calc(
+      var(--faq-row-pad) + var(--faq-q-inktop) - var(--faq-h-inktop)
+    );
+    padding-inline: var(--faq-cellx) var(--faq-inset);
     max-width: none;
   }
 }
@@ -261,11 +347,19 @@
 .faqHeading {
   margin: 0;
   max-width: 12ch;
-  font-size: clamp(2.25rem, 4.4vw, 3.75rem);
+  font-size: var(--faq-h-size);
   font-weight: 600;
   line-height: 1;
   letter-spacing: var(--tracking-display, -0.03em);
   text-wrap: balance;
+}
+
+@media (min-width: 64rem) {
+  /* Optical: a 60px round cap carries ~2px of left side bearing. Pulled back
+     so the display line and the body line below it start on the same x. */
+  .faqHeading {
+    margin-left: -0.032em;
+  }
 }
 
 .faqIntro {
@@ -277,18 +371,77 @@
   text-wrap: pretty;
 }
 
+/* Index scale — the title cell's footer, cut to two register rows and ruled
+   off from the copy above it. Its rule spans the cell entire, terminating on
+   the frame rail and on the column rule, like every other rule here. Eight
+   stations stand on the foot rule, one per entry; the open one is raised and
+   accented — the only place the accent lives at rest outside the open row. */
+.faqMap {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .faqMap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-top: auto;
+    margin-inline: calc(-1 * var(--faq-cellx)) calc(-1 * var(--faq-inset));
+    border-top: 1px solid var(--lp-grid-line);
+    padding-inline: var(--faq-cellx) var(--faq-inset);
+    /* Ticks stand ON the foot rule, not across it. */
+    padding-bottom: 1px;
+    min-height: calc(2 * var(--faq-row));
+  }
+}
+
+.faqMapLabel {
+  display: block;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: var(--faq-num-size);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--muted-foreground) 80%, transparent);
+}
+
+.faqMapScale {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  height: 1.375rem;
+}
+
+.faqMapTick {
+  width: 1px;
+  height: 0.6875rem;
+  background: var(--lp-hairline);
+  transform: scaleY(1);
+  transform-origin: center bottom;
+  transition:
+    transform 340ms var(--lp-ease-emph),
+    background-color 200ms var(--lp-ease-snap);
+}
+
+.faqInner:has(.faqItem:nth-of-type(1)[open]) .faqMapTick:nth-child(1),
+.faqInner:has(.faqItem:nth-of-type(2)[open]) .faqMapTick:nth-child(2),
+.faqInner:has(.faqItem:nth-of-type(3)[open]) .faqMapTick:nth-child(3),
+.faqInner:has(.faqItem:nth-of-type(4)[open]) .faqMapTick:nth-child(4),
+.faqInner:has(.faqItem:nth-of-type(5)[open]) .faqMapTick:nth-child(5),
+.faqInner:has(.faqItem:nth-of-type(6)[open]) .faqMapTick:nth-child(6),
+.faqInner:has(.faqItem:nth-of-type(7)[open]) .faqMapTick:nth-child(7),
+.faqInner:has(.faqItem:nth-of-type(8)[open]) .faqMapTick:nth-child(8) {
+  background: var(--primary);
+  transform: scaleY(2);
+}
+
 /* ---------------------------------------------------------------------------
    Register
 --------------------------------------------------------------------------- */
 
 .faqIndex {
   position: relative;
-}
-
-@media (min-width: 64rem) {
-  .faqIndex {
-    padding-left: var(--faq-pad);
-  }
 }
 
 /* Column rule between the ordinal and the question: the register reads as a
@@ -300,12 +453,11 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: calc(var(--faq-pad) + var(--faq-num-w) + var(--faq-gap) / 2);
+    left: calc(var(--faq-cellx) + var(--faq-ord-w) + var(--faq-inset));
     width: 1px;
     background: var(--lp-grid-line);
+    opacity: 1;
     pointer-events: none;
-    transform: scaleY(1);
-    transform-origin: center top;
   }
 }
 
@@ -318,6 +470,8 @@
 
   position: relative;
   z-index: 1;
+  /* No horizontal padding here: the row IS the cell, so its rule spans from
+     the column rule to the frame rail with nothing left over. */
   border-bottom: 1px solid var(--lp-hairline);
   transition: background-color 170ms var(--lp-ease-snap);
 }
@@ -351,9 +505,7 @@
   grid-template-columns: var(--faq-num-w) minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--faq-gap);
-  /* The glyph is held one register gap clear of the measure, so a boxed
-     control never lands on the page frame's rail. */
-  padding-right: var(--faq-gap);
+  padding-inline: var(--faq-cellx) max(var(--faq-cellx), var(--faq-gap));
   padding-block: var(--faq-row-pad);
   font-size: var(--faq-q-size);
   cursor: pointer;
@@ -376,14 +528,14 @@
   outline-offset: -3px;
 }
 
-/* Ordinals are set tight and flush RIGHT against the column rule, the way a
-   contents page sets its folios. */
+/* Ordinals hang on the leading edge of their cell, one inset off the column
+   rule — the same relationship the heading has to the frame rail. They are
+   tabular, so flush left and flush right are the same alignment. */
 .faqNum {
   align-self: start;
-  text-align: right;
-  margin-top: calc(var(--faq-first-line-c) - 0.33rem);
+  margin-top: calc(var(--faq-q-inkc) - var(--faq-num-inkc));
   font-family: var(--font-mono);
-  font-size: 0.66rem;
+  font-size: var(--faq-num-size);
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.04em;
@@ -395,14 +547,16 @@
 .faqQuestion {
   font-size: 1em;
   font-weight: 600;
-  line-height: var(--faq-q-line);
+  line-height: var(--faq-q-lh);
   letter-spacing: -0.028em;
   text-wrap: pretty;
 }
 
-/* Leader. Ruled at grid weight so a closed register still reads as a table;
-   it comes up to hairline on hover, focus and open — the same "wire between a
-   source and its port" the routing chapter uses.
+/* Leader. A dotted leader, the way a contents page sets one: the dot phase is
+   anchored to the RIGHT edge, which every leader shares, so eight ragged
+   lengths resolve into one aligned field of columns instead of eight
+   unrelated line lengths. Ruled at grid weight so a closed register still
+   reads as a table; it comes up to hairline on hover, focus and open.
 
    It only exists where the row has slack to give it. Below 80rem the longest
    question already fills its column, and a fourth track would cost a gap the
@@ -411,16 +565,24 @@
 .faqLead {
   display: none;
   align-self: start;
-  margin-top: var(--faq-first-line-c);
+  margin-top: var(--faq-q-inkc);
   height: 1px;
-  background: var(--lp-grid-line);
+  background-color: var(--lp-grid-line);
+  -webkit-mask-image: linear-gradient(to right, transparent 0 4px, #000 4px 6px);
+  mask-image: linear-gradient(to right, transparent 0 4px, #000 4px 6px);
+  -webkit-mask-size: 6px 1px;
+  mask-size: 6px 1px;
+  -webkit-mask-position: right center;
+  mask-position: right center;
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
   transform: scaleX(1);
   transform-origin: left center;
   transition: background-color 200ms var(--lp-ease-snap);
 }
 
 .faqItem[open] .faqLead {
-  background: color-mix(in oklch, var(--primary) 38%, transparent);
+  background-color: color-mix(in oklch, var(--primary) 46%, transparent);
 }
 
 @media (min-width: 80rem) {
@@ -435,11 +597,11 @@
   }
 }
 
-/* Boxed +/− glyph, optically centred on the question's first line. */
+/* Boxed +/− glyph, centred on the question's ink band. */
 .faqGlyph {
   position: relative;
   align-self: start;
-  margin-top: calc(var(--faq-first-line-c) - 0.75rem);
+  margin-top: calc(var(--faq-q-inkc) - 0.75rem);
   width: 1.5rem;
   height: 1.5rem;
   border: 1px solid var(--lp-hairline);
@@ -507,7 +669,7 @@
   }
 
   .faqIndex .faqItem:has(> .faqSummary:hover) .faqLead {
-    background: var(--lp-hairline);
+    background-color: var(--lp-hairline);
   }
 
   /* The glyph fills in on hover: the row is not just highlighted, the control
@@ -530,7 +692,7 @@
 }
 
 .faqIndex .faqItem:has(> .faqSummary:focus-visible) .faqLead {
-  background: var(--lp-hairline);
+  background-color: var(--lp-hairline);
 }
 
 /* ---------------------------------------------------------------------------
@@ -539,8 +701,8 @@
 
 .faqAnswerWrap {
   position: relative;
-  padding-left: calc(var(--faq-num-w) + var(--faq-gap));
-  padding-right: var(--faq-gap);
+  padding-left: calc(var(--faq-cellx) + var(--faq-num-w) + var(--faq-gap));
+  padding-right: max(var(--faq-cellx), var(--faq-gap));
   padding-bottom: 1.45rem;
 }
 
@@ -549,7 +711,7 @@
 .faqAnswerWrap::before {
   content: "";
   position: absolute;
-  left: calc(var(--faq-num-w) + var(--faq-gap) / 2);
+  left: calc(var(--faq-cellx) + var(--faq-ord-w) + var(--faq-inset));
   top: 0;
   bottom: 1.45rem;
   width: 1px;
@@ -606,8 +768,8 @@
    Entrance — the chapter rules itself, then fills
 
    Order: the head rule draws left to right, the strip's marks arrive, the
-   title sets, the divider drops from the head rule, the rows cascade, and the
-   foot rule closes the bracket right to left.
+   title sets, the divider drops from the head rule, the rows cascade, the
+   index scale stands up, and the foot rule closes the bracket right to left.
 
    Every declaration outside the [data-motion-enabled] guards is the finished
    composition, so no-JS and reduced motion both render complete.
@@ -617,6 +779,7 @@
   --faq-d: 60ms;
 }
 
+.faqStripKey,
 .faqStripReadout {
   --faq-d: 120ms;
 }
@@ -627,6 +790,10 @@
 
 .faqIntro {
   --faq-d: 175ms;
+}
+
+.faqMap {
+  --faq-d: 640ms;
 }
 
 .faqItem {
@@ -657,20 +824,38 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
-  :is(.faqStripNum, .faqStripName, .faqStripReadout, .faqHeading, .faqIntro, .faqItem) {
+  :is(
+    .faqStripNum,
+    .faqStripName,
+    .faqStripKey,
+    .faqStripReadout,
+    .faqHeading,
+    .faqIntro,
+    .faqMap,
+    .faqItem
+  ) {
   opacity: 0;
   translate: 0 14px;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
-  :is(.faqStripNum, .faqStripName, .faqStripReadout, .faqHeading, .faqIntro, .faqItem) {
+  :is(
+    .faqStripNum,
+    .faqStripName,
+    .faqStripKey,
+    .faqStripReadout,
+    .faqHeading,
+    .faqIntro,
+    .faqMap,
+    .faqItem
+  ) {
   transition:
     opacity var(--lp-dur-reveal) var(--lp-ease-emph) var(--faq-d, 0ms),
     translate var(--lp-dur-reveal) var(--lp-ease-emph) var(--faq-d, 0ms);
 }
 
-/* The rules: drawn, not faded. */
+/* The rules and the marks: drawn and raised, not faded. */
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
   .faqStrip::after,
@@ -687,12 +872,22 @@
   transform-origin: left center;
 }
 
+/* The two verticals fade rather than draw. A drawn vertical is a partial
+   vertical for the length of its transition, and a partial vertical caught
+   under the sticky header reads as a tick hanging off the nav. The bracket
+   rules still draw; the grid inside it arrives whole. */
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
   .faqIndex::before,
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="pending"]
   .faqIndex::after {
+  opacity: 0;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="pending"]
+  .faqMapTick {
   transform: scaleY(0);
 }
 
@@ -712,13 +907,43 @@
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
   .faqIndex::before {
-  transition: transform 620ms var(--lp-ease-emph) 200ms;
+  transition: opacity 520ms var(--lp-ease-emph) 200ms;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="faq"][data-motion-state="visible"]
   .faqIndex::after {
-  transition: transform 620ms var(--lp-ease-emph) 260ms;
+  transition: opacity 520ms var(--lp-ease-emph) 260ms;
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="faq"][data-motion-state="visible"]
+  .faqMapTick {
+  transition:
+    transform 520ms var(--lp-ease-emph) calc(660ms + var(--faq-t, 0) * 34ms),
+    background-color 200ms var(--lp-ease-snap);
+}
+
+.faqMapTick:nth-child(2) {
+  --faq-t: 1;
+}
+.faqMapTick:nth-child(3) {
+  --faq-t: 2;
+}
+.faqMapTick:nth-child(4) {
+  --faq-t: 3;
+}
+.faqMapTick:nth-child(5) {
+  --faq-t: 4;
+}
+.faqMapTick:nth-child(6) {
+  --faq-t: 5;
+}
+.faqMapTick:nth-child(7) {
+  --faq-t: 6;
+}
+.faqMapTick:nth-child(8) {
+  --faq-t: 7;
 }
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
@@ -740,6 +965,7 @@
   .faqGlyph::after,
   .faqStripValue,
   .faqLead,
+  .faqMapTick,
   .faqAnswer {
     transition: none;
   }

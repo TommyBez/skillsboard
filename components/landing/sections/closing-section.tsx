@@ -17,6 +17,9 @@ export function ClosingSection() {
       <span className={styles.closingField} aria-hidden="true" />
 
       <div className={styles.closingInner}>
+        {/* The column rail: the gutter's rule, from the chapter rule down to
+            the footer rule. The sheet's left border is drawn on it. */}
+        <span className={styles.closingSplit} aria-hidden="true" />
         {/* Chapter index, in the page's numbering: 01 hero … 06 start. Same
             mono voice, size and measure rule as every other chapter mark. */}
         <p className={`${base.chapterMark} ${styles.closingMark} uppercase`}>
@@ -32,7 +35,7 @@ export function ClosingSection() {
         <div className={styles.closingGrid}>
           <div className={styles.closingMain}>
             <h2
-              className={`${styles.closingHeading} max-w-[15ch] text-balance text-[clamp(2.5rem,6.1vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}
+              className={`${styles.closingHeading} max-w-[45rem] text-balance text-[clamp(2.5rem,6.1vw,5.75rem)] font-semibold leading-[0.96] tracking-display`}
             >
               Answer “which skill should I use?”{" "}
               <span className={styles.onceStamp}>once.</span>

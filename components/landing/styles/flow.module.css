@@ -53,14 +53,17 @@
   --ink-1: var(--foreground);
   --ink-2: var(--muted-foreground);
 
-  /* Control metrics, chosen so the numbers land on whole pixels at a 16px
-     root: 8px pad + 13px glyph → a 14.5px mark axis (a 1px rule centred on it
-     covers exactly one device pixel), + 9px gap → text at 30px. */
+  /* Control metrics, measured from the control's border box so the two axes
+     land on whole device pixels: 1px border + 8px pad + 13px glyph puts the
+     mark axis on 15.5px, where a 1px rule covers exactly one device pixel;
+     + 9px gap puts every text run on 31px. The skill card's own padding and
+     fork glyph are set from the same numbers, so the connector drops out of
+     the field's link mark and lands on the card's fork mark. */
   --ctrl-pad: 0.5rem;
   --ctrl-icon: 0.8125rem;
   --ctrl-gap: 0.5625rem;
-  --axis-mark: 0.90625rem;
-  --row-pad: 1.875rem;
+  --axis-mark: 0.96875rem;
+  --row-pad: 1.9375rem;
 
   /* The single gap between a caption and the rule that continues it. */
   --label-gap: 0.75rem;
@@ -86,9 +89,17 @@
    sits on), so the chapter mark starts on the same x as the first cell's
    content — the one vertical axis that ties the head to the panel. */
 .flowMarkRow {
-  display: grid;
-  grid-template-columns: calc(var(--pad) + 1px) minmax(0, 1fr);
+  display: flex;
   align-items: center;
+  gap: 0.75rem;
+}
+
+@media (min-width: 64rem) {
+  .flowMarkRow {
+    display: grid;
+    grid-template-columns: calc(var(--pad) + 1px) minmax(0, 1fr);
+    gap: 0;
+  }
 }
 
 .flowIndex {
@@ -117,7 +128,12 @@
   grid-template-columns: minmax(0, 1fr);
   list-style: none;
   overflow: clip;
-  border-block: 1px solid var(--lp-hairline-strong);
+  /* The panel's opening and closing rules ARE frame edges, so they carry the
+     frame's value, not a heavier one: measured on the dark field the frame
+     rails render (45,51,48) and so do these. The previous `-strong` border
+     rendered (78,83,77) and made the frame change weight where the horizontal
+     met the vertical. Only the diagrams' own rules are lighter. */
+  border-block: 1px solid var(--lp-hairline);
   background: color-mix(in oklab, var(--card) 34%, transparent);
 }
 
@@ -177,7 +193,11 @@
     /* +1px wherever the neighbouring rule is drawn inside this cell's box —
        the left rail for the first cell, the right rail / next divider for
        every cell — so the clear space is `--pad` on both sides of every rule. */
-    padding: 2.1rem calc(var(--pad) + 1px) 1.95rem var(--pad);
+    /* Equal top and bottom: the chapter has no closing band of its own — the
+       panel's bottom rule IS the chapter boundary — so the air that used to
+       sit outside the panel in a 1360 x 95 empty box now sits inside it,
+       around the content, where it is doing work. */
+    padding: 2.5rem calc(var(--pad) + 1px) 2.5rem var(--pad);
     border-top: none;
   }
 
@@ -246,7 +266,7 @@
   align-self: start;
   margin: 0.62rem 0 0;
   max-width: 32ch;
-  font-size: 0.9rem;
+  font-size: 0.9375rem;
   line-height: 1.55;
   color: var(--ink-2);
   text-wrap: pretty;
@@ -403,6 +423,19 @@
   color: var(--ink-2);
 }
 
+/* The caption is struck out from the wire on the same stub geometry column 3
+   uses for its branches, so it reads as an annotation ON the line rather than
+   a label parked beside it. */
+.pasteWireNote::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: calc(100% + 5px);
+  width: calc(var(--row-pad) - var(--axis-mark) - 4.5px);
+  height: 1px;
+  background: var(--wire);
+}
+
 .pasteWireHead {
   position: absolute;
   left: 50%;
@@ -425,7 +458,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.38rem;
-  padding: 0.62rem 0.68rem;
+  padding: 0.62rem var(--ctrl-pad);
 }
 
 .miniMeta {
@@ -439,7 +472,7 @@
 .miniSource {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: var(--ctrl-gap);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -451,8 +484,8 @@
 
 .miniFork {
   flex: none;
-  width: 0.72rem;
-  height: 0.72rem;
+  width: var(--ctrl-icon);
+  height: var(--ctrl-icon);
   color: var(--primary);
 }
 
@@ -507,7 +540,7 @@
 }
 
 .miniFoot {
-  padding: 0.58rem 0.68rem;
+  padding: 0.58rem var(--ctrl-pad);
   border-top: 1px solid var(--border);
   background: color-mix(in oklab, var(--foreground) 4%, transparent);
 }
@@ -601,7 +634,7 @@
 /* The cut is the same captioned rule as the column headings — same size,
    tracking, ink, gap and terminal — because it is the same object. */
 .resultCut {
-  margin-top: 1.1rem;
+  margin-top: 1.35rem;
 }
 
 .resultRow[data-match="true"]::before {
@@ -644,7 +677,7 @@
 .resultMark::before {
   content: "";
   position: absolute;
-  inset: -0.375em -0.22em;
+  inset: -0.42em -0.24em;
   z-index: -1;
   border-radius: var(--r-chip);
   background: color-mix(in oklab, var(--primary) 30%, transparent);
@@ -754,9 +787,9 @@
 .fanRow::before {
   content: "";
   position: absolute;
-  left: var(--axis-mark);
+  left: calc(var(--axis-mark) - 0.5px);
   top: 50%;
-  width: calc(var(--row-pad) - var(--axis-mark) - 0.3rem);
+  width: calc(var(--row-pad) - var(--axis-mark) - 4.5px);
   height: 1px;
   background: var(--wire);
   transform-origin: left center;
