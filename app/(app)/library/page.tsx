@@ -9,6 +9,7 @@ import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
 import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { SkillDossier } from "@/components/skill-dossier"
+import { TeammateReusePrompt } from "@/components/teammate-reuse-prompt"
 import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
@@ -100,6 +101,9 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     pendingInvitationCount,
     skillCount: allSkills.length,
   })
+  const teammateRecommendation = !hasFilters && !showInvitePrompt
+    ? allSkills.find((item) => item.createdBy !== userId)
+    : undefined
   const libraryHref = (next: { q?: string; tag?: string | null }) => {
     const search = new URLSearchParams()
     const nextQuery = next.q === undefined ? params.q : next.q
@@ -148,6 +152,18 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
 
       {showInvitePrompt ? (
         <InviteTeammatePrompt teamId={activeId} />
+      ) : null}
+
+      {teammateRecommendation ? (
+        <TeammateReusePrompt
+          addedBy={teammateRecommendation.addedByName}
+          command={buildInstallCommand(teammateRecommendation.githubUrl, teammateRecommendation.skillName)}
+          href={teammateRecommendation.githubUrl}
+          skillId={teammateRecommendation.id}
+          skillName={teammateRecommendation.skillName}
+          skillTitle={teammateRecommendation.title}
+          teamId={activeId}
+        />
       ) : null}
 
       {skills.length ? (
