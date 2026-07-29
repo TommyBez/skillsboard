@@ -23,9 +23,10 @@
     "typecheck": "tsc --noEmit",
     "validate:pulse-graph": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs check",
     "benchmark:pulse-graph": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs benchmark",
+    "test:unit": "node --test tests/*.test.mjs",
     "test:pulse-graph": "node --test .agents/skills/skillsboard-pulse/tests/*.test.mjs",
     "pulse:context": "node .agents/skills/skillsboard-pulse/scripts/validate-graph.mjs resolve",
-    "check": "pnpm typecheck && pnpm validate:pulse-graph && pnpm test:pulse-graph",
+    "check": "pnpm typecheck && pnpm test:unit && pnpm validate:pulse-graph && pnpm test:pulse-graph",
     "db:push": "drizzle-kit push",
     "email": "email dev --dir emails --port 3001"
   },
