@@ -224,6 +224,17 @@
   font-stretch: 93%;
 }
 
+/* The optical hang deliberately puts a sliver of ink outside the measure — a
+   pointed "A" and a round "s" have to overhang a stem line to sit on it. The
+   page frame's rail is painted on that same column and is opaque, so without
+   this it draws a 1px seam straight down the overhanging glyphs. The type owns
+   that column; the rule passes behind it. */
+.closingMark,
+.closingHeading {
+  position: relative;
+  z-index: 21;
+}
+
 @media (min-width: 64rem) {
   .closingHeading {
     margin-left: -0.037em;

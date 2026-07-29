@@ -880,7 +880,20 @@
   position: relative;
   padding-left: calc(var(--faq-cellx) + var(--faq-num-w) + var(--faq-gap));
   padding-right: max(var(--faq-cellx), var(--faq-gap));
-  padding-bottom: 1.45rem;
+  padding-bottom: 1.25rem;
+}
+
+/* The answer bay is exactly TWO register rows, so an open entry is exactly
+   three — and every horizontal edge in the chapter, in every one of the eight
+   states, lands on the same 69px lattice. Two consequences worth the fixed
+   bay: the index cell's rule in the left column stays on the lattice whichever
+   entry is open, and the page below the chapter never moves when you toggle
+   one, because the chapter's height cannot change. Declared as a MINIMUM, so
+   a longer answer or a fallback face grows the bay instead of clipping it. */
+@media (min-width: 80rem) {
+  .faqAnswerWrap {
+    min-height: calc(2 * var(--faq-row));
+  }
 }
 
 /* The answers are the chapter's actual payload — they read a step brighter and
