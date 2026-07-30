@@ -955,6 +955,44 @@
   position: relative;
 }
 
+/* Same content clear as the closing chapter above it — page gutter plus the
+   extra air off the frame rails — so the colophon doesn't snap back out to
+   the rails after "06 · Start". */
+.footerInner {
+  --footer-inline: calc(var(--lp-gutter) + 1.5rem);
+
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: var(--lp-measure);
+  flex-direction: column;
+  gap: 2rem;
+  margin-inline: auto;
+  padding-block: 3rem;
+  padding-inline: var(--footer-inline);
+}
+
+@media (min-width: 48rem) {
+  .footerInner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 3.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .footerInner {
+    --footer-inline: calc(var(--lp-gutter) + 1.75rem);
+  }
+}
+
+@media (min-width: 84rem) {
+  .footerInner {
+    --footer-inline: calc(var(--lp-gutter) + 2rem);
+  }
+}
+
 /* The plate, plus the hand-off: the closing chapter fades into it over the
    last 5rem before the rule. */
 .footerField {
