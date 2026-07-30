@@ -28,6 +28,7 @@ function chapterProgress(el: HTMLElement) {
  * - `data-scrolled` on the root (header command-strip background)
  * - `--route-progress` (hero sticky chapter: dossiers filing into the library)
  * - `--mcp-progress` (MCP sticky chapter: signal path drawing)
+ * - `--sp-*` / `--vp-*` (generic scroll- and viewport-linked channels)
  * - `--px` / `--py` pointer parallax on the hero board (capped, pointer-fine)
  * - `data-page-hidden` (pauses ambient pulses when the tab is not visible)
  * - `data-motion-state` viewport reveals for below-the-fold groups
@@ -49,6 +50,31 @@ export function LandingMotionController() {
 
     const hero = root.querySelector<HTMLElement>("[data-hero-scene]")
     const mcp = root.querySelector<HTMLElement>("[data-mcp-chapter]")
+
+    // Generic scroll-linked channels, so a chapter can drive its own
+    // choreography from CSS alone:
+    //
+    // - [data-scroll-chapter="x"] publishes --sp-x, the progress through a
+    //   tall sticky chapter's runway (0 as it pins, 1 as it releases).
+    // - [data-view-progress="x"] publishes --vp-x, how far the element has
+    //   travelled across the viewport (0 entering at the bottom, 1 leaving
+    //   at the top) — useful for parallax and hand-off between chapters.
+    //
+    // Both write onto the root, so any descendant can read them.
+    const scrollChapters = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-scroll-chapter]")
+    )
+    const viewTargets = Array.from(
+      root.querySelectorAll<HTMLElement>("[data-view-progress]")
+    )
+
+    /** 0 while the element sits below the fold, 1 once it has fully left. */
+    const viewProgress = (el: HTMLElement) => {
+      const rect = el.getBoundingClientRect()
+      const span = window.innerHeight + rect.height
+      if (span <= 0) return 0
+      return clamp01((window.innerHeight - rect.top) / span)
+    }
 
     let frame = 0
     const update = () => {
@@ -85,6 +111,20 @@ export function LandingMotionController() {
           chapterProgress(mcp).toFixed(4)
         )
       }
+
+      scrollChapters.forEach((el) => {
+        root.style.setProperty(
+          `--sp-${el.dataset.scrollChapter}`,
+          chapterProgress(el).toFixed(4)
+        )
+      })
+
+      viewTargets.forEach((el) => {
+        root.style.setProperty(
+          `--vp-${el.dataset.viewProgress}`,
+          viewProgress(el).toFixed(4)
+        )
+      })
     }
 
     const requestUpdate = () => {
@@ -97,6 +137,18 @@ export function LandingMotionController() {
     // heights include their scroll runways (otherwise progress clamps to 1).
     if (!reducedMotion) {
       root.dataset.motionEnabled = "true"
+
+      // Arming the chapters grows the document, so a deep link the browser
+      // already jumped to is now pointing at the wrong offset. Re-resolve it
+      // once, against the heights that actually shipped. In-page clicks are
+      // unaffected — by then the runways exist.
+      const hash = window.location.hash.slice(1)
+      if (hash) {
+        const target = document.getElementById(hash)
+        if (target) {
+          target.scrollIntoView({ block: "start", behavior: "instant" })
+        }
+      }
     }
 
     window.addEventListener("scroll", requestUpdate, { passive: true })
@@ -156,12 +208,13 @@ export function LandingMotionController() {
       root.querySelectorAll<HTMLElement>("[data-chapter-target]")
     )
 
-    if (
-      railLinks.length &&
-      chapters.length &&
-      "IntersectionObserver" in window
-    ) {
+    if (railLinks.length && chapters.length) {
+      let currentChapter = ""
       const setCurrentChapter = (name: string) => {
+        if (name === currentChapter) {
+          return
+        }
+        currentChapter = name
         railLinks.forEach((link) => {
           if (link.dataset.railLink === name) {
             link.setAttribute("aria-current", "true")
@@ -171,21 +224,29 @@ export function LandingMotionController() {
         })
       }
 
-      const chapterObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) {
-              return
-            }
-            const target = entry.target as HTMLElement
-            setCurrentChapter(target.dataset.chapterTarget ?? "")
-          })
-        },
-        { rootMargin: "-46% 0px -46% 0px", threshold: 0 }
-      )
+      // Whichever chapter spans the middle of the viewport is the current one.
+      // An observer band would work only for chapters tall enough to cross it —
+      // the short ones (FAQ) never reported, so the rail stalled on the chapter
+      // above them.
+      const syncChapter = () => {
+        const middle = window.innerHeight / 2
+        let best = chapters[0]
+        chapters.forEach((chapter) => {
+          const rect = chapter.getBoundingClientRect()
+          if (rect.top <= middle) {
+            best = chapter
+          }
+        })
+        setCurrentChapter(best?.dataset.chapterTarget ?? "")
+      }
 
-      chapters.forEach((chapter) => chapterObserver.observe(chapter))
-      cleanups.push(() => chapterObserver.disconnect())
+      window.addEventListener("scroll", syncChapter, { passive: true })
+      window.addEventListener("resize", syncChapter)
+      syncChapter()
+      cleanups.push(() => {
+        window.removeEventListener("scroll", syncChapter)
+        window.removeEventListener("resize", syncChapter)
+      })
     }
 
     if (!reducedMotion && "IntersectionObserver" in window) {
@@ -200,10 +261,21 @@ export function LandingMotionController() {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (
-              !entry.isIntersecting ||
-              entry.intersectionRatio < VIEWPORT_THRESHOLD
-            ) {
+            if (!entry.isIntersecting) {
+              return
+            }
+
+            // A ratio threshold alone cannot fire for a group taller than
+            // 1/threshold viewports — it can never show that fraction of
+            // itself at once. Accept either a quarter of the group or a
+            // quarter of the viewport filled by it, whichever comes first.
+            const covered = entry.intersectionRect.height
+            const enough =
+              covered >= entry.target.getBoundingClientRect().height *
+                VIEWPORT_THRESHOLD ||
+              covered >= window.innerHeight * VIEWPORT_THRESHOLD
+
+            if (!enough) {
               return
             }
 
@@ -213,7 +285,7 @@ export function LandingMotionController() {
           })
         },
         {
-          threshold: VIEWPORT_THRESHOLD,
+          threshold: [0, VIEWPORT_THRESHOLD],
           rootMargin: "0px 0px -8% 0px",
         }
       )
@@ -227,9 +299,13 @@ export function LandingMotionController() {
       // Decode effect: mono chapter marks scramble into place once, the
       // first time they enter the viewport. The SSR text is the final text,
       // so the page never depends on this running.
+      // The effect rewrites `textContent`, which would flatten away any nested
+      // markup the label carries — a chapter that wrapped a value in a span
+      // inside its decoding mark lost the span on first scroll. Only decode
+      // labels that really are a single run of text.
       const decodeTargets = Array.from(
         root.querySelectorAll<HTMLElement>("[data-decode]")
-      )
+      ).filter((el) => el.childElementCount === 0)
 
       if (decodeTargets.length) {
         const DECODE_CHARS = "ABCDEFGHJKMNPQRSTVWXYZ0123456789#/<>*"
@@ -369,6 +445,12 @@ export function LandingMotionController() {
       root.style.removeProperty("--route-progress")
       root.style.removeProperty("--mcp-progress")
       root.style.removeProperty("--scroll-progress")
+      scrollChapters.forEach((el) =>
+        root.style.removeProperty(`--sp-${el.dataset.scrollChapter}`)
+      )
+      viewTargets.forEach((el) =>
+        root.style.removeProperty(`--vp-${el.dataset.viewProgress}`)
+      )
     }
   }, [])
 
