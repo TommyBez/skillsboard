@@ -41,20 +41,20 @@ export function slugFromPath(guidePath: GuidePath): GuideSlug {
   return guidePath.slice("/guides/".length) as GuideSlug
 }
 
-export const guidesBySlug = Object.fromEntries(
+export const guidesBySlug = new Map<GuideSlug, GuideDefinition>(
   guides.map((guide) => [slugFromPath(guide.path), guide]),
-) as Record<GuideSlug, GuideDefinition>
+)
 
-export const guidesByPath = Object.fromEntries(
+export const guidesByPath = new Map<GuidePath, GuideDefinition>(
   guides.map((guide) => [guide.path, guide]),
-) as Record<GuidePath, GuideDefinition>
+)
 
 export function getGuideBySlug(slug: string): GuideDefinition | undefined {
-  return guidesBySlug[slug as GuideSlug]
+  return guidesBySlug.get(slug as GuideSlug)
 }
 
 export function getGuideByPath(guidePath: string): GuideDefinition | undefined {
-  return guidesByPath[guidePath as GuidePath]
+  return guidesByPath.get(guidePath as GuidePath)
 }
 
 export function getGuide(slugOrPath: string): GuideDefinition | undefined {
