@@ -1,13 +1,4 @@
-import {
-  aiCodingGuidelinesTemplateGuide,
-  aiCodingTeamOnboardingGuide,
-  aiSkillUseCasesGuide,
-  chooseFirstTeamSkillGuide,
-  manageCrossAgentSkillsGuide,
-  onboardNewTeammateSkillsGuide,
-  sharedMcpSkillLibraryGuide,
-  shareTeamSkillsGuide,
-} from "@/lib/seo/guides"
+import { guides } from "@/lib/seo/guides"
 
 export const resourcePaths = {
   index: "/resources",
@@ -26,16 +17,8 @@ export interface ResourceIndexEntry {
   modifiedAt: string
 }
 
-export const resourceEntries = [
-  sharedMcpSkillLibraryGuide,
-  aiSkillUseCasesGuide,
-  onboardNewTeammateSkillsGuide,
-  chooseFirstTeamSkillGuide,
-  aiCodingGuidelinesTemplateGuide,
-  aiCodingTeamOnboardingGuide,
-  shareTeamSkillsGuide,
-  manageCrossAgentSkillsGuide,
-] satisfies readonly ResourceIndexEntry[]
+/** Single registration point: guide modules feed the resources hub, related links, and sitemap. */
+export const resourceEntries = guides satisfies readonly ResourceIndexEntry[]
 
 export const resourceSections = [
   {
