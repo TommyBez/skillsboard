@@ -74,22 +74,6 @@ export function McpSection() {
                     <HomeMcpActions />
                   </Suspense>
                 </div>
-
-                {/* The step after the button, in the chapter's instrument
-                    voice. It is one library-row module tall, so the copy
-                    column's last object is measured by the diagram's unit. */}
-                <div className={styles.connect} aria-hidden="true">
-                  <p className={styles.connectHead}>
-                    <span>add the server</span>
-                    <span className={styles.connectClient}>claude code</span>
-                  </p>
-                  <p className={styles.connectLine}>
-                    <span className={styles.connectPrompt}>$</span>
-                    <span className={styles.connectCmd}>
-                      claude mcp add --transport http skills-board
-                    </span>
-                  </p>
-                </div>
               </div>
 
               {/* Decorative annotation: the connection this chapter describes,
