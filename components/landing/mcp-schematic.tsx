@@ -1,24 +1,56 @@
-import styles from "@/components/landing/landing-motion.module.css"
+import styles from "@/components/landing/styles/mcp.module.css"
 
+/** The three tools this chapter promises, with the real MCP tool they map to. */
 const mcpTools = [
-  "Search team skills",
-  "Find saved recommendations",
-  "Get install commands",
+  {
+    name: "Search team skills",
+    tool: "search_skills",
+    arg: "(query: string)",
+    ret: "\u2192 skill[]",
+  },
+  {
+    name: "Find saved recommendations",
+    tool: "search_collections",
+    arg: "(query: string)",
+    ret: "\u2192 collection[]",
+  },
+  {
+    name: "Get install commands",
+    tool: "get_skill_command",
+    arg: "(skillId: uuid)",
+    ret: "\u2192 string",
+  },
 ] as const
 
 /** Decorative library rows echoing the hero dossiers. Visual examples only. */
 const libraryRows = [
-  "code-review",
-  "pdf-extraction",
-  "brand-voice",
-  "sql-migrations",
-  "release-notes",
+  { name: "code-review", tag: "eng" },
+  { name: "pdf-extraction", tag: "ops" },
+  { name: "brand-voice", tag: "brand" },
+  { name: "sql-migrations", tag: "data" },
+  { name: "release-notes", tag: "docs" },
+] as const
+
+/*
+ * Wire segments. The wire box spans library-panel edge → agent-port line and
+ * is exactly two action rows tall, so x 0% is the library edge, 50% the node
+ * centre, 100% the ports, and y 0/50/100% are the three action-row centres.
+ * Geometry lives in the stylesheet; this is only the draw order.
+ */
+const WIRES = [
+  { key: "wTrunk", axis: "x", leg: "legTrunk" },
+  { key: "wSpur", axis: "x", leg: "legSpur" },
+  { key: "wBusUp", axis: "y", leg: "legBus" },
+  { key: "wBusDown", axis: "y" },
+  { key: "wFeedA", axis: "x", leg: "legFeed" },
+  { key: "wFeedB", axis: "x" },
+  { key: "wFeedC", axis: "x" },
 ] as const
 
 /**
  * Routing schematic: team library → MCP gateway → agent actions.
- * Desktop draws the signal paths from scroll progress (--mcp-p);
- * small screens run a vertical route revealed on visibility.
+ * Desktop draws the signal path from scroll progress (--mcp-p); small screens
+ * run a vertical route revealed on visibility. Both rest fully drawn.
  */
 export function McpSchematic() {
   return (
@@ -28,51 +60,61 @@ export function McpSchematic() {
       data-motion-group="mcp"
     >
       <div className={styles.schematicGrid}>
-        <div className={styles.schemaStack}>
-          <p className={styles.schemaEyebrow}>Team library</p>
-          <p className={styles.schemaStackTitle}>Skills your team recommends</p>
-          <ul className={styles.schemaRows} aria-hidden="true">
-            {libraryRows.map((row) => (
-              <li key={row} className={styles.schemaRow}>
-                <span className={styles.schemaRowName}>{row}</span>
-              </li>
-            ))}
-          </ul>
+        <div className={styles.libCol}>
+          <p className={`${styles.colLabel} ${styles.colLabelLib}`}>
+            Team library
+          </p>
+
+          <div className={styles.libraryPanel}>
+            <div className={styles.libraryHead}>
+              <p className={styles.schemaStackTitle}>
+                Skills your team recommends
+              </p>
+            </div>
+            <ul aria-hidden="true">
+              {libraryRows.map((row, i) => (
+                <li
+                  key={row.name}
+                  className={styles.schemaRow}
+                  data-row={i + 1}
+                >
+                  <span className={styles.schemaRowName}>{row.name}</span>
+                  <span className={styles.schemaRowTag}>{row.tag}</span>
+                </li>
+              ))}
+            </ul>
+            <span className={styles.libraryBus} aria-hidden="true" />
+          </div>
         </div>
 
         <div className={styles.schemaGateway}>
-          {/* Wire coordinates: y=4/54/104 are the vertical centers of the three
-              fixed-height agent action rows; the box is centered on the same
-              axis as the rows, so endpoints align at every viewport width. */}
-          <svg
-            className={styles.schemaWires}
-            viewBox="0 0 160 108"
-            preserveAspectRatio="none"
+          <span
+            className={`${styles.conduit} ${styles.conduitIn}`}
             aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M0 54H80" className={styles.schemaTrunk} pathLength={1} />
-            <path
-              d="M80 54h38V4h42"
-              className={`${styles.schemaBranch} ${styles.schemaBranchA}`}
-              pathLength={1}
-            />
-            <path
-              d="M80 54H160"
-              className={`${styles.schemaBranch} ${styles.schemaBranchB}`}
-              pathLength={1}
-            />
-            <path
-              d="M80 54h38v50h42"
-              className={`${styles.schemaBranch} ${styles.schemaBranchC}`}
-              pathLength={1}
-            />
-            <path
-              d="M0 54H160"
-              className={styles.schemaPulse}
-              pathLength={1}
-            />
-          </svg>
+          />
+
+          <div className={styles.schemaWireBox} aria-hidden="true">
+            {WIRES.map((wire) => (
+              <span
+                key={wire.key}
+                className={`${styles.wire} ${styles[wire.key]}`}
+                data-axis={wire.axis}
+              >
+                {"leg" in wire ? (
+                  <span
+                    className={`${styles.packetTrack} ${styles[wire.leg]}`}
+                  >
+                    <span className={styles.packetDot} />
+                  </span>
+                ) : null}
+              </span>
+            ))}
+
+            <span className={`${styles.junction} ${styles.junctionUp}`} />
+            <span className={`${styles.junction} ${styles.junctionMid}`} />
+            <span className={`${styles.junction} ${styles.junctionDown}`} />
+          </div>
+
           <span className={styles.schemaNode}>
             <svg
               viewBox="0 0 32 32"
@@ -87,24 +129,60 @@ export function McpSchematic() {
               />
             </svg>
             <span className={styles.schemaNodeLabel}>MCP</span>
+            <span className={styles.nodeFlash} aria-hidden="true" />
           </span>
+
+          <span
+            className={`${styles.conduit} ${styles.conduitOut}`}
+            aria-hidden="true"
+          />
         </div>
 
-        <div className={styles.schemaAgent}>
-          <p className={styles.schemaAgentLabel}>Inside your agent</p>
-          <ul className={styles.agentActions} aria-label="Available MCP actions">
+        <div className={styles.agentCol}>
+          <p className={`${styles.colLabel} ${styles.colLabelAgent}`}>
+            Inside your agent
+          </p>
+
+          <ul
+            className={styles.agentActions}
+            aria-label="Available MCP actions"
+          >
             {mcpTools.map((tool, i) => (
-              <li key={tool} className={styles.agentAction} data-action={i + 1}>
-                <span className={styles.agentActionName}>{tool}</span>
+              <li
+                key={tool.name}
+                className={styles.agentAction}
+                data-action={i + 1}
+              >
+                <span className={styles.actionPort} aria-hidden="true" />
+                <span className={styles.agentActionName}>{tool.name}</span>
+                <span className={styles.actionTool} aria-hidden="true">
+                  {tool.tool}
+                  <span className={styles.actionArg}>{tool.arg}</span>
+                </span>
+                <span className={styles.actionState} aria-hidden="true">
+                  <span data-state="off">idle</span>
+                  <span data-state="on">ready</span>
+                </span>
+                <span className={styles.actionRet} aria-hidden="true">
+                  {tool.ret}
+                </span>
               </li>
             ))}
           </ul>
         </div>
+
+        <p className={styles.hopMeasure} aria-hidden="true">
+          <span className={styles.hopRule} />
+          <span className={styles.hopLabel}>one hop</span>
+          <span className={styles.hopRule} />
+        </p>
       </div>
 
-      <figcaption className={`${styles.schemaCaption} text-pretty`}>
-        Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
-        same library remains available in Skills Board.
+      <figcaption className={styles.schemaCaption}>
+        <span className={`${styles.schemaCaptionText} text-pretty`}>
+          Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
+          same library remains available in Skills Board.
+        </span>
       </figcaption>
     </figure>
   )

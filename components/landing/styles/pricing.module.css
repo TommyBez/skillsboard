@@ -1,0 +1,615 @@
+/* ---------------------------------------------------------------------------
+   Pricing — one printed plate.
+
+   The chapter inverts as an *object*, not as a band: a plate laid inside the
+   page frame, at three quarters of the page measure, so the frame's rails run
+   past it on both sides instead of being erased by it.
+
+   Everything on the plate is derived from three decisions:
+
+   1. The column rule sits at exactly two fifths of the plate width. Numeral
+      column : statement column = 2 : 3.
+   2. The numeral is drawn to *fill* that column and then overshoots every
+      boundary it has by the same `--os`: it crosses the head rule and the
+      column rule, and runs off the left and bottom trim, where the plate clips
+      it. Nothing about it is politely inset. Its 380 : 532 letterform ratio
+      then fixes the height of the plate's body, and therefore the plate.
+   3. The display line is set to the measure of the column it lives in, and the
+      lede is set to the size at which its single line measures exactly as wide
+      as the display line above it. Their right edges are one edge, by rule and
+      not by accident.
+
+   Three rule roles, three weights: the column rule (2px, structural tone), the
+   head rule (1px, structural tone), the ledger rules (1px, ledger tone). The
+   plate is trimmed on its last ledger rule, so the card ends where its own
+   structure ends. The only motion is the press run — rules scribe, then the key
+   ink is pulled across the numeral. It rests finished without JS and under
+   reduced motion.
+
+   Type metrics used below, measured from the shipped faces:
+     Bricolage Grotesque 650 — cap 0.686em; at line-height .88 the cap top sits
+       0.100em under the line box top and the box ends 0.094em under the
+       baseline. "Forever." advances 3.44729em before tracking.
+     Bricolage Grotesque 400 — at line-height 1.4 the cap top sits 0.275em under
+       the line box top and the box ends 0.438em under the baseline.
+     Geist Mono 500/600 — cap 0.708em; at line-height 1 the cap top sits 0.077em
+       under the line box top and the box ends 0.215em under the baseline.
+--------------------------------------------------------------------------- */
+
+.pricingSection {
+  /* --- Ink ---------------------------------------------------------------
+     Light page → ink plate, dark page → paper plate. The plate's key green is
+     one step of the page's own green ramp, not a second green: same hue, same
+     saturation, a different lightness, chosen so it never clips the sRGB
+     boundary (which is what turned the old key into a 100%-saturated forest
+     green sitting next to a 42%-saturated logo). */
+  --plate-field: oklch(0.155 0.016 158);
+  --plate-ink: oklch(0.955 0.009 103);
+  --plate-key: oklch(0.64 0.18 148);
+
+  /* Three rule roles, two tones. */
+  --rule-struct: color-mix(in oklab, var(--plate-ink) 36%, transparent);
+  --rule-ledger: color-mix(in oklab, var(--plate-ink) 20%, transparent);
+  --rule-w: 2px;
+
+  --plate-quiet: color-mix(in oklab, var(--plate-ink) 66%, transparent);
+  --plate-lede: color-mix(in oklab, var(--plate-ink) 78%, transparent);
+  --plate-spec: color-mix(in oklab, var(--plate-ink) 94%, transparent);
+
+  /* --- Geometry (stacked / narrow default) ------------------------------- */
+  --gutter: var(--lp-gutter, 1.25rem);
+  --pad: clamp(1.15rem, 5vw, 1.75rem);
+  --index-h: 0.7rem;
+  --os: 5px;
+  /* Head band: the index cap sits exactly one pad below the trim and exactly
+     one pad above the head rule. */
+  --head-h: calc(2 * var(--pad) + 0.708 * var(--index-h));
+  --col-w: calc(100vw - 2 * var(--gutter) - 2 * var(--pad));
+  --display: min(calc(var(--col-w) / 3.23), 4.5rem);
+  --lede: clamp(0.95rem, 4vw, 1.15rem);
+  --num-w: min(76vw, 17rem);
+  --num-h: calc(var(--num-w) * 1.4);
+
+  /* --- Press run ---------------------------------------------------------
+     The plate is ruled up on arrival; the key ink is pulled across the numeral
+     on the scroll runway. `--p` is 1 = fully printed, and the controller drives
+     it down to 0 and back only where a runway exists, so every default here is
+     the finished state. Before the ink arrives the numeral shows as a blind
+     impression, never as a hole. */
+  --p: 1;
+  --p-ink: clamp(0, calc((var(--p) - 0.06) / 0.5), 1);
+  --e-ink: calc(var(--p-ink) * var(--p-ink) * (3 - 2 * var(--p-ink)));
+
+  position: relative;
+}
+
+/* The chapter's closing rule stops on the page measure, like every other line
+   of chrome, instead of crossing the frame. */
+.pricingSection::after {
+  content: "";
+  position: absolute;
+  left: var(--lp-frame-inset, var(--gutter));
+  right: var(--lp-frame-inset, var(--gutter));
+  bottom: 0;
+  height: 1px;
+  background: var(--lp-hairline);
+}
+
+:global(.dark) .pricingSection {
+  --plate-field: oklch(0.955 0.01 103);
+  --plate-ink: oklch(0.16 0.018 158);
+  /* rgb(50,122,65) — hsl(133 42% 34%) against the page's own
+     rgb(93,189,111) — hsl(131 42% 55%). Two steps of one ramp. */
+  --plate-key: oklch(0.52 0.115 148);
+}
+
+/* --- Stage ----------------------------------------------------------------- */
+
+.sticky {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+}
+
+.frame {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* --- The plate ------------------------------------------------------------- */
+
+.plate {
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: var(--head-h) auto auto;
+  border-radius: 3px;
+  background: var(--plate-field);
+  color: var(--plate-ink);
+  box-shadow: 0 30px 72px -40px oklch(0 0 0 / 0.6);
+}
+
+/* Paper: a fixed grain on the plate itself, so nothing shimmers while pinned. */
+.plate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.4'/%3E%3C/svg%3E");
+  opacity: 0.05;
+  mix-blend-mode: soft-light;
+}
+
+/* --- Index: one pad below the trim, one pad above the head rule ------------ */
+
+.indexNum,
+.indexName {
+  grid-row: 1;
+  align-self: start;
+  padding-left: var(--pad);
+  /* Land the *cap*, not the line box, one pad off the trim. */
+  margin-top: calc(var(--pad) - 0.077em);
+  font-family: var(--font-mono);
+  font-size: var(--index-h);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--plate-quiet);
+}
+
+.indexNum {
+  grid-column: 1;
+}
+
+.indexName {
+  grid-column: 2;
+}
+
+/* --- Rules ----------------------------------------------------------------- */
+
+.ruleTop {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  top: var(--head-h);
+  height: 1px;
+  background: var(--rule-struct);
+  transform-origin: left center;
+  --rd: 90ms;
+}
+
+/* --- The numeral ----------------------------------------------------------- */
+
+.numeral {
+  position: relative;
+  z-index: 1;
+  grid-row: 2;
+  grid-column: 1 / -1;
+  width: var(--num-w);
+  height: var(--num-h);
+  /* Every boundary it has, it crosses by the same amount. */
+  margin-top: calc(-1 * var(--os));
+  margin-left: calc(-1 * var(--os));
+}
+
+.zero {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: var(--plate-key);
+}
+
+/* The pull: near plate-coloured, retreating right as the key ink is laid down.
+   It is not fully opaque, so what it covers reads as a blind impression of the
+   numeral waiting for ink rather than as an empty cell. */
+.wipe {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  background: color-mix(in oklab, var(--plate-field) 88%, transparent);
+  transform-origin: 100% 50%;
+  transform: scaleX(calc(1 - var(--e-ink)));
+}
+
+/* The wet leading edge, present only during the pull. */
+.nip {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: var(--plate-key);
+  transform: translateX(calc(var(--num-w) * var(--e-ink)));
+  opacity: calc(1.9 * var(--e-ink) * (1 - var(--e-ink)));
+}
+
+/* --- The statement column -------------------------------------------------- */
+
+.column {
+  position: relative;
+  z-index: 1;
+  grid-row: 3;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  padding-inline: var(--pad);
+  margin-top: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+/* The statement is the first cell of the ledger; the rule under it is the same
+   rule that separates the three absences below. */
+.statement {
+  position: relative;
+  /* The head rule sits 0.8 pad under the lede's baseline. */
+  padding-bottom: calc(0.8 * var(--pad) - 0.438 * var(--lede));
+}
+
+.statement::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  left: calc(-1 * var(--pad));
+  right: calc(-1 * var(--pad));
+  bottom: 0;
+  height: 1px;
+  background: var(--rule-ledger);
+  transform-origin: left center;
+  --rd: 250ms;
+}
+
+.heading {
+  max-width: 4.6em;
+  font-size: var(--display);
+  font-weight: 650;
+  line-height: 0.88;
+  letter-spacing: -0.038em;
+  /* Side-bearing correction: the display line is the one that needs it, so
+     its stem lands on the same column line as the mono and the lede. */
+  margin-left: -0.038em;
+  /* Land the cap of the first line half a pad below the head rule — a decided
+     unit of air, not the residue of `leading-none`. */
+  margin-top: calc(0.5 * var(--pad) - 0.1em);
+}
+
+/* The face draws F+r and F+o tight already; the setting's negative tracking
+   made those two pairs read tighter than every other pair in the line. They
+   get most of it back. */
+.kern {
+  letter-spacing: -0.012em;
+}
+
+.lede {
+  /* One pad from the display's last baseline to the lede's cap. */
+  margin-top: calc(var(--pad) - 0.094 * var(--display) - 0.275em);
+  max-width: 46ch;
+  font-size: var(--lede);
+  line-height: 1.4;
+  letter-spacing: -0.004em;
+  color: var(--plate-lede);
+}
+
+/* Spec ledger: three absences, each written on its own rule. */
+.spec {
+  display: grid;
+  list-style: none;
+}
+
+.specRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Optical centring: `align-items: center` centres the *line box*, whose
+     centre sits 0.069em above the cap band's centre. This puts the cap band
+     itself on the centre of the row. */
+  padding-block: 0.138em 0;
+  min-height: 3.4rem;
+  font-family: var(--font-mono);
+  font-size: clamp(0.78rem, 1.02vw, 0.92rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.005em;
+  color: var(--plate-spec);
+}
+
+.specRow::after {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  left: calc(-1 * var(--pad));
+  right: calc(-1 * var(--pad));
+  bottom: 0;
+  height: 1px;
+  background: var(--rule-ledger);
+  transform-origin: left center;
+  --rd: calc(310ms + var(--i, 0) * 70ms);
+}
+
+/* The last row is closed by the plate's own trim, not by a rule sitting in a
+   band of nothing. */
+.specRow:last-child::after {
+  display: none;
+}
+
+/* --- Wide: two columns, every measurement derived from the numeral --------- */
+
+@media (min-width: 48rem) {
+  .pricingSection {
+    --plate-frac: 1;
+    --plate-cap: min(76vh, 44rem);
+    --measure-w: calc(min(1440px, 100vw) - 2 * var(--gutter));
+
+    /* plate-h = 0.6384 · plate-w + 14.73px, expanded below from its parts;
+       inverted here so the plate can be capped against the stage. */
+    --plate-w: min(
+      calc(var(--measure-w) * var(--plate-frac)),
+      calc((var(--plate-cap) - 14.73px) / 0.6384)
+    );
+    --pad: calc(var(--plate-w) * 0.0392);
+
+    /* 1. the column rule, at two fifths */
+    --col-1: calc(var(--plate-w) * 0.4);
+    /* 2. the numeral: fills that column, crosses every edge by --os */
+    --num-w: calc(var(--col-1) + var(--rule-w) + 2 * var(--os));
+    --num-h: calc(var(--num-w) * 1.4);
+    --body-h: calc(var(--num-h) - 2 * var(--os));
+    --plate-h: calc(var(--head-h) + var(--body-h));
+    /* 3. the statement measure, and the type set to it */
+    --col-w: calc(var(--plate-w) * 0.6 - 2 * var(--pad));
+    --display: calc(var(--col-w) / 3.23);
+    /* The lede is set to the size at which its single line measures exactly as
+       wide as "Forever." above it: 3.16929em of display against 19.64em of
+       lede. Their right edges are one edge, by rule and not by accident. */
+    --lede: calc(var(--display) * 0.1614);
+  }
+
+  .plate {
+    width: var(--plate-w);
+    max-width: 100%;
+    height: var(--plate-h);
+    margin-inline: auto;
+    grid-template-columns: var(--col-1) minmax(0, 1fr);
+    grid-template-rows: var(--head-h) minmax(0, 1fr);
+  }
+
+  .numeral {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .column {
+    grid-row: 2;
+    grid-column: 2;
+    margin-top: 0;
+  }
+
+  /* The column rule: the plate's spine, and the heaviest line on it. It runs
+     from the head rule to the trim; the numeral crosses it. */
+  /* One line, always: the rule above only holds if it is one line, and an
+     overflow into the pad is a better failure than a second line. */
+  .lede {
+    white-space: nowrap;
+  }
+
+  .column::before {
+    content: "";
+    position: absolute;
+    z-index: 4;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: var(--rule-w);
+    background: var(--rule-struct);
+    transform-origin: center top;
+    --rd: 170ms;
+  }
+
+  /* Three identical rows filling whatever the statement leaves. */
+  .spec {
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+  }
+
+  .specRow {
+    min-height: 0;
+  }
+}
+
+/* --- Desktop: the plate is inset inside the page frame, pinned, and printed
+   as you scroll. Three quarters of the measure, so the frame's rails run past
+   it on both sides instead of being erased by it. --------------------------- */
+
+@media (min-width: 64rem) {
+  .pricingSection {
+    --plate-frac: 0.75;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .pricingSection {
+    height: 200vh;
+    --p: var(--sp-pricing, 0);
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"]) .sticky {
+    position: sticky;
+    top: var(--lp-header-h);
+    height: calc(100dvh - var(--lp-header-h));
+    padding-block: 0;
+  }
+}
+
+/* --- Arrival, part 1: the plate is ruled up ------------------------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .ruleTop,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .statement::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .specRow::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .column::before {
+  transition: transform 640ms var(--lp-ease-emph) var(--rd, 0ms);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .ruleTop,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .statement::after,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .specRow::after {
+  transform: scaleX(0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .column::before {
+  transform: scaleY(0);
+}
+
+/* --- Arrival, part 2: the plate is placed and the type is set -------------- */
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .plate {
+  transition:
+    opacity var(--lp-dur-scene) var(--lp-ease-emph),
+    transform var(--lp-dur-scene) var(--lp-ease-emph);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .plate {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .indexNum,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .indexName,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .heading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .lede,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"]
+  .specRow {
+  transition:
+    opacity var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms),
+    transform var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms);
+}
+
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .indexNum,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .indexName,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .heading,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .lede,
+:global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-motion-group="pricing"][data-motion-state="pending"]
+  .specRow {
+  opacity: 0;
+  transform: translate3d(0, 10px, 0);
+}
+
+.indexNum {
+  --d: 40ms;
+}
+
+.indexName {
+  --d: 80ms;
+}
+
+.heading {
+  --d: 170ms;
+}
+
+.lede {
+  --d: 250ms;
+}
+
+.specRow {
+  --d: calc(320ms + var(--i, 0) * var(--lp-stagger));
+}
+
+/* Below the pin there is no runway, so the run is transition-timed instead. */
+@media (max-width: 63.999rem) {
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="pricing"]
+    .wipe,
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="pricing"]
+    .nip {
+    transition:
+      transform 940ms var(--lp-ease-in-out) 380ms,
+      opacity 940ms linear 380ms;
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="pricing"][data-motion-state="pending"]
+    .wipe {
+    transform: scaleX(1);
+  }
+
+  :global([data-landing-motion-root][data-motion-enabled="true"])
+    [data-motion-group="pricing"][data-motion-state="pending"]
+    .nip {
+    transform: translateX(0);
+    opacity: 0;
+  }
+}
+
+/* --- Reduced motion: the proof rests printed ------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .pricingSection {
+    --p: 1;
+    height: auto !important;
+  }
+
+  .sticky {
+    position: static !important;
+    height: auto !important;
+    padding-block: clamp(3.5rem, 8vw, 6.5rem) !important;
+  }
+
+  .plate,
+  .indexNum,
+  .indexName,
+  .heading,
+  .lede,
+  .specRow,
+  .specRow::after,
+  .statement::after,
+  .ruleTop,
+  .column::before,
+  .wipe,
+  .nip {
+    transition: none !important;
+  }
+}
