@@ -71,6 +71,9 @@
   --closing-mark-h: 1rem;
   --closing-lead: 2.75rem;
   --closing-tail: calc(var(--closing-lead) + var(--closing-mark-h) / 2);
+  /* Page gutter + the same content clear the flow panel uses off its rails,
+     so "06 · Start" and the terminal CTA are not painted on the frame. */
+  --closing-inline: calc(var(--lp-gutter) + 1.5rem);
 
   position: relative;
   display: flex;
@@ -80,7 +83,7 @@
   gap: var(--closing-lead);
   margin-inline: auto;
   padding-block: 4.5rem var(--closing-tail);
-  padding-inline: 1.25rem;
+  padding-inline: var(--closing-inline);
 }
 
 @media (min-width: 48rem) {
@@ -88,7 +91,18 @@
     --closing-lead: 5rem;
 
     padding-block: 6.9375rem var(--closing-tail);
-    padding-inline: 2.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .closingInner {
+    --closing-inline: calc(var(--lp-gutter) + 1.75rem);
+  }
+}
+
+@media (min-width: 84rem) {
+  .closingInner {
+    --closing-inline: calc(var(--lp-gutter) + 2rem);
   }
 }
 
@@ -113,7 +127,10 @@
     position: absolute;
     top: calc(6.9375rem + var(--closing-mark-h) / 2);
     bottom: 0;
-    left: calc(2.5rem + (100% - 5rem) * var(--closing-split));
+    left: calc(
+      var(--closing-inline) +
+        (100% - 2 * var(--closing-inline)) * var(--closing-split)
+    );
     width: 1px;
     pointer-events: none;
     /* Drawn exactly the way the two fixed page rails are drawn — white ink,

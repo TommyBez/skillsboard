@@ -40,7 +40,7 @@
 
 .flowSection {
   /* Panel measure. `--pad` is the clear space around every rule. */
-  --pad: 1.25rem;
+  --pad: 1.5rem;
 
   /* Diagram vocabulary — one radius scale, one connector ink, one mono scale,
      one set of vertical axes. Declared on the chapter so the head and the
@@ -91,49 +91,36 @@
 
 @media (min-width: 64rem) {
   .flowSection {
-    --pad: 1.5rem;
+    --pad: 1.75rem;
   }
 }
 
 @media (min-width: 84rem) {
   .flowSection {
-    --pad: 1.75rem;
+    --pad: 2rem;
   }
 }
 
 /* --- Chapter head ------------------------------------------------------- */
 
-/* The head sits on the panel's content axis, not on the frame. Everything in
-   the chapter — mark, heading, cell index, cell title, every diagram row —
-   starts on the same x; only the chapter numeral hangs outside it, in a column
-   of exactly one `--pad` (plus the frame rail it sits on). Before this the
-   headline was the one element on the page frame itself, a 26px jog with no
-   intermediate step. */
+/* One content clear from the frame rails. Index, mark, value and title all
+   live inside it — nothing is pulled back onto the rail. */
 .flowHead {
-  padding-left: var(--pad);
-}
-
-/* `02` hangs in its own column of exactly one `--pad` (plus the frame rail it
-   sits on), so the chapter mark starts on the same x as the first cell's
-   content — the one vertical axis that ties the head to the panel. */
-.flowMarkRow {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  padding-inline: var(--pad);
 }
 
 @media (min-width: 64rem) {
   .flowHead {
-    padding-left: calc(var(--pad) + 1px);
+    /* Match the panel cells: +1px wherever a frame rail is drawn inside the
+       content box, so clear space is `--pad` rule-to-ink on both sides. */
+    padding-inline: calc(var(--pad) + 1px);
   }
+}
 
-  .flowMarkRow {
-    display: grid;
-    grid-template-columns: calc(var(--pad) + 1px) minmax(0, 1fr);
-    gap: 0;
-    /* Pull the numeral back out onto the frame; the mark stays on the axis. */
-    margin-left: calc(-1 * (var(--pad) + 1px));
-  }
+.flowMarkRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .flowIndex {

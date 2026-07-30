@@ -39,7 +39,7 @@
      rails and the pane spine alike. Same three steps as the chapter above's
      `--pad`, so two stacked sections hold their content the same distance off
      their rules instead of 29px and 37px. */
-  --rule-clear: 1.25rem;
+  --rule-clear: 1.5rem;
   --wire-casing: color-mix(in oklab, var(--foreground) 13%, transparent);
   --wire-glow: color-mix(in oklab, var(--primary) 55%, transparent);
 
@@ -89,13 +89,13 @@
 
 @media (min-width: 64rem) {
   .mcpChapter {
-    --rule-clear: 1.5rem;
+    --rule-clear: 1.75rem;
   }
 }
 
 @media (min-width: 84rem) {
   .mcpChapter {
-    --rule-clear: 1.75rem;
+    --rule-clear: 2rem;
   }
 }
 
