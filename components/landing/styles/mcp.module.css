@@ -459,23 +459,12 @@
 }
 
 .endpointHead {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
   font-size: 0.6rem;
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--ink-chrome);
-}
-
-/* Ends on the same rule as the plate's own edge — so its trailing tracking,
-   which was leaving the count 1.1px short of the line it aligns to, comes
-   off the end of the run. */
-.endpointCount {
-  margin-right: -0.115em;
 }
 
 /* The slash's left side bearing is 0.078em, so a flush-set value printed 2px
@@ -686,16 +675,6 @@
   background: var(--signal-feed);
   transform: scaleX(1);
   transform-origin: right center;
-}
-
-.schemaRowIndex {
-  flex: none;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-chrome);
 }
 
 .schemaRowName {
@@ -1047,11 +1026,11 @@
 .agentAction {
   position: relative;
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "idx name name"
-    "idx tool state"
-    "idx ret  ret";
+    "name name"
+    "tool state"
+    "ret  ret";
   align-content: center;
   gap: 0.26rem 0.6rem;
   padding: 0.85rem 0.95rem;
@@ -1098,17 +1077,6 @@
   border: 1px solid var(--primary);
   background: var(--primary);
   box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--primary) 16%, transparent);
-}
-
-.actionIndex {
-  grid-area: idx;
-  align-self: center;
-  font-family: var(--font-mono);
-  font-size: 0.6rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
-  color: var(--ink-chrome);
 }
 
 .agentActionName {
@@ -1182,9 +1150,9 @@
      the signature keeps the full row rather than truncating. */
   .agentAction {
     grid-template-areas:
-      "idx name name"
-      "idx tool tool"
-      "idx ret  state";
+      "name name"
+      "tool tool"
+      "ret  state";
   }
 
   .actionTool {

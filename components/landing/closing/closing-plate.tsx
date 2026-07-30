@@ -13,11 +13,11 @@ import styles from "@/components/landing/styles/closing.module.css"
  * the writing.
  */
 const entries = [
-  { index: "01", name: "code-review", source: "acme", marked: true },
-  { index: "02", name: "pdf-extraction", source: "anthropics", marked: false },
-  { index: "03", name: "brand-voice", source: "acme", marked: false },
-  { index: "04", name: "sql-migrations", source: "drizzle-team", marked: false },
-  { index: "05", name: "release-notes", source: "vercel", marked: false },
+  { name: "code-review", source: "acme", marked: true },
+  { name: "pdf-extraction", source: "anthropics", marked: false },
+  { name: "brand-voice", source: "acme", marked: false },
+  { name: "sql-migrations", source: "drizzle-team", marked: false },
+  { name: "release-notes", source: "vercel", marked: false },
 ] as const
 
 const answer = entries.find((entry) => entry.marked) ?? entries[0]
@@ -38,13 +38,12 @@ export function ClosingPlate() {
         <ul className={styles.plateRows}>
           {entries.map((entry, i) => (
             <li
-              key={entry.index}
+              key={entry.name}
               className={styles.plateRow}
               data-marked={entry.marked ? "" : undefined}
               style={{ "--i": i } as CSSProperties}
             >
               <span className={styles.plateMark} />
-              <span className={styles.plateIndex}>{entry.index}</span>
               <span className={styles.plateName}>{entry.name}</span>
               <span className={styles.plateRule} />
               <span className={styles.plateSource}>{entry.source}</span>

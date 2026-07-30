@@ -78,9 +78,6 @@ export function McpSchematic() {
                   className={styles.schemaRow}
                   data-row={i + 1}
                 >
-                  <span className={styles.schemaRowIndex}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
                   <span className={styles.schemaRowName}>{row.name}</span>
                   <span className={styles.schemaRowTag}>{row.tag}</span>
                 </li>
@@ -157,9 +154,6 @@ export function McpSchematic() {
                 data-action={i + 1}
               >
                 <span className={styles.actionPort} aria-hidden="true" />
-                <span className={styles.actionIndex} aria-hidden="true">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
                 <span className={styles.agentActionName}>{tool.name}</span>
                 <span className={styles.actionTool} aria-hidden="true">
                   {tool.tool}

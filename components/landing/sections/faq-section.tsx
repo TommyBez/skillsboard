@@ -1,8 +1,6 @@
 import styles from "@/components/landing/styles/faq.module.css"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 
-const entryCount = String(landingFaqs.length).padStart(2, "0")
-
 /** FAQ — chapter 05, set as a ruled register. */
 export function FaqSection() {
   return (
@@ -13,13 +11,7 @@ export function FaqSection() {
       data-chapter-target="faq"
     >
       <div className={styles.faqInner} data-motion-group="faq">
-        {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). It is
-            symmetric by construction: a tabular numeral at each end, a 36px
-            dotted connector inboard of each, and one long connector spanning
-            the rest. Its marks stand on the same inset as the headline and the
-            toggles below them; only its RULE runs the whole measure, because
-            that rule is the register's head rule and both columns hang from
-            it. */}
+        {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). */}
         <p className={styles.faqStrip} aria-hidden="true">
           <span className={styles.faqStripNum} data-decode="">
             05
@@ -27,15 +19,6 @@ export function FaqSection() {
           <span className={styles.faqStripHair} />
           <span className={styles.faqStripName}>FAQ</span>
           <span className={styles.faqStripHair} data-flex="" />
-          <span className={styles.faqStripKey}>entry</span>
-          <span className={styles.faqStripHair} />
-          {/* Value is set from CSS by :has() on the open entry — a real
-              readout of the register's state, with no JS. It rests on "00",
-              a value, never on a placeholder dash. */}
-          <span className={styles.faqStripReadout}>
-            <span className={styles.faqStripValue} />
-            <span className={styles.faqStripTotal}>/ {entryCount}</span>
-          </span>
         </p>
 
         <div className={styles.faqBody}>
@@ -50,18 +33,9 @@ export function FaqSection() {
               means.
             </p>
 
-            {/* Counterweight: the title column's footer, cut to whole register
-                rows so its rule lands ON a row rule rather than beside one.
-                A legend line, then eight stations — one per entry, on the
-                register's own pitch, standing on the foot rule. The open one
-                fills with the accent from the top down, the same gesture as
-                the open row's segment across the divider. */}
+            {/* Counterweight: the title column's footer. Eight stations — one
+                per entry — light with the open row, no ordinals required. */}
             <div className={styles.faqMap} aria-hidden="true">
-              <p className={styles.faqMapLegend}>
-                <span className={styles.faqMapLabel}>index</span>
-                <span className={styles.faqMapLead} />
-                <span className={styles.faqMapTotal}>{entryCount}</span>
-              </p>
               <span className={styles.faqMapScale}>
                 {landingFaqs.map((faq) => (
                   <span key={faq.question} className={styles.faqMapTick} />
@@ -78,8 +52,8 @@ export function FaqSection() {
             {landingFaqs.map((faq, index) => (
               // Native exclusive disclosure: opening an entry closes the last
               // one, so the register never sprawls and the closed rows stay a
-              // scannable index. No JS involved. Entry 01 rests open, so the
-              // chapter shows its own primary interaction at rest.
+              // scannable index. No JS involved. The first entry rests open,
+              // so the chapter shows its own primary interaction at rest.
               <details
                 key={faq.question}
                 name="faq-index"
@@ -87,9 +61,6 @@ export function FaqSection() {
                 className={`faq-disclosure ${styles.faqItem}`}
               >
                 <summary className={styles.faqSummary}>
-                  <span className={styles.faqNum} aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   <span className={styles.faqQuestion}>{faq.question}</span>
                   {/* Leader: ties the entry to its control the way a contents
                       page ties a title to its folio. Its dots are phased from

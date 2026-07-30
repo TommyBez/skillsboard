@@ -505,11 +505,11 @@
   }
 }
 
-/* Narrow: mark, number, name, then the source run out to the right edge.
+/* Narrow: mark, name, then the source run out to the right edge.
    No leader, because a leader that stops in empty space is not a leader. */
 .plateRow {
   display: grid;
-  grid-template-columns: auto auto auto minmax(0, 1fr);
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
   gap: 0.85rem;
 }
@@ -540,7 +540,7 @@
    to where it came from, the way an index does. */
 @media (min-width: 64rem) {
   .plateRow {
-    grid-template-columns: auto auto auto minmax(2.5rem, 1fr) auto;
+    grid-template-columns: auto auto minmax(2.5rem, 1fr) auto;
   }
 
   .plateRule {
@@ -604,26 +604,6 @@
    the x-height of code-review. */
 .plateBar .plateMark {
   margin-bottom: 1.5px;
-}
-
-.plateIndex {
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  color: var(--muted-foreground);
-  opacity: 0.78;
-}
-
-@media (min-width: 82rem) {
-  .plateIndex {
-    font-size: 0.6875rem;
-  }
-}
-
-.plateRow[data-marked] .plateIndex {
-  color: var(--foreground);
-  opacity: 0.88;
 }
 
 /* ---------------------------------------------------------------------------
@@ -773,7 +753,7 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateIndex, .plateName, .plateSource, .plateLabel, .plateAnswer) {
+  :is(.plateName, .plateSource, .plateLabel, .plateAnswer) {
   opacity: 0;
   transform: translate3d(-7px, 0, 0);
 }
@@ -806,7 +786,7 @@
 
 :global([data-landing-motion-root][data-motion-enabled="true"])
   [data-motion-group="closing"][data-motion-state="visible"]
-  :is(.plateIndex, .plateName, .plateSource) {
+  :is(.plateName, .plateSource) {
   transition:
     opacity 400ms var(--lp-ease-out) calc(320ms + var(--i, 0) * 76ms),
     transform 400ms var(--lp-ease-emph) calc(320ms + var(--i, 0) * 76ms);

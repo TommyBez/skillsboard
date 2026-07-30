@@ -81,7 +81,6 @@ export function McpSection() {
               <div className={styles.endpoint} aria-hidden="true">
                 <p className={styles.endpointHead}>
                   <span>endpoint</span>
-                  <span className={styles.endpointCount}>12 tools</span>
                 </p>
                 <p className={styles.endpointValue}>/api/mcp</p>
                 <p className={styles.endpointMeta}>
