@@ -19,6 +19,7 @@ const productModuleUrl = await transpiledModule("../lib/email/product-communicat
 const productCommunications = await import(productModuleUrl)
 const {
   PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
+  canConfirmProductCommunicationsUnsubscribe,
   canLiftProviderUnsubscribe,
   evaluateProductCommunicationsEligibility,
   isProductCommunicationsSender,
@@ -106,6 +107,29 @@ test("only explicit unsubscribe suppressions are autonomously liftable", () => {
   assert.equal(isAutonomouslyLiftableSuppression("complaint"), false)
   assert.equal(isPermanentDeliverySuppression("hard_bounce"), true)
   assert.equal(isPermanentDeliverySuppression("provider_suppressed"), true)
+})
+
+test("does not confirm an unsubscribe for a stale email token", () => {
+  assert.equal(canConfirmProductCommunicationsUnsubscribe({
+    activeUnsubscribeSuppression: true,
+    preferenceSubscribed: null,
+    tokenMatchesCurrentEmail: false,
+  }), false)
+  assert.equal(canConfirmProductCommunicationsUnsubscribe({
+    activeUnsubscribeSuppression: true,
+    preferenceSubscribed: false,
+    tokenMatchesCurrentEmail: true,
+  }), true)
+  assert.equal(canConfirmProductCommunicationsUnsubscribe({
+    activeUnsubscribeSuppression: true,
+    preferenceSubscribed: true,
+    tokenMatchesCurrentEmail: true,
+  }), false)
+  assert.equal(canConfirmProductCommunicationsUnsubscribe({
+    activeUnsubscribeSuppression: false,
+    preferenceSubscribed: false,
+    tokenMatchesCurrentEmail: true,
+  }), false)
 })
 
 test("lifts a provider unsubscribe only after later local consent and signed provider confirmation", () => {

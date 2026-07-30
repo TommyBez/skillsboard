@@ -58,10 +58,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    await withdrawProductCommunicationsByToken({
+    const result = await withdrawProductCommunicationsByToken({
       emailHash: payload.emailHash,
       userId: payload.userId,
     })
+    if (pageResponse && !result.tokenMatchesCurrentEmail) {
+      return redirectToPage(request, "invalid")
+    }
   } catch (error) {
     console.error("Unable to process product communications unsubscribe", {
       name: error instanceof Error ? error.name : "UnknownError",

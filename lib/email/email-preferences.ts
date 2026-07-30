@@ -12,6 +12,7 @@ import {
   user,
 } from "@/lib/db/schema"
 import {
+  canConfirmProductCommunicationsUnsubscribe,
   canLiftProviderUnsubscribe,
   evaluateProductCommunicationsEligibility,
   isAutonomouslyLiftableSuppression,
@@ -646,9 +647,10 @@ export async function recordProductCommunicationsDeliveryInTransaction(
 export async function withdrawProductCommunicationsByToken(input: {
   emailHash: string
   userId: string
-}): Promise<{ alreadyUnsubscribed: boolean }> {
+}): Promise<{ alreadyUnsubscribed: boolean; tokenMatchesCurrentEmail: boolean }> {
   const now = new Date()
   let alreadyUnsubscribed = false
+  let tokenMatchesCurrentEmail = false
 
   await db.transaction(async (tx) => {
     const [identity] = await tx
@@ -657,7 +659,7 @@ export async function withdrawProductCommunicationsByToken(input: {
       .where(eq(user.id, input.userId))
       .limit(1)
     const currentEmailHashes = identity ? hashEmailAddressCandidates(identity.email) : null
-    const tokenMatchesCurrentEmail = Boolean(currentEmailHashes?.includes(input.emailHash))
+    tokenMatchesCurrentEmail = Boolean(currentEmailHashes?.includes(input.emailHash))
     const relevantHashes = tokenMatchesCurrentEmail && currentEmailHashes
       ? [...new Set([input.emailHash, ...currentEmailHashes])]
       : [input.emailHash]
@@ -749,7 +751,7 @@ export async function withdrawProductCommunicationsByToken(input: {
     }
   })
 
-  return { alreadyUnsubscribed }
+  return { alreadyUnsubscribed, tokenMatchesCurrentEmail }
 }
 
 export async function isProductCommunicationsUnsubscribed(input: {
@@ -758,9 +760,10 @@ export async function isProductCommunicationsUnsubscribed(input: {
 }): Promise<boolean> {
   const identity = await getUserIdentity(input.userId)
   const currentEmailHashes = identity ? hashEmailAddressCandidates(identity.email) : null
-  const relevantHashes = currentEmailHashes?.includes(input.emailHash)
-    ? [...new Set([input.emailHash, ...currentEmailHashes])]
-    : [input.emailHash]
+  const tokenMatchesCurrentEmail = Boolean(currentEmailHashes?.includes(input.emailHash))
+  if (!tokenMatchesCurrentEmail || !currentEmailHashes) return false
+
+  const relevantHashes = [...new Set([input.emailHash, ...currentEmailHashes])]
   const [[preference], [suppression]] = await Promise.all([
     db
       .select({ subscribed: emailPreference.subscribed })
@@ -783,7 +786,11 @@ export async function isProductCommunicationsUnsubscribed(input: {
       .limit(1),
   ])
 
-  return preference?.subscribed !== true && suppression?.active === true
+  return canConfirmProductCommunicationsUnsubscribe({
+    activeUnsubscribeSuppression: suppression?.active === true,
+    preferenceSubscribed: preference?.subscribed ?? null,
+    tokenMatchesCurrentEmail,
+  })
 }
 
 export async function assertTransactionalEmailAllowed(email: string): Promise<void> {

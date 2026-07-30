@@ -88,6 +88,16 @@ export function isPermanentDeliverySuppression(reason: string): boolean {
   return reason === "complaint" || reason === "hard_bounce" || reason === "provider_suppressed"
 }
 
+export function canConfirmProductCommunicationsUnsubscribe(input: {
+  activeUnsubscribeSuppression: boolean
+  preferenceSubscribed: boolean | null
+  tokenMatchesCurrentEmail: boolean
+}): boolean {
+  return input.tokenMatchesCurrentEmail
+    && input.preferenceSubscribed !== true
+    && input.activeUnsubscribeSuppression
+}
+
 export function canLiftProviderUnsubscribe(input: {
   consentedAt: Date | null
   providerOptOutAt: Date
