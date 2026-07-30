@@ -8,8 +8,6 @@ type GuidePageProps = {
   params: Promise<{ slug: string }>
 }
 
-export const dynamicParams = false
-
 export function generateStaticParams() {
   return guides.map((guide) => ({
     slug: slugFromPath(guide.path),
