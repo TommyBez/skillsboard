@@ -60,6 +60,9 @@ function SkillCard({
   )
 }
 
+/** How many pages the sentinel may pull before handing control back. */
+const MAX_AUTO_LOADS = 4
+
 function canFetchMore(page: CatalogPage) {
   if (!page.hasMore || page.source === "curated") return false
   if (page.source === "search" && page.perPage >= SEARCH_MAX_LIMIT) return false
@@ -79,6 +82,12 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
   const sentinelRef = useRef<HTMLDivElement>(null)
   const pageRef = useRef(page)
   const loadingRef = useRef(false)
+  /* Bound the automatic fetching. Without a cap the sentinel keeps pulling
+     pages for as long as someone scrolls, so passing through the catalog on
+     the way to the footer silently costs several requests. After this many
+     automatic pages the control goes back to the reader. */
+  const autoLoadsRef = useRef(0)
+  const [autoExhausted, setAutoExhausted] = useState(false)
   const saved = new Set(savedKeys)
 
   pageRef.current = page
@@ -138,20 +147,27 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
   useEffect(() => {
     const node = sentinelRef.current
-    if (!node || !canLoadMore || error) return
+    if (!node || !canLoadMore || error || autoExhausted) return
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          void loadMore()
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        // A request already in flight would make loadMore return immediately;
+        // counting that callback would shrink the next automatic window.
+        if (loadingRef.current) return
+        if (autoLoadsRef.current >= MAX_AUTO_LOADS) {
+          setAutoExhausted(true)
+          return
         }
+        autoLoadsRef.current += 1
+        void loadMore()
       },
       { root: null, rootMargin: "320px 0px", threshold: 0 },
     )
 
     observer.observe(node)
     return () => observer.disconnect()
-  }, [canLoadMore, skills.length, error, loadMore])
+  }, [canLoadMore, skills.length, error, autoExhausted, loadMore])
 
   return (
     <div className="grid gap-6">
@@ -200,7 +216,29 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
         </div>
       ) : null}
 
-      {canLoadMore && !error ? (
+      {canLoadMore && !error && autoExhausted ? (
+        <div className="flex justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isLoadingMore}
+            aria-busy={isLoadingMore || undefined}
+            onClick={() => {
+              // An explicit request re-arms the automatic window.
+              autoLoadsRef.current = 0
+              setAutoExhausted(false)
+              void loadMore()
+            }}
+          >
+            <ButtonPendingContent pending={isLoadingMore} pendingLabel="Loading…">
+              Load more skills
+            </ButtonPendingContent>
+          </Button>
+        </div>
+      ) : null}
+
+      {canLoadMore && !error && !autoExhausted ? (
         <div
           ref={sentinelRef}
           className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"

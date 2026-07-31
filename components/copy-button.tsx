@@ -84,7 +84,21 @@ export function CopyButton({
       ) : (
         <CopyIcon key="idle" data-icon="inline-start" />
       )}
-      {iconOnly ? null : hasCopied ? "Copied" : hasFailed ? "Copy failed" : label}
+      {iconOnly ? null : (
+        /* Width lock: the widest of the three labels is reserved up front, so
+           the swap to "Copied" / "Copy failed" never resizes the button and
+           never nudges the row it sits in. */
+        <span className="relative inline-grid">
+          <span aria-hidden className="invisible col-start-1 row-start-1 whitespace-nowrap">
+            {[label, "Copied", "Copy failed"].reduce((a, b) =>
+              b.length > a.length ? b : a
+            )}
+          </span>
+          <span className="col-start-1 row-start-1 whitespace-nowrap">
+            {hasCopied ? "Copied" : hasFailed ? "Copy failed" : label}
+          </span>
+        </span>
+      )}
     </Button>
   )
 }

@@ -6,6 +6,7 @@ import { toast } from "sonner"
 
 import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
 import { ButtonPendingContent } from "@/components/button-pending-content"
+import { TagInput } from "@/components/interior/tag-input"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -293,12 +294,20 @@ export function AddSkillDialog({
                   <PromptExamplesEditor disabled={pendingMode !== null} />
                 </div>
                 <Field>
-                  <FieldLabel htmlFor="tags">Tags (optional)</FieldLabel>
-                  <Input id="tags" name="tags" placeholder="research, productivity" />
+                  {/* Same treatment as the collection tags: chips as you type,
+                      still submitting the comma-joined value this form already
+                      splits on. */}
+                  <TagInput
+                    name="tags"
+                    label="Tags (optional)"
+                    max={10}
+                    placeholder="research, productivity"
+                    disabled={pendingMode !== null}
+                  />
                   <FieldDescription>
                     {selectedCount > 1
-                      ? `Comma-separated, up to 10 tags, applied to all ${selectedCount} selected skills. Notes and example prompts can be added to each skill after saving.`
-                      : "Comma-separated, up to 10 tags."}
+                      ? `Press Enter or comma to add, up to 10 tags, applied to all ${selectedCount} selected skills. Notes and example prompts can be added to each skill after saving.`
+                      : "Press Enter or comma to add. Up to 10 tags."}
                   </FieldDescription>
                 </Field>
               </div>
