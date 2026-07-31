@@ -4,9 +4,10 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react"
 import { PlusIcon, Trash2Icon } from "lucide-react"
 
 // ReorderList's drag interactions pull in the full motion runtime, so it
-// stays out of the route bundle and only loads once several prompts exist.
+// stays out of the route bundle and only loads once the editor is on screen.
+const loadReorderList = () => import("@/components/interior/reorder-list")
 const ReorderList = lazy(async () => ({
-  default: (await import("@/components/interior/reorder-list")).ReorderList,
+  default: (await loadReorderList()).ReorderList,
 })) as unknown as (typeof import("@/components/interior/reorder-list"))["ReorderList"]
 import { Button } from "@/components/ui/button"
 import {
@@ -35,6 +36,11 @@ export function PromptExamplesEditor({
 }: PromptExamplesEditorProps) {
   const nextId = useRef(Math.max(defaultValue.length, 1))
   const textareas = useRef(new Map<number, HTMLTextAreaElement>())
+  // Which prompt's textarea currently holds focus. Removing a focused node
+  // (as happens when the lazy ReorderList replaces the Suspense fallback)
+  // fires no blur event, so this survives the swap and lets the replacement
+  // node reclaim focus in its ref callback.
+  const focusedPromptId = useRef<number | null>(null)
   const [focusId, setFocusId] = useState<number | null>(null)
   const [prompts, setPrompts] = useState<PromptDraft[]>(() => (
     defaultValue.length
@@ -49,6 +55,13 @@ export function PromptExamplesEditor({
     textareas.current.get(focusId)?.focus()
     setFocusId(null)
   }, [focusId, prompts])
+
+  // Warm the reorder chunk as soon as the editor mounts (dialog open), so by
+  // the time a second prompt exists the lazy component resolves synchronously
+  // instead of committing an interactive fallback and swapping it later.
+  useEffect(() => {
+    void loadReorderList()
+  }, [])
 
   function addPrompt() {
     if (prompts.length >= MAX_PROMPTS) return
@@ -73,8 +86,22 @@ export function PromptExamplesEditor({
         <div className="min-w-0">
           <Textarea
             ref={(node) => {
-              if (node) textareas.current.set(prompt.id, node)
-              else textareas.current.delete(prompt.id)
+              if (node) {
+                textareas.current.set(prompt.id, node)
+                if (focusedPromptId.current === prompt.id && document.activeElement !== node) {
+                  node.focus()
+                  const end = node.value.length
+                  node.setSelectionRange(end, end)
+                }
+              } else {
+                textareas.current.delete(prompt.id)
+              }
+            }}
+            onFocus={() => {
+              focusedPromptId.current = prompt.id
+            }}
+            onBlur={() => {
+              if (focusedPromptId.current === prompt.id) focusedPromptId.current = null
             }}
             aria-label={`Example prompt ${index + 1}`}
             name="examplePrompts"

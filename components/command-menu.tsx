@@ -50,6 +50,14 @@ export function CommandMenu({ index = null }: { index?: CommandIndex | null }) {
         event.preventDefault()
         setMounted(true)
         setOpen((wasOpen) => !wasOpen)
+        return
+      }
+      // The palette handles Escape itself once its chunk is mounted, but a
+      // pending open (chunk still downloading) must be cancellable from the
+      // always-mounted controller too. Closing when already closed is a
+      // state no-op, so this never fights other Escape handlers.
+      if (event.key === "Escape") {
+        setOpen(false)
       }
     }
     function onOpenRequest() {
