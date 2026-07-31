@@ -4,6 +4,7 @@ import { AccountMenu } from "@/components/account-menu"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
 import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
+import { MobileNavBar } from "@/components/mobile-nav-bar"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
@@ -47,7 +48,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
         </div>
       </header>
 
-      <nav className="fixed inset-x-3 bottom-3 z-30 flex items-center justify-center gap-1 rounded-2xl border border-border bg-background/92 p-1.5 shadow-[0_18px_48px_hsl(var(--shadow-color)/0.2)] backdrop-blur-xl md:hidden" aria-label="Mobile product navigation">
+      <MobileNavBar>
         <AppNavLink href="/library" mobile><LibraryBigIcon className="mr-1.5 size-4" aria-hidden="true" />Library</AppNavLink>
         <AppNavLink href="/collections" mobile><FolderOpenIcon className="mr-1.5 size-4" aria-hidden="true" />Collections</AppNavLink>
         <AppNavLink href="/discover" mobile><SearchIcon className="mr-1.5 size-4" aria-hidden="true" />Find</AppNavLink>
@@ -61,7 +62,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
         >
           <CableIcon className="mr-1.5 size-4" aria-hidden="true" />Connect
         </AppNavLink>
-      </nav>
+      </MobileNavBar>
     </>
   )
 }
