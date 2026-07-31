@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="title description">
+  <title id="title">One recommendation, four ways to use it</title>
+  <desc id="description">Open the source, copy a compatible command, download a ZIP, or connect through MCP.</desc>
+  <rect width="1440" height="900" fill="#f4f3e9"/>
+  <circle cx="1270" cy="86" r="250" fill="#dcebd9"/>
+  <rect x="72" y="62" width="58" height="58" rx="10" fill="#05843f"/>
+  <text x="101" y="106" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="44" font-weight="800" fill="#ffffff">S</text>
+  <text x="151" y="102" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="700" fill="#071a10">Skills Board</text>
+  <text x="72" y="238" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" letter-spacing="3" fill="#05843f">USE IT YOUR WAY</text>
+  <text x="72" y="342" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700" letter-spacing="-2" fill="#071a10">One recommendation. Four ways forward.</text>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="72" y="430" width="300" height="230" rx="18" fill="#ffffff" stroke="#cbd2c6" stroke-width="2"/>
+    <text x="104" y="492" font-size="17" font-weight="700" letter-spacing="2" fill="#05843f">SOURCE</text>
+    <text x="104" y="558" font-size="31" font-weight="700" fill="#071a10">Open the original</text>
+    <text x="104" y="610" font-size="21" fill="#506058">Keep context visible.</text>
+
+    <rect x="404" y="430" width="300" height="230" rx="18" fill="#ffffff" stroke="#cbd2c6" stroke-width="2"/>
+    <text x="436" y="492" font-size="17" font-weight="700" letter-spacing="2" fill="#05843f">COMMAND</text>
+    <text x="436" y="558" font-size="31" font-weight="700" fill="#071a10">Copy an install</text>
+    <text x="436" y="610" font-size="21" fill="#506058">For compatible setups.</text>
+
+    <rect x="736" y="430" width="300" height="230" rx="18" fill="#ffffff" stroke="#cbd2c6" stroke-width="2"/>
+    <text x="768" y="492" font-size="17" font-weight="700" letter-spacing="2" fill="#05843f">ZIP</text>
+    <text x="768" y="558" font-size="31" font-weight="700" fill="#071a10">Download files</text>
+    <text x="768" y="610" font-size="21" fill="#506058">Use the latest source.</text>
+
+    <rect x="1068" y="430" width="300" height="230" rx="18" fill="#092218"/>
+    <text x="1100" y="492" font-size="17" font-weight="700" letter-spacing="2" fill="#9ae5ae">MCP</text>
+    <text x="1100" y="558" font-size="31" font-weight="700" fill="#f4f3e9">Connect an agent</text>
+    <text x="1100" y="610" font-size="21" fill="#b9c9bf">Authenticated, scoped.</text>
+  </g>
+  <text x="72" y="766" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#657169">Compatibility depends on the setup. The original source stays visible.</text>
+</svg>

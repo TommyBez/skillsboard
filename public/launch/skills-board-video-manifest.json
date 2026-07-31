@@ -1,0 +1,72 @@
+{
+  "schema_version": 1,
+  "generator": {
+    "source": "remotion/product-demo/index.tsx",
+    "source_sha256": "08ff6a7f34713335182b8419fd5c56c60f36940f2de99a05fdeabbb8b7e5cafd",
+    "font_loader": "remotion/product-demo/fonts.ts",
+    "font_loader_sha256": "89fc28340df599f8f958b1feca539f25c75d56d6c5a7dd9264d2a888a002ebd4",
+    "remotion_version": "4.0.495",
+    "render_command": "pnpm video:render:launch"
+  },
+  "outputs": [
+    {
+      "composition": "skillsboard-launch-product-hunt",
+      "path": "public/launch/skills-board-product-demo-product-hunt.mp4",
+      "sha256": "660853e34f8f6836cd699d192c4440221de508c32a40037105bbfcd4260b010f",
+      "bytes": 2906851,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 1372,
+      "duration_seconds": 45.73,
+      "video_codec": "h264",
+      "audio": false,
+      "captions": "public/launch/skills-board-product-demo-product-hunt.vtt",
+      "captions_sha256": "b32e18ecd01238c9be6c12a710a11236577d14aa90778d19608861fff191628e"
+    },
+    {
+      "composition": "skillsboard-launch-social",
+      "path": "public/launch/skills-board-product-demo.mp4",
+      "sha256": "b1c90e183a594b46e5e5e315da083175804ed4df9896cbf2e6662ad0dcc3392e",
+      "bytes": 2041318,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 900,
+      "duration_seconds": 30,
+      "video_codec": "h264",
+      "audio": false,
+      "captions": "public/launch/skills-board-product-demo.vtt",
+      "captions_sha256": "15dadf44ffae14694e1617a5f1eb924bf6c1535fc09ff1ea213875d23908899e"
+    },
+    {
+      "composition": "skillsboard-team-loop",
+      "path": "public/launch/skills-board-team-loop.mp4",
+      "sha256": "dd279655b481157ae02bd7f1d7e723afbadc7e2437da38cd4e67fe5bb11d5aa2",
+      "bytes": 1079983,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 420,
+      "duration_seconds": 14,
+      "video_codec": "h264",
+      "audio": false
+    }
+  ],
+  "posters": [
+    {
+      "path": "public/launch/skills-board-product-demo-poster.jpg",
+      "sha256": "00f9d60f62505c054e1a6fe08bfe9b9cfd1a7274495693498512a7bb666d7acf",
+      "bytes": 51023,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "path": "public/launch/skills-board-team-loop-poster.jpg",
+      "sha256": "e970026f5d6f383712021a5e147b437943af3be24bf966beb2a5b293162638da",
+      "bytes": 44350,
+      "width": 1440,
+      "height": 900
+    }
+  ]
+}

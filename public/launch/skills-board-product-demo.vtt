@@ -1,16 +1,25 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:02.000
-Alex saves a useful skill. Sam finds it and chooses how to use it.
+1
+00:00:00.000 --> 00:00:03.400
+The best skill your team found is buried in a chat.
 
-00:00:02.000 --> 00:00:18.050
-Alex adds the public copywriting skill to Northstar Studio, with a team note, an example prompt, and tags.
+2
+00:00:03.400 --> 00:00:06.500
+Skills Board. Your team's skills, all in one place.
 
-00:00:18.050 --> 00:00:19.550
-The saved recommendation is now available to the whole team.
+3
+00:00:06.500 --> 00:00:13.300
+Save a skill from its GitHub repository: Skills Board finds the installable skills, and you add the note your team needs.
 
-00:00:19.550 --> 00:00:29.000
-Sam searches the shared library for copywriting, then copies the example prompt and install command.
+4
+00:00:13.300 --> 00:00:18.100
+The recommendation lands in the team library with that note, an example prompt, the source, and the install command.
 
-00:00:29.000 --> 00:00:31.000
-Save once. Find fast. Use it your way.
+5
+00:00:18.100 --> 00:00:24.500
+Your agent reads the team library and gets the recommendation, not just a link.
+
+6
+00:00:24.500 --> 00:00:30.000
+Skills Board, at skillsboard.sh. One place for the skills your team recommends.
