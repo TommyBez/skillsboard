@@ -354,21 +354,26 @@ reverses a stated constraint that plans 001–006 were all built under.
 boundary in `plans/README.md` ("no motion library") is superseded by that
 decision — recorded here rather than silently ignored.
 
-### Ported into `components/interior/`
+### Kept in `components/interior/` — 11
 
-Twenty components, each carrying the documented prop names, defaults and
-behaviour from its docs page, restyled onto this app's oklch tokens rather
-than the library's hardcoded stone palette, and honouring `useReducedMotion`
-the way `app/globals.css` already does (keep a short opacity fade, drop every
-transform).
+Only the components a product surface actually uses. Each carries the prop
+names, defaults and behaviour documented on its interior.dev page, restyled
+onto this app's oklch tokens rather than the library's hardcoded palette, and
+honouring `prefers-reduced-motion` the way `app/globals.css` already does
+(keep a short opacity fade, drop every transform).
 
-`value-flash` · `skeleton-swap` · `scroll-spy` · `reading-progress` ·
-`segmented-control` · `hold-to-confirm` · `task-steps` · `inline-validation` ·
-`tag-input` · `progress-bar` · `collapsible-banner` · `presence-avatars` ·
-`show-more` · `sticky-header` · `hide-on-scroll` · `press-depth` ·
-`loading-button` · `filter-grid` · `reorder-list` · `wizard-steps` ·
-`command-palette` · `tooltip` · `load-more` · `long-press` · `icon-morph` ·
-`live-activity`
+`collapsible-banner` · `command-palette` · `hide-on-scroll` ·
+`presence-avatars` · `reading-progress` · `reorder-list` · `scroll-spy` ·
+`show-more` · `skeleton-swap` · `tag-input` · `value-flash`
+
+Fifteen more were ported and then deleted, because nothing imported them:
+`filter-grid`, `segmented-control`, `hold-to-confirm`, `icon-morph`,
+`inline-validation`, `live-activity`, `load-more`, `loading-button`,
+`long-press`, `press-depth`, `progress-bar`, `sticky-header`, `task-steps`,
+`tooltip`, `wizard-steps`. They were written because the plan said "all of
+them", but the mapping came from reading the audit rather than the surfaces —
+the same mistake as `task-steps`, repeated. Reasons per component are below
+and in the §2 table; git history has the code if any of them earns a home.
 
 ### Wired into product surfaces
 

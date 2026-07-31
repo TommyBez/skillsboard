@@ -11,7 +11,7 @@
  * eight-chapter guide nothing ever told you which chapter you were in.
  */
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { motion, useReducedMotion } from "motion/react"
 import { useScrollSpy } from "@/components/interior/scroll-spy"
 import { ReadingProgress } from "@/components/interior/reading-progress"
@@ -36,10 +36,17 @@ export function GuideChapterNav({
   const contentRef = useRef<HTMLElement | null>(null)
   const [mounted, setMounted] = useState(false)
 
-  const sections = chapters.map((chapter) => ({
-    id: chapter.href.replace("#", ""),
-    label: chapter.label,
-  }))
+  /* useScrollSpy keys its effect on this array, so rebuilding it every render
+     would tear down and re-attach the scroll and resize listeners each time
+     the active chapter changes — on the scroll path itself. */
+  const sections = useMemo(
+    () =>
+      chapters.map((chapter) => ({
+        id: chapter.href.replace("#", ""),
+        label: chapter.label,
+      })),
+    [chapters]
+  )
   const active = useScrollSpy(sections, 120)
 
   useEffect(() => {
