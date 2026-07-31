@@ -62,26 +62,53 @@ export function TagInput({
     onChange?.(next)
   }
 
+  /**
+   * Split incoming text on every single-character separator.
+   *
+   * Text arrives pasted, or typed and then committed on blur, and it routinely
+   * contains commas — this field replaced a comma-separated one and its
+   * placeholder still reads like a list. Taking such a string as one tag makes
+   * the UI disagree with what is submitted: the hidden value is comma-joined,
+   * so the server splits it back apart and stores more tags than the chips
+   * ever showed.
+   */
+  function splitEntries(raw: string) {
+    const marks = separators.filter((entry) => entry.length === 1)
+    const pattern = marks.length
+      ? new RegExp(`[${marks.map((m) => m.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&")).join("")}]`)
+      : null
+    return (pattern ? raw.split(pattern) : [raw])
+      .map((entry) => entry.trim())
+      .filter(Boolean)
+  }
+
   function add(raw: string) {
-    const tag = raw.trim()
-    if (!tag) return
-    if (tags.length >= max) {
-      setError(`Up to ${max} tags`)
-      return
+    const entries = splitEntries(raw)
+    if (entries.length === 0) return
+
+    const next = [...tags]
+    let rejected: string | null = null
+
+    for (const tag of entries) {
+      if (next.length >= max) {
+        rejected = `Up to ${max} tags`
+        break
+      }
+      if (!allowDuplicates && next.includes(tag)) {
+        rejected = "Already added"
+        continue
+      }
+      const rejection = validate?.(tag, next)
+      if (rejection) {
+        rejected = rejection
+        continue
+      }
+      next.push(tag)
     }
-    if (!allowDuplicates && tags.includes(tag)) {
-      setError("Already added")
-      setDraft("")
-      return
-    }
-    const rejection = validate?.(tag, tags)
-    if (rejection) {
-      setError(rejection)
-      return
-    }
-    setError(null)
+
+    setError(rejected)
     setDraft("")
-    commit([...tags, tag])
+    if (next.length !== tags.length) commit(next)
   }
 
   function remove(tag: string) {
@@ -179,6 +206,13 @@ export function TagInput({
             setArmed(false)
           }}
           onKeyDown={onKeyDown}
+          onPaste={(event) => {
+            const text = event.clipboardData.getData("text/plain")
+            if (!text) return
+            event.preventDefault()
+            add(draft + text)
+            setArmed(false)
+          }}
           onBlur={() => {
             add(draft)
             setArmed(false)
