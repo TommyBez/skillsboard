@@ -6,7 +6,6 @@ import { toast } from "sonner"
 
 import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
 import { ButtonPendingContent } from "@/components/button-pending-content"
-import { TaskSteps } from "@/components/interior/task-steps"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -305,40 +304,6 @@ export function AddSkillDialog({
               </div>
             ) : null}
           </FieldGroup>
-
-          {/* The dialog runs a two-phase operation — inspect the repository,
-              then save the selection — and previously showed only a spinner.
-              TaskSteps narrates which phase is running and what each one
-              produced. */}
-          {pendingMode !== null || hasDiscovery ? (
-            <div className="border-t border-border px-4 pt-3">
-              <TaskSteps
-                label="Add skill progress"
-                steps={[
-                  {
-                    id: "inspect",
-                    label: "Inspect repository",
-                    meta: hasDiscovery ? `${skills.length} found` : undefined,
-                  },
-                  {
-                    id: "select",
-                    label: "Choose skills to save",
-                    meta: selectedCount > 0 ? `${selectedCount} selected` : undefined,
-                  },
-                  { id: "save", label: "Save to library" },
-                ]}
-                current={
-                  pendingMode === "discover"
-                    ? 0
-                    : pendingMode === "save"
-                      ? 2
-                      : selectedCount > 0
-                        ? 2
-                        : 1
-                }
-              />
-            </div>
-          ) : null}
 
           <div className="flex justify-end border-t border-border bg-muted/35 p-4">
             <Button

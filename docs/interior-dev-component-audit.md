@@ -381,7 +381,6 @@ transform).
 | Travelling indicator on MCP client tabs (row now scrolls instead of wrapping) | `components/ui/tabs.tsx`, `components/mcp-setup-guide.tsx`, `app/globals.css` |
 | Undo on the reversible remove | `components/remove-from-collection-button.tsx` |
 | Expandable skill descriptions replacing a dead-end line-clamp | `components/skill-dossier.tsx` |
-| Phase narration in the add-skill flow | `components/add-skill-dialog.tsx` |
 | Member avatar stack | `app/(app)/settings/organization/page.tsx` |
 | Dialog timing on the declared tokens (was `duration-100`) | `components/ui/dialog.tsx` |
 | Copy button width lock | `components/copy-button.tsx` |
@@ -401,6 +400,20 @@ transform).
   §2 — Base UI already owns these with audited focus and dismissal behaviour,
   and `.faq-disclosure` already animates native `<details>` better.
 - Everything marked SKIP in §2 remains skipped; those surfaces do not exist.
+
+### Removed after review — `task-steps` in the add-skill dialog
+
+The audit called the add-skill flow "a two-phase operation with no narration"
+and matched TaskSteps to it. In the actual dialog that was wrong: the middle
+step ("choose skills to save") is the user's own action, taken while looking at
+the checkbox list that already appeared, and the discovery phase resolves in
+about a second — so the narration restated what was on screen and added chrome
+to a dialog that is already the busiest surface in the app. The existing
+pending label ("Inspecting repository…" / "Saving N skills…") carries the state
+adequately.
+
+Unwired. The lesson is that "two phases exist" is not the trigger for
+TaskSteps — the trigger is work the user *cannot otherwise observe*.
 
 ### Not working — `hold-to-confirm` is unverified and unwired
 
