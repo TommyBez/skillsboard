@@ -6,7 +6,7 @@ import { Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteCollection } from "@/app/actions/collections"
-import { ButtonPendingContent } from "@/components/button-pending-content"
+import { HoldToConfirm } from "@/components/interior/hold-to-confirm"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -74,16 +74,15 @@ export function DeleteCollectionDialog({ collectionId, collectionTitle }: Delete
           <DialogClose render={<Button variant="outline" disabled={isPending} />}>
             Cancel
           </DialogClose>
-          <Button
-            variant="destructive"
+          {/* Same guard rail as deleting a skill: the dialog explains, the
+              hold commits. A collection cannot be restored once it is gone. */}
+          <HoldToConfirm
+            onConfirm={handleDelete}
             disabled={isPending}
-            aria-busy={isPending || undefined}
-            onClick={handleDelete}
+            confirmLabel={isPending ? "Deleting…" : "Deleted"}
           >
-            <ButtonPendingContent pending={isPending} pendingLabel="Deleting…">
-              Delete collection
-            </ButtonPendingContent>
-          </Button>
+            {isPending ? "Deleting…" : "Hold to delete"}
+          </HoldToConfirm>
         </DialogFooter>
       </DialogContent>
     </Dialog>

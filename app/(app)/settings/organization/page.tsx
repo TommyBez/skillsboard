@@ -3,6 +3,8 @@ import Link from "next/link"
 import { ArrowLeftIcon } from "lucide-react"
 import { eq } from "drizzle-orm"
 
+import { PresenceAvatars } from "@/components/interior/presence-avatars"
+import { ValueFlash } from "@/components/interior/value-flash"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { InviteMemberForm } from "@/components/invite-member-form"
@@ -55,9 +57,19 @@ async function MemberDirectory() {
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Access</p>
           <h2 className="mt-2 text-2xl font-semibold tracking-tight">Library members</h2>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {members.length} {members.length === 1 ? "person has" : "people have"} access.
-        </p>
+        <div className="flex items-center gap-3">
+          {/* The roster as one object rather than a number: the stack shows who
+              is in the team before the rows below spell it out. */}
+          <PresenceAvatars
+            people={members.map((person) => ({ id: person.id, name: person.name }))}
+            label="Library members"
+            max={5}
+          />
+          <p className="text-sm text-muted-foreground">
+            <ValueFlash value={members.length} label="Library members" />{" "}
+            {members.length === 1 ? "person has" : "people have"} access.
+          </p>
+        </div>
       </div>
 
       <div className="border-t">

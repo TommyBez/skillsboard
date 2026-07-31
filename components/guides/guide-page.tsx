@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { JsonLd } from "@/components/json-ld"
 import {
   ResourceCta,
@@ -9,7 +10,7 @@ import {
   ResourceHeader,
 } from "@/components/resources/resource-chrome"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
-import type { GuideDefinition } from "@/lib/seo/guides"
+import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
 const chapters = [
@@ -72,23 +73,14 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
 
           <div className="mx-auto grid w-full max-w-[1320px] gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
             <aside className="lg:sticky lg:top-24 lg:self-start">
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                In this guide
-              </p>
-              <nav aria-label="Guide chapters" className="mt-4 border-l border-border">
-                {chapters.map((chapter) => (
-                  <a
-                    key={chapter.href}
-                    href={chapter.href}
-                    className="block border-l border-transparent px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary hover:text-foreground"
-                  >
-                    {chapter.label}
-                  </a>
-                ))}
-              </nav>
+              <GuideChapterNav
+                chapters={chapters}
+                contentId="guide-content"
+                words={estimateGuideWordCount(guide)}
+              />
             </aside>
 
-            <div className="min-w-0 max-w-4xl">
+            <div id="guide-content" className="min-w-0 max-w-4xl">
               <section aria-labelledby="problem-heading">
                 <h2 id="problem-heading" className="text-3xl font-semibold tracking-tight md:text-4xl">
                   The problem behind the query

@@ -5,7 +5,10 @@ import { useState } from "react"
 import { FolderMinusIcon } from "lucide-react"
 import { toast } from "sonner"
 
-import { removeSkillFromCollection } from "@/app/actions/collections"
+import {
+  addSkillToCollection,
+  removeSkillFromCollection,
+} from "@/app/actions/collections"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 
@@ -37,7 +40,28 @@ export function RemoveFromCollectionButton({
         toast.error(result.error)
         return
       }
-      toast.success(`Removed ${skillName} from ${collectionTitle}`)
+      /* The guard rail for a reversible action is a way back, not a longer
+         press. Removing a skill from a collection can be undone exactly, so
+         the toast carries the reversal instead of a confirmation step. */
+      toast.success(`Removed ${skillName} from ${collectionTitle}`, {
+        action: {
+          label: "Undo",
+          onClick: () => {
+            void (async () => {
+              const undone = await addSkillToCollection({
+                collectionId,
+                skillId,
+                surface: "collection_detail",
+              })
+              if (!undone.ok) {
+                toast.error(undone.error)
+                return
+              }
+              router.refresh()
+            })()
+          },
+        },
+      })
       router.refresh()
     } catch (error) {
       console.error("Unable to remove skill from collection", error)

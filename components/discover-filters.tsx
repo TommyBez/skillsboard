@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
+import { motion, useReducedMotion } from "motion/react"
 import { SearchIcon } from "lucide-react"
 
 import { useDiscoverPending } from "@/components/discover-pending"
@@ -60,6 +61,7 @@ function CatalogViewTabs({
 }) {
   const router = useRouter()
   const { startTransition } = useDiscoverPending()
+  const reduced = useReducedMotion()
 
   return (
     <nav aria-label="Catalog views" className="mt-4 flex gap-2 overflow-x-auto border-t border-border pt-4 pb-1">
@@ -68,29 +70,47 @@ function CatalogViewTabs({
         const isActive = !hasQuery && activeView === item.value
 
         return (
-          <Button
-            key={item.value}
-            size="sm"
-            variant={isActive ? "default" : "outline"}
-            nativeButton={false}
-            render={
-              <Link
-                href={href}
-                aria-current={isActive ? "page" : undefined}
-                onClick={(event) => {
-                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
-                    return
-                  }
-                  event.preventDefault()
-                  startTransition(() => {
-                    router.push(href, { scroll: false })
-                  })
-                }}
+          /* The thumb travels between views instead of the selection blinking
+             from one button to the next. These stay real links — modifier
+             clicks and open-in-new-tab must keep working — so the indicator
+             rides underneath them rather than replacing them with radios. */
+          <span key={item.value} className="relative isolate shrink-0">
+            {isActive ? (
+              <motion.span
+                layoutId="catalog-view-thumb"
+                aria-hidden
+                className="absolute inset-0 -z-10 rounded-lg bg-primary"
+                transition={
+                  reduced
+                    ? { duration: 0 }
+                    : { type: "spring", stiffness: 520, damping: 44, mass: 0.7 }
+                }
               />
-            }
-          >
-            {item.label}
-          </Button>
+            ) : null}
+            <Button
+              size="sm"
+              variant={isActive ? "ghost" : "outline"}
+              className={isActive ? "text-primary-foreground hover:bg-transparent" : undefined}
+              nativeButton={false}
+              render={
+                <Link
+                  href={href}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={(event) => {
+                    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
+                      return
+                    }
+                    event.preventDefault()
+                    startTransition(() => {
+                      router.push(href, { scroll: false })
+                    })
+                  }}
+                />
+              }
+            >
+              {item.label}
+            </Button>
+          </span>
         )
       })}
     </nav>

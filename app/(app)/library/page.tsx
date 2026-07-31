@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { CableIcon, DownloadIcon, LibraryBigIcon, SearchIcon, TagsIcon } from "lucide-react"
 
+import { ValueFlash } from "@/components/interior/value-flash"
 import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
@@ -45,11 +46,15 @@ async function LibraryStats() {
   return (
     <div className="flex flex-wrap items-center gap-5 lg:justify-end">
       <div className="min-w-20">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{skills.length}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">
+          <ValueFlash value={skills.length} label="Team skills" />
+        </p>
         <p className="text-sm text-muted-foreground">team {skills.length === 1 ? "skill" : "skills"}</p>
       </div>
       <div className="min-w-20 border-l border-border pl-5">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{tags.size}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">
+          <ValueFlash value={tags.size} label="Tags" />
+        </p>
         <p className="text-sm text-muted-foreground">{tags.size === 1 ? "tag" : "tags"}</p>
       </div>
     </div>
@@ -168,7 +173,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
       ) : null}
 
       {skills.length ? (
-        <section aria-label="Team skill recommendations" className="grid gap-4 md:grid-cols-2">
+        <section aria-label="Team skill recommendations" className="cascade-grid grid gap-4 md:grid-cols-2">
           {skills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             const canEditNote = item.createdBy === userId

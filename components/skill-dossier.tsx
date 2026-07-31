@@ -1,6 +1,8 @@
 import type { ReactNode } from "react"
 import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
 
+import { ShowMore } from "@/components/interior/show-more"
+
 import { CopyButton } from "@/components/copy-button"
 import { SkillPromptList } from "@/components/skill-prompt-list"
 import { TrackedAnchor } from "@/components/tracked-anchor"
@@ -122,9 +124,19 @@ export function SkillDossier({
             {name}
           </Heading>
           {description ? (
-            <p className={cn("text-pretty leading-relaxed text-muted-foreground", compact ? "line-clamp-2 text-sm" : "line-clamp-3 text-sm md:text-base")}>
-              {description}
-            </p>
+            /* A hard line-clamp truncated the description with no way to read
+               the rest. ShowMore keeps the same resting height but makes the
+               remainder reachable, and animates the height rather than
+               re-wrapping the text. */
+            <ShowMore
+              lines={compact ? 2 : 3}
+              label={`Show the full description of ${name}`}
+              className="w-full"
+            >
+              <p className={cn("text-pretty leading-relaxed text-muted-foreground", compact ? "text-sm" : "text-sm md:text-base")}>
+                {description}
+              </p>
+            </ShowMore>
           ) : null}
           {note ? (
             <p className={cn("rounded-lg bg-accent/50 px-3 py-2 text-pretty leading-relaxed text-foreground/90", compact ? "line-clamp-2 text-sm" : "line-clamp-4 text-sm md:text-base")}>

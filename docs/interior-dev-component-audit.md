@@ -345,3 +345,67 @@ stands on its own and Command Palette can ship unanimated.
 
 This is a decision for the repo owner, not one this audit should make: it
 reverses a stated constraint that plans 001–006 were all built under.
+
+---
+
+## 8. Implementation status
+
+`motion@12.43.0` is now a dependency, so Phase B is unblocked. The audit's
+boundary in `plans/README.md` ("no motion library") is superseded by that
+decision — recorded here rather than silently ignored.
+
+### Ported into `components/interior/`
+
+Twenty components, each carrying the documented prop names, defaults and
+behaviour from its docs page, restyled onto this app's oklch tokens rather
+than the library's hardcoded stone palette, and honouring `useReducedMotion`
+the way `app/globals.css` already does (keep a short opacity fade, drop every
+transform).
+
+`value-flash` · `skeleton-swap` · `scroll-spy` · `reading-progress` ·
+`segmented-control` · `hold-to-confirm` · `task-steps` · `inline-validation` ·
+`tag-input` · `progress-bar` · `collapsible-banner` · `presence-avatars` ·
+`show-more` · `sticky-header` · `hide-on-scroll` · `press-depth` ·
+`loading-button` · `filter-grid` · `reorder-list` · `wizard-steps` ·
+`command-palette` · `tooltip` · `load-more` · `long-press` · `icon-morph` ·
+`live-activity`
+
+### Wired into product surfaces
+
+| Change | Files |
+|---|---|
+| ⌘K command palette in the app shell | `components/command-menu.tsx`, `components/protected-app-shell.tsx` |
+| Animated counters | `app/(app)/library/page.tsx`, `app/(app)/collections/page.tsx`, `app/(app)/settings/organization/page.tsx` |
+| Chapter spy + reading progress on all 8 guides | `components/guides/guide-chapter-nav.tsx`, `components/guides/guide-page.tsx`, `lib/seo/guides.ts` |
+| Travelling thumb on Discover views (links preserved) | `components/discover-filters.tsx` |
+| Travelling indicator on MCP client tabs (row now scrolls instead of wrapping) | `components/ui/tabs.tsx`, `components/mcp-setup-guide.tsx`, `app/globals.css` |
+| Hold-to-delete on the two irreversible deletes | `components/delete-skill-dialog.tsx`, `components/delete-collection-dialog.tsx` |
+| Undo on the reversible remove | `components/remove-from-collection-button.tsx` |
+| Expandable skill descriptions replacing a dead-end line-clamp | `components/skill-dossier.tsx` |
+| Phase narration in the add-skill flow | `components/add-skill-dialog.tsx` |
+| Member avatar stack | `app/(app)/settings/organization/page.tsx` |
+| Dialog timing on the declared tokens (was `duration-100`) | `components/ui/dialog.tsx` |
+| Copy button width lock | `components/copy-button.tsx` |
+| Cascade on the Library and Collections grids | `app/(app)/library/page.tsx`, `app/(app)/collections/page.tsx` |
+
+### Deliberately not done
+
+- **Hold to Confirm on the collection-membership toggles.** Those actions are
+  reversible, and a forced 1.8 s press is the wrong weight for something a
+  second click already undoes. `remove-from-collection-button.tsx` got a real
+  undo instead. The hold is reserved for the two deletes that cannot be undone.
+- **Segmented Control on the Discover views.** The component is radio-based;
+  the existing views are real links whose modifier-click and open-in-new-tab
+  behaviour is deliberate. The travelling thumb was applied to the links
+  directly instead of replacing them.
+- **Accordion, Modal, Drawer, Popover, Dropdown, Context Menu.** Unchanged, per
+  §2 — Base UI already owns these with audited focus and dismissal behaviour,
+  and `.faq-disclosure` already animates native `<details>` better.
+- Everything marked SKIP in §2 remains skipped; those surfaces do not exist.
+
+### Verification
+
+`tsc --noEmit` clean · `pnpm test:unit` 4/4 · `next build` reaches
+"Compiled successfully". The build then fails collecting
+`/variants/home/[code]` because `FLAGS_SECRET` is unset in this environment —
+reproduced on a clean checkout of `c762a6b`, so it predates this work.

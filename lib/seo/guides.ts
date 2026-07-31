@@ -1504,3 +1504,30 @@ permissions, regulation, or repeated failure] changes.`,
   publishedAt: "2026-07-27",
   modifiedAt: "2026-07-27",
 }
+
+/**
+ * Rough word count for a guide, used to drive the reading-progress readout.
+ * Prose fields only — headings and link labels are excluded, because they are
+ * scanned rather than read and would inflate the estimate.
+ */
+export function estimateGuideWordCount(guide: GuideDefinition): number {
+  const prose: string[] = [
+    guide.intro,
+    guide.corePrinciple,
+    guide.problem,
+    guide.decisionIntro,
+    guide.stepsIntro,
+    guide.templateIntro,
+    ...guide.comparisonRows.flatMap((row) => [...row.cells]),
+    ...guide.steps.flatMap((step) => [step.body, step.output]),
+    ...guide.templateFields.map((field) => field.value),
+    ...guide.pitfalls.map((pitfall) => pitfall.body),
+    ...guide.checklist,
+    ...guide.sources.map((source) => source.note),
+  ]
+
+  return prose.reduce(
+    (total, entry) => total + entry.trim().split(/\s+/).filter(Boolean).length,
+    0
+  )
+}
