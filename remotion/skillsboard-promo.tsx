@@ -1,4 +1,3 @@
-import { loadFont } from "@remotion/fonts";
 import { Audio } from "@remotion/media";
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
@@ -17,24 +16,7 @@ import { PerCharacterRise } from "@/components/remocn/per-character-rise";
 import { pushThrough } from "@/components/remocn/push-through";
 import { ShaderMeshGradient } from "@/components/remocn/shader-mesh-gradient";
 import { SimulatedCursor } from "@/components/remocn/simulated-cursor";
-
-const SANS = "Bricolage Grotesque";
-const MONO = "Geist Mono";
-
-for (const weight of ["400", "500", "600", "700"]) {
-  loadFont({
-    family: SANS,
-    url: staticFile(`fonts/bricolage-grotesque-latin-${weight}-normal.woff2`),
-    weight,
-  });
-}
-for (const weight of ["400", "500"]) {
-  loadFont({
-    family: MONO,
-    url: staticFile(`fonts/geist-mono-latin-${weight}-normal.woff2`),
-    weight,
-  });
-}
+import { MONO, SANS } from "./fonts";
 
 // Skills Board design tokens (app/globals.css, light theme).
 const CANVAS = "#f7f8f4"; // --background
@@ -654,7 +636,10 @@ function ProductScene() {
 const FEATURES_LIST = [
   { label: "Save a skill once", sub: "One shared, searchable library" },
   { label: "Search by task, repo, or tag", sub: "Everyone knows where to look" },
-  { label: "Use it with any agent", sub: "Claude, Codex, Cursor & more" },
+  {
+    label: "Use it in the way that fits",
+    sub: "Source, compatible command, ZIP, or authenticated MCP",
+  },
 ];
 
 function FeatureCard({

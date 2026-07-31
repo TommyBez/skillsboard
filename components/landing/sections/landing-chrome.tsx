@@ -107,7 +107,7 @@ export function LandingFooter() {
     <footer className={base.footer}>
       <span className={base.footerField} aria-hidden="true" />
       <span className={base.footerRule} aria-hidden="true" />
-      <div className="relative mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 py-12 md:flex-row md:items-center md:justify-between md:px-10 md:py-14">
+      <div className={base.footerInner}>
         <span className={base.brandLockup}>
           <Brand />
         </span>
