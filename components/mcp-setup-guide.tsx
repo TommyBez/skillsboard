@@ -4,7 +4,13 @@ import type { ReactNode } from "react"
 import { useState } from "react"
 
 import { CopyButton } from "@/components/copy-button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  Tabs,
+  TabsContent,
+  TabsIndicator,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 interface Step {
@@ -241,9 +247,17 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
 
       <Tabs value={activeClient} onValueChange={selectClient} className="gap-0">
         <div className="border-b px-3 py-3 sm:px-4">
-          <TabsList className="h-auto max-w-full flex-wrap justify-start">
+          {/* One row, not a wrapping block: the indicator travels between
+              clients, and a travelling indicator cannot cross a line break.
+              Overflow scrolls horizontally instead of wrapping. */}
+          <TabsList className="no-scrollbar h-9 max-w-full justify-start overflow-x-auto">
+            <TabsIndicator />
             {clients.map((client) => (
-              <TabsTrigger key={client.id} value={client.id}>
+              <TabsTrigger
+                key={client.id}
+                value={client.id}
+                className="flex-none data-active:bg-transparent dark:data-active:bg-transparent dark:data-active:border-transparent"
+              >
                 {client.label}
               </TabsTrigger>
             ))}

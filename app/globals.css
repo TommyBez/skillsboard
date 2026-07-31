@@ -396,3 +396,13 @@
     transition: none;
   }
 }
+
+/* Horizontal tab rows scroll rather than wrap, so the travelling indicator
+   never has to cross a line break. The bar itself is noise at that size. */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

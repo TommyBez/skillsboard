@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { PlusIcon, Trash2Icon } from "lucide-react"
 
+import { ReorderList } from "@/components/interior/reorder-list"
 import { Button } from "@/components/ui/button"
 import {
   FieldDescription,
@@ -62,6 +63,54 @@ export function PromptExamplesEditor({
     })
   }
 
+  function renderRow(prompt: PromptDraft, index: number) {
+    return (
+      <div className="group/prompt grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 rounded-xl border border-border bg-muted/25 p-2 transition-colors focus-within:border-ring focus-within:bg-background">
+        <div className="min-w-0">
+          <Textarea
+            ref={(node) => {
+              if (node) textareas.current.set(prompt.id, node)
+              else textareas.current.delete(prompt.id)
+            }}
+            aria-label={`Example prompt ${index + 1}`}
+            name="examplePrompts"
+            rows={2}
+            maxLength={MAX_PROMPT_LENGTH}
+            value={prompt.value}
+            disabled={disabled}
+            onChange={(event) => {
+              const value = event.target.value
+              setPrompts((current) => current.map((item) => (
+                item.id === prompt.id ? { ...item, value } : item
+              )))
+            }}
+            placeholder={index === 0
+              ? "Audit this onboarding flow and identify the three highest-impact improvements."
+              : "Add another way your team could use this skill."}
+            className="min-h-16 resize-y border-0 bg-transparent px-2 py-1.5 shadow-none focus-visible:ring-0 dark:bg-transparent"
+          />
+          <p className="px-2 pt-1 text-right text-[0.68rem] tabular-nums text-muted-foreground" aria-hidden="true">
+            {prompt.value.length} of {MAX_PROMPT_LENGTH} characters
+          </p>
+        </div>
+        {prompts.length > 1 || prompt.value ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-sm"
+            disabled={disabled}
+            onClick={() => removePrompt(prompt.id)}
+            aria-label={`Remove example prompt ${index + 1}`}
+            title="Remove prompt"
+            className="text-muted-foreground hover:text-destructive"
+          >
+            <Trash2Icon />
+          </Button>
+        ) : <span className="size-7" aria-hidden="true" />}
+      </div>
+    )
+  }
+
   return (
     <FieldSet className="gap-3">
       <div className="flex items-start justify-between gap-4">
@@ -78,56 +127,31 @@ export function PromptExamplesEditor({
         </span>
       </div>
 
-      <div className="grid gap-2.5">
-        {prompts.map((prompt, index) => (
-          <div
-            key={prompt.id}
-            className="group/prompt grid grid-cols-[minmax(0,1fr)_auto] items-start gap-2 rounded-xl border border-border bg-muted/25 p-2 transition-colors focus-within:border-ring focus-within:bg-background"
-          >
-            <div className="min-w-0">
-              <Textarea
-                ref={(node) => {
-                  if (node) textareas.current.set(prompt.id, node)
-                  else textareas.current.delete(prompt.id)
-                }}
-                aria-label={`Example prompt ${index + 1}`}
-                name="examplePrompts"
-                rows={2}
-                maxLength={MAX_PROMPT_LENGTH}
-                value={prompt.value}
-                disabled={disabled}
-                onChange={(event) => {
-                  const value = event.target.value
-                  setPrompts((current) => current.map((item) => (
-                    item.id === prompt.id ? { ...item, value } : item
-                  )))
-                }}
-                placeholder={index === 0
-                  ? "Audit this onboarding flow and identify the three highest-impact improvements."
-                  : "Add another way your team could use this skill."}
-                className="min-h-16 resize-y border-0 bg-transparent px-2 py-1.5 shadow-none focus-visible:ring-0 dark:bg-transparent"
-              />
-              <p className="px-2 pt-1 text-right text-[0.68rem] tabular-nums text-muted-foreground" aria-hidden="true">
-                {prompt.value.length} of {MAX_PROMPT_LENGTH} characters
-              </p>
-            </div>
-            {prompts.length > 1 || prompt.value ? (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                disabled={disabled}
-                onClick={() => removePrompt(prompt.id)}
-                aria-label={`Remove example prompt ${index + 1}`}
-                title="Remove prompt"
-                className="text-muted-foreground hover:text-destructive"
-              >
-                <Trash2Icon />
-              </Button>
-            ) : <span className="size-7" aria-hidden="true" />}
-          </div>
-        ))}
-      </div>
+      {/* Order is meaningful: skill-prompt-list shows the first prompt inline
+          and keeps the rest behind "View all N", so promoting a prompt is a
+          real edit. The rows submit through name="examplePrompts", so their
+          DOM order is the saved order and reordering needs no extra plumbing.
+          A single row gets no handle — there is nothing to reorder. */}
+      {prompts.length > 1 ? (
+        <ReorderList
+          items={prompts}
+          getId={(prompt) => String(prompt.id)}
+          getLabel={(prompt) =>
+            prompt.value.trim().slice(0, 40) || "empty prompt"
+          }
+          onReorder={setPrompts}
+          label="Example prompts. Drag the handle or use the arrow keys to reorder."
+          className="gap-2.5"
+        >
+          {renderRow}
+        </ReorderList>
+      ) : (
+        <div className="grid gap-2.5">
+          {prompts.map((prompt, index) => (
+            <div key={prompt.id}>{renderRow(prompt, index)}</div>
+          ))}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Button

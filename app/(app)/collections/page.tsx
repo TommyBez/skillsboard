@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import Link from "next/link"
 import { FolderOpenIcon, SearchIcon, TagsIcon } from "lucide-react"
 
+import { ValueFlash } from "@/components/interior/value-flash"
 import { CollectionCard } from "@/components/collection-card"
 import { CreateCollectionDialog } from "@/components/create-collection-dialog"
 import { Button } from "@/components/ui/button"
@@ -22,11 +23,15 @@ async function CollectionsStats() {
   return (
     <div className="flex flex-wrap items-center gap-5 lg:justify-end">
       <div className="min-w-20">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{collections.length}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">
+          <ValueFlash value={collections.length} label="Collections" />
+        </p>
         <p className="text-sm text-muted-foreground">{collections.length === 1 ? "collection" : "collections"}</p>
       </div>
       <div className="min-w-20 border-l border-border pl-5">
-        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">{grouped}</p>
+        <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">
+          <ValueFlash value={grouped} label="Grouped skills" />
+        </p>
         <p className="text-sm text-muted-foreground">{grouped === 1 ? "grouped skill" : "grouped skills"}</p>
       </div>
     </div>
@@ -93,7 +98,7 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
       </section>
 
       {collections.length ? (
-        <section aria-label="Team skill collections" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <section aria-label="Team skill collections" className="cascade-grid grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {collections.map((item) => (
             <CollectionCard
               key={item.id}

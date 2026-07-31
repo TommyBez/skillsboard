@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { ArrowUpRightIcon, CheckIcon, GitForkIcon } from "lucide-react"
 
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { SkeletonSwap } from "@/components/interior/skeleton-swap"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { CopyButton } from "@/components/copy-button"
 import { Button } from "@/components/ui/button"
@@ -15,7 +16,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
 import type { CatalogSkill, CatalogSkillDetail } from "@/lib/catalog"
 import { buildInstallCommand } from "@/lib/install-command"
 
@@ -99,14 +99,6 @@ export function CatalogSkillDetailsDialog({
           </DialogHeader>
 
           <div className="grid gap-5 p-6">
-            {isLoading && !detail && !error ? (
-              <div className="grid gap-3" aria-busy="true" aria-live="polite">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-11/12" />
-                <Skeleton className="h-4 w-4/5" />
-              </div>
-            ) : null}
-
             {error && !detail ? (
               <div className="grid gap-3">
                 <p className="text-sm text-destructive" role="alert">{error}</p>
@@ -126,11 +118,23 @@ export function CatalogSkillDetailsDialog({
               </div>
             ) : null}
 
-            {detail || (!isLoading && !error) ? (
-              <p className="text-pretty text-sm leading-relaxed text-muted-foreground md:text-base">
-                {description}
-              </p>
-            ) : null}
+            {/* The description arrives with the lazy fetch, so the dialog used
+                to show three skeleton bars the moment it opened — even for a
+                response that beat the eye — then snap to a paragraph of a
+                different height. SkeletonSwap holds the box, waits 120ms
+                before admitting it is loading, and keeps the skeleton up long
+                enough not to flash once it has appeared. */}
+            {error && !detail ? null : (
+              <SkeletonSwap
+                ready={Boolean(detail) || (!isLoading && !error)}
+                lines={3}
+                label="Loading skill details"
+              >
+                <p className="text-pretty text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {description}
+                </p>
+              </SkeletonSwap>
+            )}
 
             <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-muted/40 p-2 pl-3">
               <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
@@ -169,7 +173,7 @@ export function CatalogSkillDetailsDialog({
               ) : (
                 <AddSkillDialog
                   defaultUrl={item.installUrl}
-                  defaultName={item.slug}
+                  lockedSkillName={item.slug}
                   triggerLabel="Save to library"
                   triggerAriaLabel={`Save ${name} to library`}
                 />
