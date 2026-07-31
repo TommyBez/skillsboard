@@ -3,6 +3,8 @@ import type { MetadataRoute } from "next"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
+const legalPaths = ["/privacy", "/terms", "/contact"] as const
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date()
   const resourceIndexLastModified = resourceEntries.reduce(
@@ -32,6 +34,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    ...legalPaths.map((path) => ({
+      url: `${siteConfig.url}${path}`,
+      lastModified,
+      changeFrequency: "yearly" as const,
+      priority: 0.3,
+    })),
     {
       url: `${siteConfig.url}${resourcePaths.index}`,
       lastModified: new Date(resourceIndexLastModified),

@@ -1,6 +1,8 @@
 import TeamInvitation from "@/emails/team-invitation"
 import { getAuthBaseUrl } from "@/lib/auth-environment"
 
+import { assertTransactionalEmailAllowed } from "./email-preferences"
+import { createEmailIdempotencyKey } from "./idempotency"
 import { getEmailFrom, getResendClient } from "./resend"
 
 export interface SendTeamInvitationInput {
@@ -24,6 +26,7 @@ function expiryDaysFromDate(expiresAt: Date): number {
 }
 
 export async function sendTeamInvitation(input: SendTeamInvitationInput): Promise<void> {
+  await assertTransactionalEmailAllowed(input.email)
   const resend = getResendClient()
   const inviteUrl = buildInviteUrl(input.invitationId)
   const expiryDays = expiryDaysFromDate(input.expiresAt)
@@ -44,14 +47,15 @@ export async function sendTeamInvitation(input: SendTeamInvitationInput): Promis
         />
       ),
     },
-    { idempotencyKey: `team-invitation/${input.invitationId}` },
+    { idempotencyKey: createEmailIdempotencyKey("team-invitation", [input.invitationId]) },
   )
 
   if (error) {
     console.error("Failed to send team invitation email", {
       name: error.name,
-      message: error.message,
     })
-    throw new Error(`Failed to send invitation email: ${error.message}`)
+    const deliveryError = new Error("Failed to send invitation email")
+    deliveryError.name = "EmailDeliveryError"
+    throw deliveryError
   }
 }

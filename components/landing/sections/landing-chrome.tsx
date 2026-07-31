@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Suspense } from "react"
 
 import { Brand } from "@/components/brand"
+import { LegalLinks } from "@/components/legal-links"
 import { PageFrame } from "@/components/landing/chrome/page-frame"
 import {
   HomeHeaderActions,
@@ -125,6 +126,11 @@ export function LandingFooter() {
               Resources
             </Link>
           </nav>
+          <LegalLinks
+            ariaLabel="Legal pages"
+            className="font-mono text-xs font-semibold uppercase tracking-[0.18em]"
+            linkClassName={base.footerNavLink}
+          />
           <span
             aria-hidden="true"
             className={`${base.headerCellRule} hidden h-4 self-center sm:block`}

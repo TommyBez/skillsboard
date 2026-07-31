@@ -3,10 +3,10 @@ import { Suspense, type ReactNode } from "react"
 import { AppHeader } from "@/components/app-header"
 import { Brand } from "@/components/brand"
 import { CommandMenu } from "@/components/command-menu"
+import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Toaster } from "@/components/ui/sonner"
 import { getAppContext } from "@/lib/app-context"
 
 async function AuthenticatedHeader() {
@@ -38,9 +38,11 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
       <Suspense fallback={<AppHeaderFallback />}>
         <AuthenticatedHeader />
       </Suspense>
+      <Suspense fallback={null}>
+        <ExistingUserEmailConsentPrompt />
+      </Suspense>
       {children}
       <CommandMenu />
-      <Toaster />
     </div>
   )
 }

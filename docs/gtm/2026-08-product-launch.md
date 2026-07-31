@@ -151,7 +151,7 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 | Activation | `onboarding` | First skill and invite path improvements | Aug 5 | Not started |
 | Measurement | `analytics` | Production launch dashboard and attribution QA | Aug 5 | Dashboard created; Production attribution QA remains |
 | Social distribution | `social`, `typefully` | Italian LinkedIn and English X launch assets | Aug 7 | Private draft verified; final Remotion media replacement, readback, preflight, and scheduling remain |
-| Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | English copy prepared; consent, suppression, unsubscribe, provider, and send readback remain |
+| Email distribution | `emails`, `resend-connector` | Eligible product launch broadcast | Aug 7 | English template and application consent, preferences, suppression, unsubscribe, and webhook controls implemented in this PR; deployment, provider projection, and send readback remain |
 | Community | `community-marketing`, `public-relations` | Product Hunt, Show HN, and native community packages | Aug 7 | Product Hunt and Show HN handoffs prepared; exact destination/provider execution remains |
 | Learning | `customer-research` | Objection log, interview guide, launch retrospective | Aug 10 | Not started |
 

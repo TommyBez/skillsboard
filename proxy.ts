@@ -39,8 +39,8 @@ export async function proxy(request: NextRequest) {
       searchParams.forEach((value, key) => {
         signInUrl.searchParams.append(key, value)
       })
-    } else if (pathname === "/library") {
-      signInUrl.searchParams.set("returnTo", "/library")
+    } else if (pathname === "/library" || pathname === "/settings/email") {
+      signInUrl.searchParams.set("returnTo", pathname)
     }
 
     return NextResponse.redirect(signInUrl)

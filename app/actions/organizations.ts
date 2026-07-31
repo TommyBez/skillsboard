@@ -126,7 +126,9 @@ export async function createInvitationLink(
         expiresAt: invitation.expiresAt,
       })
     } catch (sendError) {
-      console.error("Unable to send invitation email", sendError)
+      console.error("Unable to send invitation email", {
+        name: sendError instanceof Error ? sendError.name : "UnknownError",
+      })
       emailError =
         "The invitation was created, but the email could not be sent. Share the invite link below instead."
     }

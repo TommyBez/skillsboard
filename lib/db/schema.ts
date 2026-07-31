@@ -25,6 +25,109 @@ export const user = pgTable("user", {
   unique("user_email_key").on(table.email),
 ])
 
+export const emailPreference = pgTable("emailPreference", {
+  userId: text("userId").notNull(),
+  topic: text("topic").notNull(),
+  emailHash: text("emailHash").notNull(),
+  subscribed: boolean("subscribed").notNull().default(false),
+  source: text("source").notNull(),
+  noticeVersion: text("noticeVersion").notNull(),
+  noticeText: text("noticeText").notNull(),
+  unsubscribeToken: text("unsubscribeToken"),
+  consentedAt: timestamp("consentedAt", { withTimezone: true }),
+  withdrawnAt: timestamp("withdrawnAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({ name: "emailPreference_pkey", columns: [table.userId, table.topic] }),
+  index("emailPreference_topic_subscribed_idx").on(table.topic, table.subscribed),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "emailPreference_userId_fkey",
+  }).onDelete("cascade"),
+])
+
+export const emailConsentEvent = pgTable("emailConsentEvent", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("userId"),
+  emailHash: text("emailHash").notNull(),
+  topic: text("topic").notNull(),
+  action: text("action").notNull(),
+  source: text("source").notNull(),
+  noticeVersion: text("noticeVersion").notNull(),
+  noticeText: text("noticeText").notNull(),
+  providerReference: text("providerReference"),
+  occurredAt: timestamp("occurredAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("emailConsentEvent_email_topic_idx").on(table.emailHash, table.topic, table.occurredAt),
+  index("emailConsentEvent_user_idx").on(table.userId, table.occurredAt),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "emailConsentEvent_userId_fkey",
+  }).onDelete("set null"),
+])
+
+export const emailSuppression = pgTable("emailSuppression", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  emailHash: text("emailHash").notNull(),
+  scope: text("scope").notNull(),
+  reason: text("reason").notNull(),
+  source: text("source").notNull(),
+  sourceReference: text("sourceReference"),
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+  lastSeenAt: timestamp("lastSeenAt", { withTimezone: true }).notNull().defaultNow(),
+  liftedAt: timestamp("liftedAt", { withTimezone: true }),
+  liftedSource: text("liftedSource"),
+}, (table) => [
+  uniqueIndex("emailSuppression_email_scope_reason_unique").on(table.emailHash, table.scope, table.reason),
+  index("emailSuppression_active_lookup_idx").on(table.emailHash, table.active, table.scope),
+])
+
+export const emailProviderContactState = pgTable("emailProviderContactState", {
+  provider: text("provider").notNull(),
+  emailHash: text("emailHash").notNull(),
+  unsubscribed: boolean("unsubscribed").notNull(),
+  providerReference: text("providerReference"),
+  providerOccurredAt: timestamp("providerOccurredAt", { withTimezone: true }).notNull(),
+  observedAt: timestamp("observedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({
+    name: "emailProviderContactState_pkey",
+    columns: [table.provider, table.emailHash],
+  }),
+  index("emailProviderContactState_email_idx").on(table.emailHash, table.providerOccurredAt),
+])
+
+export const emailWebhookEvent = pgTable("emailWebhookEvent", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  payloadHash: text("payloadHash").notNull(),
+  providerEmailId: text("providerEmailId"),
+  status: text("status").notNull().default("pending"),
+  attempts: integer("attempts").notNull().default(0),
+  providerCreatedAt: timestamp("providerCreatedAt", { withTimezone: true }),
+  receivedAt: timestamp("receivedAt", { withTimezone: true }).notNull().defaultNow(),
+  processedAt: timestamp("processedAt", { withTimezone: true }),
+  lastError: text("lastError"),
+})
+
+export const emailProactiveDelivery = pgTable("emailProactiveDelivery", {
+  providerEmailId: text("providerEmailId").notNull(),
+  emailHash: text("emailHash").notNull(),
+  providerBroadcastId: text("providerBroadcastId").notNull(),
+  sentAt: timestamp("sentAt", { withTimezone: true }).notNull(),
+  receivedAt: timestamp("receivedAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({
+    name: "emailProactiveDelivery_pkey",
+    columns: [table.providerEmailId, table.emailHash],
+  }),
+  index("emailProactiveDelivery_email_sent_idx").on(table.emailHash, table.sentAt),
+])
+
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),

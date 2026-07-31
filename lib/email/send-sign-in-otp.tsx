@@ -1,7 +1,7 @@
-import { createHash } from "node:crypto"
-
 import SignInOtp from "@/emails/sign-in-otp"
 
+import { assertTransactionalEmailAllowed } from "./email-preferences"
+import { createEmailIdempotencyKey } from "./idempotency"
 import { getEmailFrom, getResendClient } from "./resend"
 
 export interface SendSignInOtpInput {
@@ -12,15 +12,11 @@ export interface SendSignInOtpInput {
 }
 
 function otpIdempotencyKey(email: string, otp: string): string {
-  // Opaque fixed-length key so email/OTP never appear in Idempotency-Key headers or proxy logs.
-  const digest = createHash("sha256")
-    .update(`sign-in-otp\0${email.toLowerCase()}\0${otp}`)
-    .digest("hex")
-    .slice(0, 32)
-  return `sign-in-otp/${digest}`
+  return createEmailIdempotencyKey("sign-in-otp", [email.toLowerCase(), otp])
 }
 
 export async function sendSignInOtp(input: SendSignInOtpInput): Promise<void> {
+  await assertTransactionalEmailAllowed(input.email)
   const resend = getResendClient()
   const expiresInSeconds = input.expiresInSeconds ?? 300
   const expiresInMinutes = Math.max(1, Math.ceil(expiresInSeconds / 60))
@@ -39,8 +35,9 @@ export async function sendSignInOtp(input: SendSignInOtpInput): Promise<void> {
   if (error) {
     console.error("Failed to send sign-in OTP email", {
       name: error.name,
-      message: error.message,
     })
-    throw new Error(`Failed to send sign-in OTP email: ${error.message}`)
+    const deliveryError = new Error("Failed to send sign-in OTP email")
+    deliveryError.name = "EmailDeliveryError"
+    throw deliveryError
   }
 }

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
+import { MailIcon, SettingsIcon, SlidersHorizontalIcon } from "lucide-react"
 
 import { SignOutForm, SignOutMenuItem } from "@/components/sign-out-form"
 import { TrackedLink } from "@/components/tracked-link"
@@ -53,6 +53,14 @@ export function AccountMenu({ user }: AccountMenuProps) {
           >
             <SettingsIcon className="size-4" aria-hidden="true" />
             Team access
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="gap-2 rounded-lg px-3 py-2 text-sm font-medium"
+            nativeButton={false}
+            render={<Link href="/settings/email" />}
+          >
+            <MailIcon className="size-4" aria-hidden="true" />
+            Email preferences
           </DropdownMenuItem>
           <DropdownMenuItem
             className="gap-2 rounded-lg px-3 py-2 text-sm font-medium"
