@@ -89,9 +89,12 @@ node scripts/measure-bundles.mjs --json # machine-readable snapshot
 ```
 
 The script reads each prerendered route's HTML in `.next/server/app` and
-sums the raw and gzip sizes of every `<script src>` chunk the document
-references — the JavaScript a browser downloads before the page is
-interactive. Selected routes (kB gzip):
+sums the raw and locally gzipped (level 9) sizes of every `<script src>`
+chunk the document references. This is a static proxy for the route's
+critical-path JavaScript, not a browser trace: chunks fetched only through
+later dynamic imports (the PostHog SDK, the ⌘K palette body, the reorder
+list) are intentionally outside the measurement, and transfer sizes on a
+real CDN may differ. Selected routes (kB gzip):
 
 | Route | Before | After | Δ |
 | --- | ---: | ---: | ---: |

@@ -20,8 +20,12 @@ export function SignOutForm({ children, returnTo, className }: SignOutFormProps)
     <form
       className={className}
       action={async (formData) => {
-        const posthog = await loadPostHog()
-        posthog.reset()
+        try {
+          const posthog = await loadPostHog()
+          posthog.reset()
+        } catch {
+          // Analytics must not block sign-out.
+        }
         await signOut(formData)
       }}
     >

@@ -87,7 +87,17 @@ export function CommandMenu({ index = null }: { index?: CommandIndex | null }) {
   if (!mounted) return null
 
   return (
-    <Suspense fallback={null}>
+    <Suspense
+      // A ⌘K that lands before the idle warm finishes should give instant
+      // feedback: show the palette's backdrop while its chunk downloads, but
+      // only when an open is actually pending — Escape cancels it.
+      fallback={open ? (
+        <div
+          aria-hidden="true"
+          className="fixed inset-0 z-50 bg-black/25 supports-backdrop-filter:backdrop-blur-xs"
+        />
+      ) : null}
+    >
       <CommandMenuBody index={index} open={open} onOpenChange={setOpen} />
     </Suspense>
   )

@@ -24,16 +24,13 @@ const sizeCache = new Map()
 function chunkSizes(file) {
   let cached = sizeCache.get(file)
   if (!cached) {
+    // Every /_next/ chunk referenced by prerendered HTML must exist in the
+    // build output; failing loudly beats publishing an undercounted report.
     const path = join(distDir, file)
-    let raw = 0
-    let gzip = 0
-    try {
-      raw = statSync(path).size
-      gzip = gzipSync(readFileSync(path), { level: 9 }).length
-    } catch {
-      // Chunk referenced but not on disk (e.g. external); count as zero.
+    cached = {
+      raw: statSync(path).size,
+      gzip: gzipSync(readFileSync(path), { level: 9 }).length,
     }
-    cached = { raw, gzip }
     sizeCache.set(file, cached)
   }
   return cached

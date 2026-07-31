@@ -142,6 +142,18 @@ export function PromptExamplesEditor({
     )
   }
 
+  // Non-reorderable rows: the single-prompt branch and the Suspense fallback
+  // while the ReorderList chunk resolves.
+  function renderPlainList() {
+    return (
+      <div className="grid gap-2.5">
+        {prompts.map((prompt, index) => (
+          <div key={prompt.id}>{renderRow(prompt, index)}</div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <FieldSet className="gap-3">
       <div className="flex items-start justify-between gap-4">
@@ -164,15 +176,7 @@ export function PromptExamplesEditor({
           DOM order is the saved order and reordering needs no extra plumbing.
           A single row gets no handle — there is nothing to reorder. */}
       {prompts.length > 1 ? (
-        <Suspense
-          fallback={(
-            <div className="grid gap-2.5">
-              {prompts.map((prompt, index) => (
-                <div key={prompt.id}>{renderRow(prompt, index)}</div>
-              ))}
-            </div>
-          )}
-        >
+        <Suspense fallback={renderPlainList()}>
         <ReorderList
           items={prompts}
           getId={(prompt) => String(prompt.id)}
@@ -187,11 +191,7 @@ export function PromptExamplesEditor({
         </ReorderList>
         </Suspense>
       ) : (
-        <div className="grid gap-2.5">
-          {prompts.map((prompt, index) => (
-            <div key={prompt.id}>{renderRow(prompt, index)}</div>
-          ))}
-        </div>
+        renderPlainList()
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
