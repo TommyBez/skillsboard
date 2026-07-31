@@ -47,7 +47,6 @@ export function AddSkillDialog({
   const [inspectedUrl, setInspectedUrl] = useState<string | null>(null)
   const [skills, setSkills] = useState<DiscoveredGitHubSkill[]>([])
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
-  const [repositorySkillCount, setRepositorySkillCount] = useState(0)
   const discoveryRequest = useRef(0)
   const lastSinglePath = useRef<string | null>(null)
 
@@ -69,7 +68,6 @@ export function AddSkillDialog({
     setInspectedUrl(null)
     setSkills([])
     setSelectedPaths([])
-    setRepositorySkillCount(0)
     setPendingMode(null)
     lastSinglePath.current = null
   }
@@ -111,7 +109,6 @@ export function AddSkillDialog({
       setInspectedUrl(result.githubUrl)
       setSkills(isLocked && selection ? [selection] : result.skills)
       setSelectedPaths(selection ? [selection.path] : [])
-      setRepositorySkillCount(result.skills.length)
     } catch (error) {
       if (requestId !== discoveryRequest.current) return
       console.error("Unable to inspect repository", error)
@@ -295,11 +292,6 @@ export function AddSkillDialog({
                   <p className="font-mono text-sm font-semibold text-foreground">{singleSelectedSkill.name}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{singleSelectedSkill.description}</p>
                 </div>
-                {isLocked && repositorySkillCount > 1 ? (
-                  <FieldDescription>
-                    This repository publishes {repositorySkillCount} skills. Only {singleSelectedSkill.name} is saved here — add the others from your library’s “Add a skill” flow.
-                  </FieldDescription>
-                ) : null}
               </Field>
             ) : null}
 
