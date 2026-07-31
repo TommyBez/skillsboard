@@ -1,12 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { motion, useReducedMotion } from "motion/react"
 import { SearchIcon } from "lucide-react"
 
 import { useDiscoverPending } from "@/components/discover-pending"
+import { useSlashFocus } from "@/components/live-search-field"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -26,6 +27,9 @@ function SearchField({
   value: string
   onValueChange?: (value: string) => void
 }) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  useSlashFocus(inputRef)
+
   return (
     <div className="grid gap-2">
       <label htmlFor="catalog-search" className="text-sm font-semibold">
@@ -37,16 +41,23 @@ function SearchField({
           aria-hidden="true"
         />
         <Input
+          ref={inputRef}
           id="catalog-search"
           name="q"
           value={value}
           onValueChange={onValueChange}
           placeholder="Search the public catalog"
-          className="pl-10"
+          className="pl-10 pr-12"
           autoComplete="off"
           spellCheck={false}
           readOnly={!onValueChange}
         />
+        <kbd
+          aria-hidden="true"
+          className="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:block"
+        >
+          /
+        </kbd>
       </div>
     </div>
   )

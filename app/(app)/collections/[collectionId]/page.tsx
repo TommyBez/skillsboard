@@ -3,8 +3,11 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeftIcon, DownloadIcon, FolderOpenIcon } from "lucide-react"
 
+import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteCollectionDialog } from "@/components/delete-collection-dialog"
 import { EditCollectionDialog } from "@/components/edit-collection-dialog"
+import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
+import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
 import { ManageCollectionSkillsDialog } from "@/components/manage-collection-skills-dialog"
 import { RemoveFromCollectionButton } from "@/components/remove-from-collection-button"
 import { SkillDossier } from "@/components/skill-dossier"
@@ -15,6 +18,8 @@ import { getAppContext } from "@/lib/app-context"
 import {
   getOrganizationCollection,
   listCollectionSkills,
+  listOrganizationCollectionMemberships,
+  listOrganizationCollections,
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
@@ -33,13 +38,22 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
   const collection = await getOrganizationCollection(activeId, collectionId)
   if (!collection) notFound()
 
-  const [collectionSkills, librarySkills] = await Promise.all([
+  const [collectionSkills, librarySkills, allCollections, collectionMemberships] = await Promise.all([
     listCollectionSkills(activeId, collectionId),
     listOrganizationSkills(activeId),
+    listOrganizationCollections(activeId),
+    listOrganizationCollectionMemberships(activeId),
   ])
   const userId = session.user.id
   const canManageCollection = collection.createdBy === userId || isOrganizationAdmin(role)
   const collectionSkillIds = new Set(collectionSkills.map((item) => item.id))
+  const collectionOptions = allCollections.map((item) => ({ id: item.id, title: item.title }))
+  const collectionIdsBySkill = new Map<string, string[]>()
+  for (const membership of collectionMemberships) {
+    const existing = collectionIdsBySkill.get(membership.skillId)
+    if (existing) existing.push(membership.collectionId)
+    else collectionIdsBySkill.set(membership.skillId, [membership.collectionId])
+  }
   const skillOptions = librarySkills.map((item) => ({
     id: item.id,
     title: item.title,
@@ -107,7 +121,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
       </section>
 
       {collectionSkills.length ? (
-        <section aria-label={`Skills in the ${collection.title} collection`} className="grid gap-4 md:grid-cols-2">
+        <section aria-label={`Skills in the ${collection.title} collection`} className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {collectionSkills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             return (
@@ -140,6 +154,24 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
                       skillId={item.id}
                       skillName={item.title}
                     />
+                    <AddToCollectionMenu
+                      skillId={item.id}
+                      skillName={item.title}
+                      collections={collectionOptions}
+                      memberCollectionIds={collectionIdsBySkill.get(item.id) ?? []}
+                    />
+                    <EditSkillPromptsDialog
+                      skillId={item.id}
+                      skillName={item.title}
+                      prompts={item.examplePrompts}
+                    />
+                    {item.createdBy === userId ? (
+                      <EditSkillNoteDialog
+                        skillId={item.id}
+                        skillName={item.title}
+                        note={item.note}
+                      />
+                    ) : null}
                     <Button
                       variant="outline"
                       size="icon-sm"

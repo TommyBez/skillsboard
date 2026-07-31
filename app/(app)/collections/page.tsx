@@ -1,12 +1,14 @@
 import { Suspense } from "react"
 import Link from "next/link"
-import { FolderOpenIcon, SearchIcon, TagsIcon } from "lucide-react"
+import { FolderOpenIcon, TagsIcon } from "lucide-react"
 
 import { ValueFlash } from "@/components/interior/value-flash"
 import { CollectionCard } from "@/components/collection-card"
 import { CreateCollectionDialog } from "@/components/create-collection-dialog"
+import { LiveSearchField } from "@/components/live-search-field"
+import { FilterPendingProvider, PendingResultsSlot } from "@/components/pending-filters"
+import { TransitionLink } from "@/components/transition-link"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
 import { listOrganizationCollections } from "@/lib/db/queries"
@@ -47,6 +49,47 @@ function CollectionsStatsFallback() {
   )
 }
 
+async function CollectionsFilters({ searchParams }: CollectionsPageProps) {
+  const [{ activeId }, params] = await Promise.all([getAppContext(), searchParams])
+  const allCollections = await listOrganizationCollections(activeId)
+  const tags = [...new Set(allCollections.flatMap((item) => item.tags))].sort()
+  const collectionsHref = (tag: string | null) => {
+    const search = new URLSearchParams()
+    if (params.q) search.set("q", params.q)
+    if (tag) search.set("tag", tag)
+    const value = search.toString()
+    return value ? `/collections?${value}` : "/collections"
+  }
+
+  return (
+    <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
+      <LiveSearchField
+        id="collections-search"
+        label="Search collections"
+        placeholder="Search by title, description, or tag"
+      />
+
+      {tags.length ? (
+        <nav aria-label="Filter collections by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
+          <TagsIcon className="mt-2 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
+            <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={collectionsHref(null)} aria-current={!params.tag ? "page" : undefined} />}>All</Button>
+            {tags.map((tag) => (
+              <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={collectionsHref(tag)} aria-current={params.tag === tag ? "page" : undefined} />}>
+                {tag}
+              </Button>
+            ))}
+          </div>
+        </nav>
+      ) : null}
+    </section>
+  )
+}
+
+function CollectionsFiltersFallback() {
+  return <Skeleton className="h-28 rounded-2xl" aria-label="Loading collection filters" />
+}
+
 async function CollectionsResults({ searchParams }: CollectionsPageProps) {
   const [{ activeId }, params] = await Promise.all([getAppContext(), searchParams])
   const allCollections = await listOrganizationCollections(activeId)
@@ -55,61 +98,32 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
     (!query || `${item.title} ${item.description ?? ""} ${item.tags.join(" ")}`.toLowerCase().includes(query))
     && (!params.tag || item.tags.includes(params.tag))
   ))
-  const tags = [...new Set(allCollections.flatMap((item) => item.tags))].sort()
   const hasFilters = Boolean(query || params.tag)
-  const collectionsHref = (next: { q?: string; tag?: string | null }) => {
-    const search = new URLSearchParams()
-    const nextQuery = next.q === undefined ? params.q : next.q
-    const nextTag = next.tag === undefined ? params.tag : next.tag
-    if (nextQuery) search.set("q", nextQuery)
-    if (nextTag) search.set("tag", nextTag)
-    const value = search.toString()
-    return value ? `/collections?${value}` : "/collections"
-  }
 
   return (
     <>
-      <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
-        <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-          <div className="grid gap-2">
-            <label htmlFor="collections-search" className="text-sm font-semibold">Search collections</label>
-            <div className="relative">
-              <SearchIcon className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
-              <Input id="collections-search" name="q" defaultValue={params.q} placeholder="Search by title, description, or tag" className="pl-10" />
-            </div>
-          </div>
-          {params.tag ? <input type="hidden" name="tag" value={params.tag} /> : null}
-          <Button type="submit" variant="outline">Search</Button>
-        </form>
-
-        {tags.length ? (
-          <nav aria-label="Filter collections by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
-            <TagsIcon className="mt-2 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-            <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
-              <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<Link href={collectionsHref({ tag: null })} aria-current={!params.tag ? "page" : undefined} />}>All</Button>
-              {tags.map((tag) => (
-                <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<Link href={collectionsHref({ tag })} aria-current={params.tag === tag ? "page" : undefined} />}>
-                  {tag}
-                </Button>
-              ))}
-            </div>
-          </nav>
-        ) : null}
-      </section>
-
       {collections.length ? (
-        <section aria-label="Team skill collections" className="cascade-grid grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {collections.map((item) => (
-            <CollectionCard
-              key={item.id}
-              id={item.id}
-              title={item.title}
-              description={item.description}
-              tags={item.tags}
-              skillCount={item.skillCount}
-              createdByName={item.createdByName}
-            />
-          ))}
+        <section aria-label="Team skill collections" className="grid gap-4">
+          {hasFilters ? (
+            <p className="font-mono text-sm text-muted-foreground" role="status">
+              {collections.length} of {allCollections.length} {allCollections.length === 1 ? "collection" : "collections"}
+              {query ? <> matching <span className="text-foreground">“{params.q?.trim()}”</span></> : null}
+              {params.tag ? <> tagged <span className="text-foreground">{params.tag}</span></> : null}
+            </p>
+          ) : null}
+          <div className="cascade-grid grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {collections.map((item) => (
+              <CollectionCard
+                key={item.id}
+                id={item.id}
+                title={item.title}
+                description={item.description}
+                tags={item.tags}
+                skillCount={item.skillCount}
+                createdByName={item.createdByName}
+              />
+            ))}
+          </div>
         </section>
       ) : (
         <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
@@ -117,13 +131,24 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
           <div>
             <h2 className="text-3xl font-semibold tracking-display md:text-4xl">{hasFilters ? "No matching collections" : "Create your first collection"}</h2>
             <p className="mt-3 max-w-lg text-lg leading-relaxed text-muted-foreground">
-              {hasFilters
-                ? "Try another search or clear the active filters."
-                : "Group the skills your team recommends by use case or project, so the whole set is easy to find."}
+              {query && params.tag
+                ? "Nothing matches both the search and the tag. Try dropping one of them."
+                : hasFilters
+                  ? "Try another search or clear the active filters."
+                  : "Group the skills your team recommends by use case or project, so the whole set is easy to find."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
-            {hasFilters ? <Button variant="outline" nativeButton={false} render={<Link href="/collections" />}>Clear filters</Button> : <CreateCollectionDialog />}
+            {query && params.tag ? (
+              <>
+                <Button variant="outline" nativeButton={false} render={<TransitionLink href={`/collections?tag=${encodeURIComponent(params.tag)}`} />}>Clear search</Button>
+                <Button variant="outline" nativeButton={false} render={<TransitionLink href={`/collections?q=${encodeURIComponent(params.q ?? "")}`} />}>Clear tag</Button>
+              </>
+            ) : hasFilters ? (
+              <Button variant="outline" nativeButton={false} render={<TransitionLink href="/collections" />}>Clear filters</Button>
+            ) : (
+              <CreateCollectionDialog />
+            )}
             <Button variant="outline" nativeButton={false} render={<Link href="/library" />}>Browse library</Button>
           </div>
         </section>
@@ -134,13 +159,10 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
 
 function CollectionsResultsFallback() {
   return (
-    <div className="grid gap-8" aria-label="Loading collections">
-      <Skeleton className="h-28 rounded-2xl" />
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Skeleton className="h-56 rounded-2xl" />
-        <Skeleton className="h-56 rounded-2xl" />
-        <Skeleton className="h-56 rounded-2xl" />
-      </div>
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Loading collections" aria-busy="true">
+      <Skeleton className="h-56 rounded-2xl" />
+      <Skeleton className="h-56 rounded-2xl" />
+      <Skeleton className="h-56 rounded-2xl" />
     </div>
   )
 }
@@ -167,9 +189,17 @@ export default function CollectionsPage({ searchParams }: CollectionsPageProps) 
         </div>
       </section>
 
-      <Suspense fallback={<CollectionsResultsFallback />}>
-        <CollectionsResults searchParams={searchParams} />
-      </Suspense>
+      <FilterPendingProvider>
+        <Suspense fallback={<CollectionsFiltersFallback />}>
+          <CollectionsFilters searchParams={searchParams} />
+        </Suspense>
+
+        <PendingResultsSlot className="flex flex-col gap-10">
+          <Suspense fallback={<CollectionsResultsFallback />}>
+            <CollectionsResults searchParams={searchParams} />
+          </Suspense>
+        </PendingResultsSlot>
+      </FilterPendingProvider>
     </main>
   )
 }

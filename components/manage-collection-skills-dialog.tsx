@@ -39,37 +39,54 @@ export function ManageCollectionSkillsDialog({
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [query, setQuery] = useState("")
-  const [pendingSkillId, setPendingSkillId] = useState<string | null>(null)
+  // Optimistic membership overrides on top of the server-provided props, and
+  // a per-row pending set: rows flip instantly, several can save at once, and
+  // only a failed row snaps back.
+  const [overrides, setOverrides] = useState<Map<string, boolean>>(new Map())
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
 
   const normalizedQuery = query.toLowerCase().trim()
   const visibleSkills = skills.filter((item) => (
     !normalizedQuery || `${item.title} ${item.source}`.toLowerCase().includes(normalizedQuery)
   ))
+  const isInCollection = (skill: CollectionSkillOption) =>
+    overrides.get(skill.id) ?? skill.inCollection
 
   function handleOpenChange(nextOpen: boolean) {
     setIsOpen(nextOpen)
-    if (!nextOpen) setQuery("")
+    if (!nextOpen) {
+      setQuery("")
+      setOverrides(new Map())
+    }
   }
 
   async function toggleSkill(skill: CollectionSkillOption) {
-    setPendingSkillId(skill.id)
+    const wasInCollection = isInCollection(skill)
+    setOverrides((current) => new Map(current).set(skill.id, !wasInCollection))
+    setPendingIds((current) => new Set(current).add(skill.id))
     try {
-      const result = skill.inCollection
+      const result = wasInCollection
         ? await removeSkillFromCollection({ collectionId, skillId: skill.id, surface: "collection_detail" })
         : await addSkillToCollection({ collectionId, skillId: skill.id, surface: "collection_detail" })
       if (!result.ok) {
+        setOverrides((current) => new Map(current).set(skill.id, wasInCollection))
         toast.error(result.error)
         return
       }
-      toast.success(skill.inCollection
+      toast.success(wasInCollection
         ? `Removed ${skill.title} from ${collectionTitle}`
         : `Added ${skill.title} to ${collectionTitle}`)
       router.refresh()
     } catch (error) {
+      setOverrides((current) => new Map(current).set(skill.id, wasInCollection))
       console.error("Unable to update collection skills", error)
       toast.error("We couldn’t update this collection. Try again.")
     } finally {
-      setPendingSkillId(null)
+      setPendingIds((current) => {
+        const next = new Set(current)
+        next.delete(skill.id)
+        return next
+      })
     }
   }
 
@@ -104,34 +121,38 @@ export function ManageCollectionSkillsDialog({
 
           {visibleSkills.length ? (
             <ul className="flex max-h-80 flex-col gap-2 overflow-y-auto pr-1">
-              {visibleSkills.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-border bg-card/80 p-3"
-                >
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold">{item.title}</p>
-                    <p className="truncate font-mono text-xs text-muted-foreground">{item.source}</p>
-                  </div>
-                  <Button
-                    variant={item.inCollection ? "outline" : "default"}
-                    size="sm"
-                    disabled={pendingSkillId !== null}
-                    aria-busy={pendingSkillId === item.id || undefined}
-                    onClick={() => void toggleSkill(item)}
-                    aria-label={item.inCollection
-                      ? `Remove ${item.title} from ${collectionTitle}`
-                      : `Add ${item.title} to ${collectionTitle}`}
+              {visibleSkills.map((item) => {
+                const inCollection = isInCollection(item)
+                const isSaving = pendingIds.has(item.id)
+                return (
+                  <li
+                    key={item.id}
+                    className="flex min-w-0 items-center justify-between gap-3 rounded-xl border border-border bg-card/80 p-3"
                   >
-                    <ButtonPendingContent
-                      pending={pendingSkillId === item.id}
-                      pendingLabel="Saving…"
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{item.title}</p>
+                      <p className="truncate font-mono text-xs text-muted-foreground">{item.source}</p>
+                    </div>
+                    <Button
+                      variant={inCollection ? "outline" : "default"}
+                      size="sm"
+                      disabled={isSaving}
+                      aria-busy={isSaving || undefined}
+                      onClick={() => void toggleSkill(item)}
+                      aria-label={inCollection
+                        ? `Remove ${item.title} from ${collectionTitle}`
+                        : `Add ${item.title} to ${collectionTitle}`}
                     >
-                      {item.inCollection ? "Remove" : "Add"}
-                    </ButtonPendingContent>
-                  </Button>
-                </li>
-              ))}
+                      <ButtonPendingContent
+                        pending={isSaving}
+                        pendingLabel="Saving…"
+                      >
+                        {inCollection ? "Remove" : "Add"}
+                      </ButtonPendingContent>
+                    </Button>
+                  </li>
+                )
+              })}
             </ul>
           ) : (
             <p className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">

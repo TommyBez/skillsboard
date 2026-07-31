@@ -155,6 +155,38 @@
   }
 }
 
+/* Visually hidden until focused, then presented as a floating pill above the
+   sticky header. First tab stop inside the signed-in app. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding-inline: 1rem;
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transform: translateY(calc(-100% - 1.5rem));
+  transition: transform 150ms var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--ring) 35%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skip-link {
+    transition: none;
+  }
+}
+
 .surface-shadow {
   box-shadow: 0 24px 70px hsl(var(--shadow-color) / 0.11), 0 2px 8px hsl(var(--shadow-color) / 0.06);
 }
@@ -299,14 +331,14 @@
   }
 }
 
-/* Stale-while-updating: dim the previous results during a catalog
+/* Stale-while-updating: dim the previous results during a filter
    transition. The delay keeps fast responses from flickering. */
-.discover-results-slot {
+.pending-results-slot {
   transition: opacity 180ms var(--ease-out);
   transition-delay: 0ms;
 }
 
-.discover-results-slot[data-pending] {
+.pending-results-slot[data-pending] {
   opacity: 0.45;
   pointer-events: none;
   transition-delay: 150ms;
@@ -344,7 +376,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .discover-results-slot {
+  .pending-results-slot {
     transition: none;
   }
 
