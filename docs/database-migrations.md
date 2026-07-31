@@ -37,12 +37,17 @@ a generated migration instead.
 
 The Neon `main` and `development` branches were created with `db:push` before
 migrations existed, so they already have the schema of `drizzle/0000_init.sql`.
-That migration is written to be idempotent (`IF NOT EXISTS` on tables/indexes,
-`duplicate_object` guards on foreign keys): the first `drizzle-kit migrate`
-against such a database executes it as a no-op and records it as applied in
-`drizzle.__drizzle_migrations`. Fresh databases get the full schema from the
-same file. Later migrations do not need to be idempotent — only this baseline
-one is.
+That migration is guarded so the first `drizzle-kit migrate` against such a
+database succeeds and records it as applied in `drizzle.__drizzle_migrations`,
+while fresh databases get the full schema from the same file. The guards cover
+tables (`IF NOT EXISTS`), indexes (`IF NOT EXISTS`), and foreign keys
+(`duplicate_object` handlers); on an existing table the whole body is skipped,
+so in-table constraints and column defaults are assumed to already match. That
+assumption holds because `db:push` and the migration were both generated from
+the same `lib/db/schema.ts` (the known cosmetic `skill.tags` /
+`skill.examplePrompts` empty-array-default mis-introspection noted in
+`AGENTS.md` does not affect the stored schema). Later migrations do not need
+guards — only this baseline one has them.
 
 ### 2. Neon integration on Vercel
 
@@ -66,12 +71,24 @@ For `.github/workflows/neon-preview-cleanup.yml`:
 
 Also consider enabling GitHub's "Automatically delete head branches" on merge.
 
+The workflow only runs for same-repository PRs: fork PRs don't receive
+`NEON_API_KEY`, and Vercel only builds fork previews after maintainer
+authorization. If a fork PR does leave a `preview/*` branch behind, delete it
+from the Neon console or rely on the integration's obsolete-branch cleanup.
+
 ## Notes
 
 - `drizzle-kit generate` is offline (it diffs `lib/db/schema.ts` against
   `drizzle/meta/`), so it needs no `DATABASE_URL`.
+- `pnpm db:migrate` (used by `vercel-build` too) wraps `drizzle-kit migrate`
+  in a Postgres advisory lock (`scripts/db-migrate.mjs`), so overlapping runs
+  against the same database serialize instead of racing.
 - Migrations run at build time, before the new code is deployed, so they must
   be backward-compatible with the currently running code (expand/contract:
   add columns as nullable/with defaults first, remove in a later release).
 - If a production build fails at the migrate step, the previous deployment
-  stays live; fix the migration and push again.
+  stays live; fix the migration and push again. Note that `drizzle-kit
+  migrate` applies each migration file in its own transaction: files that
+  already succeeded in the failed run stay applied and recorded in
+  `drizzle.__drizzle_migrations`, and a recorded migration is never re-applied
+  — check the applied set before rewriting a failed migration file.

@@ -1,7 +1,11 @@
--- Baseline migration. Written to be idempotent (IF NOT EXISTS / duplicate_object
--- guards) so it applies cleanly both to fresh databases and to the pre-existing
--- Neon branches whose schema was created with `drizzle-kit push` before this
--- repo adopted versioned migrations. Later migrations do not need this.
+-- Baseline migration, guarded so it applies cleanly both to fresh databases
+-- and to the pre-existing Neon branches whose schema was created with
+-- `drizzle-kit push` before this repo adopted versioned migrations. The guards
+-- cover tables (IF NOT EXISTS), indexes (IF NOT EXISTS), and foreign keys
+-- (duplicate_object handlers). On an existing table, IF NOT EXISTS skips the
+-- whole body, so in-table constraints and column defaults are assumed to
+-- already match — which holds here because `push` and this file were both
+-- derived from the same lib/db/schema.ts. Later migrations do not need guards.
 CREATE TABLE IF NOT EXISTS "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,

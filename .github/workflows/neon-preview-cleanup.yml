@@ -7,6 +7,11 @@ name: Cleanup Neon preview branch
 # Requires:
 #   - repository variable NEON_PROJECT_ID (Neon console -> Project settings)
 #   - repository secret  NEON_API_KEY    (Neon console -> Account -> API keys)
+#
+# Calls the Neon API directly instead of a third-party action so that a
+# missing branch is the only tolerated failure — auth/config/API errors still
+# fail the workflow. Fork PRs are skipped: they don't receive NEON_API_KEY,
+# and Vercel only builds fork previews after maintainer authorization.
 
 on:
   pull_request:
@@ -17,17 +22,37 @@ permissions: {}
 jobs:
   delete-neon-branch:
     name: Delete Neon preview branch
-    if: github.event.pull_request.merged == true
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
       - name: Delete branch preview/${{ github.event.pull_request.head.ref }}
-        uses: neondatabase/delete-branch-action@v3
-        # The Vercel integration may have already removed the branch (e.g. via
-        # "automatically delete obsolete branches"), so a missing branch is fine.
-        continue-on-error: true
-        with:
-          project_id: ${{ vars.NEON_PROJECT_ID }}
-          branch: preview/${{ github.event.pull_request.head.ref }}
-          api_key: ${{ secrets.NEON_API_KEY }}
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          # Passed through env (not inline interpolation) so a hostile branch
+          # name can't inject into the shell.
+          BRANCH_NAME: preview/${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
+
+          branch_id="$(
+            curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" "$api" |
+              jq -r --arg name "$BRANCH_NAME" \
+                '.branches[] | select(.name == $name) | .id'
+          )"
+
+          if [ -z "$branch_id" ]; then
+            echo "Branch '$BRANCH_NAME' not found — already deleted, nothing to do."
+            exit 0
+          fi
+
+          echo "Deleting Neon branch '$BRANCH_NAME' ($branch_id)"
+          curl -sfS -X DELETE \
+            -H "Authorization: Bearer ${NEON_API_KEY}" \
+            "$api/$branch_id" > /dev/null
+          echo "Deleted."
