@@ -175,13 +175,24 @@ export function CommandPalette({
         className="overflow-y-auto p-1.5"
         style={{ height: maxRows * ROW_HEIGHT + 12 }}
       >
-        {results.length === 0 ? (
-          <p className="grid h-full place-items-center text-[13px] text-muted-foreground">
-            {emptyLabel}
-          </p>
-        ) : (
-          <AnimatePresence initial={false} mode="popLayout">
-            {results.map((item, index) => (
+        {/* The boundary stays mounted and the condition sits inside it. Wrapped
+            the other way round, AnimatePresence unmounted together with the
+            rows it was meant to watch, so the last result vanished instead of
+            animating out. */}
+        <AnimatePresence initial={false} mode="popLayout">
+          {results.length === 0 ? (
+            <motion.p
+              key="empty"
+              initial={reduced ? { opacity: 0 } : { opacity: 0, y: -4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduced ? { opacity: 0 } : { opacity: 0, y: 4 }}
+              transition={{ duration: reduced ? 0.1 : 0.16 }}
+              className="grid h-full place-items-center text-[13px] text-muted-foreground"
+            >
+              {emptyLabel}
+            </motion.p>
+          ) : (
+            results.map((item, index) => (
               <motion.div
                 key={item.id}
                 id={`cmd-${item.id}`}
@@ -216,9 +227,9 @@ export function CommandPalette({
                   </span>
                 ) : null}
               </motion.div>
-            ))}
-          </AnimatePresence>
-        )}
+            ))
+          )}
+        </AnimatePresence>
       </div>
     </div>
   )
