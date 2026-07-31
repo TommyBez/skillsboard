@@ -173,7 +173,7 @@ export function CatalogSkillDetailsDialog({
               ) : (
                 <AddSkillDialog
                   defaultUrl={item.installUrl}
-                  defaultName={item.slug}
+                  lockedSkillName={item.slug}
                   triggerLabel="Save to library"
                   triggerAriaLabel={`Save ${name} to library`}
                 />

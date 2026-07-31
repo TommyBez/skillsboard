@@ -1,0 +1,92 @@
+import assert from "node:assert/strict"
+import { readFile } from "node:fs/promises"
+import { test } from "node:test"
+
+import typescript from "typescript"
+
+const source = await readFile(
+  new URL("../lib/discovered-skill-selection.ts", import.meta.url),
+  "utf8",
+)
+const { outputText } = typescript.transpileModule(source, {
+  compilerOptions: {
+    module: typescript.ModuleKind.ES2022,
+    target: typescript.ScriptTarget.ES2022,
+  },
+})
+const { pickDiscoveredSkill } = await import(
+  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+)
+
+function skill(name, path = name) {
+  return { name, path, description: `${name} description` }
+}
+
+test("picks the requested catalog skill out of a multi-skill repository", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx"), skill("xlsx", "skills/xlsx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: null, requestedName: "docx" })?.path,
+    "skills/docx",
+  )
+})
+
+test("matches the requested name regardless of casing and padding", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: null, requestedName: "  DOCX  " })?.path,
+    "skills/docx",
+  )
+})
+
+test("prefers the requested name over the linked path", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: "skills/pdf", requestedName: "docx" })?.path,
+    "skills/docx",
+  )
+})
+
+test("falls back to the linked path when the catalog slug is absent", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: "skills/pdf", requestedName: "renamed" })?.path,
+    "skills/pdf",
+  )
+})
+
+test("falls back to the only skill a repository publishes", () => {
+  const skills = [skill("renamed-upstream", "")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: null, requestedName: "old-slug" })?.path,
+    "",
+  )
+})
+
+test("returns null when a multi-skill repository no longer publishes the requested skill", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: null, requestedName: "gone" }),
+    null,
+  )
+})
+
+test("returns null for an unnamed request against a multi-skill repository", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(pickDiscoveredSkill({ skills, linkedSkillPath: null }), null)
+})
+
+test("returns null when the linked path is missing from the discovered skills", () => {
+  const skills = [skill("pdf", "skills/pdf"), skill("docx", "skills/docx")]
+
+  assert.equal(
+    pickDiscoveredSkill({ skills, linkedSkillPath: "skills/vanished" }),
+    null,
+  )
+})
