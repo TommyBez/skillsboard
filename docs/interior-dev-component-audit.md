@@ -415,6 +415,18 @@ adequately.
 Unwired. The lesson is that "two phases exist" is not the trigger for
 TaskSteps — the trigger is work the user *cannot otherwise observe*.
 
+### Rejected on inspection — `inline-validation`
+
+Its two candidate homes, `invite-member-form.tsx` and `auth-form.tsx`, both
+report **form-level errors returned by a server action**, not field-level
+client validation. InlineValidation is a controlled field with its own label,
+input and debounced `validate` callback, and it emits no `name`, so it would
+not even submit. Reserving a permanent message gutter above the submit button
+would also spend layout on every render for a message that is usually absent.
+
+The audit matched it on "errors currently push layout", which was true but not
+sufficient. Unwired.
+
 ### Not working — `hold-to-confirm` is unverified and unwired
 
 Browser testing found that `HoldToConfirm` never advances: the native
