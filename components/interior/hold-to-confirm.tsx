@@ -49,6 +49,19 @@ export function HoldToConfirm({
   const holding = useRef(false)
   const frame = useRef(0)
   const last = useRef(0)
+  /* Progress lives in a ref and is mirrored into state only for rendering.
+     Advancing it inside a setState updater would be a side effect in a place
+     React is allowed to call more than once — which schedules duplicate rAF
+     loops that then share `last`, collapsing the per-frame delta to zero and
+     stalling the fill before it ever becomes visible. */
+  const value = useRef(0)
+
+  const onConfirmRef = useRef(onConfirm)
+  const onAbortRef = useRef(onAbort)
+  useEffect(() => {
+    onConfirmRef.current = onConfirm
+    onAbortRef.current = onAbort
+  })
 
   const stop = useCallback(() => {
     if (frame.current) cancelAnimationFrame(frame.current)
@@ -61,6 +74,7 @@ export function HoldToConfirm({
     if (!confirmed) return
     const timer = window.setTimeout(() => {
       setConfirmed(false)
+      value.current = 0
       setProgress(0)
     }, resetAfter)
     return () => window.clearTimeout(timer)
@@ -70,46 +84,50 @@ export function HoldToConfirm({
     (now: number) => {
       const delta = now - last.current
       last.current = now
-      setProgress((current) => {
-        const rate = delta / duration
-        const next = holding.current
-          ? current + rate
-          : current - rate * releaseRate
+      const rate = delta / duration
+      const next = holding.current
+        ? value.current + rate
+        : value.current - rate * releaseRate
 
-        if (next >= 1) {
-          holding.current = false
-          stop()
-          setConfirmed(true)
-          onConfirm()
-          return 1
-        }
-        if (next <= 0) {
-          stop()
-          return 0
-        }
-        frame.current = requestAnimationFrame(tick)
-        return next
-      })
+      if (next >= 1) {
+        holding.current = false
+        frame.current = 0
+        value.current = 1
+        setProgress(1)
+        setConfirmed(true)
+        onConfirmRef.current()
+        return
+      }
+      if (next <= 0) {
+        frame.current = 0
+        value.current = 0
+        setProgress(0)
+        return
+      }
+      value.current = next
+      setProgress(next)
+      frame.current = requestAnimationFrame(tick)
     },
-    [duration, releaseRate, onConfirm, stop]
+    [duration, releaseRate]
   )
+
+  const run = useCallback(() => {
+    if (frame.current) return
+    last.current = performance.now()
+    frame.current = requestAnimationFrame(tick)
+  }, [tick])
 
   function start() {
     if (disabled || confirmed) return
     holding.current = true
-    if (frame.current) return
-    last.current = performance.now()
-    frame.current = requestAnimationFrame(tick)
+    run()
   }
 
   function release() {
     if (!holding.current) return
     holding.current = false
-    onAbort?.()
-    if (!frame.current) {
-      last.current = performance.now()
-      frame.current = requestAnimationFrame(tick)
-    }
+    onAbortRef.current?.()
+    run()
   }
 
   // Quantised so the fill reads as a set of stops rather than a smear.

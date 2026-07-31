@@ -6,7 +6,7 @@ import { Trash2Icon } from "lucide-react"
 import { toast } from "sonner"
 
 import { deleteSkill } from "@/app/actions/skills"
-import { HoldToConfirm } from "@/components/interior/hold-to-confirm"
+import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -74,16 +74,16 @@ export function DeleteSkillDialog({ skillId, skillName }: DeleteSkillDialogProps
           <DialogClose render={<Button variant="outline" disabled={isPending} />}>
             Cancel
           </DialogClose>
-          {/* The dialog carries the context; the hold carries the commit.
-              Deleting a skill cannot be undone, so the last step asks for a
-              deliberate 1.8s press rather than a click that can be misfired. */}
-          <HoldToConfirm
-            onConfirm={handleDelete}
+          <Button
+            variant="destructive"
             disabled={isPending}
-            confirmLabel={isPending ? "Deleting…" : "Deleted"}
+            aria-busy={isPending || undefined}
+            onClick={handleDelete}
           >
-            {isPending ? "Deleting…" : "Hold to delete"}
-          </HoldToConfirm>
+            <ButtonPendingContent pending={isPending} pendingLabel="Deleting…">
+              Delete skill
+            </ButtonPendingContent>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

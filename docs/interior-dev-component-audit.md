@@ -379,7 +379,6 @@ transform).
 | Chapter spy + reading progress on all 8 guides | `components/guides/guide-chapter-nav.tsx`, `components/guides/guide-page.tsx`, `lib/seo/guides.ts` |
 | Travelling thumb on Discover views (links preserved) | `components/discover-filters.tsx` |
 | Travelling indicator on MCP client tabs (row now scrolls instead of wrapping) | `components/ui/tabs.tsx`, `components/mcp-setup-guide.tsx`, `app/globals.css` |
-| Hold-to-delete on the two irreversible deletes | `components/delete-skill-dialog.tsx`, `components/delete-collection-dialog.tsx` |
 | Undo on the reversible remove | `components/remove-from-collection-button.tsx` |
 | Expandable skill descriptions replacing a dead-end line-clamp | `components/skill-dossier.tsx` |
 | Phase narration in the add-skill flow | `components/add-skill-dialog.tsx` |
@@ -403,9 +402,40 @@ transform).
   and `.faq-disclosure` already animates native `<details>` better.
 - Everything marked SKIP in §2 remains skipped; those surfaces do not exist.
 
+### Not working — `hold-to-confirm` is unverified and unwired
+
+Browser testing found that `HoldToConfirm` never advances: the native
+`pointerdown` reaches the button, but React never re-renders the component, so
+`start()` never runs and the fill stays at 0%. A **full hold does not fire
+`onConfirm`**, which meant that while it was wired into the delete dialogs,
+deleting a skill or a collection was impossible.
+
+Both dialogs are therefore back on their original destructive button, verified
+working (skill count 1 → 0 through the UI). The component stays in
+`components/interior/` but is not used anywhere and must not be wired up until
+the root cause is found. One fix has already been attempted and rejected —
+moving the rAF scheduling and side effects out of the `setProgress` updater,
+which was a real defect but not this one.
+
+This is the one thing static checks could not have caught: `tsc`, the unit
+tests and `next build` were all green with the deletes broken.
+
 ### Verification
 
-`tsc --noEmit` clean · `pnpm test:unit` 4/4 · `next build` reaches
-"Compiled successfully". The build then fails collecting
-`/variants/home/[code]` because `FLAGS_SECRET` is unset in this environment —
-reproduced on a clean checkout of `c762a6b`, so it predates this work.
+`tsc --noEmit` clean · `pnpm test:unit` 4/4 · `next build` exit 0, 59/59 static
+pages.
+
+Exercised in a real browser against a local Postgres (the dev database is
+unreachable from the container — no network route to Neon):
+
+| Verified working | Evidence |
+|---|---|
+| Guide chapter rail | active chapter tracks scroll: `Choose a model` → `Keep the record` → `Use the checklist` |
+| Reading progress | `0 → 50 → 90`, readout `4 min left → 2 → 1` |
+| ⌘K palette | opens on Cmd+K, reorders on query (`agent` ranks MCP setup first, drops 2 non-matches) |
+| Show More | collapsed 72px → expanded 120px against 120px of text |
+| Counters, delete flow | render correctly; skill deleted through the UI, 1 → 0 |
+
+Not exercisable here: the **add-skill discovery flow** (and so `TaskSteps`),
+because `api.github.com` returns 403 from the session's egress proxy — an
+organization policy denial the proxy README says to report, not route around.
