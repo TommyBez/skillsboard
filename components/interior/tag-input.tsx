@@ -12,7 +12,8 @@
  */
 
 import { useId, useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -159,7 +160,7 @@ export function TagInput({
           {tags.map((tag, index) => {
             const isArmed = armed && index === tags.length - 1
             return (
-              <motion.span
+              <m.span
                 key={`${index}:${tag}`}
                 layout={!reduced}
                 initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.86 }}
@@ -190,7 +191,7 @@ export function TagInput({
                 >
                   <XIcon className="size-3" />
                 </button>
-              </motion.span>
+              </m.span>
             )
           })}
         </AnimatePresence>

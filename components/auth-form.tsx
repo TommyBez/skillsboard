@@ -5,11 +5,11 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ArrowRightIcon, Loader2Icon } from "lucide-react"
-import posthog from "posthog-js"
 
 import { saveSignupProductCommunicationsConsent } from "@/app/actions/email-preferences"
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import { loadPostHog } from "@/lib/posthog-browser"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -161,7 +161,7 @@ export function AuthForm({
           : null
       const userId = user && "id" in user ? String(user.id) : null
       if (userId) {
-        posthog.identify(userId)
+        void loadPostHog().then((posthog) => posthog.identify(userId))
       }
       // Both pages share signIn.emailOtp; emit based on whether the account was just created.
       if (isNewlyCreatedUser(user)) {

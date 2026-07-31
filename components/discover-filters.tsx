@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { SearchIcon } from "lucide-react"
 
 import { useDiscoverPending } from "@/components/discover-pending"
@@ -87,7 +88,7 @@ function CatalogViewTabs({
              rides underneath them rather than replacing them with radios. */
           <span key={item.value} className="relative isolate shrink-0">
             {isActive ? (
-              <motion.span
+              <m.span
                 layoutId="catalog-view-thumb"
                 aria-hidden
                 className="absolute inset-0 -z-10 rounded-lg bg-primary"

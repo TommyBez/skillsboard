@@ -12,7 +12,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { useScrollSpy } from "@/components/interior/scroll-spy"
 import { ReadingProgress } from "@/components/interior/reading-progress"
 import { cn } from "@/lib/utils"
@@ -77,7 +78,7 @@ export function GuideChapterNav({
               )}
             >
               {isActive ? (
-                <motion.span
+                <m.span
                   layoutId="guide-chapter-marker"
                   aria-hidden
                   className="absolute inset-y-0 -left-px w-px bg-primary"

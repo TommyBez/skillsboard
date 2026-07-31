@@ -11,7 +11,8 @@
  */
 
 import { useEffect, useState } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 export interface ScrollSpySection {
@@ -95,7 +96,7 @@ export function ScrollSpy({
           return (
             <li key={section.id} className="relative">
               {isActive ? (
-                <motion.span
+                <m.span
                   layoutId={`scroll-spy-${label}`}
                   aria-hidden
                   className="absolute inset-y-0 left-0 w-[2px] rounded-full bg-primary"

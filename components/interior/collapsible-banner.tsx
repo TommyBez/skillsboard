@@ -13,7 +13,8 @@
  */
 
 import { useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { ChevronDownIcon, XIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -69,7 +70,7 @@ export function CollapsibleBanner({
   const isExpanded = current === "expanded"
 
   return (
-    <motion.aside
+    <m.aside
       layout={!reduced}
       transition={reduced ? { duration: 0 } : { duration: 0.28, ease: [0.23, 1, 0.32, 1] }}
       className={cn(
@@ -87,14 +88,14 @@ export function CollapsibleBanner({
           className="flex flex-1 items-center gap-2 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-sm"
         >
           <span className="flex-1 text-sm font-medium">{title}</span>
-          <motion.span
+          <m.span
             aria-hidden
             className="flex shrink-0 text-muted-foreground"
             animate={{ rotate: isExpanded ? 180 : 0 }}
             transition={reduced ? { duration: 0 } : { duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
           >
             <ChevronDownIcon className="size-3.5" />
-          </motion.span>
+          </m.span>
         </button>
 
         {dismissible ? (
@@ -111,7 +112,7 @@ export function CollapsibleBanner({
 
       <AnimatePresence initial={false}>
         {isExpanded ? (
-          <motion.div
+          <m.div
             key="body"
             initial={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -126,9 +127,9 @@ export function CollapsibleBanner({
               {children}
               {action}
             </div>
-          </motion.div>
+          </m.div>
         ) : null}
       </AnimatePresence>
-    </motion.aside>
+    </m.aside>
   )
 }

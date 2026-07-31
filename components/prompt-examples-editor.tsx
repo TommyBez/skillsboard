@@ -1,9 +1,13 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { Suspense, lazy, useEffect, useRef, useState } from "react"
 import { PlusIcon, Trash2Icon } from "lucide-react"
 
-import { ReorderList } from "@/components/interior/reorder-list"
+// ReorderList's drag interactions pull in the full motion runtime, so it
+// stays out of the route bundle and only loads once several prompts exist.
+const ReorderList = lazy(async () => ({
+  default: (await import("@/components/interior/reorder-list")).ReorderList,
+})) as unknown as (typeof import("@/components/interior/reorder-list"))["ReorderList"]
 import { Button } from "@/components/ui/button"
 import {
   FieldDescription,
@@ -133,6 +137,15 @@ export function PromptExamplesEditor({
           DOM order is the saved order and reordering needs no extra plumbing.
           A single row gets no handle — there is nothing to reorder. */}
       {prompts.length > 1 ? (
+        <Suspense
+          fallback={(
+            <div className="grid gap-2.5">
+              {prompts.map((prompt, index) => (
+                <div key={prompt.id}>{renderRow(prompt, index)}</div>
+              ))}
+            </div>
+          )}
+        >
         <ReorderList
           items={prompts}
           getId={(prompt) => String(prompt.id)}
@@ -145,6 +158,7 @@ export function PromptExamplesEditor({
         >
           {renderRow}
         </ReorderList>
+        </Suspense>
       ) : (
         <div className="grid gap-2.5">
           {prompts.map((prompt, index) => (

@@ -1,6 +1,15 @@
 import type { NextConfig } from 'next'
 
 const nextConfig = {
+  turbopack: {
+    resolveAlias: {
+      // The slim build keeps the full PostHog API but loads optional
+      // extensions (session recorder, surveys, dead clicks, …) on demand
+      // through the /ingest/static rewrite instead of bundling them into
+      // every page's client JS.
+      "posthog-js": "posthog-js/dist/module.slim",
+    },
+  },
   cacheComponents: true,
   cacheLife: {
     catalog: {

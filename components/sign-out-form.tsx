@@ -3,12 +3,11 @@
 import type { ComponentProps, ReactNode } from "react"
 import { useFormStatus } from "react-dom"
 import { LogOutIcon } from "lucide-react"
-import posthog from "posthog-js"
-
 import { signOut } from "@/app/actions/auth"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { loadPostHog } from "@/lib/posthog-browser"
 
 interface SignOutFormProps {
   children: ReactNode
@@ -21,6 +20,7 @@ export function SignOutForm({ children, returnTo, className }: SignOutFormProps)
     <form
       className={className}
       action={async (formData) => {
+        const posthog = await loadPostHog()
         posthog.reset()
         await signOut(formData)
       }}

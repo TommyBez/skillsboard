@@ -13,7 +13,8 @@
  */
 
 import { useEffect, useRef, useState } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 interface HideOnScrollProps {
@@ -93,7 +94,7 @@ export function HideOnScroll({
   return (
     <>
       {children}
-      <motion.div
+      <m.div
         aria-label={label}
         aria-hidden={hidden || undefined}
         initial={false}
@@ -107,7 +108,7 @@ export function HideOnScroll({
         className={cn("fixed inset-x-0 bottom-0 z-30", className)}
       >
         {bar}
-      </motion.div>
+      </m.div>
     </>
   )
 }

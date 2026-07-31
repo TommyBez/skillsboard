@@ -12,7 +12,8 @@
  */
 
 import { useEffect, useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 const RISE = 6
@@ -70,7 +71,7 @@ export function ValueFlash({
       {/* The box never moves: the outgoing digit is absolutely positioned. */}
       <span aria-hidden className="relative inline-flex overflow-hidden">
         <AnimatePresence initial={false} mode="popLayout">
-          <motion.span
+          <m.span
             key={text}
             initial={
               reduced
@@ -93,7 +94,7 @@ export function ValueFlash({
             )}
           >
             {text}
-          </motion.span>
+          </m.span>
         </AnimatePresence>
       </span>
       <span className="sr-only" role="status" aria-live="polite">

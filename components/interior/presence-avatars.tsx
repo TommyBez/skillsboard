@@ -13,7 +13,8 @@
  */
 
 import { useEffect, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 export interface PresencePerson {
@@ -78,7 +79,7 @@ export function PresenceAvatars({
       <div className="flex items-center">
         <AnimatePresence initial={false} mode="popLayout">
           {visible.map((person, index) => (
-            <motion.span
+            <m.span
               key={person.id}
               layout={!reduced}
               initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.6 }}
@@ -105,12 +106,12 @@ export function PresenceAvatars({
               ) : (
                 initials(person.name)
               )}
-            </motion.span>
+            </m.span>
           ))}
         </AnimatePresence>
 
         {hidden.length > 0 ? (
-          <motion.span
+          <m.span
             layout={!reduced}
             transition={spring}
             aria-hidden={onOverflowSelect ? undefined : true}
@@ -129,7 +130,7 @@ export function PresenceAvatars({
             ) : (
               `+${hidden.length}`
             )}
-          </motion.span>
+          </m.span>
         ) : null}
       </div>
 

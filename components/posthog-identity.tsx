@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect } from "react"
-import posthog from "posthog-js"
+
+import { loadPostHog } from "@/lib/posthog-browser"
 
 interface PostHogIdentityProps {
   userId: string
@@ -9,7 +10,7 @@ interface PostHogIdentityProps {
 
 export function PostHogIdentity({ userId }: PostHogIdentityProps) {
   useEffect(() => {
-    posthog.identify(userId)
+    void loadPostHog().then((posthog) => posthog.identify(userId))
   }, [userId])
 
   return null

@@ -12,7 +12,8 @@
  */
 
 import { useEffect, useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 interface SkeletonSwapProps {
@@ -87,7 +88,7 @@ export function SkeletonSwap({
     >
       <AnimatePresence initial={false} mode="wait">
         {showing ? (
-          <motion.div
+          <m.div
             key="skeleton"
             initial={{ opacity: 0 }}
             animate={{ opacity: showSkeleton ? 1 : 0 }}
@@ -112,16 +113,16 @@ export function SkeletonSwap({
                 ))}
               </div>
             )}
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div
+          <m.div
             key="content"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: reduced ? 0.08 : 0.2, ease: [0.23, 1, 0.32, 1] }}
           >
             {children}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

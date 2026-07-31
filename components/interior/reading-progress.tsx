@@ -11,7 +11,8 @@
  */
 
 import { useEffect, useState } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { cn } from "@/lib/utils"
 
 interface ReadingProgressProps {
@@ -98,7 +99,7 @@ export function ReadingProgress({
         aria-valuemax={100}
         aria-valuenow={Math.round(quantised * 100)}
       >
-        <motion.div
+        <m.div
           className="absolute inset-y-0 left-0 rounded-full bg-primary"
           style={{ width: `${progress * 100}%` }}
           transition={reduced ? { duration: 0 } : { duration: 0.1, ease: "linear" }}

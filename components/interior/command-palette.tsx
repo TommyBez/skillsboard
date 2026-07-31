@@ -12,7 +12,8 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "motion/react"
+import { AnimatePresence, useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { SearchIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -188,7 +189,7 @@ export function CommandPalette({
             animating out. */}
         <AnimatePresence initial={false} mode="popLayout">
           {results.length === 0 ? (
-            <motion.p
+            <m.p
               key="empty"
               initial={reduced ? { opacity: 0 } : { opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
@@ -197,10 +198,10 @@ export function CommandPalette({
               className="grid h-full place-items-center text-[13px] text-muted-foreground"
             >
               {emptyLabel}
-            </motion.p>
+            </m.p>
           ) : (
             results.map((item, index) => (
-              <motion.div
+              <m.div
                 key={item.id}
                 id={`cmd-${item.id}`}
                 layout={!reduced}
@@ -237,7 +238,7 @@ export function CommandPalette({
                     {item.group}
                   </span>
                 ) : null}
-              </motion.div>
+              </m.div>
             ))
           )}
         </AnimatePresence>

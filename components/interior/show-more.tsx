@@ -11,7 +11,8 @@
  */
 
 import { useEffect, useRef, useState } from "react"
-import { motion, useReducedMotion } from "motion/react"
+import { useReducedMotion } from "motion/react"
+import * as m from "motion/react-m"
 import { ChevronDownIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -70,7 +71,7 @@ export function ShowMore({
 
   return (
     <div className={cn("flex flex-col items-start gap-1", className)}>
-      <motion.div
+      <m.div
         className="relative w-full overflow-hidden"
         animate={height === null ? undefined : { height }}
         initial={false}
@@ -88,7 +89,7 @@ export function ShowMore({
             className="pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-card to-transparent"
           />
         ) : null}
-      </motion.div>
+      </m.div>
 
       {overflows ? (
         <button
@@ -101,14 +102,14 @@ export function ShowMore({
           className="inline-flex items-center gap-1 text-[12px] font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           {isOpen ? lessLabel : moreLabel}
-          <motion.span
+          <m.span
             aria-hidden
             className="flex"
             animate={{ rotate: isOpen ? 180 : 0 }}
             transition={reduced ? { duration: 0 } : { duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
           >
             <ChevronDownIcon className="size-3" />
-          </motion.span>
+          </m.span>
         </button>
       ) : null}
     </div>
