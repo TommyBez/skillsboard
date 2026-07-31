@@ -54,7 +54,7 @@ function SkillCard({
       actions={
         isSaved
           ? <InLibraryLabel name={item.name} />
-          : <AddSkillDialog defaultUrl={item.installUrl} defaultName={item.slug} triggerLabel="Save to library" triggerAriaLabel={`Save ${item.name} to library`} />
+          : <AddSkillDialog defaultUrl={item.installUrl} lockedSkillName={item.slug} triggerLabel="Save to library" triggerAriaLabel={`Save ${item.name} to library`} />
       }
     />
   )

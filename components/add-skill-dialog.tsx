@@ -21,18 +21,23 @@ import {
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { pickDiscoveredSkill } from "@/lib/discovered-skill-selection"
 import type { DiscoveredGitHubSkill } from "@/lib/github-skill-discovery"
 
 interface AddSkillDialogProps {
   defaultUrl?: string
-  defaultName?: string
+  /**
+   * Set when the dialog opens for one catalog entry. The dialog then saves
+   * that skill alone, never the rest of the repository it lives in.
+   */
+  lockedSkillName?: string
   triggerLabel?: string
   triggerAriaLabel?: string
 }
 
 export function AddSkillDialog({
   defaultUrl = "",
-  defaultName = "",
+  lockedSkillName = "",
   triggerLabel = "Save a skill",
   triggerAriaLabel,
 }: AddSkillDialogProps) {
@@ -42,8 +47,12 @@ export function AddSkillDialog({
   const [inspectedUrl, setInspectedUrl] = useState<string | null>(null)
   const [skills, setSkills] = useState<DiscoveredGitHubSkill[]>([])
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
+  const [repositorySkillCount, setRepositorySkillCount] = useState(0)
   const discoveryRequest = useRef(0)
   const lastSinglePath = useRef<string | null>(null)
+
+  const lockedName = lockedSkillName.trim()
+  const isLocked = lockedName.length > 0
 
   const selectedSkills = skills.filter((skill) => selectedPaths.includes(skill.path))
   const selectedCount = selectedSkills.length
@@ -60,6 +69,7 @@ export function AddSkillDialog({
     setInspectedUrl(null)
     setSkills([])
     setSelectedPaths([])
+    setRepositorySkillCount(0)
     setPendingMode(null)
     lastSinglePath.current = null
   }
@@ -84,20 +94,24 @@ export function AddSkillDialog({
         return
       }
 
-      const linked = result.linkedSkillPath === null
-        ? undefined
-        : result.skills.find((skill) => skill.path === result.linkedSkillPath)
-      const preferred = result.skills.find((skill) => (
-        skill.name.toLowerCase() === defaultName.trim().toLowerCase()
-      ))
-      const selection = linked
-        ?? preferred
-        ?? (result.skills.length === 1 ? result.skills[0] : null)
+      const selection = pickDiscoveredSkill({
+        skills: result.skills,
+        linkedSkillPath: result.linkedSkillPath,
+        requestedName: lockedName,
+      })
+
+      // A locked dialog was opened for one catalog skill, so the repository's
+      // other skills are dropped here rather than merely left unchecked.
+      if (isLocked && !selection) {
+        toast.error(`This repository no longer publishes the ${lockedName} skill.`)
+        return
+      }
 
       setRepositoryUrl(result.githubUrl)
       setInspectedUrl(result.githubUrl)
-      setSkills(result.skills)
+      setSkills(isLocked && selection ? [selection] : result.skills)
       setSelectedPaths(selection ? [selection.path] : [])
+      setRepositorySkillCount(result.skills.length)
     } catch (error) {
       if (requestId !== discoveryRequest.current) return
       console.error("Unable to inspect repository", error)
@@ -200,9 +214,13 @@ export function AddSkillDialog({
             <span className="mb-2 flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground">
               <GitBranchIcon className="size-5" aria-hidden="true" />
             </span>
-            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Save a skill</DialogTitle>
+            <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">
+              {isLocked ? `Save ${lockedName}` : "Save a skill"}
+            </DialogTitle>
             <DialogDescription className="max-w-md leading-relaxed">
-              Add its GitHub repository or direct skill link. Skills Board finds the installable skills and keeps the selected source, command, and ZIP together.
+              {isLocked
+                ? "Skills Board reads this skill from its GitHub source and keeps the source, command, and ZIP together. Only this skill is added — not the rest of its repository."
+                : "Add its GitHub repository or direct skill link. Skills Board finds the installable skills and keeps the selected source, command, and ZIP together."}
             </DialogDescription>
           </DialogHeader>
 
@@ -225,7 +243,7 @@ export function AddSkillDialog({
               <FieldDescription>Paste a repository or a direct skill link. We read its valid SKILL.md metadata; the install name is not entered manually.</FieldDescription>
             </Field>
 
-            {skills.length > 1 ? (
+            {!isLocked && skills.length > 1 ? (
               <Field className="reveal-enter">
                 <FieldLabel id="skillSelectionLabel">Skills in this repository</FieldLabel>
                 <div
@@ -277,6 +295,11 @@ export function AddSkillDialog({
                   <p className="font-mono text-sm font-semibold text-foreground">{singleSelectedSkill.name}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{singleSelectedSkill.description}</p>
                 </div>
+                {isLocked && repositorySkillCount > 1 ? (
+                  <FieldDescription>
+                    This repository publishes {repositorySkillCount} skills. Only {singleSelectedSkill.name} is saved here — add the others from your library’s “Add a skill” flow.
+                  </FieldDescription>
+                ) : null}
               </Field>
             ) : null}
 
