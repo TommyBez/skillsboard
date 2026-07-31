@@ -1,0 +1,33 @@
+name: Cleanup Neon preview branch
+
+# When a PR is merged into main, delete the Neon database branch that the
+# Neon <> Vercel integration created for its preview deployments
+# (named `preview/<git-branch>`).
+#
+# Requires:
+#   - repository variable NEON_PROJECT_ID (Neon console -> Project settings)
+#   - repository secret  NEON_API_KEY    (Neon console -> Account -> API keys)
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  delete-neon-branch:
+    name: Delete Neon preview branch
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Delete branch preview/${{ github.event.pull_request.head.ref }}
+        uses: neondatabase/delete-branch-action@v3
+        # The Vercel integration may have already removed the branch (e.g. via
+        # "automatically delete obsolete branches"), so a missing branch is fine.
+        continue-on-error: true
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/${{ github.event.pull_request.head.ref }}
+          api_key: ${{ secrets.NEON_API_KEY }}

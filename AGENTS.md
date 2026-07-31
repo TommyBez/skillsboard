@@ -13,7 +13,7 @@
 - After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 
 ### Database schema
-The Neon `development` branch is normally already aligned. `pnpm db:push` reads `.env.local` through `drizzle.config.ts` and pushes every table defined in `lib/db/schema.ts` within the `public` schema, including Better Auth and the custom `skill` table. Confirm that `.env.local` targets the `development` branch before running it. This repository does not use standalone SQL migration scripts.
+The schema lives in `lib/db/schema.ts` and is managed with versioned Drizzle migrations committed in `drizzle/` (see `docs/database-migrations.md`). After editing the schema, run `pnpm db:generate --name <description>` and commit the generated SQL together with the schema change — do not hand-edit `drizzle/meta/`. Vercel builds apply pending migrations automatically (`vercel-build` runs `drizzle-kit migrate` before `next build`): preview builds against the Neon `preview/<git-branch>` database branch, production builds against Neon `main`. To align the database in `.env.local` (normally the Neon `development` branch), run `pnpm db:migrate`. `pnpm db:push` remains for throwaway prototyping only; never push to a migration-managed database, or the next `db:migrate` will fail on drift.
 
 ### Gotchas
 - `pnpm lint` runs `eslint .`, but ESLint is **not** a declared dependency and there is no ESLint config, so it fails out of the box (not a code problem). For type checking use `npx tsc --noEmit`.
