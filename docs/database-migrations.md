@@ -33,19 +33,16 @@ a generated migration instead.
 
 ## One-time setup
 
-### 1. Baseline existing databases
+### 1. Existing databases (no action needed)
 
-Databases created with `db:push` before migrations existed (Neon `main` and
-`development` branches) already have the schema of `drizzle/0000_init.sql`, so
-that migration must be recorded as applied without running it:
-
-```bash
-DATABASE_URL="<production connection string>" pnpm db:baseline
-DATABASE_URL="<development connection string>" pnpm db:baseline
-```
-
-The script only inserts rows into `drizzle.__drizzle_migrations`; it executes
-no DDL. Preview branches forked after the baseline inherit it automatically.
+The Neon `main` and `development` branches were created with `db:push` before
+migrations existed, so they already have the schema of `drizzle/0000_init.sql`.
+That migration is written to be idempotent (`IF NOT EXISTS` on tables/indexes,
+`duplicate_object` guards on foreign keys): the first `drizzle-kit migrate`
+against such a database executes it as a no-op and records it as applied in
+`drizzle.__drizzle_migrations`. Fresh databases get the full schema from the
+same file. Later migrations do not need to be idempotent — only this baseline
+one is.
 
 ### 2. Neon integration on Vercel
 

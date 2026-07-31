@@ -33,7 +33,6 @@
     "video:render:launch": "pnpm video:render:product-hunt && pnpm video:render:social && pnpm video:render:team-loop",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:baseline": "node scripts/db-baseline.mjs",
     "db:push": "drizzle-kit push",
     "vercel-build": "drizzle-kit migrate && next build",
     "email": "email dev --dir emails --port 3001"

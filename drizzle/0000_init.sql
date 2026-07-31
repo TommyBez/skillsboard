@@ -1,4 +1,8 @@
-CREATE TABLE "account" (
+-- Baseline migration. Written to be idempotent (IF NOT EXISTS / duplicate_object
+-- guards) so it applies cleanly both to fresh databases and to the pre-existing
+-- Neon branches whose schema was created with `drizzle-kit push` before this
+-- repo adopted versioned migrations. Later migrations do not need this.
+CREATE TABLE IF NOT EXISTS "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
 	"providerId" text NOT NULL,
@@ -14,7 +18,7 @@ CREATE TABLE "account" (
 	"updatedAt" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "collection" (
+CREATE TABLE IF NOT EXISTS "collection" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organizationId" text NOT NULL,
 	"createdBy" text NOT NULL,
@@ -25,7 +29,7 @@ CREATE TABLE "collection" (
 	"updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "collectionSkill" (
+CREATE TABLE IF NOT EXISTS "collectionSkill" (
 	"collectionId" uuid NOT NULL,
 	"skillId" uuid NOT NULL,
 	"addedBy" text NOT NULL,
@@ -33,7 +37,7 @@ CREATE TABLE "collectionSkill" (
 	CONSTRAINT "collectionSkill_pkey" PRIMARY KEY("collectionId","skillId")
 );
 --> statement-breakpoint
-CREATE TABLE "invitation" (
+CREATE TABLE IF NOT EXISTS "invitation" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organizationId" text NOT NULL,
 	"email" text NOT NULL,
@@ -44,7 +48,7 @@ CREATE TABLE "invitation" (
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "jwks" (
+CREATE TABLE IF NOT EXISTS "jwks" (
 	"id" text PRIMARY KEY NOT NULL,
 	"publicKey" text NOT NULL,
 	"privateKey" text NOT NULL,
@@ -52,7 +56,7 @@ CREATE TABLE "jwks" (
 	"expiresAt" timestamp with time zone
 );
 --> statement-breakpoint
-CREATE TABLE "member" (
+CREATE TABLE IF NOT EXISTS "member" (
 	"id" text PRIMARY KEY NOT NULL,
 	"organizationId" text NOT NULL,
 	"userId" text NOT NULL,
@@ -60,7 +64,7 @@ CREATE TABLE "member" (
 	"createdAt" timestamp with time zone NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "oauthAccessToken" (
+CREATE TABLE IF NOT EXISTS "oauthAccessToken" (
 	"id" text PRIMARY KEY NOT NULL,
 	"token" text NOT NULL,
 	"clientId" text NOT NULL,
@@ -74,7 +78,7 @@ CREATE TABLE "oauthAccessToken" (
 	CONSTRAINT "oauthAccessToken_token_key" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "oauthClient" (
+CREATE TABLE IF NOT EXISTS "oauthClient" (
 	"id" text PRIMARY KEY NOT NULL,
 	"clientId" text NOT NULL,
 	"clientSecret" text,
@@ -108,7 +112,7 @@ CREATE TABLE "oauthClient" (
 	CONSTRAINT "oauthClient_clientId_key" UNIQUE("clientId")
 );
 --> statement-breakpoint
-CREATE TABLE "oauthConsent" (
+CREATE TABLE IF NOT EXISTS "oauthConsent" (
 	"id" text PRIMARY KEY NOT NULL,
 	"userId" text NOT NULL,
 	"clientId" text NOT NULL,
@@ -118,7 +122,7 @@ CREATE TABLE "oauthConsent" (
 	"updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "oauthRefreshToken" (
+CREATE TABLE IF NOT EXISTS "oauthRefreshToken" (
 	"id" text PRIMARY KEY NOT NULL,
 	"token" text NOT NULL,
 	"clientId" text NOT NULL,
@@ -133,7 +137,7 @@ CREATE TABLE "oauthRefreshToken" (
 	CONSTRAINT "oauthRefreshToken_token_key" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "organization" (
+CREATE TABLE IF NOT EXISTS "organization" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"slug" text NOT NULL,
@@ -143,7 +147,7 @@ CREATE TABLE "organization" (
 	CONSTRAINT "organization_slug_key" UNIQUE("slug")
 );
 --> statement-breakpoint
-CREATE TABLE "session" (
+CREATE TABLE IF NOT EXISTS "session" (
 	"id" text PRIMARY KEY NOT NULL,
 	"expiresAt" timestamp with time zone NOT NULL,
 	"token" text NOT NULL,
@@ -156,7 +160,7 @@ CREATE TABLE "session" (
 	CONSTRAINT "session_token_key" UNIQUE("token")
 );
 --> statement-breakpoint
-CREATE TABLE "skill" (
+CREATE TABLE IF NOT EXISTS "skill" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"organizationId" text NOT NULL,
 	"createdBy" text NOT NULL,
@@ -177,7 +181,7 @@ CREATE TABLE "skill" (
 	"updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "user" (
+CREATE TABLE IF NOT EXISTS "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -188,7 +192,7 @@ CREATE TABLE "user" (
 	CONSTRAINT "user_email_key" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE "verification" (
+CREATE TABLE IF NOT EXISTS "verification" (
 	"id" text PRIMARY KEY NOT NULL,
 	"identifier" text NOT NULL,
 	"value" text NOT NULL,
@@ -197,19 +201,52 @@ CREATE TABLE "verification" (
 	"updatedAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
 );
 --> statement-breakpoint
-ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "collectionSkill" ADD CONSTRAINT "collectionSkill_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "public"."collection"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "collectionSkill" ADD CONSTRAINT "collectionSkill_skillId_fkey" FOREIGN KEY ("skillId") REFERENCES "public"."skill"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "member" ADD CONSTRAINT "member_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "member" ADD CONSTRAINT "member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "oauthAccessToken" ADD CONSTRAINT "oauthAccessToken_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "oauthConsent" ADD CONSTRAINT "oauthConsent_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "oauthRefreshToken" ADD CONSTRAINT "oauthRefreshToken_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-CREATE INDEX "collection_org_created_idx" ON "collection" USING btree ("organizationId","createdAt");--> statement-breakpoint
-CREATE INDEX "collectionSkill_skill_idx" ON "collectionSkill" USING btree ("skillId");--> statement-breakpoint
-CREATE UNIQUE INDEX "member_org_user_unique" ON "member" USING btree ("organizationId","userId");--> statement-breakpoint
-CREATE INDEX "skill_org_created_idx" ON "skill" USING btree ("organizationId","createdAt");--> statement-breakpoint
-CREATE UNIQUE INDEX "skill_org_repo_name_unique" ON "skill" USING btree ("organizationId","githubUrl","skillName");
+DO $$ BEGIN
+ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collectionSkill" ADD CONSTRAINT "collectionSkill_collectionId_fkey" FOREIGN KEY ("collectionId") REFERENCES "public"."collection"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "collectionSkill" ADD CONSTRAINT "collectionSkill_skillId_fkey" FOREIGN KEY ("skillId") REFERENCES "public"."skill"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invitation" ADD CONSTRAINT "invitation_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "invitation" ADD CONSTRAINT "invitation_inviterId_fkey" FOREIGN KEY ("inviterId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "member" ADD CONSTRAINT "member_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "public"."organization"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "member" ADD CONSTRAINT "member_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "oauthAccessToken" ADD CONSTRAINT "oauthAccessToken_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "oauthConsent" ADD CONSTRAINT "oauthConsent_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "oauthRefreshToken" ADD CONSTRAINT "oauthRefreshToken_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "public"."oauthClient"("clientId") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "collection_org_created_idx" ON "collection" USING btree ("organizationId","createdAt");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "collectionSkill_skill_idx" ON "collectionSkill" USING btree ("skillId");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "member_org_user_unique" ON "member" USING btree ("organizationId","userId");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "skill_org_created_idx" ON "skill" USING btree ("organizationId","createdAt");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "skill_org_repo_name_unique" ON "skill" USING btree ("organizationId","githubUrl","skillName");
