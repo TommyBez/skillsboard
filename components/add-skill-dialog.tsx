@@ -230,14 +230,23 @@ export function AddSkillDialog({
                 type="url"
                 value={repositoryUrl}
                 onChange={(event) => {
+                  // A locked dialog is bound to its catalog entry's source.
+                  // Repointing it elsewhere would let a repository whose sole
+                  // skill carries another name pass the selection fallbacks.
+                  if (isLocked) return
                   setRepositoryUrl(event.target.value)
                   resetDiscovery()
                 }}
+                readOnly={isLocked}
                 disabled={pendingMode !== null}
                 placeholder="https://github.com/vercel-labs/skills"
                 required
               />
-              <FieldDescription>Paste a repository or a direct skill link. We read its valid SKILL.md metadata; the install name is not entered manually.</FieldDescription>
+              <FieldDescription>
+                {isLocked
+                  ? `The source published for ${lockedName} in the catalog. We read its valid SKILL.md metadata; the install name is not entered manually.`
+                  : "Paste a repository or a direct skill link. We read its valid SKILL.md metadata; the install name is not entered manually."}
+              </FieldDescription>
             </Field>
 
             {!isLocked && skills.length > 1 ? (

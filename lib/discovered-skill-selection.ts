@@ -23,6 +23,11 @@ export interface PickDiscoveredSkillInput<T extends SelectableSkill> {
  *
  * Returns null when the repository no longer publishes the requested skill,
  * which the caller surfaces instead of silently offering the neighbours.
+ *
+ * The fallbacks below absorb drift between a catalog slug and the SKILL.md it
+ * points at, so they only hold while `skills` comes from the source the entry
+ * itself published: a caller that lets the source be repointed would let an
+ * unrelated single-skill repository satisfy the request.
  */
 export function pickDiscoveredSkill<T extends SelectableSkill>({
   skills,
