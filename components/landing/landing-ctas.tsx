@@ -6,6 +6,7 @@ import base from "@/components/landing/styles/base.module.css"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getSession } from "@/lib/session"
 
@@ -34,12 +35,25 @@ export function primaryCtaEventProperties(
 }
 
 /**
- * Streaming placeholder for the command strip. Same reasoning as
- * `HomeCtaFallback`: without script this is the final render, so it has to be
- * the working anonymous strip rather than two grey boxes.
+ * Streaming placeholder for the command strip.
+ *
+ * Keep the theme toggle (auth-independent) and skeleton the auth-dependent
+ * controls so signed-in visitors do not flash the anonymous "Sign in" /
+ * "Create your team library" strip while the session resolves.
  */
 export function HomeHeaderActionsFallback() {
-  return <HomeHeaderActionsView signedIn={false} />
+  return (
+    <div
+      className="flex items-center gap-2"
+      aria-busy="true"
+      aria-label="Loading navigation"
+      role="status"
+    >
+      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
+      <Skeleton className="hidden h-9 w-16 rounded-[3px] sm:block" aria-hidden="true" />
+      <Skeleton className="h-8 w-16 rounded-[3px] sm:h-9 sm:w-44" aria-hidden="true" />
+    </div>
+  )
 }
 
 /**
