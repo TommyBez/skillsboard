@@ -30,3 +30,8 @@ next-env.d.ts
 
 # Remotion render output
 out/
+
+# Launch video renders (regenerate with pnpm video:render:*);
+# keep the landing-page loop that ships with the app.
+public/launch/*.mp4
+!public/launch/skills-board-team-loop.mp4
