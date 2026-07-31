@@ -28,6 +28,8 @@ interface TagInputProps {
   label: string
   placeholder?: string
   name?: string
+  disabled?: boolean
+  describedBy?: string
   className?: string
 }
 
@@ -42,6 +44,8 @@ export function TagInput({
   label,
   placeholder = "Add a tag",
   name,
+  disabled = false,
+  describedBy,
   className,
 }: TagInputProps) {
   const reduced = useReducedMotion()
@@ -118,7 +122,8 @@ export function TagInput({
           "flex min-h-9 flex-wrap items-center gap-1.5 rounded-md border bg-transparent px-2 py-1.5",
           "transition-[border-color] duration-[var(--duration-press)]",
           "focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/40",
-          error ? "border-destructive" : "border-input"
+          error ? "border-destructive" : "border-input",
+          disabled && "cursor-not-allowed opacity-50"
         )}
       >
         <AnimatePresence initial={false} mode="popLayout">
@@ -166,8 +171,8 @@ export function TagInput({
           id={inputId}
           value={draft}
           placeholder={tags.length >= max ? "" : placeholder}
-          disabled={tags.length >= max}
-          aria-describedby={error ? `${inputId}-error` : undefined}
+          disabled={disabled || tags.length >= max}
+          aria-describedby={error ? `${inputId}-error` : describedBy}
           onChange={(event) => {
             setDraft(event.target.value)
             setError(null)

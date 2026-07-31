@@ -1,3 +1,4 @@
+import { TagInput } from "@/components/interior/tag-input"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -53,15 +54,19 @@ export function CollectionDetailsFields({
         <FieldDescription>Shared with your team. Up to 500 characters.</FieldDescription>
       </Field>
       <Field>
-        <FieldLabel htmlFor={`${idPrefix}-tags`}>Tags (optional)</FieldLabel>
-        <Input
-          id={`${idPrefix}-tags`}
+        {/* Tags were a comma-separated text field: nothing showed you what had
+            been parsed until after saving. TagInput commits each tag to a chip
+            as you type, and still submits the same comma-joined value the
+            server action already parses. */}
+        <TagInput
           name="tags"
-          defaultValue={defaultTags.join(", ")}
+          label="Tags (optional)"
+          defaultValue={defaultTags}
+          max={10}
           placeholder="research, onboarding"
           disabled={disabled}
         />
-        <FieldDescription>Comma-separated, up to 10 tags.</FieldDescription>
+        <FieldDescription>Press Enter or comma to add. Up to 10 tags.</FieldDescription>
       </Field>
     </>
   )
