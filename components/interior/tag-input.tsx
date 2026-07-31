@@ -111,9 +111,11 @@ export function TagInput({
     if (next.length !== tags.length) commit(next)
   }
 
-  function remove(tag: string) {
+  /* By position, not by value. Filtering on the value removed every matching
+     chip at once, which made the advertised allowDuplicates mode unusable. */
+  function removeAt(index: number) {
     setError(null)
-    commit(tags.filter((entry) => entry !== tag))
+    commit(tags.filter((_, position) => position !== index))
   }
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -127,7 +129,7 @@ export function TagInput({
     }
     if (event.key === "Backspace" && draft === "" && tags.length > 0) {
       if (armed) {
-        remove(tags[tags.length - 1])
+        removeAt(tags.length - 1)
         setArmed(false)
       } else {
         setArmed(true)
@@ -158,7 +160,7 @@ export function TagInput({
             const isArmed = armed && index === tags.length - 1
             return (
               <motion.span
-                key={tag}
+                key={`${index}:${tag}`}
                 layout={!reduced}
                 initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.86 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -182,7 +184,7 @@ export function TagInput({
                   aria-label={`Remove ${tag}`}
                   onClick={(event) => {
                     event.stopPropagation()
-                    remove(tag)
+                    removeAt(index)
                   }}
                   className="grid size-3.5 place-items-center rounded-full text-muted-foreground transition-colors hover:text-foreground"
                 >
@@ -212,7 +214,12 @@ export function TagInput({
             const text = event.clipboardData.getData("text/plain")
             if (!text) return
             event.preventDefault()
-            add(draft + text)
+            // Paste where the caret is, replacing any selection, rather than
+            // appending — otherwise pasting mid-draft reorders what you typed.
+            const { selectionStart, selectionEnd } = event.currentTarget
+            const start = selectionStart ?? draft.length
+            const end = selectionEnd ?? draft.length
+            add(`${draft.slice(0, start)}${text}${draft.slice(end)}`)
             setArmed(false)
           }}
           onBlur={() => {

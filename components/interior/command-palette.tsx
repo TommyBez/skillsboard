@@ -74,6 +74,7 @@ export function CommandPalette({
   const [query, setQuery] = useState("")
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
   const listId = "command-palette-list"
 
   const results = useMemo(() => {
@@ -90,7 +91,32 @@ export function CommandPalette({
     if (autoFocus) inputRef.current?.focus()
   }, [autoFocus])
 
+  // The list is taller than its box once results exceed maxRows, so arrowing
+  // past the fold would move a selection nobody could see.
+  useEffect(() => {
+    listRef.current
+      ?.querySelector('[aria-selected="true"]')
+      ?.scrollIntoView({ block: "nearest" })
+  }, [active, results])
+
+  /* Focus stays in the palette while it is open. The dialog claims
+     aria-modal, the rows are not focusable, and every key this component
+     handles is bound to the container — so letting Tab reach the page behind
+     would strip the arrow keys and Escape from a keyboard user without any
+     visible sign. Focus is handed back to whatever had it on dismissal. */
+  useEffect(() => {
+    const previous = document.activeElement as HTMLElement | null
+    return () => previous?.focus?.()
+  }, [])
+
   function onKeyDown(event: React.KeyboardEvent) {
+    if (event.key === "Tab") {
+      // Nothing inside is tabbable but the field, so the trap is simply:
+      // Tab keeps focus on it rather than escaping to the page behind.
+      event.preventDefault()
+      inputRef.current?.focus()
+      return
+    }
     if (event.key === "Escape") {
       event.preventDefault()
       onDismiss()
@@ -142,6 +168,7 @@ export function CommandPalette({
       </div>
 
       <div
+        ref={listRef}
         id={listId}
         role="listbox"
         aria-label={label}

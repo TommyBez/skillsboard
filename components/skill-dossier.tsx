@@ -127,13 +127,19 @@ export function SkillDossier({
             /* A hard line-clamp truncated the description with no way to read
                the rest. ShowMore keeps the same resting height but makes the
                remainder reachable, and animates the height rather than
-               re-wrapping the text. */
+               re-wrapping the text.
+
+               The typography sits on ShowMore rather than on the paragraph:
+               it derives the clamp from the computed line height of the
+               element it wraps, so a font size declared further in would leave
+               it measuring the card's line height and the collapsed box would
+               not be the requested number of lines. */
             <ShowMore
               lines={compact ? 2 : 3}
               label={`Show the full description of ${name}`}
-              className="w-full"
+              className={cn("w-full leading-relaxed", compact ? "text-sm" : "text-sm md:text-base")}
             >
-              <p className={cn("text-pretty leading-relaxed text-muted-foreground", compact ? "text-sm" : "text-sm md:text-base")}>
+              <p className="text-pretty text-muted-foreground">
                 {description}
               </p>
             </ShowMore>

@@ -11,7 +11,7 @@
  * path, because drag alone is not an accessible way to reorder anything.
  */
 
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Reorder, useDragControls, useReducedMotion } from "motion/react"
 import { GripVerticalIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -40,8 +40,14 @@ export function ReorderList<T>({
   className,
 }: ReorderListProps<T>) {
   const reduced = useReducedMotion()
-  const list = [...items]
+  // Rebuilding this every render meant `move`'s useCallback never matched.
+  const list = useMemo(() => [...items], [items])
+  const settle = useRef(0)
 
+  /* The drag path commits once, on drop. The keyboard path would otherwise
+     commit on every arrow step, so a held key becomes one write per row — the
+     opposite of the documented contract that onCommit fires when the
+     interaction settles. Let the steps land first, then persist. */
   const move = useCallback(
     (from: number, to: number) => {
       if (to < 0 || to >= list.length) return
@@ -49,10 +55,15 @@ export function ReorderList<T>({
       const [moved] = next.splice(from, 1)
       next.splice(to, 0, moved)
       onReorder(next)
-      onCommit?.(next)
+
+      if (!onCommit) return
+      window.clearTimeout(settle.current)
+      settle.current = window.setTimeout(() => onCommit(next), 400)
     },
     [list, onReorder, onCommit]
   )
+
+  useEffect(() => () => window.clearTimeout(settle.current), [])
 
   return (
     <Reorder.Group

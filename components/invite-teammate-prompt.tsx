@@ -20,22 +20,25 @@ export function InviteTeammatePrompt({ teamId }: { teamId: string }) {
      shifting the page. */
   const [state, setState] = useState<BannerState>("expanded")
 
+  /* Resolve storage and report the view in one pass. Split across two effects,
+     the view event fired against the initial "expanded" state before the
+     stored value landed, so a dismissed prompt still counted as seen — and a
+     team change briefly carried the previous team's state. */
   useEffect(() => {
+    let next: BannerState = "expanded"
     try {
       const stored = window.localStorage.getItem(storageKey(teamId))
-      if (stored === "collapsed" || stored === "dismissed") setState(stored)
+      if (stored === "collapsed" || stored === "dismissed") next = stored
     } catch {
       // Private mode or blocked storage: the banner simply stays expanded.
     }
-  }, [teamId])
-
-  useEffect(() => {
-    if (state === "dismissed") return
+    setState(next)
+    if (next === "dismissed") return
     captureAnalyticsEvent("team_invite_prompt_viewed", {
       surface: "library_after_first_skill",
       team_id: teamId,
     })
-  }, [teamId, state])
+  }, [teamId])
 
   function persist(next: BannerState) {
     setState(next)

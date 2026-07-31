@@ -71,7 +71,11 @@ export function PresenceAvatars({
 
   return (
     <div className={cn("flex items-center", className)}>
-      <div aria-hidden className="flex items-center">
+      {/* aria-hidden belongs on the decorative faces, not on the whole row:
+          when onOverflowSelect makes the chip a real button, hiding its
+          container left a control that screen readers skipped but Tab still
+          reached. The spoken roster is the live region below. */}
+      <div className="flex items-center">
         <AnimatePresence initial={false} mode="popLayout">
           {visible.map((person, index) => (
             <motion.span
@@ -81,6 +85,7 @@ export function PresenceAvatars({
               animate={{ opacity: 1, scale: 1 }}
               exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.6 }}
               transition={spring}
+              aria-hidden
               title={person.name}
               style={{
                 width: size,
@@ -108,6 +113,7 @@ export function PresenceAvatars({
           <motion.span
             layout={!reduced}
             transition={spring}
+            aria-hidden={onOverflowSelect ? undefined : true}
             style={{ width: size, height: size, marginLeft: -overlap }}
             className="grid shrink-0 place-items-center rounded-full border-2 border-background bg-muted text-[10px] font-semibold tabular-nums text-muted-foreground"
           >

@@ -152,6 +152,9 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
     const observer = new IntersectionObserver(
       (entries) => {
         if (!entries.some((entry) => entry.isIntersecting)) return
+        // A request already in flight would make loadMore return immediately;
+        // counting that callback would shrink the next automatic window.
+        if (loadingRef.current) return
         if (autoLoadsRef.current >= MAX_AUTO_LOADS) {
           setAutoExhausted(true)
           return

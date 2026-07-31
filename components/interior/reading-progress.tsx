@@ -48,10 +48,15 @@ export function ReadingProgress({
       const viewport = scroller?.current
         ? scroller.current.getBoundingClientRect().height
         : window.innerHeight
-      // Distance the element still has to travel before its end reaches the fold.
-      const travelled = viewport - box.top
-      const total = box.height + viewport
-      const ratio = total > 0 ? travelled / total : 0
+      /* Measure the reading window, not the element's full travel across the
+         viewport. 0 is the article's top at the top of the fold, 1 is its
+         bottom at the bottom of the fold — so reaching the end of the text
+         reads as finished. Dividing by height + viewport instead only hit 1
+         once the article had scrolled entirely out of sight, which left the
+         readout claiming unread minutes at the last paragraph.
+         An article shorter than the fold is wholly visible, so it is done. */
+      const scrollable = box.height - viewport
+      const ratio = scrollable > 0 ? -box.top / scrollable : 1
       setProgress(Math.min(1, Math.max(0, ratio)))
     }
 

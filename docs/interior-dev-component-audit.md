@@ -18,9 +18,11 @@ Every one of the 54 components has exactly one dependency: **`motion`**
 thing on every page — one dependency, and the component file is copied into your
 project rather than installed.
 
-This collides with two facts about this repo:
+This collided with two facts about this repo **as it stood at the stamp
+commit**. `package.json` now ships `motion@^12.43.0`; §8 records that decision
+and supersedes the state described here.
 
-1. `motion` is **not** a dependency. `package.json` contains no `motion` and no
+1. `motion` was **not** a dependency. `package.json` contains no `motion` and no
    `framer-motion`. All product motion today is CSS (`app/globals.css` +
    ~8,900 lines of landing CSS Modules) plus one vanilla-JS scroll controller
    (`components/landing/landing-motion-controller.tsx`).
@@ -435,10 +437,16 @@ sufficient. Unwired.
 ### Not working — `hold-to-confirm` is unverified and unwired
 
 Browser testing found that `HoldToConfirm` never advances: the native
-`pointerdown` reaches the button, but React never re-renders the component, so
-`start()` never runs and the fill stays at 0%. A **full hold does not fire
-`onConfirm`**, which meant that while it was wired into the delete dialogs,
-deleting a skill or a collection was impossible.
+`pointerdown` reaches the button, the fill stays at 0%, and a **full hold does
+not fire `onConfirm`** — which meant that while it was wired into the delete
+dialogs, deleting a skill or a collection was impossible.
+
+The cause was never established. An earlier version of this note blamed React
+not re-rendering; that claim went further than the evidence. `start` is bound
+straight to `onPointerDown` and only touches refs before scheduling a frame,
+so it needs no re-render, and the observation behind the claim — no mutations
+on the fill element — is also what a progress value stalled below the
+quantisation threshold would look like.
 
 Both dialogs are therefore back on their original destructive button, verified
 working (skill count 1 → 0 through the UI). The component stays in
