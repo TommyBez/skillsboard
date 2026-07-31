@@ -1,37 +1,17 @@
 "use client"
 
-import {
-  createContext,
-  useContext,
-  useTransition,
-  type ReactNode,
-  type TransitionStartFunction,
-} from "react"
+/**
+ * Discover-specific pieces on top of the shared pending-filter plumbing in
+ * components/pending-filters.tsx (which Library and Collections use too).
+ */
 
 import { Skeleton } from "@/components/ui/skeleton"
 
-const DiscoverPendingContext = createContext<{
-  isPending: boolean
-  startTransition: TransitionStartFunction
-} | null>(null)
-
-export function DiscoverPendingProvider({ children }: { children: ReactNode }) {
-  const [isPending, startTransition] = useTransition()
-
-  return (
-    <DiscoverPendingContext.Provider value={{ isPending, startTransition }}>
-      {children}
-    </DiscoverPendingContext.Provider>
-  )
-}
-
-export function useDiscoverPending() {
-  const value = useContext(DiscoverPendingContext)
-  if (!value) {
-    throw new Error("useDiscoverPending must be used within DiscoverPendingProvider")
-  }
-  return value
-}
+export {
+  FilterPendingProvider as DiscoverPendingProvider,
+  PendingResultsSlot as DiscoverResultsSlot,
+  useFilterPending as useDiscoverPending,
+} from "@/components/pending-filters"
 
 export function DiscoverResultsFallback() {
   return (
@@ -42,24 +22,6 @@ export function DiscoverResultsFallback() {
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="hidden h-72 rounded-2xl xl:block" />
       <Skeleton className="hidden h-72 rounded-2xl xl:block" />
-    </div>
-  )
-}
-
-/**
- * Keep the previous results on screen, dimmed, while a catalog navigation
- * transition is in flight. Swapping to skeletons would drop scroll position
- * and flash layout; dimming reads as "updating" without losing context.
- */
-export function DiscoverResultsSlot({ children }: { children: ReactNode }) {
-  const { isPending } = useDiscoverPending()
-  return (
-    <div
-      className="discover-results-slot"
-      data-pending={isPending || undefined}
-      aria-busy={isPending || undefined}
-    >
-      {children}
     </div>
   )
 }

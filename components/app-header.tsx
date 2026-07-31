@@ -3,6 +3,7 @@ import { CableIcon, FolderOpenIcon, LibraryBigIcon, SearchIcon } from "lucide-re
 import { AccountMenu } from "@/components/account-menu"
 import { AppNavLink } from "@/components/app-nav-link"
 import { Brand } from "@/components/brand"
+import { CommandMenuTrigger } from "@/components/command-menu-trigger"
 import { CreateOrganizationDialog } from "@/components/create-organization-dialog"
 import { MobileNavBar } from "@/components/mobile-nav-bar"
 import { OrganizationSwitcher } from "@/components/organization-switcher"
@@ -20,7 +21,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
     <>
       <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center gap-3 px-4 md:px-6 lg:px-8">
-          <Brand />
+          <Brand compactOnMobile />
 
           <nav className="ml-3 hidden items-center gap-1 rounded-xl border border-border bg-card/65 p-1 md:flex" aria-label="Product navigation">
             <AppNavLink href="/library">Library</AppNavLink>
@@ -38,6 +39,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
           </nav>
 
           <div className="ml-auto flex min-w-0 items-center gap-2">
+            <CommandMenuTrigger />
             <div className="flex items-center gap-1.5">
               <OrganizationSwitcher organizations={organizations} activeId={activeId} />
               <CreateOrganizationDialog />

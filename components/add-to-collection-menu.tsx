@@ -34,16 +34,29 @@ export function AddToCollectionMenu({
 }: AddToCollectionMenuProps) {
   const router = useRouter()
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [pendingCollectionId, setPendingCollectionId] = useState<string | null>(null)
-  const memberIds = new Set(memberCollectionIds)
+  // Optimistic membership on top of the server-provided list: checkboxes
+  // flip the moment they are clicked, several can save at once, and only a
+  // failed toggle snaps back.
+  const [overrides, setOverrides] = useState<Map<string, boolean>>(new Map())
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set())
+  const serverMemberIds = new Set(memberCollectionIds)
+  const isMember = (collectionId: string) =>
+    overrides.get(collectionId) ?? serverMemberIds.has(collectionId)
+  const memberCount = collections.reduce(
+    (total, item) => total + (isMember(item.id) ? 1 : 0),
+    0,
+  )
 
   async function toggleMembership(collectionId: string, collectionTitle: string, nextChecked: boolean) {
-    setPendingCollectionId(collectionId)
+    const wasChecked = isMember(collectionId)
+    setOverrides((current) => new Map(current).set(collectionId, nextChecked))
+    setPendingIds((current) => new Set(current).add(collectionId))
     try {
       const result = nextChecked
         ? await addSkillToCollection({ collectionId, skillId, surface: "library" })
         : await removeSkillFromCollection({ collectionId, skillId, surface: "library" })
       if (!result.ok) {
+        setOverrides((current) => new Map(current).set(collectionId, wasChecked))
         toast.error(result.error)
         return
       }
@@ -52,10 +65,15 @@ export function AddToCollectionMenu({
         : `Removed from ${collectionTitle}`)
       router.refresh()
     } catch (error) {
+      setOverrides((current) => new Map(current).set(collectionId, wasChecked))
       console.error("Unable to update collection membership", error)
       toast.error("We couldn’t update this collection. Try again.")
     } finally {
-      setPendingCollectionId(null)
+      setPendingIds((current) => {
+        const next = new Set(current)
+        next.delete(collectionId)
+        return next
+      })
     }
   }
 
@@ -81,41 +99,36 @@ export function AddToCollectionMenu({
             <Button
               variant="outline"
               size="sm"
-              disabled={pendingCollectionId !== null}
-              aria-busy={pendingCollectionId !== null || undefined}
+              aria-busy={pendingIds.size > 0 || undefined}
               aria-label={`Manage collections for ${skillName}`}
             />
           )}
         >
-          {pendingCollectionId !== null ? (
+          {pendingIds.size > 0 ? (
             <Loader2Icon className="size-4 animate-spin" data-icon="inline-start" aria-hidden="true" />
           ) : (
             <FolderPlusIcon data-icon="inline-start" />
           )}
-          {pendingCollectionId !== null
-            ? "Saving…"
-            : memberIds.size
-              ? `Collections (${memberIds.size})`
-              : "Add to collection"}
+          {memberCount ? `Collections (${memberCount})` : "Add to collection"}
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuGroup>
             <DropdownMenuLabel>{collections.length ? "Add to collection" : "No collections yet"}</DropdownMenuLabel>
             {collections.map((item) => {
-              const isSaving = pendingCollectionId === item.id
+              const isSaving = pendingIds.has(item.id)
               return (
                 <DropdownMenuCheckboxItem
                   key={item.id}
-                  checked={memberIds.has(item.id)}
+                  checked={isMember(item.id)}
                   closeOnClick={false}
-                  disabled={pendingCollectionId !== null}
+                  disabled={isSaving}
                   onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
                 >
                   <span className="flex min-w-0 items-center gap-1.5">
                     {isSaving ? (
                       <Loader2Icon className="size-3.5 shrink-0 animate-spin" aria-hidden="true" />
                     ) : null}
-                    <span className="truncate">{isSaving ? "Saving…" : item.title}</span>
+                    <span className="truncate">{item.title}</span>
                   </span>
                 </DropdownMenuCheckboxItem>
               )

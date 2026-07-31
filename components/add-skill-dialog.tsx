@@ -33,6 +33,12 @@ interface AddSkillDialogProps {
   lockedSkillName?: string
   triggerLabel?: string
   triggerAriaLabel?: string
+  /**
+   * Controlled mode for launchers that live outside the page (the ⌘K
+   * palette). When `open` is provided the dialog renders no trigger.
+   */
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export function AddSkillDialog({
@@ -40,8 +46,13 @@ export function AddSkillDialog({
   lockedSkillName = "",
   triggerLabel = "Save a skill",
   triggerAriaLabel,
+  open,
+  onOpenChange,
 }: AddSkillDialogProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : uncontrolledOpen
+  const setIsOpen = isControlled ? (onOpenChange ?? (() => {})) : setUncontrolledOpen
   const [pendingMode, setPendingMode] = useState<"discover" | "save" | null>(null)
   const [repositoryUrl, setRepositoryUrl] = useState(defaultUrl)
   const [inspectedUrl, setInspectedUrl] = useState<string | null>(null)
@@ -202,9 +213,11 @@ export function AddSkillDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger render={<Button aria-label={triggerAriaLabel} />}>
-        <PlusIcon data-icon="inline-start" />{triggerLabel}
-      </DialogTrigger>
+      {isControlled ? null : (
+        <DialogTrigger render={<Button aria-label={triggerAriaLabel} />}>
+          <PlusIcon data-icon="inline-start" />{triggerLabel}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto p-0 sm:max-w-xl">
         <form onSubmit={handleFormSubmit}>
           <DialogHeader className="border-b border-border bg-muted/35 p-6 pr-14">
