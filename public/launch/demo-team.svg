@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="900" viewBox="0 0 1440 900" role="img" aria-labelledby="title description">
+  <title id="title">Different setups, one shared library</title>
+  <desc id="description">Each teammate finds the same recommendation and chooses the usage path that fits.</desc>
+  <rect width="1440" height="900" fill="#092218"/>
+  <text x="720" y="194" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="67" font-weight="700" letter-spacing="-2" fill="#f4f3e9">Different setups. One shared library.</text>
+  <text x="720" y="262" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#b9c9bf">The recommendation stays shared. Each teammate chooses how to use it.</text>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <rect x="100" y="390" width="300" height="190" rx="18" fill="#123426" stroke="#2d6248" stroke-width="2"/>
+    <text x="250" y="466" text-anchor="middle" font-size="19" font-weight="700" letter-spacing="2" fill="#9ae5ae">TEAMMATE A</text>
+    <text x="250" y="530" text-anchor="middle" font-size="34" font-weight="700" fill="#f4f3e9">Adds once</text>
+
+    <rect x="570" y="350" width="300" height="270" rx="22" fill="#f4f3e9"/>
+    <rect x="671" y="394" width="98" height="98" rx="18" fill="#05843f"/>
+    <text x="720" y="465" text-anchor="middle" font-size="62" font-weight="800" fill="#ffffff">S</text>
+    <text x="720" y="550" text-anchor="middle" font-size="31" font-weight="700" fill="#071a10">Shared team library</text>
+
+    <rect x="1040" y="390" width="300" height="190" rx="18" fill="#123426" stroke="#2d6248" stroke-width="2"/>
+    <text x="1190" y="466" text-anchor="middle" font-size="19" font-weight="700" letter-spacing="2" fill="#9ae5ae">TEAMMATE B</text>
+    <text x="1190" y="530" text-anchor="middle" font-size="34" font-weight="700" fill="#f4f3e9">Finds fast</text>
+  </g>
+  <line x1="405" y1="485" x2="550" y2="485" stroke="#9ae5ae" stroke-width="4" stroke-dasharray="12 14"/>
+  <path d="M532 465 L558 485 L532 505" fill="none" stroke="#9ae5ae" stroke-width="4"/>
+  <line x1="890" y1="485" x2="1025" y2="485" stroke="#9ae5ae" stroke-width="4" stroke-dasharray="12 14"/>
+  <path d="M1007 465 L1033 485 L1007 505" fill="none" stroke="#9ae5ae" stroke-width="4"/>
+  <text x="720" y="742" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" fill="#b9c9bf">Source · Compatible command · ZIP · Authenticated MCP</text>
+</svg>
