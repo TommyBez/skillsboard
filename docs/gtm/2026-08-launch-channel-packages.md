@@ -63,20 +63,21 @@ Create your team library
 1. `app/icon.svg` — product icon.
 2. `public/launch/skills-board-launch-og.jpg` — shared-library promise.
 3. `public/launch/skills-board-product-demo-poster.jpg` — full-canvas find-and-use product proof from the final master.
-4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 60-second Product Hunt cut: editorial hook, source-to-context flow, five focused real-product proof shots, animated team handoff, usage paths, team-library payoff, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
-5. `public/launch/skills-board-product-demo.mp4` — 31-second accelerated cut built from the same visual grammar and product truth, with `public/launch/skills-board-product-demo.vtt` captions for social distribution.
+4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 46-second Product Hunt cut: hook, positioning, save flow, the recommendation card, search, handoff paths, collections, the MCP agent beat, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
+5. `public/launch/skills-board-product-demo.mp4` — 30-second social cut built from the same scenes and product truth, ending on the MCP beat, with `public/launch/skills-board-product-demo.vtt` captions for social distribution and the landing-page loop.
 
 ### Video source and reproducible renders
 
-Both launch cuts are generated from shared Remotion scenes in `remotion/skillsboard-launch-videos.tsx` at 1440×900 and 30 fps. The immutable, privacy-safe product recording is `public/launch/skills-board-workflow-source.mp4`; rendered outputs never become their own input.
+Both launch cuts are generated from shared Remotion scenes in `remotion/product-demo/` at 1440×900 and 30 fps. There is no screen recording in either cut: every product surface is re-authored as a Remotion component against the app's own tokens (`app/globals.css`), so the videos are pure code and reproduce byte-for-byte from source.
 
-- `pnpm video:render:product-hunt` renders exactly 1,800 frames / 60 seconds.
-- `pnpm video:render:social` renders exactly 930 frames / 31 seconds.
-- `pnpm video:render:launch` renders both outputs.
+- `pnpm video:render:product-hunt` renders exactly 1,366 frames / 45.5 seconds.
+- `pnpm video:render:social` renders exactly 900 frames / 30 seconds.
+- `pnpm video:render:team-loop` renders the 420-frame / 14-second landing-page loop (`public/launch/skills-board-team-loop.mp4`), built from the same scenes: save → share → find, with both ends fading to the page background so the loop seam is invisible.
+- `pnpm video:render:launch` renders all three outputs.
 
-The launch compositions use the repository-pinned Remotion and Remocn motion system for brand typography, staged source → context → library flows, focused real-product proof shots, the Alex → Sam handoff, branched usage paths, and CTA. The visual system stays within Skills Board's light palette; quality comes from hierarchy, staging, crop, timing, and continuity rather than importing another product's color tokens. Both cuts are designed for silent-first comprehension and retain exact VTT sidecars.
+The launch compositions use the repository-pinned Remotion and Remocn motion system. Each scene holds one or two real product components rather than a full screenshot: the save dialog, the skill card with its team note and example prompt, the library search, the collection cards, and the agent panel. One accent (the app's primary green) carries the whole film, and the single dark scene is the MCP beat. Both cuts are designed for silent-first comprehension and retain exact VTT sidecars.
 
-`public/launch/skills-board-video-manifest.json` records the immutable source, composition source, dimensions, frame counts, durations, output bytes, and SHA-256 values used for final asset readback.
+`public/launch/skills-board-video-manifest.json` records the composition source, dimensions, frame counts, durations, output bytes, and SHA-256 values used for final asset readback.
 
 ### Human-only maker and comment brief
 

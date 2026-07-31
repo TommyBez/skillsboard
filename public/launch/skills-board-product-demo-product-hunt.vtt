@@ -1,37 +1,37 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:04.000
-Which skill should I use? Answer it once and keep the recommendation with the team.
+1
+00:00:00.000 --> 00:00:03.400
+The best skill your team found is buried in a chat.
 
-00:00:04.000 --> 00:00:08.000
-A public source becomes a team recommendation with its valid metadata and team context attached.
+2
+00:00:03.400 --> 00:00:06.800
+Skills Board. Your team's skills, all in one place.
 
-00:00:08.000 --> 00:00:13.500
-Alex starts from a public repository or skill URL. Skills Board reads its valid SKILL.md.
+3
+00:00:06.800 --> 00:00:14.500
+Save a skill from its GitHub repository: Skills Board finds the installable skills, and you add the note your team needs.
 
-00:00:13.500 --> 00:00:19.000
-Alex adds the context only the team knows: a note, an example prompt, and tags.
+4
+00:00:14.500 --> 00:00:20.500
+The recommendation lands in the team library with that note, an example prompt, the source, and the install command.
 
-00:00:19.000 --> 00:00:23.500
-The public source, its metadata, and the team context are saved together.
+5
+00:00:20.500 --> 00:00:26.200
+Teammates search by the task, then narrow by tag: three skills, then two, then the one they need.
 
-00:00:23.500 --> 00:00:27.500
-Alex saves it. Sam can find the same recommendation in the shared team library.
+6
+00:00:26.200 --> 00:00:30.600
+Every teammate picks their own handoff: open the source, copy the install command, or download the ZIP.
 
-00:00:27.500 --> 00:00:32.500
-Sam searches the library and finds Alex's recommendation with its context intact.
+7
+00:00:30.600 --> 00:00:33.700
+Group the recommendations into collections the way your team works.
 
-00:00:32.500 --> 00:00:37.000
-Sam copies a prompt or compatible command while the original source stays visible.
+8
+00:00:33.700 --> 00:00:41.200
+Connected agents read the team library over MCP and get the recommendation, not just a link.
 
-00:00:37.000 --> 00:00:43.000
-Review the source, copy a compatible command, download the latest ZIP, or connect an authenticated agent through MCP.
-
-00:00:43.000 --> 00:00:49.000
-The next teammate finds the same answer, together with its source, notes, prompts, tags, and usage paths.
-
-00:00:49.000 --> 00:00:54.000
-One good recommendation stays with the team.
-
-00:00:54.000 --> 00:01:00.000
-Save once. Find fast. Use it your way. Create your team library at skillsboard.sh.
+9
+00:00:41.200 --> 00:00:45.730
+Skills Board, at skillsboard.sh. One place for the skills your team recommends.

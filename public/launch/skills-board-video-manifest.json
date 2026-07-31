@@ -1,55 +1,72 @@
 {
   "schema_version": 1,
   "generator": {
-    "source": "remotion/skillsboard-launch-videos.tsx",
-    "source_sha256": "48d67f41efd00a0ac3f738620240c39a8bc2df61d1cd9d006d88a522535c457a",
-    "font_loader": "remotion/fonts.ts",
-    "font_loader_sha256": "c45a892f5d21007ba13c5179442d1ce026315226cd7e5045ef8aa5be3abda6e0",
+    "source": "remotion/product-demo/index.tsx",
+    "source_sha256": "08ff6a7f34713335182b8419fd5c56c60f36940f2de99a05fdeabbb8b7e5cafd",
+    "font_loader": "remotion/product-demo/fonts.ts",
+    "font_loader_sha256": "89fc28340df599f8f958b1feca539f25c75d56d6c5a7dd9264d2a888a002ebd4",
     "remotion_version": "4.0.495",
     "render_command": "pnpm video:render:launch"
-  },
-  "workflow_source": {
-    "path": "public/launch/skills-board-workflow-source.mp4",
-    "sha256": "556ab38136e0644711935300aacb41a7db84151d04310b188dcd7f8e8afca343",
-    "bytes": 1798683
   },
   "outputs": [
     {
       "composition": "skillsboard-launch-product-hunt",
       "path": "public/launch/skills-board-product-demo-product-hunt.mp4",
-      "sha256": "901fe150a268406d9748499b7d3a05577be5dc9da5e2d196319c6eac59a231ad",
-      "bytes": 9936293,
+      "sha256": "660853e34f8f6836cd699d192c4440221de508c32a40037105bbfcd4260b010f",
+      "bytes": 2906851,
       "width": 1440,
       "height": 900,
       "fps": 30,
-      "frames": 1800,
-      "duration_seconds": 60,
+      "frames": 1372,
+      "duration_seconds": 45.73,
       "video_codec": "h264",
       "audio": false,
       "captions": "public/launch/skills-board-product-demo-product-hunt.vtt",
-      "captions_sha256": "3b6bc013cd90ad19cc8a827f9c7d01e9fb423b4d73e681c68aeb55215f869e1b"
+      "captions_sha256": "b32e18ecd01238c9be6c12a710a11236577d14aa90778d19608861fff191628e"
     },
     {
       "composition": "skillsboard-launch-social",
       "path": "public/launch/skills-board-product-demo.mp4",
-      "sha256": "cbb3728a5ec8cedfde33236429515ecfb38b537d5520b8ad342aa4d14ec3f911",
-      "bytes": 6153280,
+      "sha256": "b1c90e183a594b46e5e5e315da083175804ed4df9896cbf2e6662ad0dcc3392e",
+      "bytes": 2041318,
       "width": 1440,
       "height": 900,
       "fps": 30,
-      "frames": 930,
-      "duration_seconds": 31,
+      "frames": 900,
+      "duration_seconds": 30,
       "video_codec": "h264",
       "audio": false,
       "captions": "public/launch/skills-board-product-demo.vtt",
-      "captions_sha256": "bf63190c329efaaf89286ea31ba2e0a62dce0ad2ddeddebc33cfcf2cbbc8fead"
+      "captions_sha256": "15dadf44ffae14694e1617a5f1eb924bf6c1535fc09ff1ea213875d23908899e"
+    },
+    {
+      "composition": "skillsboard-team-loop",
+      "path": "public/launch/skills-board-team-loop.mp4",
+      "sha256": "dd279655b481157ae02bd7f1d7e723afbadc7e2437da38cd4e67fe5bb11d5aa2",
+      "bytes": 1079983,
+      "width": 1440,
+      "height": 900,
+      "fps": 30,
+      "frames": 420,
+      "duration_seconds": 14,
+      "video_codec": "h264",
+      "audio": false
     }
   ],
-  "poster": {
-    "path": "public/launch/skills-board-product-demo-poster.jpg",
-    "sha256": "f475fb56fb568ea08ae1f396e4254ab3e45f175da53b6c10ee83864464914001",
-    "bytes": 111293,
-    "width": 1440,
-    "height": 900
-  }
+  "posters": [
+    {
+      "path": "public/launch/skills-board-product-demo-poster.jpg",
+      "sha256": "00f9d60f62505c054e1a6fe08bfe9b9cfd1a7274495693498512a7bb666d7acf",
+      "bytes": 51023,
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "path": "public/launch/skills-board-team-loop-poster.jpg",
+      "sha256": "e970026f5d6f383712021a5e147b437943af3be24bf966beb2a5b293162638da",
+      "bytes": 44350,
+      "width": 1440,
+      "height": 900
+    }
+  ]
 }

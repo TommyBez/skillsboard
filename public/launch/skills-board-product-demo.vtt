@@ -1,25 +1,25 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:03.000
-Which skill should I use? Keep the recommendation with the team.
+1
+00:00:00.000 --> 00:00:03.400
+The best skill your team found is buried in a chat.
 
-00:00:03.000 --> 00:00:06.000
-A public source becomes a team recommendation with its context attached.
+2
+00:00:03.400 --> 00:00:06.500
+Skills Board. Your team's skills, all in one place.
 
-00:00:06.000 --> 00:00:11.000
-Alex starts from a public repository or skill URL. Skills Board reads its valid SKILL.md.
+3
+00:00:06.500 --> 00:00:13.300
+Save a skill from its GitHub repository: Skills Board finds the installable skills, and you add the note your team needs.
 
-00:00:11.000 --> 00:00:15.500
-Alex adds a team note, an example prompt, and tags.
+4
+00:00:13.300 --> 00:00:18.100
+The recommendation lands in the team library with that note, an example prompt, the source, and the install command.
 
-00:00:15.500 --> 00:00:18.500
-Alex saves it. Sam can find it in the shared team library.
+5
+00:00:18.100 --> 00:00:24.500
+Your agent reads the team library and gets the recommendation, not just a link.
 
-00:00:18.500 --> 00:00:23.000
-Sam searches the library and finds Alex's recommendation with its context intact.
-
-00:00:23.000 --> 00:00:27.000
-Sam copies a compatible path while the original source stays visible.
-
-00:00:27.000 --> 00:00:31.000
-Save once. Find fast. Use it your way. Create your team library at skillsboard.sh.
+6
+00:00:24.500 --> 00:00:30.000
+Skills Board, at skillsboard.sh. One place for the skills your team recommends.

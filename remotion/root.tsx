@@ -1,11 +1,13 @@
 import { Composition } from "remotion";
 import {
-  LAUNCH_FPS,
+  FPS,
   PRODUCT_HUNT_DURATION,
   SOCIAL_DURATION,
-  SkillsboardLaunchProductHunt,
-  SkillsboardLaunchSocial,
-} from "./skillsboard-launch-videos";
+  SkillsboardDemoProductHunt,
+  SkillsboardDemoSocial,
+  SkillsboardTeamLoop,
+  TEAM_LOOP_DURATION,
+} from "./product-demo";
 import { PROMO_DURATION, SkillsboardPromo } from "./skillsboard-promo";
 
 export function RemotionRoot() {
@@ -20,17 +22,25 @@ export function RemotionRoot() {
         width={1280}
       />
       <Composition
-        component={SkillsboardLaunchProductHunt}
+        component={SkillsboardDemoProductHunt}
         durationInFrames={PRODUCT_HUNT_DURATION}
-        fps={LAUNCH_FPS}
+        fps={FPS}
         height={900}
         id="skillsboard-launch-product-hunt"
         width={1440}
       />
       <Composition
-        component={SkillsboardLaunchSocial}
+        component={SkillsboardTeamLoop}
+        durationInFrames={TEAM_LOOP_DURATION}
+        fps={FPS}
+        height={900}
+        id="skillsboard-team-loop"
+        width={1440}
+      />
+      <Composition
+        component={SkillsboardDemoSocial}
         durationInFrames={SOCIAL_DURATION}
-        fps={LAUNCH_FPS}
+        fps={FPS}
         height={900}
         id="skillsboard-launch-social"
         width={1440}
