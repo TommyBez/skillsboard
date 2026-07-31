@@ -197,7 +197,9 @@ export function TagInput({
           ref={inputRef}
           id={inputId}
           value={draft}
-          placeholder={tags.length >= max ? "" : placeholder}
+          /* Only while the field is empty. Sitting beside real chips, an
+             example list reads as content that is already there. */
+          placeholder={tags.length === 0 ? placeholder : ""}
           disabled={disabled || tags.length >= max}
           aria-describedby={error ? `${inputId}-error` : describedBy}
           onChange={(event) => {
