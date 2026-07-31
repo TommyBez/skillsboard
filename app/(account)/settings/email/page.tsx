@@ -1,4 +1,4 @@
-import { Suspense } from "react"
+import { cache, Suspense } from "react"
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeftIcon } from "lucide-react"
@@ -24,7 +24,7 @@ function formatRecordedAt(value: Date | null): string | null {
   }).format(value)
 }
 
-async function EmailPreferenceDetails() {
+const loadEmailPreferencePage = cache(async () => {
   const session = await requireSession("/settings/email")
   const [preference, organizationContext] = await Promise.all([
     getProductCommunicationsPreference(session.user.id),
@@ -39,26 +39,104 @@ async function EmailPreferenceDetails() {
     && (preference.eligibilityReason === "email_changed"
       || preference.eligibilityReason === "notice_outdated")
   const status = permanentlyBlocked
-    ? "Blocked"
+    ? "Blocked" as const
     : providerPaused
-      ? "Pending"
+      ? "Pending" as const
       : confirmationRequired
-        ? "Confirm"
+        ? "Confirm" as const
         : preference.effectiveSubscribed
-          ? "On"
-          : "Off"
-  const lastPreferenceChange = preference.subscribed
-    ? formatRecordedAt(preference.consentedAt)
-    : formatRecordedAt(preference.withdrawnAt)
-  const backHref = organizationContext.activeOrganization ? "/library" : "/onboarding"
-  const backLabel = organizationContext.activeOrganization ? "Back to library" : "Continue to onboarding"
+          ? "On" as const
+          : "Off" as const
+
+  return {
+    backHref: organizationContext.activeOrganization ? "/library" : "/onboarding",
+    backLabel: organizationContext.activeOrganization ? "Back to library" : "Continue to onboarding",
+    confirmationRequired,
+    lastPreferenceChange: preference.subscribed
+      ? formatRecordedAt(preference.consentedAt)
+      : formatRecordedAt(preference.withdrawnAt),
+    permanentlyBlocked,
+    preference,
+    providerPaused,
+    status,
+  }
+})
+
+async function EmailPreferenceBackLink() {
+  const { backHref, backLabel } = await loadEmailPreferencePage()
 
   return (
-    <>
-      <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href={backHref} />}>
-        <ArrowLeftIcon data-icon="inline-start" />
-        {backLabel}
-      </Button>
+    <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href={backHref} />}>
+      <ArrowLeftIcon data-icon="inline-start" />
+      {backLabel}
+    </Button>
+  )
+}
+
+async function EmailPreferenceStatusCard() {
+  const { lastPreferenceChange, preference, status } = await loadEmailPreferencePage()
+
+  return (
+    <aside className="rounded-[16px] border bg-card p-5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm font-medium">Product emails</span>
+        <Badge variant={status === "On" ? "default" : status === "Blocked" ? "destructive" : "outline"}>
+          {status}
+        </Badge>
+      </div>
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+        {lastPreferenceChange
+          ? `${preference.subscribed ? "Consent recorded" : "Not subscribed since"} ${lastPreferenceChange} UTC.`
+          : "No product-email consent has been recorded."}
+      </p>
+    </aside>
+  )
+}
+
+async function EmailPreferenceFormSection() {
+  const {
+    confirmationRequired,
+    permanentlyBlocked,
+    preference,
+    providerPaused,
+    status,
+  } = await loadEmailPreferencePage()
+
+  return (
+    <EmailPreferencesForm
+      email={preference.email}
+      initiallySubscribed={preference.subscribed}
+      confirmationRequired={confirmationRequired}
+      confirmationReason={preference.eligibilityReason === "email_changed" ? "email_changed" : "notice_outdated"}
+      permanentlyBlocked={permanentlyBlocked}
+      providerPaused={providerPaused}
+      statusLabel={status}
+    />
+  )
+}
+
+function BackLinkFallback() {
+  return <Skeleton className="h-10 w-40 rounded-xl" aria-hidden="true" />
+}
+
+function StatusCardFallback() {
+  return <Skeleton className="h-29 rounded-[16px]" aria-hidden="true" />
+}
+
+function FormFallback() {
+  return (
+    <div aria-label="Loading email preferences" role="status">
+      <Skeleton className="h-80 rounded-[16px]" />
+    </div>
+  )
+}
+
+export default function EmailSettingsPage() {
+  return (
+    <main className="mx-auto w-full max-w-5xl px-4 pt-8 pb-28 md:px-6 md:py-12">
+      <Suspense fallback={<BackLinkFallback />}>
+        <EmailPreferenceBackLink />
+      </Suspense>
 
       <header className="mt-8 grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
         <div>
@@ -71,49 +149,13 @@ async function EmailPreferenceDetails() {
           </p>
         </div>
 
-        <aside className="rounded-[16px] border bg-card p-5">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-sm font-medium">Product emails</span>
-            <Badge variant={status === "On" ? "default" : status === "Blocked" ? "destructive" : "outline"}>
-              {status}
-            </Badge>
-          </div>
-          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-            {lastPreferenceChange
-              ? `${preference.subscribed ? "Consent recorded" : "Not subscribed since"} ${lastPreferenceChange} UTC.`
-              : "No product-email consent has been recorded."}
-          </p>
-        </aside>
+        <Suspense fallback={<StatusCardFallback />}>
+          <EmailPreferenceStatusCard />
+        </Suspense>
       </header>
 
-      <EmailPreferencesForm
-        email={preference.email}
-        initiallySubscribed={preference.subscribed}
-        confirmationRequired={confirmationRequired}
-        confirmationReason={preference.eligibilityReason === "email_changed" ? "email_changed" : "notice_outdated"}
-        permanentlyBlocked={permanentlyBlocked}
-        providerPaused={providerPaused}
-        statusLabel={status}
-      />
-    </>
-  )
-}
-
-function EmailPreferenceFallback() {
-  return (
-    <div className="space-y-8" aria-label="Loading email preferences" role="status">
-      <Skeleton className="h-10 w-40 rounded-xl" />
-      <Skeleton className="h-56 rounded-[16px]" />
-      <Skeleton className="h-80 rounded-[16px]" />
-    </div>
-  )
-}
-
-export default function EmailSettingsPage() {
-  return (
-    <main className="mx-auto w-full max-w-5xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <Suspense fallback={<EmailPreferenceFallback />}>
-        <EmailPreferenceDetails />
+      <Suspense fallback={<FormFallback />}>
+        <EmailPreferenceFormSection />
       </Suspense>
     </main>
   )
