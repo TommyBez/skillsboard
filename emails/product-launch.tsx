@@ -1,17 +1,11 @@
 import {
-  Body,
   Button,
-  Container,
-  Head,
   Heading,
-  Html,
-  Preview,
   Section,
-  Tailwind,
   Text,
-  pixelBasedPreset,
 } from "react-email"
 
+import { EmailShell } from "@/emails/components/email-shell"
 import { MarketingFooter } from "@/emails/components/marketing-footer"
 import { PRODUCT_COMMUNICATIONS_UNSUBSCRIBE_TOKEN_PROPERTY } from "@/lib/email/product-communications"
 import { siteConfig } from "@/lib/site"
@@ -45,68 +39,51 @@ export default function ProductLaunchEmail({
   unsubscribeUrl = PRODUCT_LAUNCH_BROADCAST_PROPS.unsubscribeUrl,
 }: ProductLaunchEmailProps) {
   return (
-    <Html lang="en">
-      <Tailwind
-        config={{
-          presets: [pixelBasedPreset],
-          theme: {
-            extend: {
-              colors: {
-                brand: "#00752a",
-              },
-            },
-          },
-        }}
+    <EmailShell
+      preview={PRODUCT_LAUNCH_EMAIL.previewText}
+      title={PRODUCT_LAUNCH_EMAIL.subject}
+      showTransactionalFooter={false}
+    >
+      <Heading as="h1" className="m-0 mb-5 text-[28px] font-semibold leading-9 tracking-[-0.04em] text-ink">
+        A shared home for your team’s AI skills
+      </Heading>
+
+      <Text className="m-0 mb-4 text-base leading-7 text-ink">
+        Which skill should I use? Where can I find it?
+      </Text>
+      <Text className="m-0 mb-4 text-base leading-7 text-ink">
+        Those questions are easy to answer once and surprisingly easy to repeat. Skills Board gives your team one searchable library for the AI skills it recommends.
+      </Text>
+      <Text className="m-0 mb-6 text-base leading-7 text-ink">
+        One teammate adds a useful skill. Another finds it by task or tag. Each person can open the original source, copy a compatible install command, download the latest skill files as a ZIP, or connect a compatible agent through authenticated MCP.
+      </Text>
+      <Section className="mb-6 rounded-[12px] border border-solid border-border bg-panel p-5">
+        <Text className="m-0 text-sm leading-6 text-ink">
+          Skills Board does not decide whether a skill is approved or compatible with every setup. It keeps the recommendation and source visible so your team can make that choice.
+        </Text>
+      </Section>
+      <Text className="m-0 mb-6 text-base leading-7 text-ink">
+        The hosted product is free forever, and the code is open source.
+      </Text>
+
+      <Button
+        href={ctaUrl}
+        className="box-border mb-6 block rounded-[12px] bg-brand px-7 py-3.5 text-center text-base font-semibold text-brand-foreground no-underline"
       >
-        <Head>
-          <title>{PRODUCT_LAUNCH_EMAIL.subject}</title>
-        </Head>
-        <Body className="bg-gray-100 font-sans">
-          <Preview>{PRODUCT_LAUNCH_EMAIL.previewText}</Preview>
-          <Container className="mx-auto max-w-xl bg-white px-5 py-10">
-            <Heading as="h1" className="mb-6 text-3xl font-bold leading-10 text-gray-900">
-              A shared home for your team’s AI skills
-            </Heading>
+        Create your team library
+      </Button>
 
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              Which skill should I use? Where can I find it?
-            </Text>
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              Those questions are easy to answer once and surprisingly easy to repeat. Skills Board gives your team one searchable library for the AI skills it recommends.
-            </Text>
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              One teammate adds a useful skill. Another finds it by task or tag. Each person can open the original source, copy a compatible install command, download the latest skill files as a ZIP, or connect a compatible agent through authenticated MCP.
-            </Text>
-            <Section className="my-6 rounded border border-solid border-gray-200 bg-gray-50 p-5">
-              <Text className="m-0 text-sm leading-6 text-gray-700">
-                Skills Board does not decide whether a skill is approved or compatible with every setup. It keeps the recommendation and source visible so your team can make that choice.
-              </Text>
-            </Section>
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              The hosted product is free forever, and the code is open source.
-            </Text>
+      <Text className="m-0 mb-2 text-base leading-7 text-ink">
+        Tommaso<br />
+        Skills Board
+      </Text>
 
-            <Button
-              href={ctaUrl}
-              className="my-6 block box-border rounded bg-brand px-7 py-3.5 text-center text-base font-bold text-white no-underline"
-            >
-              Create your team library
-            </Button>
-
-            <Text className="my-5 text-base leading-7 text-gray-800">
-              Tommaso<br />
-              Skills Board
-            </Text>
-
-            <MarketingFooter
-              managePreferencesUrl={managePreferencesUrl}
-              providerUnsubscribeUrl={providerUnsubscribeUrl}
-              unsubscribeUrl={unsubscribeUrl}
-            />
-          </Container>
-        </Body>
-      </Tailwind>
-    </Html>
+      <MarketingFooter
+        managePreferencesUrl={managePreferencesUrl}
+        providerUnsubscribeUrl={providerUnsubscribeUrl}
+        unsubscribeUrl={unsubscribeUrl}
+      />
+    </EmailShell>
   )
 }
 

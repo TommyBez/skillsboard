@@ -15,19 +15,19 @@ export function MarketingFooter({
 }: MarketingFooterProps) {
   return (
     <>
-      <Hr className="my-7 border-solid border-gray-200" />
-      <Text className="my-2 text-xs leading-5 text-gray-500">
+      <Hr className="my-7 border-solid border-border" />
+      <Text className="my-2 text-xs leading-5 text-muted">
         You are receiving this because you opted in to Skills Board product communications.
-        You can <Link href={unsubscribeUrl} className="text-gray-700 underline">unsubscribe</Link>
-        {", "}<Link href={managePreferencesUrl} className="text-gray-700 underline">manage your email preferences</Link>,
-        {" "}or use the <Link href={providerUnsubscribeUrl} className="text-gray-700 underline">provider unsubscribe page</Link> at any time.
+        You can <Link href={unsubscribeUrl} className="text-ink underline">unsubscribe from product emails</Link>
+        {", "}<Link href={managePreferencesUrl} className="text-ink underline">manage your email preferences</Link>,
+        {" "}or use the <Link href={providerUnsubscribeUrl} className="text-ink underline">provider unsubscribe page</Link> at any time.
       </Text>
-      <Text className="my-2 text-xs leading-5 text-gray-500">
-        <Link href={`${siteConfig.url}/privacy`} className="text-gray-700 underline">Privacy</Link>
+      <Text className="my-2 text-xs leading-5 text-muted">
+        <Link href={`${siteConfig.url}/privacy`} className="text-ink underline">Privacy Policy</Link>
         {" · "}
-        <Link href={`${siteConfig.url}/contact`} className="text-gray-700 underline">Contact</Link>
+        <Link href={`${siteConfig.url}/contact`} className="text-ink underline">Contact Skills Board</Link>
       </Text>
-      <Text className="my-2 text-xs leading-5 text-gray-500">
+      <Text className="mb-0 mt-2 text-xs leading-5 text-muted">
         {siteConfig.name}<br />
         {siteConfig.postalAddress}
       </Text>
