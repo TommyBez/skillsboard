@@ -1,14 +1,16 @@
 "use client"
 
-import { Suspense, lazy, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { PlusIcon, Trash2Icon } from "lucide-react"
 
 // ReorderList's drag interactions pull in the full motion runtime, so it
 // stays out of the route bundle and only loads once the editor is on screen.
+// The module is held in state rather than React.lazy so a rejected chunk
+// simply keeps the plain list (editing still works, reordering degrades)
+// instead of throwing to the route error boundary, and reopening the dialog
+// naturally retries the import.
 const loadReorderList = () => import("@/components/interior/reorder-list")
-const ReorderList = lazy(async () => ({
-  default: (await loadReorderList()).ReorderList,
-})) as unknown as (typeof import("@/components/interior/reorder-list"))["ReorderList"]
+type ReorderListComponent = (typeof import("@/components/interior/reorder-list"))["ReorderList"]
 import { Button } from "@/components/ui/button"
 import {
   FieldDescription,
@@ -36,12 +38,14 @@ export function PromptExamplesEditor({
 }: PromptExamplesEditorProps) {
   const nextId = useRef(Math.max(defaultValue.length, 1))
   const textareas = useRef(new Map<number, HTMLTextAreaElement>())
-  // Which prompt's textarea currently holds focus. Removing a focused node
-  // (as happens when the lazy ReorderList replaces the Suspense fallback)
-  // fires no blur event, so this survives the swap and lets the replacement
-  // node reclaim focus in its ref callback.
+  // Which prompt's textarea currently holds focus, plus its caret/selection.
+  // Removing a focused node (as happens when the loaded ReorderList replaces
+  // the plain list) fires no blur event, so these survive the swap and let
+  // the replacement node reclaim focus and selection in its ref callback.
   const focusedPromptId = useRef<number | null>(null)
+  const pendingSelection = useRef<{ start: number; end: number } | null>(null)
   const [focusId, setFocusId] = useState<number | null>(null)
+  const [ReorderListImpl, setReorderListImpl] = useState<ReorderListComponent | null>(null)
   const [prompts, setPrompts] = useState<PromptDraft[]>(() => (
     defaultValue.length
       ? defaultValue.map((value, id) => ({ id, value }))
@@ -56,11 +60,22 @@ export function PromptExamplesEditor({
     setFocusId(null)
   }, [focusId, prompts])
 
-  // Warm the reorder chunk as soon as the editor mounts (dialog open), so by
-  // the time a second prompt exists the lazy component resolves synchronously
-  // instead of committing an interactive fallback and swapping it later.
+  // Load the reorder chunk as soon as the editor mounts (dialog open), so by
+  // the time a second prompt exists the reorderable list is usually ready and
+  // no post-render swap happens at all.
   useEffect(() => {
-    void loadReorderList()
+    let cancelled = false
+    loadReorderList()
+      .then((mod) => {
+        if (!cancelled) setReorderListImpl(() => mod.ReorderList)
+      })
+      .catch(() => {
+        // Chunk unavailable (deploy rotation, flaky network): keep the plain
+        // list. Reopening the dialog re-runs this effect and retries.
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   function addPrompt() {
@@ -90,10 +105,19 @@ export function PromptExamplesEditor({
                 textareas.current.set(prompt.id, node)
                 if (focusedPromptId.current === prompt.id && document.activeElement !== node) {
                   node.focus()
-                  const end = node.value.length
-                  node.setSelectionRange(end, end)
+                  const max = node.value.length
+                  const { start, end } = pendingSelection.current ?? { start: max, end: max }
+                  node.setSelectionRange(Math.min(start, max), Math.min(end, max))
+                  pendingSelection.current = null
                 }
               } else {
+                const previous = textareas.current.get(prompt.id)
+                if (previous && focusedPromptId.current === prompt.id) {
+                  pendingSelection.current = {
+                    start: previous.selectionStart,
+                    end: previous.selectionEnd,
+                  }
+                }
                 textareas.current.delete(prompt.id)
               }
             }}
@@ -175,9 +199,8 @@ export function PromptExamplesEditor({
           real edit. The rows submit through name="examplePrompts", so their
           DOM order is the saved order and reordering needs no extra plumbing.
           A single row gets no handle — there is nothing to reorder. */}
-      {prompts.length > 1 ? (
-        <Suspense fallback={renderPlainList()}>
-        <ReorderList
+      {prompts.length > 1 && ReorderListImpl ? (
+        <ReorderListImpl
           items={prompts}
           getId={(prompt) => String(prompt.id)}
           getLabel={(prompt) =>
@@ -188,8 +211,7 @@ export function PromptExamplesEditor({
           className="gap-2.5"
         >
           {renderRow}
-        </ReorderList>
-        </Suspense>
+        </ReorderListImpl>
       ) : (
         renderPlainList()
       )}
