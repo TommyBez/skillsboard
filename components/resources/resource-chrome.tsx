@@ -5,6 +5,7 @@ import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
+import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
@@ -225,6 +226,10 @@ export function ResourceFooter() {
               <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
             </a>
           </nav>
+          <LegalLinks
+            ariaLabel="Legal pages"
+            className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+          />
           <p className="text-sm text-muted-foreground">
             ©{" "}
             <Suspense

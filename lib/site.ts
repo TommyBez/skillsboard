@@ -6,6 +6,8 @@ export const siteConfig = {
   tagline: "Your team’s skills. All in one place.",
   ogDescription: "Keep team-recommended AI skills in one searchable library and connect it to your agent through MCP.",
   githubUrl: "https://github.com/TommyBez/skillsboard",
+  contactEmail: "tommaso@skillsboard.sh",
+  postalAddress: "15 Giuseppe Verdi Avenue, Suite 150, Capraia Innovation Park, CA 50050",
   locale: "en_US",
 } as const
 

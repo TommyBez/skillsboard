@@ -1,17 +1,6 @@
-import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Preview,
-  Section,
-  Tailwind,
-  Text,
-  pixelBasedPreset,
-} from "react-email"
+import { Button, Heading, Hr, Section, Text } from "react-email"
+
+import { EmailShell } from "@/emails/components/email-shell"
 
 export interface TeamInvitationProps {
   inviterName: string
@@ -27,70 +16,55 @@ function formatRole(role: string): string {
 }
 
 export default function TeamInvitation({
-  inviterName,
-  inviterEmail,
-  teamName,
-  role,
-  inviteUrl,
-  expiryDays,
+  inviterName = "Alex Morgan",
+  inviterEmail = "alex@example.com",
+  teamName = "Product Engineering",
+  role = "member",
+  inviteUrl = "https://skillsboard.example.com/invite/preview-invitation-id",
+  expiryDays = 2,
 }: TeamInvitationProps) {
   const formattedRole = formatRole(role)
+  const title = `Join ${teamName} on Skills Board`
+  const preview = `You've been invited to join ${teamName} on Skills Board`
 
   return (
-    <Html lang="en">
-      <Tailwind
-        config={{
-          presets: [pixelBasedPreset],
-          theme: {
-            extend: {
-              colors: {
-                brand: "#00752a",
-              },
-            },
-          },
-        }}
+    <EmailShell preview={preview} title={title}>
+      <Heading as="h1" className="m-0 mb-5 text-[28px] font-semibold leading-9 tracking-[-0.04em] text-ink">
+        Join {teamName}
+      </Heading>
+
+      <Text className="m-0 mb-6 text-base leading-7 text-ink">
+        <strong>{inviterName}</strong> ({inviterEmail}) invited you to collaborate on{" "}
+        <strong>{teamName}</strong> in Skills Board.
+      </Text>
+
+      <Section className="mb-6 rounded-[12px] border border-solid border-border bg-panel p-5">
+        <Text className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">
+          Role
+        </Text>
+        <Text className="m-0 text-lg font-semibold text-ink">{formattedRole}</Text>
+      </Section>
+
+      <Text className="m-0 mb-6 text-base leading-7 text-ink">
+        Accept the invitation to access the shared skill library.
+      </Text>
+
+      <Button
+        href={inviteUrl}
+        className="box-border block rounded-[12px] bg-brand px-7 py-3.5 text-center text-base font-semibold text-brand-foreground no-underline"
       >
-        <Head />
-        <Body className="bg-gray-100 font-sans">
-          <Preview>You&apos;ve been invited to join {teamName} on Skills Board</Preview>
-          <Container className="mx-auto max-w-xl bg-white px-5 py-10">
-            <Heading as="h1" className="mb-6 text-center text-3xl font-bold text-gray-800">
-              Join {teamName}
-            </Heading>
+        Accept invitation to {teamName}
+      </Button>
 
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              <strong>{inviterName}</strong> ({inviterEmail}) invited you to collaborate on{" "}
-              <strong>{teamName}</strong> in Skills Board.
-            </Text>
+      <Hr className="my-7 border-solid border-border" />
 
-            <Section className="my-6 rounded border border-solid border-gray-200 bg-gray-50 p-5">
-              <Text className="mb-2 text-xs font-bold uppercase text-gray-500">Role</Text>
-              <Text className="m-0 text-lg font-bold text-gray-800">{formattedRole}</Text>
-            </Section>
-
-            <Text className="my-4 text-base leading-7 text-gray-800">
-              Accept the invitation to access the shared skill library.
-            </Text>
-
-            <Button
-              href={inviteUrl}
-              className="my-6 block box-border rounded bg-brand px-7 py-3.5 text-center text-base font-bold text-white no-underline"
-            >
-              Accept invitation
-            </Button>
-
-            <Hr className="my-6 border-solid border-gray-200" />
-
-            <Text className="my-2 text-sm leading-5 text-gray-500">
-              This invitation expires in {expiryDays} day{expiryDays === 1 ? "" : "s"}.
-            </Text>
-            <Text className="my-2 text-sm leading-5 text-gray-500">
-              If you weren&apos;t expecting this invitation, you can safely ignore this email.
-            </Text>
-          </Container>
-        </Body>
-      </Tailwind>
-    </Html>
+      <Text className="m-0 mb-2 text-sm leading-6 text-muted">
+        This invitation expires in {expiryDays} day{expiryDays === 1 ? "" : "s"}.
+      </Text>
+      <Text className="m-0 text-sm leading-6 text-muted">
+        If you weren&apos;t expecting this invitation, you can safely ignore this email.
+      </Text>
+    </EmailShell>
   )
 }
 

@@ -11,7 +11,17 @@ import {
 } from "@/lib/auth-environment"
 import { sendSignInOtp } from "@/lib/email/send-sign-in-otp"
 import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
-import { pool } from "@/lib/db"
+import { db, pool } from "@/lib/db"
+import { emailPreference } from "@/lib/db/schema"
+import {
+  createProductCommunicationsUnsubscribeToken,
+  hashEmailAddress,
+} from "@/lib/email/email-privacy"
+import {
+  PRODUCT_COMMUNICATIONS_DISCLOSURE,
+  PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
+  PRODUCT_COMMUNICATIONS_TOPIC,
+} from "@/lib/email/product-communications"
 import { oauthScopes } from "@/lib/oauth-scopes"
 
 const isDevelopment = getDeploymentEnvironment() === "development"
@@ -24,6 +34,41 @@ export const auth = betterAuth({
   baseURL: resolveAuthBaseUrl(),
   trustedOrigins: getTrustedOrigins(),
   session: { expiresIn: 60 * 60 * 24 * 7, updateAge: 60 * 60 * 24 },
+  databaseHooks: {
+    user: {
+      create: {
+        async after(createdUser, context) {
+          const signupChoice = context?.body?.skillsboardProductCommunicationsChoice
+          if (context?.path !== "/sign-in/email-otp" || typeof signupChoice !== "boolean") return
+
+          try {
+            const emailHash = hashEmailAddress(createdUser.email)
+            await db
+              .insert(emailPreference)
+              .values({
+                userId: createdUser.id,
+                topic: PRODUCT_COMMUNICATIONS_TOPIC,
+                emailHash,
+                subscribed: false,
+                source: "signup",
+                noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
+                noticeText: PRODUCT_COMMUNICATIONS_DISCLOSURE,
+                unsubscribeToken: createProductCommunicationsUnsubscribeToken({
+                  emailHash,
+                  userId: createdUser.id,
+                }),
+              })
+              .onConflictDoNothing()
+          } catch (error) {
+            // Product-email state must never make verified account creation fail.
+            console.error("Unable to initialize the optional signup email choice", {
+              errorName: error instanceof Error ? error.name : "UnknownError",
+            })
+          }
+        },
+      },
+    },
+  },
   plugins: [
     emailOTP({
       otpLength: 6,
@@ -49,7 +94,9 @@ export const auth = betterAuth({
         try {
           await sendSignInOtp({ email, otp, expiresInSeconds: otpExpiresInSeconds })
         } catch (error) {
-          console.error("Unable to send sign-in OTP email", error)
+          console.error("Unable to send sign-in OTP email", {
+            name: error instanceof Error ? error.name : "UnknownError",
+          })
           throw error
         }
       },
@@ -70,7 +117,9 @@ export const auth = betterAuth({
             expiresAt: data.invitation.expiresAt,
           })
         } catch (error) {
-          console.error("Unable to send invitation email from auth hook", error)
+          console.error("Unable to send invitation email from auth hook", {
+            name: error instanceof Error ? error.name : "UnknownError",
+          })
         }
       },
     }),

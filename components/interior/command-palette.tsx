@@ -25,9 +25,14 @@ export interface CommandItem {
   keywords?: string
 }
 
+export interface CommandSelectModifiers {
+  /** ⌘ (or Ctrl) was held on Enter/click — the "secondary action" gesture. */
+  withCommand: boolean
+}
+
 interface CommandPaletteProps {
   items: readonly CommandItem[]
-  onSelect: (item: CommandItem) => void
+  onSelect: (item: CommandItem, modifiers: CommandSelectModifiers) => void
   onDismiss: () => void
   placeholder?: string
   label?: string
@@ -35,6 +40,7 @@ interface CommandPaletteProps {
   autoFocus?: boolean
   emptyLabel?: string
   className?: string
+  footer?: React.ReactNode
 }
 
 const ROW_HEIGHT = 38
@@ -69,6 +75,7 @@ export function CommandPalette({
   autoFocus = true,
   emptyLabel = "No matches",
   className,
+  footer,
 }: CommandPaletteProps) {
   const reduced = useReducedMotion()
   const [query, setQuery] = useState("")
@@ -135,7 +142,7 @@ export function CommandPalette({
     if (event.key === "Enter") {
       event.preventDefault()
       const chosen = results[active]
-      if (chosen) onSelect(chosen)
+      if (chosen) onSelect(chosen, { withCommand: event.metaKey || event.ctrlKey })
     }
   }
 
@@ -208,7 +215,7 @@ export function CommandPalette({
                     : { type: "spring", stiffness: 520, damping: 44 }
                 }
                 onPointerEnter={() => setActive(index)}
-                onClick={() => onSelect(item)}
+                onClick={(event) => onSelect(item, { withCommand: event.metaKey || event.ctrlKey })}
                 style={{ height: ROW_HEIGHT }}
                 className={cn(
                   "flex cursor-pointer items-center gap-2.5 rounded-md px-2.5 text-[13px]",
@@ -221,7 +228,11 @@ export function CommandPalette({
                   <span className="shrink-0 text-muted-foreground">{item.icon}</span>
                 ) : null}
                 <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                {item.group ? (
+                {item.hint ? (
+                  <span className="max-w-40 shrink-0 truncate font-mono text-[10px] text-muted-foreground">
+                    {item.hint}
+                  </span>
+                ) : item.group ? (
                   <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
                     {item.group}
                   </span>
@@ -231,6 +242,10 @@ export function CommandPalette({
           )}
         </AnimatePresence>
       </div>
+
+      {footer ? (
+        <div className="border-t border-border bg-muted/40 px-3 py-2">{footer}</div>
+      ) : null}
     </div>
   )
 }
