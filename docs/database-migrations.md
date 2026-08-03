@@ -6,7 +6,7 @@ Neon <> Vercel integration's database branching:
 
 | Event | Database | How migrations run |
 | --- | --- | --- |
-| Push to any branch | Neon preview branch `preview/<git-branch>` | Vercel preview build runs `vercel-build` (`scripts/db-migrate.mjs` then `next build`) with the branch URLs injected by the Neon integration |
+| Push to any branch | Neon preview branch `preview/<git-branch>` | Vercel preview build runs `vercel-build` (`pnpm db:migrate` then `next build`) with the branch URLs injected by the Neon integration |
 | Merge to `main` | Neon `main` branch (production) | Vercel production build runs the same `vercel-build` with the production URLs |
 | PR merged | — | `.github/workflows/neon-preview-cleanup.yml` deletes the `preview/<git-branch>` Neon branch |
 
@@ -30,9 +30,9 @@ pull request.
 To apply migrations to the database in your `.env.local` (normally the Neon
 `development` branch): `pnpm db:migrate`.
 
-The app uses pooled `DATABASE_URL`; database commands and the advisory lock use
-direct `DATABASE_URL_UNPOOLED`. For local non-pooled Postgres, both variables
-may contain the same URL.
+The app uses pooled `DATABASE_URL`; Drizzle database commands use direct
+`DATABASE_URL_UNPOOLED`. For local non-pooled Postgres, both variables may
+contain the same URL.
 
 `pnpm db:push` still exists for quick local prototyping against a throwaway
 branch, but never push to a database that is migration-managed — schema drift
@@ -89,12 +89,8 @@ from the Neon console or rely on the integration's obsolete-branch cleanup.
 
 - `drizzle-kit generate` is offline (it diffs `lib/db/schema.ts` against
   `drizzle/meta/`), so it needs no `DATABASE_URL`.
-- `pnpm db:migrate` (used by `vercel-build` too) wraps `drizzle-kit migrate`
-  in a Postgres advisory lock (`scripts/db-migrate.mjs`), so overlapping runs
-  against the same database serialize instead of racing. Both the lock and
-  Drizzle use `DATABASE_URL_UNPOOLED`: Neon PgBouncer transaction pooling does
-  not preserve session-level advisory locks and is not appropriate for schema
-  migrations.
+- `pnpm db:migrate` runs Drizzle's native `drizzle-kit migrate` command using
+  `DATABASE_URL_UNPOOLED`.
 - Migrations run at build time, before the new code is deployed, so they must
   be backward-compatible with the currently running code (expand/contract:
   add columns as nullable/with defaults first, remove in a later release).

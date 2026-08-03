@@ -33,9 +33,9 @@
     "video:render:launch": "pnpm video:render:product-hunt && pnpm video:render:social && pnpm video:render:team-loop",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check && node scripts/check-schema-migrations.mjs",
-    "db:migrate": "node scripts/db-migrate.mjs",
+    "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "vercel-build": "node scripts/db-migrate.mjs && next build",
+    "vercel-build": "pnpm db:migrate && next build",
     "email": "email dev --dir emails --port 3001"
   },
   "dependencies": {
