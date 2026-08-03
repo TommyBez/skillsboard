@@ -32,6 +32,7 @@
     "video:render:team-loop": "remotion render remotion/index.ts skillsboard-team-loop public/launch/skills-board-team-loop.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --gl=swangle --timeout=240000 --concurrency=2 --muted",
     "video:render:launch": "pnpm video:render:product-hunt && pnpm video:render:social && pnpm video:render:team-loop",
     "db:generate": "drizzle-kit generate",
+    "db:check": "drizzle-kit check && node scripts/check-schema-migrations.mjs",
     "db:migrate": "node scripts/db-migrate.mjs",
     "db:push": "drizzle-kit push",
     "vercel-build": "node scripts/db-migrate.mjs && next build",

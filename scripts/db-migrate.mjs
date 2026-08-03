@@ -3,7 +3,8 @@
 // builds of the same branch) serialize instead of racing on the migrations
 // table. drizzle-kit itself has no cross-process locking.
 //
-// Usage: node scripts/db-migrate.mjs   (DATABASE_URL from env or .env.local)
+// Usage: node scripts/db-migrate.mjs
+// DATABASE_URL_UNPOOLED is preferred; DATABASE_URL remains a local fallback.
 
 import { spawnSync } from "node:child_process"
 import { config } from "dotenv"
@@ -11,9 +12,12 @@ import pg from "pg"
 
 config({ path: ".env.local" })
 
-const databaseUrl = process.env.DATABASE_URL?.trim()
+const databaseUrl =
+  process.env.DATABASE_URL_UNPOOLED?.trim() || process.env.DATABASE_URL?.trim()
 if (!databaseUrl) {
-  console.error("DATABASE_URL is required. Add it to .env.local or the environment.")
+  console.error(
+    "DATABASE_URL_UNPOOLED or DATABASE_URL is required. Add it to .env.local or the environment.",
+  )
   process.exit(1)
 }
 
@@ -28,6 +32,12 @@ try {
   console.log("Acquiring migration advisory lock...")
   await client.query("SELECT pg_advisory_lock($1)", [MIGRATION_LOCK_KEY])
   const result = spawnSync("pnpm", ["exec", "drizzle-kit", "migrate"], {
+    env: {
+      ...process.env,
+      // Ensure drizzle-kit uses the same direct connection guarded by the lock.
+      DATABASE_URL: databaseUrl,
+      DATABASE_URL_UNPOOLED: databaseUrl,
+    },
     stdio: "inherit",
   })
   exitCode = result.status ?? 1

@@ -39,9 +39,13 @@ jobs:
         run: |
           set -euo pipefail
           api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
+          encoded_branch_name="$(
+            jq -rn --arg name "$BRANCH_NAME" '$name | @uri'
+          )"
 
           branch_id="$(
-            curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" "$api" |
+            curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" \
+              "${api}?search=${encoded_branch_name}&limit=100" |
               jq -r --arg name "$BRANCH_NAME" \
                 '.branches[] | select(.name == $name) | .id'
           )"

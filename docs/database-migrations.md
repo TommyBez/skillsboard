@@ -6,8 +6,8 @@ Neon <> Vercel integration's database branching:
 
 | Event | Database | How migrations run |
 | --- | --- | --- |
-| Push to any branch | Neon preview branch `preview/<git-branch>` | Vercel preview build runs `vercel-build` (`drizzle-kit migrate && next build`) with the branch `DATABASE_URL` injected by the Neon integration |
-| Merge to `main` | Neon `main` branch (production) | Vercel production build runs the same `vercel-build` with the production `DATABASE_URL` |
+| Push to any branch | Neon preview branch `preview/<git-branch>` | Vercel preview build runs `vercel-build` (`scripts/db-migrate.mjs` then `next build`) with the branch URLs injected by the Neon integration |
+| Merge to `main` | Neon `main` branch (production) | Vercel production build runs the same `vercel-build` with the production URLs |
 | PR merged | — | `.github/workflows/neon-preview-cleanup.yml` deletes the `preview/<git-branch>` Neon branch |
 
 Because every Neon preview branch is a copy-on-write fork of production, it
@@ -23,8 +23,16 @@ branch.
 4. The Vercel preview build applies it to that branch's Neon preview database;
    after merge, the production build applies it to production.
 
+`pnpm db:check` validates the migration history and fails if
+`lib/db/schema.ts` is ahead of the committed Drizzle snapshots. CI runs this on
+every pull request.
+
 To apply migrations to the database in your `.env.local` (normally the Neon
 `development` branch): `pnpm db:migrate`.
+
+The app uses pooled `DATABASE_URL`; database commands and the advisory lock use
+direct `DATABASE_URL_UNPOOLED`. For local non-pooled Postgres, both variables
+may contain the same URL.
 
 `pnpm db:push` still exists for quick local prototyping against a throwaway
 branch, but never push to a database that is migration-managed — schema drift
@@ -35,19 +43,19 @@ a generated migration instead.
 
 ### 1. Existing databases (no action needed)
 
-The Neon `main` and `development` branches were created with `db:push` before
-migrations existed, so they already have the schema of `drizzle/0000_init.sql`.
-That migration is guarded so the first `drizzle-kit migrate` against such a
-database succeeds and records it as applied in `drizzle.__drizzle_migrations`,
-while fresh databases get the full schema from the same file. The guards cover
-tables (`IF NOT EXISTS`), indexes (`IF NOT EXISTS`), and foreign keys
-(`duplicate_object` handlers); on an existing table the whole body is skipped,
-so in-table constraints and column defaults are assumed to already match. That
-assumption holds because `db:push` and the migration were both generated from
-the same `lib/db/schema.ts` (the known cosmetic `skill.tags` /
-`skill.examplePrompts` empty-array-default mis-introspection noted in
-`AGENTS.md` does not affect the stored schema). Later migrations do not need
-guards — only this baseline one has them.
+The Neon branches predate versioned migrations and were initially managed with
+`db:push`. `0000_init` is therefore guarded so it records the baseline without
+recreating objects that already exist, while still creating the complete schema
+on a fresh database. This includes the six email-consent tables.
+
+The baseline guards tables (`IF NOT EXISTS`), indexes (`IF NOT EXISTS`), and
+foreign keys (`duplicate_object` handlers). On an existing table the body is
+skipped, so its columns, in-table constraints, and defaults must already match.
+That assumption was verified against the live branches and holds because the
+existing objects and the baseline were derived from the same
+`lib/db/schema.ts`. Migrations after `0000` must not use blanket guards. The
+known cosmetic `skill.tags` / `skill.examplePrompts` empty-array-default
+mis-introspection noted in `AGENTS.md` does not affect this stored schema.
 
 ### 2. Neon integration on Vercel
 
@@ -55,7 +63,8 @@ In the Vercel dashboard -> Storage -> your Neon database -> Settings, make sure:
 
 - **Preview branches** ("Create a database branch for every preview
   deployment") is enabled. Neon then creates/reuses a branch named
-  `preview/<git-branch>` and injects its `DATABASE_URL` into preview builds.
+  `preview/<git-branch>` and injects `DATABASE_URL` plus the direct
+  `DATABASE_URL_UNPOOLED` into preview builds.
 - Optionally enable automatic deletion of obsolete preview branches; the
   GitHub workflow below covers the merge case regardless.
 
@@ -82,13 +91,14 @@ from the Neon console or rely on the integration's obsolete-branch cleanup.
   `drizzle/meta/`), so it needs no `DATABASE_URL`.
 - `pnpm db:migrate` (used by `vercel-build` too) wraps `drizzle-kit migrate`
   in a Postgres advisory lock (`scripts/db-migrate.mjs`), so overlapping runs
-  against the same database serialize instead of racing.
+  against the same database serialize instead of racing. Both the lock and
+  Drizzle use `DATABASE_URL_UNPOOLED`: Neon PgBouncer transaction pooling does
+  not preserve session-level advisory locks and is not appropriate for schema
+  migrations.
 - Migrations run at build time, before the new code is deployed, so they must
   be backward-compatible with the currently running code (expand/contract:
   add columns as nullable/with defaults first, remove in a later release).
 - If a production build fails at the migrate step, the previous deployment
-  stays live; fix the migration and push again. Note that `drizzle-kit
-  migrate` applies each migration file in its own transaction: files that
-  already succeeded in the failed run stay applied and recorded in
-  `drizzle.__drizzle_migrations`, and a recorded migration is never re-applied
-  — check the applied set before rewriting a failed migration file.
+  stays live. With the `pg` driver, Drizzle applies the pending migration batch
+  in one transaction, so a failure rolls that batch back. Inspect the database
+  and `drizzle.__drizzle_migrations` before editing the migration and retrying.

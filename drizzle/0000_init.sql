@@ -1,11 +1,7 @@
--- Baseline migration, guarded so it applies cleanly both to fresh databases
--- and to the pre-existing Neon branches whose schema was created with
--- `drizzle-kit push` before this repo adopted versioned migrations. The guards
--- cover tables (IF NOT EXISTS), indexes (IF NOT EXISTS), and foreign keys
--- (duplicate_object handlers). On an existing table, IF NOT EXISTS skips the
--- whole body, so in-table constraints and column defaults are assumed to
--- already match — which holds here because `push` and this file were both
--- derived from the same lib/db/schema.ts. Later migrations do not need guards.
+-- Initial migration for the complete schema at the versioned-migration
+-- cutover. It is idempotent (IF NOT EXISTS / duplicate_object guards) so it
+-- applies both to fresh databases and to pre-existing Neon branches whose
+-- schema was partially or fully created with `drizzle-kit push`.
 CREATE TABLE IF NOT EXISTS "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
@@ -253,4 +249,94 @@ CREATE INDEX IF NOT EXISTS "collection_org_created_idx" ON "collection" USING bt
 CREATE INDEX IF NOT EXISTS "collectionSkill_skill_idx" ON "collectionSkill" USING btree ("skillId");--> statement-breakpoint
 CREATE UNIQUE INDEX IF NOT EXISTS "member_org_user_unique" ON "member" USING btree ("organizationId","userId");--> statement-breakpoint
 CREATE INDEX IF NOT EXISTS "skill_org_created_idx" ON "skill" USING btree ("organizationId","createdAt");--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "skill_org_repo_name_unique" ON "skill" USING btree ("organizationId","githubUrl","skillName");
+CREATE UNIQUE INDEX IF NOT EXISTS "skill_org_repo_name_unique" ON "skill" USING btree ("organizationId","githubUrl","skillName");--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailConsentEvent" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"userId" text,
+	"emailHash" text NOT NULL,
+	"topic" text NOT NULL,
+	"action" text NOT NULL,
+	"source" text NOT NULL,
+	"noticeVersion" text NOT NULL,
+	"noticeText" text NOT NULL,
+	"providerReference" text,
+	"occurredAt" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailPreference" (
+	"userId" text NOT NULL,
+	"topic" text NOT NULL,
+	"emailHash" text NOT NULL,
+	"subscribed" boolean DEFAULT false NOT NULL,
+	"source" text NOT NULL,
+	"noticeVersion" text NOT NULL,
+	"noticeText" text NOT NULL,
+	"unsubscribeToken" text,
+	"consentedAt" timestamp with time zone,
+	"withdrawnAt" timestamp with time zone,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"updatedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "emailPreference_pkey" PRIMARY KEY("userId","topic")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailProactiveDelivery" (
+	"providerEmailId" text NOT NULL,
+	"emailHash" text NOT NULL,
+	"providerBroadcastId" text NOT NULL,
+	"sentAt" timestamp with time zone NOT NULL,
+	"receivedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "emailProactiveDelivery_pkey" PRIMARY KEY("providerEmailId","emailHash")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailProviderContactState" (
+	"provider" text NOT NULL,
+	"emailHash" text NOT NULL,
+	"unsubscribed" boolean NOT NULL,
+	"providerReference" text,
+	"providerOccurredAt" timestamp with time zone NOT NULL,
+	"observedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "emailProviderContactState_pkey" PRIMARY KEY("provider","emailHash")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailSuppression" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"emailHash" text NOT NULL,
+	"scope" text NOT NULL,
+	"reason" text NOT NULL,
+	"source" text NOT NULL,
+	"sourceReference" text,
+	"active" boolean DEFAULT true NOT NULL,
+	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"lastSeenAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"liftedAt" timestamp with time zone,
+	"liftedSource" text
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "emailWebhookEvent" (
+	"id" text PRIMARY KEY NOT NULL,
+	"type" text NOT NULL,
+	"payloadHash" text NOT NULL,
+	"providerEmailId" text,
+	"status" text DEFAULT 'pending' NOT NULL,
+	"attempts" integer DEFAULT 0 NOT NULL,
+	"providerCreatedAt" timestamp with time zone,
+	"receivedAt" timestamp with time zone DEFAULT now() NOT NULL,
+	"processedAt" timestamp with time zone,
+	"lastError" text
+);
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "emailConsentEvent" ADD CONSTRAINT "emailConsentEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE set null ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "emailPreference" ADD CONSTRAINT "emailPreference_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailConsentEvent_email_topic_idx" ON "emailConsentEvent" USING btree ("emailHash","topic","occurredAt");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailConsentEvent_user_idx" ON "emailConsentEvent" USING btree ("userId","occurredAt");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailPreference_topic_subscribed_idx" ON "emailPreference" USING btree ("topic","subscribed");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailProactiveDelivery_email_sent_idx" ON "emailProactiveDelivery" USING btree ("emailHash","sentAt");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailProviderContactState_email_idx" ON "emailProviderContactState" USING btree ("emailHash","providerOccurredAt");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "emailSuppression_email_scope_reason_unique" ON "emailSuppression" USING btree ("emailHash","scope","reason");--> statement-breakpoint
+CREATE INDEX IF NOT EXISTS "emailSuppression_active_lookup_idx" ON "emailSuppression" USING btree ("emailHash","active","scope");
