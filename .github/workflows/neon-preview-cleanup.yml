@@ -1,0 +1,79 @@
+name: Cleanup Neon preview branch
+
+# When a PR is merged into main, delete the Neon database branch that the
+# Neon <> Vercel integration created for its preview deployments
+# (named `preview/<git-branch>`).
+#
+# Requires:
+#   - repository variable NEON_PROJECT_ID (Neon console -> Project settings)
+#   - repository secret  NEON_API_KEY    (Neon console -> Account -> API keys)
+#
+# Calls the Neon API directly instead of a third-party action so that a
+# missing branch is the only tolerated failure — auth/config/API errors still
+# fail the workflow. Fork PRs are skipped: they don't receive NEON_API_KEY,
+# and Vercel only builds fork previews after maintainer authorization.
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  delete-neon-branch:
+    name: Delete Neon preview branch
+    if: >-
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Delete branch preview/${{ github.event.pull_request.head.ref }}
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+          # Passed through env (not inline interpolation) so a hostile branch
+          # name can't inject into the shell.
+          BRANCH_NAME: preview/${{ github.event.pull_request.head.ref }}
+        run: |
+          set -euo pipefail
+          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
+          encoded_branch_name="$(
+            jq -rn --arg name "$BRANCH_NAME" '$name | @uri'
+          )"
+
+          branch_id=""
+          cursor=""
+
+          while [ -z "$branch_id" ]; do
+            request_url="${api}?search=${encoded_branch_name}&limit=100"
+            if [ -n "$cursor" ]; then
+              encoded_cursor="$(jq -rn --arg value "$cursor" '$value | @uri')"
+              request_url="${request_url}&cursor=${encoded_cursor}"
+            fi
+
+            response="$(
+              curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" "$request_url"
+            )"
+            branch_id="$(
+              jq -r --arg name "$BRANCH_NAME" \
+                '.branches[]? | select(.name == $name) | .id' <<< "$response"
+            )"
+            cursor="$(jq -r '.pagination.next // empty' <<< "$response")"
+
+            if [ -z "$cursor" ]; then
+              break
+            fi
+          done
+
+          if [ -z "$branch_id" ]; then
+            echo "Branch '$BRANCH_NAME' not found — already deleted, nothing to do."
+            exit 0
+          fi
+
+          echo "Deleting Neon branch '$BRANCH_NAME' ($branch_id)"
+          curl -sfS -X DELETE \
+            -H "Authorization: Bearer ${NEON_API_KEY}" \
+            "$api/$branch_id" > /dev/null
+          echo "Deleted."

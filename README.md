@@ -82,10 +82,10 @@ Generate a Better Auth secret with `openssl rand -base64 32`, then add it and yo
 
 ### 2. Prepare the database
 
-Push the Drizzle schema to a new database. This creates both the Better Auth tables and the application-specific tables from `lib/db/schema.ts`.
+Apply the committed Drizzle migrations to a new database. This creates both the Better Auth tables and the application-specific tables from the versioned SQL in `drizzle/`.
 
 ```bash
-pnpm db:push
+pnpm db:migrate
 ```
 
 ### 3. Start developing
@@ -100,7 +100,8 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes | PostgreSQL connection string used by Better Auth and Drizzle. |
+| `DATABASE_URL` | Yes | PostgreSQL connection string used by the application; Neon may use the pooled URL here. |
+| `DATABASE_URL_UNPOOLED` | For migrations on Neon | Direct PostgreSQL connection used by Drizzle migrations. It can match `DATABASE_URL` for local, non-pooled Postgres. |
 | `BETTER_AUTH_SECRET` | Yes | Secret used to sign and encrypt authentication data. |
 | `BETTER_AUTH_URL` | Recommended | Public application origin; use `http://localhost:3000` locally. |
 | `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
@@ -138,7 +139,10 @@ Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signin
 | `pnpm dev` | Start the Turbopack development server. |
 | `pnpm typecheck` | Run the TypeScript compiler without emitting files. |
 | `pnpm check` | Run the repository's required local checks. |
-| `pnpm db:push` | Push the Drizzle schema to the configured PostgreSQL database. |
+| `pnpm db:generate --name <description>` | Generate a versioned migration after changing the schema. |
+| `pnpm db:check` | Check that the schema and committed migration snapshots match. |
+| `pnpm db:migrate` | Apply pending migrations to the configured database. |
+| `pnpm db:push` | Push the schema only to a throwaway database used for prototyping. |
 | `pnpm build` | Create a production build. |
 | `pnpm start` | Start the production server. |
 | `pnpm email` | Preview React Email templates on port 3001. |
