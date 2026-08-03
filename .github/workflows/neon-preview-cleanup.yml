@@ -43,12 +43,29 @@ jobs:
             jq -rn --arg name "$BRANCH_NAME" '$name | @uri'
           )"
 
-          branch_id="$(
-            curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" \
-              "${api}?search=${encoded_branch_name}&limit=100" |
+          branch_id=""
+          cursor=""
+
+          while [ -z "$branch_id" ]; do
+            request_url="${api}?search=${encoded_branch_name}&limit=100"
+            if [ -n "$cursor" ]; then
+              encoded_cursor="$(jq -rn --arg value "$cursor" '$value | @uri')"
+              request_url="${request_url}&cursor=${encoded_cursor}"
+            fi
+
+            response="$(
+              curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" "$request_url"
+            )"
+            branch_id="$(
               jq -r --arg name "$BRANCH_NAME" \
-                '.branches[] | select(.name == $name) | .id'
-          )"
+                '.branches[]? | select(.name == $name) | .id' <<< "$response"
+            )"
+            cursor="$(jq -r '.pagination.next // empty' <<< "$response")"
+
+            if [ -z "$cursor" ]; then
+              break
+            fi
+          done
 
           if [ -z "$branch_id" ]; then
             echo "Branch '$BRANCH_NAME' not found — already deleted, nothing to do."

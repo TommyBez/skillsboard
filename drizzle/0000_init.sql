@@ -1,7 +1,8 @@
 -- Initial migration for the complete schema at the versioned-migration
--- cutover. It is idempotent (IF NOT EXISTS / duplicate_object guards) so it
--- applies both to fresh databases and to pre-existing Neon branches whose
--- schema was partially or fully created with `drizzle-kit push`.
+-- cutover. Tables, indexes, and foreign keys are guarded (IF NOT EXISTS /
+-- duplicate_object), so it applies both to fresh databases and to pre-existing
+-- Neon branches created with `drizzle-kit push`. On an existing table, columns,
+-- constraints, and defaults are assumed to already match.
 CREATE TABLE IF NOT EXISTS "account" (
 	"id" text PRIMARY KEY NOT NULL,
 	"accountId" text NOT NULL,
