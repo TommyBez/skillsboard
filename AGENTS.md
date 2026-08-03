@@ -6,14 +6,14 @@
 `skillsboard` is a single Next.js 16 (App Router, Turbopack) app — UI + API routes in one process. Its backing store is a **Neon PostgreSQL** database (pulled from Vercel; see below). Auth is Better Auth (email OTP via Resend + organizations + OAuth/MCP provider). There is no separate backend to run.
 
 ### Running locally
-- Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the Development variables (Neon Postgres `DATABASE_URL`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
+- Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the Development variables (Neon Postgres `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:
   `npx vercel env pull .env.local --environment=development --yes`
   (run `npx vercel link --yes --project skillsboard --scope tommasos-projects-bb9d6551` first if `.vercel/project.json` is absent). This points the app at the persistent Neon `development` branch, isolated from Production's `main` branch. Preview deployments use Neon-managed ephemeral branches. Set `BETTER_AUTH_URL=http://localhost:3000` in `.env.local` for local auth callbacks. PostHog variables are scoped to Vercel Production and analytics is intentionally disabled in local development and Preview deployments.
 - Dev server: `pnpm dev` (serves `http://localhost:3000`). Standard scripts live in `package.json`.
 - After changing `.env.local`, restart `pnpm dev` so the `pg` pool in `lib/db/index.ts` (created at module load) picks up the new `DATABASE_URL`.
 
 ### Database schema
-The Neon `development` branch is normally already aligned. `pnpm db:push` reads `.env.local` through `drizzle.config.ts` and pushes every table defined in `lib/db/schema.ts` within the `public` schema, including Better Auth and the custom `skill` table. Confirm that `.env.local` targets the `development` branch before running it. This repository does not use standalone SQL migration scripts.
+The schema lives in `lib/db/schema.ts` and is managed with versioned Drizzle migrations committed in `drizzle/` (see `docs/database-migrations.md`). After editing the schema, run `pnpm db:generate --name <description>` and commit the generated SQL together with the schema change — do not hand-edit `drizzle/meta/`. Vercel builds apply pending migrations automatically (`vercel-build` runs `pnpm db:migrate` before `next build`): preview builds against the Neon `preview/<git-branch>` database branch, production builds against Neon `main`. Drizzle uses the direct `DATABASE_URL_UNPOOLED`; the app continues to use pooled `DATABASE_URL`. To align the database in `.env.local` (normally the Neon `development` branch), run `pnpm db:migrate`. `pnpm db:push` remains for throwaway prototyping only; never push to a migration-managed database, or the next `db:migrate` will fail on drift.
 
 ### Gotchas
 - `pnpm lint` runs `eslint .`, but ESLint is **not** a declared dependency and there is no ESLint config, so it fails out of the box (not a code problem). For type checking use `npx tsc --noEmit`.
