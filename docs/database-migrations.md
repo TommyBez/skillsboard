@@ -23,9 +23,9 @@ branch.
 4. The Vercel preview build applies it to that branch's Neon preview database;
    after merge, the production build applies it to production.
 
-`pnpm db:check` validates the migration history and fails if
-`lib/db/schema.ts` is ahead of the committed Drizzle snapshots. CI runs this on
-every pull request.
+`pnpm db:check` validates the Drizzle metadata and fails if
+`lib/db/schema.ts` is ahead of the committed snapshots. CI runs this on every
+pull request.
 
 To apply migrations to the database in your `.env.local` (normally the Neon
 `development` branch): `pnpm db:migrate`.
