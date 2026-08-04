@@ -91,6 +91,7 @@
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "esbuild": "^0.28.1",
+    "playwright": "1.62.1",
     "postcss": "^8.5",
     "react-email": "^6.9.0",
     "tailwindcss": "^4.2.0",

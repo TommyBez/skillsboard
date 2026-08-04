@@ -3,11 +3,7 @@ import Link from "next/link"
 import { ArrowUpRightIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
-import {
-  ResourceCta,
-  ResourceFooter,
-  ResourceHeader,
-} from "@/components/resources/resource-chrome"
+import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildResourceIndexSchema } from "@/lib/seo/resource-schema"
 import {
   resourceEntries,
@@ -41,9 +37,8 @@ const populatedSections = resourceSections
 
 export default function ResourcesPage() {
   return (
-    <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
+    <>
       <JsonLd data={buildResourceIndexSchema()} />
-      <ResourceHeader landingPath={resourcePaths.index} location="resources_header" />
 
       <main>
         <header className="relative isolate border-b border-border/70">
@@ -143,8 +138,6 @@ export default function ResourcesPage() {
           </section>
         </div>
       </main>
-
-      <ResourceFooter />
-    </div>
+    </>
   )
 }

@@ -4,11 +4,7 @@ import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 import { CopyButton } from "@/components/copy-button"
 import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { JsonLd } from "@/components/json-ld"
-import {
-  ResourceCta,
-  ResourceFooter,
-  ResourceHeader,
-} from "@/components/resources/resource-chrome"
+import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
@@ -25,10 +21,8 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
 
   return (
-    <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
+    <>
       <JsonLd data={buildGuideSchema(guide)} />
-
-      <ResourceHeader landingPath={guide.path} location="guide_header" />
 
       <main>
         <article>
@@ -349,8 +343,6 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
           </div>
         </article>
       </main>
-
-      <ResourceFooter />
-    </div>
+    </>
   )
 }
