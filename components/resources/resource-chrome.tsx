@@ -76,7 +76,14 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
       >
         Resources
       </Link>
-      <ThemeToggle />
+      {/* Sized and cornered to the controls beside it. The bare component is
+          built for the app shell — 40px, `rounded-xl`, matching the nav pill
+          it sits next to there — and unadapted it was the one round 40px
+          control in a strip of 32px 3px-cornered ones. Not `base.headerToggle`
+          from the landing chrome, which would be the closer match by eye: its
+          border and field are `--lp-*` custom properties declared on that
+          stylesheet's `.root`, which these pages are not inside. */}
+      <ThemeToggle className="size-8 rounded-[3px]" />
       <Button
         size="sm"
         variant="ghost"
