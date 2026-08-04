@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
-import { Brand } from "@/components/brand"
 import { CopyButton } from "@/components/copy-button"
 import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { JsonLd } from "@/components/json-ld"
@@ -10,7 +9,6 @@ import {
   ResourceFooter,
   ResourceHeader,
 } from "@/components/resources/resource-chrome"
-import { Skeleton } from "@/components/ui/skeleton"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
@@ -22,59 +20,6 @@ const chapters = [
   { href: "#pitfalls", label: "Avoid pitfalls" },
   { href: "#checklist", label: "Use the checklist" },
 ] as const
-
-/**
- * Shell shown while the slug resolves. Every element below the header depends
- * on the guide, so the fallback reproduces the page frame — sticky header bar,
- * hero, and the two-column body — at skeleton fidelity to hold the layout.
- * The header actions are omitted rather than rendered against a placeholder
- * path, so no CTA click is attributed to the wrong guide.
- */
-export function GuidePageFallback() {
-  return (
-    <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
-      {/*
-        No `aria-hidden` here: `Brand` renders a real, keyboard-focusable link
-        home, and hiding it from assistive tech would leave a focus stop that
-        screen readers cannot announce.
-      */}
-      <div className="sticky top-0 z-40 flex h-14 items-center border-b border-border/80 bg-background/92 px-4 backdrop-blur-xl sm:px-5 md:px-10">
-        <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between">
-          <Brand compactOnMobile />
-        </div>
-      </div>
-
-      <main aria-busy="true" aria-label="Loading guide">
-        <div className="border-b border-border/70">
-          <div className="mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
-            <div>
-              <Skeleton className="h-5 w-40" />
-              <Skeleton className="mt-7 h-4 w-32" />
-              <Skeleton className="mt-5 h-16 w-full max-w-2xl md:h-24" />
-              <Skeleton className="mt-7 h-6 w-full max-w-3xl" />
-            </div>
-            <div className="border-l-2 border-primary pl-5">
-              <Skeleton className="h-4 w-28" />
-              <Skeleton className="mt-3 h-16 w-full" />
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-auto grid w-full max-w-[1320px] gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
-          <Skeleton className="hidden h-64 rounded-[3px] lg:block" />
-          <div className="min-w-0 max-w-4xl">
-            <Skeleton className="h-9 w-2/3 md:h-10" />
-            <Skeleton className="mt-5 h-24 w-full" />
-            <Skeleton className="mt-16 h-9 w-1/2 md:h-10" />
-            <Skeleton className="mt-5 h-56 w-full" />
-          </div>
-        </div>
-      </main>
-
-      <ResourceFooter />
-    </div>
-  )
-}
 
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
@@ -370,8 +315,9 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                         key={resource.path}
                         href={resource.path}
                         // See the note on the resources index: resolves the
-                        // guide's slug before the click so a related-guide
-                        // navigation shows content, not the loading shell.
+                        // guide's slug before the click, so a related-guide
+                        // navigation renders content instead of waiting on a
+                        // server hop.
                         prefetch
                         className="group grid gap-3 rounded-[3px] border border-border bg-card p-5 transition-colors hover:border-primary/70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                       >

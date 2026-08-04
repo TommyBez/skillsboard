@@ -97,14 +97,13 @@ export default function ResourcesPage() {
                   <Link
                     key={entry.path}
                     href={entry.path}
-                    // Guides read `params` behind a `<Suspense>` boundary, so the
-                    // shared route shell alone would land on the skeleton. Opting
-                    // into per-link prefetching resolves the slug ahead of the
-                    // click. Every guide is prerendered, so this is served from
-                    // the static cache rather than a server invocation per link,
-                    // but it is a deliberate spend, not free: it takes this
-                    // page's prefetch payload from 48.2 KB to 107.4 KB. Worth it
-                    // on the guides index, where following a card is the point.
+                    // `/guides/[slug]` has no route-level shell to share — the
+                    // page renders straight from `params`, so the reusable shell
+                    // Partial Prefetching would hand out is empty. Per-link
+                    // prefetching is what makes a guide click instant: it pulls
+                    // the slug's prerendered payload from the static cache, no
+                    // server invocation. It is a deliberate spend on this page's
+                    // prefetch budget, and the guides index is where it earns out.
                     prefetch
                     className="group flex min-h-64 flex-col rounded-[3px] border border-border bg-card p-6 transition-colors hover:border-primary/70 md:p-7"
                   >
