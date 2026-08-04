@@ -1,7 +1,7 @@
 import { ResourceShell } from "@/components/resources/resource-chrome"
 
-export default function ResourcesLayout({
+export default function GuidesLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  return <ResourceShell location="resources_header">{children}</ResourceShell>
+  return <ResourceShell location="guide_header">{children}</ResourceShell>
 }

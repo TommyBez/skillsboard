@@ -176,7 +176,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
               </p>
               <div className="mt-7">
-                <ResourceCta landingPath={guide.path} location="guide_inline" />
+                <ResourceCta location="guide_inline" />
               </div>
             </section>
 
@@ -335,7 +335,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 Save the reviewed skill, document the path that works, and keep the recommendation visible to the whole team.
               </p>
               <div className="mt-7 flex justify-center">
-                <ResourceCta landingPath={guide.path} location="guide_closing" />
+                <ResourceCta location="guide_closing" />
               </div>
             </section>
           </div>

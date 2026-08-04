@@ -37,7 +37,6 @@ export function primaryCtaEventProperties(
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   return {
     destination: primaryAction.href,
-    landing_path: "/",
     location,
     visitor_state: "anonymous",
   }

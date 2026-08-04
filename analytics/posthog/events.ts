@@ -1,10 +1,16 @@
-import type { GuidePath } from "@/lib/seo/guides"
-import type { resourcePaths } from "@/lib/seo/resources"
-
 type NonTeamEventPropertiesMap = {
+  /**
+   * No `landing_path`. It enumerated every guide path so a click could be
+   * attributed to the page it came from, but posthog-js already stamps
+   * `$pathname` and `$current_url` on every capture, and the `before_send`
+   * sanitizer keeps them intact for these routes — it strips non-UTM query
+   * params and redacts `/invite/*`, nothing else. The property restated the
+   * URL, and threading it through the chrome forced the guide layout onto the
+   * `[slug]` segment to get at the slug. `location` stays because it is the
+   * one thing the URL cannot tell you: which slot on the page was clicked.
+   */
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    landing_path: "/" | GuidePath | typeof resourcePaths.index
     location:
       | "header"
       | "hero"

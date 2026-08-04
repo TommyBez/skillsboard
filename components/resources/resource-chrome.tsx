@@ -9,11 +9,9 @@ import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
-import type { GuidePath } from "@/lib/seo/guides"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-type ResourceLandingPath = GuidePath | typeof resourcePaths.index
 type ResourceHeaderLocation = "guide_header" | "resources_header"
 type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
 
@@ -37,24 +35,16 @@ async function CurrentYear() {
 }
 
 function ctaProperties(
-  landingPath: ResourceLandingPath,
   location: ResourceHeaderLocation | ResourceCtaLocation,
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   return {
     destination: ctaHref,
-    landing_path: landingPath,
     location,
     visitor_state: "anonymous",
   }
 }
 
-export function ResourceCta({
-  landingPath,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  location: ResourceCtaLocation
-}) {
+export function ResourceCta({ location }: { location: ResourceCtaLocation }) {
   return (
     <Button
       size="lg"
@@ -65,7 +55,7 @@ export function ResourceCta({
           href={ctaHref}
           analytics={{
             event: "landing_cta_clicked",
-            properties: ctaProperties(landingPath, location),
+            properties: ctaProperties(location),
           }}
         />
       )}
@@ -76,18 +66,12 @@ export function ResourceCta({
   )
 }
 
-function ResourceHeaderActions({
-  landingPath,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  location: ResourceHeaderLocation
-}) {
+function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation }) {
   return (
     <div className="flex min-w-0 items-center gap-1.5">
       <Link
         href={resourcePaths.index}
-        aria-current={landingPath === resourcePaths.index ? "page" : undefined}
+        aria-current={location === "resources_header" ? "page" : undefined}
         className="rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
       >
         Resources
@@ -111,7 +95,7 @@ function ResourceHeaderActions({
             href={ctaHref}
             analytics={{
               event: "landing_cta_clicked",
-              properties: ctaProperties(landingPath, location),
+              properties: ctaProperties(location),
             }}
           />
         )}
@@ -123,18 +107,12 @@ function ResourceHeaderActions({
   )
 }
 
-export function ResourceHeader({
-  landingPath,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  location: ResourceHeaderLocation
-}) {
+export function ResourceHeader({ location }: { location: ResourceHeaderLocation }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/92 backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-5 md:px-10">
         <Brand compactOnMobile />
-        <ResourceHeaderActions landingPath={landingPath} location={location} />
+        <ResourceHeaderActions location={location} />
       </div>
     </header>
   )
@@ -145,17 +123,15 @@ export function ResourceHeader({
  * three lines they should be and no page renders its own header or footer.
  */
 export function ResourceShell({
-  landingPath,
   location,
   children,
 }: {
-  landingPath: ResourceLandingPath
   location: ResourceHeaderLocation
   children: React.ReactNode
 }) {
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
-      <ResourceHeader landingPath={landingPath} location={location} />
+      <ResourceHeader location={location} />
       <main>{children}</main>
       <ResourceFooter />
     </div>
