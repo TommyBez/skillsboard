@@ -97,6 +97,12 @@ export default function ResourcesPage() {
                   <Link
                     key={entry.path}
                     href={entry.path}
+                    // Guides read `params` behind a `<Suspense>` boundary, so the
+                    // shared route shell alone would land on the skeleton. Opting
+                    // into per-link prefetching resolves the slug ahead of the
+                    // click; every guide is prerendered, so this is served from
+                    // the static cache rather than a server invocation per link.
+                    prefetch
                     className="group flex min-h-64 flex-col rounded-[3px] border border-border bg-card p-6 transition-colors hover:border-primary/70 md:p-7"
                   >
                     <div className="flex items-start justify-between gap-4">
