@@ -5,8 +5,7 @@ import type { NextConfig } from 'next'
  * `node_modules/next/dist/docs/` (see AGENTS.md). Key pages:
  * - 01-app/02-guides/adopting-partial-prefetching.md
  * - 01-app/02-guides/instant-navigation.md
- * - 01-app/02-guides/offline-support.md
- * - 01-app/03-api-reference/05-config/01-next-config-js/{partialPrefetching,reactCompiler,turbopackRustReactCompiler,useOffline,optimizePackageImports}.md
+ * - 01-app/03-api-reference/05-config/01-next-config-js/{partialPrefetching,reactCompiler}.md
  */
 const nextConfig = {
   // Instant Navigations: Cache Components + Partial Prefetching
@@ -20,16 +19,8 @@ const nextConfig = {
       expire: 3600,
     },
   },
-  // React Compiler via the Turbopack Rust port (no babel-plugin needed).
+  // Stable React Compiler (Babel path; see reactCompiler.md).
   reactCompiler: true,
-  experimental: {
-    turbopackRustReactCompiler: true,
-    // Retry soft navigations / RSC fetches / Server Actions when offline.
-    useOffline: true,
-    // Packages beyond Next's default optimizePackageImports list
-    // (lucide-react and date-fns are already optimized by default).
-    optimizePackageImports: ["@base-ui/react", "motion"],
-  },
   async rewrites() {
     return [
       {

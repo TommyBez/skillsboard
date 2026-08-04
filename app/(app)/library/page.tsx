@@ -96,9 +96,9 @@ async function LibraryFilters({ searchParams }: LibraryPageProps) {
         <nav aria-label="Filter library by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
           <TagsIcon className="mt-2 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
-            <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={libraryHref(null)} prefetch aria-current={!params.tag ? "page" : undefined} />}>All</Button>
+            <Button size="sm" variant={!params.tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={libraryHref(null)} aria-current={!params.tag ? "page" : undefined} />}>All</Button>
             {tags.map((tag) => (
-              <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={libraryHref(tag)} prefetch aria-current={params.tag === tag ? "page" : undefined} />}>
+              <Button key={tag} size="sm" variant={params.tag === tag ? "default" : "outline"} nativeButton={false} render={<TransitionLink href={libraryHref(tag)} aria-current={params.tag === tag ? "page" : undefined} />}>
                 {tag}
               </Button>
             ))}

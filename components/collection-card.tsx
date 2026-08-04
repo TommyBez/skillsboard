@@ -51,12 +51,7 @@ export function CollectionCard({
 
       <div className="flex flex-1 flex-col gap-2">
         <h2 className="text-2xl font-semibold tracking-[-0.035em]">
-          <Link
-            href={`/collections/${id}`}
-            // Runtime-prefetch params-bound cached collection data ahead of the click.
-            prefetch
-            className="outline-none after:absolute after:inset-0 after:content-['']"
-          >
+          <Link href={`/collections/${id}`} className="outline-none after:absolute after:inset-0 after:content-['']">
             {title}
           </Link>
         </h2>

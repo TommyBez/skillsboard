@@ -106,7 +106,6 @@ function CatalogViewTabs({
               render={
                 <Link
                   href={href}
-                  prefetch
                   aria-current={isActive ? "page" : undefined}
                   onClick={(event) => {
                     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) {
@@ -141,7 +140,7 @@ export function DiscoverFiltersFallback() {
             size="sm"
             variant={item.value === "trending" ? "default" : "outline"}
             nativeButton={false}
-            render={<Link href={`/discover?view=${item.value}`} prefetch />}
+            render={<Link href={`/discover?view=${item.value}`} />}
           >
             {item.label}
           </Button>
