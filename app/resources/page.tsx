@@ -100,8 +100,11 @@ export default function ResourcesPage() {
                     // Guides read `params` behind a `<Suspense>` boundary, so the
                     // shared route shell alone would land on the skeleton. Opting
                     // into per-link prefetching resolves the slug ahead of the
-                    // click; every guide is prerendered, so this is served from
-                    // the static cache rather than a server invocation per link.
+                    // click. Every guide is prerendered, so this is served from
+                    // the static cache rather than a server invocation per link,
+                    // but it is a deliberate spend, not free: it takes this
+                    // page's prefetch payload from 48.2 KB to 107.4 KB. Worth it
+                    // on the guides index, where following a card is the point.
                     prefetch
                     className="group flex min-h-64 flex-col rounded-[3px] border border-border bg-card p-6 transition-colors hover:border-primary/70 md:p-7"
                   >
