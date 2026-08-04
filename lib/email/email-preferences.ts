@@ -15,7 +15,7 @@ import {
   canConfirmProductCommunicationsUnsubscribe,
   canLiftProviderUnsubscribe,
   evaluateProductCommunicationsEligibility,
-  isAutonomouslyLiftableSuppression,
+  isExplicitConsentLiftableSuppression,
   isPermanentDeliverySuppression,
   normalizeEmailAddress,
   planProviderContactEvent,
@@ -883,7 +883,7 @@ export function describeSuppressionReason(reason: string): string {
 }
 
 export function canExplicitConsentLiftSuppression(reason: string): boolean {
-  return isAutonomouslyLiftableSuppression(reason)
+  return isExplicitConsentLiftableSuppression(reason)
 }
 
 export function suppressionBlocksAllDelivery(reason: string): boolean {
