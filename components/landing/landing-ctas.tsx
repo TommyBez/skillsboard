@@ -6,86 +6,41 @@ import base from "@/components/landing/styles/base.module.css"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
-import { getSession } from "@/lib/session"
 
 export type CtaLocation = "header" | "hero" | "closing"
 
-export function primaryAction(signedIn: boolean): {
-  href: "/library" | "/sign-up"
-  label: string
-} {
-  return signedIn
-    ? { href: "/library", label: "Open your library" }
-    : { href: "/sign-up", label: "Create your team library" }
-}
+/**
+ * The landing page's one action, stated once.
+ *
+ * It used to branch on the session: signed-in visitors were offered "Open your
+ * library" instead. That made every call to action on the page an async,
+ * session-dependent render — three Suspense boundaries, three skeletons, and a
+ * fallback that had to be a *working* link because it was the no-script final
+ * render. The landing page is the acquisition surface: the invitation is the
+ * same for everyone, and a signed-in visitor who takes it lands in their
+ * library anyway. One label, no session read, no streaming hole.
+ */
+export const primaryAction = {
+  href: "/sign-up",
+  label: "Create your team library",
+} as const
 
+/**
+ * `visitor_state` is fixed at "anonymous" because the CTA no longer reads the
+ * session — it is a property of the action offered, not a claim about who is
+ * looking at it. Signed-in traffic is still distinguishable downstream by the
+ * identified person on the event.
+ */
 export function primaryCtaEventProperties(
-  signedIn: boolean,
   location: CtaLocation,
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
-  const primary = primaryAction(signedIn)
   return {
-    destination: primary.href,
+    destination: primaryAction.href,
     landing_path: "/",
     location,
-    visitor_state: signedIn ? "signed_in" : "anonymous",
+    visitor_state: "anonymous",
   }
-}
-
-/**
- * Streaming placeholder for the command strip.
- *
- * Keep the theme toggle (auth-independent) and skeleton the auth-dependent
- * controls so signed-in visitors do not flash the anonymous "Sign in" /
- * "Create your team library" strip while the session resolves.
- */
-export function HomeHeaderActionsFallback() {
-  return (
-    <div
-      className="flex items-center gap-2"
-      aria-busy="true"
-      aria-label="Loading navigation"
-      role="status"
-    >
-      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
-      <Skeleton className="hidden h-9 w-16 rounded-[3px] sm:block" aria-hidden="true" />
-      <Skeleton className="h-8 w-16 rounded-[3px] sm:h-9 sm:w-44" aria-hidden="true" />
-    </div>
-  )
-}
-
-/**
- * Streaming placeholder for a primary action.
- *
- * A Suspense fallback is only ever replaced by script, so without JavaScript
- * this is the final render — a skeleton would leave the page's main action as
- * a dead grey box. Render the anonymous action instead: it is a working link
- * to the same place the resolved button sends a signed-out visitor, and for a
- * signed-in one it is replaced the moment the session lands.
- *
- * It carries `ctaPrimary` for the same reason it carries an href: without
- * script this is what a visitor sees, and it has to be the same button as the
- * one beside it. Without that class it rendered as the bare filled variant —
- * fill clipped to the padding box, so two pixels shorter than its neighbours,
- * and with no lit top edge — three chapters' primary actions quietly a
- * different control from the hero's.
- */
-export function HomeCtaFallback({ className }: { className?: string }) {
-  const primary = primaryAction(false)
-
-  return (
-    <Button
-      size="lg"
-      className={`${base.ctaButton} ${base.ctaPrimary} ${className ?? ""}`}
-      nativeButton={false}
-      render={<Link href={primary.href} />}
-    >
-      {primary.label}
-      <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
-    </Button>
-  )
 }
 
 /**
@@ -106,24 +61,20 @@ export function HomeCtaFallback({ className }: { className?: string }) {
  * extent that is exactly its box, so it finally shares the theme toggle's 36
  * rows and its centre.
  */
-function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
-  const primary = primaryAction(signedIn)
-
+export function HomeHeaderActions() {
   return (
     <div className="flex items-center gap-2">
       <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
       <nav className="flex items-center gap-2" aria-label="Main navigation">
-        {!signedIn ? (
-          <Button
-            size="sm"
-            variant="ghost"
-            className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 sm:inline-flex`}
-            nativeButton={false}
-            render={<Link href="/sign-in" />}
-          >
-            Sign in
-          </Button>
-        ) : null}
+        <Button
+          size="sm"
+          variant="ghost"
+          className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 sm:inline-flex`}
+          nativeButton={false}
+          render={<Link href="/sign-in" />}
+        >
+          Sign in
+        </Button>
         <Button
           size="sm"
           variant="outline"
@@ -131,16 +82,16 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
           nativeButton={false}
           render={(
             <TrackedLink
-              href={primary.href}
+              href={primaryAction.href}
               analytics={{
                 event: "landing_cta_clicked",
-                properties: primaryCtaEventProperties(signedIn, "header"),
+                properties: primaryCtaEventProperties("header"),
               }}
             />
           )}
         >
-          <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
-          <span className="hidden sm:inline">{primary.label}</span>
+          <span className="sm:hidden">Start</span>
+          <span className="hidden sm:inline">{primaryAction.label}</span>
           <ArrowRightIcon
             className={`${base.ctaArrow} hidden sm:block`}
             data-icon="inline-end"
@@ -151,14 +102,7 @@ function HomeHeaderActionsView({ signedIn }: { signedIn: boolean }) {
   )
 }
 
-export async function HomeHeaderActions() {
-  const session = await getSession()
-  return <HomeHeaderActionsView signedIn={Boolean(session?.user)} />
-}
-
-function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
-  const primary = primaryAction(signedIn)
-
+export function HomeHeroActions() {
   return (
     <div className="flex flex-wrap gap-3">
       <span className={base.magnetic} data-magnetic>
@@ -168,15 +112,15 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
           nativeButton={false}
           render={(
             <TrackedLink
-              href={primary.href}
+              href={primaryAction.href}
               analytics={{
                 event: "landing_cta_clicked",
-                properties: primaryCtaEventProperties(signedIn, "hero"),
+                properties: primaryCtaEventProperties("hero"),
               }}
             />
           )}
         >
-          {primary.label}
+          {primaryAction.label}
           <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
         </Button>
       </span>
@@ -190,7 +134,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
             href="#mcp"
             analytics={{
               event: "mcp_entry_clicked",
-              properties: mcpEntryEventProperties(signedIn, "landing_hero", "#mcp"),
+              properties: mcpEntryEventProperties(false, "landing_hero", "#mcp"),
             }}
           />
         )}
@@ -202,23 +146,7 @@ function HomeHeroActionsView({ signedIn }: { signedIn: boolean }) {
   )
 }
 
-export async function HomeHeroActions() {
-  const session = await getSession()
-  return <HomeHeroActionsView signedIn={Boolean(session?.user)} />
-}
-
-/**
- * The hero offers two actions, so its placeholder has to as well — the generic
- * one renders a single button, which without script left the hero permanently
- * missing its secondary route into the MCP chapter.
- */
-export function HomeHeroActionsFallback() {
-  return <HomeHeroActionsView signedIn={false} />
-}
-
-function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
-  const href = signedIn ? "/settings/mcp" : "/sign-up"
-
+export function HomeMcpActions() {
   return (
     <span className={base.magnetic} data-magnetic>
       <Button
@@ -227,30 +155,27 @@ function HomeMcpActionsView({ signedIn }: { signedIn: boolean }) {
         nativeButton={false}
         render={(
           <TrackedLink
-            href={href}
+            href={primaryAction.href}
             analytics={{
               event: "mcp_entry_clicked",
-              properties: mcpEntryEventProperties(signedIn, "landing_section", href),
+              properties: mcpEntryEventProperties(
+                false,
+                "landing_section",
+                primaryAction.href,
+              ),
             }}
           />
         )}
       >
         <CableIcon data-icon="inline-start" />
-        {signedIn ? "Connect your agent" : "Create a library to connect"}
+        Create a library to connect
         <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
       </Button>
     </span>
   )
 }
 
-export async function HomeMcpActions() {
-  const session = await getSession()
-  return <HomeMcpActionsView signedIn={Boolean(session?.user)} />
-}
-
-function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
-  const primary = primaryAction(signedIn)
-
+export function HomeFinalActions() {
   return (
     <span className={base.magnetic} data-magnetic>
       <Button
@@ -259,22 +184,17 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
         nativeButton={false}
         render={(
           <TrackedLink
-            href={primary.href}
+            href={primaryAction.href}
             analytics={{
               event: "landing_cta_clicked",
-              properties: primaryCtaEventProperties(signedIn, "closing"),
+              properties: primaryCtaEventProperties("closing"),
             }}
           />
         )}
       >
-        {primary.label}
+        {primaryAction.label}
         <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
       </Button>
     </span>
   )
-}
-
-export async function HomeFinalActions() {
-  const session = await getSession()
-  return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
 }

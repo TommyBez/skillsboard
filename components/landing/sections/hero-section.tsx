@@ -1,7 +1,5 @@
-import { Suspense } from "react"
-
 import { HeroBoard } from "@/components/landing/hero-board"
-import { HomeHeroActions, HomeHeroActionsFallback } from "@/components/landing/landing-ctas"
+import { HomeHeroActions } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/hero.module.css"
 
@@ -98,9 +96,7 @@ export function HeroSection() {
                 to use and where to find them.
               </p>
               <div className={styles.heroCta}>
-                <Suspense fallback={<HomeHeroActionsFallback />}>
-                  <HomeHeroActions />
-                </Suspense>
+                <HomeHeroActions />
               </div>
             </div>
 

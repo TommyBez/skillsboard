@@ -9,8 +9,6 @@ import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getSession } from "@/lib/session"
 import type { GuidePath } from "@/lib/seo/guides"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
@@ -18,6 +16,19 @@ import { siteConfig } from "@/lib/site"
 type ResourceLandingPath = GuidePath | typeof resourcePaths.index
 type ResourceHeaderLocation = "guide_header" | "resources_header"
 type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
+
+/**
+ * The one action these pages offer.
+ *
+ * Guides and the resource index used to branch on the session — "Open your
+ * team library" for signed-in readers, "Create your team library" for everyone
+ * else — which made the header and every inline CTA an async, session-reading
+ * render behind a skeleton. These are acquisition pages; the invitation is the
+ * same for every reader, and a signed-in one who takes it lands in their
+ * library regardless. `visitor_state` is fixed at "anonymous" for the same
+ * reason: it now describes the action offered, not who is looking at it.
+ */
+const ctaHref = "/sign-up" as const
 
 async function CurrentYear() {
   await connection()
@@ -27,65 +38,14 @@ async function CurrentYear() {
 
 function ctaProperties(
   landingPath: ResourceLandingPath,
-  signedIn: boolean,
   location: ResourceHeaderLocation | ResourceCtaLocation,
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   return {
-    destination: signedIn ? "/library" : "/sign-up",
+    destination: ctaHref,
     landing_path: landingPath,
     location,
-    visitor_state: signedIn ? "signed_in" : "anonymous",
+    visitor_state: "anonymous",
   }
-}
-
-function ResourceCtaView({
-  landingPath,
-  signedIn,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  signedIn: boolean
-  location: ResourceCtaLocation
-}) {
-  const href = signedIn ? "/library" : "/sign-up"
-
-  return (
-    <Button
-      size="lg"
-      className="rounded-[3px]"
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: ctaProperties(landingPath, signedIn, location),
-          }}
-        />
-      )}
-    >
-      {signedIn ? "Open your team library" : "Create your team library"}
-      <ArrowRightIcon data-icon="inline-end" />
-    </Button>
-  )
-}
-
-async function ResourceCtaContent({
-  landingPath,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  location: ResourceCtaLocation
-}) {
-  const session = await getSession()
-
-  return (
-    <ResourceCtaView
-      landingPath={landingPath}
-      signedIn={Boolean(session?.user)}
-      location={location}
-    />
-  )
 }
 
 export function ResourceCta({
@@ -96,20 +56,32 @@ export function ResourceCta({
   location: ResourceCtaLocation
 }) {
   return (
-    <Suspense fallback={<Skeleton className="h-11 w-56 rounded-[3px]" aria-busy="true" />}>
-      <ResourceCtaContent landingPath={landingPath} location={location} />
-    </Suspense>
+    <Button
+      size="lg"
+      className="rounded-[3px]"
+      nativeButton={false}
+      render={(
+        <TrackedLink
+          href={ctaHref}
+          analytics={{
+            event: "landing_cta_clicked",
+            properties: ctaProperties(landingPath, location),
+          }}
+        />
+      )}
+    >
+      Create your team library
+      <ArrowRightIcon data-icon="inline-end" />
+    </Button>
   )
 }
 
-function ResourceHeaderActionsView({
+function ResourceHeaderActions({
   landingPath,
   location,
-  signedIn,
 }: {
   landingPath: ResourceLandingPath
   location: ResourceHeaderLocation
-  signedIn: boolean
 }) {
   return (
     <div className="flex min-w-0 items-center gap-1.5">
@@ -121,53 +93,33 @@ function ResourceHeaderActionsView({
         Resources
       </Link>
       <ThemeToggle />
-      {!signedIn ? (
-        <Button
-          size="sm"
-          variant="ghost"
-          className="hidden rounded-[3px] md:inline-flex"
-          nativeButton={false}
-          render={<Link href="/sign-in" />}
-        >
-          Sign in
-        </Button>
-      ) : null}
+      <Button
+        size="sm"
+        variant="ghost"
+        className="hidden rounded-[3px] md:inline-flex"
+        nativeButton={false}
+        render={<Link href="/sign-in" />}
+      >
+        Sign in
+      </Button>
       <Button
         size="sm"
         className="rounded-[3px] px-2.5 sm:px-3"
         nativeButton={false}
         render={(
           <TrackedLink
-            href={signedIn ? "/library" : "/sign-up"}
+            href={ctaHref}
             analytics={{
               event: "landing_cta_clicked",
-              properties: ctaProperties(landingPath, signedIn, location),
+              properties: ctaProperties(landingPath, location),
             }}
           />
         )}
       >
-        <span className="sm:hidden">{signedIn ? "Open" : "Start"}</span>
-        <span className="hidden sm:inline">{signedIn ? "Open library" : "Create library"}</span>
+        <span className="sm:hidden">Start</span>
+        <span className="hidden sm:inline">Create library</span>
       </Button>
     </div>
-  )
-}
-
-async function ResourceHeaderActions({
-  landingPath,
-  location,
-}: {
-  landingPath: ResourceLandingPath
-  location: ResourceHeaderLocation
-}) {
-  const session = await getSession()
-
-  return (
-    <ResourceHeaderActionsView
-      landingPath={landingPath}
-      location={location}
-      signedIn={Boolean(session?.user)}
-    />
   )
 }
 
@@ -182,24 +134,31 @@ export function ResourceHeader({
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/92 backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-5 md:px-10">
         <Brand compactOnMobile />
-        <Suspense
-          fallback={(
-            <div className="flex items-center gap-1.5">
-              <Link
-                href={resourcePaths.index}
-                className="px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:px-3 sm:text-xs"
-              >
-                Resources
-              </Link>
-              <ThemeToggle />
-              <Skeleton className="h-8 w-14 rounded-[3px] sm:w-28" aria-busy="true" />
-            </div>
-          )}
-        >
-          <ResourceHeaderActions landingPath={landingPath} location={location} />
-        </Suspense>
+        <ResourceHeaderActions landingPath={landingPath} location={location} />
       </div>
     </header>
+  )
+}
+
+/**
+ * The chrome every resource page shares, so the layouts that mount it are the
+ * three lines they should be and no page renders its own header or footer.
+ */
+export function ResourceShell({
+  landingPath,
+  location,
+  children,
+}: {
+  landingPath: ResourceLandingPath
+  location: ResourceHeaderLocation
+  children: React.ReactNode
+}) {
+  return (
+    <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
+      <ResourceHeader landingPath={landingPath} location={location} />
+      <main>{children}</main>
+      <ResourceFooter />
+    </div>
   )
 }
 
