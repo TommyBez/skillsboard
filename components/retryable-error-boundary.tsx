@@ -39,6 +39,7 @@ const BoundRetryableErrorBoundary = catchError(RetryableErrorFallback)
 /**
  * Nested error boundary that can retry Server Component trees without
  * interfering with `notFound()` / `redirect()`.
+ * See node_modules/next/dist/docs/01-app/03-api-reference/04-functions/catchError.md
  */
 export function RetryableErrorBoundary({
   children,

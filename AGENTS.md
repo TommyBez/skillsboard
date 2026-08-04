@@ -1,9 +1,28 @@
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
 # AGENTS.md
 
 ## Cursor Cloud specific instructions
 
 ### What this is
 `skillsboard` is a single Next.js 16.3 (App Router, Turbopack) app — UI + API routes in one process. Instant Navigations are enabled via `cacheComponents` + `partialPrefetching` (see `next.config.ts`). Its backing store is a **Neon PostgreSQL** database (pulled from Vercel; see below). Auth is Better Auth (email OTP via Resend + organizations + OAuth/MCP provider). There is no separate backend to run.
+
+### Next.js docs for this install
+Prefer the **version-matched docs bundled with the installed `next` package** over training data or nextjs.org:
+
+- Index: `node_modules/next/dist/docs/index.md`
+- App Router guides: `node_modules/next/dist/docs/01-app/02-guides/`
+- Config / API reference: `node_modules/next/dist/docs/01-app/03-api-reference/`
+
+Read those files before changing Next.js config, routing, caching, prefetching, or error-handling. Upgrading `next` upgrades these docs with it.
 
 ### Running locally
 - Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the Development variables (Neon Postgres `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:

@@ -6,6 +6,7 @@ import { WifiOffIcon } from "lucide-react"
 /**
  * Surfaces connectivity loss while experimental.useOffline keeps soft
  * navigations, RSC fetches, and Server Actions pending for automatic retry.
+ * See node_modules/next/dist/docs/01-app/02-guides/offline-support.md
  */
 export function OfflineBanner() {
   const isOffline = useOffline()

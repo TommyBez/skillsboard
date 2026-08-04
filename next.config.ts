@@ -1,8 +1,16 @@
 import type { NextConfig } from 'next'
 
+/**
+ * Config choices are grounded in the installed Next.js docs at
+ * `node_modules/next/dist/docs/` (see AGENTS.md). Key pages:
+ * - 01-app/02-guides/adopting-partial-prefetching.md
+ * - 01-app/02-guides/instant-navigation.md
+ * - 01-app/02-guides/offline-support.md
+ * - 01-app/03-api-reference/05-config/01-next-config-js/{partialPrefetching,reactCompiler,turbopackRustReactCompiler,useOffline,optimizePackageImports}.md
+ */
 const nextConfig = {
-  // Instant Navigations foundation (already on) + Partial Prefetching for
-  // one reusable App Shell per route instead of one prefetch per link.
+  // Instant Navigations: Cache Components + Partial Prefetching
+  // (one reusable App Shell per route).
   cacheComponents: true,
   partialPrefetching: true,
   cacheLife: {
@@ -12,24 +20,15 @@ const nextConfig = {
       expire: 3600,
     },
   },
-  // Auto-memoize components via the Rust React Compiler inside Turbopack.
+  // React Compiler via the Turbopack Rust port (no babel-plugin needed).
   reactCompiler: true,
   experimental: {
     turbopackRustReactCompiler: true,
-    // Seed client caches from real navigations for instant return trips.
-    cachedNavigations: true,
-    // Upgrade shell prefetches to runtime prefetches on hover intent.
-    dynamicOnHover: true,
-    // Keep soft navigations / RSC fetches / Server Actions pending offline
-    // and retry when connectivity returns.
+    // Retry soft navigations / RSC fetches / Server Actions when offline.
     useOffline: true,
-    // Tree-shake large icon / UI barrels in both Turbopack and webpack.
-    optimizePackageImports: [
-      "lucide-react",
-      "@base-ui/react",
-      "date-fns",
-      "motion",
-    ],
+    // Packages beyond Next's default optimizePackageImports list
+    // (lucide-react and date-fns are already optimized by default).
+    optimizePackageImports: ["@base-ui/react", "motion"],
   },
   async rewrites() {
     return [
