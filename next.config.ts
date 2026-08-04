@@ -8,13 +8,10 @@ const nextConfig = {
   // per-link prefetches into a single cached shell per route.
   partialPrefetching: true,
   // Compile components with the React Compiler so memoization is handled at
-  // build time rather than by hand-written `useMemo`/`memo`.
+  // build time rather than by hand-written `useMemo`/`memo`. This runs through
+  // Babel via `babel-plugin-react-compiler`; the Rust port that runs inside
+  // Turbopack is still experimental.
   reactCompiler: true,
-  experimental: {
-    // Run the React Compiler natively inside Turbopack instead of through
-    // Babel, which keeps `next dev`/`next build` off the JS transform path.
-    turbopackRustReactCompiler: true,
-  },
   cacheLife: {
     catalog: {
       stale: 60,

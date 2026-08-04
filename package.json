@@ -88,6 +88,7 @@
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "^1.0.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "esbuild": "^0.28.1",
