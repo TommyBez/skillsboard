@@ -1,23 +1,11 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { importTsFile } from "./helpers/load-ts.mjs"
 
-const source = await readFile(
+const { findRecentTeammateRecommendation } = await importTsFile(
   new URL("../lib/library-view-state.ts", import.meta.url),
-  "utf8",
 )
-const { outputText } = typescript.transpileModule(source, {
-  compilerOptions: {
-    module: typescript.ModuleKind.ES2022,
-    target: typescript.ScriptTarget.ES2022,
-  },
-})
-const libraryViewState = await import(
-  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
-)
-const { findRecentTeammateRecommendation } = libraryViewState
 
 const now = new Date("2026-07-29T08:00:00.000Z")
 const userId = "current-user"

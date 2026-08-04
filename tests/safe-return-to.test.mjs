@@ -1,18 +1,10 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { importTsFile } from "./helpers/load-ts.mjs"
 
-const source = await readFile(new URL("../lib/safe-return-to.ts", import.meta.url), "utf8")
-const { outputText } = typescript.transpileModule(source, {
-  compilerOptions: {
-    module: typescript.ModuleKind.ES2022,
-    target: typescript.ScriptTarget.ES2022,
-  },
-})
-const { safeReturnTo } = await import(
-  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+const { safeReturnTo } = await importTsFile(
+  new URL("../lib/safe-return-to.ts", import.meta.url),
 )
 
 test("allows the exact protected destinations used by auth and email preferences", () => {

@@ -1,21 +1,11 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { importTsFile, transpileTsFile } from "./helpers/load-ts.mjs"
 
-async function transpiledModule(path) {
-  const source = await readFile(new URL(path, import.meta.url), "utf8")
-  const { outputText } = typescript.transpileModule(source, {
-    compilerOptions: {
-      module: typescript.ModuleKind.ES2022,
-      target: typescript.ScriptTarget.ES2022,
-    },
-  })
-  return `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
-}
-
-const productModuleUrl = await transpiledModule("../lib/email/product-communications.ts")
+const productModuleUrl = await transpileTsFile(
+  new URL("../lib/email/product-communications.ts", import.meta.url),
+)
 const productCommunications = await import(productModuleUrl)
 const {
   PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
@@ -202,25 +192,18 @@ test("unsubscribe tokens are encrypted, randomized, and contain no raw email add
   const originalRoot = Buffer.alloc(32, 17).toString("base64")
   const replacementRoot = Buffer.alloc(32, 29).toString("base64")
   process.env.EMAIL_PRIVACY_SECRET = originalRoot
-  const privacySource = (await readFile(
-    new URL("../lib/email/email-privacy.ts", import.meta.url),
-    "utf8",
-  )).replace('import "server-only"', "")
-  const { outputText } = typescript.transpileModule(privacySource, {
-    compilerOptions: {
-      module: typescript.ModuleKind.ES2022,
-      target: typescript.ScriptTarget.ES2022,
-    },
-  })
-  const privacyModuleUrl = `data:text/javascript;base64,${Buffer.from(
-    outputText.replace('"@/lib/email/product-communications"', JSON.stringify(productModuleUrl)),
-  ).toString("base64")}`
   const {
     createProductCommunicationsUnsubscribeToken,
     hashEmailAddress,
     hashEmailAddressCandidates,
     verifyProductCommunicationsUnsubscribeToken,
-  } = await import(privacyModuleUrl)
+  } = await importTsFile(new URL("../lib/email/email-privacy.ts", import.meta.url), {
+    stripServerOnly: true,
+    replaceImports: {
+      '"@/lib/email/product-communications"': JSON.stringify(productModuleUrl),
+      "'@/lib/email/product-communications'": JSON.stringify(productModuleUrl),
+    },
+  })
   const email = "person@example.com"
   const emailHash = hashEmailAddress(email)
   const token = createProductCommunicationsUnsubscribeToken({

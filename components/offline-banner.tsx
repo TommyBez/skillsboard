@@ -15,7 +15,7 @@ export function OfflineBanner() {
   return (
     <div
       role="status"
-      className="sticky top-0 z-50 border-b border-border bg-muted px-4 py-2 text-center text-sm text-foreground"
+      className="border-b border-border bg-muted px-4 py-2 text-center text-sm text-foreground"
     >
       <span className="inline-flex items-center justify-center gap-2">
         <WifiOffIcon className="size-3.5 shrink-0" aria-hidden="true" />

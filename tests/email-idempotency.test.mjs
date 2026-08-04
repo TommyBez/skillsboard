@@ -1,21 +1,11 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { importTsFile } from "./helpers/load-ts.mjs"
 
-const source = (await readFile(
+const { createEmailIdempotencyKey } = await importTsFile(
   new URL("../lib/email/idempotency.ts", import.meta.url),
-  "utf8",
-)).replace('import "server-only"', "")
-const { outputText } = typescript.transpileModule(source, {
-  compilerOptions: {
-    module: typescript.ModuleKind.ES2022,
-    target: typescript.ScriptTarget.ES2022,
-  },
-})
-const { createEmailIdempotencyKey } = await import(
-  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+  { stripServerOnly: true },
 )
 
 test("email idempotency keys are deterministic HMACs without raw correlators", () => {
