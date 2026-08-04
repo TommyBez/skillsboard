@@ -66,7 +66,7 @@ Create your team library
 4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 46-second Product Hunt cut: hook, positioning, save flow, the recommendation card, search, handoff paths, collections, the MCP agent beat, and CTA, with matching `public/launch/skills-board-product-demo-product-hunt.vtt` captions.
 5. `public/launch/skills-board-product-demo.mp4` — 30-second social cut built from the same scenes and product truth, ending on the MCP beat, with `public/launch/skills-board-product-demo.vtt` captions for social distribution.
 
-Videos, posters, and the manifest are render outputs, not committed files. Run `pnpm video:render:launch` before assembling a package, pull the posters from the resulting masters (`remotion still` on the same composition, or a frame grab off the mp4), then regenerate the manifest. The Remotion compositions and the caption sidecars are the only committed inputs.
+Videos and posters are render outputs, not committed files. Run `pnpm video:render:launch` before assembling a package and pull the posters from the resulting masters with `remotion still` on the same composition. The Remotion compositions and the caption sidecars are the only committed inputs.
 
 ### Video source and reproducible renders
 
@@ -79,7 +79,7 @@ Both launch cuts are generated from shared Remotion scenes in `remotion/product-
 
 The launch compositions use the repository-pinned Remotion and Remocn motion system. Each scene holds one or two real product components rather than a full screenshot: the save dialog, the skill card with its team note and example prompt, the library search, the collection cards, and the agent panel. One accent (the app's primary green) carries the whole film, and the single dark scene is the MCP beat. Both cuts are designed for silent-first comprehension and retain exact VTT sidecars.
 
-`node scripts/write-video-manifest.mjs` writes `public/launch/skills-board-video-manifest.json` after a render, recording the composition source, dimensions, frame counts, durations, output bytes, and SHA-256 values used for final asset readback. Like the renders themselves, the manifest is generated per render rather than committed.
+There is no hand-rolled asset manifest. Dimensions, fps, frame counts, and durations are properties of the compositions themselves — read them with `npx remotion compositions remotion/index.ts`, which reports what any render will produce without a second source of truth to keep in sync.
 
 ### Human-only maker and comment brief
 
