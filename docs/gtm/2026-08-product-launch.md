@@ -102,7 +102,7 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 
 - [x] Produce the 60-second paced launch demo, 31-second accelerated cut, and 14-second homepage loop with synthetic identities and a public skill.
 - [x] Complete desktop and mobile QA of the dormant single-homepage launch treatment.
-- [x] Prepare a launch-specific 1200×630 OG image, video poster, and English video captions.
+- [x] Prepare a launch-specific 1200×630 OG image and video poster.
 - [x] Prepare the Italian LinkedIn and English X variants in one private Typefully draft with the 31-second demo.
 - [x] Prepare the Product Hunt listing, Show HN facts handoff, consented-email copy, campaign-link matrix, and destination-specific community brief schema.
 - [ ] Complete exact Product Hunt eligibility/account readback and let the human maker write and publish every platform-required comment without engagement manipulation.
