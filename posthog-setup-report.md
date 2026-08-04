@@ -49,7 +49,7 @@ All team-scoped events include a stable `team_id` property through the tested `w
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.
-- Activation, `AAT-28`, retained, reactivated, and lost are cross-user metrics. Query them with HogQL grouped by `properties.team_id`; do not use a standard PostHog funnel grouped by `distinct_id`.
+- Activation, retention, reactivation, and loss are cross-user metrics. Query them with HogQL grouped by `properties.team_id`; do not use a standard PostHog funnel grouped by `distinct_id`.
 - Revenue is not instrumented because the hosted product is free forever. Sustainability combines aggregate infrastructure cost and founder-time inputs outside user-event analytics.
 
 ## Next steps
@@ -73,7 +73,7 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 - [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.
 - [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating each dependent production metric as decision-ready.
-- [x] Define team-level HogQL semantics for Activation and `AAT-28` state transitions; Retention fails closed as `unavailable` until historical activation milestones are reconciled.
+- [x] Define team-level HogQL semantics for activation and retention state transitions; retention fails closed as `unavailable` until historical activation milestones are reconciled.
 - [ ] Verify production project `225645` and the current dashboard and insight IDs in PostHog before relying on them.
 
 ### Agent skill
