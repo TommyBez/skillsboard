@@ -66,7 +66,7 @@ Create your team library
 4. `public/launch/skills-board-product-demo-product-hunt.mp4` — 46-second Product Hunt cut: hook, positioning, save flow, the recommendation card, search, handoff paths, collections, the MCP agent beat, and CTA.
 5. `public/launch/skills-board-product-demo.mp4` — 30-second social cut built from the same scenes and product truth, ending on the MCP beat, for social distribution.
 
-Videos and posters are render outputs, not committed files. Run `pnpm video:render:launch` before assembling a package and pull the posters from the resulting masters with `remotion still` on the same composition. The Remotion compositions are the only committed input; captions, where a platform wants them, are authored per upload against the cut being posted.
+Videos and the poster are render outputs, not committed files. `pnpm video:render:launch` produces every asset the gallery order needs — the three cuts and the poster — so a clean checkout restores the package with one command. The Remotion compositions are the only committed input; captions, where a platform wants them, are authored per upload against the cut being posted.
 
 ### Video source and reproducible renders
 
@@ -75,7 +75,8 @@ Both launch cuts are generated from shared Remotion scenes in `remotion/product-
 - `pnpm video:render:product-hunt` renders exactly 1,366 frames / 45.5 seconds.
 - `pnpm video:render:social` renders exactly 900 frames / 30 seconds.
 - `pnpm video:render:team-loop` renders the 420-frame / 14-second team loop (`public/launch/skills-board-team-loop.mp4`), built from the same scenes: save → share → find, with both ends fading to the page background so the loop seam is invisible.
-- `pnpm video:render:launch` renders all three outputs.
+- `pnpm video:still:product-demo-poster` writes the gallery poster from frame 580 of the Product Hunt composition — the skill card at full scale with its team note, example prompt, attribution, and the install command mid-copy. The frame is pinned in the script, so the still is reproducible rather than hand-picked.
+- `pnpm video:render:launch` renders all three cuts and then the poster.
 
 The launch compositions use the repository-pinned Remotion and Remocn motion system. Each scene holds one or two real product components rather than a full screenshot: the save dialog, the skill card with its team note and example prompt, the library search, the collection cards, and the agent panel. One accent (the app's primary green) carries the whole film, and the single dark scene is the MCP beat. Both cuts are designed for silent-first comprehension: every claim is on screen as type, so neither cut depends on a caption track to be understood.
 
