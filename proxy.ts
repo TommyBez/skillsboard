@@ -5,11 +5,31 @@ import { precompute } from "flags/next"
 import { homepageFlags } from "@/lib/launch"
 import { guidePaths } from "@/lib/seo/guides/types"
 
+const guidePrefix = "/guides/"
+
 /**
  * Imported from `guides/types` rather than the `guides` barrel so the proxy
- * bundle carries eight path strings instead of every guide's body copy.
+ * bundle carries eight slugs instead of every guide's body copy.
  */
-const knownGuidePaths = new Set<string>(Object.values(guidePaths))
+const knownGuideSlugs = new Set<string>(
+  Object.values(guidePaths).map((path) => path.slice(guidePrefix.length)),
+)
+
+/**
+ * Matches on the slug segment alone, not the whole pathname. `/guides/[slug]`
+ * has sibling metadata routes — `opengraph-image` and `twitter-image` — and
+ * `skipTrailingSlashRedirect` leaves `/guides/<slug>/` intact, none of which
+ * equal a bare guide path. Comparing full pathnames 404s all of them. Anything
+ * under a known slug is handed to the router, which 404s unmatched sub-paths
+ * on its own.
+ */
+function isUnknownGuidePath(pathname: string) {
+  if (!pathname.startsWith(guidePrefix)) return false
+
+  const slug = pathname.slice(guidePrefix.length).split("/")[0]
+
+  return !knownGuideSlugs.has(slug)
+}
 
 function isProtectedPath(pathname: string) {
   if (pathname === "/onboarding" || pathname === "/consent") return true
@@ -39,7 +59,7 @@ export async function proxy(request: NextRequest) {
   // every dynamic route streams a shell first, so the existence check has to
   // happen before the body streams. A lookup against eight known paths is
   // cheap enough to run here.
-  if (pathname.startsWith("/guides/") && !knownGuidePaths.has(pathname)) {
+  if (isUnknownGuidePath(pathname)) {
     return NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 })
   }
 

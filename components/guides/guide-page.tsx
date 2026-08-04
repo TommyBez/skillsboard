@@ -33,10 +33,12 @@ const chapters = [
 export function GuidePageFallback() {
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
-      <div
-        className="sticky top-0 z-40 flex h-14 items-center border-b border-border/80 bg-background/92 px-4 backdrop-blur-xl sm:px-5 md:px-10"
-        aria-hidden="true"
-      >
+      {/*
+        No `aria-hidden` here: `Brand` renders a real, keyboard-focusable link
+        home, and hiding it from assistive tech would leave a focus stop that
+        screen readers cannot announce.
+      */}
+      <div className="sticky top-0 z-40 flex h-14 items-center border-b border-border/80 bg-background/92 px-4 backdrop-blur-xl sm:px-5 md:px-10">
         <div className="mx-auto flex w-full max-w-[1320px] items-center justify-between">
           <Brand compactOnMobile />
         </div>
