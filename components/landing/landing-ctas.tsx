@@ -63,7 +63,7 @@ export function primaryCtaEventProperties(
 export function HomeHeaderActions() {
   return (
     <div className="flex items-center gap-2">
-      <ThemeToggle className={`${base.headerToggle} size-8 sm:size-9`} />
+      <ThemeToggle chrome="marketing" className="size-8 sm:size-9" />
       <nav className="flex items-center gap-2" aria-label="Main navigation">
         <Button
           size="sm"
