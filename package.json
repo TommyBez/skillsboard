@@ -41,7 +41,6 @@
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@better-auth/oauth-provider": "^1.6.23",
-    "@flags-sdk/posthog": "^0.2.2",
     "@paper-design/shaders-react": "^0.0.77",
     "@remotion/fonts": "4.0.495",
     "@remotion/google-fonts": "4.0.495",
@@ -56,7 +55,6 @@
     "date-fns": "^4.4.0",
     "drizzle-orm": "^0.45.2",
     "fflate": "^0.8.3",
-    "flags": "^4.2.3",
     "input-otp": "^1.4.2",
     "lucide-react": "^1.16.0",
     "mcp-handler": "^1.1.0",

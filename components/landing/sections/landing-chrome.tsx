@@ -1,4 +1,3 @@
-import { ArrowRightIcon } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
 
@@ -64,27 +63,6 @@ export function LandingHeader() {
         </div>
       </header>
     </>
-  )
-}
-
-export function LandingLaunchBanner() {
-  return (
-    <aside className={base.banner}>
-      <a
-        href="#launch-demo"
-        className={`${base.bannerLink} mx-auto flex w-full max-w-[1440px] items-center justify-center gap-2.5 px-5 py-3 text-center text-sm font-semibold md:px-10`}
-      >
-        <span className="font-mono text-xs uppercase tracking-[0.16em] text-primary">
-          Product walkthrough
-        </span>
-        <span aria-hidden="true" className="h-3 w-px shrink-0 bg-primary/35" />
-        <span>See how a team shares one useful skill in 14 seconds.</span>
-        <ArrowRightIcon
-          className={`${base.ctaArrow} size-4 shrink-0`}
-          aria-hidden="true"
-        />
-      </a>
-    </aside>
   )
 }
 

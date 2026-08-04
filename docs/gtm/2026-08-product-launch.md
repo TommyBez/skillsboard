@@ -46,23 +46,23 @@ Skills Board is already publicly available with self-serve signup. August 11 is 
 
 The existing homepage remains the only canonical product landing page. There is no separate launch route or duplicate conversion surface.
 
-## Homepage launch-treatment control
+## Homepage
 
-The temporary homepage treatment is controlled server-side by the PostHog boolean feature flag `homepage-launch-treatment` in `lib/launch.ts`. Vercel Flags evaluates it in `proxy.ts` and rewrites `/` to one of two variants generated under `app/variants/home/[code]`, so the canonical URL, metadata, and initial HTML agree without client flicker or making the PostHog decision part of the page render. The authenticated `/.well-known/vercel/flags` discovery endpoint exposes the code-defined flag to Flags Explorer; session-scoped Vercel Toolbar overrides are handled automatically by `flags/next`. `FLAGS_SECRET` must use a distinct value in Development, Preview, and Production. PostHog remains the provider authority when no Toolbar override is active; the flag defaults to `false` and fails closed if PostHog is unavailable. When enabled, the same canonical homepage adds:
+The homepage carries no launch treatment. The gated variant — a PostHog-controlled
+flag in `lib/launch.ts`, a Vercel Flags precompute rewrite in `proxy.ts`, and the
+two precomputed pages under `app/variants/home/[code]` — has been removed, along
+with the launch banner, the embedded demo loop, and the `launch_demo` CTA
+location. `/` is served directly by `app/page.tsx` with a single set of metadata.
 
-- A compact product-walkthrough banner linking to the existing workflow section.
-- A silent, captioned 14-second add → share → find loop recorded from the current product.
-- A launch-specific OpenGraph image.
-- A measured `launch_demo` CTA location while preserving `landing_path: "/"`.
-
-Enable the PostHog flag only after the final launch-day preflight. The code can ship safely while the flag remains disabled, and disabling it restores the standard homepage without a deploy. Remove the temporary banner and launch framing after the launch window; retain the short demo only if observed behavior supports it.
+Launch coverage on owned surfaces runs through the channel packages instead: the
+demo videos are distributed on social and Product Hunt, not embedded on the
+landing page.
 
 ## ORB channel plan
 
 ### Owned
 
-- Product landing page, temporarily carrying the launch demo and launch campaign attribution.
-- A silent 14-second homepage loop showing add → share → find across two teammates.
+- Product landing page, carrying launch campaign attribution.
 - A 60-second paced launch demo for Product Hunt, README, direct sharing, and high-intent evaluation, plus a 31-second accelerated cut for social distribution.
 - Consent-compliant product email to eligible subscribers.
 - In-product activation prompts for first skill, invite, and teammate reuse.
@@ -121,7 +121,7 @@ The privacy-safe channel copy, campaign-link matrix, Product Hunt and Show HN hu
 ### 4. Launch day — August 11, Europe/Rome
 
 - **08:30:** final production and analytics smoke test.
-- **09:00:** after the final production and analytics smoke test passes, activate the PostHog `homepage-launch-treatment` flag; the already-live application remains available through its existing routes.
+- **09:00:** after the final production and analytics smoke test passes, confirm the homepage is serving normally; there is no launch-day toggle, and the already-live application remains available through its existing routes.
 - **09:05:** Product Hunt listing goes live if the official capability and identity checks pass.
 - **09:15:** publish the product demo on LinkedIn and X.
 - **10:00:** send the consent-compliant product email.

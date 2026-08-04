@@ -1,12 +1,10 @@
-import { Suspense, type CSSProperties, type ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 
 import {
   PasteResolveVisual,
   RouteFanVisual,
   SearchFilterVisual,
 } from "@/components/landing/flow/flow-visuals"
-import { HomeCtaFallback, HomeLaunchActions } from "@/components/landing/landing-ctas"
-import { LaunchDemoLoop } from "@/components/landing/launch-demo-loop"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/flow.module.css"
 
@@ -36,37 +34,8 @@ const flowSteps: ReadonlyArray<{
   },
 ]
 
-function HomeLaunchDemo() {
-  return (
-    <div
-      id="launch-demo"
-      className={`surface-shadow ${styles.launchDemo} grid scroll-mt-28 overflow-hidden border border-border bg-card lg:grid-cols-[minmax(0,1.35fr)_minmax(19rem,0.65fr)]`}
-    >
-      <LaunchDemoLoop />
-      <div className="flex flex-col justify-center border-t border-border p-6 md:p-8 lg:border-l lg:border-t-0 lg:p-10">
-        <p className={`${base.chapterMark} uppercase`}>
-          Current product · synthetic demo data
-        </p>
-        <h3 className="mt-5 max-w-[14ch] text-balance text-3xl font-semibold leading-none tracking-display md:text-4xl">
-          One teammate saves it. The next finds it.
-        </h3>
-        <p className="mt-5 text-pretty leading-relaxed text-muted-foreground">
-          Skills Board is already available. This short walkthrough shows the
-          current add → share → find loop using synthetic identities and a
-          public skill.
-        </p>
-        <div className="mt-7">
-          <Suspense fallback={<HomeCtaFallback />}>
-            <HomeLaunchActions />
-          </Suspense>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 /** Workflow — three moves, indexed like a manual, each one demonstrated. */
-export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: boolean }) {
+export function FlowSection() {
   return (
     <section
       id="flow"
@@ -109,8 +78,6 @@ export function FlowSection({ showLaunchTreatment }: { showLaunchTreatment: bool
             Save once. Find fast. Use it your way.
           </h2>
         </div>
-
-        {showLaunchTreatment ? <HomeLaunchDemo /> : null}
 
         <ol className={styles.flowGrid}>
           {flowSteps.map((step, i) => (

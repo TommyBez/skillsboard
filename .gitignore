@@ -31,7 +31,8 @@ next-env.d.ts
 # Remotion render output
 out/
 
-# Launch video renders (regenerate with pnpm video:render:*);
-# keep the landing-page loop that ships with the app.
+# Launch video renders and their stills (regenerate with pnpm video:render:*
+# from the Remotion compositions; nothing rendered is committed).
 public/launch/*.mp4
-!public/launch/skills-board-team-loop.mp4
+public/launch/*-poster.jpg
+public/launch/skills-board-video-manifest.json

@@ -14,7 +14,6 @@ type NonTeamEventPropertiesMap = {
       | "guide_closing"
       | "resources_header"
       | "resources_closing"
-      | "launch_demo"
     visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
