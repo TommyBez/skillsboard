@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
-import { precompute } from "flags/next"
 
-import { homepageFlags } from "@/lib/launch"
 import { guidePaths } from "@/lib/seo/guides/types"
 
 const guidePrefix = "/guides/"
@@ -45,19 +43,11 @@ function isProtectedPath(pathname: string) {
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl
 
-  if (pathname === "/") {
-    const code = await precompute(homepageFlags)
-    const variantUrl = request.nextUrl.clone()
-    variantUrl.pathname = `/variants/home/${code}`
-
-    return NextResponse.rewrite(variantUrl)
-  }
-
   // `/guides/[slug]` resolves its slug inside a `<Suspense>` boundary so the
   // route can prerender a shell, which means a `notFound()` there fires after
   // the response has committed to 200 — a soft 404. Under Cache Components
   // every dynamic route streams a shell first, so the existence check has to
-  // happen before the body streams. A lookup against eight known paths is
+  // happen before the body streams. A lookup against eight known slugs is
   // cheap enough to run here.
   if (isUnknownGuidePath(pathname)) {
     return NextResponse.rewrite(new URL("/_not-found", request.url), { status: 404 })
@@ -88,7 +78,6 @@ export async function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/",
     "/guides/:path*",
     "/library",
     "/library/:path*",

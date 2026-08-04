@@ -61,8 +61,8 @@
 
   /* --- appended: one rule language for the chrome ---------------------------
      Every line the chrome draws takes this ink: the header's measure rule,
-     the banner's edge, the footer's measure rule, both vertical rails of the
-     page frame, and the resting edge of every outlined control — the theme
+     the footer's measure rule, both vertical rails of the page frame, and
+     the resting edge of every outlined control — the theme
      toggle, the outline CTA, the GitHub mark. One declaration, so the ladder
      is unambiguous: chapter hairlines at 16%, structure and controls at 23%,
      a 30% step reserved for hover. Accent ink appears in chrome in one place
@@ -70,7 +70,7 @@
      a boundary.
 
      Where a rule is laid over a field that is not the page's own — the footer
-     plate, the banner's tint, whatever band a rail happens to cross — it is
+     plate, whatever band a rail happens to cross — it is
      painted as two layers, this ink over an opaque `--background`, so the
      rendered number does not depend on what is behind it. Measured at 1440:
      64/64/64/64 dark and 191/191/191/191 light for the four edges of the
@@ -893,49 +893,6 @@
 .railTick,
 .railLabel {
   display: none;
-}
-
-/* ---------------------------------------------------------------------------
-   Launch banner — a routed strip, not a coloured bar
---------------------------------------------------------------------------- */
-
-.banner {
-  position: relative;
-  z-index: 30;
-  background: color-mix(in oklab, var(--primary) 9%, var(--background));
-}
-
-/* Same edge treatment as the frame's four sides — the banner's tinted field
-   would otherwise print this rule at its own third value. */
-.banner::after {
-  content: "";
-  position: absolute;
-  left: var(--lp-frame-inset);
-  right: var(--lp-frame-inset);
-  bottom: 0;
-  height: 1px;
-  background:
-    linear-gradient(var(--lp-chrome-rule), var(--lp-chrome-rule)),
-    var(--background);
-}
-
-.bannerLink {
-  transition: background-color var(--lp-dur-hover) var(--lp-ease-snap);
-}
-
-.bannerLink:hover {
-  background-color: color-mix(in oklab, var(--primary) 8%, transparent);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .bannerLink:hover .ctaArrow {
-    transform: translate3d(4px, 0, 0);
-  }
-}
-
-.bannerLink:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: -3px;
 }
 
 /* ---------------------------------------------------------------------------
