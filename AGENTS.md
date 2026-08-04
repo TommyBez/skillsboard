@@ -3,7 +3,7 @@
 ## Cursor Cloud specific instructions
 
 ### What this is
-`skillsboard` is a single Next.js 16 (App Router, Turbopack) app — UI + API routes in one process. Its backing store is a **Neon PostgreSQL** database (pulled from Vercel; see below). Auth is Better Auth (email OTP via Resend + organizations + OAuth/MCP provider). There is no separate backend to run.
+`skillsboard` is a single Next.js 16.3 (App Router, Turbopack) app — UI + API routes in one process. Instant Navigations are enabled via `cacheComponents` + `partialPrefetching` (see `next.config.ts`). Its backing store is a **Neon PostgreSQL** database (pulled from Vercel; see below). Auth is Better Auth (email OTP via Resend + organizations + OAuth/MCP provider). There is no separate backend to run.
 
 ### Running locally
 - Environment lives in `.env.local` (gitignored, so it is not in the repo). Populate it from Vercel (`VERCEL_TOKEN` is provided as a secret): the project is linked to `tommasos-projects-bb9d6551/skillsboard`. Pull the Development variables (Neon Postgres `DATABASE_URL` / `DATABASE_URL_UNPOOLED`, `BETTER_AUTH_SECRET`, `VERCEL_OIDC_TOKEN`, etc.) with:

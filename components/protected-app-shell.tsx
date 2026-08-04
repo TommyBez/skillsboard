@@ -6,6 +6,7 @@ import { CommandMenu } from "@/components/command-menu"
 import { CommandMenuIndex } from "@/components/command-menu-index"
 import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
 import { PostHogIdentity } from "@/components/posthog-identity"
+import { RetryableErrorBoundary } from "@/components/retryable-error-boundary"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
@@ -48,7 +49,7 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
         <ExistingUserEmailConsentPrompt />
       </Suspense>
       <div id="main-content" tabIndex={-1} className="outline-none">
-        {children}
+        <RetryableErrorBoundary>{children}</RetryableErrorBoundary>
       </div>
       {/* Navigation and actions work from the first paint; the searchable
           skill/collection rows stream in with the index. */}

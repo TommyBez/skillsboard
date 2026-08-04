@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 
 import { EmailPreferenceToastBridge } from "@/components/email-preference-toast-bridge"
+import { OfflineBanner } from "@/components/offline-banner"
 import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
@@ -82,6 +83,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <OfflineBanner />
           {children}
           <EmailPreferenceToastBridge />
           <Toaster />
