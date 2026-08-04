@@ -23,7 +23,7 @@ const {
   canLiftProviderUnsubscribe,
   evaluateProductCommunicationsEligibility,
   isProductCommunicationsSender,
-  isAutonomouslyLiftableSuppression,
+  isExplicitConsentLiftableSuppression,
   isPermanentDeliverySuppression,
   normalizeEmailAddress,
   planProviderContactEvent,
@@ -101,10 +101,10 @@ test("fails closed for missing consent, changed email, verification, or suppress
   }).reason, "suppressed")
 })
 
-test("only explicit unsubscribe suppressions are autonomously liftable", () => {
-  assert.equal(isAutonomouslyLiftableSuppression("unsubscribe"), true)
-  assert.equal(isAutonomouslyLiftableSuppression("provider_unsubscribe"), false)
-  assert.equal(isAutonomouslyLiftableSuppression("complaint"), false)
+test("only explicit unsubscribe suppressions are liftable by explicit consent", () => {
+  assert.equal(isExplicitConsentLiftableSuppression("unsubscribe"), true)
+  assert.equal(isExplicitConsentLiftableSuppression("provider_unsubscribe"), false)
+  assert.equal(isExplicitConsentLiftableSuppression("complaint"), false)
   assert.equal(isPermanentDeliverySuppression("hard_bounce"), true)
   assert.equal(isPermanentDeliverySuppression("provider_suppressed"), true)
 })

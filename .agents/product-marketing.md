@@ -159,13 +159,12 @@
 - Publish only verified, already shipped product reality. A capability claim requires the current production deployment and product readback to prove it. Never turn a hypothesis, draft, experiment, private prototype, or unmerged pull request into a public capability claim.
 - Do not invent founder anecdotes, customer stories, personal reading, roadmap commitments, timelines, or ETAs. First-person copy may describe only documented actions, motivations, and results.
 - The connected personal social account may discuss only Skills Board and its shipped features. LinkedIn copy is Italian; X and every email category are English.
-- Proactive founder-voice email uses `Tommaso from Skills Board <tommaso@skillsboard.sh>` only after the consent, suppression, unsubscribe, identity, provider, and public-postal-identity gates in the Growth/Product Pulse contract pass. Transactional email keeps a separate operational identity.
+- Proactive founder-voice email uses `Tommaso from Skills Board <tommaso@skillsboard.sh>` only after consent, suppression, unsubscribe, identity, provider, public-postal-identity, and explicit send authorization are verified. Transactional email keeps a separate operational identity.
 - Product updates, newsletters, activation guidance, and structured product-research invitations share the `product_communications` consent topic. Optional in-app surveys follow their own non-blocking research/opt-out contract and do not require that email consent. The topic never authorizes personal qualitative follow-up.
 - Paid advertising is policy-ineligible while Skills Board has no revenue line. Reconsidering it requires a merged strategy change that establishes a revenue model.
 - Public proof points remain unavailable until the underlying metric is production-validated or the attributable person or customer has granted publication consent. A public metric also requires its exact definition, window, denominator, privacy-safe aggregation, and authorization under the policy that owns it.
-- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy is delivered through a repository PR. Branching, implementation, push, and PR preparation are autonomous; the owner's approval is required only immediately before merge.
-- Social, community, SEO, analytics, product, and legally consented/provider-compliant communication actions require no per-action human approval. The pinned active Pulse contract is standing authority.
-- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. After contract-pin integrity passes, the pinned Pulse contract authorizes routed sending, publishing, targeting, and provider writes only when the exact operation is physically available and subject to its legal, consent, privacy, identity, binding-platform, spend/overage, and PR-merge boundaries.
+- A material change to the product contract, ICP, JTBD, positioning, or durable communication policy is delivered through the normal repository review process.
+- This document controls product truth, audience hypotheses, positioning, claims, language, and voice. It does not authorize sending, publishing, targeting, provider writes, or repository merges; each external effect requires explicit authorization and its applicable legal, consent, privacy, identity, platform, and spend checks.
 
 ## Message Hierarchy
 1. Your team already has useful skill recommendations. Put them somewhere everyone can find.
@@ -207,7 +206,5 @@
 **Onboarding and individual value path:** Create an account -> create a team library -> add the first recommended skill -> invite a teammate or connect an agent through MCP -> search the library -> retrieve a command, open the source, or download the ZIP.
 
 **Team activation metric:** Within 14 days of team creation, save the first skill, have an invitation accepted, and have a non-creator select a usage path.
-
-**AAT-28 ownership:** The exact AAT-28 definition and measurement rules belong to the analytics scorecard policy. Marketing work may reference the validated result but must not redefine the metric here.
 
 **Current metrics:** Not established.

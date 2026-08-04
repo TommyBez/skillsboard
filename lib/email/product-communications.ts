@@ -80,7 +80,7 @@ export function evaluateProductCommunicationsEligibility({
   return { eligible: true, reason: null }
 }
 
-export function isAutonomouslyLiftableSuppression(reason: string): boolean {
+export function isExplicitConsentLiftableSuppression(reason: string): boolean {
   return reason === "unsubscribe"
 }
 
