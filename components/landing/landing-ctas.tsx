@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getSession } from "@/lib/session"
 
-export type CtaLocation = "header" | "hero" | "closing" | "launch_demo"
+export type CtaLocation = "header" | "hero" | "closing"
 
 export function primaryAction(signedIn: boolean): {
   href: "/library" | "/sign-up"
@@ -277,33 +277,4 @@ function HomeFinalActionsView({ signedIn }: { signedIn: boolean }) {
 export async function HomeFinalActions() {
   const session = await getSession()
   return <HomeFinalActionsView signedIn={Boolean(session?.user)} />
-}
-
-function HomeLaunchActionsView({ signedIn }: { signedIn: boolean }) {
-  const primary = primaryAction(signedIn)
-
-  return (
-    <Button
-      size="lg"
-      className={`${base.ctaButton} ${base.ctaPrimary}`}
-      nativeButton={false}
-      render={(
-        <TrackedLink
-          href={primary.href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties(signedIn, "launch_demo"),
-          }}
-        />
-      )}
-    >
-      {primary.label}
-      <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
-    </Button>
-  )
-}
-
-export async function HomeLaunchActions() {
-  const session = await getSession()
-  return <HomeLaunchActionsView signedIn={Boolean(session?.user)} />
 }
