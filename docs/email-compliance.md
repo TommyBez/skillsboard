@@ -44,7 +44,7 @@ Do not log webhook payloads or recipient addresses. The endpoint records only th
 
 ## Resend broadcast configuration
 
-Provider resources must be created and read back through the official authenticated Resend capability selected by Pulse:
+Provider resources must be created and read back through the official authenticated Resend capability:
 
 1. Verify exactly one Skills Board sending domain and the exact founder sender identity.
 2. Create or verify a public `Product communications` topic whose immutable default subscription is `opt_out`.
