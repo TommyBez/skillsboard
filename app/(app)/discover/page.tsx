@@ -10,6 +10,7 @@ import {
   DiscoverResultsFallback,
   DiscoverResultsSlot,
 } from "@/components/discover-pending"
+import { SectionErrorBoundary } from "@/components/section-error-boundary"
 import { Button } from "@/components/ui/button"
 import { getAppContext } from "@/lib/app-context"
 import type { CatalogPage } from "@/lib/catalog"
@@ -102,9 +103,11 @@ export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
         </Suspense>
 
         <DiscoverResultsSlot>
-          <Suspense fallback={<DiscoverResultsFallback />}>
-            <DiscoverResults searchParams={searchParams} />
-          </Suspense>
+          <SectionErrorBoundary label="the catalog">
+            <Suspense fallback={<DiscoverResultsFallback />}>
+              <DiscoverResults searchParams={searchParams} />
+            </Suspense>
+          </SectionErrorBoundary>
         </DiscoverResultsSlot>
       </DiscoverPendingProvider>
     </main>

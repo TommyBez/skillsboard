@@ -1,22 +1,9 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { loadTsModule } from "./load-ts-module.mjs"
 
-const source = await readFile(
-  new URL("../lib/discovered-skill-selection.ts", import.meta.url),
-  "utf8",
-)
-const { outputText } = typescript.transpileModule(source, {
-  compilerOptions: {
-    module: typescript.ModuleKind.ES2022,
-    target: typescript.ScriptTarget.ES2022,
-  },
-})
-const { pickDiscoveredSkill } = await import(
-  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
-)
+const { pickDiscoveredSkill } = await loadTsModule("../lib/discovered-skill-selection.ts")
 
 function skill(name, path = name) {
   return { name, path, description: `${name} description` }

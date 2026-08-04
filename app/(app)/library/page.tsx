@@ -11,6 +11,7 @@ import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
 import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { LiveSearchField } from "@/components/live-search-field"
 import { FilterPendingProvider, PendingResultsSlot } from "@/components/pending-filters"
+import { SectionErrorBoundary } from "@/components/section-error-boundary"
 import { SkillDossier } from "@/components/skill-dossier"
 import { TransitionLink } from "@/components/transition-link"
 import { TeammateReusePrompt } from "@/components/teammate-reuse-prompt"
@@ -349,9 +350,11 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
         </Suspense>
 
         <PendingResultsSlot className="flex flex-col gap-10">
-          <Suspense fallback={<LibraryResultsFallback />}>
-            <LibraryResults searchParams={searchParams} />
-          </Suspense>
+          <SectionErrorBoundary label="your team library">
+            <Suspense fallback={<LibraryResultsFallback />}>
+              <LibraryResults searchParams={searchParams} />
+            </Suspense>
+          </SectionErrorBoundary>
         </PendingResultsSlot>
       </FilterPendingProvider>
     </main>
