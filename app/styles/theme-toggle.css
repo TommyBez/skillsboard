@@ -3,17 +3,19 @@
    are the two headers built in the marketing language: 3px corners, a rule-weight
    edge, a field of its own.
 
-   It lived in `components/landing/styles/base.module.css` as `.headerToggle`
-   until both headers needed it. That file scopes its `--lp-*` tokens to `.root`
-   — the landing page's own wrapper — so the class could not be reused outside
-   that tree without silently resolving its edge and field to nothing. The four
-   values it actually needs are restated here against the global tokens they were
-   always derived from, so the class stands on its own wherever it is mounted.
+   It lived in the landing base stylesheet as `.headerToggle` until both headers
+   needed it. That file scopes its `--lp-*` tokens to `.lp-root` — the landing
+   page's own wrapper — so the class could not be reused outside that tree
+   without silently resolving its edge and field to nothing. The four values it
+   actually needs are restated here against the global tokens they were always
+   derived from, so the class stands on its own wherever it is mounted.
 
    Size is deliberately not set. The two headers size their controls differently
    (36px on the landing, 32px on the resource pages, each following the buttons
    beside it), and a control that matches its neighbours is the whole point of
    the treatment — so height stays with the caller and everything else lives
+   here. `relative` and the 3px corner are the caller's too: both are plain
+   utilities, so they are set in the component's class list rather than restated
    here.
 
    Design notes carried over, because they are why the rules are what they are:
@@ -33,7 +35,7 @@
    a background-colour, so the edge composites over the page's own field and not
    over the interior. Without that the edge printed 64,69,64 while the frame
    printed 60,65,60 from the same token. */
-.marketing {
+.theme-toggle-marketing {
   /* Formerly --lp-chrome-rule / --lp-hairline-strong / --lp-hairline /
      --lp-control-field, verbatim. Every outlined control in this chrome draws
      its edge at the same weight as the rules the page is built from. */
@@ -46,8 +48,6 @@
   --tt-ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
   --tt-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 
-  position: relative;
-  border-radius: 3px;
   border-color: var(--tt-rule);
   background-image:
     linear-gradient(var(--tt-field), var(--tt-field)),
@@ -63,29 +63,29 @@
    a pixel of lift under the pointer, a pixel of give under the press. It used
    to lighten its field instead, which it cannot do (the field is a background
    image) and which never matched the controls either side of it anyway. */
-.marketing:hover {
+.theme-toggle-marketing:hover {
   border-color: var(--tt-rule-hover);
 }
 
-.marketing:active {
+.theme-toggle-marketing:active {
   translate: 0 1px;
   transition-duration: var(--tt-dur-tap);
 }
 
-.marketing:focus-visible {
+.theme-toggle-marketing:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
 /* `:not(:active)` so a press keeps its pixel of give while the pointer is still
    over the control. Without it this rule — equal in specificity to
-   `.marketing:active` and later in the file — wins the cascade during a mouse
+   `.theme-toggle-marketing:active` and later in the file — wins the cascade during a mouse
    press and lifts the button instead of pushing it, so the press model is
    inert on exactly the devices that can hover. The landing stylesheet this
    moved from had the same ordering, and the same silent bug, since the lift
    was introduced. */
 @media (hover: hover) and (pointer: fine) {
-  .marketing:hover:not(:active) {
+  .theme-toggle-marketing:hover:not(:active) {
     translate: 0 -1px;
   }
 }
@@ -96,7 +96,7 @@
    ("Theme: system"); this prints that name, so pointing at it or tabbing to it
    answers the question immediately instead of a second later via the OS
    tooltip. No JS, no invented copy — the control's own label, made visible. */
-.marketing::after {
+.theme-toggle-marketing::after {
   content: attr(title);
   position: absolute;
   top: calc(100% + 0.5rem);
@@ -123,29 +123,29 @@
     translate var(--tt-dur-hover) var(--tt-ease-out);
 }
 
-.marketing:hover::after,
-.marketing:focus-visible::after {
+.theme-toggle-marketing:hover::after,
+.theme-toggle-marketing:focus-visible::after {
   opacity: 1;
   translate: 0 0;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marketing,
-  .marketing::after {
+  .theme-toggle-marketing,
+  .theme-toggle-marketing::after {
     transition: none;
     transition-delay: 0s;
   }
 
-  .marketing::after {
+  .theme-toggle-marketing::after {
     translate: none;
   }
 
   /* Matches the hover rule's `:not(:active)` selector exactly. Plain
-     `.marketing:hover` here would be a specificity step *below* it, so the
+     `.theme-toggle-marketing:hover` here would be a specificity step *below* it, so the
      later position would not save it and reduced-motion visitors would keep
      the lift. */
-  .marketing:hover:not(:active),
-  .marketing:active {
+  .theme-toggle-marketing:hover:not(:active),
+  .theme-toggle-marketing:active {
     translate: none;
   }
 }

@@ -2,7 +2,6 @@ import { ArrowRightIcon, CableIcon } from "lucide-react"
 import Link from "next/link"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
-import base from "@/components/landing/styles/base.module.css"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
@@ -61,7 +60,7 @@ export function HomeHeaderActions() {
         <Button
           size="sm"
           variant="ghost"
-          className={`${base.ctaButton} ${base.ctaGhost} hidden h-9 sm:inline-flex`}
+          className="lp-cta lp-cta-ghost relative hidden h-9 sm:inline-flex"
           nativeButton={false}
           render={<Link href="/sign-in" />}
         >
@@ -70,7 +69,7 @@ export function HomeHeaderActions() {
         <Button
           size="sm"
           variant="outline"
-          className={`${base.ctaButton} ${base.ctaHeaderAction} sm:h-9`}
+          className="lp-cta lp-cta-header-action relative sm:h-9"
           nativeButton={false}
           render={(
             <TrackedLink
@@ -85,7 +84,7 @@ export function HomeHeaderActions() {
           <span className="sm:hidden">Start</span>
           <span className="hidden sm:inline">{primaryAction.label}</span>
           <ArrowRightIcon
-            className={`${base.ctaArrow} hidden sm:block`}
+            className="lp-cta-arrow hidden sm:block"
             data-icon="inline-end"
           />
         </Button>
@@ -97,10 +96,10 @@ export function HomeHeaderActions() {
 export function HomeHeroActions() {
   return (
     <div className="flex flex-wrap gap-3">
-      <span className={base.magnetic} data-magnetic>
+      <span className="lp-magnetic inline-flex" data-magnetic>
         <Button
           size="lg"
-          className={`${base.ctaButton} ${base.ctaPrimary}`}
+          className="lp-cta lp-cta-primary relative"
           nativeButton={false}
           render={(
             <TrackedLink
@@ -113,13 +112,13 @@ export function HomeHeroActions() {
           )}
         >
           {primaryAction.label}
-          <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+          <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
         </Button>
       </span>
       <Button
         size="lg"
         variant="outline"
-        className={`${base.ctaButton} ${base.ctaSecondary}`}
+        className="lp-cta lp-cta-secondary relative"
         nativeButton={false}
         render={(
           <TrackedLink
@@ -132,7 +131,7 @@ export function HomeHeroActions() {
         )}
       >
         See MCP access
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </Button>
     </div>
   )
@@ -140,10 +139,10 @@ export function HomeHeroActions() {
 
 export function HomeMcpActions() {
   return (
-    <span className={base.magnetic} data-magnetic>
+    <span className="lp-magnetic inline-flex" data-magnetic>
       <Button
         size="lg"
-        className={`${base.ctaButton} ${base.ctaPrimary}`}
+        className="lp-cta lp-cta-primary relative"
         nativeButton={false}
         render={(
           <TrackedLink
@@ -160,7 +159,7 @@ export function HomeMcpActions() {
       >
         <CableIcon data-icon="inline-start" />
         Create a library to connect
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </Button>
     </span>
   )
@@ -168,10 +167,10 @@ export function HomeMcpActions() {
 
 export function HomeFinalActions() {
   return (
-    <span className={base.magnetic} data-magnetic>
+    <span className="lp-magnetic inline-flex" data-magnetic>
       <Button
         size="lg"
-        className={`${base.ctaButton} ${base.ctaPrimary}`}
+        className="lp-cta lp-cta-primary relative"
         nativeButton={false}
         render={(
           <TrackedLink
@@ -184,7 +183,7 @@ export function HomeFinalActions() {
         )}
       >
         {primaryAction.label}
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </Button>
     </span>
   )

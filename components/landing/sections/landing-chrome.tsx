@@ -4,7 +4,6 @@ import { Brand } from "@/components/brand"
 import { LegalLinks } from "@/components/legal-links"
 import { PageFrame } from "@/components/landing/chrome/page-frame"
 import { HomeHeaderActions } from "@/components/landing/landing-ctas"
-import base from "@/components/landing/styles/base.module.css"
 
 /**
  * Retired chapter index.
@@ -42,15 +41,19 @@ export function ChapterRail() {
  * scrollbar already reports, it was absent without script and absent under
  * reduced motion, and in a still it was a line that stopped mid-air. Cut, the
  * way the chapter index was cut in round 3. See the retirement note in
- * `base.module.css`.
+ * `app/styles/landing/base.css`.
+ *
+ * `bg-transparent` is the strip's resting field, and it is meant to be beaten:
+ * the scrolled state and the no-script fallback both give it `--background`
+ * from an unlayered stylesheet, which outranks any utility.
  */
 export function LandingHeader() {
   return (
     <>
       <PageFrame />
-      <header className={base.header}>
+      <header className="lp-header sticky top-0 z-40 bg-transparent">
         <div className="mx-auto flex h-14 w-full max-w-[1440px] items-center justify-between gap-4 px-5 md:px-10">
-          <span className={base.brandLockup}>
+          <span className={brandLockup}>
             <Brand compactOnMobile />
           </span>
           <HomeHeaderActions />
@@ -59,6 +62,29 @@ export function LandingHeader() {
     </>
   )
 }
+
+/**
+ * The brand lockup, pulled back onto the column by the mark's own side bearing
+ * so the first ink of the page starts on the measure rather than three pixels
+ * inside it. Header and footer use the same pair, so the wordmark reads as
+ * hanging from one column top to bottom.
+ *
+ * The class is still needed: it is the hook for the rule that lifts the mark
+ * onto the wordmark's optical centre, which reaches for a child this wrapper
+ * does not render itself.
+ */
+const brandLockup = "lp-brand-lockup inline-flex ms-[calc(-1*var(--lp-mark-bearing))]"
+
+/**
+ * A colophon link. The negative inline-end margin takes back the trailing
+ * letter-space of the tracked caps, so the optical gap to the next cell matches
+ * the gap between the links themselves.
+ *
+ * The class carries the underline it grows on hover and the two states that
+ * drive it.
+ */
+const footerNavLink =
+  "lp-footer-nav-link relative me-[-0.18em] py-[0.15rem] text-muted-foreground no-underline"
 
 function GitHubMark() {
   return (
@@ -73,14 +99,34 @@ function GitHubMark() {
   )
 }
 
-/** Footer — open-source colophon. */
+/**
+ * Footer — open-source colophon.
+ *
+ * The last chapter dissolves into a slightly recessed field and the measure
+ * rule returns as the frame's bottom edge. That rule is the same 1px of the
+ * same ink across the same span as the rule at the top of the page; it keeps
+ * its own class because it is painted as two layers, and that construction is
+ * argued in the stylesheet.
+ *
+ * The plate is the hand-off — the closing chapter fades into it over the last
+ * 5rem before the rule — and where the frame exists it stops at the frame, so
+ * the page's last field is inside the frame like everything else instead of
+ * running out under it.
+ *
+ * The inner measure carries the same content clear as the closing chapter
+ * above it, page gutter plus the extra air off the frame rails, so the
+ * colophon doesn't snap back out to the rails after "06 · Start".
+ */
 export function LandingFooter() {
   return (
-    <footer className={base.footer}>
-      <span className={base.footerField} aria-hidden="true" />
-      <span className={base.footerRule} aria-hidden="true" />
-      <div className={base.footerInner}>
-        <span className={base.brandLockup}>
+    <footer className="relative">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 -top-20 bottom-0 z-0 bg-[linear-gradient(to_bottom,transparent_0,var(--lp-footer-field)_5rem)] lg:left-[var(--lp-frame-inset)] lg:right-[var(--lp-frame-inset)]"
+      />
+      <span className="lp-footer-rule" aria-hidden="true" />
+      <div className="relative mx-auto flex w-full max-w-[var(--lp-measure)] flex-col gap-8 px-[calc(var(--lp-gutter)+1.5rem)] py-12 md:flex-row md:items-center md:justify-between md:py-14 lg:px-[calc(var(--lp-gutter)+1.75rem)] min-[84rem]:px-[calc(var(--lp-gutter)+2rem)]">
+        <span className={brandLockup}>
           <Brand />
         </span>
         <div className="flex flex-wrap items-center gap-x-7 gap-y-4 md:justify-end">
@@ -88,31 +134,36 @@ export function LandingFooter() {
             aria-label="Footer"
             className="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
           >
-            <a href="#pricing" className={base.footerNavLink}>
+            <a href="#pricing" className={footerNavLink}>
               Pricing
             </a>
-            <a href="#faq" className={base.footerNavLink}>
+            <a href="#faq" className={footerNavLink}>
               FAQ
             </a>
-            <Link href="/resources" className={base.footerNavLink}>
+            <Link href="/resources" className={footerNavLink}>
               Resources
             </Link>
           </nav>
           <LegalLinks
             ariaLabel="Legal pages"
             className="font-mono text-xs font-semibold uppercase tracking-[0.18em]"
-            linkClassName={base.footerNavLink}
+            linkClassName={footerNavLink}
           />
+          {/* A short vertical divider between two cells of a control row. It
+              centres on the row's optical centre — the same centre the caps and
+              the icon cell sit on — so it must not ask for `self-stretch`,
+              which a definite height cancels, dropping it back to flex-start
+              and leaving it 10px high in a 36px row. */}
           <span
             aria-hidden="true"
-            className={`${base.headerCellRule} hidden h-4 self-center sm:block`}
+            className="hidden h-4 w-px flex-none self-center bg-[var(--lp-hairline)] sm:block"
           />
           <a
             href="https://github.com/TommyBez/skillsboard"
             target="_blank"
             rel="noreferrer"
             aria-label="Skills Board on GitHub"
-            className={`${base.footerMark} inline-flex size-9 shrink-0 items-center justify-center`}
+            className="lp-footer-mark inline-flex size-9 shrink-0 items-center justify-center"
           >
             <GitHubMark />
           </a>
