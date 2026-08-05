@@ -11,10 +11,6 @@ import {
   resourceSections,
 } from "@/lib/seo/resources"
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 const description =
   "Explore practical resources for sharing, reviewing, and managing reusable AI skills across your team and agent workflows."
 

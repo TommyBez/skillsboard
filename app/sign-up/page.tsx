@@ -4,10 +4,6 @@ import type { Metadata } from "next"
 import { AccessShell } from "@/components/access-shell"
 import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 export const metadata: Metadata = {
   title: "Create your team library",
   description:

@@ -6,10 +6,6 @@ import {
 } from "@/components/landing/sections/landing-chrome"
 import base from "@/components/landing/styles/base.module.css"
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 /**
  * The landing surface's frame: motion root, command strip, footer.
  *

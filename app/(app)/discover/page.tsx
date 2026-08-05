@@ -16,10 +16,6 @@ import type { CatalogPage } from "@/lib/catalog"
 import { listOrganizationSkills } from "@/lib/db/queries"
 import { getCuratedSkills, getLeaderboard, searchCatalog } from "@/lib/skills-sh"
 
-// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
-// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
-export const instant = false;
-
 interface DiscoverPageProps {
   searchParams: Promise<{ q?: string; view?: "trending" | "hot" | "all-time" | "curated" }>
 }
