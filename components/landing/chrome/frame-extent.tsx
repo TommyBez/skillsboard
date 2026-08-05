@@ -5,7 +5,7 @@ import { useEffect } from "react"
 /**
  * Closes the page frame at the bottom.
  *
- * The frame's vertical rails are drawn in the document (see `.frameRail`), so
+ * The frame's vertical rails are drawn in the document (see `PageFrame`), so
  * their top end lands on the header rule by construction. Their bottom end
  * cannot: the rail is a child of the landing root, and the root ends *below*
  * the footer rule, so `bottom: 0` runs the rails past the corner they are

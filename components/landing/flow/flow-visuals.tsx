@@ -1,6 +1,5 @@
 import { GitForkIcon, LinkIcon, SearchIcon } from "lucide-react"
 
-import styles from "@/components/landing/styles/flow.module.css"
 
 /**
  * Three purpose-built micro-diagrams for the workflow chapter. Each one is
@@ -21,7 +20,7 @@ import styles from "@/components/landing/styles/flow.module.css"
  * where the connectors hang — and `--row-pad`, where every row's text starts.
  *
  * All three are pure markup + CSS. They render in their finished, composed
- * state by default; `flow.module.css` only re-stages them when the shared
+ * state by default; `app/styles/landing/flow.css` only re-stages them when the shared
  * motion controller has armed the `flow` group, so no-JS and reduced-motion
  * viewers get the resting diagram with nothing hidden.
  */
@@ -29,9 +28,9 @@ import styles from "@/components/landing/styles/flow.module.css"
 /** A caption followed by a hairline that runs to the column's right edge. */
 function VizLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className={styles.vizLabel} aria-hidden="true">
-      <span className={styles.labelText}>{children}</span>
-      <span className={styles.labelRule} />
+    <p className="lp-flow-viz-label" aria-hidden="true">
+      <span className="lp-flow-label-text">{children}</span>
+      <span className="lp-flow-label-rule" />
     </p>
   )
 }
@@ -39,15 +38,15 @@ function VizLabel({ children }: { children: React.ReactNode }) {
 /** The same object, closing the column: one measured fact about the diagram. */
 function VizFoot({ label, value }: { label: string; value: string }) {
   return (
-    <p className={`${styles.vizLabel} ${styles.vizFoot}`} aria-hidden="true">
-      <span className={styles.labelText}>{label}</span>
-      <span className={styles.labelRule} />
-      <span className={styles.footVal}>{value}</span>
+    <p className="lp-flow-viz-label lp-flow-viz-foot" aria-hidden="true">
+      <span className="lp-flow-label-text">{label}</span>
+      <span className="lp-flow-label-rule" />
+      <span className="lp-flow-foot-val">{value}</span>
     </p>
   )
 }
 
-const Arrow = () => <span className={styles.vizArrow}>{"->"}</span>
+const Arrow = () => <span className="inline-block mx-[0.12em] tracking-[-0.06em]">{"->"}</span>
 
 /* 01 — a pasted GitHub URL resolving into a populated skill card. */
 export function PasteResolveVisual() {
@@ -56,43 +55,43 @@ export function PasteResolveVisual() {
       <VizLabel>
         url <Arrow /> skill
       </VizLabel>
-      <div className={styles.vizBody} aria-hidden="true">
-        <div className={styles.pasteField}>
-          <span className={styles.pasteFlash} />
-          <LinkIcon className={styles.ctrlIcon} aria-hidden="true" />
-          <span className={styles.pasteUrl}>
-            <span className={styles.pasteDim}>github.com/</span>
+      <div className="lp-flow-viz-body" aria-hidden="true">
+        <div className="lp-flow-paste-field">
+          <span className="lp-flow-paste-flash" />
+          <LinkIcon className="lp-flow-ctrl-icon" aria-hidden="true" />
+          <span className="lp-flow-paste-url">
+            <span className="lp-flow-paste-dim">github.com/</span>
             anthropics/skills
           </span>
         </div>
 
-        <span className={styles.pasteLink}>
-          <span className={styles.pasteWire}>
-            <span className={styles.pasteWireHead} />
+        <span className="relative block flex-1 min-h-[2.6rem]">
+          <span className="lp-flow-paste-wire">
+            <span className="lp-flow-paste-wire-head" />
           </span>
-          <span className={styles.pasteWireNote}>resolve</span>
+          <span className="lp-flow-paste-wire-note">resolve</span>
         </span>
 
-        <div className={styles.miniCard}>
-          <div className={styles.miniBody}>
-            <div className={styles.miniMeta}>
-              <span className={styles.miniSource}>
-                <GitForkIcon className={styles.miniFork} aria-hidden="true" />
+        <div className="lp-flow-mini-card">
+          <div className="lp-flow-mini-body">
+            <div className="lp-flow-mini-meta">
+              <span className="lp-flow-mini-source">
+                <GitForkIcon className="lp-flow-mini-fork" aria-hidden="true" />
                 anthropics/skills
               </span>
-              <span className={styles.miniStars}>8.4k stars</span>
+              <span className="lp-flow-mini-stars">8.4k stars</span>
             </div>
-            <p className={styles.miniName}>pdf-extraction</p>
-            <p className={styles.miniDesc}>
+            <p className="lp-flow-mini-name">pdf-extraction</p>
+            <p className="lp-flow-mini-desc">
               Pull text, tables, and metadata from PDF documents.
             </p>
-            <div className={styles.miniTags}>
-              <span className={styles.miniTag}>documents</span>
-              <span className={styles.miniTag}>parsing</span>
+            <div className="lp-flow-mini-tags">
+              <span className="lp-flow-mini-tag">documents</span>
+              <span className="lp-flow-mini-tag">parsing</span>
             </div>
           </div>
-          <div className={styles.miniFoot}>
-            <code className={styles.miniCmd}>
+          <div className="lp-flow-mini-foot">
+            <code className="lp-flow-mini-cmd">
               npx skills add anthropics/skills --skill pdf-extraction
             </code>
           </div>
@@ -119,34 +118,34 @@ export function SearchFilterVisual() {
       <VizLabel>
         query <Arrow /> match
       </VizLabel>
-      <div className={styles.vizBody} aria-hidden="true">
-        <div className={styles.searchField}>
-          <SearchIcon className={styles.ctrlIcon} aria-hidden="true" />
-          <span className={styles.searchQueryWrap}>
-            <span className={styles.searchQuery}>pdf</span>
-            <span className={styles.searchCaret} />
+      <div className="lp-flow-viz-body" aria-hidden="true">
+        <div className="lp-flow-search-field">
+          <SearchIcon className="lp-flow-ctrl-icon" aria-hidden="true" />
+          <span className="lp-flow-search-query-wrap">
+            <span className="lp-flow-search-query">pdf</span>
+            <span className="lp-flow-search-caret" />
           </span>
         </div>
 
-        <ul className={styles.resultList}>
-          <li className={styles.resultRow} data-match="true">
-            <span className={styles.resultName}>
-              <span className={styles.resultMark}>pdf</span>-extraction
+        <ul className="lp-flow-result-list">
+          <li className="lp-flow-result-row" data-match="true">
+            <span className="lp-flow-result-name">
+              <span className="lp-flow-result-mark">pdf</span>-extraction
             </span>
-            <span className={styles.resultRepo}>anthropics/skills</span>
+            <span className="lp-flow-result-repo">anthropics/skills</span>
           </li>
         </ul>
 
-        <p className={`${styles.vizLabel} ${styles.resultCut}`} aria-hidden="true">
-          <span className={styles.labelText}>filtered out</span>
-          <span className={styles.labelRule} />
+        <p className="lp-flow-viz-label lp-flow-result-cut" aria-hidden="true">
+          <span className="lp-flow-label-text">filtered out</span>
+          <span className="lp-flow-label-rule" />
         </p>
 
-        <ul className={`${styles.resultList} ${styles.resultRest}`}>
+        <ul className="lp-flow-result-list lp-flow-result-rest">
           {libraryRows.map((row) => (
-            <li key={row.name} className={styles.resultRow} data-match="false">
-              <span className={styles.resultName}>{row.name}</span>
-              <span className={styles.resultRepo}>{row.repo}</span>
+            <li key={row.name} className="lp-flow-result-row" data-match="false">
+              <span className="lp-flow-result-name">{row.name}</span>
+              <span className="lp-flow-result-repo">{row.repo}</span>
             </li>
           ))}
         </ul>
@@ -170,17 +169,17 @@ export function RouteFanVisual() {
       <VizLabel>
         skill <Arrow /> routes
       </VizLabel>
-      <div className={styles.vizBody} aria-hidden="true">
-        <p className={styles.fanNode}>
-          <GitForkIcon className={styles.ctrlIcon} aria-hidden="true" />
+      <div className="lp-flow-viz-body" aria-hidden="true">
+        <p className="lp-flow-fan-node">
+          <GitForkIcon className="lp-flow-ctrl-icon" aria-hidden="true" />
           pdf-extraction
         </p>
-        <span className={styles.fanStem} />
-        <ul className={styles.fanList}>
+        <span className="lp-flow-fan-stem" />
+        <ul className="lp-flow-fan-list">
           {routes.map((route) => (
-            <li key={route.key} className={styles.fanRow}>
-              <span className={styles.fanKey}>{route.key}</span>
-              <span className={styles.fanVal}>{route.value}</span>
+            <li key={route.key} className="lp-flow-fan-row">
+              <span className="lp-flow-fan-key">{route.key}</span>
+              <span className="lp-flow-fan-val">{route.value}</span>
             </li>
           ))}
         </ul>

@@ -14,7 +14,7 @@
    only adds the arrival.
 --------------------------------------------------------------------------- */
 
-.closing {
+.lp-closing {
   /* The column line, as a fraction of the band's own measure. The grid, the
      rail that draws it and the sheet that sits on it all read this. */
   --closing-split: 0.61;
@@ -29,7 +29,7 @@
 
 /* Field: a fine raster that settles toward the footer, so the band has a
    floor and the hand-off into the colophon is a fade rather than a cut. */
-.closingField {
+.lp-closing-field {
   position: absolute;
   inset: 0;
   z-index: 0;
@@ -67,7 +67,7 @@
 
    Nothing is centred by free space any more: the layout is deterministic, so
    the vertical rail below can be placed on the chapter rule to the pixel. */
-.closingInner {
+.lp-closing-inner {
   --closing-mark-h: 1rem;
   --closing-lead: 2.75rem;
   --closing-tail: calc(var(--closing-lead) + var(--closing-mark-h) / 2);
@@ -87,7 +87,7 @@
 }
 
 @media (min-width: 48rem) {
-  .closingInner {
+  .lp-closing-inner {
     --closing-lead: 5rem;
 
     padding-block: 6.9375rem var(--closing-tail);
@@ -95,13 +95,13 @@
 }
 
 @media (min-width: 64rem) {
-  .closingInner {
+  .lp-closing-inner {
     --closing-inline: calc(var(--lp-gutter) + 1.75rem);
   }
 }
 
 @media (min-width: 84rem) {
-  .closingInner {
+  .lp-closing-inner {
     --closing-inline: calc(var(--lp-gutter) + 2rem);
   }
 }
@@ -117,12 +117,12 @@
    footer rule; neither end floats. The sheet's own left border is drawn on it.
 --------------------------------------------------------------------------- */
 
-.closingSplit {
+.lp-closing-split {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .closingSplit {
+  .lp-closing-split {
     display: block;
     position: absolute;
     top: calc(6.9375rem + var(--closing-mark-h) / 2);
@@ -148,28 +148,23 @@
    Chapter mark — 06 · START, in the same voice as 03 · MCP and 05 / FAQ
 
    Size, weight, tracking, colour and the trailing measure rule all come from
-   the shared `base.chapterMark`; this only sets the index/name pairing.
+   the shared `chapterMark` recipe in `components/landing/styles.ts`; this only
+   sets the index/name pairing.
 --------------------------------------------------------------------------- */
 
 /* Own class, kept as the layout + arrival hook for the chapter mark row.
    The line box is pinned to a round 16px so the measure rule it carries sits
    on an exact half-pixel of the band, which is what the column rail below is
    positioned from. */
-.closingMark {
+.lp-closing-mark {
   flex: none;
   line-height: 1rem;
 }
 
 /* Optical: the mono zero is round, so its ink is set a hair left of the
    column's stem line — the same correction the display and body copy carry. */
-.closingMarkIndex {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6rem;
-  margin-left: -0.65px;
-}
 
-.closingMarkSep {
+.lp-closing-mark-sep {
   color: color-mix(in oklab, var(--foreground) 34%, transparent);
 }
 
@@ -183,13 +178,13 @@
    bottom edge and the button's bottom edge, the same two lines.
 --------------------------------------------------------------------------- */
 
-.closingGrid {
+.lp-closing-grid {
   display: grid;
   gap: 3rem;
 }
 
 @media (min-width: 64rem) {
-  .closingGrid {
+  .lp-closing-grid {
     /* One number owns the column line: the grid split and the rail that draws
        it are the same value, so the rule can never drift off the boundary. */
     grid-template-columns:
@@ -200,23 +195,23 @@
     row-gap: 2.25rem;
   }
 
-  .closingMain {
+  .lp-closing-main {
     grid-column: 1;
     grid-row: 1;
   }
 
-  .closingCta {
+  .lp-closing-cta {
     grid-column: 1;
     grid-row: 2;
   }
 
-  .plate {
+  .lp-closing-plate {
     grid-column: 2;
     grid-row: 1 / span 2;
   }
 }
 
-.closingMain {
+.lp-closing-main {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -234,7 +229,7 @@
    to the left of it. The block is pulled out by the "s" bearing plus its
    overhang; `text-indent` puts line one — which always starts on the "A" —
    back on the stem line. */
-.closingHeading {
+.lp-closing-heading {
   max-width: var(--closing-measure);
   margin-top: -0.152em;
   margin-left: -0.0085em;
@@ -246,14 +241,14 @@
    page frame's rail is painted on that same column and is opaque, so without
    this it draws a 1px seam straight down the overhanging glyphs. The type owns
    that column; the rule passes behind it. */
-.closingMark,
-.closingHeading {
+.lp-closing-mark,
+.lp-closing-heading {
   position: relative;
   z-index: 21;
 }
 
 @media (min-width: 64rem) {
-  .closingHeading {
+  .lp-closing-heading {
     margin-left: -0.037em;
     text-indent: 0.0285em;
   }
@@ -263,7 +258,7 @@
    flat-stemmed "T", so the "T" holds the stem line and the "S" overhangs it.
 
    The measure comes from `--closing-measure`; see the ladder at the top. */
-.closingCopy {
+.lp-closing-copy {
   max-width: calc(var(--closing-measure) * 0.8);
   margin-bottom: 0;
   margin-left: -0.014em;
@@ -287,7 +282,7 @@
    - horizontal placement: the block is pulled back so the gap from the closing
      quote's ink to the word's ink reads as one and a half word spaces rather
      than two, and the stamp stays part of the line it interrupts. */
-.onceStamp {
+.lp-closing-once-stamp {
   position: relative;
   display: inline-block;
   margin-left: -0.045em;
@@ -304,7 +299,7 @@
 }
 
 /* Ink grain: the impression is never perfectly even. */
-.onceStamp::after {
+.lp-closing-once-stamp::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -317,7 +312,7 @@
 }
 
 /* Impact halo: a single ring of displaced ink on landing, invisible at rest. */
-.onceStamp::before {
+.lp-closing-once-stamp::before {
   content: "";
   position: absolute;
   inset: -0.11em -0.07em;
@@ -337,13 +332,13 @@
    it, painted on the wrapper so nothing about the button is overridden.
 --------------------------------------------------------------------------- */
 
-.closingCta {
+.lp-closing-cta {
   position: relative;
   display: inline-flex;
   justify-self: start;
 }
 
-.closingCta::before {
+.lp-closing-cta::before {
   content: "";
   position: absolute;
   inset: -22% -10%;
@@ -360,33 +355,33 @@
   transition: opacity var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-:global(.dark) .closingCta::before {
+.dark .lp-closing-cta::before {
   opacity: 0.5;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .closingCta:hover::before {
+  .lp-closing-cta:hover::before {
     opacity: 0.5;
   }
 
-  :global(.dark) .closingCta:hover::before {
+  .dark .lp-closing-cta:hover::before {
     opacity: 0.92;
   }
 }
 
-.closingCta:active::before {
+.lp-closing-cta:active::before {
   opacity: 0.2;
   transition-duration: var(--lp-dur-tap);
 }
 
-:global(.dark) .closingCta:active::before {
+.dark .lp-closing-cta:active::before {
   opacity: 0.38;
 }
 
 /* The streamed fallback holds exactly the button's box, so the terminal
    action never resizes as the session resolves — and so the chapter is still
    composed if the stream never lands (no JS). */
-.closingCta > div {
+.lp-closing-cta > div {
   height: 3.5rem;
   width: 18rem;
   max-width: 100%;
@@ -394,7 +389,7 @@
 }
 
 /* The last action on the page carries more weight than the ones above it. */
-.closingCta a {
+.lp-closing-cta a {
   height: 3.5rem;
   padding-inline: 1.75rem;
   font-size: 1.125rem;
@@ -415,11 +410,11 @@
    the frame.
 --------------------------------------------------------------------------- */
 
-.plate {
+.lp-closing-plate {
   display: flex;
 }
 
-.plateFrame {
+.lp-closing-plate-frame {
   position: relative;
   display: flex;
   flex: 1 1 auto;
@@ -435,7 +430,7 @@
 }
 
 @media (max-width: 24rem) {
-  .plateFrame {
+  .lp-closing-plate-frame {
     padding-inline: 1.125rem;
   }
 }
@@ -444,7 +439,7 @@
    mirror is exact: 20px on the outside of the label row and 18px on the rule
    side at both ends, so both bands measure 57px and both labels' cap centres
    land on their own band's centre line. The two used to disagree by 9.5px. */
-.plateBar {
+.lp-closing-plate-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -452,19 +447,19 @@
   padding-bottom: 18px;
 }
 
-.plateBar[data-foot] {
+.lp-closing-plate-bar[data-foot] {
   padding-top: 20px;
   padding-bottom: 0;
 }
 
 /* Both bars carry the same line box, so the sheet's two edge rules sit the
    same distance from the sheet's two edges. Measured: 57px, both ends. */
-.plateLabel,
-.plateAnswer {
+.lp-closing-plate-label,
+.lp-closing-plate-answer {
   line-height: 1.125rem;
 }
 
-.plateLabel {
+.lp-closing-plate-label {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 600;
@@ -474,14 +469,8 @@
   white-space: nowrap;
 }
 
-.plateLegend {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-width: 0;
-}
 
-.plateAnswer {
+.lp-closing-plate-answer {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: -0.005em;
@@ -490,22 +479,22 @@
 }
 
 /* Structural edges of the sheet: one weight, one scope, top and bottom. */
-.plateEdge {
+.lp-closing-plate-edge {
   display: block;
   height: 1px;
   background: var(--lp-hairline);
   transform-origin: left center;
 }
 
-.plateEdge[data-edge="head"] {
+.lp-closing-plate-edge[data-edge="head"] {
   margin-bottom: 1.25rem;
 }
 
-.plateEdge[data-edge="foot"] {
+.lp-closing-plate-edge[data-edge="foot"] {
   margin-top: 1.25rem;
 }
 
-.plateRows {
+.lp-closing-plate-rows {
   display: grid;
   gap: 1rem;
   margin: 0;
@@ -516,7 +505,7 @@
 /* Once the sheet is stretched to the height of the column beside it, the
    entries take up the slack instead of leaving a hole under the last one. */
 @media (min-width: 64rem) {
-  .plateRows {
+  .lp-closing-plate-rows {
     flex: 1 1 auto;
     align-content: space-between;
   }
@@ -524,7 +513,7 @@
 
 /* Narrow: mark, name, then the source run out to the right edge.
    No leader, because a leader that stops in empty space is not a leader. */
-.plateRow {
+.lp-closing-plate-row {
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
@@ -532,19 +521,19 @@
 }
 
 @media (max-width: 24rem) {
-  .plateRow {
+  .lp-closing-plate-row {
     gap: 0.7rem;
   }
 }
 
-.plateRule {
+.lp-closing-plate-rule {
   display: none;
   height: 1px;
   background: color-mix(in oklab, var(--foreground) 9%, transparent);
   transform-origin: left center;
 }
 
-.plateSource {
+.lp-closing-plate-source {
   justify-self: end;
   font-family: var(--font-mono);
   font-size: 0.625rem;
@@ -556,30 +545,30 @@
 /* Wide enough for the leader to still read as a leader: it runs the entry out
    to where it came from, the way an index does. */
 @media (min-width: 64rem) {
-  .plateRow {
+  .lp-closing-plate-row {
     grid-template-columns: auto auto minmax(2.5rem, 1fr) auto;
   }
 
-  .plateRule {
+  .lp-closing-plate-rule {
     display: block;
   }
 
-  .plateSource {
+  .lp-closing-plate-source {
     justify-self: auto;
   }
 }
 
 @media (min-width: 82rem) {
-  .plateSource {
+  .lp-closing-plate-source {
     font-size: 0.6875rem;
   }
 }
 
-.plateRow[data-marked] .plateSource {
+.lp-closing-plate-row[data-marked] .lp-closing-plate-source {
   color: color-mix(in oklab, var(--foreground) 66%, transparent);
 }
 
-.plateName {
+.lp-closing-plate-name {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   letter-spacing: -0.005em;
@@ -588,13 +577,13 @@
 }
 
 @media (min-width: 82rem) {
-  .plateName,
-  .plateAnswer {
+  .lp-closing-plate-name,
+  .lp-closing-plate-answer {
     font-size: 0.8125rem;
   }
 }
 
-.plateRow[data-marked] .plateName {
+.lp-closing-plate-row[data-marked] .lp-closing-plate-name {
   color: var(--foreground);
 }
 
@@ -602,7 +591,7 @@
    everywhere on the sheet. State is carried by colour alone — a marker that
    changes size is a different marker, and a 3px one is dust rather than a
    mark. */
-.plateMark {
+.lp-closing-plate-mark {
   width: 6px;
   height: 6px;
   flex: none;
@@ -610,8 +599,8 @@
   background: color-mix(in oklab, var(--foreground) 26%, transparent);
 }
 
-.plateRow[data-marked] .plateMark,
-.plateMark[data-legend] {
+.lp-closing-plate-row[data-marked] .lp-closing-plate-mark,
+.lp-closing-plate-mark[data-legend] {
   background: var(--primary);
 }
 
@@ -619,7 +608,7 @@
    its line box, which sits 0.75px lower. Measured after: the legend square is
    within 0.5px of the caps of RECOMMENDED, the answer square within 0.13px of
    the x-height of code-review. */
-.plateBar .plateMark {
+.lp-closing-plate-bar .lp-closing-plate-mark {
   margin-bottom: 1.5px;
 }
 
@@ -627,36 +616,36 @@
    Arrival — the claim lands, the ledger is written, the answer is filed
 --------------------------------------------------------------------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.closingMark, .closingHeading, .closingCopy, .closingCta) {
+  :is(.lp-closing-mark, .lp-closing-heading, .lp-closing-copy, .lp-closing-cta) {
   opacity: 0;
   transform: translate3d(0, 18px, 0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .closingHeading {
+  .lp-closing-heading {
   transform: translate3d(0, 38px, 0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  :is(.closingMark, .closingHeading, .closingCopy, .closingCta) {
+  :is(.lp-closing-mark, .lp-closing-heading, .lp-closing-copy, .lp-closing-cta) {
   transition:
     opacity var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms),
     transform var(--lp-dur-reveal) var(--lp-ease-emph) var(--d, 0ms);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingMark {
+  .lp-closing-mark {
   --d: 0ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingHeading {
+  .lp-closing-heading {
   --d: 60ms;
 
   transition:
@@ -664,47 +653,47 @@
     transform 720ms var(--lp-ease-emph) var(--d);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCopy {
+  .lp-closing-copy {
   --d: 320ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta {
+  .lp-closing-cta {
   --d: 560ms;
 }
 
 /* The bloom comes up under the button a beat after it has landed. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .closingCta::before {
+  .lp-closing-cta::before {
   opacity: 0;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .closingCta::before {
+  .lp-closing-cta::before {
   transition: opacity 520ms var(--lp-ease-out) 760ms;
 }
 
 /* The stamp: falls, hits, compresses, settles. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .onceStamp {
+  .lp-closing-once-stamp {
   opacity: 0;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .onceStamp {
+  .lp-closing-once-stamp {
   animation: closingStamp 620ms var(--lp-ease-out) 460ms both;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .onceStamp::before {
+  .lp-closing-once-stamp::before {
   animation: closingStampHalo 620ms var(--lp-ease-out) 460ms both;
 }
 
@@ -750,84 +739,84 @@
 
 /* The plate: the sheet arrives, the entries are ruled in, the mark lands,
    and the answer bar closes it. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .plateFrame {
+  .lp-closing-plate-frame {
   opacity: 0;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateFrame {
+  .lp-closing-plate-frame {
   transition: opacity 480ms var(--lp-ease-out) 200ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateRule, .plateEdge) {
+  :is(.lp-closing-plate-rule, .lp-closing-plate-edge) {
   transform: scaleX(0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  :is(.plateName, .plateSource, .plateLabel, .plateAnswer) {
+  :is(.lp-closing-plate-name, .lp-closing-plate-source, .lp-closing-plate-label, .lp-closing-plate-answer) {
   opacity: 0;
   transform: translate3d(-7px, 0, 0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="pending"]
-  .plateMark {
+  .lp-closing-plate-mark {
   opacity: 0;
   transform: scale(0.3);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateEdge[data-edge="head"] {
+  .lp-closing-plate-edge[data-edge="head"] {
   transition: transform 520ms var(--lp-ease-emph) 280ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateEdge[data-edge="foot"] {
+  .lp-closing-plate-edge[data-edge="foot"] {
   transition: transform 620ms var(--lp-ease-emph) 800ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateRule {
+  .lp-closing-plate-rule {
   transition: transform 620ms var(--lp-ease-emph)
     calc(360ms + var(--i, 0) * 76ms);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  :is(.plateName, .plateSource) {
+  :is(.lp-closing-plate-name, .lp-closing-plate-source) {
   transition:
     opacity 400ms var(--lp-ease-out) calc(320ms + var(--i, 0) * 76ms),
     transform 400ms var(--lp-ease-emph) calc(320ms + var(--i, 0) * 76ms);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateBar .plateLabel {
+  .lp-closing-plate-bar .lp-closing-plate-label {
   transition:
     opacity 400ms var(--lp-ease-out) 240ms,
     transform 400ms var(--lp-ease-emph) 240ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateBar[data-foot] :is(.plateLabel, .plateAnswer) {
+  .lp-closing-plate-bar[data-foot] :is(.lp-closing-plate-label, .lp-closing-plate-answer) {
   transition:
     opacity 400ms var(--lp-ease-out) 880ms,
     transform 400ms var(--lp-ease-emph) 880ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateMark {
+  .lp-closing-plate-mark {
   transition:
     opacity 240ms var(--lp-ease-out) calc(400ms + var(--i, 0) * 76ms),
     transform 420ms var(--lp-ease-spring) calc(400ms + var(--i, 0) * 76ms);
@@ -835,19 +824,19 @@
 
 /* The marked entry answers the stamp, a beat after it lands; the answer bar's
    mark lands last of all, once the sheet is closed. */
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateRow[data-marked]
-  .plateMark {
+  .lp-closing-plate-row[data-marked]
+  .lp-closing-plate-mark {
   transition:
     opacity 220ms var(--lp-ease-out) 700ms,
     transform 440ms var(--lp-ease-spring) 700ms;
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="closing"][data-motion-state="visible"]
-  .plateBar[data-foot]
-  .plateMark {
+  .lp-closing-plate-bar[data-foot]
+  .lp-closing-plate-mark {
   transition:
     opacity 220ms var(--lp-ease-out) 900ms,
     transform 440ms var(--lp-ease-spring) 900ms;
@@ -858,7 +847,7 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .closingCta::before {
+  .lp-closing-cta::before {
     transition: none;
   }
 }

@@ -18,7 +18,7 @@
    fully composed diagram. `--mcp-p` defaults to 1 on the landing root.
 --------------------------------------------------------------------------- */
 
-.mcpChapter {
+.lp-mcp-chapter {
   /* The module. lib row == lib head == agent row / 2, so
      5 lib rows + 1 head == 3 agent rows, exactly. Held on an integer rem
      ladder rather than a viewport formula: a fractional unit would put every
@@ -88,13 +88,13 @@
 }
 
 @media (min-width: 64rem) {
-  .mcpChapter {
+  .lp-mcp-chapter {
     --rule-clear: 1.75rem;
   }
 }
 
 @media (min-width: 84rem) {
-  .mcpChapter {
+  .lp-mcp-chapter {
     --rule-clear: 2rem;
   }
 }
@@ -103,7 +103,7 @@
    diagram. The 1 : 1 : 2 relationship is preserved, and the copy column's
    fourth element stands down so the block still fits its runway. */
 @media (min-width: 64rem) and (max-height: 50rem) {
-  .mcpChapter {
+  .lp-mcp-chapter {
     --lib-row-h: 3.75rem;
   }
 }
@@ -111,11 +111,11 @@
 /* The tall scroll chapter only exists when the controller is live; without
    JS or with reduced motion the section is a normal static spread. */
 @media (min-width: 64rem) {
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .mcpChapter {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-chapter {
     height: 220vh;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .mcpSticky {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-sticky {
     position: sticky;
     top: var(--lp-header-h);
     height: calc(100dvh - var(--lp-header-h));
@@ -129,7 +129,7 @@
    Frame — rails, header strip, spine, footer band
 --------------------------------------------------------------------------- */
 
-.frame {
+.lp-mcp-frame {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -148,11 +148,11 @@
   /* The frame's rails have to land *on* the page measure, not outboard of it:
      without the gutter the chapter's content started 12px left of every other
      chapter's between 1024 and 1440. */
-  .mcpSticky {
+  .lp-mcp-sticky {
     padding-inline: var(--lp-gutter);
   }
 
-  .frame {
+  .lp-mcp-frame {
     border-inline: 1px solid var(--rule-frame);
     /* Nothing is inset by the frame itself. Every band inside it carries the
        page's own `--rule-clear`, measured from the rule beside it, so the
@@ -162,7 +162,7 @@
 
   /* Only the pinned version trades page padding for viewport height; the
      static (no-JS / reduced-motion) spread keeps the page's normal rhythm. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .frame {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-frame {
     height: 100%;
     --frame-pad: clamp(1.1rem, 2.4vh, 1.9rem);
   }
@@ -172,7 +172,7 @@
    One joint governs the strip, and it is measured ink to ink rather than box
    to box: every run here is tracked mono, so a box-to-box gap reads a
    letter-space wider than it is. Each run gives its trailing tracking back. */
-.frameTop {
+.lp-mcp-frame-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -187,12 +187,12 @@
      page's clear space off the rails. Two right-hand terminations in the
      header, not four: the rule ends on the frame, the type ends on the
      content column. */
-  .frameTop {
+  .lp-mcp-frame-top {
     padding-inline: var(--rule-clear);
   }
 }
 
-.frameIndex {
+.lp-mcp-frame-index {
   flex: none;
   /* 0.75rem of ink-to-ink joint: the nominal gap less this run's own trailing
      slack (tracking minus the final glyph's right bearing = 0.145em). */
@@ -205,17 +205,14 @@
   color: var(--foreground);
 }
 
-.frameMark {
-  flex: 1;
-  min-width: 0;
-}
 
-/* The trailing-tracking pull for the mark lives on the shared
-   `.chapterMark::after`, so this chapter uses the page's joint rather than
-   compensating for it locally. The readout takes the same 0.75rem on the far
-   side of the rule, so both flanks of one rule are one measurement. */
+/* The trailing-tracking pull for the mark lives on the shared chapter mark's
+   `after:` rule (see `components/landing/styles.ts`), so this chapter uses the
+   page's joint rather than compensating for it locally. The readout takes the
+   same 0.75rem on the far side of the rule, so both flanks of one rule are one
+   measurement. */
 
-.readout {
+.lp-mcp-readout {
   display: flex;
   align-items: center;
   /* 0.75rem measured from SIGNAL's last *glyph*: the run carries 0.154em of
@@ -230,7 +227,7 @@
   color: var(--ink-chrome);
 }
 
-.readoutKey {
+.lp-mcp-readout-key {
   color: var(--ink-chrome);
 }
 
@@ -239,7 +236,7 @@
    unexplained air. A hairline divides the key from the field, so the space is
    the field's, not a gap; and the field is now sized to its longest phase
    rather than half a rem wider than it. */
-.readoutSep {
+.lp-mcp-readout-sep {
   flex: none;
   width: 1px;
   height: 0.7rem;
@@ -249,44 +246,44 @@
 /* The stack is set from the right and pulled back by its own trailing
    letter-space, so every phase — STANDBY, INDEXING, LIVE — terminates on the
    same column edge as the caption and the endpoint plate below it. */
-.readoutStack {
+.lp-mcp-readout-stack {
   display: grid;
   justify-items: end;
   min-width: 3.75rem;
   margin-right: -0.154em;
 }
 
-.readoutStack > span {
+.lp-mcp-readout-stack > span {
   grid-area: 1 / 1;
   color: var(--primary);
 }
 
-.readoutStack > span[data-phase="0"] {
+.lp-mcp-readout-stack > span[data-phase="0"] {
   color: var(--ink-chrome);
 }
 
 /* Static / no-JS rest state: the chapter is finished, so it reads "live". */
-.readoutStack > span[data-phase] {
+.lp-mcp-readout-stack > span[data-phase] {
   opacity: 0;
 }
 
-.readoutStack > span[data-phase="4"] {
+.lp-mcp-readout-stack > span[data-phase="4"] {
   opacity: 1;
 }
 
 /* Body: copy column | spine | schematic column */
-.frameBody {
+.lp-mcp-frame-body {
   display: grid;
   gap: 2.5rem;
   padding-block: clamp(1.75rem, 4vw, 2.75rem);
 }
 
-.frameSpine {
+.lp-mcp-frame-spine {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .frameBody {
+  .lp-mcp-frame-body {
     flex: 1;
     min-height: 0;
     grid-template-columns: minmax(15rem, 0.78fr) 0px minmax(0, 1.22fr);
@@ -300,14 +297,14 @@
      in mid-air 46px short of them. Its track is 0 below 84rem — see the two
      blocks that follow — so the rule simply is not drawn where it could not
      be the page's own column rule. */
-  .frameSpine {
+  .lp-mcp-frame-spine {
     display: block;
     background: var(--rule-frame);
     margin-bottom: calc(-1 * var(--frame-pad));
   }
 
-  .copyCol,
-  .schematic {
+  .lp-mcp-copy-col,
+  .lp-mcp-schematic {
     padding-block: clamp(1.25rem, 2.6vh, 2rem);
   }
 }
@@ -328,18 +325,18 @@
    The copy pane is therefore page column 1 and the schematic is page columns
    2–3, with `--rule-clear` either side of every rule. */
 @media (min-width: 84rem) {
-  .frameBody {
+  .lp-mcp-frame-body {
     grid-template-columns:
       calc((100% + 1px) / 3 - 1px)
       1px
       minmax(0, 1fr);
   }
 
-  .copyCol {
+  .lp-mcp-copy-col {
     padding-inline: var(--rule-clear);
   }
 
-  .schematic {
+  .lp-mcp-schematic {
     padding-inline: var(--rule-clear);
   }
 }
@@ -352,47 +349,43 @@
    can be the page's own rule. Content still clears every rail by
    `--rule-clear`, so the inset story is unchanged. */
 @media (min-width: 64rem) and (max-width: 83.9975rem) {
-  .mcpChapter {
+  .lp-mcp-chapter {
     --gw: clamp(6rem, 10.8vw, 9.5rem);
   }
 
-  .copyCol {
+  .lp-mcp-copy-col {
     padding-left: var(--rule-clear);
     padding-right: 2rem;
   }
 
-  .schematic {
+  .lp-mcp-schematic {
     padding-left: 2rem;
     padding-right: var(--rule-clear);
   }
 
-  .libraryHead,
-  .schemaRow {
+  .lp-mcp-library-head,
+  .lp-mcp-schema-row {
     padding-inline: 0.7rem;
   }
 
-  .schemaRow {
+  .lp-mcp-schema-row {
     gap: 0.45rem;
   }
 }
 
-.copyCol {
+.lp-mcp-copy-col {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
 @media (min-width: 64rem) {
-  .copyCol {
+  .lp-mcp-copy-col {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
   }
 }
 
-.copyBody {
-  align-self: center;
-  min-width: 0;
-}
 
 /* The display line.
    -----------------
@@ -408,7 +401,7 @@
    the difference back through `text-indent`, so line 1 sits on the column and
    lines 2–3 overhang it by half a pixel, which is what a reader reads as
    flush. */
-.copyHeading {
+.lp-mcp-copy-heading {
   max-width: 6.85em;
   margin-left: -0.0196em;
   text-indent: -0.039em;
@@ -420,7 +413,7 @@
    moves with the size, so it takes one step at the point the display size
    does. */
 @media (min-width: 48rem) {
-  .copyHeading {
+  .lp-mcp-copy-heading {
     max-width: 6.72em;
   }
 }
@@ -430,14 +423,11 @@
    on "Your agent" and opened line 2 on "can search". Cut just under the
    advance of "Connect Skills Board through MCP. Your", so the first line ends
    on the sentence. Em-based, so the break survives the 16px/17px step. */
-.copyLede {
-  max-width: 17.8em;
-}
 
 /* Otherwise line 2 is the single 34px word "copy." under a 392px line. The
    measure is set where the natural break falls two words earlier, which gives
    a descending pair instead of an orphan. */
-.copyShield p {
+.lp-mcp-copy-shield p {
   max-width: 19rem;
   text-wrap: pretty;
 }
@@ -450,7 +440,7 @@
    between the 34px display cap and the 11px labels.
 --------------------------------------------------------------------------- */
 
-.endpoint {
+.lp-mcp-endpoint {
   margin-top: 2rem;
   padding-top: 1.1rem;
   /* Column-scoped: a step under the frame's own full-bleed rules. */
@@ -458,7 +448,7 @@
   font-family: var(--font-mono);
 }
 
-.endpointHead {
+.lp-mcp-endpoint-head {
   font-size: 0.6rem;
   font-weight: 600;
   line-height: 1.5;
@@ -469,7 +459,7 @@
 
 /* The slash's left side bearing is 0.078em, so a flush-set value printed 2px
    inboard of the rail every other element in the column sits on. */
-.endpointValue {
+.lp-mcp-endpoint-value {
   margin-top: 0.42rem;
   text-indent: -0.078em;
   font-size: clamp(1.3rem, 1.85vw, 1.6rem);
@@ -479,7 +469,7 @@
   color: var(--foreground);
 }
 
-.endpointMeta {
+.lp-mcp-endpoint-meta {
   margin-top: 0.55rem;
   margin-right: -0.096em;
   font-size: 0.6rem;
@@ -491,7 +481,7 @@
 }
 
 @media (min-width: 64rem) {
-  .endpoint {
+  .lp-mcp-endpoint {
     height: var(--footer-band);
     margin-top: 0;
   }
@@ -501,20 +491,20 @@
    Schematic
 --------------------------------------------------------------------------- */
 
-.schematic {
+.lp-mcp-schematic {
   display: flex;
   flex-direction: column;
   min-width: 0;
 }
 
 @media (min-width: 64rem) {
-  .schematic {
+  .lp-mcp-schematic {
     display: grid;
     grid-template-rows: minmax(0, 1fr) auto;
   }
 }
 
-.schematicGrid {
+.lp-mcp-schematic-grid {
   position: relative;
   isolation: isolate;
   display: grid;
@@ -523,14 +513,14 @@
   gap: 0;
 }
 
-.libCol,
-.agentCol {
+.lp-mcp-lib-col,
+.lp-mcp-agent-col {
   position: relative;
   z-index: 1;
   min-width: 0;
 }
 
-.colLabel {
+.lp-mcp-col-label {
   position: relative;
   z-index: 1;
   display: flex;
@@ -550,7 +540,7 @@
    the pane spine, never level with them. The negative margin gives back the
    label's trailing letter-space, so the joint is 0.55rem of air rather than
    0.55rem plus a letter-space. */
-.colLabel::after {
+.lp-mcp-col-label::after {
   content: "";
   flex: 1;
   height: 1px;
@@ -566,8 +556,8 @@
    3×. They are the same rule as the frame now, and the rows they hold are
    divided by the lighter cell ink, which gives the diagram two steps of
    structure that both sit *under* the page's one. */
-.libraryPanel,
-.agentActions {
+.lp-mcp-library-panel,
+.lp-mcp-agent-actions {
   position: relative;
   z-index: 1;
   border: 1px solid var(--rule-frame);
@@ -584,7 +574,7 @@
    border: the card keeps two 1px edges of equal weight, and the bus reads as
    plumbing hung on the card, which is what it is. It energises top-to-bottom
    as the library is indexed, then hands off to the trunk. */
-.libraryBus {
+.lp-mcp-library-bus {
   position: absolute;
   top: -1px;
   bottom: -1px;
@@ -603,7 +593,7 @@
    vocabularies at once. Drawn on the bus rather than at the wire's own left
    edge so it is unambiguously a tap on the collector, not a mark emanating
    from the row boundary it happens to share. */
-.libraryBus::after {
+.lp-mcp-library-bus::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -614,7 +604,7 @@
   background: var(--signal);
 }
 
-.libraryHead {
+.lp-mcp-library-head {
   position: relative;
   display: flex;
   align-items: center;
@@ -625,8 +615,8 @@
 /* Row dividers are drawn, not bordered: a border would shrink each row's
    percentage-resolution box by 1px and push every nub and stub half a pixel
    off its own row centre. */
-.libraryHead::after,
-.schemaRow:not(:last-child)::before {
+.lp-mcp-library-head::after,
+.lp-mcp-schema-row:not(:last-child)::before {
   content: "";
   position: absolute;
   left: 0;
@@ -636,17 +626,8 @@
   background: var(--rule-cell);
 }
 
-.schemaStackTitle {
-  /* Capped so the title stays on one line for as long as the panel is wide
-     enough to hold it — otherwise it is one line at 1440 and two at 1920. */
-  font-size: clamp(0.95rem, 1.09vw, 1.02rem);
-  font-weight: 650;
-  letter-spacing: -0.022em;
-  line-height: 1.22;
-  text-wrap: balance;
-}
 
-.schemaRow {
+.lp-mcp-schema-row {
   position: relative;
   display: flex;
   align-items: center;
@@ -659,12 +640,12 @@
    last boundary — so the last band has to give that pixel back. Without this
    the final row measured 65px against 64 for the other five, which is exactly
    the tell that the bottom border was not on the module. */
-.schemaRow:last-child {
+.lp-mcp-schema-row:last-child {
   height: calc(var(--lib-row-h) - 1px);
 }
 
 /* Stub that carries a row onto the collector bus. */
-.schemaRow::after {
+.lp-mcp-schema-row::after {
   content: "";
   position: absolute;
   right: -3px;
@@ -677,18 +658,8 @@
   transform-origin: right center;
 }
 
-.schemaRowName {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: -0.015em;
-}
 
-.schemaRowTag {
+.lp-mcp-schema-row-tag {
   flex: none;
   margin-right: -0.111em;
   font-family: var(--font-mono);
@@ -702,14 +673,14 @@
 /* Below ~1200px the library column is too narrow for a trailing tag before
    the skill names start truncating; the tag is the least load-bearing part. */
 @media (min-width: 64rem) and (max-width: 74.9975rem) {
-  .schemaRowTag {
+  .lp-mcp-schema-row-tag {
     display: none;
   }
 }
 
 /* --- Gateway ------------------------------------------------------------- */
 
-.schemaGateway {
+.lp-mcp-schema-gateway {
   position: relative;
   z-index: 1;
   display: flex;
@@ -721,7 +692,7 @@
 
 /* Vertical conduit used by the small-screen route. Same 2px gauge as every
    other run in the diagram. */
-.conduit {
+.lp-mcp-conduit {
   position: relative;
   display: block;
   width: 2px;
@@ -729,7 +700,7 @@
   background: var(--wire-casing);
 }
 
-.conduit::after {
+.lp-mcp-conduit::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -760,12 +731,12 @@
    fraction of it, so the node's edges land at ~26.7% / ~73.3% at every width.
 --------------------------------------------------------------------------- */
 
-.schemaWireBox {
+.lp-mcp-schema-wire-box {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .schemaWireBox {
+  .lp-mcp-schema-wire-box {
     display: block;
     position: absolute;
     left: calc(-1 * var(--schema-gap));
@@ -777,7 +748,7 @@
   }
 }
 
-.wire {
+.lp-mcp-wire {
   position: absolute;
   background: var(--wire-casing);
 }
@@ -786,74 +757,74 @@
    annotation throw more light than the page frame does. The one glow left in
    the chapter belongs to the gateway, which is the only element reporting
    state. */
-.wire::after {
+.lp-mcp-wire::after {
   content: "";
   position: absolute;
   inset: 0;
   background: var(--signal);
 }
 
-.wire[data-axis="x"] {
+.lp-mcp-wire[data-axis="x"] {
   height: 2px;
   margin-top: -1px;
 }
 
-.wire[data-axis="x"]::after {
+.lp-mcp-wire[data-axis="x"]::after {
   transform: scaleX(var(--w, 1));
   transform-origin: left center;
 }
 
-.wire[data-axis="y"] {
+.lp-mcp-wire[data-axis="y"] {
   width: 2px;
   margin-left: -1px;
 }
 
-.wire[data-axis="y"]::after {
+.lp-mcp-wire[data-axis="y"]::after {
   transform: scaleY(var(--w, 1));
   transform-origin: top center;
 }
 
-.wTrunk {
+.lp-mcp-w-trunk {
   top: 50%;
   left: 0;
   width: 28%;
 }
 
-.wSpur {
+.lp-mcp-w-spur {
   top: 50%;
   left: 71%;
   width: 13%;
 }
 
-.wBusUp {
+.lp-mcp-w-bus-up {
   left: 84%;
   bottom: 50%;
   height: 50%;
 }
 
-.wBusUp::after {
+.lp-mcp-w-bus-up::after {
   transform-origin: bottom center;
 }
 
-.wBusDown {
+.lp-mcp-w-bus-down {
   left: 84%;
   top: 50%;
   height: 50%;
 }
 
-.wFeedA {
+.lp-mcp-w-feed-a {
   top: 0;
   left: 84%;
   right: 0;
 }
 
-.wFeedB {
+.lp-mcp-w-feed-b {
   top: 50%;
   left: 84%;
   right: 0;
 }
 
-.wFeedC {
+.lp-mcp-w-feed-c {
   top: 100%;
   left: 84%;
   right: 0;
@@ -861,12 +832,12 @@
 
 /* Junction marks: the splitter and the two turns out to the outer ports.
    Sized against the 2px run they terminate, not against the old 5px one. */
-.junction {
+.lp-mcp-junction {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .junction {
+  .lp-mcp-junction {
     display: block;
     position: absolute;
     left: 84%;
@@ -878,27 +849,27 @@
     transform: scale(1);
   }
 
-  .junctionUp {
+  .lp-mcp-junction-up {
     top: 0;
   }
 
-  .junctionMid {
+  .lp-mcp-junction-mid {
     top: 50%;
   }
 
-  .junctionDown {
+  .lp-mcp-junction-down {
     top: 100%;
   }
 }
 
 /* One request in flight. The track is the full length of its segment, so
    translating it by 100% walks the dot from the segment's start to its end. */
-.packetTrack {
+.lp-mcp-packet-track {
   position: absolute;
   opacity: 0;
 }
 
-.wire[data-axis="x"] > .packetTrack {
+.lp-mcp-wire[data-axis="x"] > .lp-mcp-packet-track {
   left: 0;
   top: 50%;
   width: 100%;
@@ -906,7 +877,7 @@
   transform: translateX(calc(var(--leg, 0) * 100%));
 }
 
-.wire[data-axis="y"] > .packetTrack {
+.lp-mcp-wire[data-axis="y"] > .lp-mcp-packet-track {
   top: 0;
   left: 50%;
   height: 100%;
@@ -914,40 +885,40 @@
   transform: translateY(calc(var(--leg, 0) * 100%));
 }
 
-.wBusUp > .packetTrack {
+.lp-mcp-w-bus-up > .lp-mcp-packet-track {
   top: auto;
   bottom: 0;
   transform: translateY(calc(var(--leg, 0) * -100%));
 }
 
-.packetDot {
+.lp-mcp-packet-dot {
   position: absolute;
   border-radius: 2px;
   background: var(--lp-alert);
   box-shadow: 0 0 12px 2px color-mix(in oklab, var(--lp-alert) 55%, transparent);
 }
 
-.wire[data-axis="x"] > .packetTrack > .packetDot {
+.lp-mcp-wire[data-axis="x"] > .lp-mcp-packet-track > .lp-mcp-packet-dot {
   left: -9px;
   top: -2px;
   width: 18px;
   height: 4px;
 }
 
-.wire[data-axis="y"] > .packetTrack > .packetDot {
+.lp-mcp-wire[data-axis="y"] > .lp-mcp-packet-track > .lp-mcp-packet-dot {
   top: -9px;
   left: -2px;
   height: 18px;
   width: 4px;
 }
 
-.wBusUp > .packetTrack > .packetDot {
+.lp-mcp-w-bus-up > .lp-mcp-packet-track > .lp-mcp-packet-dot {
   top: auto;
   bottom: -9px;
 }
 
 /* The hub. Opaque, so the wires visually terminate on its edges. */
-.schemaNode {
+.lp-mcp-schema-node {
   position: relative;
   z-index: 2;
   display: grid;
@@ -962,19 +933,19 @@
 }
 
 @media (min-width: 64rem) {
-  .schemaNode {
+  .lp-mcp-schema-node {
     width: min(7.5rem, 58%);
   }
 }
 
 @media (min-width: 64rem) and (max-width: 83.9975rem) {
-  .schemaNode {
+  .lp-mcp-schema-node {
     width: min(7.5rem, 76%);
   }
 }
 
 /* Powered ring + glow — the gateway's one piece of state. */
-.schemaNode::after {
+.lp-mcp-schema-node::after {
   content: "";
   position: absolute;
   inset: -6px;
@@ -989,7 +960,7 @@
   pointer-events: none;
 }
 
-.nodeFlash {
+.lp-mcp-node-flash {
   position: absolute;
   inset: -6px;
   border: 1px solid var(--primary);
@@ -998,13 +969,13 @@
   pointer-events: none;
 }
 
-.schemaNodeMark {
+.lp-mcp-schema-node-mark {
   width: 1.6rem;
   height: 1.6rem;
   color: var(--primary);
 }
 
-.schemaNodeLabel {
+.lp-mcp-schema-node-label {
   font-family: var(--font-mono);
   font-size: 0.66rem;
   font-weight: 700;
@@ -1015,7 +986,7 @@
 
 /* --- Agent actions ------------------------------------------------------- */
 
-.agentActions {
+.lp-mcp-agent-actions {
   min-width: 0;
 }
 
@@ -1023,7 +994,7 @@
    rather than sitting flat under a hero that carries all of it: the action at
    display weight, the call it maps to at mono, and what it hands back a step
    under that. */
-.agentAction {
+.lp-mcp-agent-action {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -1036,12 +1007,12 @@
   padding: 0.85rem 0.95rem;
 }
 
-.agentAction:last-child {
+.lp-mcp-agent-action:last-child {
   height: calc(var(--agent-row-h) - 1px);
 }
 
 /* Base divider (drawn, not bordered — see the library note). */
-.agentAction:not(:last-child)::before {
+.lp-mcp-agent-action:not(:last-child)::before {
   content: "";
   position: absolute;
   left: 0;
@@ -1052,7 +1023,7 @@
 }
 
 /* Activation rule: hairline by default, primary once the port is armed. */
-.agentAction::after {
+.lp-mcp-agent-action::after {
   content: "";
   position: absolute;
   left: 0;
@@ -1067,7 +1038,7 @@
 /* Input port on the row's leading edge — where the wire lands. Offset by the
    card's 1px border so the nub is centred on the edge line, not on the row's
    padding box, which sits half a pixel inboard of it. */
-.actionPort {
+.lp-mcp-action-port {
   position: absolute;
   left: -3.5px;
   top: 50%;
@@ -1079,16 +1050,8 @@
   box-shadow: 0 0 0 2.5px color-mix(in oklab, var(--primary) 16%, transparent);
 }
 
-.agentActionName {
-  grid-area: name;
-  font-size: clamp(1rem, 1.21vw, 1.18rem);
-  font-weight: 650;
-  letter-spacing: -0.025em;
-  line-height: 1.15;
-  text-wrap: balance;
-}
 
-.actionTool {
+.lp-mcp-action-tool {
   grid-area: tool;
   min-width: 0;
   overflow: hidden;
@@ -1101,7 +1064,7 @@
 }
 
 /* What the call hands back — the diagram's smallest tier. */
-.actionRet {
+.lp-mcp-action-ret {
   grid-area: ret;
   min-width: 0;
   overflow: hidden;
@@ -1113,7 +1076,7 @@
   color: var(--ink-chrome);
 }
 
-.actionState {
+.lp-mcp-action-state {
   grid-area: state;
   justify-self: end;
   display: grid;
@@ -1128,16 +1091,16 @@
   text-align: right;
 }
 
-.actionState > span {
+.lp-mcp-action-state > span {
   grid-area: 1 / 1;
   opacity: 0;
 }
 
-.actionState > span[data-state="off"] {
+.lp-mcp-action-state > span[data-state="off"] {
   color: var(--ink-chrome);
 }
 
-.actionState > span[data-state="on"] {
+.lp-mcp-action-state > span[data-state="on"] {
   opacity: 1;
   color: var(--primary);
 }
@@ -1148,22 +1111,22 @@
   /* The card is ~190px inside its padding here, which is not enough for the
      call and its status on one line. The status drops to the returns line, so
      the signature keeps the full row rather than truncating. */
-  .agentAction {
+  .lp-mcp-agent-action {
     grid-template-areas:
       "name name"
       "tool tool"
       "ret  state";
   }
 
-  .actionTool {
+  .lp-mcp-action-tool {
     font-size: 0.58rem;
   }
 
-  .actionArg {
+  .lp-mcp-action-arg {
     display: none;
   }
 
-  .actionState {
+  .lp-mcp-action-state {
     font-size: 0.55rem;
     min-width: 0;
     padding-left: 0.45rem;
@@ -1173,7 +1136,7 @@
 /* --- Annotations --------------------------------------------------------- */
 
 /* Dimension line across the whole route: library edge to agent ports. */
-.hopMeasure {
+.lp-mcp-hop-measure {
   position: relative;
   z-index: 1;
   display: flex;
@@ -1192,17 +1155,14 @@
    between two flex rules centres its *box* and not its ink: the run sat 1.1px
    left of the centre its own two rules defined. Taking the trailing space back
    centres the ink and makes both flanks the same 0.75rem. */
-.hopLabel {
-  margin-right: -0.241em;
-}
 
-.hopRule {
+.lp-mcp-hop-rule {
   flex: 1;
   height: 1px;
   background: var(--rule-grid);
 }
 
-.schemaCaption {
+.lp-mcp-schema-caption {
   margin-top: 1.5rem;
   padding-top: 1.1rem;
   /* Column-scoped, like the endpoint plate's rule opposite it. */
@@ -1211,7 +1171,7 @@
 
 /* The rule belongs to the column; the prose keeps its own measure. Before,
    the rule inherited the 46ch measure and died in open space at x=967. */
-.schemaCaptionText {
+.lp-mcp-schema-caption-text {
   display: block;
   /* Set to three lines, so the figure's caption fills its band to within a
      line of the plate opposite it instead of ending 29px short of it. */
@@ -1222,7 +1182,7 @@
 }
 
 @media (min-width: 64rem) {
-  .schemaCaption {
+  .lp-mcp-schema-caption {
     height: var(--footer-band);
     margin-top: 0;
   }
@@ -1238,7 +1198,7 @@
      centred on x946: two centres 30px apart, stacked vertically, with the eye
      reading the hub as the axis. One axis now — the hub, the splitter, the
      dimension line and the schematic column all share it. */
-  .schematicGrid {
+  .lp-mcp-schematic-grid {
     grid-template-columns: minmax(0, 1fr) var(--gw) minmax(0, 1fr);
     grid-template-rows: auto auto;
     column-gap: var(--schema-gap);
@@ -1251,26 +1211,26 @@
     padding-top: calc(var(--col-label-h) + var(--col-label-gap));
   }
 
-  .libCol {
+  .lp-mcp-lib-col {
     grid-column: 1;
     grid-row: 1;
   }
 
-  .schemaGateway {
+  .lp-mcp-schema-gateway {
     grid-column: 2;
     grid-row: 1;
     align-self: stretch;
     padding-block: 0;
   }
 
-  .agentCol {
+  .lp-mcp-agent-col {
     grid-column: 3;
     grid-row: 1;
   }
 
   /* Each label is lifted out of flow so its block stays centred on the wire
      axis; both blocks are sized to land the labels on the same baseline. */
-  .colLabel {
+  .lp-mcp-col-label {
     position: absolute;
     left: 0;
     right: 0;
@@ -1278,24 +1238,24 @@
     margin-bottom: var(--col-label-gap);
   }
 
-  .hopMeasure {
+  .lp-mcp-hop-measure {
     grid-column: 1 / -1;
     grid-row: 2;
     margin-top: 0;
   }
 
-  .conduit {
+  .lp-mcp-conduit {
     display: none;
   }
 
-  .agentAction {
+  .lp-mcp-agent-action {
     height: var(--agent-row-h);
     padding-block: 0;
   }
 
   /* --- scroll-linked windows (controller live only) --- */
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schematic {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schematic {
     /* Library indexing */
     --scan: clamp(0, (var(--mcp-p) - 0.05) / 0.2, 1);
     /* Trunk into the gateway */
@@ -1325,65 +1285,65 @@
   }
 
   /* Library rows index one at a time, then the collector bus fills. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .libraryBus {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-library-bus {
     transform: scaleY(var(--scan));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .libraryBus::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-library-bus::after {
     transform: scale(clamp(0, (var(--trunk) - 0.4) / 0.6, 1));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row::after {
     transform: scaleX(var(--r, 1));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="1"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="1"] {
     --r: clamp(0, (var(--mcp-p) - 0.05) / 0.05, 1);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="2"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="2"] {
     --r: clamp(0, (var(--mcp-p) - 0.09) / 0.05, 1);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="3"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="3"] {
     --r: clamp(0, (var(--mcp-p) - 0.13) / 0.05, 1);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="4"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="4"] {
     --r: clamp(0, (var(--mcp-p) - 0.17) / 0.05, 1);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="5"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="5"] {
     --r: clamp(0, (var(--mcp-p) - 0.21) / 0.05, 1);
   }
 
   /* Wires draw, one axis-aligned segment at a time. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wTrunk {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-trunk {
     --w: var(--trunk);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wSpur {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-spur {
     --w: var(--spur);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wBusUp,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wBusDown {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-bus-up,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-bus-down {
     --w: var(--bus);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedA {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-feed-a {
     --w: var(--feed-a);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedB {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-feed-b {
     --w: var(--feed-b);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .wFeedC {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-w-feed-c {
     --w: var(--feed-c);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionMid {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-junction-mid {
     transform: scale(clamp(0, (var(--spur) - 0.6) / 0.4, 1));
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionUp,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .junctionDown {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-junction-up,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-junction-down {
     transform: scale(clamp(0, (var(--bus) - 0.7) / 0.3, 1));
   }
 
   /* Gateway ignition. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-node::after {
     opacity: var(--ignite);
     transform: scale(calc(0.9 + 0.1 * var(--ignite)));
   }
@@ -1391,7 +1351,7 @@
   /* Ports arm. The action names never dim — activation is carried by the
      port, the state chip and the underline, so a dormant row still reads as
      a deliberate pre-flight state instead of disabled text. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .actionPort {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-action-port {
     background: color-mix(
       in oklch,
       var(--primary) calc(var(--arm, 1) * 100%),
@@ -1407,55 +1367,55 @@
     transform: scale(calc(0.82 + 0.18 * var(--arm, 1)));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-agent-action::after {
     transform: scaleX(var(--arm, 1));
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .actionState
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-action-state
     > span[data-state="off"] {
     opacity: calc(1 - clamp(0, (var(--arm, 1) - 0.5) / 0.06, 1));
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .actionState
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-action-state
     > span[data-state="on"] {
     opacity: clamp(0, (var(--arm, 1) - 0.5) / 0.06, 1);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="1"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-agent-action[data-action="1"] {
     --arm: var(--arm-1);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="2"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-agent-action[data-action="2"] {
     --arm: var(--arm-2);
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction[data-action="3"] {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-agent-action[data-action="3"] {
     --arm: var(--arm-3);
   }
 
   /* One packet, handed from segment to segment so it never stalls at a
      corner: trunk → (the gateway registers the hit) → spur → bus → port 01. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .legTrunk {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-leg-trunk {
     --leg: var(--leg-trunk);
     opacity: calc(
       clamp(0, var(--leg-trunk) / 0.02, 1) *
         (1 - clamp(0, (var(--leg-trunk) - 0.98) / 0.02, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .legSpur {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-leg-spur {
     --leg: var(--leg-spur);
     opacity: calc(
       clamp(0, var(--leg-spur) / 0.02, 1) *
         (1 - clamp(0, (var(--leg-spur) - 0.98) / 0.02, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .legBus {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-leg-bus {
     --leg: var(--leg-bus);
     opacity: calc(
       clamp(0, var(--leg-bus) / 0.02, 1) *
         (1 - clamp(0, (var(--leg-bus) - 0.98) / 0.02, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .legFeed {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-leg-feed {
     --leg: var(--leg-feed);
     opacity: calc(
       clamp(0, var(--leg-feed) / 0.02, 1) *
@@ -1464,43 +1424,43 @@
   }
 
   /* The node registers the hit: one outward ring, then gone. */
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .nodeFlash {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-node-flash {
     opacity: var(--hit);
     transform: scale(calc(1 + 0.18 * var(--hit-ramp)));
   }
 
   /* Header readout tracks the phase the diagram is actually in. */
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .readoutStack
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-readout-stack
     > span[data-phase="0"] {
     opacity: calc(1 - clamp(0, (var(--mcp-p) - 0.05) / 0.006, 1));
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .readoutStack
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-readout-stack
     > span[data-phase="1"] {
     opacity: calc(
       clamp(0, (var(--mcp-p) - 0.05) / 0.006, 1) *
         (1 - clamp(0, (var(--mcp-p) - 0.24) / 0.006, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .readoutStack
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-readout-stack
     > span[data-phase="2"] {
     opacity: calc(
       clamp(0, (var(--mcp-p) - 0.24) / 0.006, 1) *
         (1 - clamp(0, (var(--mcp-p) - 0.42) / 0.006, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .readoutStack
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-readout-stack
     > span[data-phase="3"] {
     opacity: calc(
       clamp(0, (var(--mcp-p) - 0.42) / 0.006, 1) *
         (1 - clamp(0, (var(--mcp-p) - 0.7) / 0.006, 1))
     );
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .readoutStack
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-readout-stack
     > span[data-phase="4"] {
     opacity: clamp(0, (var(--mcp-p) - 0.7) / 0.006, 1);
   }
@@ -1511,11 +1471,11 @@
 --------------------------------------------------------------------------- */
 
 @media (max-width: 63.9975rem) {
-  .colLabelLib {
+  .lp-mcp-col-label-lib {
     margin-bottom: 0.85rem;
   }
 
-  .colLabelAgent {
+  .lp-mcp-col-label-agent {
     margin-top: 1.4rem;
     margin-bottom: 0.85rem;
   }
@@ -1523,123 +1483,123 @@
   /* The route runs vertically here, so the horizontal collector furniture —
      and the horizontal dimension line across it — would measure nothing. Each
      row keeps a short tick inside its own edge, which is what indexes. */
-  .libraryBus,
-  .hopMeasure {
+  .lp-mcp-library-bus,
+  .lp-mcp-hop-measure {
     display: none;
   }
 
   /* Vertical route: the collector runs nowhere here, so each row keeps a
      short tick on its *leading* edge — the same side the agent rows take
      their ports on — instead of a stub hanging into the trailing tag. */
-  .schemaRow::after {
+  .lp-mcp-schema-row::after {
     right: auto;
     left: 0;
     width: 0.55rem;
     transform-origin: left center;
   }
 
-  .libraryHead {
+  .lp-mcp-library-head {
     height: auto;
     padding-block: 0.85rem;
   }
 
-  .schemaRow,
-  .schemaRow:last-child {
+  .lp-mcp-schema-row,
+  .lp-mcp-schema-row:last-child {
     height: auto;
     padding-block: 0.72rem;
   }
 
-  .agentAction,
-  .agentAction:last-child {
+  .lp-mcp-agent-action,
+  .lp-mcp-agent-action:last-child {
     height: auto;
     padding-block: 0.9rem;
   }
 
-  .schemaNode {
+  .lp-mcp-schema-node {
     margin-block: 0.55rem;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduit::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .agentAction::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .actionPort,
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-conduit::after,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row::after,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-agent-action::after,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-action-port,
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-node::after {
     transition:
       transform 460ms var(--lp-ease-out),
       opacity 460ms var(--lp-ease-out);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="mcp"][data-motion-state="pending"]
-    .conduit::after {
+    .lp-mcp-conduit::after {
     transform: scaleY(0);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="mcp"][data-motion-state="pending"]
-    .agentAction::after {
+    .lp-mcp-agent-action::after {
     transform: scaleX(0);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="mcp"][data-motion-state="pending"]
-    .schemaRow::after {
+    .lp-mcp-schema-row::after {
     transform: scaleX(0);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="mcp"][data-motion-state="pending"]
-    .schemaNode::after {
+    .lp-mcp-schema-node::after {
     opacity: 0;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="mcp"][data-motion-state="pending"]
-    .actionPort {
+    .lp-mcp-action-port {
     transform: scale(0.5);
     opacity: 0.35;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="1"]::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="1"]::after {
     transition-delay: 60ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="2"]::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="2"]::after {
     transition-delay: 130ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="3"]::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="3"]::after {
     transition-delay: 200ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="4"]::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="4"]::after {
     transition-delay: 270ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaRow[data-row="5"]::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-row[data-row="5"]::after {
     transition-delay: 340ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduitIn::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-conduit-in::after {
     transition-delay: 420ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .schemaNode::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-schema-node::after {
     transition-delay: 600ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .conduitOut::after {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-mcp-conduit-out::after {
     transition-delay: 700ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="1"]::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="1"] .actionPort {
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="1"]::after,
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="1"] .lp-mcp-action-port {
     transition-delay: 860ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="2"]::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="2"] .actionPort {
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="2"]::after,
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="2"] .lp-mcp-action-port {
     transition-delay: 940ms;
   }
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="3"]::after,
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .agentAction[data-action="3"] .actionPort {
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="3"]::after,
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-mcp-agent-action[data-action="3"] .lp-mcp-action-port {
     transition-delay: 1020ms;
   }
 }
@@ -1649,17 +1609,17 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .packetTrack,
-  .nodeFlash {
+  .lp-mcp-packet-track,
+  .lp-mcp-node-flash {
     opacity: 0;
   }
 
-  .conduit::after,
-  .libraryBus,
-  .schemaRow::after,
-  .agentAction::after,
-  .actionPort,
-  .schemaNode::after {
+  .lp-mcp-conduit::after,
+  .lp-mcp-library-bus,
+  .lp-mcp-schema-row::after,
+  .lp-mcp-agent-action::after,
+  .lp-mcp-action-port,
+  .lp-mcp-schema-node::after {
     transition: none;
   }
 }
