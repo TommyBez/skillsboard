@@ -1,14 +1,4 @@
 type NonTeamEventPropertiesMap = {
-  /**
-   * No `landing_path`. It enumerated every guide path so a click could be
-   * attributed to the page it came from, but posthog-js already stamps
-   * `$pathname` and `$current_url` on every capture, and the `before_send`
-   * sanitizer keeps them intact for these routes — it strips non-UTM query
-   * params and redacts `/invite/*`, nothing else. The property restated the
-   * URL, and threading it through the chrome forced the guide layout onto the
-   * `[slug]` segment to get at the slug. `location` stays because it is the
-   * one thing the URL cannot tell you: which slot on the page was clicked.
-   */
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
     location:
@@ -21,17 +11,6 @@ type NonTeamEventPropertiesMap = {
       | "resources_header"
       | "resources_closing"
   }
-  /**
-   * No `visitor_state` on either event, for the same reason there is no
-   * `landing_path`: nothing left produces it honestly. The marketing surfaces
-   * no longer read the session, so they could only ever assert "anonymous" —
-   * a claim about the action offered, not about who clicked, which would
-   * misfile every signed-in visitor. The four app-side producers hardcode
-   * "signed_in", which `location` already implies: `account_menu`,
-   * `app_navigation`, and `library_header` exist only behind auth. A property
-   * that is either constant or fabricated at every call site is worse than
-   * absent — it reads as measured.
-   */
   mcp_entry_clicked: {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
     location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
