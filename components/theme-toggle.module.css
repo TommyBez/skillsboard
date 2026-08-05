@@ -77,8 +77,15 @@
   outline-offset: 2px;
 }
 
+/* `:not(:active)` so a press keeps its pixel of give while the pointer is still
+   over the control. Without it this rule — equal in specificity to
+   `.marketing:active` and later in the file — wins the cascade during a mouse
+   press and lifts the button instead of pushing it, so the press model is
+   inert on exactly the devices that can hover. The landing stylesheet this
+   moved from had the same ordering, and the same silent bug, since the lift
+   was introduced. */
 @media (hover: hover) and (pointer: fine) {
-  .marketing:hover {
+  .marketing:hover:not(:active) {
     translate: 0 -1px;
   }
 }
@@ -133,7 +140,11 @@
     translate: none;
   }
 
-  .marketing:hover,
+  /* Matches the hover rule's `:not(:active)` selector exactly. Plain
+     `.marketing:hover` here would be a specificity step *below* it, so the
+     later position would not save it and reduced-motion visitors would keep
+     the lift. */
+  .marketing:hover:not(:active),
   .marketing:active {
     translate: none;
   }
