@@ -82,6 +82,22 @@ test("ignores a repeated returnTo rather than trusting the first value", () => {
   assert.equal(resolve("returnTo=/invite/a&returnTo=/invite/b"), "/library")
 })
 
+test("ignores query keys AuthEntry itself ignores, marketing params included", () => {
+  // AuthEntry reads exactly two things from the query — the OAuth keys and
+  // returnTo — so for a signed-in visitor every one of these resolves to
+  // "/library" there too. Matching that is the point: the edge and the page
+  // must not disagree about where a request lands.
+  //
+  // Deliberate, not accidental. An allowlist of "recognised" keys would send
+  // /sign-in?utm_source=newsletter to the page while AuthEntry redirects it
+  // anyway — a divergence, and one that would skip the edge for most real
+  // campaign traffic.
+  assert.equal(resolve("foo=bar"), "/library")
+  assert.equal(resolve("utm_source=newsletter&utm_medium=email"), "/library")
+  assert.equal(resolve("gclid=abc123"), "/library")
+  assert.equal(resolve("returnTo=/library&utm_campaign=launch"), "/library")
+})
+
 test("stands down once a real session check has already run", () => {
   // The loop this prevents: a present-but-invalid cookie passes the proxy,
   // /onboarding calls requireSession() with no returnTo and lands on a bare
