@@ -31,7 +31,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
               href="/settings/mcp"
               analytics={{
                 event: "mcp_entry_clicked",
-                properties: mcpEntryEventProperties(true, "app_navigation", "/settings/mcp"),
+                properties: mcpEntryEventProperties("app_navigation", "/settings/mcp"),
               }}
             >
               Connect agent
@@ -59,7 +59,7 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
           mobile
           analytics={{
             event: "mcp_entry_clicked",
-            properties: mcpEntryEventProperties(true, "app_navigation", "/settings/mcp"),
+            properties: mcpEntryEventProperties("app_navigation", "/settings/mcp"),
           }}
         >
           <CableIcon className="mr-1.5 size-4" aria-hidden="true" />Connect

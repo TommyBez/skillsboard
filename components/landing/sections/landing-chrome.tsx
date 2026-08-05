@@ -1,13 +1,9 @@
 import Link from "next/link"
-import { Suspense } from "react"
 
 import { Brand } from "@/components/brand"
 import { LegalLinks } from "@/components/legal-links"
 import { PageFrame } from "@/components/landing/chrome/page-frame"
-import {
-  HomeHeaderActions,
-  HomeHeaderActionsFallback,
-} from "@/components/landing/landing-ctas"
+import { HomeHeaderActions } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
 
 /**
@@ -57,9 +53,7 @@ export function LandingHeader() {
           <span className={base.brandLockup}>
             <Brand compactOnMobile />
           </span>
-          <Suspense fallback={<HomeHeaderActionsFallback />}>
-            <HomeHeaderActions />
-          </Suspense>
+          <HomeHeaderActions />
         </div>
       </header>
     </>

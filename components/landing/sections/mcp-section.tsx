@@ -1,7 +1,6 @@
 import { ShieldCheckIcon } from "lucide-react"
-import { Suspense } from "react"
 
-import { HomeCtaFallback, HomeMcpActions } from "@/components/landing/landing-ctas"
+import { HomeMcpActions } from "@/components/landing/landing-ctas"
 import { McpSchematic } from "@/components/landing/mcp-schematic"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/mcp.module.css"
@@ -70,9 +69,7 @@ export function McpSection() {
                   </p>
                 </div>
                 <div className="mt-7">
-                  <Suspense fallback={<HomeCtaFallback />}>
-                    <HomeMcpActions />
-                  </Suspense>
+                  <HomeMcpActions />
                 </div>
               </div>
 
