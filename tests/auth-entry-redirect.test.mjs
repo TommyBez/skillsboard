@@ -37,11 +37,10 @@ async function loadModule(repoPath) {
   return url
 }
 
-const { resolveSignedInSignUpRedirect } = await import(
-  await loadModule("lib/auth-entry-redirect")
-)
+const { resolveSignedInAuthRedirect, buildSessionCheckedSignInPath, SESSION_CHECKED_PARAM } =
+  await import(await loadModule("lib/auth-entry-redirect"))
 
-const resolve = (query) => resolveSignedInSignUpRedirect(new URLSearchParams(query))
+const resolve = (query) => resolveSignedInAuthRedirect(new URLSearchParams(query))
 
 test("claims the bare marketing CTA, which is what every landing button links to", () => {
   assert.equal(resolve(""), "/library")
@@ -81,4 +80,33 @@ test("ignores a repeated returnTo rather than trusting the first value", () => {
   // getAll returns an array, AuthEntry only honours a string, and both fall
   // back to "/library" — so the edge and the page still agree.
   assert.equal(resolve("returnTo=/invite/a&returnTo=/invite/b"), "/library")
+})
+
+test("stands down once a real session check has already run", () => {
+  // The loop this prevents: a present-but-invalid cookie passes the proxy,
+  // /onboarding calls requireSession() with no returnTo and lands on a bare
+  // /sign-in, the proxy bounces it to /library, /library fails the same check
+  // and bounces back. The marker is what breaks it.
+  assert.equal(resolve(`${SESSION_CHECKED_PARAM}=1`), null)
+  assert.equal(resolve(`returnTo=/library&${SESSION_CHECKED_PARAM}=1`), null)
+})
+
+test("never bounces back a URL that requireSession itself produced", () => {
+  // The invariant that makes /sign-in safe to claim at the edge, asserted end
+  // to end rather than by inspection: whatever requireSession redirects to,
+  // the proxy stands down on. Every returnTo it is called with in the app,
+  // plus the bare case that /onboarding and the server actions hit.
+  for (const returnTo of [undefined, "/library", "/settings/email", "/invite/invite_1"]) {
+    const path = buildSessionCheckedSignInPath(returnTo)
+    const { searchParams } = new URL(path, "https://skillsboard.sh")
+    assert.equal(resolveSignedInAuthRedirect(searchParams), null, `looped on ${path}`)
+  }
+})
+
+test("keeps returnTo intact so the page can still honour it", () => {
+  assert.equal(
+    buildSessionCheckedSignInPath("/settings/email"),
+    `/sign-in?returnTo=%2Fsettings%2Femail&${SESSION_CHECKED_PARAM}=1`,
+  )
+  assert.equal(buildSessionCheckedSignInPath(), `/sign-in?${SESSION_CHECKED_PARAM}=1`)
 })

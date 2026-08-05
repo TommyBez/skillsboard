@@ -3,6 +3,7 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
 import { auth } from "@/lib/auth"
+import { buildSessionCheckedSignInPath } from "@/lib/auth-entry-redirect"
 import { listUserOrganizations } from "@/lib/db/queries"
 
 export const getSession = cache(async () => {
@@ -12,7 +13,9 @@ export const getSession = cache(async () => {
 export async function requireSession(returnTo?: string) {
   const session = await getSession()
   if (!session?.user) {
-    redirect(returnTo ? `/sign-in?returnTo=${encodeURIComponent(returnTo)}` : "/sign-in")
+    // Marked, so the proxy does not optimistically bounce this back to
+    // /library — see the note on SESSION_CHECKED_PARAM.
+    redirect(buildSessionCheckedSignInPath(returnTo))
   }
   return session
 }

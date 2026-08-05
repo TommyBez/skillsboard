@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
-import { resolveSignedInSignUpRedirect } from "@/lib/auth-entry-redirect"
+import { resolveSignedInAuthRedirect } from "@/lib/auth-entry-redirect"
 
 function isProtectedPath(pathname: string) {
   if (pathname === "/onboarding" || pathname === "/consent") return true
@@ -32,19 +32,16 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(signInUrl)
   }
 
-  // The other direction, narrowly. A signed-in visitor who takes a marketing
-  // CTA should never reach the signup form at all, so the bounce happens here
-  // rather than after the page has rendered — see the helper for which shapes
-  // are claimed and which are left to `AuthEntry`.
+  // The other direction. A signed-in visitor who takes a marketing CTA — or
+  // the "Sign in" beside it — should never reach an auth form at all, so the
+  // bounce happens here rather than after the page has rendered. See the
+  // helper for which shapes are claimed and which are left to `AuthEntry`.
   //
-  // `/sign-in` is *not* given the same treatment, and must not be: it is where
-  // `requireSession` sends a failed session check, so redirecting it on cookie
-  // presence would put a stale cookie in a permanent /sign-in ↔ /library loop.
-  // `/sign-up` is no one's failure destination, so the worst a stale cookie
-  // costs here is one extra hop before `AuthEntry` — which still validates the
-  // real session — hands the visitor to /sign-in.
-  if (sessionCookie && pathname === "/sign-up") {
-    const destination = resolveSignedInSignUpRedirect(searchParams)
+  // `/sign-in` is safe to include only because `requireSession` marks its own
+  // redirects: it is where a failed session check lands, so without that marker
+  // a present-but-invalid cookie would loop /sign-in ↔ /library forever.
+  if (sessionCookie && (pathname === "/sign-in" || pathname === "/sign-up")) {
+    const destination = resolveSignedInAuthRedirect(searchParams)
     if (destination) return NextResponse.redirect(new URL(destination, request.url))
   }
 
@@ -60,6 +57,7 @@ export const config = {
     "/settings/:path*",
     "/onboarding",
     "/consent",
+    "/sign-in",
     "/sign-up",
   ],
 }
