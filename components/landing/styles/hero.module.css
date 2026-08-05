@@ -906,7 +906,7 @@
      the old way — a fraction of the stage — the row stayed 64 on any window
      taller than about 800px, `--qh` fell below its floor and clamped, and the
      two registrations the whole panel is built on (card 02's top edge on the
-     head rule, card 04's bottom edge on the foot rule) went 18px out. The
+     head rule, card 04's bottom edge on the panel's bottom edge) went 18px out. The
      visible symptom was the filter control poking out from under card 02 at
      768 and 800 tall, which reads as a rendering fault rather than as a
      composition. At this value `--qh` lands on its floor exactly wherever the
@@ -922,13 +922,12 @@
     4rem
   );
   --hh: 3rem; /* panel head height */
-  --fh: 3rem; /* panel foot height */
   /* The filter row's height is *derived*, not chosen, from the one relation
      that makes the drawer read as a slot rather than as a stray wrapper: the
-     two loose cards standing over it must land on its head rule and its foot
-     rule — on, not beside. Solving that for --qh, with the panel's own two
-     borders counted, gives this. Clamped so a short window degrades the
-     registration rather than the filter row. */
+     two loose cards standing over it must land on its head rule and its
+     bottom edge — on, not beside. Solving that for --qh, with the panel's
+     own two borders counted, gives this. Clamped so a short window degrades
+     the registration rather than the filter row. */
   --qh: clamp(
     2.625rem,
     calc(
@@ -956,12 +955,12 @@
   --cbody: 6.5rem;
   --ch: calc(var(--rh) + var(--cbody)); /* dossier card height */
   /* The drawer's own two horizontal borders are in the sum. Leaving them out
-     put its head rule 1px below card 02's top edge and its foot rule 1px below
-     card 04's bottom edge — the two registrations the whole panel is built on,
-     each off by one device row, which is exactly the kind of near-miss that
-     reads as an accident. */
+     put its head rule 1px below card 02's top edge and its bottom edge 1px
+     below card 04's bottom edge — the two registrations the whole panel is
+     built on, each off by one device row, which is exactly the kind of
+     near-miss that reads as an accident. */
   --ph: calc(
-    2px + var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh) + var(--fh)
+    2px + var(--hh) + var(--qh) + 2 * var(--pp) + 5 * var(--rh)
   );
   --pt: calc((var(--sh) - var(--ph)) / 2); /* panel centred in the stage */
 
@@ -1156,13 +1155,6 @@
   border-bottom: 1px solid var(--lp-grid-line);
 }
 
-.libraryDot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
 .libraryLabel {
   font-family: var(--font-mono);
   font-size: 0.6rem;
@@ -1255,30 +1247,6 @@
     var(--lp-grid-line) calc(var(--rh) - 1px),
     var(--lp-grid-line) var(--rh)
   );
-}
-
-.libraryFoot {
-  position: absolute;
-  inset-inline: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  height: var(--fh);
-  padding-inline: calc(var(--pp) + 0.75rem);
-  border-top: 1px solid var(--lp-grid-line);
-  font-family: var(--font-mono);
-  font-size: 0.5875rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-mid);
-}
-
-/* The base label stands in the same text column as a filed row's name and the
-   head's status dot: the numeral's own side bearing, given back. */
-.libraryFoot > span:first-child {
-  margin-inline-start: -0.5px;
 }
 
 /* ------------------------------------------------------------------
@@ -1996,8 +1964,7 @@
    +1px on the closing side pays for the page frame's rail, which is the desktop
    drawer's right edge. Neither applies here: this panel has four borders of its
    own, so its head and base take the same padding as its rows. */
-.mobileLibrary .libraryHead,
-.mobileLibrary .libraryFoot {
+.mobileLibrary .libraryHead {
   padding-inline: 0.75rem;
 }
 
@@ -2033,11 +2000,6 @@
 
 .mobileRow:last-child {
   border-bottom: none;
-}
-
-.mobileLibrary .libraryFoot {
-  position: static;
-  height: 2.1rem;
 }
 
 @media (min-width: 64rem) {

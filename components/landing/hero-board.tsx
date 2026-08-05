@@ -155,15 +155,12 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
   )
 }
 
-/* The panel says three things and each of them is a different fact: what it is
-   (head), that it is searchable (filter), and how many repositories feed it
-   (base). It used to say "5 SKILLS" in the head as well, 40px above a filter
-   row already reading "Filter 5 skills" — the same number three times in one
-   340px column. */
+/* The panel says two things: what it is (head) and that it is searchable
+   (filter). It used to also print a sources count in the foot and a status
+   light beside the label — both gone; the filter already carries the count. */
 function LibraryHead() {
   return (
     <div className={styles.libraryHead}>
-      <span className={styles.libraryDot} />
       <span className={styles.libraryLabel}>Team library</span>
       <span className={styles.libraryScan} />
     </div>
@@ -180,18 +177,6 @@ function LibraryFilter() {
   )
 }
 
-/* One mark, not two. The base used to print "5 SOURCES" and "MCP READY", the
-   second of which carried the chapter's *second* green dot 620px from the
-   first — two status lights doing two different jobs inside one panel. The
-   sources count is the one fact the head does not already state. */
-function LibraryFoot() {
-  return (
-    <div className={styles.libraryFoot}>
-      <span>5 sources</span>
-    </div>
-  )
-}
-
 export function HeroBoard() {
   return (
     <>
@@ -204,7 +189,6 @@ export function HeroBoard() {
             <LibraryHead />
             <LibraryFilter />
             <div className={styles.libraryRows} />
-            <LibraryFoot />
           </div>
 
           <div className={styles.libraryFeed}>
@@ -280,7 +264,6 @@ export function HeroBoard() {
               </div>
             ))}
           </div>
-          <LibraryFoot />
         </div>
       </div>
     </>
