@@ -1,0 +1,151 @@
+/* Marketing chrome treatment for the theme toggle.
+   Used by the landing command strip and by the guides / resources header, which
+   are the two headers built in the marketing language: 3px corners, a rule-weight
+   edge, a field of its own.
+
+   It lived in `components/landing/styles/base.module.css` as `.headerToggle`
+   until both headers needed it. That file scopes its `--lp-*` tokens to `.root`
+   — the landing page's own wrapper — so the class could not be reused outside
+   that tree without silently resolving its edge and field to nothing. The four
+   values it actually needs are restated here against the global tokens they were
+   always derived from, so the class stands on its own wherever it is mounted.
+
+   Size is deliberately not set. The two headers size their controls differently
+   (36px on the landing, 32px on the resource pages, each following the buttons
+   beside it), and a control that matches its neighbours is the whole point of
+   the treatment — so height stays with the caller and everything else lives
+   here.
+
+   Design notes carried over, because they are why the rules are what they are:
+
+   A review called the original "the weakest object in the header": a border
+   faint enough to read as a smudge, next to a solid green control the two didn't
+   even share a height with. Measured at 1440 dark, the two controls' *boxes*
+   were both exactly 36 tall at y=10–46 — but the action was a filled slab
+   standing on the press model's 1px plinth, so its painted extent was 10–47, 37
+   rows, centred on 28.5 against the toggle's 28.0. Two fixes, neither of them
+   "make the border louder": the action next to it is no longer a filled slab and
+   no longer casts (see `.ctaHeaderAction`), so both controls paint the same rows
+   on one centre; and this one gets a field, so it reads as a container at rest
+   rather than as four hairlines.
+
+   The interior and the edge are painted as two background layers rather than as
+   a background-colour, so the edge composites over the page's own field and not
+   over the interior. Without that the edge printed 64,69,64 while the frame
+   printed 60,65,60 from the same token. */
+.marketing {
+  /* Formerly --lp-chrome-rule / --lp-hairline-strong / --lp-hairline /
+     --lp-control-field, verbatim. Every outlined control in this chrome draws
+     its edge at the same weight as the rules the page is built from. */
+  --tt-rule: color-mix(in oklab, var(--foreground) 23%, transparent);
+  --tt-rule-hover: color-mix(in oklab, var(--foreground) 30%, transparent);
+  --tt-hairline: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --tt-field: color-mix(in oklab, var(--foreground) 3%, var(--background));
+  --tt-dur-hover: 220ms;
+  --tt-dur-tap: 140ms;
+  --tt-ease-snap: cubic-bezier(0.4, 0, 0.2, 1);
+  --tt-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  position: relative;
+  border-radius: 3px;
+  border-color: var(--tt-rule);
+  background-image:
+    linear-gradient(var(--tt-field), var(--tt-field)),
+    linear-gradient(var(--background), var(--background));
+  background-origin: padding-box, border-box;
+  background-clip: padding-box, border-box;
+  transition:
+    border-color var(--tt-dur-hover) var(--tt-ease-snap),
+    translate var(--tt-dur-hover) var(--tt-ease-snap);
+}
+
+/* Hover and press are the CTA cluster's, because this control lives in it:
+   a pixel of lift under the pointer, a pixel of give under the press. It used
+   to lighten its field instead, which it cannot do (the field is a background
+   image) and which never matched the controls either side of it anyway. */
+.marketing:hover {
+  border-color: var(--tt-rule-hover);
+}
+
+.marketing:active {
+  translate: 0 1px;
+  transition-duration: var(--tt-dur-tap);
+}
+
+.marketing:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* `:not(:active)` so a press keeps its pixel of give while the pointer is still
+   over the control. Without it this rule — equal in specificity to
+   `.marketing:active` and later in the file — wins the cascade during a mouse
+   press and lifts the button instead of pushing it, so the press model is
+   inert on exactly the devices that can hover. The landing stylesheet this
+   moved from had the same ordering, and the same silent bug, since the lift
+   was introduced. */
+@media (hover: hover) and (pointer: fine) {
+  .marketing:hover:not(:active) {
+    translate: 0 -1px;
+  }
+}
+
+/* The one control in the header whose glyph cannot say what it does: a monitor
+   outline means "follow the system", which nothing about the shape tells you.
+   The button already carries its own name and state in `title`
+   ("Theme: system"); this prints that name, so pointing at it or tabbing to it
+   answers the question immediately instead of a second later via the OS
+   tooltip. No JS, no invented copy — the control's own label, made visible. */
+.marketing::after {
+  content: attr(title);
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 2;
+  padding: 0.24rem 0.4rem 0.2rem;
+  border: 1px solid var(--tt-hairline);
+  border-radius: 3px;
+  background: var(--background);
+  box-shadow: 0 4px 12px -8px hsl(var(--shadow-color) / 0.6);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 -3px;
+  transition:
+    opacity var(--tt-dur-hover) var(--tt-ease-out),
+    translate var(--tt-dur-hover) var(--tt-ease-out);
+}
+
+.marketing:hover::after,
+.marketing:focus-visible::after {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing,
+  .marketing::after {
+    transition: none;
+    transition-delay: 0s;
+  }
+
+  .marketing::after {
+    translate: none;
+  }
+
+  /* Matches the hover rule's `:not(:active)` selector exactly. Plain
+     `.marketing:hover` here would be a specificity step *below* it, so the
+     later position would not save it and reduced-motion visitors would keep
+     the lift. */
+  .marketing:hover:not(:active),
+  .marketing:active {
+    translate: none;
+  }
+}

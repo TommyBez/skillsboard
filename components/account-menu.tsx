@@ -70,7 +70,7 @@ export function AccountMenu({ user }: AccountMenuProps) {
                 href="/settings/mcp"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: mcpEntryEventProperties(true, "account_menu", "/settings/mcp"),
+                  properties: mcpEntryEventProperties("account_menu", "/settings/mcp"),
                 }}
               />
             )}

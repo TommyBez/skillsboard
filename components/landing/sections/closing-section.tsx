@@ -1,7 +1,5 @@
-import { Suspense } from "react"
-
 import { ClosingPlate } from "@/components/landing/closing/closing-plate"
-import { HomeCtaFallback, HomeFinalActions } from "@/components/landing/landing-ctas"
+import { HomeFinalActions } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/closing.module.css"
 
@@ -54,9 +52,7 @@ export function ClosingSection() {
               the page in the single-column layout too, and so the plate can
               span both rows beside it at desktop widths. */}
           <div className={styles.closingCta}>
-            <Suspense fallback={<HomeCtaFallback />}>
-              <HomeFinalActions />
-            </Suspense>
+            <HomeFinalActions />
           </div>
         </div>
       </div>

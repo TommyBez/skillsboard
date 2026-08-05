@@ -458,98 +458,15 @@
   translate: 0 calc(-1 * var(--lp-mark-rise));
 }
 
-/* Theme toggle — a real container, matched to the action beside it.
-   36×36, 3px corner, `--lp-chrome-rule` edge, and its own field: it occludes
-   the ground it stands on instead of being an outline drawn on the page.
-
-   A review called it "the weakest object in the header": a border faint enough
-   to read as a smudge, next to a solid green control the two didn't even share
-   a height with. Measured at 1440 dark, the two controls' *boxes* were both
-   exactly 36 tall at y=10–46 — but the action was a filled slab standing on the
-   press model's 1px plinth, so its painted extent was 10–47, 37 rows, centred on
-   28.5 against the toggle's 28.0. Two fixes, neither of them "make the border
-   louder": the action next to it is no longer a filled slab and no longer casts
-   (see `.ctaHeaderAction`), so both controls now paint exactly 36 rows from 10
-   to 46 on one centre; and this one gets a field, so it reads as a container at
-   rest rather than as four hairlines.
-
-   The interior and the edge are painted as two background layers rather than as
-   a background-colour, so the edge composites over the page's own field and not
-   over the interior — see `--lp-control-field`. Without that the edge printed
-   64,69,64 while the frame printed 60,65,60 from the same token. */
-.headerToggle {
-  position: relative;
-  border-radius: 3px;
-  /* Every outlined control on the page draws its edge at the same weight as
-     the rules the page is built from. */
-  border-color: var(--lp-chrome-rule);
-  background-image:
-    linear-gradient(var(--lp-control-field), var(--lp-control-field)),
-    linear-gradient(var(--background), var(--background));
-  background-origin: padding-box, border-box;
-  background-clip: padding-box, border-box;
-  transition:
-    border-color var(--lp-dur-hover) var(--lp-ease-snap),
-    translate var(--lp-dur-hover) var(--lp-ease-snap);
-}
-
-/* Hover and press are the CTA cluster's, because this control lives in it:
-   a pixel of lift under the pointer, a pixel of give under the press. It used
-   to lighten its field instead, which it can no longer do (the field is a
-   background image now — see `.ctaSecondary`) and which never matched the
-   controls either side of it anyway. */
-.headerToggle:hover {
-  border-color: var(--lp-hairline-strong);
-}
-
-.headerToggle:active {
-  translate: 0 1px;
-  transition-duration: var(--lp-dur-tap);
-}
-
-.headerToggle:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-
-/* The one control on the page whose glyph cannot say what it does: a monitor
-   outline means "follow the system", which nothing about the shape tells you.
-   The button already carries its own name and state in `title`
-   ("Theme: system"); this prints that name, so pointing at it or tabbing to
-   it answers the question immediately instead of a second later via the OS
-   tooltip. No JS, no invented copy — the control's own label, made visible. */
-.headerToggle::after {
-  content: attr(title);
-  position: absolute;
-  top: calc(100% + 0.5rem);
-  right: 0;
-  z-index: 2;
-  padding: 0.24rem 0.4rem 0.2rem;
-  border: 1px solid var(--lp-hairline);
-  border-radius: 3px;
-  background: var(--background);
-  box-shadow: 0 4px 12px -8px hsl(var(--shadow-color) / 0.6);
-  color: var(--muted-foreground);
-  font-family: var(--font-mono);
-  font-size: 0.5625rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  translate: 0 -3px;
-  transition:
-    opacity var(--lp-dur-hover) var(--lp-ease-out),
-    translate var(--lp-dur-hover) var(--lp-ease-out);
-}
-
-.headerToggle:hover::after,
-.headerToggle:focus-visible::after {
-  opacity: 1;
-  translate: 0 0;
-}
+/* Theme toggle — retired from this stylesheet.
+   The treatment (3px corner, `--lp-chrome-rule` edge, its own field, the CTA
+   cluster's hover-and-press, and the title printed under the control) moved to
+   `components/theme-toggle.module.css` when the guides / resources header
+   needed the same control. It could not simply be imported from here: the
+   `--lp-*` tokens it read are declared on `.root`, so outside the landing tree
+   its edge and field resolved to nothing. The component now owns it as
+   `chrome="marketing"`, both headers ask for it by name, and the design notes
+   moved with the rules. */
 
 /* ---------------------------------------------------------------------------
    Shared CTA language — sharp, directional, routed
@@ -784,10 +701,6 @@
   .ctaHeaderAction:hover {
     border-color: var(--lp-accent-edge-hover);
     box-shadow: 0 8px 18px -14px color-mix(in oklab, var(--primary) 55%, transparent);
-  }
-
-  .headerToggle:hover {
-    translate: 0 -1px;
   }
 }
 
@@ -1109,21 +1022,13 @@
   .bannerLink,
   .footerNavLink,
   .footerNavLink::after,
-  .footerMark,
-  .headerToggle,
-  .headerToggle::after {
+  .footerMark {
     transition: none;
     transition-delay: 0s;
   }
 
-  .headerToggle::after {
-    translate: none;
-  }
-
   .ctaButton:hover,
   .ctaButton:active,
-  .headerToggle:hover,
-  .headerToggle:active,
   .footerMark:hover {
     translate: none;
   }

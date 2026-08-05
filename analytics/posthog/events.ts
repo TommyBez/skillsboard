@@ -1,10 +1,6 @@
-import type { GuidePath } from "@/lib/seo/guides"
-import type { resourcePaths } from "@/lib/seo/resources"
-
 type NonTeamEventPropertiesMap = {
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    landing_path: "/" | GuidePath | typeof resourcePaths.index
     location:
       | "header"
       | "hero"
@@ -14,12 +10,10 @@ type NonTeamEventPropertiesMap = {
       | "guide_closing"
       | "resources_header"
       | "resources_closing"
-    visitor_state: "anonymous" | "signed_in"
   }
   mcp_entry_clicked: {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
     location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
-    visitor_state: "anonymous" | "signed_in"
   }
   mcp_setup_viewed: Record<never, never>
   mcp_client_selected: {

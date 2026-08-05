@@ -332,7 +332,7 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
                 href="/settings/mcp"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: mcpEntryEventProperties(true, "library_header", "/settings/mcp"),
+                  properties: mcpEntryEventProperties("library_header", "/settings/mcp"),
                 }}
               />
             )}
