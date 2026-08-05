@@ -36,7 +36,7 @@
        under the line box top and the box ends 0.215em under the baseline.
 --------------------------------------------------------------------------- */
 
-.pricingSection {
+.lp-pricing {
   /* --- Ink ---------------------------------------------------------------
      Light page → ink plate, dark page → paper plate. The plate's key green is
      one step of the page's own green ramp, not a second green: same hue, same
@@ -85,7 +85,7 @@
 
 /* The chapter's closing rule stops on the page measure, like every other line
    of chrome, instead of crossing the frame. */
-.pricingSection::after {
+.lp-pricing::after {
   content: "";
   position: absolute;
   left: var(--lp-frame-inset, var(--gutter));
@@ -95,7 +95,7 @@
   background: var(--lp-hairline);
 }
 
-:global(.dark) .pricingSection {
+.dark .lp-pricing {
   --plate-field: oklch(0.955 0.01 103);
   --plate-ink: oklch(0.16 0.018 158);
   /* rgb(50,122,65) — hsl(133 42% 34%) against the page's own
@@ -105,23 +105,17 @@
 
 /* --- Stage ----------------------------------------------------------------- */
 
-.sticky {
-  position: relative;
-  display: flex;
-  align-items: center;
+/* `relative flex items-center` is in the stage's class list; the block padding
+   stays because the reduced-motion rule at the foot of this file has to restate
+   it, and a value and its override belong in one file. The frame the stage
+   holds is four plain utilities on the page measure and has no class left. */
+.lp-pricing-stage {
   padding-block: clamp(3.5rem, 8vw, 6.5rem);
-}
-
-.frame {
-  width: 100%;
-  max-width: 1440px;
-  margin-inline: auto;
-  padding-inline: var(--gutter);
 }
 
 /* --- The plate ------------------------------------------------------------- */
 
-.plate {
+.lp-pricing-plate {
   position: relative;
   isolation: isolate;
   overflow: clip;
@@ -135,7 +129,7 @@
 }
 
 /* Paper: a fixed grain on the plate itself, so nothing shimmers while pinned. */
-.plate::after {
+.lp-pricing-plate::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -148,8 +142,8 @@
 
 /* --- Index: one pad below the trim, one pad above the head rule ------------ */
 
-.indexNum,
-.indexName {
+.lp-pricing-index-num,
+.lp-pricing-index-name {
   grid-row: 1;
   align-self: start;
   padding-left: var(--pad);
@@ -164,17 +158,17 @@
   color: var(--plate-quiet);
 }
 
-.indexNum {
+.lp-pricing-index-num {
   grid-column: 1;
 }
 
-.indexName {
+.lp-pricing-index-name {
   grid-column: 2;
 }
 
 /* --- Rules ----------------------------------------------------------------- */
 
-.ruleTop {
+.lp-pricing-rule-top {
   position: absolute;
   z-index: 4;
   left: 0;
@@ -188,7 +182,7 @@
 
 /* --- The numeral ----------------------------------------------------------- */
 
-.numeral {
+.lp-pricing-numeral {
   position: relative;
   z-index: 1;
   grid-row: 2;
@@ -200,17 +194,10 @@
   margin-left: calc(-1 * var(--os));
 }
 
-.zero {
-  display: block;
-  width: 100%;
-  height: 100%;
-  fill: var(--plate-key);
-}
-
 /* The pull: near plate-coloured, retreating right as the key ink is laid down.
    It is not fully opaque, so what it covers reads as a blind impression of the
    numeral waiting for ink rather than as an empty cell. */
-.wipe {
+.lp-pricing-wipe {
   position: absolute;
   z-index: 2;
   inset: 0;
@@ -220,7 +207,7 @@
 }
 
 /* The wet leading edge, present only during the pull. */
-.nip {
+.lp-pricing-nip {
   position: absolute;
   z-index: 3;
   top: 0;
@@ -234,7 +221,7 @@
 
 /* --- The statement column -------------------------------------------------- */
 
-.column {
+.lp-pricing-column {
   position: relative;
   z-index: 1;
   grid-row: 3;
@@ -248,13 +235,13 @@
 
 /* The statement is the first cell of the ledger; the rule under it is the same
    rule that separates the three absences below. */
-.statement {
+.lp-pricing-statement {
   position: relative;
   /* The head rule sits 0.8 pad under the lede's baseline. */
   padding-bottom: calc(0.8 * var(--pad) - 0.438 * var(--lede));
 }
 
-.statement::after {
+.lp-pricing-statement::after {
   content: "";
   position: absolute;
   z-index: 4;
@@ -267,7 +254,7 @@
   --rd: 250ms;
 }
 
-.heading {
+.lp-pricing-heading {
   max-width: 4.6em;
   font-size: var(--display);
   font-weight: 650;
@@ -281,14 +268,7 @@
   margin-top: calc(0.5 * var(--pad) - 0.1em);
 }
 
-/* The face draws F+r and F+o tight already; the setting's negative tracking
-   made those two pairs read tighter than every other pair in the line. They
-   get most of it back. */
-.kern {
-  letter-spacing: -0.012em;
-}
-
-.lede {
+.lp-pricing-lede {
   /* One pad from the display's last baseline to the lede's cap. */
   margin-top: calc(var(--pad) - 0.094 * var(--display) - 0.275em);
   max-width: 46ch;
@@ -298,13 +278,11 @@
   color: var(--plate-lede);
 }
 
-/* Spec ledger: three absences, each written on its own rule. */
-.spec {
-  display: grid;
-  list-style: none;
-}
+/* Spec ledger: three absences, each written on its own rule. The list is
+   `grid list-none`, and three identical rows filling whatever the statement
+   leaves is `md:grid-rows-3`. */
 
-.specRow {
+.lp-pricing-spec-row {
   position: relative;
   display: flex;
   align-items: center;
@@ -321,7 +299,7 @@
   color: var(--plate-spec);
 }
 
-.specRow::after {
+.lp-pricing-spec-row::after {
   content: "";
   position: absolute;
   z-index: 4;
@@ -336,14 +314,14 @@
 
 /* The last row is closed by the plate's own trim, not by a rule sitting in a
    band of nothing. */
-.specRow:last-child::after {
+.lp-pricing-spec-row:last-child::after {
   display: none;
 }
 
 /* --- Wide: two columns, every measurement derived from the numeral --------- */
 
 @media (min-width: 48rem) {
-  .pricingSection {
+  .lp-pricing {
     --plate-frac: 1;
     --plate-cap: min(76vh, 44rem);
     --measure-w: calc(min(1440px, 100vw) - 2 * var(--gutter));
@@ -372,7 +350,7 @@
     --lede: calc(var(--display) * 0.1614);
   }
 
-  .plate {
+  .lp-pricing-plate {
     width: var(--plate-w);
     max-width: 100%;
     height: var(--plate-h);
@@ -381,12 +359,12 @@
     grid-template-rows: var(--head-h) minmax(0, 1fr);
   }
 
-  .numeral {
+  .lp-pricing-numeral {
     grid-row: 2;
     grid-column: 1;
   }
 
-  .column {
+  .lp-pricing-column {
     grid-row: 2;
     grid-column: 2;
     margin-top: 0;
@@ -396,11 +374,11 @@
      from the head rule to the trim; the numeral crosses it. */
   /* One line, always: the rule above only holds if it is one line, and an
      overflow into the pad is a better failure than a second line. */
-  .lede {
+  .lp-pricing-lede {
     white-space: nowrap;
   }
 
-  .column::before {
+  .lp-pricing-column::before {
     content: "";
     position: absolute;
     z-index: 4;
@@ -413,12 +391,7 @@
     --rd: 170ms;
   }
 
-  /* Three identical rows filling whatever the statement leaves. */
-  .spec {
-    grid-template-rows: repeat(3, minmax(0, 1fr));
-  }
-
-  .specRow {
+  .lp-pricing-spec-row {
     min-height: 0;
   }
 }
@@ -428,17 +401,17 @@
    it on both sides instead of being erased by it. --------------------------- */
 
 @media (min-width: 64rem) {
-  .pricingSection {
+  .lp-pricing {
     --plate-frac: 0.75;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
-    .pricingSection {
+  [data-landing-motion-root][data-motion-enabled="true"]
+    .lp-pricing {
     height: 200vh;
     --p: var(--sp-pricing, 0);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .sticky {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-pricing-stage {
     position: sticky;
     top: var(--lp-header-h);
     height: calc(100dvh - var(--lp-header-h));
@@ -448,137 +421,137 @@
 
 /* --- Arrival, part 1: the plate is ruled up ------------------------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .ruleTop,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-rule-top,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .statement::after,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-statement::after,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .specRow::after,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-spec-row::after,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .column::before {
+  .lp-pricing-column::before {
   transition: transform 640ms var(--lp-ease-emph) var(--rd, 0ms);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .ruleTop,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-rule-top,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .statement::after,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-statement::after,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .specRow::after {
+  .lp-pricing-spec-row::after {
   transform: scaleX(0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .column::before {
+  .lp-pricing-column::before {
   transform: scaleY(0);
 }
 
 /* --- Arrival, part 2: the plate is placed and the type is set -------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .plate {
+  .lp-pricing-plate {
   transition:
     opacity var(--lp-dur-scene) var(--lp-ease-emph),
     transform var(--lp-dur-scene) var(--lp-ease-emph);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .plate {
+  .lp-pricing-plate {
   opacity: 0;
   transform: translate3d(0, 22px, 0);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .indexNum,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-index-num,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .indexName,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-index-name,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .heading,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-heading,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .lede,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-lede,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .specRow {
+  .lp-pricing-spec-row {
   transition:
     opacity var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms),
     transform var(--lp-dur-reveal) var(--lp-ease-out) var(--d, 0ms);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .indexNum,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-index-num,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .indexName,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-index-name,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .heading,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-heading,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .lede,
-:global([data-landing-motion-root][data-motion-enabled="true"])
+  .lp-pricing-lede,
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .specRow {
+  .lp-pricing-spec-row {
   opacity: 0;
   transform: translate3d(0, 10px, 0);
 }
 
-.indexNum {
+.lp-pricing-index-num {
   --d: 40ms;
 }
 
-.indexName {
+.lp-pricing-index-name {
   --d: 80ms;
 }
 
-.heading {
+.lp-pricing-heading {
   --d: 170ms;
 }
 
-.lede {
+.lp-pricing-lede {
   --d: 250ms;
 }
 
-.specRow {
+.lp-pricing-spec-row {
   --d: calc(320ms + var(--i, 0) * var(--lp-stagger));
 }
 
 /* Below the pin there is no runway, so the run is transition-timed instead. */
 @media (max-width: 63.999rem) {
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="pricing"]
-    .wipe,
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+    .lp-pricing-wipe,
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="pricing"]
-    .nip {
+    .lp-pricing-nip {
     transition:
       transform 940ms var(--lp-ease-in-out) 380ms,
       opacity 940ms linear 380ms;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="pricing"][data-motion-state="pending"]
-    .wipe {
+    .lp-pricing-wipe {
     transform: scaleX(1);
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"])
+  [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="pricing"][data-motion-state="pending"]
-    .nip {
+    .lp-pricing-nip {
     transform: translateX(0);
     opacity: 0;
   }
@@ -587,29 +560,29 @@
 /* --- Reduced motion: the proof rests printed ------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .pricingSection {
+  .lp-pricing {
     --p: 1;
     height: auto !important;
   }
 
-  .sticky {
+  .lp-pricing-stage {
     position: static !important;
     height: auto !important;
     padding-block: clamp(3.5rem, 8vw, 6.5rem) !important;
   }
 
-  .plate,
-  .indexNum,
-  .indexName,
-  .heading,
-  .lede,
-  .specRow,
-  .specRow::after,
-  .statement::after,
-  .ruleTop,
-  .column::before,
-  .wipe,
-  .nip {
+  .lp-pricing-plate,
+  .lp-pricing-index-num,
+  .lp-pricing-index-name,
+  .lp-pricing-heading,
+  .lp-pricing-lede,
+  .lp-pricing-spec-row,
+  .lp-pricing-spec-row::after,
+  .lp-pricing-statement::after,
+  .lp-pricing-rule-top,
+  .lp-pricing-column::before,
+  .lp-pricing-wipe,
+  .lp-pricing-nip {
     transition: none !important;
   }
 }

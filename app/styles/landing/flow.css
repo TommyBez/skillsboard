@@ -38,7 +38,7 @@
    bottom only re-stages them once the shared `flow` group has armed.
 --------------------------------------------------------------------------- */
 
-.flowSection {
+.lp-flow-section {
   /* Panel measure. `--pad` is the clear space around every rule. */
   --pad: 1.5rem;
 
@@ -90,13 +90,13 @@
 }
 
 @media (min-width: 64rem) {
-  .flowSection {
+  .lp-flow-section {
     --pad: 1.75rem;
   }
 }
 
 @media (min-width: 84rem) {
-  .flowSection {
+  .lp-flow-section {
     --pad: 2rem;
   }
 }
@@ -105,25 +105,20 @@
 
 /* One content clear from the frame rails. Index, mark, value and title all
    live inside it — nothing is pulled back onto the rail. */
-.flowHead {
+.lp-flow-head {
   padding-inline: var(--pad);
 }
 
 @media (min-width: 64rem) {
-  .flowHead {
+  .lp-flow-head {
     /* Match the panel cells: +1px wherever a frame rail is drawn inside the
        content box, so clear space is `--pad` rule-to-ink on both sides. */
     padding-inline: calc(var(--pad) + 1px);
   }
 }
 
-.flowMarkRow {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
 
-.flowIndex {
+.lp-flow-index {
   font-family: var(--font-mono);
   font-size: var(--m-meta);
   font-weight: 600;
@@ -132,24 +127,15 @@
   color: var(--ink-2);
 }
 
-.flowMarkLine {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
 
-.flowMark {
-  flex: 1;
-  min-width: 0;
-}
 
-/* `.chapterMark::after` is the rule that continues the caption; this parks the
+/* The shared chapter mark's `after:` rule is what continues the caption (see
+   `components/landing/styles.ts`); this parks the
    value at the end of it. The clear space is deliberately unequal: 12px from
    the caption to the rule, 20px from the rule to the value, so the rule reads
    as belonging to the word it continues rather than to the number it
    terminates. The three column footers carry the same asymmetry. */
-.flowMarkVal {
+.lp-flow-mark-val {
   flex: none;
   margin-left: 1.25rem;
   font-family: var(--font-mono);
@@ -164,24 +150,10 @@
 /* Optically aligned, not box-aligned: at 60px the leading glyph carries ~2.5px
    of side bearing, so the box is pulled back by that much and the ink lands on
    the same x as the mono caption above it and the cell titles below it. */
-.flowTitle {
-  /* The clear space above the headline lives INSIDE its box (5rem of padding,
-     pulled back out with the margin so the rendered gap to the caption is the
-     2.25rem it looks like). The heading is the chapter's anchor target, and a
-     56px sticky header sits over the top of the viewport: with the air outside
-     the box, any scroll that parks the viewport on this element buried the
-     first line under the header — 11px of clearance above the caps against
-     53px below, which is what made the chapter read as clipped at its top.
-     With the air inside the box the same landing gives 33px above and 40px
-     below, and nothing about the resting composition moves. */
-  margin-top: -2.75rem;
-  padding-top: 5rem;
-  margin-left: -0.042em;
-}
 
 /* --- The framed three-up panel ------------------------------------------ */
 
-.flowGrid {
+.lp-flow-grid {
   margin: 2.5rem 0 0;
   padding: 0;
   display: grid;
@@ -201,7 +173,7 @@
   background: var(--card);
 }
 
-.flowStep {
+.lp-flow-step {
   position: relative;
   isolation: isolate;
   display: grid;
@@ -213,13 +185,13 @@
   --t: calc(var(--c, 0) * 90ms);
 }
 
-.flowStep:first-child {
+.lp-flow-step:first-child {
   border-top: none;
 }
 
 /* A whisper of lift on hover — no shadow, no scale, just field and index.
    It fills the cell rule-to-rule and paints under the content. */
-.flowStep::after {
+.lp-flow-step::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -231,17 +203,17 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .flowStep:hover::after {
+  .lp-flow-step:hover::after {
     opacity: 1;
   }
 
-  .flowStep:hover .stepIndex {
+  .lp-flow-step:hover .lp-flow-step-index {
     color: var(--primary);
   }
 }
 
 @media (min-width: 64rem) {
-  .flowGrid {
+  .lp-flow-grid {
     /* Three equal thirds of the interior *between* the frame rails, with the
        two dividers accounted for. At the 1360px measure this is exactly
        454 / 453 / 453, which puts the divider rules on x = 453 and x = 906
@@ -253,7 +225,7 @@
     grid-template-rows: auto auto auto auto 1fr auto;
   }
 
-  .flowStep {
+  .lp-flow-step {
     /* +1px wherever the neighbouring rule is drawn inside this cell's box —
        the left rail for the first cell, the right rail / next divider for
        every cell — so the clear space is `--pad` on both sides of every rule. */
@@ -265,13 +237,13 @@
     border-top: none;
   }
 
-  .flowStep:first-child {
+  .lp-flow-step:first-child {
     padding-left: calc(var(--pad) + 1px);
   }
 
   /* The dividers are drawn on the cell's own leading edge, so they tile the
      interior with the cells instead of floating in a gutter. */
-  .flowStep:not(:first-child)::before {
+  .lp-flow-step:not(:first-child)::before {
     content: "";
     position: absolute;
     top: 0;
@@ -285,7 +257,7 @@
      copy, caption, diagram and readout sit on the same baselines however the
      copy happens to wrap. */
   @supports (grid-template-rows: subgrid) {
-    .flowStep {
+    .lp-flow-step {
       grid-row: span 6;
       grid-template-rows: subgrid;
     }
@@ -299,7 +271,7 @@
    inside a chapter get a visibly different token: a single digit against a
    dimmed total. It also states the length of the sequence. It sits on the
    cell's own left edge like everything else; nothing hangs into a gutter. */
-.stepIndex {
+.lp-flow-step-index {
   grid-column: 1;
   justify-self: start;
   font-family: var(--font-mono);
@@ -312,11 +284,11 @@
   transition: color var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-.stepIndexOf {
+.lp-flow-step-index-of {
   color: var(--ink-2);
 }
 
-.stepTitle {
+.lp-flow-step-title {
   grid-column: 1;
   margin: 0.75rem 0 0;
   font-size: clamp(1.35rem, 1.7vw, 1.62rem);
@@ -325,7 +297,7 @@
   line-height: 1.06;
 }
 
-.stepCopy {
+.lp-flow-step-copy {
   grid-column: 1;
   align-self: start;
   margin: 0.625rem 0 0;
@@ -343,7 +315,7 @@
    chapter — three column captions, the search demo's cut, and the three
    closing readouts, which simply park a value at the end of the rule. Same
    size, tracking, ink, gap and terminal in every one of them. */
-.vizLabel {
+.lp-flow-viz-label {
   grid-column: 1;
   display: flex;
   align-items: center;
@@ -357,27 +329,22 @@
   color: var(--ink-2);
 }
 
-.labelText,
-.footVal {
+.lp-flow-label-text,
+.lp-flow-foot-val {
   flex: none;
 }
 
-.labelRule {
+.lp-flow-label-rule {
   flex: 1;
   min-width: 1rem;
   height: 1px;
   background: var(--lp-grid-line);
 }
 
-.vizArrow {
-  display: inline-block;
-  margin: 0 0.12em;
-  letter-spacing: -0.06em;
-}
 
 /* Register 2: the diagram. It absorbs every bit of slack in the panel, so the
    three columns bottom out on the same line whatever their contents weigh. */
-.vizBody {
+.lp-flow-viz-body {
   grid-column: 1;
   align-self: stretch;
   /* The caption's clear space is `--label-gap` in both directions: to the rule
@@ -388,7 +355,7 @@
   align-items: stretch;
 }
 
-.vizFoot {
+.lp-flow-viz-foot {
   margin-top: 1.5rem;
 }
 
@@ -396,7 +363,7 @@
    continuation of the caption, so it must read as attached to the word and
    detached from the number. Symmetric 12/12 made the leader look like it was
    underlining the value. */
-.footVal {
+.lp-flow-foot-val {
   margin-left: 0.5rem;
   font-variant-numeric: tabular-nums;
   color: var(--ink-1);
@@ -404,7 +371,7 @@
 
 /* --- Controls: the three columns all open with one ---------------------- */
 
-.ctrlIcon {
+.lp-flow-ctrl-icon {
   flex: none;
   width: var(--ctrl-icon);
   height: var(--ctrl-icon);
@@ -415,7 +382,7 @@
    01 — pasted URL resolves into a populated skill card
 --------------------------------------------------------------------------- */
 
-.pasteField {
+.lp-flow-paste-field {
   position: relative;
   display: flex;
   align-items: center;
@@ -428,7 +395,7 @@
   background: color-mix(in oklab, var(--background) 55%, transparent);
 }
 
-.pasteFlash {
+.lp-flow-paste-flash {
   position: absolute;
   inset: 0;
   opacity: 0;
@@ -437,7 +404,7 @@
   background: color-mix(in oklab, var(--primary) 24%, transparent);
 }
 
-.pasteUrl {
+.lp-flow-paste-url {
   position: relative;
   flex: 1;
   min-width: 0;
@@ -450,7 +417,7 @@
   color: var(--ink-1);
 }
 
-.pasteDim {
+.lp-flow-paste-dim {
   color: var(--ink-2);
 }
 
@@ -458,16 +425,10 @@
    at the top, the card is fixed at the bottom, and the link spans whatever is
    between them. That is what makes column 1 finish on the same baseline as
    the other two at every width, instead of being hand-tuned to it. */
-.pasteLink {
-  position: relative;
-  display: block;
-  flex: 1;
-  min-height: 2.6rem;
-}
 
 /* Hung on `--axis-mark`: the wire drops out of the centre of the field's own
    glyph, and lands on the same x as column 3's route spine. */
-.pasteWire {
+.lp-flow-paste-wire {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -480,7 +441,7 @@
 /* The connector carries its own caption, so the span it opens up reads as the
    step the diagram is describing rather than as a hole in the column. It sits
    on `--row-pad` — the same x as every row of text in the other two columns. */
-.pasteWireNote {
+.lp-flow-paste-wire-note {
   position: absolute;
   top: 50%;
   left: var(--row-pad);
@@ -497,7 +458,7 @@
 /* The caption is struck out from the wire on the same stub geometry column 3
    uses for its branches, so it reads as an annotation ON the line rather than
    a label parked beside it. */
-.pasteWireNote::before {
+.lp-flow-paste-wire-note::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -507,7 +468,7 @@
   background: var(--wire);
 }
 
-.pasteWireHead {
+.lp-flow-paste-wire-head {
   position: absolute;
   left: 50%;
   bottom: -1px;
@@ -524,14 +485,14 @@
    In light the band is already the top surface (252.6 against a 243.6 page),
    so the card holds `--card` and its border does the separating; lifting it
    there would only take it away from the plate it sits on. */
-.miniCard {
+.lp-flow-mini-card {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: var(--r-card);
   background: var(--card);
 }
 
-:global(.dark) .miniCard {
+.dark .lp-flow-mini-card {
   background: color-mix(in oklab, var(--foreground) 3%, var(--card));
 }
 
@@ -539,14 +500,14 @@
    rows and the route rows use, so all three columns present one text edge. The
    old 8px inset put the description a hair off the border and left the source
    line ragging 21px right of the name, because the fork glyph was in flow. */
-.miniBody {
+.lp-flow-mini-body {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
   padding: 0.85rem var(--row-pad);
 }
 
-.miniMeta {
+.lp-flow-mini-meta {
   position: relative;
   display: flex;
   align-items: center;
@@ -555,7 +516,7 @@
   min-width: 0;
 }
 
-.miniSource {
+.lp-flow-mini-source {
   display: flex;
   align-items: center;
   gap: var(--ctrl-gap);
@@ -572,7 +533,7 @@
    card's fork glyph, and the source line starts on the same x as the name, the
    description, the tags and the install command. Measured from the card's
    border box — hence the 1px for its own border. */
-.miniFork {
+.lp-flow-mini-fork {
   position: absolute;
   top: 50%;
   left: calc(
@@ -585,7 +546,7 @@
   color: var(--primary);
 }
 
-.miniStars {
+.lp-flow-mini-stars {
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--m-meta);
@@ -594,7 +555,7 @@
   color: var(--ink-2);
 }
 
-.miniName {
+.lp-flow-mini-name {
   margin: 0;
   font-size: 0.88rem;
   font-weight: 650;
@@ -602,7 +563,7 @@
   line-height: 1.15;
 }
 
-.miniDesc {
+.lp-flow-mini-desc {
   margin: 0;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -614,14 +575,14 @@
   text-wrap: pretty;
 }
 
-.miniTags {
+.lp-flow-mini-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.28rem;
   margin-top: 0.12rem;
 }
 
-.miniTag {
+.lp-flow-mini-tag {
   display: inline-flex;
   align-items: center;
   min-height: 1.3rem;
@@ -635,13 +596,13 @@
   color: var(--ink-1);
 }
 
-.miniFoot {
+.lp-flow-mini-foot {
   padding: 0.72rem var(--row-pad);
   border-top: 1px solid var(--border);
   background: color-mix(in oklab, var(--foreground) 4%, transparent);
 }
 
-.miniCmd {
+.lp-flow-mini-cmd {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -655,7 +616,7 @@
    02 — a query filters the library down to one match
 --------------------------------------------------------------------------- */
 
-.searchField {
+.lp-flow-search-field {
   display: flex;
   align-items: center;
   gap: var(--ctrl-gap);
@@ -666,7 +627,7 @@
   background: color-mix(in oklab, var(--background) 55%, transparent);
 }
 
-.searchQueryWrap {
+.lp-flow-search-query-wrap {
   position: relative;
   flex: 1;
   min-width: 0;
@@ -677,14 +638,14 @@
   line-height: 1;
 }
 
-.searchQuery {
+.lp-flow-search-query {
   display: inline-block;
   color: var(--ink-1);
 }
 
 /* Parked one character past the query; `ch` resolves in the same mono face,
    so the caret and the typed characters stay locked together. */
-.searchCaret {
+.lp-flow-search-caret {
   position: absolute;
   left: 0;
   top: 50%;
@@ -695,7 +656,7 @@
   transform: translateX(3ch);
 }
 
-.resultList {
+.lp-flow-result-list {
   margin: var(--label-gap) 0 0;
   padding: 0;
   list-style: none;
@@ -705,12 +666,12 @@
    the bottom of the diagram and its gap above never changes. It closes on a
    rule at the column's terminal, so all three columns end on the same line and
    the space above the readout is a bracketed 24px rather than leftover. */
-.resultRest {
+.lp-flow-result-rest {
   position: relative;
   flex: 1 0 auto;
 }
 
-.resultRest::after {
+.lp-flow-result-rest::after {
   content: "";
   position: absolute;
   inset: auto var(--row-pad) 0;
@@ -725,7 +686,7 @@
    dividers under inset text read as belonging to the cell, not the list.
    The pitch is an exact 32px (7 + 18 + 7); at 0.42rem padding against a 1.5
    line-height it computed to 31.78 and rendered 31 / 32 / 32 down the list. */
-.resultRow {
+.lp-flow-result-row {
   position: relative;
   isolation: isolate;
   display: flex;
@@ -735,7 +696,7 @@
   padding: 7px var(--row-pad);
 }
 
-.resultRow:not(:last-child)::after {
+.lp-flow-result-row:not(:last-child)::after {
   content: "";
   position: absolute;
   inset: auto var(--row-pad) 0;
@@ -745,11 +706,11 @@
 
 /* The cut is the same captioned rule as the column headings — same size,
    tracking, ink, gap and terminal — because it is the same object. */
-.resultCut {
+.lp-flow-result-cut {
   margin-top: 1.5rem;
 }
 
-.resultRow[data-match="true"]::before {
+.lp-flow-result-row[data-match="true"]::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -758,7 +719,7 @@
   transform-origin: left center;
 }
 
-.resultName {
+.lp-flow-result-name {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -774,19 +735,19 @@
 /* Filtered-out rows rest in the secondary ink — that IS the finished state of
    a search. They are dimmed by ink, never by opacity: at 50% the source
    labels measured 2.6:1 against the panel. */
-.resultRow[data-match="false"] .resultName {
+.lp-flow-result-row[data-match="false"] .lp-flow-result-name {
   color: var(--ink-2);
 }
 
 /* The match marker is a token, not a smear: it covers the row's full leading,
    so nothing clips the descender of the `p`, and it carries the same radius
    as the card's tags. */
-.resultMark {
+.lp-flow-result-mark {
   position: relative;
   isolation: isolate;
 }
 
-.resultMark::before {
+.lp-flow-result-mark::before {
   content: "";
   position: absolute;
   inset: -0.42em -0.24em;
@@ -796,7 +757,7 @@
   transform-origin: left center;
 }
 
-.resultRepo {
+.lp-flow-result-repo {
   flex: none;
   font-family: var(--font-mono);
   max-width: 8rem;
@@ -820,7 +781,7 @@
    icon look arbitrary — it aligned to neither the chip's edge nor its centre.
    Full measure, and the stem is obviously on the mark axis, exactly as the
    connector in column 1 is. */
-.fanNode {
+.lp-flow-fan-node {
   display: flex;
   align-items: center;
   gap: var(--ctrl-gap);
@@ -836,7 +797,7 @@
   line-height: 1.2;
 }
 
-.fanNode .ctrlIcon {
+.lp-flow-fan-node .lp-flow-ctrl-icon {
   color: var(--primary);
 }
 
@@ -845,7 +806,7 @@
    whatever is between. Sharing the slack across the four branches instead made
    the row pitch fractional — 50.28px, rendering 51 / 50 / 49, no two gaps in
    the tree equal. */
-.fanStem {
+.lp-flow-fan-stem {
   flex: 1 1 auto;
   align-self: flex-start;
   width: 1px;
@@ -855,7 +816,7 @@
   transform-origin: top center;
 }
 
-.fanList {
+.lp-flow-fan-list {
   position: relative;
   display: flex;
   flex: none;
@@ -867,7 +828,7 @@
 
 /* The list closes on a rule at the column's terminal, level with the card's
    bottom border in column 1 and the library's closing rule in column 2. */
-.fanList::after {
+.lp-flow-fan-list::after {
   content: "";
   position: absolute;
   inset: auto var(--row-pad) 0;
@@ -879,7 +840,7 @@
 /* The spine continues the stem down to the last branch's centre. Four rows of
    equal height means half a row is exactly one eighth of the list, so this
    stays exact without hard-coding the row height. */
-.fanList::before {
+.lp-flow-fan-list::before {
   content: "";
   position: absolute;
   left: calc(var(--axis-mark) - 0.5px);
@@ -893,7 +854,7 @@
 /* Same padding, same terminal and the same trailing-divider rule as the search
    results: no rule under the last row, so nothing is left dangling. */
 /* Fixed pitch, one number, every width. */
-.fanRow {
+.lp-flow-fan-row {
   position: relative;
   display: flex;
   flex: none;
@@ -905,7 +866,7 @@
 
 /* Bracketed on `--row-pad` like the library's dividers, which also keeps them
    off the spine: at full bleed they ran straight through the tree's stem. */
-.fanRow:not(:last-child)::after {
+.lp-flow-fan-row:not(:last-child)::after {
   content: "";
   position: absolute;
   inset: auto var(--row-pad) 0;
@@ -914,7 +875,7 @@
 }
 
 /* Each branch stub: from the spine to the key column, on the row's centre. */
-.fanRow::before {
+.lp-flow-fan-row::before {
   content: "";
   position: absolute;
   left: calc(var(--axis-mark) - 0.5px);
@@ -925,7 +886,7 @@
   transform-origin: left center;
 }
 
-.fanKey {
+.lp-flow-fan-key {
   flex: none;
   font-family: var(--font-mono);
   font-size: var(--m-text);
@@ -934,7 +895,7 @@
   color: var(--ink-1);
 }
 
-.fanVal {
+.lp-flow-fan-val {
   flex: none;
   margin-left: auto;
   max-width: 9rem;
@@ -1113,167 +1074,167 @@
 
 /* --- Pending: stage everything the reveal will play --------------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="flow"][data-motion-state="pending"] {
-  & .flowHead,
-  & .stepIndex,
-  & .stepTitle,
-  & .stepCopy,
-  & .vizLabel,
-  & .pasteField,
-  & .pasteWireNote,
-  & .miniCard,
-  & .miniMeta,
-  & .miniName,
-  & .miniDesc,
-  & .miniTags,
-  & .miniFoot,
-  & .searchField,
-  & .resultRow,
-  & .footVal,
-  & .fanNode,
-  & .fanRow {
+  & .lp-flow-head,
+  & .lp-flow-step-index,
+  & .lp-flow-step-title,
+  & .lp-flow-step-copy,
+  & .lp-flow-viz-label,
+  & .lp-flow-paste-field,
+  & .lp-flow-paste-wire-note,
+  & .lp-flow-mini-card,
+  & .lp-flow-mini-meta,
+  & .lp-flow-mini-name,
+  & .lp-flow-mini-desc,
+  & .lp-flow-mini-tags,
+  & .lp-flow-mini-foot,
+  & .lp-flow-search-field,
+  & .lp-flow-result-row,
+  & .lp-flow-foot-val,
+  & .lp-flow-fan-node,
+  & .lp-flow-fan-row {
     opacity: 0;
   }
 
-  & .pasteWire,
-  & .fanStem,
-  & .fanList::before {
+  & .lp-flow-paste-wire,
+  & .lp-flow-fan-stem,
+  & .lp-flow-fan-list::before {
     transform: scaleY(0);
   }
 
-  & .fanRow::before,
-  & .resultMark::before,
-  & .resultRest::after,
-  & .fanList::after,
-  & .resultRow[data-match="true"]::before {
+  & .lp-flow-fan-row::before,
+  & .lp-flow-result-mark::before,
+  & .lp-flow-result-rest::after,
+  & .lp-flow-fan-list::after,
+  & .lp-flow-result-row[data-match="true"]::before {
     transform: scaleX(0);
   }
 
-  & .pasteUrl,
-  & .searchQuery {
+  & .lp-flow-paste-url,
+  & .lp-flow-search-query {
     clip-path: inset(0 100% 0 0);
   }
 
-  & .searchCaret {
+  & .lp-flow-search-caret {
     opacity: 0;
   }
 }
 
 /* --- Visible: the chapter plays ---------------------------------------- */
 
-:global([data-landing-motion-root][data-motion-enabled="true"])
+[data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="flow"][data-motion-state="visible"] {
-  & .flowHead {
+  & .lp-flow-head {
     animation: flowRise var(--lp-dur-reveal) var(--lp-ease-emph) both;
   }
 
   /* Cell head */
-  & .stepIndex {
+  & .lp-flow-step-index {
     animation: flowFade 420ms var(--lp-ease-out) calc(var(--t) + 150ms) both;
   }
 
-  & .stepTitle {
+  & .lp-flow-step-title {
     animation: flowRiseSm 500ms var(--lp-ease-emph) calc(var(--t) + 150ms) both;
   }
 
-  & .stepCopy {
+  & .lp-flow-step-copy {
     animation: flowRiseSm 500ms var(--lp-ease-emph) calc(var(--t) + 210ms) both;
   }
 
-  & .vizLabel {
+  & .lp-flow-viz-label {
     animation: flowFade 380ms var(--lp-ease-out) calc(var(--t) + 320ms) both;
   }
 
   /* 01 — paste resolves */
-  & .pasteField {
+  & .lp-flow-paste-field {
     animation: flowRiseSm 420ms var(--lp-ease-emph) calc(var(--t) + 320ms) both;
   }
 
-  & .pasteFlash {
+  & .lp-flow-paste-flash {
     animation: flowPasteFlash 520ms var(--lp-ease-out) calc(var(--t) + 470ms)
       both;
   }
 
-  & .pasteUrl {
+  & .lp-flow-paste-url {
     animation: flowWipe 200ms var(--lp-ease-snap) calc(var(--t) + 480ms) both;
   }
 
-  & .pasteWire {
+  & .lp-flow-paste-wire {
     animation: flowDrawY 280ms var(--lp-ease-emph) calc(var(--t) + 720ms) both;
   }
 
-  & .pasteWireNote {
+  & .lp-flow-paste-wire-note {
     animation: flowFade 300ms var(--lp-ease-out) calc(var(--t) + 800ms) both;
   }
 
-  & .miniCard {
+  & .lp-flow-mini-card {
     animation: flowRiseSm 460ms var(--lp-ease-emph) calc(var(--t) + 900ms) both;
   }
 
-  & .miniMeta {
+  & .lp-flow-mini-meta {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1000ms) both;
   }
 
-  & .miniName {
+  & .lp-flow-mini-name {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1060ms) both;
   }
 
-  & .miniDesc {
+  & .lp-flow-mini-desc {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1120ms) both;
   }
 
-  & .miniTags {
+  & .lp-flow-mini-tags {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
   }
 
-  & .miniFoot {
+  & .lp-flow-mini-foot {
     animation: flowRiseSm 380ms var(--lp-ease-out) calc(var(--t) + 1240ms) both;
   }
 
   /* 02 — a query filters the library */
-  & .searchField {
+  & .lp-flow-search-field {
     animation: flowRiseSm 420ms var(--lp-ease-emph) calc(var(--t) + 320ms) both;
   }
 
-  & .resultRow {
+  & .lp-flow-result-row {
     animation: flowRiseSm 400ms var(--lp-ease-out)
       calc(var(--t) + 440ms + var(--r, 0) * 55ms) both;
   }
 
   /* The cut belongs to the list, so it arrives with it rather than sitting
      alone in an otherwise empty panel while the rows stagger in. */
-  & .resultCut {
+  & .lp-flow-result-cut {
     animation: flowFade 360ms var(--lp-ease-out) calc(var(--t) + 500ms) both;
   }
 
-  & .resultRest .resultRow:nth-child(1) {
+  & .lp-flow-result-rest .lp-flow-result-row:nth-child(1) {
     --r: 1;
   }
 
-  & .resultRest .resultRow:nth-child(2) {
+  & .lp-flow-result-rest .lp-flow-result-row:nth-child(2) {
     --r: 2;
   }
 
-  & .resultRest .resultRow:nth-child(3) {
+  & .lp-flow-result-rest .lp-flow-result-row:nth-child(3) {
     --r: 3;
   }
 
-  & .resultRest .resultRow:nth-child(4) {
+  & .lp-flow-result-rest .lp-flow-result-row:nth-child(4) {
     --r: 4;
   }
 
   /* The list's closing rule is drawn once its rows have landed, so the column
      visibly terminates rather than starting with a rule under nothing. */
-  & .resultRest::after {
+  & .lp-flow-result-rest::after {
     animation: flowDrawX 320ms var(--lp-ease-emph) calc(var(--t) + 700ms) both;
   }
 
-  & .searchQuery {
+  & .lp-flow-search-query {
     animation: flowWipe 380ms steps(3, end) calc(var(--t) + 760ms) both;
   }
 
-  & .searchCaret {
+  & .lp-flow-search-caret {
     animation:
       flowCaretIn 380ms steps(3, end) calc(var(--t) + 760ms) both,
       /* Three blinks, then rest. The caret is the last thing in the chapter
@@ -1284,68 +1245,68 @@
 
   /* Filtering lands after the query is typed: everything but the match
      recedes, the match gets its band and its highlighted substring. */
-  & .resultRow[data-match="false"] .resultName {
+  & .lp-flow-result-row[data-match="false"] .lp-flow-result-name {
     animation: flowDim 340ms var(--lp-ease-out) calc(var(--t) + 1180ms) both;
   }
 
-  & .resultRow[data-match="true"]::before {
+  & .lp-flow-result-row[data-match="true"]::before {
     animation: flowDrawX 300ms var(--lp-ease-emph) calc(var(--t) + 1180ms) both;
   }
 
-  & .resultMark::before {
+  & .lp-flow-result-mark::before {
     animation: flowDrawX 260ms var(--lp-ease-emph) calc(var(--t) + 1200ms) both;
   }
 
   /* The readout is the column's conclusion, so it arrives after the caption
-     that opens the column — this rule follows `.vizLabel` and wins on order —
+     that opens the column — this rule follows `.lp-flow-viz-label` and wins on order —
      and its value only once the diagram has resolved. */
-  & .vizFoot {
+  & .lp-flow-viz-foot {
     animation: flowFade 380ms var(--lp-ease-out) calc(var(--t) + 700ms) both;
   }
 
-  & .footVal {
+  & .lp-flow-foot-val {
     animation: flowCountIn 320ms var(--lp-ease-emph) calc(var(--t) + 1300ms)
       both;
   }
 
   /* 03 — the fan of routes */
-  & .fanNode {
+  & .lp-flow-fan-node {
     animation: flowPop 420ms var(--lp-ease-spring) calc(var(--t) + 320ms) both;
   }
 
   /* One continuous draw: the stem leaves the node, the spine carries it down
      the table, then each branch strikes out to its row. */
-  & .fanStem {
+  & .lp-flow-fan-stem {
     animation: flowDrawY 260ms var(--lp-ease-emph) calc(var(--t) + 500ms) both;
   }
 
-  & .fanList::before {
+  & .lp-flow-fan-list::before {
     animation: flowDrawY 200ms var(--lp-ease-out) calc(var(--t) + 740ms) both;
   }
 
-  & .fanRow::before {
+  & .lp-flow-fan-row::before {
     animation: flowDrawX 220ms var(--lp-ease-emph)
       calc(var(--t) + 880ms + var(--r, 0) * 70ms) both;
   }
 
-  & .fanRow {
+  & .lp-flow-fan-row {
     animation: flowSlideIn 420ms var(--lp-ease-emph)
       calc(var(--t) + 910ms + var(--r, 0) * 70ms) both;
   }
 
-  & .fanList::after {
+  & .lp-flow-fan-list::after {
     animation: flowDrawX 320ms var(--lp-ease-emph) calc(var(--t) + 1180ms) both;
   }
 
-  & .fanRow:nth-child(2) {
+  & .lp-flow-fan-row:nth-child(2) {
     --r: 1;
   }
 
-  & .fanRow:nth-child(3) {
+  & .lp-flow-fan-row:nth-child(3) {
     --r: 2;
   }
 
-  & .fanRow:nth-child(4) {
+  & .lp-flow-fan-row:nth-child(4) {
     --r: 3;
   }
 }
@@ -1355,15 +1316,15 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .flowStep::after,
-  .stepIndex {
+  .lp-flow-step::after,
+  .lp-flow-step-index {
     transition: none;
   }
 
-  .flowHead,
-  .flowStep *,
-  .flowStep *::before,
-  .flowStep *::after {
+  .lp-flow-head,
+  .lp-flow-step *,
+  .lp-flow-step *::before,
+  .lp-flow-step *::after {
     animation: none !important;
   }
 }

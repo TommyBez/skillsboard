@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react"
 import { GitForkIcon, SearchIcon, StarIcon } from "lucide-react"
 
-import styles from "@/components/landing/styles/hero.module.css"
 
 /**
  * Decorative skill dossiers. Visual examples only — they mirror the real
@@ -108,10 +107,10 @@ function SourceRef({
   return (
     <span className={className}>
       <GitForkIcon className={iconClassName} aria-hidden="true" />
-      <span className={styles.sourceText}>
-        <span className={styles.sourceOwner}>{dossier.owner}</span>
-        <span className={styles.sourceSlash}>/</span>
-        <span className={styles.sourceRepo}>{dossier.repo}</span>
+      <span className="min-w-0 truncate">
+        <span className="lp-hero-source-owner">{dossier.owner}</span>
+        <span className="lp-hero-source-slash">/</span>
+        <span className="lp-hero-source-repo">{dossier.repo}</span>
       </span>
     </span>
   )
@@ -122,10 +121,10 @@ function SourceRef({
    numbering system saying nothing the row's own position does not. */
 function DossierRow({ dossier }: { dossier: Dossier }) {
   return (
-    <div className={styles.dossierRow}>
-      <span className={styles.dossierName}>{dossier.name}</span>
-      <span className={styles.dossierStars}>
-        <StarIcon className={styles.dossierStar} aria-hidden="true" />
+    <div className="lp-hero-dossier-row">
+      <span className="lp-hero-dossier-name">{dossier.name}</span>
+      <span className="lp-hero-dossier-stars">
+        <StarIcon className="size-[0.65rem] fill-current opacity-80" aria-hidden="true" />
         {dossier.stars}
       </span>
     </div>
@@ -134,18 +133,18 @@ function DossierRow({ dossier }: { dossier: Dossier }) {
 
 function DossierCard({ dossier }: { dossier: Dossier }) {
   return (
-    <div className={styles.dossier}>
+    <div className="lp-hero-dossier">
       <DossierRow dossier={dossier} />
-      <div className={styles.dossierBody}>
+      <div className="lp-hero-dossier-body">
         <SourceRef
           dossier={dossier}
-          className={styles.dossierSource}
-          iconClassName={styles.dossierFork}
+          className="lp-hero-dossier-source"
+          iconClassName="lp-hero-dossier-fork"
         />
-        <p className={styles.dossierDesc}>{dossier.description}</p>
-        <div className={styles.dossierTags}>
+        <p className="lp-hero-dossier-desc">{dossier.description}</p>
+        <div className="flex flex-nowrap gap-[0.28rem] overflow-hidden">
           {dossier.tags.map((tag) => (
-            <span key={tag} className={styles.dossierTag}>
+            <span key={tag} className="lp-hero-dossier-tag">
               {tag}
             </span>
           ))}
@@ -162,20 +161,20 @@ function DossierCard({ dossier }: { dossier: Dossier }) {
    340px column. */
 function LibraryHead() {
   return (
-    <div className={styles.libraryHead}>
-      <span className={styles.libraryDot} />
-      <span className={styles.libraryLabel}>Team library</span>
-      <span className={styles.libraryScan} />
+    <div className="lp-hero-library-head">
+      <span className="lp-hero-library-dot" />
+      <span className="lp-hero-library-label">Team library</span>
+      <span className="lp-hero-library-scan" />
     </div>
   )
 }
 
 function LibraryFilter() {
   return (
-    <div className={styles.libraryFilter}>
-      <SearchIcon className={styles.libraryFilterIcon} aria-hidden="true" />
-      <span className={styles.libraryFilterText}>Filter 5 skills</span>
-      <span className={styles.libraryKbd}>⌘K</span>
+    <div className="lp-hero-library-filter">
+      <SearchIcon className="size-3 shrink-0 opacity-75" aria-hidden="true" />
+      <span className="min-w-0 flex-1 truncate">Filter 5 skills</span>
+      <span className="lp-hero-library-kbd">⌘K</span>
     </div>
   )
 }
@@ -186,7 +185,7 @@ function LibraryFilter() {
    sources count is the one fact the head does not already state. */
 function LibraryFoot() {
   return (
-    <div className={styles.libraryFoot}>
+    <div className="lp-hero-library-foot">
       <span>5 sources</span>
     </div>
   )
@@ -198,28 +197,28 @@ export function HeroBoard() {
       {/* Desktop / large tablet: a composed scatter of dossiers that files,
           card by card, into the team library panel across the sticky runway.
           Hovering a filed row pulls its full dossier back out of the drawer. */}
-      <div className={styles.heroBoard} data-hero-board aria-hidden="true">
-        <div className={styles.heroCards}>
-          <div className={styles.libraryFrame}>
+      <div className="lp-hero-board" data-hero-board aria-hidden="true">
+        <div className="lp-hero-cards">
+          <div className="lp-hero-library-frame">
             <LibraryHead />
             <LibraryFilter />
-            <div className={styles.libraryRows} />
+            <div className="lp-hero-library-rows" />
             <LibraryFoot />
           </div>
 
-          <div className={styles.libraryFeed}>
+          <div className="lp-hero-library-feed">
             {dossiers.map((dossier, i) => (
               <div
                 key={dossier.name}
-                className={styles.libraryFeedRow}
+                className="lp-hero-library-feed-row"
                 data-slot={i + 1}
               >
                 <SourceRef
                   dossier={dossier}
-                  className={styles.libraryFeedLabel}
-                  iconClassName={styles.libraryFeedIcon}
+                  className="lp-hero-library-feed-label"
+                  iconClassName="lp-hero-library-feed-icon"
                 />
-                <span className={styles.libraryFeedLine} />
+                <span className="lp-hero-library-feed-line" />
               </div>
             ))}
           </div>
@@ -227,18 +226,18 @@ export function HeroBoard() {
           {dossiers.map((dossier, i) => (
             <div
               key={dossier.name}
-              className={styles.dossierSlot}
+              className="lp-hero-dossier-slot"
               data-slot={i + 1}
             >
-              <div className={styles.dossierEnter}>
+              <div className="lp-hero-dossier-enter">
                 <div
-                  className={styles.dossierParallax}
+                  className="lp-hero-dossier-parallax"
                   style={{ "--depth": dossier.depth } as CSSProperties}
                 >
                   <DossierCard dossier={dossier} />
-                  <div className={styles.dossierPeek}>
+                  <div className="lp-hero-dossier-peek">
                     <DossierCard dossier={dossier} />
-                    <span className={styles.dossierLeader} />
+                    <span className="lp-hero-dossier-leader" />
                   </div>
                 </div>
               </div>
@@ -249,32 +248,32 @@ export function HeroBoard() {
 
       {/* Small screens: the same story, told as a static before / after.
           All five dossiers appear in both halves, in the same order. */}
-      <div className={styles.heroBoardMobile} aria-hidden="true">
-        <p className={styles.mobileMark}>Scattered</p>
-        <div className={styles.mobileChaos}>
+      <div className="lp-hero-board-mobile" aria-hidden="true">
+        <p className="lp-hero-mobile-mark">Scattered</p>
+        <div className="mt-[0.9rem] flex flex-col gap-[0.55rem]">
           {dossiers.map((dossier) => (
-            <div key={dossier.name} className={styles.mobileChaosCard}>
+            <div key={dossier.name} className="lp-hero-mobile-chaos-card">
               <DossierCard dossier={dossier} />
             </div>
           ))}
         </div>
 
-        <div className={styles.mobileArrow}>
-          <span className={styles.mobileArrowLine} />
+        <div className="mt-[1.35rem] mb-[1.1rem] flex justify-center">
+          <span className="lp-hero-mobile-arrow-line" />
         </div>
 
-        <p className={`${styles.mobileMark} ${styles.mobileMarkFiled}`}>Filed</p>
-        <div className={styles.mobileLibrary}>
+        <p className="lp-hero-mobile-mark lp-hero-mobile-mark-filed">Filed</p>
+        <div className="lp-hero-mobile-library">
           <LibraryHead />
-          <div className={styles.mobileFilter}>
+          <div className="lp-hero-mobile-filter">
             <LibraryFilter />
           </div>
-          <div className={styles.mobileRows}>
+          <div className="px-3 pb-1">
             {dossiers.map((dossier) => (
-              <div key={dossier.name} className={styles.mobileRow}>
-                <span className={styles.dossierName}>{dossier.name}</span>
-                <span className={styles.dossierStars}>
-                  <StarIcon className={styles.dossierStar} aria-hidden="true" />
+              <div key={dossier.name} className="lp-hero-mobile-row">
+                <span className="lp-hero-dossier-name">{dossier.name}</span>
+                <span className="lp-hero-dossier-stars">
+                  <StarIcon className="size-[0.65rem] fill-current opacity-80" aria-hidden="true" />
                   {dossier.stars}
                 </span>
               </div>

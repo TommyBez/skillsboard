@@ -4,7 +4,6 @@ import {
   LandingFooter,
   LandingHeader,
 } from "@/components/landing/sections/landing-chrome"
-import base from "@/components/landing/styles/base.module.css"
 
 /**
  * The landing surface's frame: motion root, command strip, footer.
@@ -18,7 +17,7 @@ export default function LandingLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <div
-      className={`${base.root} min-h-[100dvh] overflow-x-clip bg-background text-foreground`}
+      className="lp-root relative min-h-[100dvh] overflow-x-clip bg-background text-foreground"
       data-landing-motion-root
     >
       <LandingMotionController />
