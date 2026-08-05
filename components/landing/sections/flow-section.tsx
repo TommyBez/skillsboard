@@ -49,6 +49,7 @@ export function FlowSection() {
       <div
         className="relative mx-auto w-full max-w-[1440px] px-5 pt-16 md:px-10 md:pt-24"
         data-motion-group="flow"
+        data-motion-state="pending"
       >
         <div className={styles.flowHead}>
           <div className={styles.flowMarkRow}>

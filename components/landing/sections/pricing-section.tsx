@@ -34,6 +34,7 @@ export function PricingSection() {
       aria-labelledby="pricing-heading"
       className={`${styles.pricingSection} scroll-mt-14`}
       data-motion-group="pricing"
+      data-motion-state="pending"
       data-chapter-target="pricing"
       data-scroll-chapter="pricing"
     >

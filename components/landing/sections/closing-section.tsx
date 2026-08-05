@@ -11,6 +11,7 @@ export function ClosingSection() {
       id="start"
       className={`${base.grain} ${styles.closing} scroll-mt-14`}
       data-motion-group="closing"
+      data-motion-state="pending"
       data-chapter-target="start"
     >
       <span className={styles.closingField} aria-hidden="true" />

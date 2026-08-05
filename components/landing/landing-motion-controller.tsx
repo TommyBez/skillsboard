@@ -250,13 +250,13 @@ export function LandingMotionController() {
     }
 
     if (!reducedMotion && "IntersectionObserver" in window) {
+      // Groups render `data-motion-state="pending"` from the server, so
+      // hydration always matches; the pending styles stay inert until
+      // `data-motion-enabled` is set on the root above. Here we only flip
+      // groups to "visible" once they enter the viewport.
       const groups = Array.from(
         root.querySelectorAll<HTMLElement>("[data-motion-group]")
       )
-
-      groups.forEach((group) => {
-        group.dataset.motionState = "pending"
-      })
 
       const observer = new IntersectionObserver(
         (entries) => {
@@ -293,7 +293,9 @@ export function LandingMotionController() {
       groups.forEach((group) => observer.observe(group))
       cleanups.push(() => {
         observer.disconnect()
-        groups.forEach((group) => group.removeAttribute("data-motion-state"))
+        groups.forEach((group) => {
+          group.dataset.motionState = "pending"
+        })
       })
 
       // Pointer parallax on the hero board: a few pixels of depth at most,

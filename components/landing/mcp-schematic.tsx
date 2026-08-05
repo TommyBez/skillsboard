@@ -58,6 +58,7 @@ export function McpSchematic() {
       className={styles.schematic}
       aria-label="Skills Board connects a shared team library to an MCP-compatible agent"
       data-motion-group="mcp"
+      data-motion-state="pending"
     >
       <div className={styles.schematicGrid}>
         <div className={styles.libCol}>

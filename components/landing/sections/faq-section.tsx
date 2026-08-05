@@ -11,7 +11,11 @@ export function FaqSection() {
       className={`${styles.faqSection} scroll-mt-14`}
       data-chapter-target="faq"
     >
-      <div className={styles.faqInner} data-motion-group="faq">
+      <div
+        className={styles.faqInner}
+        data-motion-group="faq"
+        data-motion-state="pending"
+      >
         {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). */}
         <p className={styles.faqStrip} aria-hidden="true">
           <DecodeText className={styles.faqStripNum} text="05" />
