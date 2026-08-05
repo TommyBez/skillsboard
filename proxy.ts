@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
-
 import { resolveSignedInSignUpRedirect } from "@/lib/auth-entry-redirect"
 
 function isProtectedPath(pathname: string) {
