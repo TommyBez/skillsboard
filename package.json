@@ -88,7 +88,7 @@
     "postcss": "^8.5",
     "react-email": "^6.9.0",
     "tailwindcss": "^4.2.0",
-    "typescript": "5.7.3"
+    "typescript": "7.0.2"
   },
   "pnpm": {
     "overrides": {
