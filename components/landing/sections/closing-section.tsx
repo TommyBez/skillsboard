@@ -1,4 +1,5 @@
 import { ClosingPlate } from "@/components/landing/closing/closing-plate"
+import { DecodeText } from "@/components/landing/decode-text"
 import { HomeFinalActions } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
 import styles from "@/components/landing/styles/closing.module.css"
@@ -22,7 +23,7 @@ export function ClosingSection() {
             mono voice, size and measure rule as every other chapter mark. */}
         <p className={`${base.chapterMark} ${styles.closingMark} uppercase`}>
           <span className={styles.closingMarkIndex}>
-            <span data-decode="">06</span>
+            <DecodeText text="06" />
             <span className={styles.closingMarkSep} aria-hidden="true">
               ·
             </span>

@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react"
 
+import { DecodeText } from "@/components/landing/decode-text"
 import styles from "@/components/landing/styles/pricing.module.css"
 
 /** The three absences, kept verbatim — ruled as a spec ledger. */
@@ -39,9 +40,11 @@ export function PricingSection() {
       <div className={styles.sticky}>
         <div className={styles.frame}>
           <div className={styles.plate}>
-            <span className={styles.indexNum} aria-hidden="true" data-decode="">
-              04
-            </span>
+            <DecodeText
+              className={styles.indexNum}
+              aria-hidden="true"
+              text="04"
+            />
             <span className={styles.indexName} aria-hidden="true">
               Pricing
             </span>

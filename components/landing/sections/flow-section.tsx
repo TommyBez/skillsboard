@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react"
 
+import { DecodeText } from "@/components/landing/decode-text"
 import {
   PasteResolveVisual,
   RouteFanVisual,
@@ -57,15 +58,14 @@ export function FlowSection() {
             {/* The chapter head is the same object the three columns close
                 with: caption, hairline, measured value. Top and bottom of the
                 chapter now rhyme instead of the top being bare text. The value
-                sits outside the decoded label — `data-decode` rewrites that
-                element's text, so anything nested inside it is destroyed. */}
+                sits outside the decoded label — DecodeText rewrites its own
+                text, so anything nested inside it would be destroyed. */}
             <div className={styles.flowMarkLine}>
-              <p
+              <DecodeText
+                as="p"
                 className={`${base.chapterMark} ${styles.flowMark} uppercase`}
-                data-decode=""
-              >
-                How it works
-              </p>
+                text="How it works"
+              />
               <span className={styles.flowMarkVal} aria-hidden="true">
                 3 steps
               </span>

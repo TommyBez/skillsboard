@@ -1,3 +1,4 @@
+import { DecodeText } from "@/components/landing/decode-text"
 import { HeroBoard } from "@/components/landing/hero-board"
 import { HomeHeroActions } from "@/components/landing/landing-ctas"
 import base from "@/components/landing/styles/base.module.css"
@@ -52,9 +53,11 @@ export function HeroSection() {
             <span className={styles.heroIndex} aria-hidden="true">
               01
             </span>
-            <p className={styles.heroEyebrow} data-decode="">
-              Skills selected by your team
-            </p>
+            <DecodeText
+              as="p"
+              className={styles.heroEyebrow}
+              text="Skills selected by your team"
+            />
             <span className={styles.heroTopRule} aria-hidden="true" />
           </div>
 

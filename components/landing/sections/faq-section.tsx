@@ -1,3 +1,4 @@
+import { DecodeText } from "@/components/landing/decode-text"
 import styles from "@/components/landing/styles/faq.module.css"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 
@@ -13,9 +14,7 @@ export function FaqSection() {
       <div className={styles.faqInner} data-motion-group="faq">
         {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). */}
         <p className={styles.faqStrip} aria-hidden="true">
-          <span className={styles.faqStripNum} data-decode="">
-            05
-          </span>
+          <DecodeText className={styles.faqStripNum} text="05" />
           <span className={styles.faqStripHair} />
           <span className={styles.faqStripName}>FAQ</span>
           <span className={styles.faqStripHair} data-flex="" />

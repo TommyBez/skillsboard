@@ -1,5 +1,6 @@
 import { ShieldCheckIcon } from "lucide-react"
 
+import { DecodeText } from "@/components/landing/decode-text"
 import { HomeMcpActions } from "@/components/landing/landing-ctas"
 import { McpSchematic } from "@/components/landing/mcp-schematic"
 import base from "@/components/landing/styles/base.module.css"
@@ -21,12 +22,11 @@ export function McpSection() {
             <span className={styles.frameIndex} aria-hidden="true">
               03
             </span>
-            <p
+            <DecodeText
+              as="p"
               className={`${base.chapterMark} ${styles.frameMark} uppercase`}
-              data-decode=""
-            >
-              MCP access
-            </p>
+              text="MCP access"
+            />
             <p className={styles.readout} aria-hidden="true">
               <span className={styles.readoutKey}>signal</span>
               <span className={styles.readoutSep} />
