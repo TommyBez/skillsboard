@@ -23,8 +23,7 @@ type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing
  * else — which made the header and every inline CTA an async, session-reading
  * render behind a skeleton. These are acquisition pages; the invitation is the
  * same for every reader, and a signed-in one who takes it lands in their
- * library regardless. `visitor_state` is fixed at "anonymous" for the same
- * reason: it now describes the action offered, not who is looking at it.
+ * library regardless.
  */
 const ctaHref = "/sign-up" as const
 
@@ -40,7 +39,6 @@ function ctaProperties(
   return {
     destination: ctaHref,
     location,
-    visitor_state: "anonymous",
   }
 }
 

@@ -20,12 +20,21 @@ type NonTeamEventPropertiesMap = {
       | "guide_closing"
       | "resources_header"
       | "resources_closing"
-    visitor_state: "anonymous" | "signed_in"
   }
+  /**
+   * No `visitor_state` on either event, for the same reason there is no
+   * `landing_path`: nothing left produces it honestly. The marketing surfaces
+   * no longer read the session, so they could only ever assert "anonymous" —
+   * a claim about the action offered, not about who clicked, which would
+   * misfile every signed-in visitor. The four app-side producers hardcode
+   * "signed_in", which `location` already implies: `account_menu`,
+   * `app_navigation`, and `library_header` exist only behind auth. A property
+   * that is either constant or fabricated at every call site is worse than
+   * absent — it reads as measured.
+   */
   mcp_entry_clicked: {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
     location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
-    visitor_state: "anonymous" | "signed_in"
   }
   mcp_setup_viewed: Record<never, never>
   mcp_client_selected: {

@@ -26,19 +26,12 @@ export const primaryAction = {
   label: "Create your team library",
 } as const
 
-/**
- * `visitor_state` is fixed at "anonymous" because the CTA no longer reads the
- * session — it is a property of the action offered, not a claim about who is
- * looking at it. Signed-in traffic is still distinguishable downstream by the
- * identified person on the event.
- */
 export function primaryCtaEventProperties(
   location: CtaLocation,
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   return {
     destination: primaryAction.href,
     location,
-    visitor_state: "anonymous",
   }
 }
 
@@ -133,7 +126,7 @@ export function HomeHeroActions() {
             href="#mcp"
             analytics={{
               event: "mcp_entry_clicked",
-              properties: mcpEntryEventProperties(false, "landing_hero", "#mcp"),
+              properties: mcpEntryEventProperties("landing_hero", "#mcp"),
             }}
           />
         )}
@@ -158,7 +151,6 @@ export function HomeMcpActions() {
             analytics={{
               event: "mcp_entry_clicked",
               properties: mcpEntryEventProperties(
-                false,
                 "landing_section",
                 primaryAction.href,
               ),
