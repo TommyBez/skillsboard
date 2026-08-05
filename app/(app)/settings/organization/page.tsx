@@ -13,6 +13,10 @@ import { getAppContext } from "@/lib/app-context"
 import { db } from "@/lib/db"
 import { member, user } from "@/lib/db/schema"
 
+// TODO: Cache Components adoption. Refactor this route so this opt-out can be removed.
+// See: https://nextjs.org/docs/app/guides/migrating-to-cache-components
+export const instant = false;
+
 const getOrganizationDetails = cache(async () => {
   const { organizations, activeId } = await getAppContext()
   const activeOrganization = organizations.find((organization) => organization.id === activeId) ?? organizations[0]
