@@ -81,7 +81,9 @@ export function HomeHeaderActions() {
             />
           )}
         >
-          <span className="sm:hidden">Start</span>
+          {/* "Sign up", not "Start": Lighthouse flags "Start" as
+              non-descriptive link text, and it names the destination. */}
+          <span className="sm:hidden">Sign up</span>
           <span className="hidden sm:inline">{primaryAction.label}</span>
           <ArrowRightIcon
             className="lp-cta-arrow hidden sm:block"

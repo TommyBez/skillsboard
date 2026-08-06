@@ -1,37 +1,13 @@
-import posthog from "posthog-js"
+import { posthogReady } from "@/lib/posthog-client"
 
-import {
-  sanitizeAnalyticsUrl,
-  sanitizePostHogUrlProperties,
-} from "@/lib/analytics-url-privacy"
-
-const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN
-if (token) {
-  posthog.init(token, {
-    api_host: "/ingest",
-    ui_host: "https://eu.posthog.com",
-    before_send: (capture) => {
-      if (!capture) return null
-
-      return {
-        ...capture,
-        properties: sanitizePostHogUrlProperties(capture.properties),
-        $set: sanitizePostHogUrlProperties(capture.$set),
-        $set_once: sanitizePostHogUrlProperties(capture.$set_once),
-      }
-    },
-    capture_pageview: "history_change",
-    defaults: "2026-01-30",
-    capture_exceptions: true,
-    debug: process.env.NODE_ENV === "development",
-    respect_dnt: true,
-    session_recording: {
-      maskCapturedNetworkRequestFn: (request) => ({
-        ...request,
-        name: sanitizeAnalyticsUrl(request.name),
-      }),
-      recordBody: false,
-      recordHeaders: false,
-    },
-  })
+// Kick off the lazy load once the browser is idle; see lib/posthog-client.ts
+// for why posthog-js is no longer part of the entry bundle. Starting at idle
+// rather than at hydration keeps the ~70 kB fetch and its evaluation out of
+// the critical first-paint window on slow connections. Captures fired before
+// init resolves are queued by the promise chain, so nothing is dropped — the
+// initial pageview is still captured at init, a beat later than before.
+if (typeof window.requestIdleCallback === "function") {
+  window.requestIdleCallback(() => void posthogReady(), { timeout: 2000 })
+} else {
+  window.setTimeout(() => void posthogReady(), 800)
 }

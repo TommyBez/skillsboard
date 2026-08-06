@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react"
 
+import { DecodeText } from "@/components/landing/decode-text"
 import {
   PasteResolveVisual,
   RouteFanVisual,
@@ -47,6 +48,7 @@ export function FlowSection() {
       <div
         className="relative mx-auto w-full max-w-[1440px] px-5 pt-16 md:px-10 md:pt-24"
         data-motion-group="flow"
+        data-motion-state="pending"
       >
         <div className="lp-flow-head">
           <div className="flex items-center gap-3">
@@ -56,15 +58,14 @@ export function FlowSection() {
             {/* The chapter head is the same object the three columns close
                 with: caption, hairline, measured value. Top and bottom of the
                 chapter now rhyme instead of the top being bare text. The value
-                sits outside the decoded label — `data-decode` rewrites that
-                element's text, so anything nested inside it is destroyed. */}
+               sits outside the decoded label — DecodeText rewrites its own
+               text, so anything nested inside it would be destroyed. */}
             <div className="flex min-w-0 flex-1 items-center">
-              <p
+              <DecodeText
+                as="p"
                 className={`${chapterMark} min-w-0 flex-1 uppercase`}
-                data-decode=""
-              >
-                How it works
-              </p>
+                text="How it works"
+              />
               <span className="lp-flow-mark-val" aria-hidden="true">
                 3 steps
               </span>

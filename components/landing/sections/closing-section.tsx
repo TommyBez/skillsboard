@@ -1,4 +1,5 @@
 import { ClosingPlate } from "@/components/landing/closing/closing-plate"
+import { DecodeText } from "@/components/landing/decode-text"
 import { HomeFinalActions } from "@/components/landing/landing-ctas"
 import { chapterMark } from "@/components/landing/styles"
 
@@ -9,6 +10,7 @@ export function ClosingSection() {
       id="start"
       className="lp-grain lp-closing relative scroll-mt-14"
       data-motion-group="closing"
+      data-motion-state="pending"
       data-chapter-target="start"
     >
       <span className="lp-closing-field" aria-hidden="true" />
@@ -21,7 +23,7 @@ export function ClosingSection() {
             mono voice, size and measure rule as every other chapter mark. */}
         <p className={`${chapterMark} lp-closing-mark uppercase`}>
           <span className="inline-flex items-center gap-[0.6rem] ml-[-0.65px]">
-            <span data-decode="">06</span>
+            <DecodeText text="06" />
             <span className="lp-closing-mark-sep" aria-hidden="true">
               ·
             </span>

@@ -5,21 +5,16 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ArrowRightIcon, Loader2Icon } from "lucide-react"
-import posthog from "posthog-js"
-
 import { saveSignupProductCommunicationsConsent } from "@/app/actions/email-preferences"
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import { posthogReady } from "@/lib/posthog-client"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
-import {
-  queueSignupEmailPreferenceFailure,
-  showSignupEmailPreferenceFailure,
-} from "@/components/email-preference-toast-bridge"
 import { PRODUCT_COMMUNICATIONS_DISCLOSURE } from "@/lib/email/product-communications"
 
 interface AuthFormProps {
@@ -161,7 +156,9 @@ export function AuthForm({
           : null
       const userId = user && "id" in user ? String(user.id) : null
       if (userId) {
-        posthog.identify(userId)
+        // Chained ahead of the captures below on the same promise, so the
+        // identify always lands before them.
+        void posthogReady().then((posthog) => posthog?.identify(userId))
       }
       // Both pages share signIn.emailOtp; emit based on whether the account was just created.
       if (isNewlyCreatedUser(user)) {
@@ -173,22 +170,21 @@ export function AuthForm({
         captureAnalyticsEvent("user_signed_in", { method: "email_otp" })
       }
 
-      let optionalPreferenceSaved = true
       if (isSignUp && productCommunications) {
         try {
-          const preferenceResult = await saveSignupProductCommunicationsConsent()
-          optionalPreferenceSaved = preferenceResult.saved
+          // Best-effort: the account is already created at this point, and a
+          // failed save simply leaves product emails off — the user can opt in
+          // anytime from /settings/email.
+          await saveSignupProductCommunicationsConsent()
         } catch {
-          optionalPreferenceSaved = false
+          // Swallow: signup must not report failure for an optional preference.
         }
       }
 
       if (continueHref) {
-        if (!optionalPreferenceSaved) queueSignupEmailPreferenceFailure()
         window.location.assign(continueHref)
         return
       }
-      if (!optionalPreferenceSaved) showSignupEmailPreferenceFailure()
       router.push(returnTo)
       router.refresh()
     } catch {

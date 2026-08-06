@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import typescript from "typescript"
+import { stripTypeScriptTypes } from "node:module"
 
 /**
  * The other unit tests transpile one self-contained file. This module composes
@@ -18,12 +18,7 @@ async function loadModule(repoPath) {
   if (cached) return cached
 
   const source = await readFile(new URL(`../${repoPath}.ts`, import.meta.url), "utf8")
-  const { outputText } = typescript.transpileModule(source, {
-    compilerOptions: {
-      module: typescript.ModuleKind.ES2022,
-      target: typescript.ScriptTarget.ES2022,
-    },
-  })
+  const outputText = stripTypeScriptTypes(source, { mode: "transform" })
 
   let resolved = outputText
   for (const [, specifier] of outputText.matchAll(/from ["']@\/([^"']+)["']/g)) {

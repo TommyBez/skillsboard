@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react"
 
+import { DecodeText } from "@/components/landing/decode-text"
+
 /** The three absences, kept verbatim — ruled as a spec ledger. */
 const ledger = ["No trial.", "No credit card.", "No paid tier."] as const
 
@@ -31,15 +33,18 @@ export function PricingSection() {
       aria-labelledby="pricing-heading"
       className="lp-pricing relative scroll-mt-14"
       data-motion-group="pricing"
+      data-motion-state="pending"
       data-chapter-target="pricing"
       data-scroll-chapter="pricing"
     >
       <div className="lp-pricing-stage relative flex items-center">
         <div className="mx-auto w-full max-w-[1440px] px-[var(--gutter)]">
           <div className="lp-pricing-plate">
-            <span className="lp-pricing-index-num" aria-hidden="true" data-decode="">
-              04
-            </span>
+            <DecodeText
+              className="lp-pricing-index-num"
+              aria-hidden="true"
+              text="04"
+            />
             <span className="lp-pricing-index-name" aria-hidden="true">
               Pricing
             </span>
