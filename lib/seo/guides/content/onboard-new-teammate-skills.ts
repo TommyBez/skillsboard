@@ -10,6 +10,11 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
     "AI coding tools",
     "mixed-agent teams",
   ],
+  relatedGuidePaths: [
+    guidePaths.shareTeamSkills,
+    guidePaths.chooseFirstTeamSkill,
+    guidePaths.manageCrossAgentSkills,
+  ],
   eyebrow: "New teammate handoff",
   title: "AI skills onboarding checklist for a new teammate",
   seoTitle: "AI Skills Onboarding Checklist for New Teammates | Skills Board",
@@ -17,6 +22,8 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
     "Use this AI skills onboarding checklist to help a new teammate find one team-recommended skill, choose a suitable path, and verify it on a real task.",
   intro:
     "Onboarding a new teammate to AI skills should not begin with a catalog tour or a folder of setup notes. Give them one real task, one recommendation the team already uses, and enough context to choose a suitable path. The handoff works when they can find, inspect, and use the skill without private guidance.",
+  answer:
+    "Onboard a new teammate to AI skills with one real task and one reviewed recommendation—not a catalog tour. Give them the canonical source, a supported access path, the expected result, and clear safety boundaries. The handoff works when they can complete it without private guidance.",
   corePrinciple:
     "Give one teammate one real task and let them complete the handoff themselves.",
   problem:
@@ -73,9 +80,9 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
       output: "An independently found recommendation with the relevant source and limits identified.",
     },
     {
-      title: "Let them choose and test a use path",
-      body: "The teammate chooses the original source, a compatible install command, the latest files as a ZIP, or authenticated MCP access when available for their setup. They run the same safe fixture and compare the result with the acceptance criteria.",
-      output: "One observed use path and a pass, partial, or fail result from the fixture.",
+      title: "Let them choose a path and test the skill",
+      body: "The teammate opens the original source, copies a compatible install command, or downloads the latest files as a ZIP. If their agent supports MCP, they can use it to find the same recommendation and retrieve the command. After setting up the skill outside Skills Board, they run the safe fixture and compare the result with the acceptance criteria.",
+      output: "One observed access and setup path, plus a pass, partial, or fail result from the fixture.",
     },
     {
       title: "Record the result and next step",
@@ -105,7 +112,7 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
     },
     {
       label: "Use path and fixture",
-      value: "The source, compatible command, ZIP, or MCP path chosen, plus the observed fixture result.",
+      value: "The source, compatible command, or ZIP path chosen; whether MCP helped find it; and the observed fixture result.",
     },
     {
       label: "Outcome and owner",
@@ -145,7 +152,8 @@ Handoff date: [date]
 - Latest-source behavior understood: [yes/no]
 
 ## 5. Use path and fixture
-- Path chosen: [source / compatible command / ZIP / MCP]
+- Path chosen: [source / compatible command / ZIP]
+- Found through MCP: [yes/no/not applicable]
 - Agent and environment: [observed setup]
 - Acceptance criteria: [pass conditions]
 - Result: [pass / partial / fail plus evidence]
@@ -220,5 +228,5 @@ Handoff date: [date]
   },
   ogAlt: "Skills Board guide: onboard a new teammate through one useful AI skill.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-07-29",
+  modifiedAt: "2026-08-06",
 }

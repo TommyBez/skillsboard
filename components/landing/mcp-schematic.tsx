@@ -1,5 +1,5 @@
 
-/** The three tools this chapter promises, with the real MCP tool they map to. */
+/** Three representative tools, with the real MCP tool each action maps to. */
 const mcpTools = [
   {
     name: "Search team skills",
@@ -8,7 +8,7 @@ const mcpTools = [
     ret: "\u2192 skill[]",
   },
   {
-    name: "Find saved recommendations",
+    name: "Search team collections",
     tool: "search_collections",
     arg: "(query: string)",
     ret: "\u2192 collection[]",
@@ -183,8 +183,9 @@ export function McpSchematic() {
 
       <figcaption className="lp-mcp-schema-caption">
         <span className="lp-mcp-schema-caption-text text-pretty">
-          Choose Claude, Cursor, VS Code, or another MCP-compatible client. The
-          same library remains available in Skills Board.
+          Representative actions are shown here. Choose Claude, Cursor, VS Code,
+          or another MCP-compatible client; the same library remains available
+          in Skills Board.
         </span>
       </figcaption>
     </figure>

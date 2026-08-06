@@ -4,10 +4,29 @@ import Link from "next/link"
 import { LegalPageShell } from "@/components/legal-page-shell"
 import { siteConfig } from "@/lib/site"
 
+const description = "How Skills Board collects, uses, shares, and protects personal data."
+const socialTitle = "Privacy Policy | Skills Board"
+const socialImageAlt = "Skills Board: Your team’s skills. All in one place."
+
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How Skills Board collects, uses, shares, and protects personal data.",
+  description,
   alternates: { canonical: "/privacy" },
+  openGraph: {
+    type: "website",
+    url: "/privacy",
+    title: socialTitle,
+    description,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    images: [{ url: "/opengraph-image", alt: socialImageAlt }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: socialTitle,
+    description,
+    images: [{ url: "/twitter-image", alt: socialImageAlt }],
+  },
 }
 
 export default function PrivacyPage() {

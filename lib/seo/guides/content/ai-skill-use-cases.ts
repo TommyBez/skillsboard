@@ -4,6 +4,11 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
   path: guidePaths.aiSkillUseCases,
   contentType: "guide",
   topics: ["AI agent skills", "team workflows", "use cases", "team operations", "AI coding tools"],
+  relatedGuidePaths: [
+    guidePaths.chooseFirstTeamSkill,
+    guidePaths.shareTeamSkills,
+    guidePaths.aiCodingGuidelinesTemplate,
+  ],
   eyebrow: "Team skill use cases",
   title: "AI agent skill use cases for teams: 8 repeatable workflows",
   seoTitle: "AI Agent Skill Use Cases for Teams | Skills Board",
@@ -11,6 +16,8 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
     "Explore eight practical AI agent skill use cases for teams, with clear triggers, safe inputs, reviewable outputs, human checks, and stop boundaries.",
   intro:
     "The most useful agent skills do not start as clever prompts. They start as recurring team workflows with recognizable inputs, a result someone can review, and enough stable guidance to help a second person repeat the work. These eight use cases show what that pattern looks like across engineering, product, research, design, and go-to-market work.",
+  answer:
+    "A strong AI agent skill captures a repeatable procedure with known inputs and a reviewable output. Good team use cases include pull-request preflight, release notes, bug triage, research synthesis, feedback triage, specification review, design and accessibility review, and launch QA. Keep accountable decisions human.",
   corePrinciple:
     "A skill-worthy use case repeats, starts from known inputs, and ends in a reviewable result.",
   problem:
@@ -214,5 +221,5 @@ Review date: [date]
   },
   ogAlt: "Skills Board guide: eight repeatable AI agent skill use cases for teams.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-07-29",
+  modifiedAt: "2026-08-06",
 }

@@ -9,6 +9,11 @@ export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
     "team operations",
     "agent instructions",
   ],
+  relatedGuidePaths: [
+    guidePaths.aiCodingTeamOnboarding,
+    guidePaths.aiSkillUseCases,
+    guidePaths.manageCrossAgentSkills,
+  ],
   eyebrow: "AI coding standards",
   title: "AI coding guidelines template for engineering teams",
   seoTitle: "AI Coding Guidelines Template for Teams | Skills Board",
@@ -16,6 +21,8 @@ export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
     "Use this AI coding guidelines template to define allowed work, trusted context, verification, human handoffs, and ownership for a team using coding agents.",
   intro:
     "A useful AI coding policy should make everyday engineering decisions easier. It should tell people and agents which work is appropriate, which context is authoritative, how output is verified, and when a human must take over. This template gives a small team a practical starting point without pretending one file can replace security, privacy, or legal review.",
+  answer:
+    "Effective AI coding guidelines separate short, universal boundaries from repository context and task-specific playbooks. Define permitted work, authoritative context, verification, human handoffs, and ownership. Then test the guidance on real work; one policy file cannot replace security or review.",
   corePrinciple:
     "Keep universal rules short. Put detailed procedures in focused, testable playbooks.",
   problem:
@@ -225,5 +232,5 @@ permissions, regulation, or repeated failure] changes.`,
   },
   ogAlt: "Skills Board guide: AI coding guidelines template for engineering teams.",
   publishedAt: "2026-07-27",
-  modifiedAt: "2026-07-27",
+  modifiedAt: "2026-08-06",
 }

@@ -3,6 +3,10 @@ import type { Metadata } from "next"
 
 import { AccessShell } from "@/components/access-shell"
 import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
+import { siteConfig } from "@/lib/site"
+
+const socialDescription =
+  "Start a shared skill library for your team. Free forever, open source, built for mixed agent setups."
 
 export const metadata: Metadata = {
   title: "Create your team library",
@@ -10,10 +14,17 @@ export const metadata: Metadata = {
     "Create a free Skills Board account and start a shared library of AI skills your team recommends.",
   alternates: { canonical: "/sign-up" },
   openGraph: {
+    type: "website",
     url: "/sign-up",
     title: "Create your team library | Skills Board",
-    description:
-      "Start a shared skill library for your team. Free forever, open source, built for mixed agent setups.",
+    description: socialDescription,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Create your team library | Skills Board",
+    description: socialDescription,
   },
 }
 

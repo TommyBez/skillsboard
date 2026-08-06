@@ -9,6 +9,13 @@ import { buildGuideSchema } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
+const guideDateFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+  year: "numeric",
+})
+
 const chapters = [
   { href: "#decision", label: "Choose a model" },
   { href: "#workflow", label: "Run the workflow" },
@@ -16,6 +23,10 @@ const chapters = [
   { href: "#pitfalls", label: "Avoid pitfalls" },
   { href: "#checklist", label: "Use the checklist" },
 ] as const
+
+function formatGuideDate(value: string) {
+  return guideDateFormatter.format(new Date(`${value}T00:00:00Z`))
+}
 
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
@@ -52,6 +63,28 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-7 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
                 {guide.intro}
               </p>
+              <dl className="mt-8 flex flex-wrap gap-x-6 gap-y-3 border-t border-border/70 pt-5 text-sm text-muted-foreground">
+                <div className="flex gap-2">
+                  <dt className="font-semibold text-foreground">Publisher</dt>
+                  <dd>
+                    <Link href="/" className="underline decoration-border underline-offset-4 hover:text-foreground">
+                      Skills Board
+                    </Link>
+                  </dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-semibold text-foreground">Published</dt>
+                  <dd>
+                    <time dateTime={guide.publishedAt}>{formatGuideDate(guide.publishedAt)}</time>
+                  </dd>
+                </div>
+                <div className="flex gap-2">
+                  <dt className="font-semibold text-foreground">Updated</dt>
+                  <dd>
+                    <time dateTime={guide.modifiedAt}>{formatGuideDate(guide.modifiedAt)}</time>
+                  </dd>
+                </div>
+              </dl>
             </div>
             <div className="border-l-2 border-primary pl-5">
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
@@ -74,7 +107,19 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
           </aside>
 
           <div id="guide-content" className="min-w-0 max-w-4xl">
-            <section aria-labelledby="problem-heading">
+            <section
+              aria-labelledby="answer-heading"
+              className="rounded-[3px] border border-primary/30 bg-primary/5 p-6 md:p-8"
+            >
+              <h2 id="answer-heading" className="text-2xl font-semibold tracking-tight md:text-3xl">
+                Quick answer
+              </h2>
+              <p className="mt-4 text-pretty text-lg leading-relaxed">
+                {guide.answer}
+              </p>
+            </section>
+
+            <section aria-labelledby="problem-heading" className="pt-16">
               <h2 id="problem-heading" className="text-3xl font-semibold tracking-tight md:text-4xl">
                 The problem behind the query
               </h2>
@@ -264,7 +309,9 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 Primary sources
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                Product behavior changes. Use these official sources to verify current agent-specific setup before rollout.
+                <span className="font-semibold text-foreground">Editorial method:</span>{" "}
+                Skills Board synthesizes the first-party and standards sources cited below into a practical
+                workflow. Product behavior can change, so verify the linked sources before rollout.
               </p>
               <ul className="mt-6 space-y-4">
                 {guide.sources.map((source) => (

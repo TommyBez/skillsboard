@@ -3,10 +3,29 @@ import type { Metadata } from "next"
 import { LegalPageShell } from "@/components/legal-page-shell"
 import { siteConfig } from "@/lib/site"
 
+const description = "Terms that apply when you use the hosted Skills Board service."
+const socialTitle = "Terms of Service | Skills Board"
+const socialImageAlt = "Skills Board: Your team’s skills. All in one place."
+
 export const metadata: Metadata = {
   title: "Terms of Service",
-  description: "Terms that apply when you use the hosted Skills Board service.",
+  description,
   alternates: { canonical: "/terms" },
+  openGraph: {
+    type: "website",
+    url: "/terms",
+    title: socialTitle,
+    description,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    images: [{ url: "/opengraph-image", alt: socialImageAlt }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: socialTitle,
+    description,
+    images: [{ url: "/twitter-image", alt: socialImageAlt }],
+  },
 }
 
 export default function TermsPage() {

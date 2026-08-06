@@ -4,6 +4,11 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
   path: guidePaths.aiCodingTeamOnboarding,
   contentType: "guide",
   topics: ["team onboarding", "AI coding tools", "workflow standardization", "mixed-agent teams"],
+  relatedGuidePaths: [
+    guidePaths.aiCodingGuidelinesTemplate,
+    guidePaths.aiSkillUseCases,
+    guidePaths.onboardNewTeammateSkills,
+  ],
   eyebrow: "AI coding operations",
   title: "How to onboard your engineering team to AI coding tools",
   seoTitle: "AI Coding Team Onboarding Guide | Skills Board",
@@ -11,6 +16,8 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
     "A practical AI coding team onboarding plan: choose one workflow, provide trusted context, set review gates, and measure adoption before expanding tool access.",
   intro:
     "Buying seats is not an onboarding strategy. Teams adopt AI coding tools when they can use them on a real task, with trusted context, clear review boundaries, and a visible definition of success. This guide turns an individual experiment into a repeatable team rollout.",
+  answer:
+    "Onboard an engineering team to AI coding tools around one recurring, reviewable workflow—not a feature tour. Give the pilot trusted context, explicit review gates, a shared fixture, and a clear definition of success. Expand only after a second engineer can repeat the workflow.",
   corePrinciple:
     "Standardize one useful workflow before standardizing a tool.",
   problem:
@@ -147,5 +154,5 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: how to onboard an engineering team to AI coding tools.",
   publishedAt: "2026-07-27",
-  modifiedAt: "2026-07-27",
+  modifiedAt: "2026-08-06",
 }

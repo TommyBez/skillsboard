@@ -10,6 +10,7 @@ import {
   resourcePaths,
   resourceSections,
 } from "@/lib/seo/resources"
+import { siteConfig } from "@/lib/site"
 
 const description =
   "Explore practical resources for sharing, reviewing, and managing reusable AI skills across your team and agent workflows."
@@ -21,6 +22,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: resourcePaths.index,
+    title: "Skills Board Resources",
+    description,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
     title: "Skills Board Resources",
     description,
   },

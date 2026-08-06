@@ -17,7 +17,7 @@ export const landingFaqs = [
   {
     question: "What can my agent do through MCP?",
     answer:
-      "After you connect Skills Board, an MCP-compatible agent can list and search your team libraries, retrieve install commands for saved skills, browse the public catalog, and save new skills to a team library. The agent cannot edit or delete team skills.",
+      "After you connect Skills Board, an MCP-compatible agent can search team skills and collections, retrieve install commands, and discover public or repository skills. With the right scope, it can save new skills and organize collections. It cannot edit or delete saved skills, install them, or run them.",
   },
   {
     question: "Does every skill work with every agent?",
@@ -37,6 +37,6 @@ export const landingFaqs = [
   {
     question: "Will I get the exact version someone on my team used?",
     answer:
-      "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions, so teammates always work from the current source files.",
+      "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions, so the files available now may differ from the version a teammate used earlier.",
   },
 ] as const

@@ -131,8 +131,11 @@ export function ResourceShell({
 }) {
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-background text-foreground">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <ResourceHeader location={location} />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <ResourceFooter />
     </div>
   )

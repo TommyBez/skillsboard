@@ -23,9 +23,12 @@ export default function LandingLayout({
       <LandingMotionController />
       <ChapterRail />
 
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <LandingHeader />
 
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
 
       <LandingFooter />
     </div>

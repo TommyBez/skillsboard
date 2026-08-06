@@ -1,7 +1,25 @@
+import Link from "next/link"
+
 import { ClosingPlate } from "@/components/landing/closing/closing-plate"
 import { DecodeText } from "@/components/landing/decode-text"
 import { HomeFinalActions } from "@/components/landing/landing-ctas"
 import { chapterMark } from "@/components/landing/styles"
+import { guidePaths } from "@/lib/seo/guides/types"
+
+const startingGuides = [
+  {
+    href: guidePaths.sharedMcpSkillLibrary,
+    label: "Use the team library through MCP",
+  },
+  {
+    href: guidePaths.aiSkillUseCases,
+    label: "Explore repeatable skill use cases",
+  },
+  {
+    href: guidePaths.onboardNewTeammateSkills,
+    label: "Onboard a teammate with shared skills",
+  },
+] as const
 
 /** Closing — the final plate: everything indexed, one terminal action. */
 export function ClosingSection() {
@@ -45,6 +63,20 @@ export function ClosingSection() {
               Save the recommendation where the whole team can find it. The next
               person can get started without asking where to look.
             </p>
+            <nav
+              aria-label="Starting guides"
+              className="mt-7 flex max-w-2xl flex-wrap gap-x-6 gap-y-3 text-sm font-semibold"
+            >
+              {startingGuides.map((guide) => (
+                <Link
+                  key={guide.href}
+                  href={guide.href}
+                  className="underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+                >
+                  {guide.label}
+                </Link>
+              ))}
+            </nav>
           </div>
 
           <ClosingPlate />

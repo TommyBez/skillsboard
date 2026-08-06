@@ -16,11 +16,15 @@ const knownGuideSlugs = new Set<string>(
 
 /**
  * Matches on the slug segment alone, not the whole pathname. `/guides/[slug]`
- * has sibling metadata routes — `opengraph-image` and `twitter-image` — and
- * `skipTrailingSlashRedirect` leaves `/guides/<slug>/` intact, none of which
- * equal a bare guide path. Comparing full pathnames 404s all of them. Anything
- * under a known slug is handed to the router, which 404s unmatched sub-paths
- * on its own.
+ * has sibling metadata routes — `opengraph-image` and `twitter-image` — which
+ * do not equal a bare guide path, so comparing full pathnames 404s them.
+ * Anything under a known slug is handed to the router, which 404s unmatched
+ * sub-paths on its own.
+ *
+ * Trailing slashes never reach here: `redirects()` in `next.config.ts` runs
+ * before the proxy, so `/guides/<slug>/` is canonicalized with a 308 first.
+ * Verified against `next start` — an unknown slug with a trailing slash is
+ * 308 then 404.
  */
 function isUnknownGuidePath(pathname: string) {
   if (!pathname.startsWith(guidePrefix)) return false

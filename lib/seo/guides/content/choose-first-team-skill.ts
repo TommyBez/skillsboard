@@ -4,6 +4,11 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
   path: guidePaths.chooseFirstTeamSkill,
   contentType: "guide",
   topics: ["team operations", "skill selection", "AI agent skills", "team onboarding"],
+  relatedGuidePaths: [
+    guidePaths.aiSkillUseCases,
+    guidePaths.shareTeamSkills,
+    guidePaths.onboardNewTeammateSkills,
+  ],
   eyebrow: "First team skill",
   title: "How to choose the first AI agent skill for your team",
   seoTitle: "Choose Your Team’s First AI Agent Skill | Skills Board",
@@ -11,6 +16,8 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
     "Evaluate AI agent skills with a selection scorecard, source review, disqualifier check, and teammate test before your team recommends one.",
   intro:
     "The best first skill is not the most impressive one in a catalog. It is the smallest repeatable workflow your team can inspect, test, and hand to a second teammate with a clear expected result. This guide turns that choice into an observable team decision.",
+  answer:
+    "Choose your first AI agent skill around one repeated team problem. Compare a small set of inspectable candidates, reject unsafe or opaque options, and test the winner on a representative task. Recommend it only after a second teammate reproduces the result.",
   corePrinciple:
     "Choose the repeated problem first. Validate the skill with a second teammate.",
   problem:
@@ -218,5 +225,5 @@ Review again when: [source, agent, permissions, or workflow changes]`,
   },
   ogAlt: "Skills Board guide: choose the first AI agent skill for your team.",
   publishedAt: "2026-07-28",
-  modifiedAt: "2026-07-28",
+  modifiedAt: "2026-08-06",
 }

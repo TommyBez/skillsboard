@@ -20,6 +20,10 @@ export interface ResourceIndexEntry {
 /** Single registration point: guide modules feed the resources hub, related links, and sitemap. */
 export const resourceEntries = guides satisfies readonly ResourceIndexEntry[]
 
+const resourceEntriesByPath = new Map(
+  resourceEntries.map((entry) => [entry.path, entry]),
+)
+
 export const resourceSections = [
   {
     contentType: "guide",
@@ -42,9 +46,17 @@ export function getRelatedResources(
   limit = 3,
 ): readonly ResourceIndexEntry[] {
   const current = resourceEntries.find((entry) => entry.path === currentPath)
+  const curatedEntries = (current?.relatedGuidePaths ?? []).flatMap((path) => {
+    const entry = resourceEntriesByPath.get(path)
+    return entry ? [entry] : []
+  })
+  const curatedPaths = new Set(curatedEntries.map((entry) => entry.path))
 
-  return resourceEntries
-    .filter((entry) => entry.path !== currentPath)
+  const topicMatches = resourceEntries
+    .filter(
+      (entry) =>
+        entry.path !== currentPath && !curatedPaths.has(entry.path),
+    )
     .map((entry) => ({
       entry,
       sharedTopics: current
@@ -57,6 +69,7 @@ export function getRelatedResources(
         b.entry.modifiedAt.localeCompare(a.entry.modifiedAt) ||
         a.entry.title.localeCompare(b.entry.title),
     )
-    .slice(0, limit)
     .map(({ entry }) => entry)
+
+  return [...curatedEntries, ...topicMatches].slice(0, limit)
 }

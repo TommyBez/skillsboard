@@ -93,11 +93,17 @@ export function HeroSection() {
 
             <div className="lp-hero-lower lp-hero-exit">
               <p className="lp-hero-blurb">
-                Build a shared, searchable library so everyone knows which skills
-                to use and where to find them.
+                Skills Board is a shared AI skill library for teams. Keep every
+                recommendation searchable with its original source. Teammates can
+                open the source, copy a compatible install command, or download
+                the latest files as a ZIP. Connected agents can search the same
+                library through MCP.
               </p>
               <div className="lp-hero-cta">
                 <HomeHeroActions />
+                <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-muted-foreground">
+                  Free forever. No credit card.
+                </p>
               </div>
             </div>
 
