@@ -2,12 +2,11 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { stripTypeScriptTypes } from "node:module"
+import { transpileTs } from "./transpile-ts.mjs"
 
 async function transpiledModule(path) {
   const source = await readFile(new URL(path, import.meta.url), "utf8")
-  const outputText = stripTypeScriptTypes(source, { mode: "transform" })
-  return `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+  return `data:text/javascript;base64,${Buffer.from(transpileTs(source)).toString("base64")}`
 }
 
 const productModuleUrl = await transpiledModule("../lib/email/product-communications.ts")
@@ -201,7 +200,7 @@ test("unsubscribe tokens are encrypted, randomized, and contain no raw email add
     new URL("../lib/email/email-privacy.ts", import.meta.url),
     "utf8",
   )).replace('import "server-only"', "")
-  const outputText = stripTypeScriptTypes(privacySource, { mode: "transform" })
+  const outputText = transpileTs(privacySource)
   const privacyModuleUrl = `data:text/javascript;base64,${Buffer.from(
     outputText.replace('"@/lib/email/product-communications"', JSON.stringify(productModuleUrl)),
   ).toString("base64")}`

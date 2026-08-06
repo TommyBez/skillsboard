@@ -44,7 +44,7 @@ export function DecodeText({ as: Tag = "span", text, ...props }: DecodeTextProps
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting) continue
+          if (!entry.isIntersecting || entry.intersectionRatio < 0.5) continue
           observer.unobserve(entry.target)
           runDecode()
         }

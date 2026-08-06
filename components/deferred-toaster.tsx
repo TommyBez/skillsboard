@@ -19,9 +19,13 @@ export function DeferredToaster() {
   useEffect(() => {
     let cancelled = false
     const load = () => {
-      void import("@/components/ui/sonner").then((sonner) => {
-        if (!cancelled) setToaster(() => sonner.Toaster)
-      })
+      void import("@/components/ui/sonner")
+        .then((sonner) => {
+          if (!cancelled) setToaster(() => sonner.Toaster)
+        })
+        .catch(() => {
+          // Chunk load failed; leave the toast stack unmounted.
+        })
     }
     if (typeof window.requestIdleCallback === "function") {
       const id = window.requestIdleCallback(load, { timeout: 1500 })
