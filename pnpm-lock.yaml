@@ -155,9 +155,6 @@ importers:
       drizzle-kit:
         specifier: ^0.31.10
         version: 0.31.10
-      esbuild:
-        specifier: 0.28.1
-        version: 0.28.1
       postcss:
         specifier: ^8.5
         version: 8.5.6
@@ -8369,7 +8366,7 @@ snapshots:
 
   tapable@2.3.0: {}
 
-  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.6)(webpack@5.105.0(esbuild@0.28.1)(postcss@8.5.6)):
+  terser-webpack-plugin@5.6.1(esbuild@0.28.1)(postcss@8.5.6)(webpack@5.105.0(postcss@8.5.6)):
     dependencies:
       '@jridgewell/trace-mapping': 0.3.31
       jest-worker: 27.5.1
@@ -8531,7 +8528,7 @@ snapshots:
       neo-async: 2.6.2
       schema-utils: 4.3.3
       tapable: 2.3.0
-      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.6)(webpack@5.105.0(esbuild@0.28.1)(postcss@8.5.6))
+      terser-webpack-plugin: 5.6.1(esbuild@0.28.1)(postcss@8.5.6)(webpack@5.105.0(postcss@8.5.6))
       watchpack: 2.5.2
       webpack-sources: 3.5.1
     transitivePeerDependencies:

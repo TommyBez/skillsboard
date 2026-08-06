@@ -2,13 +2,16 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { transpileTsToDataUrl } from "./transpile-ts.mjs"
+import { stripTypeScriptTypes } from "node:module"
 
 const source = await readFile(
   new URL("../lib/team-analytics-properties.ts", import.meta.url),
   "utf8",
 )
-const { withTeamAnalyticsScope } = await import(transpileTsToDataUrl(source))
+const outputText = stripTypeScriptTypes(source, { mode: "transform" })
+const { withTeamAnalyticsScope } = await import(
+  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+)
 
 test("attaches the authoritative team_id to every team-scoped event payload", () => {
   assert.deepEqual(withTeamAnalyticsScope({ skill_name: "analytics" }, "team-123"), {

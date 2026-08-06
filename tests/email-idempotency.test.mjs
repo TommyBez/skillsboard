@@ -2,13 +2,16 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { transpileTsToDataUrl } from "./transpile-ts.mjs"
+import { stripTypeScriptTypes } from "node:module"
 
 const source = (await readFile(
   new URL("../lib/email/idempotency.ts", import.meta.url),
   "utf8",
 )).replace('import "server-only"', "")
-const { createEmailIdempotencyKey } = await import(transpileTsToDataUrl(source))
+const outputText = stripTypeScriptTypes(source, { mode: "transform" })
+const { createEmailIdempotencyKey } = await import(
+  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+)
 
 test("email idempotency keys are deterministic HMACs without raw correlators", () => {
   process.env.BETTER_AUTH_SECRET = "test-only-better-auth-secret-with-at-least-32-bytes"

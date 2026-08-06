@@ -2,13 +2,16 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { transpileTsToDataUrl } from "./transpile-ts.mjs"
+import { stripTypeScriptTypes } from "node:module"
 
 const source = await readFile(
   new URL("../lib/discovered-skill-selection.ts", import.meta.url),
   "utf8",
 )
-const { pickDiscoveredSkill } = await import(transpileTsToDataUrl(source))
+const outputText = stripTypeScriptTypes(source, { mode: "transform" })
+const { pickDiscoveredSkill } = await import(
+  `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+)
 
 function skill(name, path = name) {
   return { name, path, description: `${name} description` }
