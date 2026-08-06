@@ -3,21 +3,21 @@ import { resourcePaths } from "@/lib/seo/resources"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 export const aboutDescription =
-  "Learn who publishes Skills Board, how its guides are sourced and reviewed, when they are updated, and which product boundaries readers should keep visible."
+  "Skills Board gives teams one place to save, share, and reuse AI skills across agents. Learn why it exists, how it works, and how to get involved."
 
 export const aboutSocialImageAlt =
-  "About Skills Board: organization identity, editorial method, sources, and updates."
+  "About Skills Board, a shared AI skill library for teams."
 
 export const aboutSocialImageContent: OgTemplateContent = {
-  eyebrow: "Organization & editorial method",
+  eyebrow: "About Skills Board",
   title: [
-    { text: "About Skills Board" },
-    { text: "and how we publish.", accent: true },
+    { text: "AI skills worth sharing." },
+    { text: "One place to keep them.", accent: true },
   ],
   description:
-    "Who publishes Skills Board guides, how sources are selected and reviewed, and where product boundaries are documented.",
+    "A free, open-source library for the AI skills your team recommends.",
   contextLabel: "skillsboard.sh/about",
-  chips: ["Identity", "Sources", "Updates"],
+  chips: ["Team library", "MCP", "Open source"],
 }
 
 export function buildAboutSchema() {
@@ -78,7 +78,7 @@ export function buildAboutSchema() {
         "@type": "AboutPage",
         "@id": pageId,
         url: pageUrl,
-        name: "About Skills Board and its editorial method",
+        name: "About Skills Board",
         description: aboutDescription,
         dateModified: "2026-08-06",
         inLanguage: "en",

@@ -12,10 +12,10 @@ import {
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-const socialTitle = "About Skills Board and our editorial method"
+const socialTitle = "About Skills Board"
 
 export const metadata: Metadata = {
-  title: { absolute: "About Skills Board and Our Editorial Method" },
+  title: { absolute: "About Skills Board | Shared AI Skills for Teams" },
   description: aboutDescription,
   alternates: { canonical: resourcePaths.about },
   openGraph: {
@@ -68,133 +68,105 @@ export default function AboutPage() {
               About
             </p>
             <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
-              Who publishes Skills Board guidance
+              AI skills worth sharing. One place to keep them.
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-base leading-7 text-muted-foreground">
-              Skills Board publishes practical guidance for teams sharing and operating reusable AI skills. This page
-              explains the organization identity, editorial method, sourcing policy, and boundaries behind that work.
+              Skills Board gives teams one shared library for the AI skills they
+              recommend, so useful workflows stay easy to find, understand, and
+              reuse.
             </p>
           </header>
 
           <div className="space-y-10 text-[0.95rem] leading-7 text-muted-foreground [&_a]:font-medium [&_a]:text-foreground [&_a]:underline [&_a]:decoration-primary/40 [&_a]:underline-offset-4 [&_h2]:mb-3 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-[-0.025em] [&_h2]:text-foreground [&_li]:pl-1 [&_p+p]:mt-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ul]:space-y-2">
-            <p className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
-              Last reviewed August 6, 2026
-            </p>
+            <section>
+              <h2>Why Skills Board exists</h2>
+              <p>
+                Useful AI workflows often disappear into chat threads,
+                bookmarks, and setup notes that only one person can find. The
+                next teammate starts from scratch or asks the same question
+                again.
+              </p>
+              <p>
+                Skills Board turns those discoveries into a searchable team
+                library. Save the original source, keep the recommendation
+                visible, and give everyone a clear place to start.
+              </p>
+            </section>
 
             <section>
-              <h2>Skills Board in one sentence</h2>
+              <h2>One library, even when your tools differ</h2>
               <p>
-                Skills Board is a shared AI skill library for teams. The hosted product runs at{" "}
-                <a href={siteConfig.url}>{siteConfig.url.replace("https://", "")}</a>, and its source code is public in
-                the{" "}
+                Teammates can use the same recommendation in the way that suits
+                their setup:
+              </p>
+              <ul>
+                <li>
+                  Browse or search the skills and collections your team has
+                  saved.
+                </li>
+                <li>
+                  Open the original source, copy a compatible install command,
+                  or download the latest files as a ZIP.
+                </li>
+                <li>
+                  Connect an MCP-compatible agent to search the library and,
+                  with permission, save or organize recommendations.
+                </li>
+              </ul>
+              <p>
+                The library stays useful even when teammates use different
+                agents or installation paths.
+              </p>
+            </section>
+
+            <section>
+              <h2>Free and open source</h2>
+              <p>
+                Skills Board is free to use, and the source code is public. You
+                can use the hosted product at{" "}
+                <a href={siteConfig.url}>
+                  {siteConfig.url.replace("https://", "")}
+                </a>{" "}
+                or explore the{" "}
                 <a href={siteConfig.githubUrl} target="_blank" rel="noreferrer">
-                  Skills Board GitHub repository
+                  open-source project on GitHub
                   <ExternalLinkIcon className="ml-1 inline size-3.5" aria-hidden="true" />
                 </a>
                 .
               </p>
+            </section>
+
+            <section>
+              <h2>Practical guides for teams</h2>
               <p>
-                The hosted service and public project are published under the {siteConfig.name} name. Product and
-                editorial questions can be sent to{" "}
-                <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>.
+                Skills Board also publishes guides for choosing, sharing, and
+                operating AI skills as a team. Each guide links to the sources
+                behind it and includes a review date, so you can verify the
+                details before using it.
+              </p>
+              <p>
+                <Link href={resourcePaths.index}>Explore Skills Board resources</Link>.
               </p>
             </section>
 
             <section>
-              <h2>How guides are produced and reviewed</h2>
-              <ol className="ml-5 list-decimal space-y-2">
-                <li>Start with one bounded question a team can answer through an observable workflow.</li>
-                <li>
-                  Check product claims against the Skills Board source and external claims against current first-party
-                  or standards documentation.
-                </li>
-                <li>
-                  Write the direct answer first, then make the decision, steps, reusable record, pitfalls, and human
-                  checks explicit.
-                </li>
-                <li>
-                  Review the draft for unsupported claims, hidden permissions, agent-specific assumptions, and
-                  conflicts with related guides.
-                </li>
-                <li>Publish the primary sources, publisher, and review dates on the guide itself.</li>
-              </ol>
+              <h2>Get in touch</h2>
               <p>
-                Guides are published by Skills Board. They are practical editorial guidance, not independently
-                peer-reviewed research or a substitute for security, privacy, or legal review.
-              </p>
-            </section>
-
-            <section>
-              <h2>Sources and citations</h2>
-              <p>
-                Guides prefer primary material: official vendor documentation, standards, and the relevant open-source
-                repositories. A guide’s Primary sources section links the material used and explains why each source
-                matters. When a claim depends on Skills Board behavior, the public repository is the source of truth.
-              </p>
-              <p>
-                External products and standards can change. Readers should open the linked sources and verify current
-                behavior before a rollout, especially for authentication, permissions, installation, or agent
-                compatibility.
-              </p>
-            </section>
-
-            <section>
-              <h2>Review and update policy</h2>
-              <p>
-                Each guide shows a publication date and a last-updated date. The updated date changes when the guide
-                receives a material source, product, workflow, or editorial review—not merely because the page was
-                requested or rebuilt.
-              </p>
-              <p>
-                Skills Board revisits guidance when a cited source or documented product behavior changes. The visible
-                date is not a promise that every external integration is continuously monitored, so current source
-                verification remains part of the recommended workflow.
-              </p>
-            </section>
-
-            <section>
-              <h2>Product and guidance boundaries</h2>
-              <ul>
-                <li>A saved skill is a team recommendation, not a security review or compatibility certification.</li>
-                <li>
-                  Skills Board points to the latest available source and does not promise a pinned historical version of
-                  that source.
-                </li>
-                <li>
-                  MCP read access can list and search authorized skills and collections, retrieve install commands, and
-                  discover public or repository skills. With <code>skills:write</code>, it can save new skills, create
-                  collections, and add or remove saved skills from collections.
-                </li>
-                <li>
-                  MCP access cannot edit or delete saved team skills, install skills in an agent, or execute skills.
-                </li>
-                <li>
-                  Install commands and ZIP downloads are handoff paths. Teams remain responsible for inspecting source,
-                  permissions, and results in their own environment.
-                </li>
-              </ul>
-            </section>
-
-            <section>
-              <h2>Corrections and contact</h2>
-              <p>
-                For a factual correction or private product question, email{" "}
-                <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>. Public documentation issues
-                that contain no private account or team information can be filed in{" "}
+                Questions, ideas, or feedback? Email{" "}
+                <a href={`mailto:${siteConfig.contactEmail}`}>
+                  {siteConfig.contactEmail}
+                </a>
+                . You can also open a public issue in the{" "}
                 <a href={`${siteConfig.githubUrl}/issues`} target="_blank" rel="noreferrer">
-                  GitHub issues
+                  GitHub repository
                   <ExternalLinkIcon className="ml-1 inline size-3.5" aria-hidden="true" />
                 </a>
-                . Suspected vulnerabilities should follow the repository’s{" "}
+                . For a security issue, please use the project’s{" "}
                 <a href={`${siteConfig.githubUrl}/security/policy`} target="_blank" rel="noreferrer">
                   security reporting policy
                   <ExternalLinkIcon className="ml-1 inline size-3.5" aria-hidden="true" />
                 </a>
                 .
-              </p>
-              <p>
-                Browse the three topical collections on the{" "}
-                <Link href={resourcePaths.index}>Skills Board resources page</Link>.
               </p>
             </section>
           </div>

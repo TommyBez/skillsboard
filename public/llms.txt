@@ -18,7 +18,7 @@ Key facts:
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://www.skillsboard.sh/): Product overview, pricing, and common questions
 - [Resources](https://www.skillsboard.sh/resources): Practical guides for teams sharing, reviewing, and operating AI skills
-- [About and editorial method](https://www.skillsboard.sh/about): Organization identity, sourcing, review and update policy, and product capability boundaries
+- [About Skills Board](https://www.skillsboard.sh/about): Why the shared team library exists, how teams use it, and where to find the open-source project
 - [Cross-agent skill compatibility fixture](https://www.skillsboard.sh/cross-agent-skill-compatibility-fixture.md): Versioned discovery and instruction-transport protocol with fixed criteria and no claimed agent results
 - [Pricing](https://www.skillsboard.sh/pricing.md): Machine-readable pricing details
 - [Create account](https://www.skillsboard.sh/sign-up): Start a free team library

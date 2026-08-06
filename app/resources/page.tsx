@@ -58,12 +58,12 @@ export default function ResourcesPage() {
             Use practical, step-by-step guidance to navigate the decisions, patterns, and trade-offs behind durable team workflows.
           </p>
           <p className="mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-muted-foreground">
-            Every guide shows its publisher, review dates, and primary sources. Read{" "}
+            Every guide shows its publisher, review dates, and primary sources.{" "}
             <Link
               href={resourcePaths.about}
               className="inline-flex min-h-11 items-center font-semibold text-foreground underline decoration-primary/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
-              how Skills Board produces and updates its guidance
+              Learn more about Skills Board
             </Link>
             .
           </p>
