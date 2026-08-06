@@ -5,7 +5,7 @@ import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import styles from "@/components/theme-toggle.module.css"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/button-variants"
 import { cn } from "@/lib/utils"
 
 const modes = ["light", "dark", "system"] as const
@@ -66,17 +66,21 @@ export function ThemeToggle({
     : "Toggle color theme"
 
   return (
-    <Button
+    // A native button wearing the shared recipe: this control needs no Base UI
+    // behavior, and landing first-load skips the `@base-ui/react` runtime.
+    <button
       type="button"
-      variant="outline"
-      size="icon-sm"
-      className={cn(chromeClassName[chrome], className)}
+      className={cn(
+        buttonVariants({ variant: "outline", size: "icon-sm" }),
+        chromeClassName[chrome],
+        className,
+      )}
       aria-label={label}
       title={mounted ? `Theme: ${current}` : "Theme"}
       disabled={!mounted}
       onClick={() => setTheme(next)}
     >
       <Icon key={current} className="theme-toggle-icon size-4" aria-hidden="true" />
-    </Button>
+    </button>
   )
 }

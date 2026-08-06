@@ -1,7 +1,6 @@
 "use client"
 
 import type { MouseEventHandler } from "react"
-import posthog from "posthog-js"
 import type { CaptureOptions } from "posthog-js"
 
 import type {
@@ -9,6 +8,7 @@ import type {
   AnalyticsCapturedEventProperties,
   CapturableAnalyticsEventName,
 } from "@/analytics/posthog/events"
+import { posthogReady } from "@/lib/posthog-client"
 
 export type ClientAnalyticsEvent = AnalyticsCapturedEventCapture
 
@@ -21,13 +21,15 @@ export function captureAnalyticsEvent<EventName extends CapturableAnalyticsEvent
   event: EventName,
   ...args: ClientAnalyticsCaptureArgs<EventName>
 ) {
-  posthog.capture(event, args[0], args[1])
+  void posthogReady().then((posthog) => posthog?.capture(event, args[0], args[1]))
 }
 
 export function captureClientAnalyticsEvent(analytics: ClientAnalyticsEvent) {
-  posthog.capture(
-    analytics.event,
-    "properties" in analytics ? analytics.properties : undefined,
+  void posthogReady().then((posthog) =>
+    posthog?.capture(
+      analytics.event,
+      "properties" in analytics ? analytics.properties : undefined,
+    )
   )
 }
 

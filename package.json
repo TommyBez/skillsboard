@@ -15,6 +15,13 @@
   "engines": {
     "node": ">=20.9.0"
   },
+  "browserslist": [
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 111",
+    "safari >= 16.4",
+    "ios >= 16.4"
+  ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "next dev",

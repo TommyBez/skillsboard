@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 
-import { EmailPreferenceToastBridge } from "@/components/email-preference-toast-bridge"
+import { DeferredToaster } from "@/components/deferred-toaster"
 import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
-import { Toaster } from "@/components/ui/sonner"
 import { siteConfig } from "@/lib/site"
 
 import "./globals.css"
 
+// The opsz axis is unused in the codebase — only wdth is declared, since the
+// hero headline's font-stretch: 93% needs it. Fewer axes, smaller files.
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
   variable: "--font-bricolage",
-  axes: ["opsz", "wdth"],
+  axes: ["wdth"],
 })
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
 
@@ -83,8 +84,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          <EmailPreferenceToastBridge />
-          <Toaster />
+          <DeferredToaster />
           {process.env.VERCEL_ENV === "production" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>
       </body>
