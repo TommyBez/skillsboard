@@ -1,8 +1,6 @@
 import { DecodeText } from "@/components/landing/decode-text"
 import { HeroBoard } from "@/components/landing/hero-board"
 import { HomeHeroActions } from "@/components/landing/landing-ctas"
-import base from "@/components/landing/styles/base.module.css"
-import styles from "@/components/landing/styles/hero.module.css"
 
 /**
  * Hero — sticky chapter: scattered dossiers file into the team library.
@@ -39,29 +37,29 @@ export function HeroSection() {
   return (
     <section
       id="intro"
-      className={styles.hero}
+      className="lp-hero"
       data-hero-scene
       data-chapter-target="intro"
       data-view-progress="hero"
     >
-      <div className={`${styles.heroSticky} ${base.grain}`}>
-        <div className={styles.heroFrame}>
-          <div className={styles.heroField} aria-hidden="true" />
+      <div className="lp-hero-sticky lp-grain relative">
+        <div className="lp-hero-frame">
+          <div className="lp-hero-field" aria-hidden="true" />
 
-          <div className={styles.heroTop}>
+          <div className="lp-hero-top">
             {/* Chapter index, same grammar as 02–06. */}
-            <span className={styles.heroIndex} aria-hidden="true">
+            <span className="lp-hero-index" aria-hidden="true">
               01
             </span>
             <DecodeText
               as="p"
-              className={styles.heroEyebrow}
+              className="lp-hero-eyebrow"
               text="Skills selected by your team"
             />
-            <span className={styles.heroTopRule} aria-hidden="true" />
+            <span className="lp-hero-top-rule" aria-hidden="true" />
           </div>
 
-          <div className={styles.heroMid}>
+          <div className="lp-hero-mid">
             {/* The one interior vertical. It stands on the composition's spine
                 — the 50% line of the measure — and runs the chapter's full
                 height at one constant value: top end on the header rule, bottom
@@ -73,32 +71,32 @@ export function HeroSection() {
                 The period used to end ON it. At a 100px cap height the dot's
                 ink and a 1px rule at the same x are one shape; verified
                 visually, it read as a defect. */}
-            <span className={styles.heroSpine} aria-hidden="true" />
+            <span className="lp-hero-spine" aria-hidden="true" />
 
-            <div className={`${styles.heroCopyCol} ${styles.heroExit}`}>
-              <h1 className={styles.heroHeadline}>
-                <span className={styles.heroLineMask}>
+            <div className="lp-hero-copy-col lp-hero-exit">
+              <h1 className="lp-hero-headline">
+                <span className="lp-hero-line-mask">
                   {/* U+2019, not the typewriter prime: at a 74px cap height a
                       straight vertical tick is the loudest wrong mark on the
                       page. Same words, correct glyph. */}
-                  <span className={`${styles.heroLine} ${styles.heroLineFirst}`}>
+                  <span className="lp-hero-line lp-hero-line-first">
                     Your team’s skills.
                   </span>
                 </span>
-                <span className={styles.heroLineMask}>
-                  <span className={`${styles.heroLine} ${styles.heroLineSecond}`}>
+                <span className="lp-hero-line-mask">
+                  <span className="lp-hero-line lp-hero-line-second">
                     All in one place.
                   </span>
                 </span>
               </h1>
             </div>
 
-            <div className={`${styles.heroLower} ${styles.heroExit}`}>
-              <p className={styles.heroBlurb}>
+            <div className="lp-hero-lower lp-hero-exit">
+              <p className="lp-hero-blurb">
                 Build a shared, searchable library so everyone knows which skills
                 to use and where to find them.
               </p>
-              <div className={styles.heroCta}>
+              <div className="lp-hero-cta">
                 <HomeHeroActions />
               </div>
             </div>
@@ -106,14 +104,14 @@ export function HeroSection() {
             <HeroBoard />
           </div>
 
-          <div className={styles.heroRail} aria-hidden="true">
-            <span className={styles.heroRailLabel} data-state="scattered">
+          <div className="lp-hero-rail" aria-hidden="true">
+            <span className="lp-hero-rail-label" data-state="scattered">
               Scattered
             </span>
-            <span className={styles.heroRailTrack}>
-              <span className={styles.heroRailFill} />
+            <span className="lp-hero-rail-track">
+              <span className="lp-hero-rail-fill" />
             </span>
-            <span className={styles.heroRailLabel} data-state="filed">
+            <span className="lp-hero-rail-label" data-state="filed">
               Filed
             </span>
           </div>

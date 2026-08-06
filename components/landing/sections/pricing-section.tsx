@@ -1,7 +1,6 @@
 import type { CSSProperties } from "react"
 
 import { DecodeText } from "@/components/landing/decode-text"
-import styles from "@/components/landing/styles/pricing.module.css"
 
 /** The three absences, kept verbatim — ruled as a spec ledger. */
 const ledger = ["No trial.", "No credit card.", "No paid tier."] as const
@@ -32,57 +31,59 @@ export function PricingSection() {
     <section
       id="pricing"
       aria-labelledby="pricing-heading"
-      className={`${styles.pricingSection} scroll-mt-14`}
+      className="lp-pricing relative scroll-mt-14"
       data-motion-group="pricing"
       data-motion-state="pending"
       data-chapter-target="pricing"
       data-scroll-chapter="pricing"
     >
-      <div className={styles.sticky}>
-        <div className={styles.frame}>
-          <div className={styles.plate}>
+      <div className="lp-pricing-stage relative flex items-center">
+        <div className="mx-auto w-full max-w-[1440px] px-[var(--gutter)]">
+          <div className="lp-pricing-plate">
             <DecodeText
-              className={styles.indexNum}
+              className="lp-pricing-index-num"
               aria-hidden="true"
               text="04"
             />
-            <span className={styles.indexName} aria-hidden="true">
+            <span className="lp-pricing-index-name" aria-hidden="true">
               Pricing
             </span>
 
-            <span className={styles.ruleTop} aria-hidden="true" />
+            <span className="lp-pricing-rule-top" aria-hidden="true" />
 
-            <div className={styles.numeral} aria-hidden="true">
+            <div className="lp-pricing-numeral" aria-hidden="true">
               <svg
-                className={styles.zero}
+                className="block size-full fill-[var(--plate-key)]"
                 viewBox="0 0 380 532"
                 preserveAspectRatio="none"
                 focusable="false"
               >
                 <path d={ZERO} fillRule="evenodd" />
               </svg>
-              <span className={styles.wipe} />
-              <span className={styles.nip} />
+              <span className="lp-pricing-wipe" />
+              <span className="lp-pricing-nip" />
             </div>
 
-            <div className={styles.column}>
-              <div className={styles.statement}>
-                {/* The two capital F's carry the setting's negative tracking on a
-                    pair the face already draws tight; they get it back. */}
-                <h2 id="pricing-heading" className={styles.heading}>
-                  <span className={styles.kern}>F</span>ree.{" "}
-                  <span className={styles.kern}>F</span>orever.
+            <div className="lp-pricing-column">
+              <div className="lp-pricing-statement">
+                {/* The face draws F+r and F+o tight already, so the display
+                    line's -0.038em made those two pairs read tighter than every
+                    other pair in the line. The two capital F's get most of it
+                    back. */}
+                <h2 id="pricing-heading" className="lp-pricing-heading">
+                  <span className="tracking-[-0.012em]">F</span>ree.{" "}
+                  <span className="tracking-[-0.012em]">F</span>orever.
                 </h2>
-                <p className={styles.lede}>
+                <p className="lp-pricing-lede">
                   Skills Board is free to use and open source.
                 </p>
               </div>
 
-              <ul className={styles.spec}>
+              <ul className="grid list-none md:grid-rows-3">
                 {ledger.map((line, index) => (
                   <li
                     key={line}
-                    className={styles.specRow}
+                    className="lp-pricing-spec-row"
                     style={{ "--i": index } as CSSProperties}
                   >
                     {line}

@@ -16,7 +16,7 @@
    • prefers-reduced-motion → the scene rests filed: a tidy library listing.
 --------------------------------------------------------------------------- */
 
-.hero {
+.lp-hero {
   --hero-px: 1.25rem;
   /* The board stage's height — the single measure the whole chapter is laid
      out against: the copy column's baseline, the scatter pitch, the panel's
@@ -192,7 +192,7 @@
 /* The chapter boundary. Drawn as a rule on the measure rather than as a border
    on the section: a border is full-bleed, so this one line crossed both outer
    gutters while every other chapter boundary on the page stops at the frame. */
-.hero::after {
+.lp-hero::after {
   content: "";
   position: absolute;
   left: var(--lp-frame-inset);
@@ -205,19 +205,19 @@
 }
 
 @media (min-width: 48rem) {
-  .hero {
+  .lp-hero {
     --hero-px: 2.5rem;
   }
 }
 
 /* Where the page frame exists, so does the chapter's clearance off it. */
 @media (min-width: 64rem) {
-  .hero {
+  .lp-hero {
     --copy-x: 12px;
   }
 }
 
-.heroSticky {
+.lp-hero-sticky {
   position: relative;
   display: flex;
   align-items: stretch;
@@ -228,11 +228,11 @@
 /* Tall sticky runway only when the controller is live; without JS or with
    reduced motion the hero is a normal one-viewport spread. */
 @media (min-width: 64rem) {
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .hero {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-hero {
     height: 200vh;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .heroSticky {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-hero-sticky {
     position: sticky;
     top: var(--lp-header-h);
     height: calc(100dvh - var(--lp-header-h));
@@ -246,7 +246,7 @@
    column grid (the headline's line length above all) therefore lands on the
    grid whether or not a classic scrollbar is eating 15px of the viewport.
    `vw` cannot do that; it counts the scrollbar. */
-.heroFrame {
+.lp-hero-frame {
   position: relative;
   container-type: inline-size;
   flex: 1;
@@ -264,7 +264,7 @@
    nailed to the frame's floor, one small margin above the chapter's bottom
    hairline, so the hero always *terminates* rather than trailing off. */
 @media (min-width: 64rem) {
-  .heroFrame {
+  .lp-hero-frame {
     /* no explicit height: the flex parent stretches it, which is the only way
        the rail reaches the floor in the un-pinned (no-JS / reduced) case too */
     grid-template-rows: auto minmax(var(--stage-h), 1fr) auto;
@@ -278,7 +278,7 @@
 
 /* Top strip — the hero's standing header rule. The eyebrow sits on the rule
    (same annotation grammar as the other chapters' marks); one line, not two. */
-.heroTop {
+.lp-hero-top {
   display: flex;
   align-items: center;
   gap: var(--joint);
@@ -293,11 +293,11 @@
 /* Phones: the strip carries an index, a mark and a rule in 350px, so the mark
    gives back the tracking the rule needs to read as a rule. */
 @media (max-width: 47.99rem) {
-  .heroTop {
+  .lp-hero-top {
     gap: 0.7rem;
   }
 
-  .heroEyebrow {
+  .lp-hero-eyebrow {
     font-size: 0.64rem;
     letter-spacing: 0.15em;
   }
@@ -306,13 +306,13 @@
 /* Below the pinned layout the strip is not a band of its own — it sits directly
    over the headline — so it carries the register gap as a margin instead. */
 @media (max-width: 63.99rem) {
-  .heroTop {
+  .lp-hero-top {
     margin-bottom: 1.25rem;
   }
 }
 
 /* Chapter index — identical spec to the other chapters' header marks. */
-.heroIndex {
+.lp-hero-index {
   flex: none;
   /* the mono '0' bowl carries a left side bearing; giving it back lands the
      ink on the same 41 as the headline, the paragraph and the button */
@@ -343,7 +343,7 @@
 
    Weight: division, not object — --lp-grid-line, the same ink as the spine and
    as every other divider in the chapter. */
-.heroTopRule {
+.lp-hero-top-rule {
   flex: 1;
   height: 1px;
   /* the label's trailing letter-space, given back */
@@ -353,7 +353,7 @@
   animation: lp-hero-draw 760ms var(--lp-ease-emph) var(--lp-beat-2) both;
 }
 
-.heroMid {
+.lp-hero-mid {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -364,7 +364,7 @@
 /* The copy band stretches to the frame's middle row; the stage is centred
    inside it, and the copy column is centred on the same axis. */
 @media (min-width: 64rem) {
-  .heroMid {
+  .lp-hero-mid {
     min-height: var(--stage-h);
     /* The copy column is centred in the band, then biased up by half of this.
 
@@ -376,7 +376,7 @@
 
 /* Short laptops: the band has no spare height to bias with. */
 @media (min-width: 64rem) and (max-height: 46rem) {
-  .heroMid {
+  .lp-hero-mid {
     padding-block-end: 1.5rem;
   }
 }
@@ -385,9 +385,9 @@
    Field — dither texture + column rails, the depth under the chapter
 ------------------------------------------------------------------ */
 
-.heroField {
+.lp-hero-field {
   position: absolute;
-  /* The frame's content box, not its border box. `.heroFrame` is
+  /* The frame's content box, not its border box. `.lp-hero-frame` is
      `max-width: 90rem` *including* its own padding, so `inset: 0` painted this
      radial a full 1440 wide and ran it 40px past the page frame into both outer
      gutters. Measured consequence: the gutter field read (7,14,10) on the left
@@ -438,12 +438,12 @@
    rather than fading into grain. Headline line 1's terminal period lands on
    it, the stage's left edge is it, and the floor rule's right end stops on it.
    The 75% line is still there — it is the drawer's left border, drawn once. */
-.heroSpine {
+.lp-hero-spine {
   display: none;
 }
 
 @media (min-width: 64rem) {
-  .heroSpine {
+  .lp-hero-spine {
     position: absolute;
     display: block;
     left: 50%;
@@ -478,13 +478,13 @@
    Copy column
 ------------------------------------------------------------------ */
 
-.heroCopyCol {
+.lp-hero-copy-col {
   position: relative;
   z-index: 2;
   padding-inline-start: var(--copy-x);
 }
 
-.heroEyebrow {
+.lp-hero-eyebrow {
   /* the strip's slack belongs to the rule, never to the label */
   flex: none;
   display: inline-flex;
@@ -507,7 +507,7 @@
    has an 8px cap band, and this was 0.55rem — 8.8px, which rasterises 9 device
    rows against the label's 8. A square standing one row proud of the letters
    beside it reads as a misprint, not as a mark. */
-.heroEyebrow::before {
+.lp-hero-eyebrow::before {
   content: "";
   width: 8px;
   height: 8px;
@@ -515,7 +515,7 @@
   animation: lp-hero-tick 460ms var(--lp-ease-spring) var(--lp-beat-2) both;
 }
 
-.heroHeadline {
+.lp-hero-headline {
   font-size: clamp(2.75rem, 7vw, 7rem);
   font-weight: 600;
   font-stretch: 93%;
@@ -540,27 +540,27 @@
    Two numbers now, each measured, each landing its line's ink on x = 41: the
    inside face of the rail, and the same edge the paragraph, the primary button
    and the chapter index stand on. Nothing crosses the rail. */
-.heroLineMask {
+.lp-hero-line-mask {
   display: block;
   overflow: clip;
   padding-block-end: 0.09em;
   margin-block-end: -0.09em;
 }
 
-.heroLineMask:first-child {
+.lp-hero-line-mask:first-child {
   margin-inline-start: var(--optic-line-1, 0px);
 }
 
-.heroLineMask:last-child {
+.lp-hero-line-mask:last-child {
   margin-inline-start: var(--optic-line-2, 0px);
 }
 
-.heroLine {
+.lp-hero-line {
   display: block;
   animation: lp-hero-line 720ms var(--lp-ease-emph) both;
 }
 
-.heroLineFirst {
+.lp-hero-line-first {
   animation-delay: var(--lp-beat-2);
 }
 
@@ -569,7 +569,7 @@
    exact hue reserved for "click here", at half the contrast of the setup half
    (7.1:1 against 14.2:1) — and it made the rag step at the line break read as
    an event rather than as a rag. */
-.heroLineSecond {
+.lp-hero-line-second {
   animation-delay: var(--lp-beat-3);
 }
 
@@ -580,7 +580,7 @@
    spine, and both of those are known: the edge is 12px inboard of the frame's
    content box and the spine is the half measure. So the line's length is
    `50cqw - 23px`, and the font size is that length divided by the face's
-   length-per-point at this size. `cqw` is the measure (see `.heroFrame`), so the
+   length-per-point at this size. `cqw` is the measure (see `.lp-hero-frame`), so the
    alignment survives a classic scrollbar; `vw` would not.
 
    Five bands, because the divisor is not a constant: the face carries an
@@ -592,36 +592,36 @@
    past it is a collision with the deck. Line 1 used to end ON the spine, where
    the terminal period's ink and a 1px rule are one shape. */
 @media (min-width: 64rem) {
-  .heroHeadline {
+  .lp-hero-headline {
     font-size: clamp(2.75rem, calc((50cqw - 23px) / 6.983), 6.5rem);
   }
 }
 
 @media (min-width: 72rem) {
-  .heroHeadline {
+  .lp-hero-headline {
     font-size: clamp(2.75rem, calc((50cqw - 23px) / 6.866), 6.5rem);
   }
 }
 
 @media (min-width: 80rem) {
-  .heroHeadline {
+  .lp-hero-headline {
     font-size: clamp(2.75rem, calc((50cqw - 23px) / 6.743), 6.5rem);
   }
 }
 
 @media (min-width: 85rem) {
-  .heroHeadline {
+  .lp-hero-headline {
     font-size: clamp(2.75rem, calc((50cqw - 23px) / 6.664), 6.5rem);
   }
 }
 
 @media (min-width: 90rem) {
-  .heroHeadline {
+  .lp-hero-headline {
     font-size: clamp(2.75rem, calc((50cqw - 23px) / 6.58), 6.5rem);
   }
 }
 
-.heroLower {
+.lp-hero-lower {
   position: relative;
   z-index: 2;
   margin-top: 2.25rem;
@@ -633,7 +633,7 @@
    The column's two internal registers are --reg-1 and --reg-2; see the note on
    those tokens for how all three of its vertical values are solved. */
 @media (min-width: 64rem) {
-  .heroLower {
+  .lp-hero-lower {
     margin-top: var(--reg-1);
     /* One and a half columns. The paragraph's rag and the button row's width
        are intrinsic — you cannot align a rag to a rule — but the measure they
@@ -642,12 +642,12 @@
     max-width: 37.5%;
   }
 
-  .heroBlurb {
+  .lp-hero-blurb {
     max-width: 100%;
   }
 }
 
-.heroBlurb {
+.lp-hero-blurb {
   max-width: 34rem;
   /* the 'B' stem's left side bearing, given back, so the paragraph's ink lands
      on the same 41 as the headline above it and the button below it */
@@ -661,12 +661,12 @@
 }
 
 @media (min-width: 48rem) {
-  .heroBlurb {
+  .lp-hero-blurb {
     font-size: 1.25rem;
   }
 }
 
-.heroCta {
+.lp-hero-cta {
   margin-top: 1.75rem;
   animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
     var(--lp-beat-5) both;
@@ -676,7 +676,7 @@
    dossier card and a quarter of their own height, so the two fills nearly
    touched and the pair read as one split control. 20px is larger than any
    padding in the chapter and still visibly a pair. */
-.heroCta > div {
+.lp-hero-cta > div {
   gap: 1.25rem;
 }
 
@@ -684,13 +684,13 @@
    intrinsic and is allowed to exceed it rather than break into two rows —
    a stacked pair of actions is a different composition, not a narrower one. */
 @media (min-width: 64rem) {
-  .heroCta > div {
+  .lp-hero-cta > div {
     flex-wrap: nowrap;
   }
 }
 
 @media (min-width: 64rem) {
-  .heroCta {
+  .lp-hero-cta {
     margin-top: var(--reg-2);
   }
 }
@@ -705,28 +705,28 @@
       step inside the control as outside it. A control has to occlude the
       ground it stands on. Same wash, composited over the page field instead of
       over whatever happens to be behind it. That fix has since moved into the
-      shared control: `.ctaSecondary` paints its own field and its own opaque
+      shared control: `.lp-cta-secondary` paints its own field and its own opaque
       ground for its edge, so the chapter's override was a `background-color`
       sitting beneath two opaque image layers — a no-op — and is gone.
    2. Register. The primary stands on a 1px plinth (the shared press model's
       cast edge) and the secondary did not, so the two buttons' painted extents
       differed by a pixel top and bottom even though their boxes were identical.
       Same plinth, same extent. That is what is left here. */
-.heroCta > div > a {
+.lp-hero-cta > div > a {
   box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 14%, transparent);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .heroCta > div > a:hover {
+  .lp-hero-cta > div > a:hover {
     box-shadow: 0 2px 0 color-mix(in oklab, var(--foreground) 16%, transparent);
   }
 }
 
-.heroCta > div > a:active {
+.lp-hero-cta > div > a:active {
   box-shadow: 0 0 0 color-mix(in oklab, var(--foreground) 0%, transparent);
 }
 
-.heroCta > div > a:focus-visible {
+.lp-hero-cta > div > a:focus-visible {
   box-shadow: none;
 }
 
@@ -734,7 +734,7 @@
    State rail — the scene's scrubber, anchored to the frame's baseline
 ------------------------------------------------------------------ */
 
-.heroRail {
+.lp-hero-rail {
   --rail-p: 0;
   position: relative;
   z-index: 2;
@@ -767,13 +767,13 @@
 }
 
 @media (min-width: 64rem) {
-  .heroRail {
+  .lp-hero-rail {
     display: flex;
     /* nailed to the frame's floor by the grid, not floated under the stage */
     margin-top: 0;
   }
 
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .heroRail {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-hero-rail {
     /* reaches FILED just as the fifth card settles, leaving the tail of the
        runway as a settle rather than an unfinished bar */
     --rail-p: clamp(0, calc(var(--route-p) / 0.88), 1);
@@ -786,12 +786,12 @@
    Each end is compensated by its own side bearing, and the right one also by
    the trailing letter-space of the tracked caps. The terminals used to land
    ON the two rails, which is where the frame's own ink is. */
-.heroRailLabel {
+.lp-hero-rail-label {
   flex-shrink: 0;
   transition: color 240ms var(--lp-ease-out);
 }
 
-.heroRailLabel[data-state="scattered"] {
+.lp-hero-rail-label[data-state="scattered"] {
   /* the S's ink lands on x = 52 — the same edge as the chapter index, the
      headline, the paragraph and the primary button, five rows above */
   margin-inline-start: calc(var(--copy-x) + var(--optic-rail, 0px));
@@ -801,7 +801,7 @@
   margin-inline-end: -1.1px;
 }
 
-.heroRailLabel[data-state="filed"] {
+.lp-hero-rail-label[data-state="filed"] {
   /* the D's ink lands on the chapter's right edge, its own trailing
      letter-space given back so the box does not overshoot the ink */
   margin-inline-end: var(--optic-rail-trail, 0px);
@@ -813,7 +813,7 @@
    the device. Now the pair rests equal, the accent stays on the track's fill
    where it reports progress, and the only lift in the row is FILED arriving —
    which is the one thing in the scene worth announcing. */
-.heroRailLabel[data-state="filed"] {
+.lp-hero-rail-label[data-state="filed"] {
   color: color-mix(
     in oklab,
     var(--hero-label-live) calc(var(--rail-p) * 100%),
@@ -826,7 +826,7 @@
    instrument's ground and takes the grid ink, a step below it, so the accent
    fill has something to read against. They used to be the same value doing
    two different jobs 25px apart. */
-.heroRailTrack {
+.lp-hero-rail-track {
   position: relative;
   flex: 1;
   height: 2px;
@@ -837,7 +837,7 @@
   translate: 0 -0.5px;
 }
 
-.heroRailFill {
+.lp-hero-rail-fill {
   position: absolute;
   inset: 0;
   background: var(--primary);
@@ -850,7 +850,7 @@
    scatter → filed delta can live entirely in `transform`.
 ------------------------------------------------------------------ */
 
-.heroBoard {
+.lp-hero-board {
   --px: 0;
   --py: 0;
 
@@ -1048,18 +1048,18 @@
    composition. Both values are what keep `--qh` inside its clamp down to a
    660px viewport. */
 @media (min-width: 64rem) and (max-height: 46rem) {
-  .heroBoard {
+  .lp-hero-board {
     /* the same arithmetic as --cbody above, with the summary row taken out:
        1 + 12 + 15 + 12 + 18.39 + 14.22 */
     --cbody: 74.61px;
   }
 
-  .heroBoard .dossierDesc {
+  .lp-hero-board .lp-hero-dossier-desc {
     display: none;
   }
 }
 
-.heroCards {
+.lp-hero-cards {
   position: absolute;
   inset: 0;
 }
@@ -1108,7 +1108,7 @@
    the drawer's inside face and a filed card is 16px, and the card's radius is
    12px, so the drawer's is 28px — not 14px, which read as equal to the card's
    across 28 device pixels of padding. All four corners now. */
-.libraryFrame {
+.lp-hero-library-frame {
   position: absolute;
   inset-inline-end: 0;
   top: var(--pt);
@@ -1142,7 +1142,7 @@
   transition: translate 420ms var(--lp-ease-out);
 }
 
-.libraryHead {
+.lp-hero-library-head {
   position: relative;
   display: flex;
   align-items: center;
@@ -1155,7 +1155,7 @@
   border-bottom: 1px solid var(--lp-grid-line);
 }
 
-.libraryLabel {
+.lp-hero-library-label {
   font-family: var(--font-mono);
   font-size: 0.6rem;
   font-weight: 700;
@@ -1166,7 +1166,7 @@
 
 
 /* Indexing hairline: the panel head reports how much of the deck is filed. */
-.libraryScan {
+.lp-hero-library-scan {
   position: absolute;
   left: 0;
   right: 0;
@@ -1178,7 +1178,7 @@
 }
 
 /* Filter row: the library is searchable, so the panel says so. */
-.libraryFilter {
+.lp-hero-library-filter {
   position: absolute;
   inset-inline: var(--pp);
   /* centred in the band --qh reserves for it, by arithmetic rather than by eye:
@@ -1205,22 +1205,9 @@
   color: var(--ink-mid);
 }
 
-.libraryFilterIcon {
-  width: 0.75rem;
-  height: 0.75rem;
-  flex-shrink: 0;
-  opacity: 0.75;
-}
 
-.libraryFilterText {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.libraryKbd {
+.lp-hero-library-kbd {
   flex-shrink: 0;
   padding: 0.05rem 0.25rem;
   border: 1px solid var(--lp-grid-line);
@@ -1232,7 +1219,7 @@
 
 /* Row separators live on the panel, not on the cards, so a filed row always
    sits on a crisp baseline no matter where its card was clipped. */
-.libraryRows {
+.lp-hero-library-rows {
   position: absolute;
   left: var(--pp);
   right: var(--pp);
@@ -1260,7 +1247,7 @@
    the desk, pointing at rows that are still empty. It is therefore not part of
    the unarmed composition at all — not rendered, rather than rendered at zero
    opacity. Reduced motion rests the scene filed, so it is drawn there. */
-.libraryFeed {
+.lp-hero-library-feed {
   display: none;
   position: absolute;
   /* the leaders stop on the drawer's left border — the thing they point at */
@@ -1271,13 +1258,13 @@
   transition: opacity 220ms var(--lp-ease-snap);
 }
 
-:global([data-landing-motion-root][data-motion-enabled="true"]) .libraryFeed {
+[data-landing-motion-root][data-motion-enabled="true"] .lp-hero-library-feed {
   display: block;
 }
 
 /* Each leader is drawn as its own card docks: the source label takes the place
    the dossier just left. */
-.libraryFeedRow {
+.lp-hero-library-feed-row {
   --t: clamp(
     0,
     calc((var(--route-p) - var(--ls, 0) - var(--win) + 0.1) / 0.13),
@@ -1289,27 +1276,27 @@
   height: var(--rh);
 }
 
-.libraryFeedRow[data-slot="1"] {
+.lp-hero-library-feed-row[data-slot="1"] {
   --ls: var(--ls1);
 }
 
-.libraryFeedRow[data-slot="2"] {
+.lp-hero-library-feed-row[data-slot="2"] {
   --ls: var(--ls2);
 }
 
-.libraryFeedRow[data-slot="3"] {
+.lp-hero-library-feed-row[data-slot="3"] {
   --ls: var(--ls3);
 }
 
-.libraryFeedRow[data-slot="4"] {
+.lp-hero-library-feed-row[data-slot="4"] {
   --ls: var(--ls4);
 }
 
-.libraryFeedRow[data-slot="5"] {
+.lp-hero-library-feed-row[data-slot="5"] {
   --ls: var(--ls5);
 }
 
-.libraryFeedLabel {
+.lp-hero-library-feed-label {
   flex: 1;
   justify-content: flex-end;
   font-size: 0.62rem;
@@ -1317,7 +1304,7 @@
   translate: calc((1 - var(--t)) * -8px) 0;
 }
 
-.libraryFeedIcon {
+.lp-hero-library-feed-icon {
   width: 0.75rem;
   height: 0.75rem;
   flex-shrink: 0;
@@ -1325,7 +1312,7 @@
   opacity: 0.8;
 }
 
-.libraryFeedLine {
+.lp-hero-library-feed-line {
   position: relative;
   flex-shrink: 0;
   width: 3.5rem;
@@ -1337,7 +1324,7 @@
 
 /* Arrowhead, not a dot: the source feeds the library, and the diagram says
    which way. */
-.libraryFeedLine::after {
+.lp-hero-library-feed-line::after {
   content: "";
   position: absolute;
   right: -1px;
@@ -1354,7 +1341,7 @@
    decays to zero across each card's slice of the runway.
 ------------------------------------------------------------------ */
 
-.dossierSlot {
+.lp-hero-dossier-slot {
   --t: clamp(0, calc((var(--route-p) - var(--ls, 0)) / var(--win)), 1);
   /* smoothstep: cards ease in and settle instead of tracking scroll linearly */
   --fp: calc(var(--t) * var(--t) * (3 - 2 * var(--t)));
@@ -1398,7 +1385,7 @@
    column, at every viewport width, with no length written down anywhere. The
    two cards already standing in column 4 travel vertically only: they are over
    their slot to begin with, and the composition says so. */
-.dossierSlot[data-slot="1"] {
+.lp-hero-dossier-slot[data-slot="1"] {
   top: var(--row0);
   z-index: 9;
   --ls: var(--ls1);
@@ -1407,7 +1394,7 @@
   --sr: calc(-1 * var(--fan));
 }
 
-.dossierSlot[data-slot="2"] {
+.lp-hero-dossier-slot[data-slot="2"] {
   top: calc(var(--row0) + var(--rh));
   z-index: 8;
   --ls: var(--ls2);
@@ -1416,7 +1403,7 @@
   --sr: calc(-0.5 * var(--fan));
 }
 
-.dossierSlot[data-slot="3"] {
+.lp-hero-dossier-slot[data-slot="3"] {
   top: calc(var(--row0) + 2 * var(--rh));
   z-index: 7;
   --ls: var(--ls3);
@@ -1425,7 +1412,7 @@
   --sr: 0deg;
 }
 
-.dossierSlot[data-slot="4"] {
+.lp-hero-dossier-slot[data-slot="4"] {
   top: calc(var(--row0) + 3 * var(--rh));
   z-index: 6;
   --ls: var(--ls4);
@@ -1434,7 +1421,7 @@
   --sr: calc(0.5 * var(--fan));
 }
 
-.dossierSlot[data-slot="5"] {
+.lp-hero-dossier-slot[data-slot="5"] {
   top: calc(var(--row0) + 4 * var(--rh));
   z-index: 5;
   --ls: var(--ls5);
@@ -1447,7 +1434,7 @@
    with the body copy and closing before the rail. Each card rocks into its own
    scatter tilt (`--sr`) rather than dropping straight, so the deal reads as a
    hand laying paper down. */
-.dossierEnter {
+.lp-hero-dossier-enter {
   animation: lp-hero-deal 700ms var(--lp-ease-emph) both;
 }
 
@@ -1456,33 +1443,33 @@
    parked at opacity 0 inside a hidden board. Nothing in the chapter should be
    holding an unplayed from-state. */
 @media (max-width: 63.99rem) {
-  .dossierEnter {
+  .lp-hero-dossier-enter {
     animation: none;
   }
 }
 
-.dossierSlot[data-slot="1"] .dossierEnter {
+.lp-hero-dossier-slot[data-slot="1"] .lp-hero-dossier-enter {
   animation-delay: var(--lp-beat-4);
 }
 
-.dossierSlot[data-slot="2"] .dossierEnter {
+.lp-hero-dossier-slot[data-slot="2"] .lp-hero-dossier-enter {
   animation-delay: var(--lp-beat-5);
 }
 
-.dossierSlot[data-slot="3"] .dossierEnter {
+.lp-hero-dossier-slot[data-slot="3"] .lp-hero-dossier-enter {
   animation-delay: var(--lp-beat-6);
 }
 
-.dossierSlot[data-slot="4"] .dossierEnter {
+.lp-hero-dossier-slot[data-slot="4"] .lp-hero-dossier-enter {
   animation-delay: var(--lp-beat-7);
 }
 
-.dossierSlot[data-slot="5"] .dossierEnter {
+.lp-hero-dossier-slot[data-slot="5"] .lp-hero-dossier-enter {
   animation-delay: var(--lp-beat-8);
 }
 
 /* Pointer parallax: real depth while the deck is loose, calm once filed. */
-.dossierParallax {
+.lp-hero-dossier-parallax {
   --amp: calc(1 - var(--fp) * 0.82);
   /* The card's own box-shadow would be trimmed away by its fold clip-path, so
      the deck's drop shadow lives here, on the untrimmed wrapper. Two layers of
@@ -1507,7 +1494,7 @@
    index row once filed. The fold is clip-path only.
 ------------------------------------------------------------------ */
 
-.dossier {
+.lp-hero-dossier {
   --radius: 0.75rem;
   position: relative;
   display: flex;
@@ -1546,7 +1533,7 @@
 /* Dark field: a drop shadow on near-black cannot say "this card is off the
    desk", so elevation is carried by the surface getting lighter instead.
    In the light theme the shadow does that job on its own. */
-:global(.dark) .dossier {
+.dark .lp-hero-dossier {
   --surface: color-mix(
     in oklab,
     var(--foreground) calc(var(--lift, 0) * 6%),
@@ -1554,7 +1541,7 @@
   );
 }
 
-.dossierRow {
+.lp-hero-dossier-row {
   /* the index strip's height is the filed row's height; it is never allowed to
      absorb a rounding error from the box below it */
   flex: none;
@@ -1572,7 +1559,7 @@
    and the star count's last numeral each carry a side bearing into the joint.
    Both bearings are given back, so the inset you measure is the inset that is
    declared and the two ends of the row agree. */
-.dossierName {
+.lp-hero-dossier-name {
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -1586,7 +1573,7 @@
   transition: translate 200ms var(--lp-ease-snap);
 }
 
-.dossierStars {
+.lp-hero-dossier-stars {
   margin-inline-end: -1.25px;
   flex-shrink: 0;
   display: inline-flex;
@@ -1599,14 +1586,8 @@
   white-space: nowrap;
 }
 
-.dossierStar {
-  width: 0.65rem;
-  height: 0.65rem;
-  fill: currentcolor;
-  opacity: 0.8;
-}
 
-.dossierBody {
+.lp-hero-dossier-body {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -1636,8 +1617,8 @@
    the weight. It must read as a *source*, not as a caption.
 ------------------------------------------------------------------ */
 
-.dossierSource,
-.libraryFeedLabel {
+.lp-hero-dossier-source,
+.lp-hero-library-feed-label {
   display: flex;
   min-width: 0;
   align-items: center;
@@ -1648,22 +1629,16 @@
   letter-spacing: 0.005em;
 }
 
-.sourceText {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
 
-.sourceOwner {
+.lp-hero-source-owner {
   color: var(--ink-lo);
 }
 
-.sourceSlash {
+.lp-hero-source-slash {
   color: var(--ink-lo);
 }
 
-.sourceRepo {
+.lp-hero-source-repo {
   font-weight: 600;
   color: var(--ink-hi);
 }
@@ -1671,7 +1646,7 @@
 /* Provenance mark. It was printed in the accent on all five cards at once —
    five 12px flecks of the one hue that means "act here". It is a glyph in the
    source line and takes the source line's ink. */
-.dossierFork {
+.lp-hero-dossier-fork {
   width: 0.78rem;
   height: 0.78rem;
   flex-shrink: 0;
@@ -1680,7 +1655,7 @@
 
 /* One line, at every card width the scatter uses: five cards of identical
    height are what make the arrangement read as an arrangement. */
-.dossierDesc {
+.lp-hero-dossier-desc {
   margin: 0;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -1692,14 +1667,8 @@
   color: var(--ink-mid);
 }
 
-.dossierTags {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 0.28rem;
-  overflow: hidden;
-}
 
-.dossierTag {
+.lp-hero-dossier-tag {
   display: inline-flex;
   align-items: center;
   min-height: 1.15rem;
@@ -1729,7 +1698,7 @@
    of the drawer, docked beside the panel with a leader line.
 ------------------------------------------------------------------ */
 
-.dossierPeek {
+.lp-hero-dossier-peek {
   position: absolute;
   top: calc(var(--rh) / 2);
   /* pulled out into the slot the loose deck occupied — column 3, inset by the
@@ -1746,7 +1715,7 @@
     translate 260ms var(--lp-ease-emph);
 }
 
-.dossierPeek .dossier {
+.lp-hero-dossier-peek .lp-hero-dossier {
   --fp: 0;
   --dp: 0;
   --merge: 0;
@@ -1758,7 +1727,7 @@
     0 24px 48px hsl(var(--shadow-color) / 0.28);
 }
 
-.dossierLeader {
+.lp-hero-dossier-leader {
   position: absolute;
   top: 50%;
   right: calc(-1 * (var(--col) - 100%));
@@ -1767,7 +1736,7 @@
   background: color-mix(in oklab, var(--primary) 60%, transparent);
 }
 
-.dossierLeader::after {
+.lp-hero-dossier-leader::after {
   content: "";
   position: absolute;
   right: -0.16rem;
@@ -1780,19 +1749,19 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .heroCards:hover .dossier {
+  .lp-hero-cards:hover .lp-hero-dossier {
     opacity: 0.48;
   }
 
-  .heroCards:hover .libraryFeed {
+  .lp-hero-cards:hover .lp-hero-library-feed {
     opacity: 0.2;
   }
 
-  .dossierSlot:hover {
+  .lp-hero-dossier-slot:hover {
     z-index: 12;
   }
 
-  .dossierSlot:hover .dossier {
+  .lp-hero-dossier-slot:hover .lp-hero-dossier {
     opacity: 1;
     border-color: color-mix(
       in oklab,
@@ -1805,13 +1774,13 @@
     );
   }
 
-  .dossierSlot:hover .dossierParallax {
+  .lp-hero-dossier-slot:hover .lp-hero-dossier-parallax {
     box-shadow:
       0 10px 22px hsl(var(--shadow-color) / calc(0.2 * (1 - var(--dp, 0)))),
       0 26px 50px hsl(var(--shadow-color) / calc(0.26 * (1 - var(--dp, 0))));
   }
 
-  .dossierSlot:hover .dossierRow {
+  .lp-hero-dossier-slot:hover .lp-hero-dossier-row {
     background: color-mix(
       in oklab,
       var(--primary) calc(var(--dp) * 10%),
@@ -1819,11 +1788,11 @@
     );
   }
 
-  .dossierSlot:hover .dossierName {
+  .lp-hero-dossier-slot:hover .lp-hero-dossier-name {
     translate: calc(var(--dp) * 2px) 0;
   }
 
-  .dossierSlot:hover .dossierPeek {
+  .lp-hero-dossier-slot:hover .lp-hero-dossier-peek {
     opacity: var(--dp);
     translate: 0 -50%;
   }
@@ -1833,7 +1802,7 @@
    Small screens: a static before / after field manual
 ------------------------------------------------------------------ */
 
-.heroBoardMobile {
+.lp-hero-board-mobile {
   --rh: 2.9rem;
   position: relative;
   z-index: 2;
@@ -1843,7 +1812,7 @@
   margin-top: 3rem;
 }
 
-.mobileMark {
+.lp-hero-mobile-mark {
   display: flex;
   align-items: center;
   /* the chapter's one joint, here too */
@@ -1856,7 +1825,7 @@
   color: var(--muted-foreground);
 }
 
-.mobileMark::after {
+.lp-hero-mobile-mark::after {
   content: "";
   flex: 1;
   height: 1px;
@@ -1866,26 +1835,20 @@
   background: var(--lp-grid-line);
 }
 
-.mobileMarkFiled {
+.lp-hero-mobile-mark-filed {
   color: var(--primary);
 }
 
-.mobileMarkFiled::after {
+.lp-hero-mobile-mark-filed::after {
   background: color-mix(in oklab, var(--primary) 40%, transparent);
 }
 
-.mobileChaos {
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-  margin-top: 0.9rem;
-}
 
-.mobileChaosCard {
+.lp-hero-mobile-chaos-card {
   width: 84%;
 }
 
-.mobileChaosCard .dossier {
+.lp-hero-mobile-chaos-card .lp-hero-dossier {
   --fp: 0;
   --dp: 0;
   --merge: 0;
@@ -1898,30 +1861,25 @@
    deck has none at rest: a rotated 1px border is antialiased across two device
    rows and every card ends up at a different apparent weight. The deck reads
    as loose from its offsets alone. */
-.mobileChaosCard:nth-child(odd) {
+.lp-hero-mobile-chaos-card:nth-child(odd) {
   align-self: flex-start;
 }
 
-.mobileChaosCard:nth-child(even) {
+.lp-hero-mobile-chaos-card:nth-child(even) {
   align-self: flex-end;
   margin-right: 2%;
 }
 
-.mobileChaosCard:nth-child(3) {
+.lp-hero-mobile-chaos-card:nth-child(3) {
   margin-left: 8%;
 }
 
-.mobileChaosCard:nth-child(5) {
+.lp-hero-mobile-chaos-card:nth-child(5) {
   margin-left: 5%;
 }
 
-.mobileArrow {
-  display: flex;
-  justify-content: center;
-  margin: 1.35rem 0 1.1rem;
-}
 
-.mobileArrowLine {
+.lp-hero-mobile-arrow-line {
   position: relative;
   width: 1px;
   height: 1.75rem;
@@ -1932,7 +1890,7 @@
   );
 }
 
-.mobileArrowLine::after {
+.lp-hero-mobile-arrow-line::after {
   content: "";
   position: absolute;
   bottom: 0;
@@ -1945,7 +1903,7 @@
   border-bottom: 1px solid var(--primary);
 }
 
-.mobileLibrary {
+.lp-hero-mobile-library {
   position: relative;
   margin-top: 0.9rem;
   overflow: hidden;
@@ -1964,33 +1922,30 @@
    +1px on the closing side pays for the page frame's rail, which is the desktop
    drawer's right edge. Neither applies here: this panel has four borders of its
    own, so its head and base take the same padding as its rows. */
-.mobileLibrary .libraryHead {
+.lp-hero-mobile-library .lp-hero-library-head {
   padding-inline: 0.75rem;
 }
 
-.mobileLibrary .libraryHead {
+.lp-hero-mobile-library .lp-hero-library-head {
   height: 2.75rem;
 }
 
-.mobileLibrary .libraryScan {
+.lp-hero-mobile-library .lp-hero-library-scan {
   transform: none;
 }
 
-.mobileFilter {
+.lp-hero-mobile-filter {
   position: relative;
   height: 3rem;
 }
 
-.mobileFilter .libraryFilter {
+.lp-hero-mobile-filter .lp-hero-library-filter {
   inset-inline: 0.75rem;
   top: 0.55rem;
 }
 
-.mobileRows {
-  padding: 0 0.75rem 0.25rem;
-}
 
-.mobileRow {
+.lp-hero-mobile-row {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -1998,16 +1953,16 @@
   border-bottom: 1px solid var(--lp-grid-line);
 }
 
-.mobileRow:last-child {
+.lp-hero-mobile-row:last-child {
   border-bottom: none;
 }
 
 @media (min-width: 64rem) {
-  .heroBoard {
+  .lp-hero-board {
     display: block;
   }
 
-  .heroBoardMobile {
+  .lp-hero-board-mobile {
     display: none;
   }
 }
@@ -2017,7 +1972,7 @@
 --------------------------------------------------------------------------- */
 
 @media (min-width: 64rem) {
-  :global([data-landing-motion-root][data-motion-enabled="true"]) .heroExit {
+  [data-landing-motion-root][data-motion-enabled="true"] .lp-hero-exit {
     --hx: clamp(0, calc((var(--route-p) - 0.45) / 0.46), 1);
     translate: 0 calc(var(--hx) * -14px);
     /* enough to hand focus to the board, not enough to grey the headline out
@@ -2114,86 +2069,86 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .heroField,
-  .heroSpine,
-  .heroEyebrow,
-  .heroIndex,
-  .heroBlurb,
-  .heroCta,
-  .heroRail {
+  .lp-hero-field,
+  .lp-hero-spine,
+  .lp-hero-eyebrow,
+  .lp-hero-index,
+  .lp-hero-blurb,
+  .lp-hero-cta,
+  .lp-hero-rail {
     animation: lp-hero-fade 140ms linear both;
   }
 
   /* the scene rests filed, so the diagram that explains the filing is drawn */
-  .libraryFeed {
+  .lp-hero-library-feed {
     display: block;
   }
 
-  .heroField,
-  .heroSpine {
+  .lp-hero-field,
+  .lp-hero-spine {
     translate: none;
     scale: none;
   }
 
-  .heroEyebrow::before,
-  .heroLine,
-  .dossierEnter {
+  .lp-hero-eyebrow::before,
+  .lp-hero-line,
+  .lp-hero-dossier-enter {
     animation: none;
     transform: none;
   }
 
-  .heroRail {
+  .lp-hero-rail {
     --rail-p: 1;
     margin-top: 0;
   }
 
-  .heroTopRule {
+  .lp-hero-top-rule {
     animation: lp-hero-fade 140ms linear both;
     scale: none;
   }
 
-  .libraryFeedRow {
+  .lp-hero-library-feed-row {
     --t: 1;
   }
 
-  .libraryFeed {
+  .lp-hero-library-feed {
     transition: none;
   }
 
-  .dossierSlot {
+  .lp-hero-dossier-slot {
     --fp: 1;
     --lift: 0;
     --merge: 1;
     transform: none;
   }
 
-  .libraryFrame {
+  .lp-hero-library-frame {
     translate: none;
     transition: none;
   }
 
-  .heroBoard {
+  .lp-hero-board {
     --done: 1;
   }
 
-  .libraryScan {
+  .lp-hero-library-scan {
     transform: none;
   }
 
-  .dossierParallax {
+  .lp-hero-dossier-parallax {
     translate: none;
     rotate: none;
     box-shadow: none;
     transition: none;
   }
 
-  .dossier,
-  .heroCards:hover .dossier {
+  .lp-hero-dossier,
+  .lp-hero-cards:hover .lp-hero-dossier {
     opacity: 1;
     transition: none;
   }
 
-  .dossierPeek {
+  .lp-hero-dossier-peek {
     display: none;
   }
 }

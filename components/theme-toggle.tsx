@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { MoonIcon, SunIcon } from "lucide-react"
 import { useTheme } from "next-themes"
 
-import styles from "@/components/theme-toggle.module.css"
 import { buttonVariants } from "@/components/button-variants"
 import { cn } from "@/lib/utils"
 
@@ -18,13 +17,13 @@ const modes = ["light", "dark", "system"] as const
  * the guides / resources header: 3px corners, a rule-weight edge, a field of its
  * own, the CTA cluster's hover-and-press, and the title printed under the
  * control on hover. Size is the caller's, because each header's controls are
- * sized to each other — see the module.
+ * sized to each other — see `app/styles/theme-toggle.css`.
  */
 export type ThemeToggleChrome = "app" | "marketing"
 
 const chromeClassName: Record<ThemeToggleChrome, string> = {
   app: "relative size-10 rounded-xl border-border bg-card/65",
-  marketing: styles.marketing,
+  marketing: "theme-toggle-marketing relative rounded-[3px]",
 }
 
 type Mode = (typeof modes)[number]

@@ -5,7 +5,7 @@
    choreography is layered on by LandingMotionController via CSS variables.
 --------------------------------------------------------------------------- */
 
-.root {
+.lp-root {
   --lp-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --lp-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
 
@@ -47,7 +47,7 @@
     var(--lp-gutter),
     calc(50% - var(--lp-measure) / 2 + var(--lp-gutter))
   );
-  /* Retired from the page frame, kept for `closing.module.css`, which draws
+  /* Retired from the page frame, kept for `closing.css`, which draws
      its column rail from it.
 
      It was the frame's ink as an alpha of differenced white, hand-tuned so
@@ -108,7 +108,7 @@
   --lp-frame-end: 0px;
   /* `--lp-mark-rise`: how far the brand mark has to come up to centre on the
      wordmark's type rather than on its line box. Mean of the cap-band centre
-     and the ascender-band centre; derived in the `.brandLockup` note. */
+     and the ascender-band centre; derived in the `.lp-brand-lockup` note. */
   --lp-mark-rise: 0.75px;
 
   /* --- appended: one construction for every outlined control ---------------
@@ -146,23 +146,21 @@
   );
 
   /* The command strip's action — the one place accent ink appears in the
-     chrome, now that the scroll gauge is gone. See `.ctaHeaderAction`. The edge
+     chrome, now that the scroll gauge is gone. See `.lp-cta-header-action`. The edge
      is deliberately in the accent rather than in `--lp-chrome-rule`: it has to
      say "this is the go action" without carrying a filled slab's mass. */
   --lp-accent-edge: color-mix(in oklab, var(--primary) 45%, transparent);
   --lp-accent-edge-hover: color-mix(in oklab, var(--primary) 70%, transparent);
   --lp-accent-field: color-mix(in oklab, var(--primary) 12%, var(--background));
-
-  position: relative;
 }
 
 @media (min-width: 48rem) {
-  .root {
+  .lp-root {
     --lp-gutter: 2.5rem;
   }
 }
 
-:global(.dark) .root {
+.dark .lp-root {
   --lp-alert: oklch(0.74 0.14 60);
   --pricing-field: oklch(0.945 0.011 103);
   --pricing-ink: oklch(0.17 0.017 158);
@@ -170,10 +168,10 @@
   /* `--lp-frame-ink` is deliberately *not* re-keyed here: differenced ink is
      symmetric about mid-grey, so one alpha renders the same contrast on both
      fields. It no longer draws the page frame — see the note on the token —
-     but `closing.module.css` still reaches for it. */
+     but `closing.css` still reaches for it. */
 }
 
-.root[data-motion-enabled="true"] {
+.lp-root[data-motion-enabled="true"] {
   --mcp-p: var(--mcp-progress, 0);
 }
 
@@ -198,15 +196,14 @@
    gutter for exactly the band y=106–765. That is not grain. It is Chrome's
    8-bit dither of the hero chapter's radial field, which was 1440 wide — i.e.
    40px past the frame on each side — and only ever bright on the right, where
-   its centre is (78% of the measure). `.grain::after` was correctly inset; the
+   its centre is (78% of the measure). `.lp-grain::after` was correctly inset; the
    texture outside the frame was a *gradient*, not a second overlay. The frame
    matte contains it, and the gutter now measures 0.000 on both sides at every
-   depth. The one overlay is this one. */
-.grain {
-  position: relative;
-}
+   depth. The one overlay is this one.
 
-.grain::after {
+   The class is the overlay and nothing else — the positioning context it needs
+   is a plain `relative` in the chapter's own class list. */
+.lp-grain::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -219,147 +216,26 @@
 }
 
 @media (min-width: 64rem) {
-  .grain::after {
+  .lp-grain::after {
     left: var(--lp-frame-inset);
     right: var(--lp-frame-inset);
   }
 }
 
-:global(.dark) .grain::after {
+.dark .lp-grain::after {
   opacity: 0.22;
   mix-blend-mode: overlay;
 }
-
 /* ---------------------------------------------------------------------------
-   Page frame — two continuous hairlines on the content edge
+   Page frame — retired from this stylesheet, not from the page.
 
-   The single strongest structural signal on the page: every chapter is seen
-   to live inside one deliberate measure. Never hit-tests, never reflows
-   anything, sits above section fields but below the command strip so the
-   header rule reads as the frame's top edge.
-
-   ONE RECTANGLE, ONE NUMBER, FOUR EDGES — and, now, ONE GROUND.
-
-   Round 3 made the rails opaque (`--lp-chrome-rule` over a backdrop of the
-   page's own field) because a translucent rail landing on a chapter's own
-   vertical border rendered half again as heavy as the same rail a band earlier:
-   measured, 46.8 down the hero against 71.9 through the MCP chapter, on a line
-   that is meant to be one continuous edge.
-
-   Round 5 found the other half of the same problem. The rails printed a
-   constant 60,65,60, but the *ground* they were drawn against did not: the
-   left gutter measured 7,14,10 at every depth while the right measured up to
-   25,31,27, so one rule read 1.87:1 against its surroundings on the left and
-   1.59:1 on the right. Every other hairline on the page is alpha, i.e. a
-   constant step over its local ground; an opaque rail is a constant number
-   instead, and where the ground moves the two are not the same thing.
-
-   The two requirements only conflict when the ground moves. So fix the ground.
-   `.frameMatte` lays the page's own field over both outer gutters *and* over
-   the rail's own column, and the rails go back to being what every other
-   hairline is — plain `--lp-chrome-rule`, no backdrop, alpha over its local
-   ground. Because that ground is now uniform by construction, the rail is
-   simultaneously one rendered value down the whole document and one constant
-   step over the field beside it. Measured after: 60,65,60 at every depth, left
-   and right, 1.871:1 both sides; the gutters read 7,14,10 with standard
-   deviation 0.000 at every depth. The chapter borders that used to double under
-   a translucent rail are now *behind* the matte, so they cannot.
-
-   What the matte covers, measured on a full-document capture at 1440: the hero
-   chapter's radial field (1440 wide, so 40px past the frame; visible in the
-   right gutter y=106–765), one full-bleed 1px horizontal on the hero's bottom
-   border at y=1855, and the closing chapter's 28px dot raster from y=7752 down.
-   All three are chapter-owned and all three crossed a boundary the page claims
-   is a boundary. Nothing else lives out there — no chapter paints a deliberate
-   full-bleed plate — and the matte sits below `z-index: 21`, which is where the
-   closing headline's 2px optical overhang lives, so the type that deliberately
-   breaks the measure still paints in front.
-
-   The cost, taken knowingly: where a chapter's display type overhangs the
-   measure by its own side bearing — the closing headline does, by ~2px — the
-   rail cuts a 1px seam through the glyph instead of ghosting it. That is the
-   frame passing in front of type that broke it, which is at least one
-   consistent story; the real fix belongs in the chapter that overhangs.
+   The mattes and the rails are four absolutely-positioned spans with no
+   pseudo-element, no state and no derived geometry: every declaration they had
+   is a plain utility, so they are composed in `components/landing/chrome/page-frame.tsx`
+   and the measurements that justify them moved there with them. What is left
+   here is the token they both read — `--lp-chrome-rule`, declared on
+   `.lp-root` above — and this pointer, so the ink ladder still has one home.
 --------------------------------------------------------------------------- */
-
-/* The matte: outside the frame is the page's own field, full stop.
-   Two jobs, one element. It makes the frame a boundary rather than a line drawn
-   on a field that carries on past it, and it gives the rails a ground that
-   cannot move — which is what lets them be alpha. `top: 0` rather than the
-   header height because the strip is transparent at rest, so the gutter above
-   the frame's top edge would otherwise show a chapter's field too. */
-.frameMatte {
-  position: absolute;
-  top: 0;
-  bottom: var(--lp-frame-end, 0px);
-  z-index: 19;
-  display: none;
-  /* The rail's own column, so the rail composites over this and nothing else.
-     Same expression as `left: var(--lp-frame-inset)` on the rail — the 50% in
-     that token resolves against the same containing block either way. */
-  width: calc(var(--lp-frame-inset) + 1px);
-  background: var(--background);
-  pointer-events: none;
-}
-
-.frameMatte[data-side="start"] {
-  left: 0;
-}
-
-.frameMatte[data-side="end"] {
-  right: 0;
-}
-
-@media (min-width: 64rem) {
-  .frameMatte {
-    display: block;
-  }
-}
-
-/* Absolute, not fixed. Fixed rails cannot know where the page ends, so they
-   ran from the header rule to the *viewport's* bottom edge: at the end of the
-   document the frame was closed at the top and open at the bottom, with 47px
-   of rail hanging below the footer rule and past the corner it was supposed to
-   turn. Anchored in the document instead, the rails start on the header rule
-   and stop on the footer rule, and the four edges close a rectangle. A rail is
-   a straight vertical line at a constant x, so scrolling with the page rather
-   than with the viewport is visually identical everywhere except at the two
-   ends — which are the only places this was ever wrong. */
-.frameRail {
-  position: absolute;
-  top: var(--lp-header-h);
-  bottom: var(--lp-frame-end, 0px);
-  z-index: 20;
-  display: none;
-  width: 1px;
-  /* Alpha, like every other hairline on the page — one ink, no backdrop. It can
-     be, because `.frameMatte` guarantees the field underneath it: the rail is
-     drawn on the page's own ground for its whole length, so 23% of foreground
-     over that ground is both one rendered number (60,65,60 dark, 191 light) and
-     one constant step over the field beside it.
-
-     It was opaque for two rounds, for a real reason — three chapters draw their
-     own vertical border on exactly this measure and a translucent rail landing
-     on one of those rendered 71.9 where the same rail rendered 46.8 a band
-     earlier. Those borders are behind the matte now. The invariant is kept by
-     controlling the ground rather than by hard-coding the ink. */
-  background: var(--lp-chrome-rule);
-  pointer-events: none;
-}
-
-.frameRail[data-side="start"] {
-  left: var(--lp-frame-inset);
-}
-
-.frameRail[data-side="end"] {
-  right: var(--lp-frame-inset);
-}
-
-@media (min-width: 64rem) {
-  .frameRail {
-    display: block;
-  }
-}
 
 /* ---------------------------------------------------------------------------
    Header — compact command strip
@@ -369,11 +245,12 @@
    under the strip instead of being ghosted in half by it.
 --------------------------------------------------------------------------- */
 
-.header {
-  position: sticky;
-  top: 0;
-  z-index: 40;
-  background-color: transparent;
+/* Only what the strip cannot say as a utility: the two properties the scrolled
+   state and the no-script fallback animate between. `sticky top-0 z-40
+   bg-transparent` is the strip's resting composition and lives in its class
+   list — the rules below still win over that `bg-transparent`, because this
+   stylesheet is unlayered and utilities are not. */
+.lp-header {
   transition:
     background-color var(--lp-dur-hover) var(--lp-ease-snap),
     box-shadow var(--lp-dur-hover) var(--lp-ease-snap);
@@ -387,7 +264,7 @@
    the dark field: the rails print 63 and the dimmed rule printed 50, so the
    rectangle's top edge was 20% lighter than its sides for the whole hero. The
    frame is one weight or it is not a frame. */
-.header::before {
+.lp-header::before {
   content: "";
   position: absolute;
   left: var(--lp-frame-inset);
@@ -398,7 +275,7 @@
   transition: background-color var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-.root[data-scrolled] .header {
+.lp-root[data-scrolled] .lp-header {
   /* Opaque on purpose. A frosted strip is the fashionable answer, but this
      page runs display type and an inverted plate underneath it: at any alpha
      that still reads as glass, headings ghost through the wordmark as they
@@ -417,31 +294,24 @@
    pass straight through the wordmark. It keeps its field instead: one less
    dramatic first screen, but never an illegible one. */
 @media (scripting: none) {
-  .header {
+  .lp-header {
     background-color: var(--background);
   }
 }
 
-/* A short vertical divider between two cells of a control row. It centres on
-   the row's optical centre — the same centre the caps and the icon cell sit
-   on. (It used to declare `align-self: stretch`, which a definite height
-   cancels, dropping it back to flex-start and leaving it 10px high in a
-   36px row.) */
-.headerCellRule {
-  align-self: center;
-  width: 1px;
-  flex: none;
-  background: var(--lp-hairline);
-}
+/* The cell divider between two cells of a control row is four plain utilities —
+   `self-center w-px flex-none bg-[var(--lp-hairline)]` — and lives in the
+   footer's class list. It centres on the row's optical centre, the same centre
+   the caps and the icon cell sit on; it must not ask for `self-stretch`, which
+   a definite height cancels, dropping it back to flex-start and leaving it 10px
+   high in a 36px row.
 
-/* The brand lockup, pulled back onto the column by the mark's own side
-   bearing so the first ink of the page starts on the measure rather than
-   three pixels inside it. Header and footer use the same wrapper, so the
-   wordmark reads as hanging from one column top to bottom. */
-.brandLockup {
-  display: inline-flex;
-  margin-inline-start: calc(-1 * var(--lp-mark-bearing));
-}
+   The brand lockup is likewise `inline-flex` plus a pull back onto the column
+   by the mark's own side bearing (`ms-[calc(-1*var(--lp-mark-bearing))]`), so
+   the first ink of the page starts on the measure rather than three pixels
+   inside it. Header and footer use the same pair, so the wordmark reads as
+   hanging from one column top to bottom. Only the rule below stays here: it
+   reaches *into* the lockup for a mark the wrapper does not render itself. */
 
 /* The lockup is centred on its type, not on its line box.
    `align-items: center` centres the 28px mark box on the centre of the
@@ -454,16 +324,16 @@
    centre — small, but on an 11px cap height it is the difference between a
    lockup and two things next to each other. Lift by the mean of the two
    optical centres so the mark sits within a quarter pixel of both. */
-.brandLockup :global(.brand-mark) {
+.lp-brand-lockup .brand-mark {
   translate: 0 calc(-1 * var(--lp-mark-rise));
 }
 
 /* Theme toggle — retired from this stylesheet.
    The treatment (3px corner, `--lp-chrome-rule` edge, its own field, the CTA
    cluster's hover-and-press, and the title printed under the control) moved to
-   `components/theme-toggle.module.css` when the guides / resources header
+   `app/styles/theme-toggle.css` when the guides / resources header
    needed the same control. It could not simply be imported from here: the
-   `--lp-*` tokens it read are declared on `.root`, so outside the landing tree
+   `--lp-*` tokens it read are declared on `.lp-root`, so outside the landing tree
    its edge and field resolved to nothing. The component now owns it as
    `chrome="marketing"`, both headers ask for it by name, and the design notes
    moved with the rules. */
@@ -484,9 +354,19 @@
    axis in one size and both axes in another; measured, that left the nav
    action leaning right and the chapter action leaning left. Padding is
    symmetric here and the *icon* is compensated instead, by its own side
-   bearing, which is where the asymmetry actually comes from. */
-.ctaButton {
-  position: relative;
+   bearing, which is where the asymmetry actually comes from.
+
+   This block stays in CSS rather than moving to the button's class list, and
+   the padding is why. The compensation it has to beat is declared under a
+   variant — `has-data-[icon=inline-end]:pr-4.5` — and a variant utility is not
+   a conflict `tailwind-merge` can see, so a `px-[1.25em]` alongside it would
+   not remove it; `:has()` also lends that selector the specificity to win
+   inside the utilities layer. Declared here it is unlayered, so it beats the
+   compensation outright. The other three properties go with it: they are one
+   geometry, and splitting them across two files to save three declarations
+   would leave the note above pointing at half a rule. `relative` is the
+   exception — nothing competes for it — so it sits in the class list. */
+.lp-cta {
   padding-inline: 1.25em;
   gap: 0.5em;
   border-radius: 3px;
@@ -498,7 +378,7 @@
     box-shadow var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-.ctaButton:focus-visible {
+.lp-cta:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 3px;
   box-shadow: none;
@@ -509,7 +389,7 @@
    distance from the button edge as the label's first cap does on the other
    side, and the same distance from the label as the label's own letters are
    from each other's boxes. */
-.ctaArrow {
+.lp-cta-arrow {
   inline-size: 1em;
   block-size: 1em;
   flex: none;
@@ -525,12 +405,12 @@
    glyph carried its own side bearing into the joint. Take the inner bearing
    back too and every gap in the button is the gap it says it is: 20 / 8 /
    label / 8 / 20. */
-.ctaButton .ctaArrow[data-icon="inline-end"] {
+.lp-cta .lp-cta-arrow[data-icon="inline-end"] {
   margin-inline-start: calc(-1 * var(--lp-arrow-bearing));
   margin-inline-end: calc(-1 * var(--lp-arrow-bearing));
 }
 
-.ctaButton svg[data-icon="inline-start"] {
+.lp-cta svg[data-icon="inline-start"] {
   inline-size: 1em;
   block-size: 1em;
   flex: none;
@@ -553,8 +433,8 @@
    34px of ink — two pixels shorter than the 36px icon button standing right
    next to it in the same bar. It also puts the fill *under* the border, which
    is what lets the border carry the highlight. */
-.ctaPrimary,
-.ctaPrimary:focus-visible {
+.lp-cta-primary,
+.lp-cta-primary:focus-visible {
   background-clip: border-box;
   border-top-color: var(--lp-lit-edge);
   box-shadow: 0 1px 0 color-mix(in oklab, var(--foreground) 14%, transparent);
@@ -591,7 +471,7 @@
    control — or a chapter overriding it — happens to carry. Both layers are
    background *images*, so a chapter's `background-color` override paints
    beneath them and is a harmless no-op rather than a source of drift. */
-.ctaSecondary {
+.lp-cta-secondary {
   border-color: var(--lp-chrome-rule);
   background-image:
     linear-gradient(var(--lp-control-field), var(--lp-control-field)),
@@ -606,7 +486,7 @@
    and printed 63 instead of 60. A ghost that has no field has nothing under its
    edge but the page, so the edge is the page's rule weight by construction.
    Hover is carried by the edge appearing at all, plus the shared 1px lift. */
-.ctaGhost {
+.lp-cta-ghost {
   border-color: transparent;
 }
 
@@ -647,10 +527,10 @@
    12.8px the cap band runs 23.0–32.0 (centre 27.5) and the x-height band
    25.5–32.0 (centre 28.75). No single placement can centre both. The label sits
    on 27.998 — within 0.13px of the mean of the two optical centres (28.125),
-   which is the same rule `.brandLockup` uses for the mark. Centring the cap band
+   which is the same rule `.lp-brand-lockup` uses for the mark. Centring the cap band
    exactly would drop the label's visual mass 1.25px low in a 36px pill.
 --------------------------------------------------------------------------- */
-.ctaHeaderAction {
+.lp-cta-header-action {
   border-color: var(--lp-accent-edge);
   color: var(--foreground);
   background-image:
@@ -661,15 +541,15 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .ctaButton:hover {
+  .lp-cta:hover {
     translate: 0 -1px;
   }
 
-  .ctaButton:hover .ctaArrow {
+  .lp-cta:hover .lp-cta-arrow {
     transform: translate3d(4px, 0, 0);
   }
 
-  .ctaPrimary:hover {
+  .lp-cta-primary:hover {
     border-top-color: var(--lp-lit-edge-hover);
     box-shadow:
       0 2px 0 color-mix(in oklab, var(--foreground) 16%, transparent),
@@ -679,71 +559,59 @@
   /* Hover on an outlined control is carried by its edge and the shared 1px
      lift, not by its fill. Its fill cannot move: the interior is a background
      *image* now (so the edge composites over the page's field rather than over
-     the interior — see `.ctaSecondary`), and `background-image` is not an
+     the interior — see `.lp-cta-secondary`), and `background-image` is not an
      animatable property. A wash faked with `inset 0 0 0 999px` would be, but the
      hero chapter owns `box-shadow` on this control. Given the choice between one
      mechanism with a slightly quieter hover and two mechanisms doing the same
      job, this file takes the first: edge steps 23% → 30%, control lifts a pixel,
      arrow slides four. */
-  .ctaSecondary:hover {
+  .lp-cta-secondary:hover {
     border-color: var(--lp-hairline-strong);
   }
 
   /* A hovered ghost becomes an outlined control, so it takes the outlined
      control's resting edge — the same edge the toggle two cells to its left
      is already wearing, and now at the same rendered value. */
-  .ctaGhost:hover {
+  .lp-cta-ghost:hover {
     border-color: var(--lp-chrome-rule);
   }
 
   /* Same light, same halo as the filled action — a fraction of the strength,
      because it is a fraction of the mass. */
-  .ctaHeaderAction:hover {
+  .lp-cta-header-action:hover {
     border-color: var(--lp-accent-edge-hover);
     box-shadow: 0 8px 18px -14px color-mix(in oklab, var(--primary) 55%, transparent);
   }
 }
 
-.ctaButton:active {
+.lp-cta:active {
   translate: 0 1px;
   transition-duration: var(--lp-dur-tap);
 }
 
 /* Pressed: the slab goes down into the page, so it loses the edge it was
    catching the light on and takes a shadow from above instead. */
-.ctaPrimary:active {
+.lp-cta-primary:active {
   border-top-color: transparent;
   box-shadow:
     inset 0 1px 2px color-mix(in oklab, var(--foreground) 22%, transparent),
     0 0 0 color-mix(in oklab, var(--foreground) 0%, transparent);
 }
 
-.ctaButton:active .ctaArrow {
+.lp-cta:active .lp-cta-arrow {
   transform: translate3d(6px, 0, 0);
 }
 
 /* Chapter index annotations — thin technical marks, decorative only. */
-.chapterMark {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-family: var(--font-mono);
-  font-size: 0.675rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  color: var(--muted-foreground);
-}
-
-.chapterMark::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--lp-hairline);
-  /* Tracked caps carry their letter-space after the final glyph, so a 0.75rem
-     gap measured box-to-box reads as 0.75rem + 0.22em of air. Take the
-     trailing space back so the joint is the size it says it is. */
-  margin-left: -0.22em;
-}
+/* Chapter index annotations — retired from this stylesheet.
+   Nine declarations and a five-declaration rule with no derived value, no state
+   and no data URI: all of it has a utility spelling, including the rule the
+   `::after` draws. It is shared by three chapters, so it lives as one exported
+   recipe in `components/landing/styles.ts` rather than as one class here. The
+   measurement that justifies its one odd number went with it: tracked caps
+   carry their letter-space after the final glyph, so a 0.75rem gap measured
+   box-to-box reads as 0.75rem + 0.22em of air, and the rule takes the trailing
+   space back so the joint is the size it says it is. */
 
 /* ---------------------------------------------------------------------------
    Scroll gauge — retired
@@ -775,13 +643,12 @@
    the chrome moves to the command strip's action, where it reports what a
    control does rather than decorating a boundary.
 
-   The class names survive as no-ops so any stale reference still resolves.
+   The `display: none` no-ops that survived the cut are gone with the modules.
+   They existed so a stale `styles.scrollProgress` still resolved to a real
+   class; in a global stylesheet there is no such thing as a stale reference,
+   and two unprefixed global names this generic are a hazard rather than a
+   safety net. Nothing renders them — checked across the tree before removal.
 --------------------------------------------------------------------------- */
-
-.scrollProgress,
-.scrollHead {
-  display: none;
-}
 
 /* ---------------------------------------------------------------------------
    Chapter rail — retired
@@ -797,16 +664,11 @@
    page keeps one honest position signal — the playhead on the measure rule —
    and the footer keeps the links.
 
-   The class names survive as no-ops so any stale reference still resolves,
-   and the controller already guards on `railLinks.length`.
+   The `display: none` no-ops are gone with the modules, for the same reason the
+   gauge's are — `.rail` and `.railLabel` as unprefixed global names would hide
+   anything that ever adopted those words. The controller already guards on
+   `railLinks.length`, so nothing depends on them.
 --------------------------------------------------------------------------- */
-
-.rail,
-.railLink,
-.railTick,
-.railLabel {
-  display: none;
-}
 
 /* ---------------------------------------------------------------------------
    Footer — the closing plate
@@ -821,85 +683,35 @@
    inside the frame like everything else, instead of running out under it.
 --------------------------------------------------------------------------- */
 
-.footer {
-  position: relative;
-}
+/* The colophon's own box, its inner measure and its plate are utility-composed
+   in `landing-chrome.tsx`. Two notes travelled with them.
 
-/* Same content clear as the closing chapter above it — page gutter plus the
-   extra air off the frame rails — so the colophon doesn't snap back out to
-   the rails after "06 · Start". */
-.footerInner {
-  --footer-inline: calc(var(--lp-gutter) + 1.5rem);
+   The inner measure carries the same content clear as the closing chapter above
+   it — page gutter plus the extra air off the frame rails, stepping 1.5rem →
+   1.75rem → 2rem at 48/64/84rem — so the colophon doesn't snap back out to the
+   rails after "06 · Start". It needed a `--footer-inline` custom property only
+   because a media query cannot restate one side of a shorthand; three
+   breakpoint-prefixed padding utilities say it directly and the property is
+   gone.
 
-  position: relative;
-  display: flex;
-  width: 100%;
-  max-width: var(--lp-measure);
-  flex-direction: column;
-  gap: 2rem;
-  margin-inline: auto;
-  padding-block: 3rem;
-  padding-inline: var(--footer-inline);
-}
-
-@media (min-width: 48rem) {
-  .footerInner {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    padding-block: 3.5rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .footerInner {
-    --footer-inline: calc(var(--lp-gutter) + 1.75rem);
-  }
-}
-
-@media (min-width: 84rem) {
-  .footerInner {
-    --footer-inline: calc(var(--lp-gutter) + 2rem);
-  }
-}
-
-/* The plate, plus the hand-off: the closing chapter fades into it over the
-   last 5rem before the rule. */
-.footerField {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -5rem;
-  bottom: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 0,
-    var(--lp-footer-field) 5rem
-  );
-}
-
-@media (min-width: 64rem) {
-  .footerField {
-    left: var(--lp-frame-inset);
-    right: var(--lp-frame-inset);
-  }
-}
+   The plate is the hand-off: the closing chapter fades into it over the last
+   5rem before the rule, and where the frame exists it stops at the frame — the
+   page's last field is inside the frame like everything else, instead of
+   running out under it. */
 
 /* The frame's bottom edge. Painted over the page's own field rather than over
    the footer plate: the plate is `--foreground` at 3.5%, and a translucent
    rule laid on it rendered 69 where the same declaration rendered 64 at the
    top of the page and 63 down the sides.
 
-   The two rails went back to plain alpha in round 5, because `.frameMatte` gives
+   The two rails went back to plain alpha in round 5, because `.lp-frame-matte` gives
    them a ground the page controls. This edge is the one of the four that cannot:
    the colophon plate is authored to reach full strength exactly here, so the
    rule crosses it whatever order the two are painted in. It keeps its own copy
    of the page field, which is what makes it print the same 60,65,60 (191 light)
    as the other three rather than 65. Same ink, same rendered number, one extra
    layer where the page put a field under it. */
-.footerRule {
+.lp-footer-rule {
   position: absolute;
   left: var(--lp-frame-inset);
   right: var(--lp-frame-inset);
@@ -911,18 +723,16 @@
     var(--background);
 }
 
-.footerNavLink {
-  position: relative;
-  /* Take back the trailing letter-space of the tracked caps so the optical
-     gap to the next cell matches the gap between the links themselves. */
-  margin-inline-end: -0.18em;
-  padding-block: 0.15rem;
-  color: var(--muted-foreground);
-  text-decoration: none;
+/* The link's resting composition — `relative -me-[0.18em] py-[0.15rem]
+   text-muted-foreground no-underline` — is in its class list; the negative
+   margin takes back the trailing letter-space of the tracked caps so the
+   optical gap to the next cell matches the gap between the links themselves.
+   What stays is the underline it grows and the two states that drive it. */
+.lp-footer-nav-link {
   transition: color var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-.footerNavLink::after {
+.lp-footer-nav-link::after {
   content: "";
   position: absolute;
   left: 0;
@@ -935,15 +745,15 @@
   transition: transform var(--lp-dur-hover) var(--lp-ease-out);
 }
 
-.footerNavLink:hover {
+.lp-footer-nav-link:hover {
   color: var(--foreground);
 }
 
-.footerNavLink:hover::after {
+.lp-footer-nav-link:hover::after {
   transform: scaleX(1);
 }
 
-.footerNavLink:focus-visible {
+.lp-footer-nav-link:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 4px;
   border-radius: 1px;
@@ -962,7 +772,7 @@
    than the page field, so its interior takes the shared 3% over *that*
    (`--lp-footer-control-field`) while the border's own layer is the page field —
    one relationship, one rendered edge value at both ends of the page. */
-.footerMark {
+.lp-footer-mark {
   border: 1px solid var(--lp-chrome-rule);
   border-radius: 3px;
   color: var(--muted-foreground);
@@ -980,13 +790,13 @@
     translate var(--lp-dur-hover) var(--lp-ease-snap);
 }
 
-.footerMark:hover {
+.lp-footer-mark:hover {
   border-color: var(--lp-hairline-strong);
   color: var(--foreground);
   translate: 0 -1px;
 }
 
-.footerMark:focus-visible {
+.lp-footer-mark:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
   color: var(--foreground);
@@ -999,13 +809,15 @@
    feel attached rather than laggy.
 --------------------------------------------------------------------------- */
 
-.magnetic {
-  display: inline-flex;
+/* `inline-flex` is in the wrapper's class list; the pull itself stays here,
+   because the controller writes `--mx` / `--my` onto the element and the two
+   durations are one mechanism. */
+.lp-magnetic {
   translate: calc(var(--mx, 0) * 1px) calc(var(--my, 0) * 1px);
   transition: translate 420ms var(--lp-ease-out);
 }
 
-.magnetic:hover {
+.lp-magnetic:hover {
   transition-duration: 90ms;
 }
 
@@ -1014,32 +826,33 @@
 --------------------------------------------------------------------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .header,
-  .header::before,
-  .ctaArrow,
-  .ctaButton,
-  .magnetic,
-  .bannerLink,
-  .footerNavLink,
-  .footerNavLink::after,
-  .footerMark {
+  .lp-header,
+  .lp-header::before,
+  .lp-cta-arrow,
+  .lp-cta,
+  .lp-magnetic,
+  .lp-footer-nav-link,
+  .lp-footer-nav-link::after,
+  .lp-footer-mark {
     transition: none;
     transition-delay: 0s;
   }
 
-  .ctaButton:hover,
-  .ctaButton:active,
-  .footerMark:hover {
+  .lp-cta:hover,
+  .lp-cta:active,
+  .lp-footer-mark:hover {
     translate: none;
   }
 
-  .ctaButton:hover .ctaArrow,
-  .ctaButton:active .ctaArrow,
-  .bannerLink:hover .ctaArrow {
+  /* `.bannerLink` used to appear in both of these lists. Nothing declared it
+     and nothing rendered it — it was a selector for an element the page had
+     already dropped — so it went with the modules. */
+  .lp-cta:hover .lp-cta-arrow,
+  .lp-cta:active .lp-cta-arrow {
     transform: none;
   }
 
-  .ctaButton:active {
+  .lp-cta:active {
     scale: 1 !important;
     transform: none;
   }

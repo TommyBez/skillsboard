@@ -2,6 +2,29 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
+/* Chapter stylesheets for the marketing surface.
+   These carry the part of the landing page that has no utility spelling: the
+   derived geometry each chapter is measured from (one token feeding the next
+   through calc), the pseudo-element rules and plates, the keyframes, and the
+   descendant selectors the motion controller drives from
+   `[data-motion-group][data-motion-state]` on an ancestor. Everything that does
+   have a utility spelling — layout, spacing, type scale, colour — lives in the
+   components' class lists instead.
+
+   Unlayered on purpose. They replaced CSS Modules, which are also unlayered, so
+   keeping them out of `@layer components` preserves the cascade the chapters
+   were tuned against: a chapter rule still outranks the utility it overrides on
+   the same element (the outline CTA's edge over `variant="outline"`'s
+   `border-border`, for one), exactly as it did before. */
+@import './styles/theme-toggle.css';
+@import './styles/landing/base.css';
+@import './styles/landing/hero.css';
+@import './styles/landing/flow.css';
+@import './styles/landing/mcp.css';
+@import './styles/landing/pricing.css';
+@import './styles/landing/faq.css';
+@import './styles/landing/closing.css';
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

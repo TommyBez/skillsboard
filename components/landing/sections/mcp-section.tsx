@@ -3,8 +3,7 @@ import { ShieldCheckIcon } from "lucide-react"
 import { DecodeText } from "@/components/landing/decode-text"
 import { HomeMcpActions } from "@/components/landing/landing-ctas"
 import { McpSchematic } from "@/components/landing/mcp-schematic"
-import base from "@/components/landing/styles/base.module.css"
-import styles from "@/components/landing/styles/mcp.module.css"
+import { chapterMark } from "@/components/landing/styles"
 
 /** MCP — the signature routing chapter. */
 export function McpSection() {
@@ -12,25 +11,25 @@ export function McpSection() {
     <section
       id="mcp"
       aria-labelledby="mcp-heading"
-      className={`${styles.mcpChapter} scroll-mt-14`}
+      className="lp-mcp-chapter scroll-mt-14"
       data-mcp-chapter
       data-chapter-target="mcp"
     >
-      <div className={styles.mcpSticky}>
-        <div className={styles.frame}>
-          <div className={styles.frameTop}>
-            <span className={styles.frameIndex} aria-hidden="true">
+      <div className="lp-mcp-sticky">
+        <div className="lp-mcp-frame">
+          <div className="lp-mcp-frame-top">
+            <span className="lp-mcp-frame-index" aria-hidden="true">
               03
             </span>
             <DecodeText
               as="p"
-              className={`${base.chapterMark} ${styles.frameMark} uppercase`}
+              className={`${chapterMark} min-w-0 flex-1 uppercase`}
               text="MCP access"
             />
-            <p className={styles.readout} aria-hidden="true">
-              <span className={styles.readoutKey}>signal</span>
-              <span className={styles.readoutSep} />
-              <span className={styles.readoutStack}>
+            <p className="lp-mcp-readout" aria-hidden="true">
+              <span className="lp-mcp-readout-key">signal</span>
+              <span className="lp-mcp-readout-sep" />
+              <span className="lp-mcp-readout-stack">
                 <span data-phase="0">standby</span>
                 <span data-phase="1">indexing</span>
                 <span data-phase="2">linking</span>
@@ -40,24 +39,24 @@ export function McpSection() {
             </p>
           </div>
 
-          <div className={styles.frameBody}>
-            <div className={styles.copyCol}>
-              <div className={styles.copyBody}>
+          <div className="lp-mcp-frame-body">
+            <div className="lp-mcp-copy-col">
+              <div className="min-w-0 self-center">
                 <h2
                   id="mcp-heading"
-                  className={`${styles.copyHeading} text-4xl font-semibold leading-[1.02] tracking-display md:text-5xl lg:text-[clamp(2.6rem,3.55vw,3.4rem)]`}
+                  className="lp-mcp-copy-heading text-4xl font-semibold leading-[1.02] tracking-display md:text-5xl lg:text-[clamp(2.6rem,3.55vw,3.4rem)]"
                 >
                   Bring your team’s skills into your agent.
                 </h2>
                 <p
-                  className={`${styles.copyLede} mt-5 text-pretty text-base leading-relaxed text-muted-foreground lg:text-[1.0625rem]`}
+                  className="max-w-[17.8em] mt-5 text-pretty text-base leading-relaxed text-muted-foreground lg:text-[1.0625rem]"
                 >
                   Connect Skills Board through MCP. Your agent can search the
                   shared library, retrieve install commands, and save new skills
                   it discovers.
                 </p>
                 <div
-                  className={`${styles.copyShield} mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground`}
+                  className="lp-mcp-copy-shield mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"
                 >
                   <ShieldCheckIcon
                     className="mt-0.5 size-4 shrink-0 text-primary"
@@ -75,18 +74,18 @@ export function McpSection() {
 
               {/* Decorative annotation: the connection this chapter describes,
                   stated once, at the tier the type scale was missing. */}
-              <div className={styles.endpoint} aria-hidden="true">
-                <p className={styles.endpointHead}>
+              <div className="lp-mcp-endpoint" aria-hidden="true">
+                <p className="lp-mcp-endpoint-head">
                   <span>endpoint</span>
                 </p>
-                <p className={styles.endpointValue}>/api/mcp</p>
-                <p className={styles.endpointMeta}>
+                <p className="lp-mcp-endpoint-value">/api/mcp</p>
+                <p className="lp-mcp-endpoint-meta">
                   streamable http · oauth 2.1 · browser
                 </p>
               </div>
             </div>
 
-            <div className={styles.frameSpine} aria-hidden="true" />
+            <div className="lp-mcp-frame-spine" aria-hidden="true" />
 
             <McpSchematic />
           </div>

@@ -3,7 +3,6 @@ import Link from "next/link"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { buttonVariants } from "@/components/button-variants"
-import base from "@/components/landing/styles/base.module.css"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
@@ -68,9 +67,7 @@ export function HomeHeaderActions() {
           href="/sign-in"
           className={cn(
             buttonVariants({ variant: "ghost", size: "sm" }),
-            base.ctaButton,
-            base.ctaGhost,
-            "hidden h-9 sm:inline-flex",
+            "lp-cta lp-cta-ghost relative hidden h-9 sm:inline-flex",
           )}
         >
           Sign in
@@ -83,9 +80,7 @@ export function HomeHeaderActions() {
           }}
           className={cn(
             buttonVariants({ variant: "outline", size: "sm" }),
-            base.ctaButton,
-            base.ctaHeaderAction,
-            "sm:h-9",
+            "lp-cta lp-cta-header-action relative sm:h-9",
           )}
         >
           {/* "Sign up", not "Start": Lighthouse flags "Start" as
@@ -93,7 +88,7 @@ export function HomeHeaderActions() {
           <span className="sm:hidden">Sign up</span>
           <span className="hidden sm:inline">{primaryAction.label}</span>
           <ArrowRightIcon
-            className={`${base.ctaArrow} hidden sm:block`}
+            className="lp-cta-arrow hidden sm:block"
             data-icon="inline-end"
           />
         </TrackedLink>
@@ -105,7 +100,7 @@ export function HomeHeaderActions() {
 export function HomeHeroActions() {
   return (
     <div className="flex flex-wrap gap-3">
-      <span className={base.magnetic} data-magnetic>
+      <span className="lp-magnetic inline-flex" data-magnetic>
         <TrackedLink
           href={primaryAction.href}
           analytics={{
@@ -114,12 +109,11 @@ export function HomeHeroActions() {
           }}
           className={cn(
             buttonVariants({ size: "lg" }),
-            base.ctaButton,
-            base.ctaPrimary,
+            "lp-cta lp-cta-primary relative",
           )}
         >
           {primaryAction.label}
-          <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+          <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
         </TrackedLink>
       </span>
       <TrackedLink
@@ -130,12 +124,11 @@ export function HomeHeroActions() {
         }}
         className={cn(
           buttonVariants({ variant: "outline", size: "lg" }),
-          base.ctaButton,
-          base.ctaSecondary,
+          "lp-cta lp-cta-secondary relative",
         )}
       >
         See MCP access
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </TrackedLink>
     </div>
   )
@@ -143,7 +136,7 @@ export function HomeHeroActions() {
 
 export function HomeMcpActions() {
   return (
-    <span className={base.magnetic} data-magnetic>
+    <span className="lp-magnetic inline-flex" data-magnetic>
       <TrackedLink
         href={primaryAction.href}
         analytics={{
@@ -155,13 +148,12 @@ export function HomeMcpActions() {
         }}
         className={cn(
           buttonVariants({ size: "lg" }),
-          base.ctaButton,
-          base.ctaPrimary,
+          "lp-cta lp-cta-primary relative",
         )}
       >
         <CableIcon data-icon="inline-start" />
         Create a library to connect
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </TrackedLink>
     </span>
   )
@@ -169,7 +161,7 @@ export function HomeMcpActions() {
 
 export function HomeFinalActions() {
   return (
-    <span className={base.magnetic} data-magnetic>
+    <span className="lp-magnetic inline-flex" data-magnetic>
       <TrackedLink
         href={primaryAction.href}
         analytics={{
@@ -178,12 +170,11 @@ export function HomeFinalActions() {
         }}
         className={cn(
           buttonVariants({ size: "lg" }),
-          base.ctaButton,
-          base.ctaPrimary,
+          "lp-cta lp-cta-primary relative",
         )}
       >
         {primaryAction.label}
-        <ArrowRightIcon className={base.ctaArrow} data-icon="inline-end" />
+        <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
       </TrackedLink>
     </span>
   )
