@@ -1,3 +1,4 @@
+import { DecodeText } from "@/components/landing/decode-text"
 import { HeroBoard } from "@/components/landing/hero-board"
 import { HomeHeroActions } from "@/components/landing/landing-ctas"
 
@@ -50,9 +51,11 @@ export function HeroSection() {
             <span className="lp-hero-index" aria-hidden="true">
               01
             </span>
-            <p className="lp-hero-eyebrow" data-decode="">
-              Skills selected by your team
-            </p>
+            <DecodeText
+              as="p"
+              className="lp-hero-eyebrow"
+              text="Skills selected by your team"
+            />
             <span className="lp-hero-top-rule" aria-hidden="true" />
           </div>
 

@@ -13,8 +13,15 @@
     "url": "https://github.com/TommyBez/skillsboard/issues"
   },
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22.13.0"
   },
+  "browserslist": [
+    "chrome >= 111",
+    "edge >= 111",
+    "firefox >= 111",
+    "safari >= 16.4",
+    "ios >= 16.4"
+  ],
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "dev": "next dev",
@@ -61,8 +68,8 @@
     "pg": "^8.22.0",
     "posthog-js": "^1.402.3",
     "posthog-node": "^5.44.0",
-    "react": "^19",
-    "react-dom": "^19",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
     "remotion": "4.0.495",
     "resend": "^6.17.2",
     "shadcn": "^4.8.0",
@@ -81,12 +88,11 @@
     "@types/culori": "^4.0.1",
     "@types/node": "^24",
     "@types/pg": "^8.20.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
     "babel-plugin-react-compiler": "^1.0.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
-    "esbuild": "^0.28.1",
     "postcss": "^8.5",
     "react-email": "^6.9.0",
     "tailwindcss": "^4.2.0",
@@ -94,7 +100,9 @@
   },
   "pnpm": {
     "overrides": {
-      "hono": "4.12.25"
+      "hono": "4.12.25",
+      "@types/react": "19.2.18",
+      "@types/react-dom": "19.2.4"
     }
   }
 }

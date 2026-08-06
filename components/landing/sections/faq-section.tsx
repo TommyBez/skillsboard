@@ -1,3 +1,4 @@
+import { DecodeText } from "@/components/landing/decode-text"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 
 /** FAQ — chapter 05, set as a ruled register. */
@@ -9,12 +10,14 @@ export function FaqSection() {
       className="relative scroll-mt-14"
       data-chapter-target="faq"
     >
-      <div className="lp-faq-inner" data-motion-group="faq">
+      <div
+        className="lp-faq-inner"
+        data-motion-group="faq"
+        data-motion-state="pending"
+      >
         {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). */}
         <p className="lp-faq-strip" aria-hidden="true">
-          <span className="lp-faq-strip-num" data-decode="">
-            05
-          </span>
+          <DecodeText className="lp-faq-strip-num" text="05" />
           <span className="lp-faq-strip-hair" />
           <span className="lp-faq-strip-name">FAQ</span>
           <span className="lp-faq-strip-hair" data-flex="" />

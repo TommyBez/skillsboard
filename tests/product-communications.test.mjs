@@ -1,9 +1,16 @@
 import assert from "node:assert/strict"
+import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { tsModuleUrl } from "./load-ts-module.mjs"
+import { stripTypeScriptTypes } from "node:module"
 
-const productModuleUrl = await tsModuleUrl("../lib/email/product-communications.ts")
+async function transpiledModule(path) {
+  const source = await readFile(new URL(path, import.meta.url), "utf8")
+  const outputText = stripTypeScriptTypes(source, { mode: "transform" })
+  return `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
+}
+
+const productModuleUrl = await transpiledModule("../lib/email/product-communications.ts")
 const productCommunications = await import(productModuleUrl)
 const {
   PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
@@ -190,11 +197,14 @@ test("unsubscribe tokens are encrypted, randomized, and contain no raw email add
   const originalRoot = Buffer.alloc(32, 17).toString("base64")
   const replacementRoot = Buffer.alloc(32, 29).toString("base64")
   process.env.EMAIL_PRIVACY_SECRET = originalRoot
-  const privacyModuleUrl = await tsModuleUrl("../lib/email/email-privacy.ts", (source) =>
-    source
-      .replace('import "server-only"', "")
-      .replace('"@/lib/email/product-communications"', JSON.stringify(productModuleUrl)),
-  )
+  const privacySource = (await readFile(
+    new URL("../lib/email/email-privacy.ts", import.meta.url),
+    "utf8",
+  )).replace('import "server-only"', "")
+  const outputText = stripTypeScriptTypes(privacySource, { mode: "transform" })
+  const privacyModuleUrl = `data:text/javascript;base64,${Buffer.from(
+    outputText.replace('"@/lib/email/product-communications"', JSON.stringify(productModuleUrl)),
+  ).toString("base64")}`
   const {
     createProductCommunicationsUnsubscribeToken,
     hashEmailAddress,
