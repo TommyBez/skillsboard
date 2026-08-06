@@ -1,10 +1,10 @@
 import type { CSSProperties } from "react"
-import { GitForkIcon, SearchIcon, StarIcon } from "lucide-react"
+import { GitForkIcon, SearchIcon } from "lucide-react"
 
 
 /**
  * Decorative skill dossiers. Visual examples only — they mirror the real
- * SkillDossier information hierarchy (name, stars, source, description, tags)
+ * SkillDossier information hierarchy (name, source, description, tags)
  * so the hero reads as the actual app UI.
  *
  * `source` is split into owner / repo because it is a *provenance* line, not a
@@ -37,16 +37,14 @@ import { GitForkIcon, SearchIcon, StarIcon } from "lucide-react"
  *
  * The whole board is aria-hidden; the hero copy carries the message.
  */
-/* Star counts are three digits on every card on purpose. A thousands separator
-   set in the card's 10px mono reads as a decimal point — "1,204" was being read
-   as 1.2 — and mixing separated and unseparated values in the same column makes
-   the whole set ambiguous. One numeral width, one column, no punctuation. */
+/* Every card is explicitly labelled as an example. Fabricated popularity
+   counts would look like product proof even though this board is illustrative. */
 const dossiers = [
   {
     name: "code-review",
     owner: "acme",
     repo: "eng-skills",
-    stars: "412",
+    label: "example",
     // One line, and short enough that it never truncates, at every card width
     // down to 1024 — the scattered deck is a composition of five equal cards,
     // so their heights must not vary and none of them may end in an ellipsis.
@@ -58,7 +56,7 @@ const dossiers = [
     name: "pdf-extraction",
     owner: "anthropic",
     repo: "skills",
-    stars: "938",
+    label: "example",
     description: "Pulls tables out of PDFs.",
     tags: ["documents"],
     depth: "7px",
@@ -67,7 +65,7 @@ const dossiers = [
     name: "brand-voice",
     owner: "acme",
     repo: "brand-kit",
-    stars: "271",
+    label: "example",
     description: "Rewrites copy on brand.",
     tags: ["writing", "brand"],
     depth: "14px",
@@ -76,7 +74,7 @@ const dossiers = [
     name: "sql-migrations",
     owner: "drizzle",
     repo: "skills",
-    stars: "864",
+    label: "example",
     description: "Drafts safe migrations.",
     tags: ["database"],
     depth: "6px",
@@ -85,7 +83,7 @@ const dossiers = [
     name: "release-notes",
     owner: "vercel",
     repo: "skills",
-    stars: "590",
+    label: "example",
     description: "Turns PRs into notes.",
     tags: ["shipping", "docs"],
     depth: "10px",
@@ -124,8 +122,7 @@ function DossierRow({ dossier }: { dossier: Dossier }) {
     <div className="lp-hero-dossier-row">
       <span className="lp-hero-dossier-name">{dossier.name}</span>
       <span className="lp-hero-dossier-stars">
-        <StarIcon className="size-[0.65rem] fill-current opacity-80" aria-hidden="true" />
-        {dossier.stars}
+        {dossier.label}
       </span>
     </div>
   )
@@ -257,8 +254,7 @@ export function HeroBoard() {
               <div key={dossier.name} className="lp-hero-mobile-row">
                 <span className="lp-hero-dossier-name">{dossier.name}</span>
                 <span className="lp-hero-dossier-stars">
-                  <StarIcon className="size-[0.65rem] fill-current opacity-80" aria-hidden="true" />
-                  {dossier.stars}
+                  {dossier.label}
                 </span>
               </div>
             ))}

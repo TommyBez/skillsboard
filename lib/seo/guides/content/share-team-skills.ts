@@ -4,6 +4,11 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   path: guidePaths.shareTeamSkills,
   contentType: "guide",
   topics: ["team operations", "skill sharing", "governance", "mixed-agent teams"],
+  relatedGuidePaths: [
+    guidePaths.manageCrossAgentSkills,
+    guidePaths.chooseFirstTeamSkill,
+    guidePaths.onboardNewTeammateSkills,
+  ],
   eyebrow: "Team skill operations",
   title: "How to share AI agent skills with your team",
   seoTitle: "How to Share AI Agent Skills With Your Team | Skills Board",
@@ -11,6 +16,8 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     "A practical workflow to share AI agent skills across a team, set ownership, compare distribution models, and keep one trusted recommendation library.",
   intro:
     "Sharing a skill is easy. Making it trustworthy, discoverable, and reusable by the next teammate is the real job. This guide gives you a lightweight operating model that works whether your team uses one agent or several.",
+  answer:
+    "Share an agent skill through one versioned canonical source and one visible team recommendation. Record its purpose, owner, reviewed setup paths, and status. Test the agent paths teammates use, then link to the source instead of copying SKILL.md into multiple places.",
   corePrinciple:
     "One canonical source. One visible recommendation. Explicit setup for every agent path.",
   problem:
@@ -84,7 +91,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     { label: "Problem", value: "The repeated task this skill helps the team complete." },
     { label: "Recommendation", value: "Why the team prefers this skill over the current alternative." },
     { label: "Canonical source", value: "The repository path or source URL for the reviewed artifact." },
-    { label: "Use paths", value: "Source, install command, ZIP, MCP, or agent-specific instructions that actually exist." },
+    { label: "Use paths", value: "Source, install command, ZIP, connected-agent search through MCP, or agent-specific instructions that actually exist." },
     { label: "Compatibility", value: "Agents and environments the team has tested—never an assumed universal claim." },
     { label: "Owner and status", value: "The person responsible plus active, needs-review, or retired." },
   ],
@@ -146,5 +153,5 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: how to share AI agent skills with your team.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-07-22",
+  modifiedAt: "2026-08-06",
 }

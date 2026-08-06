@@ -4,6 +4,11 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
   path: guidePaths.sharedMcpSkillLibrary,
   contentType: "guide",
   topics: ["MCP", "team operations", "skill sharing", "AI agent skills", "agent access"],
+  relatedGuidePaths: [
+    guidePaths.manageCrossAgentSkills,
+    guidePaths.shareTeamSkills,
+    guidePaths.onboardNewTeammateSkills,
+  ],
   eyebrow: "MCP team access",
   title: "How to use a shared AI skill library through MCP",
   seoTitle: "Shared MCP Skill Library for Teams | Skills Board",
@@ -11,6 +16,8 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
     "Connect an MCP-compatible agent to a shared team skill library, authorize access in the browser, search recommendations, and verify a useful handoff.",
   intro:
     "A shared skill library should remain useful when a teammate works inside an agent. MCP gives a compatible client an authenticated path to the same team recommendations, so the teammate can search the library, retrieve a command, and, with the required scope, contribute skills or organize collections without copying an API key.",
+  answer:
+    "Use MCP as an authenticated path to a shared skill library, not as a universal installer. Connect the intended account, verify its permissions, and retrieve a real recommendation. Keep the original source and non-MCP setup paths available.",
   corePrinciple:
     "Keep the team recommendation central. Use MCP as one authenticated access path.",
   problem:
@@ -207,5 +214,5 @@ Test date: [date]
   },
   ogAlt: "Skills Board guide: use a shared AI skill library through MCP.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-07-29",
+  modifiedAt: "2026-08-06",
 }

@@ -4,6 +4,11 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   path: guidePaths.manageCrossAgentSkills,
   contentType: "guide",
   topics: ["team operations", "skill sharing", "compatibility", "mixed-agent teams"],
+  relatedGuidePaths: [
+    guidePaths.shareTeamSkills,
+    guidePaths.sharedMcpSkillLibrary,
+    guidePaths.onboardNewTeammateSkills,
+  ],
   eyebrow: "Cross-agent operations",
   title: "Manage skills across Claude Code, Codex, and Cursor",
   seoTitle: "Manage Claude Code, Codex & Cursor Skills | Skills Board",
@@ -11,6 +16,8 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     "Use one source of truth to manage SKILL.md workflows across Claude Code, Codex, and Cursor without confusing portability with automatic synchronization.",
   intro:
     "Claude Code, Codex, and Cursor can all work with reusable skills, but “supported” does not mean “kept in sync.” A durable team setup separates the shared skill source from each agent’s installation and discovery rules.",
+  answer:
+    "To share skills across Claude Code, Codex, and Cursor, keep one canonical SKILL.md source and document how each agent installs, discovers, and invokes it. Test every agent path with the same fixture, then share the compatibility record. Do not maintain separate canonical copies or assume updates sync automatically.",
   corePrinciple:
     "One canonical source. One visible recommendation. Explicit setup for every agent path.",
   problem:
@@ -166,5 +173,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-07-22",
+  modifiedAt: "2026-08-06",
 }

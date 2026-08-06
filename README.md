@@ -31,7 +31,7 @@
 </p>
 
 <p align="center">
-  <a href="https://skillsboard.sh"><strong>Try the hosted app</strong></a>
+  <a href="https://www.skillsboard.sh"><strong>Try the hosted app</strong></a>
   ·
   <a href="#run-locally">Run it locally</a>
   ·
@@ -46,7 +46,7 @@ Useful skill recommendations tend to disappear into chats, bookmarks, and person
 - **Different agents welcome.** Share the same recommendation across Claude, Codex, Cursor, and other agent setups.
 - **A choice of handoff.** Open the original source, copy a compatible install command, or download the latest skill files as a ZIP.
 - **Organization-scoped access.** Create a team, invite members, and keep each library available to its members.
-- **Optional MCP access.** Connect compatible agents to authenticated tools for listing, searching, and saving skills to the library.
+- **Optional MCP access.** Connect compatible agents to authenticated, scope-controlled tools for finding and organizing team skills and collections.
 
 > [!IMPORTANT]
 > A saved skill is a team recommendation, not a security review, compatibility certification, or pinned release. Skills Board reads the latest available source; inspect that source before using it in an agent.
@@ -118,7 +118,7 @@ Product communications are separate from transactional OTP and invitation email.
 
 ## MCP access
 
-Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** for the connection flow. The server offers tools to list and search team skills, get a saved skill's install command, browse the optional public catalog, and save new skills from GitHub to a team library (guarded by the `skills:write` scope).
+Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** to connect it. The tools can search team skills and collections, retrieve install commands, and discover public or repository skills. With `skills:write`, they can save new skills and organize collections. They cannot edit or delete saved team skills, install them in an agent, or execute them.
 
 ## Tech stack
 

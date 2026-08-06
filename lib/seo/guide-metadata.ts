@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import type { GuideDefinition } from "@/lib/seo/guides"
+import { siteConfig } from "@/lib/site"
 
 export function buildGuideMetadata(guide: GuideDefinition): Metadata {
   const openGraphImage = {
@@ -26,6 +27,8 @@ export function buildGuideMetadata(guide: GuideDefinition): Metadata {
       url: guide.path,
       title: guide.title,
       description: guide.description,
+      siteName: siteConfig.name,
+      locale: siteConfig.locale,
       publishedTime: guide.publishedAt,
       modifiedTime: guide.modifiedAt,
       images: [openGraphImage],

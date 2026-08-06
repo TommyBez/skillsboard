@@ -16,6 +16,11 @@ export function buildLandingSchema() {
         url: siteConfig.url,
         description: siteConfig.description,
         sameAs: [siteConfig.githubUrl],
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: siteConfig.contactEmail,
+        },
       },
       {
         "@type": "WebSite",

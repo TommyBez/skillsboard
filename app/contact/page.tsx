@@ -4,10 +4,29 @@ import { ExternalLinkIcon, MailIcon, MapPinIcon } from "lucide-react"
 import { LegalPageShell } from "@/components/legal-page-shell"
 import { siteConfig } from "@/lib/site"
 
+const description = "Contact Skills Board for product, account, privacy, or security questions."
+const socialTitle = "Contact | Skills Board"
+const socialImageAlt = "Skills Board: Your team’s skills. All in one place."
+
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Contact Skills Board for product, account, privacy, or security questions.",
+  description,
   alternates: { canonical: "/contact" },
+  openGraph: {
+    type: "website",
+    url: "/contact",
+    title: socialTitle,
+    description,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+    images: [{ url: "/opengraph-image", alt: socialImageAlt }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: socialTitle,
+    description,
+    images: [{ url: "/twitter-image", alt: socialImageAlt }],
+  },
 }
 
 export default function ContactPage() {

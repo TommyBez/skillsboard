@@ -51,9 +51,10 @@ export function McpSection() {
                 <p
                   className="max-w-[17.8em] mt-5 text-pretty text-base leading-relaxed text-muted-foreground lg:text-[1.0625rem]"
                 >
-                  Connect Skills Board through MCP. Your agent can search the
-                  shared library, retrieve install commands, and save new skills
-                  it discovers.
+                  Connect Skills Board through MCP. Within the scopes you grant,
+                  your agent can search team skills and collections, retrieve
+                  install commands, and discover public or repository skills.
+                  With write access, it can save skills and organize collections.
                 </p>
                 <div
                   className="lp-mcp-copy-shield mt-5 flex items-start gap-2 text-sm leading-relaxed text-muted-foreground"

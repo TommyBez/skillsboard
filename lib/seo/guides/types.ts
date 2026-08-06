@@ -19,12 +19,15 @@ export interface GuideDefinition {
   path: GuidePath
   contentType: "guide"
   topics: readonly string[]
+  relatedGuidePaths: readonly GuidePath[]
   eyebrow: string
   title: string
   /** Full document <title>, including the brand suffix. */
   seoTitle: string
   description: string
   intro: string
+  /** Concise, answer-first summary shown near the start of the guide. */
+  answer: string
   corePrinciple: string
   problem: string
   decisionTitle: string

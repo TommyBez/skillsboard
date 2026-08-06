@@ -20,6 +20,9 @@ export function LegalPageShell({
 }: LegalPageShellProps) {
   return (
     <div className="app-canvas min-h-svh bg-background text-foreground">
+      <a href="#main-content" className="skip-link">
+        Skip to content
+      </a>
       <header className="border-b border-border/80 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] w-full max-w-[1200px] items-center justify-between gap-4 px-5 md:px-10">
           <Brand />
@@ -27,7 +30,7 @@ export function LegalPageShell({
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1200px] px-5 py-12 md:px-10 md:py-20">
+      <main id="main-content" className="mx-auto w-full max-w-[1200px] px-5 py-12 md:px-10 md:py-20">
         <article className="grid gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
           <header className="lg:sticky lg:top-28 lg:self-start">
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
