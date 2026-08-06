@@ -18,6 +18,15 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
     "The most useful agent skills do not start as clever prompts. They start as recurring team workflows with recognizable inputs, a result someone can review, and enough stable guidance to help a second person repeat the work. These eight use cases show what that pattern looks like across engineering, product, research, design, and go-to-market work.",
   answer:
     "A strong AI agent skill captures a repeatable procedure with known inputs and a reviewable output. Good team use cases include pull-request preflight, release notes, bug triage, research synthesis, feedback triage, specification review, design and accessibility review, and launch QA. Keep accountable decisions human.",
+  citations: {
+    answer: ["openai-skills", "anthropic-agent-skills-sdk", "github-agent-skills"],
+    decision: [
+      "openai-skills",
+      "anthropic-agent-skills-sdk",
+      "github-agent-skills",
+      "dora-ai-capabilities",
+    ],
+  },
   corePrinciple:
     "A skill-worthy use case repeats, starts from known inputs, and ends in a reviewable result.",
   problem:
@@ -186,21 +195,25 @@ Review date: [date]
   ],
   sources: [
     {
+      id: "openai-skills",
       label: "OpenAI: Using skills",
       href: "https://openai.com/academy/skills/",
       note: "Introduces skills as reusable workflows and starts skill creation from a repeatable task with a clear input and output.",
     },
     {
+      id: "anthropic-agent-skills-sdk",
       label: "Anthropic: Agent Skills in the SDK",
       href: "https://code.claude.com/docs/en/agent-sdk/skills",
       note: "Documents SKILL.md, supporting resources, discovery, and the environment in which a reusable skill runs.",
     },
     {
+      id: "github-agent-skills",
       label: "GitHub: About agent skills",
       href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
       note: "Describes Agent Skills as folders of instructions, scripts, and resources that improve repeatable specialized tasks.",
     },
     {
+      id: "dora-ai-capabilities",
       label: "Google Cloud and DORA: AI Capabilities Model",
       href: "https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model",
       note: "Connects stronger AI-assisted outcomes with clear policy, versioned work, user focus, and small, reviewable batches.",

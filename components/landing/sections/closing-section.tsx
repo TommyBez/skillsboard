@@ -71,7 +71,7 @@ export function ClosingSection() {
                 <Link
                   key={guide.href}
                   href={guide.href}
-                  className="underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+                  className="inline-flex min-h-11 items-center px-2 underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
                 >
                   {guide.label}
                 </Link>

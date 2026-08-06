@@ -22,8 +22,8 @@ const modes = ["light", "dark", "system"] as const
 export type ThemeToggleChrome = "app" | "marketing"
 
 const chromeClassName: Record<ThemeToggleChrome, string> = {
-  app: "relative size-10 rounded-xl border-border bg-card/65",
-  marketing: "theme-toggle-marketing relative rounded-[3px]",
+  app: "relative size-10 min-h-11 min-w-11 rounded-xl border-border bg-card/65",
+  marketing: "theme-toggle-marketing relative min-h-11 min-w-11 rounded-[3px]",
 }
 
 type Mode = (typeof modes)[number]

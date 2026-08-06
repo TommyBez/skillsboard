@@ -18,6 +18,14 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
     "Buying seats is not an onboarding strategy. Teams adopt AI coding tools when they can use them on a real task, with trusted context, clear review boundaries, and a visible definition of success. This guide turns an individual experiment into a repeatable team rollout.",
   answer:
     "Onboard an engineering team to AI coding tools around one recurring, reviewable workflow—not a feature tour. Give the pilot trusted context, explicit review gates, a shared fixture, and a clear definition of success. Expand only after a second engineer can repeat the workflow.",
+  citations: {
+    answer: ["ibm-ai-code-standardization", "linkedin-agent-playbooks"],
+    decision: ["ibm-ai-code-standardization", "linkedin-agent-playbooks"],
+    steps: {
+      2: ["linkedin-agent-playbooks"],
+      5: ["ibm-ai-code-standardization"],
+    },
+  },
   corePrinciple:
     "Standardize one useful workflow before standardizing a tool.",
   problem:
@@ -124,16 +132,19 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
   ],
   sources: [
     {
+      id: "ibm-ai-code-standardization",
       label: "IBM: Standardize AI code generation across a development team",
       href: "https://www.ibm.com/think/insights/standardize-ai-code-generation-across-your-development-team",
       note: "Discusses moving from individual AI coding use to shared team standards, context, governance, and reusable practices.",
     },
     {
+      id: "linkedin-agent-playbooks",
       label: "LinkedIn Engineering: Contextual agent playbooks and tools",
       href: "https://www.linkedin.com/blog/engineering/ai/contextual-agent-playbooks-and-tools-how-linkedin-gave-ai-coding-agents-organizational-context",
       note: "Describes how organizational context and repeatable playbooks make coding agents more useful inside an engineering environment.",
     },
     {
+      id: "openai-workspace-agents",
       label: "OpenAI: Workspace agents in ChatGPT",
       href: "https://openai.com/index/introducing-workspace-agents-in-chatgpt/",
       note: "Shows the shift from personal AI use toward shared, governed agent workflows connected to team knowledge and tools.",

@@ -18,6 +18,10 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
     "The best first skill is not the most impressive one in a catalog. It is the smallest repeatable workflow your team can inspect, test, and hand to a second teammate with a clear expected result. This guide turns that choice into an observable team decision.",
   answer:
     "Choose your first AI agent skill around one repeated team problem. Compare a small set of inspectable candidates, reject unsafe or opaque options, and test the winner on a representative task. Recommend it only after a second teammate reproduces the result.",
+  citations: {
+    answer: ["openai-skills", "anthropic-agent-skills-sdk", "github-add-agent-skills"],
+    decision: ["openai-skills", "anthropic-agent-skills-sdk", "github-add-agent-skills"],
+  },
   corePrinciple:
     "Choose the repeated problem first. Validate the skill with a second teammate.",
   problem:
@@ -195,16 +199,19 @@ Review again when: [source, agent, permissions, or workflow changes]`,
   ],
   sources: [
     {
+      id: "openai-skills",
       label: "OpenAI: Using skills",
       href: "https://openai.com/academy/skills/",
       note: "Introduces skills as reusable workflows and starts skill creation from a repeatable task with a clear input and output.",
     },
     {
+      id: "anthropic-agent-skills-sdk",
       label: "Anthropic: Agent Skills in the SDK",
       href: "https://code.claude.com/docs/en/agent-sdk/skills",
       note: "Documents the SKILL.md structure, supporting files, discovery, and progressive loading used by Claude Agent SDK.",
     },
     {
+      id: "github-add-agent-skills",
       label: "GitHub: Add agent skills",
       href: "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills",
       note: "Documents skill folders, SKILL.md requirements, supporting resources, and repository-level sharing for Copilot coding agent.",

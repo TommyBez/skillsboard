@@ -6,24 +6,24 @@ import { AuthEntry, AuthEntryFallback } from "@/components/auth-entry"
 import { siteConfig } from "@/lib/site"
 
 const socialDescription =
-  "Start a shared skill library for your team. Free forever, open source, built for mixed agent setups."
+  "Start a shared AI skill library for your team. Free forever, open source, and built for mixed agent setups."
 
 export const metadata: Metadata = {
-  title: "Create your team library",
+  title: "Create your shared AI skill library",
   description:
-    "Create a free Skills Board account and start a shared library of AI skills your team recommends.",
+    "Create a free Skills Board account and start a shared AI skill library for your team.",
   alternates: { canonical: "/sign-up" },
   openGraph: {
     type: "website",
     url: "/sign-up",
-    title: "Create your team library | Skills Board",
+    title: "Create your shared AI skill library | Skills Board",
     description: socialDescription,
     siteName: siteConfig.name,
     locale: siteConfig.locale,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Create your team library | Skills Board",
+    title: "Create your shared AI skill library | Skills Board",
     description: socialDescription,
   },
 }
@@ -36,8 +36,8 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
   return (
     <AccessShell
       marker="Create account"
-      title="Create your free account"
-      description="Enter your email for a one-time code, then start a shared skill library for your team."
+      title="Create your shared AI skill library"
+      description="Enter your email for a one-time code, then start the free library your team can use across agent setups."
       editorialTitle="Stop answering the same “which skill?” question."
       editorialBody="Collect the skills your team recommends so colleagues can find them and choose the source, compatible command, or ZIP that fits their setup."
     >

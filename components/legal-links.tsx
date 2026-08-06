@@ -28,7 +28,10 @@ export function LegalLinks({
         <Link
           key={link.href}
           href={link.href}
-          className={cn("transition-colors hover:text-foreground", linkClassName)}
+          className={cn(
+            "inline-flex min-h-11 min-w-11 items-center justify-center px-2 transition-colors hover:text-foreground",
+            linkClassName,
+          )}
         >
           {link.label}
         </Link>

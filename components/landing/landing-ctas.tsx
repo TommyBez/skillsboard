@@ -60,7 +60,7 @@ export function HomeHeaderActions() {
         <Button
           size="sm"
           variant="ghost"
-          className="lp-cta lp-cta-ghost relative hidden h-9 sm:inline-flex"
+          className="lp-cta lp-cta-ghost relative hidden h-9 min-h-11 sm:inline-flex"
           nativeButton={false}
           render={<Link href="/sign-in" />}
         >
@@ -69,7 +69,7 @@ export function HomeHeaderActions() {
         <Button
           size="sm"
           variant="outline"
-          className="lp-cta lp-cta-header-action relative sm:h-9"
+          className="lp-cta lp-cta-header-action relative min-h-11 sm:h-9"
           nativeButton={false}
           render={(
             <TrackedLink

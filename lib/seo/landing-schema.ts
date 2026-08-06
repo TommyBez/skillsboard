@@ -5,6 +5,8 @@ export function buildLandingSchema() {
   const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
   const softwareId = absoluteUrl("/#software")
+  const logoId = absoluteUrl("/#logo")
+  const logoUrl = absoluteUrl("/apple-icon.png")
 
   return {
     "@context": "https://schema.org",
@@ -15,12 +17,22 @@ export function buildLandingSchema() {
         name: siteConfig.name,
         url: siteConfig.url,
         description: siteConfig.description,
+        logo: { "@id": logoId },
         sameAs: [siteConfig.githubUrl],
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "customer support",
           email: siteConfig.contactEmail,
         },
+      },
+      {
+        "@type": "ImageObject",
+        "@id": logoId,
+        url: logoUrl,
+        contentUrl: logoUrl,
+        width: 180,
+        height: 180,
+        caption: `${siteConfig.name} logo`,
       },
       {
         "@type": "WebSite",

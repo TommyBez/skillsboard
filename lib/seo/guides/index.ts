@@ -37,6 +37,42 @@ export const guides = [
   manageCrossAgentSkillsGuide,
 ] as const satisfies readonly GuideDefinition[]
 
+function validateGuideAuthority(guide: GuideDefinition) {
+  const sourceIds = guide.sources.map((source) => source.id)
+  const uniqueSourceIds = new Set(sourceIds)
+
+  if (uniqueSourceIds.size !== sourceIds.length) {
+    throw new Error(`Guide has duplicate source IDs: ${guide.path}`)
+  }
+
+  const citedSourceIds = [
+    ...(guide.citations?.answer ?? []),
+    ...(guide.citations?.problem ?? []),
+    ...(guide.citations?.decision ?? []),
+    ...Object.values(guide.citations?.steps ?? {}).flat(),
+  ]
+  const unknownSourceIds = [...new Set(citedSourceIds)].filter(
+    (sourceId) => !uniqueSourceIds.has(sourceId),
+  )
+
+  if (unknownSourceIds.length > 0) {
+    throw new Error(
+      `Guide cites unknown source IDs at ${guide.path}: ${unknownSourceIds.join(", ")}`,
+    )
+  }
+
+  if (
+    guide.evidenceAsset &&
+    !guide.sources.some((source) => source.href.endsWith(guide.evidenceAsset?.href ?? ""))
+  ) {
+    throw new Error(`Guide evidence asset is missing from its sources: ${guide.path}`)
+  }
+}
+
+for (const guide of guides) {
+  validateGuideAuthority(guide)
+}
+
 export function slugFromPath(guidePath: GuidePath): GuideSlug {
   return guidePath.slice("/guides/".length) as GuideSlug
 }
@@ -72,6 +108,7 @@ export function getGuide(slugOrPath: string): GuideDefinition | undefined {
 export function estimateGuideWordCount(guide: GuideDefinition): number {
   const prose: string[] = [
     guide.intro,
+    guide.answer,
     guide.corePrinciple,
     guide.problem,
     guide.decisionIntro,
@@ -83,6 +120,14 @@ export function estimateGuideWordCount(guide: GuideDefinition): number {
     ...guide.pitfalls.map((pitfall) => pitfall.body),
     ...guide.checklist,
     ...guide.sources.map((source) => source.note),
+    ...(guide.evidenceAsset
+      ? [
+          guide.evidenceAsset.summary,
+          ...guide.evidenceAsset.scope,
+          ...guide.evidenceAsset.methodology.flatMap((step) => [step.title, step.body]),
+          ...guide.evidenceAsset.limitations,
+        ]
+      : []),
   ]
 
   return prose.reduce(

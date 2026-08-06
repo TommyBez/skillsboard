@@ -1,9 +1,12 @@
-import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
+import { resourceClusters, resourcePaths } from "@/lib/seo/resources"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 export function buildResourceIndexSchema() {
   const pageUrl = absoluteUrl(resourcePaths.index)
   const itemListId = `${pageUrl}#resources`
+  const displayedResources = resourceClusters.flatMap(
+    (cluster) => cluster.entries,
+  )
 
   return {
     "@context": "https://schema.org",
@@ -23,8 +26,8 @@ export function buildResourceIndexSchema() {
         "@type": "ItemList",
         "@id": itemListId,
         name: "Skills Board resources",
-        numberOfItems: resourceEntries.length,
-        itemListElement: resourceEntries.map((entry, index) => ({
+        numberOfItems: displayedResources.length,
+        itemListElement: displayedResources.map((entry, index) => ({
           "@type": "ListItem",
           position: index + 1,
           name: entry.title,

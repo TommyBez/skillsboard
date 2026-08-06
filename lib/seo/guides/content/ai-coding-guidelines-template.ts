@@ -23,6 +23,22 @@ export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
     "A useful AI coding policy should make everyday engineering decisions easier. It should tell people and agents which work is appropriate, which context is authoritative, how output is verified, and when a human must take over. This template gives a small team a practical starting point without pretending one file can replace security, privacy, or legal review.",
   answer:
     "Effective AI coding guidelines separate short, universal boundaries from repository context and task-specific playbooks. Define permitted work, authoritative context, verification, human handoffs, and ownership. Then test the guidance on real work; one policy file cannot replace security or review.",
+  citations: {
+    answer: [
+      "github-custom-instructions",
+      "anthropic-project-memory",
+      "github-review-ai-code",
+    ],
+    decision: [
+      "github-custom-instructions",
+      "anthropic-project-memory",
+      "openai-harness-engineering",
+    ],
+    steps: {
+      4: ["github-review-ai-code"],
+      5: ["openai-harness-engineering"],
+    },
+  },
   corePrinciple:
     "Keep universal rules short. Put detailed procedures in focused, testable playbooks.",
   problem:
@@ -192,26 +208,31 @@ permissions, regulation, or repeated failure] changes.`,
   ],
   sources: [
     {
+      id: "github-custom-instructions",
       label: "GitHub: Support for custom instruction types",
       href: "https://docs.github.com/en/copilot/reference/custom-instructions-support",
       note: "Maps repository-wide, path-specific, agent, organization, and personal instruction support across Copilot surfaces.",
     },
     {
+      id: "anthropic-project-memory",
       label: "Anthropic: How Claude remembers your project",
       href: "https://code.claude.com/docs/en/memory",
       note: "Separates repository guidance from enforceable controls and documents scoped instruction files and modular rules.",
     },
     {
+      id: "dora-ai-capabilities",
       label: "Google Cloud and DORA: AI Capabilities Model",
       href: "https://cloud.google.com/blog/products/ai-machine-learning/introducing-doras-inaugural-ai-capabilities-model",
       note: "Reports organizational capabilities associated with stronger AI-assisted software outcomes, including clear policy, small batches, and version control.",
     },
     {
+      id: "openai-harness-engineering",
       label: "OpenAI: Harness engineering",
       href: "https://openai.com/index/harness-engineering/",
       note: "Shows a small repository entrypoint, progressively disclosed guidance, and automated checks for important invariants.",
     },
     {
+      id: "github-review-ai-code",
       label: "GitHub: Review AI-generated code",
       href: "https://docs.github.com/en/enterprise-cloud@latest/copilot/tutorials/review-ai-generated-code",
       note: "Recommends human review together with tests, static analysis, security checks, and validation against project requirements.",

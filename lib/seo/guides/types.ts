@@ -11,9 +11,46 @@ export const guidePaths = {
   aiCodingGuidelinesTemplate: "/guides/ai-coding-guidelines-template",
 } as const
 
+export const guideEvidencePaths = {
+  crossAgentCompatibilityFixture: "/cross-agent-skill-compatibility-fixture.md",
+} as const
+
 export type GuidePath = (typeof guidePaths)[keyof typeof guidePaths]
 
 export type GuideSlug = GuidePath extends `/guides/${infer S}` ? S : never
+
+export interface GuideSource {
+  /** Stable key used by adjacent section citations. */
+  id: string
+  label: string
+  href: string
+  note: string
+}
+
+export interface GuideCitations {
+  answer?: readonly string[]
+  problem?: readonly string[]
+  decision?: readonly string[]
+  /** Zero-based step index mapped to the sources that support that step. */
+  steps?: Readonly<Record<number, readonly string[]>>
+}
+
+export interface GuideEvidenceAsset {
+  eyebrow: string
+  title: string
+  summary: string
+  version: string
+  publishedAt: string
+  status: string
+  scope: readonly string[]
+  methodology: readonly {
+    title: string
+    body: string
+  }[]
+  limitations: readonly string[]
+  href: string
+  linkLabel: string
+}
 
 export interface GuideDefinition {
   path: GuidePath
@@ -28,6 +65,8 @@ export interface GuideDefinition {
   intro: string
   /** Concise, answer-first summary shown near the start of the guide. */
   answer: string
+  /** Source keys rendered beside the material claims they support. */
+  citations?: GuideCitations
   corePrinciple: string
   problem: string
   decisionTitle: string
@@ -51,17 +90,15 @@ export interface GuideDefinition {
     value: string
   }[]
   copyTemplate?: string
+  /** Optional first-party protocol or evidence artifact published with this guide. */
+  evidenceAsset?: GuideEvidenceAsset
   pitfallsTitle: string
   pitfalls: readonly {
     title: string
     body: string
   }[]
   checklist: readonly string[]
-  sources: readonly {
-    label: string
-    href: string
-    note: string
-  }[]
+  sources: readonly GuideSource[]
   /** Intentional social creative — not auto-derived from title. */
   og: OgTemplateContent
   ogAlt: string

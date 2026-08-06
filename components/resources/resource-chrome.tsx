@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-type ResourceHeaderLocation = "guide_header" | "resources_header"
+type ResourceHeaderLocation = "about_header" | "guide_header" | "resources_header"
 type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
 
 /**
@@ -70,7 +70,7 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
       <Link
         href={resourcePaths.index}
         aria-current={location === "resources_header" ? "page" : undefined}
-        className="rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
+        className="inline-flex min-h-11 items-center rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
       >
         Resources
       </Link>
@@ -80,7 +80,7 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
       <Button
         size="sm"
         variant="ghost"
-        className="hidden rounded-[3px] md:inline-flex"
+        className="hidden min-h-11 rounded-[3px] md:inline-flex"
         nativeButton={false}
         render={<Link href="/sign-in" />}
       >
@@ -88,7 +88,7 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
       </Button>
       <Button
         size="sm"
-        className="rounded-[3px] px-2.5 sm:px-3"
+        className="min-h-11 rounded-[3px] px-2.5 sm:px-3"
         nativeButton={false}
         render={(
           <TrackedLink
@@ -135,7 +135,12 @@ export function ResourceShell({
         Skip to content
       </a>
       <ResourceHeader location={location} />
-      <main id="main-content">{children}</main>
+      <main
+        id="main-content"
+        className="[&_nav[aria-label=Breadcrumb]_a]:-mx-2 [&_nav[aria-label=Breadcrumb]_a]:-my-2 [&_nav[aria-label=Breadcrumb]_a]:inline-flex [&_nav[aria-label=Breadcrumb]_a]:min-h-11 [&_nav[aria-label=Breadcrumb]_a]:items-center [&_nav[aria-label=Breadcrumb]_a]:px-2"
+      >
+        {children}
+      </main>
       <ResourceFooter />
     </div>
   )
@@ -151,14 +156,23 @@ export function ResourceFooter() {
             aria-label="Resource footer"
             className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
           >
-            <Link href={resourcePaths.index} className="transition-colors hover:text-foreground">
+            <Link
+              href={resourcePaths.index}
+              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            >
               Resources
+            </Link>
+            <Link
+              href={resourcePaths.about}
+              className="inline-flex min-h-11 min-w-11 items-center justify-center transition-colors hover:text-foreground"
+            >
+              About
             </Link>
             <a
               href={siteConfig.githubUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+              className="inline-flex min-h-11 items-center gap-1.5 transition-colors hover:text-foreground"
             >
               GitHub
               <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
