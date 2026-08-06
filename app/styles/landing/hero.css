@@ -1556,7 +1556,7 @@
 /* The index strip's two ends are the card's declared 12px inset, measured as
    INK. They were 14 left and 13 right on all five cards — consistent, and
    consistently not the number the padding says, because the name's first glyph
-   and the star count's last numeral each carry a side bearing into the joint.
+   and the example label's last glyph each carry a side bearing into the joint.
    Both bearings are given back, so the inset you measure is the inset that is
    declared and the two ends of the row agree. */
 .lp-hero-dossier-name {

@@ -79,7 +79,7 @@ export function PasteResolveVisual() {
                 <GitForkIcon className="lp-flow-mini-fork" aria-hidden="true" />
                 anthropics/skills
               </span>
-              <span className="lp-flow-mini-stars">8.4k stars</span>
+              <span className="lp-flow-mini-stars">illustrative</span>
             </div>
             <p className="lp-flow-mini-name">pdf-extraction</p>
             <p className="lp-flow-mini-desc">
@@ -150,7 +150,7 @@ export function SearchFilterVisual() {
           ))}
         </ul>
       </div>
-      <VizFoot label="result" value="1 / 24" />
+      <VizFoot label="result" value="1 match" />
     </>
   )
 }
@@ -159,8 +159,8 @@ export function SearchFilterVisual() {
 const routes = [
   { key: "source", value: "anthropics/skills" },
   { key: "install", value: "npx skills add" },
-  { key: "zip", value: "skill.zip · 12 kB" },
-  { key: "mcp", value: "tools/get_skill" },
+  { key: "zip", value: "skill.zip · latest" },
+  { key: "mcp", value: "tools/get_skill_command" },
 ] as const
 
 export function RouteFanVisual() {

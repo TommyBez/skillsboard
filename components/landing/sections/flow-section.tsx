@@ -29,7 +29,7 @@ const flowSteps: ReadonlyArray<{
   {
     index: "3",
     title: "Use it your way",
-    copy: "Open the source, copy the install command, download a ZIP, or let your agent fetch it over MCP.",
+    copy: "Open the source, copy a compatible install command, download the latest files as a ZIP, or search the same library from your connected agent.",
     visual: <RouteFanVisual />,
   },
 ]
