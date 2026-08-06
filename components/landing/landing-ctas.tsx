@@ -2,11 +2,10 @@ import { ArrowRightIcon, CableIcon } from "lucide-react"
 import Link from "next/link"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
-import { buttonVariants } from "@/components/button-variants"
 import { TrackedLink } from "@/components/tracked-link"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { Button } from "@/components/ui/button"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
-import { cn } from "@/lib/utils"
 
 export type CtaLocation = "header" | "hero" | "closing"
 
@@ -52,35 +51,34 @@ export function primaryCtaEventProperties(
  * fill. Measured after: 9% of the hero action's green excess, and a painted
  * extent that is exactly its box, so it finally shares the theme toggle's 36
  * rows and its centre.
- *
- * Every action on this page is a plain anchor wearing `buttonVariants` rather
- * than the Base UI `Button`: a link needs no button runtime, and keeping
- * `@base-ui/react` off the landing takes ~18 kB (gzipped) out of the
- * first-load bundle. Same classes, same paint.
  */
 export function HomeHeaderActions() {
   return (
     <div className="flex items-center gap-2">
       <ThemeToggle chrome="marketing" className="size-8 sm:size-9" />
       <nav className="flex items-center gap-2" aria-label="Main navigation">
-        <Link
-          href="/sign-in"
-          className={cn(
-            buttonVariants({ variant: "ghost", size: "sm" }),
-            "lp-cta lp-cta-ghost relative hidden h-9 sm:inline-flex",
-          )}
+        <Button
+          size="sm"
+          variant="ghost"
+          className="lp-cta lp-cta-ghost relative hidden h-9 sm:inline-flex"
+          nativeButton={false}
+          render={<Link href="/sign-in" />}
         >
           Sign in
-        </Link>
-        <TrackedLink
-          href={primaryAction.href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties("header"),
-          }}
-          className={cn(
-            buttonVariants({ variant: "outline", size: "sm" }),
-            "lp-cta lp-cta-header-action relative sm:h-9",
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="lp-cta lp-cta-header-action relative sm:h-9"
+          nativeButton={false}
+          render={(
+            <TrackedLink
+              href={primaryAction.href}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties("header"),
+              }}
+            />
           )}
         >
           {/* "Sign up", not "Start": Lighthouse flags "Start" as
@@ -91,7 +89,7 @@ export function HomeHeaderActions() {
             className="lp-cta-arrow hidden sm:block"
             data-icon="inline-end"
           />
-        </TrackedLink>
+        </Button>
       </nav>
     </div>
   )
@@ -101,35 +99,42 @@ export function HomeHeroActions() {
   return (
     <div className="flex flex-wrap gap-3">
       <span className="lp-magnetic inline-flex" data-magnetic>
-        <TrackedLink
-          href={primaryAction.href}
-          analytics={{
-            event: "landing_cta_clicked",
-            properties: primaryCtaEventProperties("hero"),
-          }}
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "lp-cta lp-cta-primary relative",
+        <Button
+          size="lg"
+          className="lp-cta lp-cta-primary relative"
+          nativeButton={false}
+          render={(
+            <TrackedLink
+              href={primaryAction.href}
+              analytics={{
+                event: "landing_cta_clicked",
+                properties: primaryCtaEventProperties("hero"),
+              }}
+            />
           )}
         >
           {primaryAction.label}
           <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
-        </TrackedLink>
+        </Button>
       </span>
-      <TrackedLink
-        href="#mcp"
-        analytics={{
-          event: "mcp_entry_clicked",
-          properties: mcpEntryEventProperties("landing_hero", "#mcp"),
-        }}
-        className={cn(
-          buttonVariants({ variant: "outline", size: "lg" }),
-          "lp-cta lp-cta-secondary relative",
+      <Button
+        size="lg"
+        variant="outline"
+        className="lp-cta lp-cta-secondary relative"
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href="#mcp"
+            analytics={{
+              event: "mcp_entry_clicked",
+              properties: mcpEntryEventProperties("landing_hero", "#mcp"),
+            }}
+          />
         )}
       >
         See MCP access
         <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
-      </TrackedLink>
+      </Button>
     </div>
   )
 }
@@ -137,24 +142,27 @@ export function HomeHeroActions() {
 export function HomeMcpActions() {
   return (
     <span className="lp-magnetic inline-flex" data-magnetic>
-      <TrackedLink
-        href={primaryAction.href}
-        analytics={{
-          event: "mcp_entry_clicked",
-          properties: mcpEntryEventProperties(
-            "landing_section",
-            primaryAction.href,
-          ),
-        }}
-        className={cn(
-          buttonVariants({ size: "lg" }),
-          "lp-cta lp-cta-primary relative",
+      <Button
+        size="lg"
+        className="lp-cta lp-cta-primary relative"
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primaryAction.href}
+            analytics={{
+              event: "mcp_entry_clicked",
+              properties: mcpEntryEventProperties(
+                "landing_section",
+                primaryAction.href,
+              ),
+            }}
+          />
         )}
       >
         <CableIcon data-icon="inline-start" />
         Create a library to connect
         <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
-      </TrackedLink>
+      </Button>
     </span>
   )
 }
@@ -162,20 +170,23 @@ export function HomeMcpActions() {
 export function HomeFinalActions() {
   return (
     <span className="lp-magnetic inline-flex" data-magnetic>
-      <TrackedLink
-        href={primaryAction.href}
-        analytics={{
-          event: "landing_cta_clicked",
-          properties: primaryCtaEventProperties("closing"),
-        }}
-        className={cn(
-          buttonVariants({ size: "lg" }),
-          "lp-cta lp-cta-primary relative",
+      <Button
+        size="lg"
+        className="lp-cta lp-cta-primary relative"
+        nativeButton={false}
+        render={(
+          <TrackedLink
+            href={primaryAction.href}
+            analytics={{
+              event: "landing_cta_clicked",
+              properties: primaryCtaEventProperties("closing"),
+            }}
+          />
         )}
       >
         {primaryAction.label}
         <ArrowRightIcon className="lp-cta-arrow" data-icon="inline-end" />
-      </TrackedLink>
+      </Button>
     </span>
   )
 }
