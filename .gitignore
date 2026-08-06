@@ -31,3 +31,6 @@ out/
 # from the Remotion compositions; nothing rendered is committed).
 public/launch/*.mp4
 public/launch/*-poster.jpg
+
+# Stato agente GTM — locale, non versionato di proposito
+gtm/
