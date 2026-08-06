@@ -13,11 +13,18 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   title: "How to share AI agent skills with your team",
   seoTitle: "How to Share AI Agent Skills With Your Team | Skills Board",
   description:
-    "A practical workflow to share AI agent skills across a team, set ownership, compare distribution models, and keep one trusted recommendation library.",
+    "A practical workflow to share AI agent skills across a team, set ownership, compare distribution models, and keep one visible team recommendation library.",
   intro:
-    "Sharing a skill is easy. Making it trustworthy, discoverable, and reusable by the next teammate is the real job. This guide gives you a lightweight operating model that works whether your team uses one agent or several.",
+    "Sharing a skill is easy. Making it inspectable, discoverable, and reusable by the next teammate is the real job. This guide gives you a lightweight operating model that works whether your team uses one agent or several.",
   answer:
     "Share an agent skill through one versioned canonical source and one visible team recommendation. Record its purpose, owner, reviewed setup paths, and status. Test the agent paths teammates use, then link to the source instead of copying SKILL.md into multiple places.",
+  citations: {
+    answer: ["openai-skills", "anthropic-skills", "github-agent-skills"],
+    decision: ["openai-skills", "anthropic-skills", "github-agent-skills"],
+    steps: {
+      4: ["openai-skills", "anthropic-skills", "github-agent-skills"],
+    },
+  },
   corePrinciple:
     "One canonical source. One visible recommendation. Explicit setup for every agent path.",
   problem:
@@ -124,16 +131,19 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   ],
   sources: [
     {
+      id: "openai-skills",
       label: "OpenAI: Using skills",
       href: "https://openai.com/academy/skills/",
       note: "Defines skills as reusable workflows and SKILL.md as a portable, versionable playbook.",
     },
     {
+      id: "anthropic-skills",
       label: "Anthropic: Extend Claude with skills",
       href: "https://code.claude.com/docs/en/slash-commands",
       note: "Documents skill structure, discovery, sharing, invocation, and supporting resources in Claude Code.",
     },
     {
+      id: "github-agent-skills",
       label: "GitHub: About agent skills",
       href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
       note: "Describes the open Agent Skills standard and repository or personal skill locations supported by Copilot.",

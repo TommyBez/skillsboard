@@ -84,7 +84,7 @@ const brandLockup = "lp-brand-lockup inline-flex ms-[calc(-1*var(--lp-mark-beari
  * drive it.
  */
 const footerNavLink =
-  "lp-footer-nav-link relative me-[-0.18em] py-[0.15rem] text-muted-foreground no-underline"
+  "lp-footer-nav-link relative me-[-0.18em] inline-flex min-h-11 min-w-11 items-center justify-center py-[0.15rem] text-muted-foreground no-underline"
 
 function GitHubMark() {
   return (
@@ -143,6 +143,9 @@ export function LandingFooter() {
             <Link href="/resources" className={footerNavLink}>
               Resources
             </Link>
+            <Link href="/about" className={footerNavLink}>
+              About
+            </Link>
           </nav>
           <LegalLinks
             ariaLabel="Legal pages"
@@ -163,7 +166,7 @@ export function LandingFooter() {
             target="_blank"
             rel="noreferrer"
             aria-label="Skills Board on GitHub"
-            className="lp-footer-mark inline-flex size-9 shrink-0 items-center justify-center"
+            className="lp-footer-mark inline-flex size-11 shrink-0 items-center justify-center"
           >
             <GitHubMark />
           </a>

@@ -5,6 +5,7 @@ type NonTeamEventPropertiesMap = {
       | "header"
       | "hero"
       | "closing"
+      | "about_header"
       | "guide_header"
       | "guide_inline"
       | "guide_closing"

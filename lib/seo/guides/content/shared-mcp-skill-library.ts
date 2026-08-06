@@ -18,6 +18,15 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
     "A shared skill library should remain useful when a teammate works inside an agent. MCP gives a compatible client an authenticated path to the same team recommendations, so the teammate can search the library, retrieve a command, and, with the required scope, contribute skills or organize collections without copying an API key.",
   answer:
     "Use MCP as an authenticated path to a shared skill library, not as a universal installer. Connect the intended account, verify its permissions, and retrieve a real recommendation. Keep the original source and non-MCP setup paths available.",
+  citations: {
+    answer: ["skills-board-repository", "mcp-authorization", "mcp-transports"],
+    problem: ["skills-board-repository"],
+    decision: ["mcp-authorization", "mcp-transports", "anthropic-mcp"],
+    steps: {
+      1: ["mcp-transports", "anthropic-mcp"],
+      2: ["mcp-authorization", "anthropic-mcp"],
+    },
+  },
   corePrinciple:
     "Keep the team recommendation central. Use MCP as one authenticated access path.",
   problem:
@@ -179,21 +188,25 @@ Test date: [date]
   ],
   sources: [
     {
+      id: "skills-board-repository",
       label: "Skills Board: Open-source repository",
       href: "https://github.com/TommyBez/skillsboard",
       note: "Documents the OAuth-protected endpoint, team-library tools, write-scope boundary, source visibility, and alternative use paths implemented by Skills Board.",
     },
     {
+      id: "mcp-authorization",
       label: "Model Context Protocol: Authorization",
       href: "https://modelcontextprotocol.io/specification/2025-11-25/basic/authorization",
       note: "Defines authorization for HTTP-based MCP connections, including OAuth discovery, access-token handling, and scope requirements.",
     },
     {
+      id: "mcp-transports",
       label: "Model Context Protocol: Transports",
       href: "https://modelcontextprotocol.io/specification/2025-11-25/basic/transports",
       note: "Defines Streamable HTTP as a standard MCP transport and explains its single-endpoint request model.",
     },
     {
+      id: "anthropic-mcp",
       label: "Anthropic: Connect Claude Code to tools via MCP",
       href: "https://code.claude.com/docs/en/mcp",
       note: "Documents remote HTTP server setup and browser authentication for OAuth-protected MCP connections in Claude Code.",

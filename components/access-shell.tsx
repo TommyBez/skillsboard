@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import Link from "next/link"
 
 import { Brand } from "@/components/brand"
 import { LegalLinks } from "@/components/legal-links"
@@ -80,6 +81,12 @@ export function AccessShell({
           <footer className="flex flex-wrap items-center justify-between gap-x-5 gap-y-3 border-t border-border px-5 py-4 font-mono text-[0.6rem] uppercase tracking-[0.16em] text-muted-foreground sm:px-9 lg:px-14 xl:px-20">
             <span>Skills Board</span>
             <div className="flex flex-wrap items-center justify-end gap-x-5 gap-y-2">
+              <Link
+                href="/about"
+                className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground"
+              >
+                About
+              </Link>
               <LegalLinks ariaLabel="Legal pages" className="gap-x-4" />
               <span>Hosted for free. Open source.</span>
             </div>

@@ -70,7 +70,7 @@ export function GuideChapterNav({
               href={chapter.href}
               aria-current={isActive ? "location" : undefined}
               className={cn(
-                "relative block px-4 py-2 text-sm transition-colors",
+                "relative flex min-h-11 items-center px-4 py-2 text-sm transition-colors",
                 isActive
                   ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"

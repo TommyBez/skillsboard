@@ -24,6 +24,18 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
     "Onboarding a new teammate to AI skills should not begin with a catalog tour or a folder of setup notes. Give them one real task, one recommendation the team already uses, and enough context to choose a suitable path. The handoff works when they can find, inspect, and use the skill without private guidance.",
   answer:
     "Onboard a new teammate to AI skills with one real task and one reviewed recommendation—not a catalog tour. Give them the canonical source, a supported access path, the expected result, and clear safety boundaries. The handoff works when they can complete it without private guidance.",
+  citations: {
+    answer: ["openai-skills", "anthropic-agent-skills-sdk", "github-agent-skills"],
+    decision: ["openai-skills", "anthropic-agent-skills-sdk", "github-agent-skills"],
+    steps: {
+      4: [
+        "skills-board-repository",
+        "openai-skills",
+        "anthropic-agent-skills-sdk",
+        "github-agent-skills",
+      ],
+    },
+  },
   corePrinciple:
     "Give one teammate one real task and let them complete the handoff themselves.",
   problem:
@@ -193,21 +205,25 @@ Handoff date: [date]
   ],
   sources: [
     {
+      id: "skills-board-repository",
       label: "Skills Board: Open-source repository",
       href: "https://github.com/TommyBez/skillsboard",
       note: "Documents the team library, source visibility, available handoff paths, recommendation limits, and optional MCP access implemented by Skills Board.",
     },
     {
+      id: "openai-skills",
       label: "OpenAI: Using skills",
       href: "https://openai.com/academy/skills/",
       note: "Introduces skills as reusable workflows and starts skill design from a repeatable task with a clear input and output.",
     },
     {
+      id: "anthropic-agent-skills-sdk",
       label: "Anthropic: Agent Skills in the SDK",
       href: "https://code.claude.com/docs/en/agent-sdk/skills",
       note: "Documents SKILL.md, supporting files, skill discovery, and the environment in which a skill runs.",
     },
     {
+      id: "github-agent-skills",
       label: "GitHub: About agent skills",
       href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
       note: "Describes the open Agent Skills standard and the repository and personal locations supported by Copilot coding agent.",

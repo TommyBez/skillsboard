@@ -3,10 +3,12 @@ import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
 import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
+import { GuideEvidenceAssetSection } from "@/components/guides/guide-evidence-asset"
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
+import type { GuideSource } from "@/lib/seo/guides/types"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
 const guideDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -16,20 +18,65 @@ const guideDateFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 })
 
-const chapters = [
-  { href: "#decision", label: "Choose a model" },
-  { href: "#workflow", label: "Run the workflow" },
-  { href: "#record", label: "Keep the record" },
-  { href: "#pitfalls", label: "Avoid pitfalls" },
-  { href: "#checklist", label: "Use the checklist" },
-] as const
-
 function formatGuideDate(value: string) {
   return guideDateFormatter.format(new Date(`${value}T00:00:00Z`))
 }
 
+function SectionCitations({
+  sourceIds,
+  sources,
+}: {
+  sourceIds?: readonly string[]
+  sources: readonly GuideSource[]
+}) {
+  if (!sourceIds?.length) {
+    return null
+  }
+
+  const citedSources = sourceIds
+    .map((sourceId) => sources.find((source) => source.id === sourceId))
+    .filter((source): source is GuideSource => Boolean(source))
+
+  if (citedSources.length === 0) {
+    return null
+  }
+
+  return (
+    <aside aria-label="Sources for this section" className="mt-5 border-l-2 border-border pl-4">
+      <p className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+        Sources for this section
+      </p>
+      <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2">
+        {citedSources.map((source) => (
+          <li key={source.id}>
+            <a
+              href={source.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+            >
+              {source.label}
+              <ExternalLinkIcon className="size-3" aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
+
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
+  const chapters = [
+    { href: "#decision", label: "Choose a model" },
+    { href: "#workflow", label: "Run the workflow" },
+    ...(guide.evidenceAsset
+      ? [{ href: "#evidence-asset", label: "Run the fixture" }]
+      : []),
+    { href: "#record", label: "Keep the record" },
+    { href: "#pitfalls", label: "Avoid pitfalls" },
+    { href: "#checklist", label: "Use the checklist" },
+  ]
 
   return (
     <>
@@ -117,6 +164,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-4 text-pretty text-lg leading-relaxed">
                 {guide.answer}
               </p>
+              <SectionCitations sourceIds={guide.citations?.answer} sources={guide.sources} />
             </section>
 
             <section aria-labelledby="problem-heading" className="pt-16">
@@ -126,6 +174,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-5 text-pretty text-lg leading-relaxed text-muted-foreground">
                 {guide.problem}
               </p>
+              <SectionCitations sourceIds={guide.citations?.problem} sources={guide.sources} />
             </section>
 
             <section id="decision" aria-labelledby="decision-heading" className="scroll-mt-24 pt-16">
@@ -138,6 +187,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-5 text-pretty text-lg leading-relaxed text-muted-foreground">
                 {guide.decisionIntro}
               </p>
+              <SectionCitations sourceIds={guide.citations?.decision} sources={guide.sources} />
 
               <div className="mt-8 overflow-x-auto rounded-[3px] border border-border bg-card">
                 <table className="w-full min-w-[720px] border-collapse text-left">
@@ -201,11 +251,19 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                       <p className="mt-4 border-l-2 border-primary/60 pl-4 text-sm font-medium leading-relaxed">
                         Output: {step.output}
                       </p>
+                      <SectionCitations
+                        sourceIds={guide.citations?.steps?.[index]}
+                        sources={guide.sources}
+                      />
                     </div>
                   </li>
                 ))}
               </ol>
             </section>
+
+            {guide.evidenceAsset ? (
+              <GuideEvidenceAssetSection asset={guide.evidenceAsset} />
+            ) : null}
 
             <section
               aria-label="Create a shared skill library"
@@ -315,7 +373,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               </p>
               <ul className="mt-6 space-y-4">
                 {guide.sources.map((source) => (
-                  <li key={source.href}>
+                  <li key={source.id}>
                     <a
                       href={source.href}
                       target="_blank"

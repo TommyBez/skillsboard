@@ -1,7 +1,9 @@
 import { guides } from "@/lib/seo/guides"
+import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export const resourcePaths = {
   index: "/resources",
+  about: "/about",
 } as const
 
 export type ResourceContentType = "guide" | "article"
@@ -24,22 +26,82 @@ const resourceEntriesByPath = new Map(
   resourceEntries.map((entry) => [entry.path, entry]),
 )
 
-export const resourceSections = [
-  {
-    contentType: "guide",
-    title: "Guides",
-    description: "Practical workflows for adopting AI agents, standardizing team guidance, and sharing reusable skills.",
-  },
-  {
-    contentType: "article",
-    title: "Articles",
-    description: "Focused perspectives on how teams build and operate with reusable AI skills.",
-  },
-] as const satisfies readonly {
-  contentType: ResourceContentType
+interface ResourceClusterDefinition {
+  id: "cross-agent-sharing" | "team-governance-onboarding" | "ai-coding-practices"
   title: string
   description: string
-}[]
+  paths: readonly GuidePath[]
+}
+
+const resourceClusterDefinitions = [
+  {
+    id: "cross-agent-sharing",
+    title: "Cross-agent sharing",
+    description:
+      "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
+    paths: [
+      guidePaths.shareTeamSkills,
+      guidePaths.manageCrossAgentSkills,
+      guidePaths.sharedMcpSkillLibrary,
+    ],
+  },
+  {
+    id: "team-governance-onboarding",
+    title: "Team governance and onboarding",
+    description:
+      "Choose useful skills, define accountable workflows, and help a second teammate reproduce the result without private context.",
+    paths: [
+      guidePaths.chooseFirstTeamSkill,
+      guidePaths.onboardNewTeammateSkills,
+      guidePaths.aiSkillUseCases,
+    ],
+  },
+  {
+    id: "ai-coding-practices",
+    title: "AI coding practices",
+    description:
+      "Turn coding-agent experiments into bounded team guidance, review gates, and repeatable engineering workflows.",
+    paths: [
+      guidePaths.aiCodingGuidelinesTemplate,
+      guidePaths.aiCodingTeamOnboarding,
+    ],
+  },
+] as const satisfies readonly ResourceClusterDefinition[]
+
+const clusteredPaths = resourceClusterDefinitions.flatMap(({ paths }) => paths)
+const uniqueClusteredPaths = new Set(clusteredPaths)
+
+if (uniqueClusteredPaths.size !== clusteredPaths.length) {
+  throw new Error("A resource guide appears in more than one topic cluster")
+}
+
+const unclusteredEntries = resourceEntries.filter(
+  (entry) => !uniqueClusteredPaths.has(entry.path),
+)
+
+if (unclusteredEntries.length > 0) {
+  throw new Error(
+    `Resource guides missing a topic cluster: ${unclusteredEntries.map((entry) => entry.path).join(", ")}`,
+  )
+}
+
+function getResourceEntry(path: GuidePath): ResourceIndexEntry {
+  const entry = resourceEntriesByPath.get(path)
+
+  if (!entry) {
+    throw new Error(`Missing resource entry for ${path}`)
+  }
+
+  return entry
+}
+
+/** Topic-led architecture for the public resource hub. Every guide appears once. */
+export const resourceClusters = resourceClusterDefinitions.map(
+  ({ paths, ...cluster }) => ({
+    ...cluster,
+    entries: paths.map(getResourceEntry),
+  }),
+)
 
 export function getRelatedResources(
   currentPath: string,

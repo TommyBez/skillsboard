@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import Link from "next/link"
 
 import { Brand } from "@/components/brand"
 import { LegalLinks } from "@/components/legal-links"
@@ -54,12 +55,20 @@ export function LegalPageShell({
         <div className="mx-auto grid w-full max-w-[1200px] gap-6 px-5 py-10 md:grid-cols-[auto_1fr] md:px-10">
           <Brand />
           <div className="space-y-3 md:justify-self-end md:text-right">
-            <LegalLinks
-              ariaLabel="Legal pages"
-              className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground md:justify-end"
-            />
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground md:justify-end">
+              <Link
+                href="/about"
+                className="inline-flex min-h-11 items-center px-2 transition-colors hover:text-foreground"
+              >
+                About
+              </Link>
+              <LegalLinks ariaLabel="Legal pages" />
+            </div>
             <p className="text-sm text-muted-foreground">
-              <a className="hover:text-foreground" href={`mailto:${siteConfig.contactEmail}`}>
+              <a
+                className="inline-flex min-h-11 items-center hover:text-foreground"
+                href={`mailto:${siteConfig.contactEmail}`}
+              >
                 {siteConfig.contactEmail}
               </a>
             </p>

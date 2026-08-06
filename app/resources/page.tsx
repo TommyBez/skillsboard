@@ -6,9 +6,8 @@ import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildResourceIndexSchema } from "@/lib/seo/resource-schema"
 import {
-  resourceEntries,
+  resourceClusters,
   resourcePaths,
-  resourceSections,
 } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
@@ -34,15 +33,6 @@ export const metadata: Metadata = {
   },
 }
 
-const populatedSections = resourceSections
-  .map((section) => ({
-    ...section,
-    entries: resourceEntries.filter(
-      (entry) => entry.contentType === section.contentType,
-    ),
-  }))
-  .filter((section) => section.entries.length > 0)
-
 export default function ResourcesPage() {
   return (
     <>
@@ -67,35 +57,45 @@ export default function ResourcesPage() {
           <p className="mt-7 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
             Use practical, step-by-step guidance to navigate the decisions, patterns, and trade-offs behind durable team workflows.
           </p>
+          <p className="mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-muted-foreground">
+            Every guide shows its publisher, review dates, and primary sources. Read{" "}
+            <Link
+              href={resourcePaths.about}
+              className="inline-flex min-h-11 items-center font-semibold text-foreground underline decoration-primary/40 underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+            >
+              how Skills Board produces and updates its guidance
+            </Link>
+            .
+          </p>
         </div>
       </header>
 
       <div className="mx-auto w-full max-w-[1320px] px-5 py-14 md:px-10 md:py-20">
-        {populatedSections.map((section, sectionIndex) => (
+        {resourceClusters.map((cluster, clusterIndex) => (
           <section
-            key={section.contentType}
-            aria-labelledby={`${section.contentType}-heading`}
-            className={sectionIndex > 0 ? "border-t border-border pt-14 md:pt-20" : undefined}
+            key={cluster.id}
+            aria-labelledby={`${cluster.id}-heading`}
+            className={clusterIndex > 0 ? "border-t border-border pt-14 md:pt-20" : undefined}
           >
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,30rem)] md:items-end">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  {String(sectionIndex + 1).padStart(2, "0")} / {section.contentType}
+                  {String(clusterIndex + 1).padStart(2, "0")} / Topic
                 </p>
                 <h2
-                  id={`${section.contentType}-heading`}
+                  id={`${cluster.id}-heading`}
                   className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl"
                 >
-                  {section.title}
+                  {cluster.title}
                 </h2>
               </div>
               <p className="text-pretty leading-relaxed text-muted-foreground md:text-right">
-                {section.description}
+                {cluster.description}
               </p>
             </div>
 
             <div className="mt-9 grid gap-4 lg:grid-cols-2">
-              {section.entries.map((entry) => (
+              {cluster.entries.map((entry) => (
                 <Link
                   key={entry.path}
                   href={entry.path}

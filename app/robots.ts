@@ -7,10 +7,9 @@ const privatePaths = [
   "/library",
   "/discover",
   "/settings",
-  "/onboarding",
-  "/consent",
+  // Invitation URLs contain bearer-like identifiers. Keep them out of crawl
+  // paths even though the route also emits a noindex directive.
   "/invite/",
-  "/sign-in",
 ]
 
 export default function robots(): MetadataRoute.Robots {

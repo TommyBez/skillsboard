@@ -6,7 +6,7 @@ export function Brand({ compactOnMobile = false }: { compactOnMobile?: boolean }
   return (
     <Link
       href="/"
-      className="group flex shrink-0 items-center gap-2.5 whitespace-nowrap"
+      className="group flex min-h-11 min-w-11 shrink-0 items-center gap-2.5 whitespace-nowrap"
       aria-label="Skills Board home"
     >
       <BrandMark className="brand-mark size-7 transition-transform duration-150 ease-out group-active:scale-[0.94]" />
