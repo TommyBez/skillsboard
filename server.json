@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.TommyBez/skillsboard",
+  "title": "Skills Board",
+  "description": "Search your team's shared AI-skill library, get install commands, and save skills from your agent.",
+  "version": "1.0.0",
+  "websiteUrl": "https://www.skillsboard.sh",
+  "repository": {
+    "url": "https://github.com/TommyBez/skillsboard",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://www.skillsboard.sh/api/mcp"
+    }
+  ]
+}
