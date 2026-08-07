@@ -8,7 +8,7 @@ Neon <> Vercel integration's database branching:
 | --- | --- | --- |
 | Push to any branch | Neon preview branch `preview/<git-branch>` | Vercel preview build runs `vercel-build` (`pnpm db:migrate` then `next build`) with the branch URLs injected by the Neon integration |
 | Merge to `main` | Neon `main` branch (production) | Vercel production build runs the same `vercel-build` with the production URLs |
-| PR merged | — | `.github/workflows/neon-preview-cleanup.yml` deletes the `preview/<git-branch>` Neon branch |
+| PR closed (merged or not) | — | `.github/workflows/neon-preview-cleanup.yml` deletes the `preview/<git-branch>` Neon branch |
 
 Because every Neon preview branch is a copy-on-write fork of production, it
 already contains production's applied-migrations table, so `drizzle-kit
@@ -66,7 +66,7 @@ In the Vercel dashboard -> Storage -> your Neon database -> Settings, make sure:
   `preview/<git-branch>` and injects `DATABASE_URL` plus the direct
   `DATABASE_URL_UNPOOLED` into preview builds.
 - Optionally enable automatic deletion of obsolete preview branches; the
-  GitHub workflow below covers the merge case regardless.
+  GitHub workflow below covers same-repository PR closures regardless.
 
 No Vercel build-command change is needed: Vercel automatically prefers the
 `vercel-build` script in `package.json` over `build`.
@@ -80,10 +80,11 @@ For `.github/workflows/neon-preview-cleanup.yml`:
 
 Also consider enabling GitHub's "Automatically delete head branches" on merge.
 
-The workflow only runs for same-repository PRs: fork PRs don't receive
-`NEON_API_KEY`, and Vercel only builds fork previews after maintainer
-authorization. If a fork PR does leave a `preview/*` branch behind, delete it
-from the Neon console or rely on the integration's obsolete-branch cleanup.
+The workflow uses `pull_request_target` so it also runs when a PR with merge
+conflicts is closed. It never checks out or executes PR code, and the job only
+runs for same-repository PRs before exposing `NEON_API_KEY`. If a fork PR does
+leave a `preview/*` branch behind, delete it from the Neon console or rely on
+the integration's obsolete-branch cleanup.
 
 ## Notes
 
