@@ -4,6 +4,7 @@ import { CableIcon, DownloadIcon, LibraryBigIcon, TagsIcon } from "lucide-react"
 
 import { ValueFlash } from "@/components/interior/value-flash"
 import { AddSkillDialog } from "@/components/add-skill-dialog"
+import { LibraryEmptyStateCtas } from "@/components/library-empty-state-ctas"
 import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
@@ -278,13 +279,16 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
               <>
                 <Button variant="outline" nativeButton={false} render={<TransitionLink href={`/library?tag=${encodeURIComponent(params.tag)}`} />}>Clear search</Button>
                 <Button variant="outline" nativeButton={false} render={<TransitionLink href={`/library?q=${encodeURIComponent(params.q ?? "")}`} />}>Clear tag</Button>
+                <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Find skills</Button>
               </>
             ) : hasFilters ? (
-              <Button variant="outline" nativeButton={false} render={<TransitionLink href="/library" />}>Clear filters</Button>
+              <>
+                <Button variant="outline" nativeButton={false} render={<TransitionLink href="/library" />}>Clear filters</Button>
+                <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Find skills</Button>
+              </>
             ) : (
-              <AddSkillDialog triggerLabel="Add a skill" />
+              <LibraryEmptyStateCtas teamId={activeId} />
             )}
-            <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Find skills</Button>
           </div>
         </section>
       )}

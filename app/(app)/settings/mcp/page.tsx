@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { ArrowLeftIcon } from "lucide-react"
 
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
+import { getAppContext } from "@/lib/app-context"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -38,9 +39,12 @@ const getMcpDetails = cache(async () => {
 })
 
 async function McpGuide() {
-  const { config, mcpUrl } = await getMcpDetails()
+  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
+    getMcpDetails(),
+    getAppContext(),
+  ])
 
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} />
+  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
 }
 
 export default function McpSettingsPage() {

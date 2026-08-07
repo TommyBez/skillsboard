@@ -20,9 +20,6 @@ type NonTeamEventPropertiesMap = {
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
-  mcp_config_copied: {
-    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
-  }
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
@@ -91,6 +88,12 @@ type TeamEventPropertiesMap = {
     filter_state: "none" | "search" | "search_and_tag" | "tag"
     has_skills: boolean
     skill_count: number
+  }
+  library_empty_state_cta_clicked: {
+    cta: "add_skill" | "find_skills"
+  }
+  mcp_config_copied: {
+    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
   }
   team_invite_prompt_viewed: {
     surface: "library_after_first_skill"
