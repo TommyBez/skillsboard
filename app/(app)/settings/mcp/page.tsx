@@ -75,28 +75,36 @@ export default function McpSettingsPage() {
         </p>
       </header>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-10">
+      <div className="mt-8">
         <Suspense
           fallback={<Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}
         >
           <McpGuide />
         </Suspense>
-
-        <aside className="overflow-hidden rounded-[16px] border bg-card">
-          <div className="px-5 py-5 sm:px-6">
-            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Tools</p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight">Available tools</h2>
-          </div>
-          <div className="border-t">
-            {availableTools.map((tool) => (
-              <div key={tool.name} className="border-b px-5 py-4 last:border-b-0 sm:px-6">
-                <code className="font-mono text-sm font-medium text-foreground">{tool.name}</code>
-                <p className="mt-1 text-sm leading-5 text-muted-foreground">{tool.description}</p>
-              </div>
-            ))}
-          </div>
-        </aside>
       </div>
+
+      <section className="mt-8 overflow-hidden rounded-[16px] border bg-card">
+        <div className="flex items-end justify-between gap-4 px-5 py-5 sm:px-6 sm:py-6">
+          <div>
+            <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Tools</p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">Available tools</h2>
+          </div>
+          <span className="rounded-full bg-accent px-2.5 py-1 font-mono text-xs font-semibold text-accent-foreground">
+            {availableTools.length} tools
+          </span>
+        </div>
+        <div className="border-t">
+          {availableTools.map((tool) => (
+            <div
+              key={tool.name}
+              className="grid gap-0.5 border-b px-5 py-3.5 transition-colors last:border-b-0 hover:bg-accent/40 sm:grid-cols-[17rem_minmax(0,1fr)] sm:items-baseline sm:gap-6 sm:px-6"
+            >
+              <code className="font-mono text-sm font-medium text-foreground">{tool.name}</code>
+              <p className="text-sm leading-relaxed text-muted-foreground">{tool.description}</p>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <div className="mt-8">
         <McpTroubleshooting />
