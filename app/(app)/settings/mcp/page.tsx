@@ -4,6 +4,7 @@ import { headers } from "next/headers"
 import { ArrowLeftIcon } from "lucide-react"
 
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
+import { getAppContext } from "@/lib/app-context"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -37,16 +38,27 @@ const getMcpDetails = cache(async () => {
   return { config, host, mcpUrl }
 })
 
-async function McpGuide() {
-  const { config, mcpUrl } = await getMcpDetails()
+async function McpSetupAnalyticsScope() {
+  const { activeId } = await getAppContext()
 
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} />
+  return <McpSetupAnalytics teamId={activeId} />
+}
+
+async function McpGuide() {
+  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
+    getMcpDetails(),
+    getAppContext(),
+  ])
+
+  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
 }
 
 export default function McpSettingsPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <McpSetupAnalytics />
+      <Suspense fallback={null}>
+        <McpSetupAnalyticsScope />
+      </Suspense>
       <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
         <ArrowLeftIcon data-icon="inline-start" />
         Back to library

@@ -39,6 +39,8 @@ interface AddSkillDialogProps {
    */
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  /** Called when the user clicks the rendered trigger. Used for analytics. */
+  onTriggerClick?: () => void
 }
 
 export function AddSkillDialog({
@@ -48,6 +50,7 @@ export function AddSkillDialog({
   triggerAriaLabel,
   open,
   onOpenChange,
+  onTriggerClick,
 }: AddSkillDialogProps) {
   const [uncontrolledOpen, setUncontrolledOpen] = useState(false)
   const isControlled = open !== undefined
@@ -214,7 +217,7 @@ export function AddSkillDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {isControlled ? null : (
-        <DialogTrigger render={<Button aria-label={triggerAriaLabel} />}>
+        <DialogTrigger render={<Button aria-label={triggerAriaLabel} onClick={onTriggerClick} />}>
           <PlusIcon data-icon="inline-start" />{triggerLabel}
         </DialogTrigger>
       )}
