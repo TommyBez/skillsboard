@@ -38,6 +38,12 @@ const getMcpDetails = cache(async () => {
   return { config, host, mcpUrl }
 })
 
+async function McpSetupAnalyticsScope() {
+  const { activeId } = await getAppContext()
+
+  return <McpSetupAnalytics teamId={activeId} />
+}
+
 async function McpGuide() {
   const [{ config, mcpUrl }, { activeId }] = await Promise.all([
     getMcpDetails(),
@@ -50,7 +56,9 @@ async function McpGuide() {
 export default function McpSettingsPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <McpSetupAnalytics />
+      <Suspense fallback={null}>
+        <McpSetupAnalyticsScope />
+      </Suspense>
       <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
         <ArrowLeftIcon data-icon="inline-start" />
         Back to library

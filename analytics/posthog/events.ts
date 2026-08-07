@@ -16,7 +16,6 @@ type NonTeamEventPropertiesMap = {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
     location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
   }
-  mcp_setup_viewed: Record<never, never>
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
@@ -92,6 +91,7 @@ type TeamEventPropertiesMap = {
   library_empty_state_cta_clicked: {
     cta: "add_skill" | "find_skills"
   }
+  mcp_setup_viewed: Record<never, never>
   mcp_config_copied: {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
   }
