@@ -88,13 +88,11 @@ async function LibraryFilters({ searchParams }: LibraryPageProps) {
 
   return (
     <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
-      <Suspense fallback={<Skeleton className="h-10 rounded-xl" aria-label="Loading library search" />}>
-        <LiveSearchField
-          id="library-search"
-          label="Search team library"
-          placeholder="Search by name, prompt, note, or tag"
-        />
-      </Suspense>
+      <LiveSearchField
+        id="library-search"
+        label="Search team library"
+        placeholder="Search by name, prompt, note, or tag"
+      />
 
       {tags.length ? (
         <nav aria-label="Filter library by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
