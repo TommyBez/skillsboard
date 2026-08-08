@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
-import { Suspense } from "react"
 
 import { DeferredToaster } from "@/components/deferred-toaster"
-import { PostHogRoutePrivacy } from "@/components/posthog-route-privacy"
 import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
 import { siteConfig } from "@/lib/site"
@@ -86,9 +84,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          <Suspense fallback={null}>
-            <PostHogRoutePrivacy />
-          </Suspense>
           <DeferredToaster />
           {process.env.VERCEL_ENV === "production" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>
