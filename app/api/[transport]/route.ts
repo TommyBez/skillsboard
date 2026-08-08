@@ -6,6 +6,8 @@ import { z } from "zod"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
+import { mutateCollectionMembership } from "@/lib/db/collection-memberships"
+import { getCollectionDistribution } from "@/lib/db/collection-distributions"
 import {
   getUserCollection,
   getUserSkill,
@@ -14,12 +16,13 @@ import {
   listUserOrganizations,
   listUserSkills,
 } from "@/lib/db/queries"
-import { collection, collectionSkill } from "@/lib/db/schema"
+import { collection } from "@/lib/db/schema"
 import {
   discoverGitHubSkills,
   GitHubSkillDiscoveryError,
 } from "@/lib/github-skill-discovery"
 import { buildInstallCommand } from "@/lib/install-command"
+import { buildInstallableCollectionCommand } from "@/lib/installable-collection-protocol"
 import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
 import { saveSkillToLibrary } from "@/lib/save-skill"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
@@ -37,6 +40,7 @@ type McpToolName =
   | "discover_repository_skills"
   | "discover_skills"
   | "get_collection_skills"
+  | "get_collection_install_command"
   | "get_skill_command"
   | "list_collections"
   | "list_skills"
@@ -130,6 +134,9 @@ async function route(request: Request) {
   const resource = `${origin}/api/mcp`
   return mcpHandler({ jwksUrl: `${origin}/api/auth/jwks`, verifyOptions: { issuer: `${origin}/api/auth`, audience: resource } }, async (req, jwt) => {
     if (!jwt.sub) return new Response("Token subject is required", { status: 401 })
+    if (!tokenHasScope(jwt, "skills:read")) {
+      return new Response("This connection is missing the skills:read scope", { status: 403 })
+    }
     return createMcpHandler((server) => {
       server.registerTool("list_skills", {
         title: "List team skills",
@@ -377,6 +384,42 @@ async function route(request: Request) {
         }, null, 2))
       })
 
+      server.registerTool("get_collection_install_command", {
+        title: "Get collection install command",
+        description: "Get the one-command installer for a published installable collection",
+        inputSchema: { collectionId: z.uuid() },
+      }, async ({ collectionId }) => {
+        const found = await getUserCollection(jwt.sub!, collectionId)
+        if (!found) {
+          captureMcpToolUsed(jwt.sub!, "get_collection_install_command", false)
+          return textResult("Collection not found", true)
+        }
+
+        const distribution = await getCollectionDistribution(found.organizationId, found.id)
+        if (
+          !distribution
+          || distribution.revokedAt
+          || !distribution.activeReleaseId
+          || !distribution.publishedAt
+        ) {
+          captureMcpToolUsed(jwt.sub!, "get_collection_install_command", false)
+          return textResult("This collection does not have an active install link", true)
+        }
+
+        const origin = getOrigin(request)
+        const shareUrl = `${origin}/p/${distribution.shareId}`
+        captureMcpToolUsed(jwt.sub!, "get_collection_install_command", true)
+        return textResult(JSON.stringify({
+          collectionId: found.id,
+          title: distribution.releaseTitle ?? found.title,
+          revision: distribution.activeRevision,
+          publishedAt: distribution.publishedAt,
+          shareUrl,
+          installCommand: buildInstallableCollectionCommand(origin, distribution.shareId),
+          updateBehavior: "Rerun the install command to add skills introduced by a later revision. The skills update command refreshes already installed skills but does not automatically remove skills deleted from the collection.",
+        }, null, 2))
+      })
+
       server.registerTool("create_collection", {
         title: "Create a collection",
         description: "Create a team collection that groups saved skills by use case or project. Collections are visible to the whole team.",
@@ -454,35 +497,44 @@ async function route(request: Request) {
           return textResult("This connection is missing the skills:write scope. Reconnect Skills Board from your MCP client to grant write access.", true)
         }
 
-        const [foundCollection, foundSkill] = await Promise.all([
-          getUserCollection(jwt.sub!, collectionId),
-          getUserSkill(jwt.sub!, skillId),
-        ])
-        if (!foundCollection || !foundSkill || foundCollection.organizationId !== foundSkill.organizationId) {
-          captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
-          return textResult("Collection or skill not found in the same team library", true)
-        }
-
+        let outcome: Awaited<ReturnType<typeof mutateCollectionMembership>>
         try {
-          await db
-            .insert(collectionSkill)
-            .values({ collectionId, skillId, addedBy: jwt.sub! })
-            .onConflictDoNothing()
+          outcome = await mutateCollectionMembership({
+            collectionId,
+            mutation: "add",
+            skillId,
+            userId: jwt.sub!,
+          })
         } catch (error) {
           console.error("Unable to add skill to collection over MCP", error)
           captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
           return textResult("We couldn’t add this skill to the collection. Try again.", true)
         }
 
+        if (outcome.status === "not_found") {
+          captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
+          return textResult("Collection or skill not found in the same team library", true)
+        }
+        if (outcome.status === "forbidden") {
+          captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
+          return textResult("Only the collection creator or a team admin can change an installable collection.", true)
+        }
+
         captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", true)
-        captureTeamEvent({
-          distinctId: jwt.sub!,
-          event: "collection_skill_added",
-          properties: { collection_id: collectionId, skill_id: skillId, surface: "mcp" },
-          teamId: foundCollection.organizationId,
-        })
-        revalidateTag(cacheTags.organizationCollections(foundCollection.organizationId), { expire: 0 })
-        return textResult(JSON.stringify({ added: true, collectionTitle: foundCollection.title }, null, 2))
+        if (outcome.changed) {
+          captureTeamEvent({
+            distinctId: jwt.sub!,
+            event: "collection_skill_added",
+            properties: { collection_id: collectionId, skill_id: skillId, surface: "mcp" },
+            teamId: outcome.organizationId,
+          })
+          revalidateTag(cacheTags.organizationCollections(outcome.organizationId), { expire: 0 })
+        }
+        return textResult(JSON.stringify({
+          added: outcome.changed,
+          alreadyPresent: !outcome.changed,
+          collectionTitle: outcome.collectionTitle,
+        }, null, 2))
       })
 
       server.registerTool("remove_skill_from_collection", {
@@ -495,34 +547,44 @@ async function route(request: Request) {
           return textResult("This connection is missing the skills:write scope. Reconnect Skills Board from your MCP client to grant write access.", true)
         }
 
-        const foundCollection = await getUserCollection(jwt.sub!, collectionId)
-        if (!foundCollection) {
-          captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
-          return textResult("Collection not found", true)
-        }
-
+        let outcome: Awaited<ReturnType<typeof mutateCollectionMembership>>
         try {
-          await db
-            .delete(collectionSkill)
-            .where(and(
-              eq(collectionSkill.collectionId, collectionId),
-              eq(collectionSkill.skillId, skillId),
-            ))
+          outcome = await mutateCollectionMembership({
+            collectionId,
+            mutation: "remove",
+            skillId,
+            userId: jwt.sub!,
+          })
         } catch (error) {
           console.error("Unable to remove skill from collection over MCP", error)
           captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
           return textResult("We couldn’t remove this skill from the collection. Try again.", true)
         }
 
+        if (outcome.status === "not_found") {
+          captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
+          return textResult("Collection not found", true)
+        }
+        if (outcome.status === "forbidden") {
+          captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
+          return textResult("Only the collection creator or a team admin can change an installable collection.", true)
+        }
+
         captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", true)
-        captureTeamEvent({
-          distinctId: jwt.sub!,
-          event: "collection_skill_removed",
-          properties: { collection_id: collectionId, skill_id: skillId, surface: "mcp" },
-          teamId: foundCollection.organizationId,
-        })
-        revalidateTag(cacheTags.organizationCollections(foundCollection.organizationId), { expire: 0 })
-        return textResult(JSON.stringify({ removed: true, collectionTitle: foundCollection.title }, null, 2))
+        if (outcome.changed) {
+          captureTeamEvent({
+            distinctId: jwt.sub!,
+            event: "collection_skill_removed",
+            properties: { collection_id: collectionId, skill_id: skillId, surface: "mcp" },
+            teamId: outcome.organizationId,
+          })
+          revalidateTag(cacheTags.organizationCollections(outcome.organizationId), { expire: 0 })
+        }
+        return textResult(JSON.stringify({
+          collectionTitle: outcome.collectionTitle,
+          removed: outcome.changed,
+          wasAbsent: !outcome.changed,
+        }, null, 2))
       })
     }, { serverInfo: { name: "skills-board", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
   })(request)

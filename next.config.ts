@@ -13,6 +13,14 @@ const nextConfig = {
       expire: 3600,
     },
   },
+  async headers() {
+    return [
+      {
+        source: "/p/:path*",
+        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+      },
+    ]
+  },
   async redirects() {
     return [
       {

@@ -1,4 +1,5 @@
 const REDACTED_INVITATION_PATH = "/invite/[redacted]"
+const REDACTED_INSTALLABLE_COLLECTION_PATH = "/p/[redacted]"
 
 const ALLOWED_MARKETING_QUERY_PARAMETERS = new Set([
   "utm_campaign",
@@ -28,6 +29,11 @@ function redactInvitationPath(pathname: string) {
   return pathname.replace(/\/invite\/[^/]+/gi, REDACTED_INVITATION_PATH)
 }
 
+function redactInstallableCollectionPath(pathname: string) {
+  if (!/\/p\/[^/]+/i.test(pathname)) return pathname
+  return pathname.replace(/\/p\/[^/]+/gi, REDACTED_INSTALLABLE_COLLECTION_PATH)
+}
+
 export function sanitizeAnalyticsUrl(value: string) {
   const isAbsolute = /^[a-z][a-z\d+.-]*:\/\//i.test(value)
   if (!isAbsolute && !value.startsWith("/")) return value
@@ -40,7 +46,7 @@ export function sanitizeAnalyticsUrl(value: string) {
       }
     }
 
-    const pathname = redactInvitationPath(url.pathname)
+    const pathname = redactInstallableCollectionPath(redactInvitationPath(url.pathname))
     const search = url.searchParams.toString()
     const sanitizedPath = `${pathname}${search ? `?${search}` : ""}`
     return isAbsolute ? `${url.origin}${sanitizedPath}` : sanitizedPath

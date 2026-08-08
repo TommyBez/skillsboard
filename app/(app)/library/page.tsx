@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getAppContext } from "@/lib/app-context"
+import { listCollectionDistributionIds } from "@/lib/db/collection-distributions"
 import {
   countOrganizationMembers,
   countPendingOrganizationInvitations,
@@ -87,11 +88,13 @@ async function LibraryFilters({ searchParams }: LibraryPageProps) {
 
   return (
     <section className="rounded-2xl border border-border bg-card/80 p-4 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.06)] md:p-5">
-      <LiveSearchField
-        id="library-search"
-        label="Search team library"
-        placeholder="Search by name, prompt, note, or tag"
-      />
+      <Suspense fallback={<Skeleton className="h-10 rounded-xl" aria-label="Loading library search" />}>
+        <LiveSearchField
+          id="library-search"
+          label="Search team library"
+          placeholder="Search by name, prompt, note, or tag"
+        />
+      </Suspense>
 
       {tags.length ? (
         <nav aria-label="Filter library by tag" className="mt-4 flex items-start gap-3 border-t border-border pt-4">
@@ -118,10 +121,11 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const [{ activeId, session, role }, params] = await Promise.all([getAppContext(), searchParams])
   const userId = session.user.id
   const canManageLibrary = isOrganizationAdmin(role)
-  const [allSkills, collections, collectionMemberships] = await Promise.all([
+  const [allSkills, collections, collectionMemberships, distributionRows] = await Promise.all([
     listOrganizationSkills(activeId),
     listOrganizationCollections(activeId),
     listOrganizationCollectionMemberships(activeId),
+    listCollectionDistributionIds(activeId),
   ])
   const collectionIdsBySkill = new Map<string, string[]>()
   for (const membership of collectionMemberships) {
@@ -129,7 +133,20 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     if (existing) existing.push(membership.collectionId)
     else collectionIdsBySkill.set(membership.skillId, [membership.collectionId])
   }
-  const collectionOptions = collections.map((item) => ({ id: item.id, title: item.title }))
+  const distributedCollectionIds = new Set(distributionRows.map((item) => item.collectionId))
+  const readOnlyCollectionIds = new Set<string>()
+  if (!canManageLibrary) {
+    for (const item of collections) {
+      if (distributedCollectionIds.has(item.id) && item.createdBy !== userId) {
+        readOnlyCollectionIds.add(item.id)
+      }
+    }
+  }
+  const collectionOptions = collections.map((item) => ({
+    id: item.id,
+    readOnly: readOnlyCollectionIds.has(item.id),
+    title: item.title,
+  }))
   const [memberCount, pendingInvitationCount] = canManageLibrary && allSkills.length > 0
     ? await Promise.all([
         countOrganizationMembers(activeId),
@@ -191,7 +208,9 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
           {skills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             const canEditNote = item.createdBy === userId
-            const canDelete = canEditNote || canManageLibrary
+            const belongsToManagedInstallableCollection = (collectionIdsBySkill.get(item.id) ?? [])
+              .some((collectionId) => readOnlyCollectionIds.has(collectionId))
+            const canDelete = canManageLibrary || (canEditNote && !belongsToManagedInstallableCollection)
             return (
               <SkillDossier
                 key={item.id}

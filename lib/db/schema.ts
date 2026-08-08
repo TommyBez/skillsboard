@@ -388,3 +388,72 @@ export const collectionSkill = pgTable("collectionSkill", {
     name: "collectionSkill_skillId_fkey",
   }).onDelete("cascade"),
 ])
+
+export const collectionRelease = pgTable("collectionRelease", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  collectionId: uuid("collectionId").notNull(),
+  revision: integer("revision").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  createdBy: text("createdBy").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  supersededAt: timestamp("supersededAt", { withTimezone: true }),
+}, (table) => [
+  unique("collectionRelease_collectionId_revision_key").on(table.collectionId, table.revision),
+  unique("collectionRelease_collectionId_id_key").on(table.collectionId, table.id),
+  foreignKey({
+    columns: [table.collectionId],
+    foreignColumns: [collection.id],
+    name: "collectionRelease_collectionId_fkey",
+  }).onDelete("cascade"),
+])
+
+export const collectionReleaseSkill = pgTable("collectionReleaseSkill", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  releaseId: uuid("releaseId").notNull(),
+  sourceSkillId: uuid("sourceSkillId"),
+  position: integer("position").notNull(),
+  skillName: text("skillName").notNull(),
+  description: text("description").notNull(),
+  githubUrl: text("githubUrl").notNull(),
+  repoOwner: text("repoOwner").notNull(),
+  repoName: text("repoName").notNull(),
+  skillPath: text("skillPath").notNull(),
+  commitSha: text("commitSha").notNull(),
+  artifactDigest: text("artifactDigest").notNull(),
+  artifactBase64: text("artifactBase64").notNull(),
+  artifactBytes: integer("artifactBytes").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  unique("collectionReleaseSkill_releaseId_skillName_key").on(table.releaseId, table.skillName),
+  index("collectionReleaseSkill_releaseId_position_idx").on(table.releaseId, table.position),
+  foreignKey({
+    columns: [table.releaseId],
+    foreignColumns: [collectionRelease.id],
+    name: "collectionReleaseSkill_releaseId_fkey",
+  }).onDelete("cascade"),
+])
+
+export const collectionDistribution = pgTable("collectionDistribution", {
+  collectionId: uuid("collectionId").primaryKey(),
+  shareId: text("shareId").notNull(),
+  activeReleaseId: uuid("activeReleaseId"),
+  activeRevision: integer("activeRevision").notNull().default(0),
+  publishedAt: timestamp("publishedAt", { withTimezone: true }),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }),
+  createdBy: text("createdBy").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  unique("collectionDistribution_shareId_key").on(table.shareId),
+  foreignKey({
+    columns: [table.collectionId],
+    foreignColumns: [collection.id],
+    name: "collectionDistribution_collectionId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.collectionId, table.activeReleaseId],
+    foreignColumns: [collectionRelease.collectionId, collectionRelease.id],
+    name: "collectionDistribution_activeReleaseId_fkey",
+  }).onDelete("restrict"),
+])
