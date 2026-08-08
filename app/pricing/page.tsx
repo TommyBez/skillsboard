@@ -14,7 +14,7 @@ import { siteConfig } from "@/lib/site"
 const socialTitle = "Skills Board Pricing: Free Forever"
 
 export const metadata: Metadata = {
-  title: { absolute: "Pricing | Skills Board — Free Forever" },
+  title: { absolute: "Pricing | Skills Board: Free Forever" },
   description: pricingDescription,
   alternates: { canonical: pricingPath },
   openGraph: {
