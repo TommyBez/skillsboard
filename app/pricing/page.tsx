@@ -11,10 +11,25 @@ import {
 } from "@/lib/seo/pricing-schema"
 import { siteConfig } from "@/lib/site"
 
+const socialTitle = "Skills Board Pricing: Free Forever"
+
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Skills Board — Free Forever" },
   description: pricingDescription,
   alternates: { canonical: pricingPath },
+  openGraph: {
+    type: "website",
+    url: pricingPath,
+    title: socialTitle,
+    description: pricingDescription,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: socialTitle,
+    description: pricingDescription,
+  },
 }
 
 const hostedFeatures = [
