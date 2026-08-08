@@ -19,6 +19,7 @@ const availableTools = [
   { name: "list_collections", description: "List skill collections across your team libraries" },
   { name: "search_collections", description: "Search collections by title, description, or tag" },
   { name: "get_collection_skills", description: "List the skills grouped in a collection" },
+  { name: "get_collection_install_command", description: "Retrieve the one-command installer for a published collection" },
   { name: "create_collection", description: "Create a collection that groups skills by use case or project" },
   { name: "add_skill_to_collection", description: "Add a saved skill to a collection" },
   { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },

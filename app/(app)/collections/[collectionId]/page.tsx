@@ -8,6 +8,7 @@ import { DeleteCollectionDialog } from "@/components/delete-collection-dialog"
 import { EditCollectionDialog } from "@/components/edit-collection-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
+import { InstallableCollectionPanel } from "@/components/installable-collection-panel"
 import { ManageCollectionSkillsDialog } from "@/components/manage-collection-skills-dialog"
 import { RemoveFromCollectionButton } from "@/components/remove-from-collection-button"
 import { SkillDossier } from "@/components/skill-dossier"
@@ -15,6 +16,11 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
+import { getAuthBaseUrl } from "@/lib/auth-environment"
+import {
+  getCollectionDistribution,
+  listCollectionDistributionIds,
+} from "@/lib/db/collection-distributions"
 import {
   getOrganizationCollection,
   listCollectionSkills,
@@ -23,7 +29,12 @@ import {
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
+import {
+  buildInstallableCollectionCommand,
+  buildInstallableCollectionUrl,
+} from "@/lib/installable-collection-protocol"
 import { isOrganizationAdmin } from "@/lib/session"
+import { siteConfig } from "@/lib/site"
 
 interface CollectionDetailPageProps {
   params: Promise<{ collectionId: string }>
@@ -38,16 +49,27 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
   const collection = await getOrganizationCollection(activeId, collectionId)
   if (!collection) notFound()
 
-  const [collectionSkills, librarySkills, allCollections, collectionMemberships] = await Promise.all([
+  const [collectionSkills, librarySkills, allCollections, collectionMemberships, distributionState, distributionRows] = await Promise.all([
     listCollectionSkills(activeId, collectionId),
     listOrganizationSkills(activeId),
     listOrganizationCollections(activeId),
     listOrganizationCollectionMemberships(activeId),
+    getCollectionDistribution(activeId, collectionId),
+    listCollectionDistributionIds(activeId),
   ])
   const userId = session.user.id
-  const canManageCollection = collection.createdBy === userId || isOrganizationAdmin(role)
+  const canManageLibrary = isOrganizationAdmin(role)
+  const canManageCollection = collection.createdBy === userId || canManageLibrary
+  const canManageMembership = !distributionState || canManageCollection
   const collectionSkillIds = new Set(collectionSkills.map((item) => item.id))
-  const collectionOptions = allCollections.map((item) => ({ id: item.id, title: item.title }))
+  const distributedCollectionIds = new Set(distributionRows.map((item) => item.collectionId))
+  const collectionOptions = allCollections.map((item) => ({
+    id: item.id,
+    readOnly: distributedCollectionIds.has(item.id)
+      && item.createdBy !== userId
+      && !canManageLibrary,
+    title: item.title,
+  }))
   const collectionIdsBySkill = new Map<string, string[]>()
   for (const membership of collectionMemberships) {
     const existing = collectionIdsBySkill.get(membership.skillId)
@@ -60,6 +82,35 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
     source: `${item.repoOwner}/${item.repoName}`,
     inCollection: collectionSkillIds.has(item.id),
   }))
+  const distributionBaseUrl = getAuthBaseUrl() ?? siteConfig.url
+  const activeDistribution = distributionState
+    && !distributionState.revokedAt
+    && distributionState.activeReleaseId
+    && distributionState.publishedAt
+    ? {
+        activeRevision: distributionState.activeRevision,
+        changesPending: collection.updatedAt.getTime() > distributionState.publishedAt.getTime(),
+        installCommand: buildInstallableCollectionCommand(
+          distributionBaseUrl,
+          distributionState.shareId,
+        ),
+        publishedAt: distributionState.publishedAt.toISOString(),
+        publishedTitle: distributionState.releaseTitle ?? collection.title,
+        shareUrl: buildInstallableCollectionUrl(
+          distributionBaseUrl,
+          distributionState.shareId,
+        ),
+      }
+    : null
+  const disabledDistribution = distributionState?.revokedAt
+    && distributionState.activeReleaseId
+    && distributionState.publishedAt
+    ? {
+        activeRevision: distributionState.activeRevision,
+        publishedAt: distributionState.publishedAt.toISOString(),
+        publishedTitle: distributionState.releaseTitle ?? collection.title,
+      }
+    : null
 
   return (
     <>
@@ -98,11 +149,13 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-          <ManageCollectionSkillsDialog
-            collectionId={collection.id}
-            collectionTitle={collection.title}
-            skills={skillOptions}
-          />
+          {canManageMembership ? (
+            <ManageCollectionSkillsDialog
+              collectionId={collection.id}
+              collectionTitle={collection.title}
+              skills={skillOptions}
+            />
+          ) : null}
           {canManageCollection ? (
             <>
               <EditCollectionDialog
@@ -119,6 +172,16 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
           ) : null}
         </div>
       </section>
+
+      <InstallableCollectionPanel
+        collectionId={collection.id}
+        collectionTitle={collection.title}
+        canManage={canManageCollection}
+        disabledDistribution={disabledDistribution}
+        skillCount={collectionSkills.length}
+        teamId={activeId}
+        distribution={activeDistribution}
+      />
 
       {collectionSkills.length ? (
         <section aria-label={`Skills in the ${collection.title} collection`} className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -148,12 +211,14 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
                 }}
                 actions={(
                   <>
-                    <RemoveFromCollectionButton
-                      collectionId={collection.id}
-                      collectionTitle={collection.title}
-                      skillId={item.id}
-                      skillName={item.title}
-                    />
+                    {canManageMembership ? (
+                      <RemoveFromCollectionButton
+                        collectionId={collection.id}
+                        collectionTitle={collection.title}
+                        skillId={item.id}
+                        skillName={item.title}
+                      />
+                    ) : null}
                     <AddToCollectionMenu
                       skillId={item.id}
                       skillName={item.title}
@@ -203,11 +268,13 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
-            <ManageCollectionSkillsDialog
-              collectionId={collection.id}
-              collectionTitle={collection.title}
-              skills={skillOptions}
-            />
+            {canManageMembership ? (
+              <ManageCollectionSkillsDialog
+                collectionId={collection.id}
+                collectionTitle={collection.title}
+                skills={skillOptions}
+              />
+            ) : null}
             <Button variant="outline" nativeButton={false} render={<Link href="/library" />}>Browse library</Button>
           </div>
         </section>

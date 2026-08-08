@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useState } from "react"
-import { FolderPlusIcon, Loader2Icon, PlusIcon } from "lucide-react"
+import { FolderPlusIcon, Loader2Icon, LockKeyholeIcon, PlusIcon } from "lucide-react"
 import { toast } from "sonner"
 
 import { addSkillToCollection, removeSkillFromCollection } from "@/app/actions/collections"
@@ -22,7 +22,7 @@ import {
 interface AddToCollectionMenuProps {
   skillId: string
   skillName: string
-  collections: { id: string; title: string }[]
+  collections: { id: string; readOnly?: boolean; title: string }[]
   memberCollectionIds: string[]
 }
 
@@ -121,14 +121,20 @@ export function AddToCollectionMenu({
                   key={item.id}
                   checked={isMember(item.id)}
                   closeOnClick={false}
-                  disabled={isSaving}
+                  disabled={isSaving || item.readOnly}
+                  title={item.readOnly
+                    ? "Only the collection creator or a team admin can change this installable collection."
+                    : undefined}
                   onCheckedChange={(nextChecked) => void toggleMembership(item.id, item.title, nextChecked)}
                 >
                   <span className="flex min-w-0 items-center gap-1.5">
                     {isSaving ? (
                       <Loader2Icon className="size-3.5 shrink-0 animate-spin" aria-hidden="true" />
+                    ) : item.readOnly ? (
+                      <LockKeyholeIcon className="size-3.5 shrink-0" aria-hidden="true" />
                     ) : null}
                     <span className="truncate">{item.title}</span>
+                    {item.readOnly ? <span className="sr-only">, managed installable collection</span> : null}
                   </span>
                 </DropdownMenuCheckboxItem>
               )

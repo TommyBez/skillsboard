@@ -1,12 +1,12 @@
 "use server"
 
-import { and, eq } from "drizzle-orm"
+import { and, asc, eq, inArray } from "drizzle-orm"
 import { updateTag } from "next/cache"
 import { z } from "zod"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
-import { skill } from "@/lib/db/schema"
+import { collection, collectionDistribution, collectionSkill, skill } from "@/lib/db/schema"
 import { getGitHubMetadata } from "@/lib/github"
 import {
   discoverGitHubSkills,
@@ -217,27 +217,77 @@ export async function deleteSkill(input: z.input<typeof deleteSkillSchema>) {
     return { ok: false as const, error: "Skill not found" }
   }
 
-  const [savedSkill] = await db
-    .select({ id: skill.id, createdBy: skill.createdBy })
-    .from(skill)
-    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
-    .limit(1)
+  const now = new Date()
+  const outcome = await db.transaction(async (tx) => {
+    const [savedSkill] = await tx
+      .select({ id: skill.id, createdBy: skill.createdBy })
+      .from(skill)
+      .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
+      .limit(1)
+      .for("update")
 
-  if (!savedSkill) {
+    if (!savedSkill) return "not_found" as const
+
+    const canDelete = savedSkill.createdBy === userId || isOrganizationAdmin(role)
+    if (!canDelete) return "forbidden" as const
+
+    const affectedCollections = await tx
+      .select({
+        createdBy: collection.createdBy,
+        id: collection.id,
+      })
+      .from(collectionSkill)
+      .innerJoin(collection, and(
+        eq(collectionSkill.collectionId, collection.id),
+        eq(collection.organizationId, organizationId),
+      ))
+      .where(eq(collectionSkill.skillId, savedSkill.id))
+      .orderBy(asc(collection.id))
+      .for("update")
+
+    const affectedCollectionIds = affectedCollections.map((item) => item.id)
+    if (affectedCollectionIds.length && !isOrganizationAdmin(role)) {
+      const distributions = await tx
+        .select({ collectionId: collectionDistribution.collectionId })
+        .from(collectionDistribution)
+        .where(inArray(collectionDistribution.collectionId, affectedCollectionIds))
+      const distributedCollectionIds = new Set(distributions.map((item) => item.collectionId))
+      const protectedCollection = affectedCollections.some((item) => (
+        distributedCollectionIds.has(item.id) && item.createdBy !== userId
+      ))
+      if (protectedCollection) return "protected_collection" as const
+    }
+
+    await tx
+      .delete(skill)
+      .where(and(eq(skill.id, savedSkill.id), eq(skill.organizationId, organizationId)))
+
+    if (affectedCollectionIds.length) {
+      await tx
+        .update(collection)
+        .set({ updatedAt: now })
+        .where(inArray(collection.id, affectedCollectionIds))
+    }
+
+    return "deleted" as const
+  })
+
+  if (outcome === "not_found") {
     return { ok: false as const, error: "Skill not found" }
   }
-
-  const canDelete = savedSkill.createdBy === userId || isOrganizationAdmin(role)
-  if (!canDelete) {
+  if (outcome === "forbidden") {
     return {
       ok: false as const,
       error: "Only the person who added this skill, or a team admin, can delete it.",
     }
   }
+  if (outcome === "protected_collection") {
+    return {
+      ok: false as const,
+      error: "This skill belongs to an installable collection managed by someone else. Ask its creator or a team admin to remove it first.",
+    }
+  }
 
-  await db
-    .delete(skill)
-    .where(and(eq(skill.id, parsed.data.skillId), eq(skill.organizationId, organizationId)))
   updateTag(cacheTags.organizationSkills(organizationId))
   // Removing a skill cascades out of every collection that referenced it.
   updateTag(cacheTags.organizationCollections(organizationId))

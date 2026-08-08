@@ -90,6 +90,7 @@ const AGENT_SKILL_CONTAINERS = [
 
 interface GitHubRepositoryResponse {
   default_branch: string
+  private: boolean
   stargazers_count: number
   updated_at: string
 }
@@ -129,6 +130,7 @@ export interface GitHubSkillDiscovery {
   repoName: string
   repoStars: number
   repoUpdatedAt: Date
+  isPrivate: boolean
   defaultBranch: string
   /** Commit on the repository's default branch used for both the tree and descriptors. */
   commitSha: string
@@ -800,6 +802,7 @@ async function fetchGitHubRepositorySnapshot(value: string): Promise<GitHubRepos
     || typeof repository !== "object"
     || typeof repository.default_branch !== "string"
     || !repository.default_branch
+    || typeof repository.private !== "boolean"
     || !Number.isSafeInteger(repository.stargazers_count)
     || repository.stargazers_count < 0
     || typeof repository.updated_at !== "string"
@@ -846,6 +849,7 @@ async function fetchGitHubRepositorySnapshot(value: string): Promise<GitHubRepos
     ...parsedUrl,
     repoStars: repository.stargazers_count,
     repoUpdatedAt,
+    isPrivate: repository.private,
     defaultBranch: repository.default_branch,
     commitSha: commit.sha,
     tree,

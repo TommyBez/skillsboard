@@ -1,0 +1,1 @@
+ALTER TABLE "collectionRelease" ADD COLUMN "supersededAt" timestamp with time zone;

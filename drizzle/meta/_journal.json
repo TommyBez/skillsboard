@@ -8,6 +8,34 @@
       "when": 1785743153825,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1786191471339,
+      "tag": "0001_installable_collections",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786191677641,
+      "tag": "0002_enforce_collection_release_ownership",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786192462048,
+      "tag": "0003_retain_superseded_collection_releases",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786198824355,
+      "tag": "0004_collection_release_retention_cleanup",
+      "breakpoints": true
     }
   ]
 }
