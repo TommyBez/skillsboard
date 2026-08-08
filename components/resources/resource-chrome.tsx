@@ -12,7 +12,11 @@ import { Button } from "@/components/ui/button"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-type ResourceHeaderLocation = "about_header" | "guide_header" | "resources_header"
+type ResourceHeaderLocation =
+  | "about_header"
+  | "guide_header"
+  | "pricing_header"
+  | "resources_header"
 type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
 
 /**

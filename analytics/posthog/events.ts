@@ -9,6 +9,7 @@ type NonTeamEventPropertiesMap = {
       | "guide_header"
       | "guide_inline"
       | "guide_closing"
+      | "pricing_header"
       | "resources_header"
       | "resources_closing"
   }
