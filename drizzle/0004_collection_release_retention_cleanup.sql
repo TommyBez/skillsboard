@@ -1,0 +1,1 @@
+CREATE INDEX "collectionRelease_supersededAt_idx" ON "collectionRelease" USING btree ("supersededAt","id") WHERE "collectionRelease"."supersededAt" IS NOT NULL;

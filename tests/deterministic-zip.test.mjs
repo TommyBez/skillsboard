@@ -1,4 +1,5 @@
 import assert from "node:assert/strict"
+import { createHash } from "node:crypto"
 import { test } from "node:test"
 
 import { unzipSync } from "fflate"
@@ -6,6 +7,7 @@ import { unzipSync } from "fflate"
 import {
   buildDeterministicZip,
   canonicalizePortableArchivePath,
+  createPortablePathTracker,
 } from "../lib/deterministic-zip.ts"
 
 const encoder = new TextEncoder()
@@ -19,6 +21,14 @@ test("creates byte-identical ZIPs regardless of input order", () => {
   const reversed = buildDeterministicZip([...files].reverse(), null)
 
   assert.deepEqual(forward, reversed)
+})
+
+test("produces a stable digest for a known input", () => {
+  const digest = createHash("sha256")
+    .update(buildDeterministicZip(files, null))
+    .digest("hex")
+
+  assert.equal(digest, "1117ec53ba9f86163eb615cbe7d6d29f232b632aaf4370cf6c1704da62562b40")
 })
 
 test("places installable skill files at the archive root", () => {
@@ -106,6 +116,16 @@ test("rejects file-directory collisions after portable normalization", () => {
     ], null),
     /collide on common filesystems/,
   )
+})
+
+test("tracks portable file-directory collisions in either insertion order", () => {
+  const nestedFirst = createPortablePathTracker()
+  assert.equal(nestedFirst.add("References/checklist.md"), true)
+  assert.equal(nestedFirst.add("references"), false)
+
+  const fileFirst = createPortablePathTracker()
+  assert.equal(fileFirst.add("REFERENCES"), true)
+  assert.equal(fileFirst.add("references/checklist.md"), false)
 })
 
 test("rejects reserved Win32 device names with casing or extensions", () => {

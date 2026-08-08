@@ -96,6 +96,16 @@ export function InstallableCollectionPanel({
     : exceedsSkillLimit
       ? ` Remove ${skillCount - MAX_INSTALLABLE_COLLECTION_SKILLS} ${skillCount - MAX_INSTALLABLE_COLLECTION_SKILLS === 1 ? "skill" : "skills"} before publishing.`
       : ""
+  let unpublishedDescription: string
+  if (disabledDistribution) {
+    unpublishedDescription = `Revision ${disabledDistribution.activeRevision}, published as “${disabledDistribution.publishedTitle}” on ${publishedAtFormatter.format(new Date(disabledDistribution.publishedAt))}, is offline. Publishing again creates a new revision and a new unlisted URL.${disabledPublishRequirement}`
+  } else if (skillCount === 0) {
+    unpublishedDescription = "Add at least one skill before publishing an install link."
+  } else if (exceedsSkillLimit) {
+    unpublishedDescription = `Installable collections currently support up to ${MAX_INSTALLABLE_COLLECTION_SKILLS} skills. Remove ${skillCount - MAX_INSTALLABLE_COLLECTION_SKILLS} before publishing.`
+  } else {
+    unpublishedDescription = `Publish an unlisted link so teammates can install all ${skillCount} ${skillCount === 1 ? "skill" : "skills"} in this collection with one command. Anyone with the link can open the shared page.`
+  }
 
   async function publish() {
     setPendingAction("publish")
@@ -168,13 +178,7 @@ export function InstallableCollectionPanel({
             {disabledDistribution ? <Badge variant="outline">Disabled</Badge> : null}
           </div>
           <CardDescription className="max-w-2xl leading-relaxed">
-            {disabledDistribution
-              ? `Revision ${disabledDistribution.activeRevision}, published as “${disabledDistribution.publishedTitle}” on ${publishedAtFormatter.format(new Date(disabledDistribution.publishedAt))}, is offline. Publishing again creates a new revision and a new unlisted URL.${disabledPublishRequirement}`
-              : skillCount === 0
-              ? "Add at least one skill before publishing an install link."
-              : exceedsSkillLimit
-                ? `Installable collections currently support up to ${MAX_INSTALLABLE_COLLECTION_SKILLS} skills. Remove ${skillCount - MAX_INSTALLABLE_COLLECTION_SKILLS} before publishing.`
-              : `Publish an unlisted link so teammates can install all ${skillCount} ${skillCount === 1 ? "skill" : "skills"} in this collection with one command. Anyone with the link can open the shared page.`}
+            {unpublishedDescription}
           </CardDescription>
         </CardHeader>
         {canManage ? (

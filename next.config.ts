@@ -17,7 +17,10 @@ const nextConfig = {
     return [
       {
         source: "/p/:path*",
-        headers: [{ key: "Referrer-Policy", value: "no-referrer" }],
+        headers: [
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
       },
     ]
   },

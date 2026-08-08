@@ -22,6 +22,7 @@ import {
   SkillArchiveError,
   type InstallableSkillArchive,
 } from "@/lib/github-skill-archive"
+import { createCollectionArchiveBudget } from "@/lib/installable-collection-package-budget"
 import {
   buildInstallableCollectionArtifactFilename,
   MAX_INSTALLABLE_COLLECTION_DESCRIPTION_LENGTH,
@@ -54,6 +55,8 @@ interface PackagedSkill {
   archive: InstallableSkillArchive
   source: PublishableSkill
 }
+
+class CollectionPackagingError extends SkillArchiveError {}
 
 function createShareId() {
   return randomBytes(24).toString("base64url")
@@ -144,6 +147,11 @@ async function mutateActiveCollectionDistribution(input: {
 
 async function packageSkills(skills: PublishableSkill[]) {
   const packaged = new Array<PackagedSkill>(skills.length)
+  const collectionBudget = createCollectionArchiveBudget({
+    artifactBytes: MAX_COLLECTION_ARTIFACT_BYTES,
+    sourceBytes: MAX_COLLECTION_SOURCE_BYTES,
+  })
+  let packagingError: CollectionPackagingError | null = null
   const repositoryGroups = new Map<string, Array<{
     index: number
     source: PublishableSkill
@@ -167,19 +175,85 @@ async function packageSkills(skills: PublishableSkill[]) {
   const groups = [...repositoryGroups.values()]
   let nextGroupIndex = 0
 
+  function failPackaging(error: CollectionPackagingError): never {
+    packagingError ??= error
+    throw packagingError
+  }
+
+  function retainArchive(
+    entry: { index: number; source: PublishableSkill },
+    archive: InstallableSkillArchive,
+  ) {
+    if (packagingError) throw packagingError
+
+    if (archive.artifactBytes > MAX_ARTIFACT_BYTES) {
+      failPackaging(new CollectionPackagingError(
+        `${entry.source.title}: the compressed skill is larger than 4 MB and cannot be published yet.`,
+        413,
+      ))
+    }
+    if (archive.description.length > MAX_INSTALLABLE_COLLECTION_DESCRIPTION_LENGTH) {
+      failPackaging(new CollectionPackagingError(
+        `${entry.source.title}: the skill description is longer than ${MAX_INSTALLABLE_COLLECTION_DESCRIPTION_LENGTH} characters and is not compatible with the installer.`,
+        422,
+      ))
+    }
+    try {
+      buildInstallableCollectionArtifactFilename(archive.skillName)
+    } catch {
+      failPackaging(new CollectionPackagingError(
+        `${entry.source.title}: the resolved skill name cannot be installed safely on every supported platform.`,
+        422,
+      ))
+    }
+
+    const budgetResult = collectionBudget.add(archive)
+    if (!budgetResult.ok) {
+      failPackaging(budgetResult.limit === "artifact"
+        ? new CollectionPackagingError(
+            "The collection produces more than 20 MB of compressed skill files and cannot be published yet.",
+            413,
+          )
+        : new CollectionPackagingError(
+            "The collection contains more than 50 MB of source files and cannot be published safely.",
+            413,
+          ))
+    }
+
+    packaged[entry.index] = { archive, source: entry.source }
+  }
+
   async function worker() {
     while (nextGroupIndex < groups.length) {
       const groupIndex = nextGroupIndex
       const group = groups[groupIndex]
       nextGroupIndex += 1
 
-      let archives: InstallableSkillArchive[]
+      const entriesByPath = new Map<string, typeof group>()
+      for (const entry of group) {
+        const entries = entriesByPath.get(entry.skillPath)
+        if (entries) entries.push(entry)
+        else entriesByPath.set(entry.skillPath, [entry])
+      }
       try {
-        archives = await buildInstallableSkillArchives({
+        await buildInstallableSkillArchives({
           githubUrl: group[0].source.githubUrl,
+          onArchiveBuilt: (archive) => {
+            const entries = entriesByPath.get(archive.skillPath)
+            if (!entries) {
+              failPackaging(new CollectionPackagingError(
+                "The selected skill could not be matched to its saved source path.",
+                422,
+              ))
+            }
+            // GitHub resolution deduplicates identical paths. Fan the archive
+            // back out so each saved skill retains its prior storage and budget semantics.
+            for (const entry of entries) retainArchive(entry, archive)
+          },
           skillPaths: group.map((item) => item.skillPath),
         })
       } catch (error) {
+        if (error instanceof CollectionPackagingError) throw error
         if (error instanceof SkillArchiveError) {
           const repository = `${group[0].source.repoOwner}/${group[0].source.repoName}`
           throw new SkillArchiveError(`${repository}: ${error.message}`, error.status, { cause: error })
@@ -187,33 +261,13 @@ async function packageSkills(skills: PublishableSkill[]) {
         throw error
       }
 
-      const archivesByPath = new Map(archives.map((archive) => [archive.skillPath, archive]))
-      for (const { index, source, skillPath } of group) {
-        const archive = archivesByPath.get(skillPath)
-        if (!archive) {
-          throw new SkillArchiveError(`${source.title}: the selected skill could not be packaged.`, 422)
-        }
-        if (archive.artifactBytes > MAX_ARTIFACT_BYTES) {
-          throw new SkillArchiveError(
-            `${source.title}: the compressed skill is larger than 4 MB and cannot be published yet.`,
-            413,
-          )
-        }
-        if (archive.description.length > MAX_INSTALLABLE_COLLECTION_DESCRIPTION_LENGTH) {
-          throw new SkillArchiveError(
-            `${source.title}: the skill description is longer than ${MAX_INSTALLABLE_COLLECTION_DESCRIPTION_LENGTH} characters and is not compatible with the installer.`,
+      for (const { index, source } of group) {
+        if (!packaged[index]) {
+          failPackaging(new CollectionPackagingError(
+            `${source.title}: the selected skill could not be packaged.`,
             422,
-          )
+          ))
         }
-        try {
-          buildInstallableCollectionArtifactFilename(archive.skillName)
-        } catch {
-          throw new SkillArchiveError(
-            `${source.title}: the resolved skill name cannot be installed safely on every supported platform.`,
-            422,
-          )
-        }
-        packaged[index] = { archive, source }
       }
     }
   }
@@ -222,27 +276,16 @@ async function packageSkills(skills: PublishableSkill[]) {
     Array.from({ length: Math.min(PACKAGE_CONCURRENCY, groups.length) }, () => worker()),
   )
 
-  const totalBytes = packaged.reduce((total, item) => total + item.archive.artifactBytes, 0)
-  if (totalBytes > MAX_COLLECTION_ARTIFACT_BYTES) {
-    throw new SkillArchiveError(
-      "The collection produces more than 20 MB of compressed skill files and cannot be published yet.",
-      413,
-    )
+  const seenNames = new Set<string>()
+  const duplicateNames = new Set<string>()
+  for (const item of packaged) {
+    const { skillName } = item.archive
+    if (seenNames.has(skillName)) duplicateNames.add(skillName)
+    else seenNames.add(skillName)
   }
-  const totalSourceBytes = packaged.reduce((total, item) => total + item.archive.sourceBytes, 0)
-  if (totalSourceBytes > MAX_COLLECTION_SOURCE_BYTES) {
+  if (duplicateNames.size) {
     throw new SkillArchiveError(
-      "The collection contains more than 50 MB of source files and cannot be published safely.",
-      413,
-    )
-  }
-
-  const duplicateNames = packaged
-    .map((item) => item.archive.skillName)
-    .filter((name, index, names) => names.indexOf(name) !== index)
-  if (duplicateNames.length) {
-    throw new SkillArchiveError(
-      `Two skills resolve to the same install name: ${[...new Set(duplicateNames)].join(", ")}. Remove one before publishing.`,
+      `Two skills resolve to the same install name: ${[...duplicateNames].join(", ")}. Remove one before publishing.`,
       422,
     )
   }

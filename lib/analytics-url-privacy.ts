@@ -1,5 +1,6 @@
 const REDACTED_INVITATION_PATH = "/invite/[redacted]"
 const REDACTED_INSTALLABLE_COLLECTION_PATH = "/p/[redacted]"
+const INSTALLABLE_COLLECTION_PATH_PATTERN = /^\/p\/[^/]+(?:\/|$)/i
 
 const ALLOWED_MARKETING_QUERY_PARAMETERS = new Set([
   "utm_campaign",
@@ -32,6 +33,71 @@ function redactInvitationPath(pathname: string) {
 function redactInstallableCollectionPath(pathname: string) {
   if (!/\/p\/[^/]+/i.test(pathname)) return pathname
   return pathname.replace(/\/p\/[^/]+/gi, REDACTED_INSTALLABLE_COLLECTION_PATH)
+}
+
+export function isInstallableCollectionPathname(pathname: string) {
+  return INSTALLABLE_COLLECTION_PATH_PATTERN.test(pathname)
+}
+
+export type PostHogRoutePrivacyState = "active" | "bearer" | "pending-bearer"
+export type PostHogRoutePrivacyEffect =
+  | "none"
+  | "resume"
+  | "resume-with-pageview"
+  | "suspend"
+
+type PostHogRoutePrivacyEvent =
+  | {
+      type: "navigation-start"
+      currentPathname: string
+      destinationPathname: string
+    }
+  | { type: "navigation-commit"; pathname: string }
+
+export function initialPostHogRoutePrivacyState(
+  pathname: string,
+): PostHogRoutePrivacyState {
+  return isInstallableCollectionPathname(pathname) ? "bearer" : "active"
+}
+
+export function transitionPostHogRoutePrivacy(
+  state: PostHogRoutePrivacyState,
+  event: PostHogRoutePrivacyEvent,
+): { effect: PostHogRoutePrivacyEffect; state: PostHogRoutePrivacyState } {
+  if (event.type === "navigation-commit") {
+    if (isInstallableCollectionPathname(event.pathname)) {
+      return {
+        effect: state === "active" ? "suspend" : "none",
+        state: "bearer",
+      }
+    }
+
+    return state === "active"
+      ? { effect: "none", state: "active" }
+      : { effect: "resume-with-pageview", state: "active" }
+  }
+
+  const currentIsBearer = isInstallableCollectionPathname(event.currentPathname)
+  if (isInstallableCollectionPathname(event.destinationPathname)) {
+    if (currentIsBearer) {
+      return {
+        effect: state === "active" ? "suspend" : "none",
+        state: "bearer",
+      }
+    }
+
+    return {
+      effect: state === "active" ? "suspend" : "none",
+      state: "pending-bearer",
+    }
+  }
+
+  if (currentIsBearer) return { effect: "none", state: "bearer" }
+  if (state === "pending-bearer") return { effect: "resume", state: "active" }
+  if (state === "bearer") {
+    return { effect: "resume-with-pageview", state: "active" }
+  }
+  return { effect: "none", state: "active" }
 }
 
 export function sanitizeAnalyticsUrl(value: string) {

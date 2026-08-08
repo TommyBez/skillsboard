@@ -5,6 +5,7 @@ import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
 import { cacheTags } from "@/lib/cache-tags"
+import { getAuthBaseUrl } from "@/lib/auth-environment"
 import { db } from "@/lib/db"
 import { mutateCollectionMembership } from "@/lib/db/collection-memberships"
 import { getCollectionDistribution } from "@/lib/db/collection-distributions"
@@ -22,9 +23,13 @@ import {
   GitHubSkillDiscoveryError,
 } from "@/lib/github-skill-discovery"
 import { buildInstallCommand } from "@/lib/install-command"
-import { buildInstallableCollectionCommand } from "@/lib/installable-collection-protocol"
+import {
+  buildInstallableCollectionCommand,
+  buildInstallableCollectionUrl,
+} from "@/lib/installable-collection-protocol"
 import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
 import { saveSkillToLibrary } from "@/lib/save-skill"
+import { siteConfig } from "@/lib/site"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
 
 function getOrigin(request: Request) {
@@ -406,8 +411,11 @@ async function route(request: Request) {
           return textResult("This collection does not have an active install link", true)
         }
 
-        const origin = getOrigin(request)
-        const shareUrl = `${origin}/p/${distribution.shareId}`
+        const distributionBaseUrl = getAuthBaseUrl() ?? siteConfig.url
+        const shareUrl = buildInstallableCollectionUrl(
+          distributionBaseUrl,
+          distribution.shareId,
+        )
         captureMcpToolUsed(jwt.sub!, "get_collection_install_command", true)
         return textResult(JSON.stringify({
           collectionId: found.id,
@@ -415,7 +423,10 @@ async function route(request: Request) {
           revision: distribution.activeRevision,
           publishedAt: distribution.publishedAt,
           shareUrl,
-          installCommand: buildInstallableCollectionCommand(origin, distribution.shareId),
+          installCommand: buildInstallableCollectionCommand(
+            distributionBaseUrl,
+            distribution.shareId,
+          ),
           updateBehavior: "Rerun the install command to add skills introduced by a later revision. The skills update command refreshes already installed skills but does not automatically remove skills deleted from the collection.",
         }, null, 2))
       })

@@ -401,6 +401,9 @@ export const collectionRelease = pgTable("collectionRelease", {
 }, (table) => [
   unique("collectionRelease_collectionId_revision_key").on(table.collectionId, table.revision),
   unique("collectionRelease_collectionId_id_key").on(table.collectionId, table.id),
+  index("collectionRelease_supersededAt_idx")
+    .on(table.supersededAt, table.id)
+    .where(sql`${table.supersededAt} IS NOT NULL`),
   foreignKey({
     columns: [table.collectionId],
     foreignColumns: [collection.id],

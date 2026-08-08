@@ -29,7 +29,10 @@ import {
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
-import { buildInstallableCollectionCommand } from "@/lib/installable-collection-protocol"
+import {
+  buildInstallableCollectionCommand,
+  buildInstallableCollectionUrl,
+} from "@/lib/installable-collection-protocol"
 import { isOrganizationAdmin } from "@/lib/session"
 import { siteConfig } from "@/lib/site"
 
@@ -79,6 +82,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
     source: `${item.repoOwner}/${item.repoName}`,
     inCollection: collectionSkillIds.has(item.id),
   }))
+  const distributionBaseUrl = getAuthBaseUrl() ?? siteConfig.url
   const activeDistribution = distributionState
     && !distributionState.revokedAt
     && distributionState.activeReleaseId
@@ -87,12 +91,15 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
         activeRevision: distributionState.activeRevision,
         changesPending: collection.updatedAt.getTime() > distributionState.publishedAt.getTime(),
         installCommand: buildInstallableCollectionCommand(
-          getAuthBaseUrl() ?? siteConfig.url,
+          distributionBaseUrl,
           distributionState.shareId,
         ),
         publishedAt: distributionState.publishedAt.toISOString(),
         publishedTitle: distributionState.releaseTitle ?? collection.title,
-        shareUrl: `${(getAuthBaseUrl() ?? siteConfig.url).replace(/\/$/, "")}/p/${distributionState.shareId}`,
+        shareUrl: buildInstallableCollectionUrl(
+          distributionBaseUrl,
+          distributionState.shareId,
+        ),
       }
     : null
   const disabledDistribution = distributionState?.revokedAt

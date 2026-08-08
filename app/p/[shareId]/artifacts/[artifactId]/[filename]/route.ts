@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto"
 
 import { getPublishedCollectionArtifact } from "@/lib/db/collection-distributions"
-import { buildInstallableCollectionArtifactFilename } from "@/lib/installable-collection-protocol"
+import {
+  buildInstallableCollectionArtifactFilename,
+  isValidInstallableCollectionShareId,
+} from "@/lib/installable-collection-protocol"
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 const RESPONSE_HEADERS = {
@@ -24,12 +27,27 @@ export async function GET(
   },
 ) {
   const { artifactId, filename, shareId } = await params
-  if (!UUID_PATTERN.test(artifactId)) return notFoundResponse()
+  if (
+    !isValidInstallableCollectionShareId(shareId)
+    || !UUID_PATTERN.test(artifactId)
+  ) return notFoundResponse()
 
   const artifact = await getPublishedCollectionArtifact(shareId, artifactId)
   if (!artifact) return notFoundResponse()
 
-  const expectedFilename = buildInstallableCollectionArtifactFilename(artifact.skillName)
+  let expectedFilename: string
+  try {
+    expectedFilename = buildInstallableCollectionArtifactFilename(artifact.skillName)
+  } catch (error) {
+    console.error("Published collection artifact metadata failed validation", {
+      artifactId,
+      error,
+    })
+    return Response.json(
+      { error: "Artifact unavailable" },
+      { status: 500, headers: RESPONSE_HEADERS },
+    )
+  }
   if (filename !== expectedFilename) return notFoundResponse()
 
   const bytes = Buffer.from(artifact.artifactBase64, "base64")

@@ -32,8 +32,14 @@ export interface InstallableCollectionManifest {
   skills: InstallableCollectionArchiveManifestEntry[]
 }
 
+export function isValidInstallableCollectionShareId(
+  shareId: unknown,
+): shareId is string {
+  return typeof shareId === "string" && SHARE_ID_PATTERN.test(shareId)
+}
+
 function assertValidShareId(shareId: string) {
-  if (typeof shareId !== "string" || !SHARE_ID_PATTERN.test(shareId)) {
+  if (!isValidInstallableCollectionShareId(shareId)) {
     throw new TypeError("Share ID must be exactly 32 URL-safe characters")
   }
 }
@@ -103,10 +109,13 @@ function normalizeBaseUrl(baseUrl: string) {
 }
 
 export function buildInstallableCollectionCommand(baseUrl: string, shareId: string) {
-  assertValidShareId(shareId)
-
-  const collectionUrl = `${normalizeBaseUrl(baseUrl)}/p/${encodeURIComponent(shareId)}`
+  const collectionUrl = buildInstallableCollectionUrl(baseUrl, shareId)
   return `npx skills add ${collectionUrl} --skill "*"`
+}
+
+export function buildInstallableCollectionUrl(baseUrl: string, shareId: string) {
+  assertValidShareId(shareId)
+  return `${normalizeBaseUrl(baseUrl)}/p/${encodeURIComponent(shareId)}`
 }
 
 export function buildInstallableCollectionArtifactFilename(skillName: string) {

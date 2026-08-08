@@ -1,21 +1,19 @@
 import assert from "node:assert/strict"
-import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
-import { stripTypeScriptTypes } from "node:module"
+import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
-const source = await readFile(
-  new URL("../lib/installable-collection-protocol.ts", import.meta.url),
-  "utf8",
-)
-const outputText = stripTypeScriptTypes(source, { mode: "transform" })
 const {
   INSTALLABLE_COLLECTION_SCHEMA_URL,
   buildInstallableCollectionArtifactFilename,
   buildInstallableCollectionArtifactPath,
   buildInstallableCollectionCommand,
+  buildInstallableCollectionUrl,
   buildWellKnownManifest,
-} = await import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`)
+  isValidInstallableCollectionShareId,
+} = await loadTsModule(
+  new URL("../lib/installable-collection-protocol.ts", import.meta.url),
+)
 
 const SHARE_ID = "Ab_-".repeat(8)
 const DIGEST_A = `sha256:${"a".repeat(64)}`
@@ -30,9 +28,27 @@ test("builds a project install command and normalizes the base URL", () => {
 
 test("URL-encodes a base path before appending the encoded share ID", () => {
   assert.equal(
+    buildInstallableCollectionUrl("https://example.com/team collections/", SHARE_ID),
+    `https://example.com/team%20collections/p/${SHARE_ID}`,
+  )
+  assert.equal(
     buildInstallableCollectionCommand("https://example.com/team collections/", SHARE_ID),
     `npx skills add https://example.com/team%20collections/p/${SHARE_ID} --skill "*"`,
   )
+})
+
+test("validates installable collection share IDs without throwing", () => {
+  assert.equal(isValidInstallableCollectionShareId(SHARE_ID), true)
+
+  for (const value of [
+    undefined,
+    null,
+    "a".repeat(31),
+    "a".repeat(33),
+    `${"a".repeat(31)}/`,
+  ]) {
+    assert.equal(isValidInstallableCollectionShareId(value), false, String(value))
+  }
 })
 
 test("builds deterministic artifact filenames and relative paths", () => {

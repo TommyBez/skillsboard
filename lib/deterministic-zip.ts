@@ -9,6 +9,31 @@ export interface DeterministicArchiveFile {
   relativePath: string
 }
 
+/** Tracks canonical paths and rejects file/directory collisions across a set. */
+export function createPortablePathTracker() {
+  const paths = new Set<string>()
+  const directories = new Set<string>()
+
+  return {
+    add(path: string) {
+      const portablePath = canonicalizePortableArchivePath(path)
+      const segments = portablePath.split("/")
+      const parents = segments.slice(0, -1).map((_, index) => (
+        segments.slice(0, index + 1).join("/")
+      ))
+      if (
+        paths.has(portablePath)
+        || directories.has(portablePath)
+        || parents.some((directory) => paths.has(directory))
+      ) return false
+
+      paths.add(portablePath)
+      for (const directory of parents) directories.add(directory)
+      return true
+    },
+  }
+}
+
 function caseFold(value: string) {
   // The lower/upper/lower sequence covers Unicode folds such as sharp-s and
   // final sigma that a single toLowerCase() pass leaves distinct.
@@ -40,8 +65,7 @@ export function buildDeterministicZip(
 ) {
   const archiveEntries = Object.create(null) as Zippable
   const seenPaths = new Set<string>()
-  const seenPortablePaths = new Set<string>()
-  const seenPortableDirectories = new Set<string>()
+  const portablePaths = createPortablePathTracker()
   const orderedFiles = [...files].sort((a, b) => (
     a.relativePath < b.relativePath ? -1 : a.relativePath > b.relativePath ? 1 : 0
   ))
@@ -52,21 +76,10 @@ export function buildDeterministicZip(
       throw new TypeError(`Unsafe archive path: ${path}`)
     }
     if (seenPaths.has(path)) throw new TypeError(`Duplicate archive path: ${path}`)
-    const portablePath = canonicalizePortableArchivePath(path)
-    const portableSegments = portablePath.split("/")
-    const portableDirectories = portableSegments.slice(0, -1).map((_, index) => (
-      portableSegments.slice(0, index + 1).join("/")
-    ))
-    if (
-      seenPortablePaths.has(portablePath)
-      || seenPortableDirectories.has(portablePath)
-      || portableDirectories.some((directory) => seenPortablePaths.has(directory))
-    ) {
+    if (!portablePaths.add(path)) {
       throw new TypeError(`Archive paths collide on common filesystems: ${path}`)
     }
     seenPaths.add(path)
-    seenPortablePaths.add(portablePath)
-    for (const directory of portableDirectories) seenPortableDirectories.add(directory)
     archiveEntries[path] = [file.bytes, { mtime: DETERMINISTIC_ARCHIVE_DATE }]
   }
 

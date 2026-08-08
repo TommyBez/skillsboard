@@ -4,7 +4,7 @@ import { createHash } from "node:crypto"
 
 import {
   buildDeterministicZip,
-  canonicalizePortableArchivePath,
+  createPortablePathTracker,
 } from "@/lib/deterministic-zip"
 import {
   GitHubSkillDiscoveryError,
@@ -19,6 +19,7 @@ const MAX_FILE_BYTES = 5 * 1024 * 1024
 const MAX_TOTAL_BYTES = 25 * 1024 * 1024
 const MAX_REPOSITORY_PATH_LENGTH = 512
 const DOWNLOAD_CONCURRENCY = 6
+const ARCHIVE_CONCURRENCY = 3
 const GITHUB_TIMEOUT_MS = 15_000
 
 interface ResolvedSkillFile extends GitHubTreeEntry {
@@ -98,8 +99,7 @@ function collectSkillFiles(tree: GitHubTreeEntry[], skillPath: string) {
   }
 
   let totalSize = 0
-  const portablePaths = new Set<string>()
-  const portableDirectories = new Set<string>()
+  const portablePaths = createPortablePathTracker()
   for (const file of files) {
     if (!isSafeRepositoryPath(file.relativePath) || !Number.isSafeInteger(file.size) || file.size < 0) {
       throw new SkillArchiveError("This skill contains a file path that cannot be packaged safely.", 422)
@@ -107,31 +107,21 @@ function collectSkillFiles(tree: GitHubTreeEntry[], skillPath: string) {
     if (file.size > MAX_FILE_BYTES) {
       throw new SkillArchiveError("This skill contains a file larger than 5 MB and is too large to package.", 413)
     }
-    let portablePath: string
+    let accepted: boolean
     try {
-      portablePath = canonicalizePortableArchivePath(file.relativePath)
+      accepted = portablePaths.add(file.relativePath)
     } catch {
       throw new SkillArchiveError(
         "This skill contains a file path that cannot be extracted safely on common filesystems.",
         422,
       )
     }
-    const portableSegments = portablePath.split("/")
-    const parentDirectories = portableSegments.slice(0, -1).map((_, index) => (
-      portableSegments.slice(0, index + 1).join("/")
-    ))
-    if (
-      portablePaths.has(portablePath)
-      || portableDirectories.has(portablePath)
-      || parentDirectories.some((directory) => portablePaths.has(directory))
-    ) {
+    if (!accepted) {
       throw new SkillArchiveError(
         "This skill contains file paths that collide on common filesystems and cannot be packaged safely.",
         422,
       )
     }
-    portablePaths.add(portablePath)
-    for (const directory of parentDirectories) portableDirectories.add(directory)
     totalSize += file.size
   }
 
@@ -316,6 +306,7 @@ export async function buildInstallableSkillArchive(input: {
 /** Builds several skills from one repository snapshot and commit. */
 export async function buildInstallableSkillArchives(input: {
   githubUrl: string
+  onArchiveBuilt?: (archive: InstallableSkillArchive) => void
   skillPaths: string[]
 }): Promise<InstallableSkillArchive[]> {
   if (!input.skillPaths.length) {
@@ -349,7 +340,7 @@ export async function buildInstallableSkillArchives(input: {
       nextIndex += 1
       const archive = await buildResolvedSkillArchive({ ...discovery, skill }, null)
       const digest = createHash("sha256").update(archive.bytes).digest("hex")
-      archives[index] = {
+      const installableArchive: InstallableSkillArchive = {
         ...archive,
         artifactBytes: archive.bytes.byteLength,
         description: skill.description,
@@ -358,11 +349,13 @@ export async function buildInstallableSkillArchives(input: {
         isPrivate: discovery.isPrivate,
         skillName: skill.name,
       }
+      input.onArchiveBuilt?.(installableArchive)
+      archives[index] = installableArchive
     }
   }
 
   await Promise.all(
-    Array.from({ length: Math.min(3, discovery.skills.length) }, () => worker()),
+    Array.from({ length: Math.min(ARCHIVE_CONCURRENCY, discovery.skills.length) }, () => worker()),
   )
   return archives
 }

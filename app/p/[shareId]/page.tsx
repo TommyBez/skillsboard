@@ -15,7 +15,10 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAuthBaseUrl } from "@/lib/auth-environment"
 import { getPublishedCollectionByShareId } from "@/lib/db/collection-distributions"
-import { buildInstallableCollectionCommand } from "@/lib/installable-collection-protocol"
+import {
+  buildInstallableCollectionCommand,
+  isValidInstallableCollectionShareId,
+} from "@/lib/installable-collection-protocol"
 import { siteConfig } from "@/lib/site"
 
 export const metadata: Metadata = {
@@ -25,7 +28,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-const SHARE_ID_PATTERN = /^[A-Za-z0-9_-]{32}$/
 const publishedAtFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   month: "short",
@@ -55,7 +57,7 @@ function pinnedSourceUrl(skill: {
 
 async function SharedCollection({ params }: SharedCollectionProps) {
   const { shareId } = await params
-  if (!SHARE_ID_PATTERN.test(shareId)) notFound()
+  if (!isValidInstallableCollectionShareId(shareId)) notFound()
 
   const published = await getPublishedCollectionByShareId(shareId)
   if (!published) notFound()
