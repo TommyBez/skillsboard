@@ -11,7 +11,7 @@ import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import {
   alternativesIndexPath,
-  type AlternativeCtaLocation,
+  type AlternativeCtaPlacement,
 } from "@/lib/seo/alternatives"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
@@ -24,7 +24,7 @@ type ResourceHeaderLocation =
   | "resources_header"
 type ResourceCtaLocation =
   | "alternatives_index"
-  | AlternativeCtaLocation
+  | AlternativeCtaPlacement
   | "guide_inline"
   | "guide_closing"
   | "resources_closing"

@@ -129,7 +129,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location={entry.ctaLocation} />
+            <ResourceCta location={`${entry.ctaLocation}_header`} />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -171,7 +171,12 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             {entry.comparison.caption}
           </p>
 
-          <div className="mt-8 overflow-x-auto rounded-[3px] border border-border bg-card">
+          <div
+            tabIndex={0}
+            role="region"
+            aria-labelledby="comparison-heading"
+            className="mt-8 overflow-x-auto rounded-[3px] border border-border bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
             <table className="w-full min-w-[760px] border-collapse text-left">
               <caption className="sr-only">{entry.comparison.caption}</caption>
               <thead>
@@ -350,7 +355,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             the first skill, and invite the people who keep asking.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location={entry.ctaLocation} />
+            <ResourceCta location={`${entry.ctaLocation}_closing`} />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

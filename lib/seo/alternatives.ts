@@ -16,11 +16,19 @@ export type AlternativePath =
 export type AlternativeSlug =
   AlternativePath extends `/alternatives/${infer Slug}` ? Slug : never
 
-/** Analytics locations, kept in sync with the landing_cta_clicked union. */
+/** One value per alternative page, used as the analytics location prefix. */
 export type AlternativeCtaLocation =
   | "alternatives_github_repo"
   | "alternatives_skills_sh"
   | "alternatives_smithery"
+
+/**
+ * The two CTA placements on an alternative page, kept in sync with the
+ * landing_cta_clicked union. Guides split guide_inline from guide_closing for
+ * the same reason, so the placement stays readable in PostHog.
+ */
+export type AlternativeCtaPlacement =
+  `${AlternativeCtaLocation}_${"header" | "closing"}`
 
 export interface AlternativeSource {
   /** Stable key referenced by comparison rows. */
@@ -591,7 +599,7 @@ const smithery: AlternativeDefinition = {
         dimension: "Scope of the catalog",
         skillsBoard: "Your team's list, as short as your team keeps it.",
         alternative:
-          "A public registry whose homepage invites you to browse 14,088 or more MCPs, plus a paginated public skills catalog.",
+          "A public registry whose homepage invites you to browse more than 14,000 MCPs, plus a paginated public skills catalog.",
         sourceIds: ["smithery-home", "smithery-skills"],
       },
       {
