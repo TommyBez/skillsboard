@@ -59,13 +59,14 @@ export function EditSkillNoteDialog({
         render={
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
+            className="size-8 rounded-lg"
             aria-label={hasNote ? `Edit note for ${skillName}` : `Add note for ${skillName}`}
+            title={hasNote ? "Edit note" : "Add note"}
           />
         }
       >
-        <NotebookPenIcon data-icon="inline-start" />
-        {hasNote ? "Edit note" : "Add note"}
+        <NotebookPenIcon aria-hidden="true" />
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto p-0 sm:max-w-lg">
         <form action={handleSubmit}>
