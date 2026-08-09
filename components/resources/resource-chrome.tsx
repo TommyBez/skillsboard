@@ -9,15 +9,25 @@ import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
+import {
+  alternativesIndexPath,
+  type AlternativeCtaPlacement,
+} from "@/lib/seo/alternatives"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
 type ResourceHeaderLocation =
   | "about_header"
+  | "alternatives_header"
   | "guide_header"
   | "pricing_header"
   | "resources_header"
-type ResourceCtaLocation = "guide_inline" | "guide_closing" | "resources_closing"
+type ResourceCtaLocation =
+  | "alternatives_index"
+  | AlternativeCtaPlacement
+  | "guide_inline"
+  | "guide_closing"
+  | "resources_closing"
 
 /**
  * The one action these pages offer.
@@ -165,6 +175,12 @@ export function ResourceFooter() {
               className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
             >
               Resources
+            </Link>
+            <Link
+              href={alternativesIndexPath}
+              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            >
+              Alternatives
             </Link>
             <Link
               href={resourcePaths.about}
