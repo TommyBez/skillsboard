@@ -25,7 +25,7 @@ export function AccessShell({
   return (
     <main className="app-canvas relative min-h-svh overflow-hidden p-2 text-foreground sm:p-4 lg:p-6">
       <div className="surface-shadow relative mx-auto grid min-h-[calc(100svh-1rem)] max-w-[1440px] overflow-hidden rounded-[16px] border border-border bg-card sm:min-h-[calc(100svh-2rem)] lg:min-h-[calc(100svh-3rem)] lg:grid-cols-[minmax(0,1fr)_minmax(480px,0.82fr)]">
-        <aside className="ink-panel relative hidden overflow-hidden lg:flex lg:flex-col lg:p-10 xl:p-14">
+        <aside className="ink-panel relative hidden overflow-hidden @container lg:flex lg:flex-col lg:p-10 xl:p-14">
           <div className="relative flex items-center justify-between gap-6">
             <Brand />
             <div className="flex items-center gap-3">
@@ -36,8 +36,8 @@ export function AccessShell({
             </div>
           </div>
 
-          <div className="relative my-auto max-w-2xl py-16">
-            <p className="max-w-[13ch] text-balance text-[clamp(3.25rem,5vw,5.8rem)] font-semibold leading-[0.92] tracking-display">
+          <div className="relative my-auto min-w-0 max-w-2xl py-16">
+            <p className="max-w-[min(15ch,100%)] text-balance text-[clamp(3rem,11cqi,4.75rem)] font-semibold leading-[0.92] tracking-display">
               {editorialTitle}
             </p>
             <p className="mt-8 max-w-lg text-pretty text-base leading-7 text-(--surface-ink-foreground) opacity-60 xl:text-lg">
