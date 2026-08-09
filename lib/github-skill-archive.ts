@@ -305,6 +305,7 @@ export async function buildInstallableSkillArchive(input: {
 
 /** Builds several skills from one repository snapshot and commit. */
 export async function buildInstallableSkillArchives(input: {
+  expectedCommitSha?: string
   githubUrl: string
   onArchiveBuilt?: (archive: InstallableSkillArchive) => void
   skillPaths: string[]
@@ -321,6 +322,16 @@ export async function buildInstallableSkillArchives(input: {
       throw new SkillArchiveError(error.message, error.status, { cause: error })
     }
     throw error
+  }
+
+  if (
+    input.expectedCommitSha !== undefined
+    && discovery.commitSha !== input.expectedCommitSha
+  ) {
+    throw new SkillArchiveError(
+      "The GitHub repository changed while the collection was being packaged. Try publishing again.",
+      409,
+    )
   }
 
   if (discovery.isPrivate) {

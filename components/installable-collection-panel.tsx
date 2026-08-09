@@ -63,6 +63,7 @@ interface InstallableCollectionPanelProps {
   canManage: boolean
   disabledDistribution: DisabledCollectionDistribution | null
   skillCount: number
+  sourceVerificationCount: number
   teamId: string
   distribution: CollectionDistribution | null
 }
@@ -82,6 +83,7 @@ export function InstallableCollectionPanel({
   canManage,
   disabledDistribution,
   skillCount,
+  sourceVerificationCount,
   teamId,
   distribution,
 }: InstallableCollectionPanelProps) {
@@ -91,6 +93,30 @@ export function InstallableCollectionPanel({
   const [disableDialogOpen, setDisableDialogOpen] = useState(false)
   const isPending = pendingAction !== null
   const exceedsSkillLimit = skillCount > MAX_INSTALLABLE_COLLECTION_SKILLS
+  const needsSourceVerification = sourceVerificationCount > 0
+  const sourceVerificationSubject = sourceVerificationCount === 1
+    ? "the GitHub source for 1 existing skill"
+    : `the GitHub sources for ${sourceVerificationCount} existing skills`
+  const sourceVerificationDescription = needsSourceVerification
+    ? `Skills Board will verify ${sourceVerificationSubject} during publishing.`
+    : ""
+  const publishPendingLabel = needsSourceVerification
+    ? "Verifying and publishing…"
+    : "Publishing…"
+  let unpublishedPublishLabel = disabledDistribution
+    ? "Publish new install link"
+    : "Publish install link"
+  let livePublishLabel = distribution?.changesPending
+    ? "Publish update"
+    : "Refresh release"
+  if (needsSourceVerification) {
+    unpublishedPublishLabel = disabledDistribution
+      ? "Verify & publish new link"
+      : "Verify & publish"
+    livePublishLabel = distribution?.changesPending
+      ? "Verify & publish update"
+      : "Verify & refresh release"
+  }
   const disabledPublishRequirement = skillCount === 0
     ? " Add at least one skill before publishing."
     : exceedsSkillLimit
@@ -105,6 +131,9 @@ export function InstallableCollectionPanel({
     unpublishedDescription = `Installable collections currently support up to ${MAX_INSTALLABLE_COLLECTION_SKILLS} skills. Remove ${skillCount - MAX_INSTALLABLE_COLLECTION_SKILLS} before publishing.`
   } else {
     unpublishedDescription = `Publish an unlisted link so teammates can install all ${skillCount} ${skillCount === 1 ? "skill" : "skills"} in this collection with one command. Anyone with the link can open the shared page.`
+  }
+  if (sourceVerificationDescription) {
+    unpublishedDescription += ` ${sourceVerificationDescription}`
   }
 
   async function publish() {
@@ -188,9 +217,9 @@ export function InstallableCollectionPanel({
               aria-busy={pendingAction === "publish" || undefined}
               onClick={publish}
             >
-              <ButtonPendingContent pending={pendingAction === "publish"} pendingLabel="Publishing…">
+              <ButtonPendingContent pending={pendingAction === "publish"} pendingLabel={publishPendingLabel}>
                 <UploadCloudIcon data-icon="inline-start" />
-                {disabledDistribution ? "Publish new install link" : "Publish install link"}
+                {unpublishedPublishLabel}
               </ButtonPendingContent>
             </Button>
           </CardFooter>
@@ -215,7 +244,7 @@ export function InstallableCollectionPanel({
           <span className="mt-1 block font-sans">Published {publishedAtFormatter.format(new Date(distribution.publishedAt))}</span>
         </p>
         <CardDescription className="max-w-2xl leading-relaxed">
-          Share one command for revision {distribution.activeRevision}, published as “{distribution.publishedTitle}”. Publish another revision when the collection changes.
+          Share one command for revision {distribution.activeRevision}, published as “{distribution.publishedTitle}”. Publish another revision when the collection changes.{sourceVerificationDescription ? ` ${sourceVerificationDescription}` : null}
         </CardDescription>
       </CardHeader>
 
@@ -275,9 +304,9 @@ export function InstallableCollectionPanel({
             aria-busy={pendingAction === "publish" || undefined}
             onClick={publish}
           >
-            <ButtonPendingContent pending={pendingAction === "publish"} pendingLabel="Publishing…">
+            <ButtonPendingContent pending={pendingAction === "publish"} pendingLabel={publishPendingLabel}>
               <UploadCloudIcon data-icon="inline-start" />
-              {distribution.changesPending ? "Publish update" : "Refresh release"}
+              {livePublishLabel}
             </ButtonPendingContent>
           </Button>
 

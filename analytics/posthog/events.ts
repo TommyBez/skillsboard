@@ -146,6 +146,7 @@ type TeamEventPropertiesMap = {
   collection_distribution_published: {
     collection_id: string
     is_update: boolean
+    recovered_source_count: number
     revision: number
     skill_count: number
   }

@@ -2,7 +2,7 @@
 
 import { randomBytes } from "node:crypto"
 
-import { and, asc, eq, isNull, lt, ne, sql } from "drizzle-orm"
+import { and, asc, eq, inArray, isNull, lt, ne, sql } from "drizzle-orm"
 import { updateTag } from "next/cache"
 import { z } from "zod"
 
@@ -22,6 +22,10 @@ import {
   SkillArchiveError,
   type InstallableSkillArchive,
 } from "@/lib/github-skill-archive"
+import {
+  discoverGitHubSkillCandidates,
+  GitHubSkillDiscoveryError,
+} from "@/lib/github-skill-discovery"
 import { createCollectionArchiveBudget } from "@/lib/installable-collection-package-budget"
 import {
   buildInstallableCollectionArtifactFilename,
@@ -32,6 +36,11 @@ import {
   shouldRetainSupersededReleaseGrace,
   supersededReleaseCutoff,
 } from "@/lib/installable-collection-release-policy"
+import {
+  decideLegacySkillPathPersistence,
+  matchesRecoveredCanonicalName,
+  resolveLegacySkillPaths,
+} from "@/lib/legacy-skill-path-resolution"
 import { captureTeamEvent } from "@/lib/posthog-server"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
@@ -47,12 +56,25 @@ interface PublishableSkill {
   id: string
   repoName: string
   repoOwner: string
+  skillName: string
   skillPath: string | null
   title: string
 }
 
 interface PackagedSkill {
   archive: InstallableSkillArchive
+  source: PublishableSkill
+}
+
+interface RecoveredSkillPath {
+  id: string
+  skillPath: string
+}
+
+interface ResolvedRepositorySkill {
+  expectedCanonicalName: string | null
+  index: number
+  skillPath: string
   source: PublishableSkill
 }
 
@@ -147,6 +169,7 @@ async function mutateActiveCollectionDistribution(input: {
 
 async function packageSkills(skills: PublishableSkill[]) {
   const packaged = new Array<PackagedSkill>(skills.length)
+  const recoveredPaths = new Array<RecoveredSkillPath | undefined>(skills.length)
   const collectionBudget = createCollectionArchiveBudget({
     artifactBytes: MAX_COLLECTION_ARTIFACT_BYTES,
     sourceBytes: MAX_COLLECTION_SOURCE_BYTES,
@@ -155,18 +178,11 @@ async function packageSkills(skills: PublishableSkill[]) {
   const repositoryGroups = new Map<string, Array<{
     index: number
     source: PublishableSkill
-    skillPath: string
   }>>()
 
   for (const [index, source] of skills.entries()) {
-    if (source.skillPath === null) {
-      throw new SkillArchiveError(
-        `${source.title}: this skill does not have a verified source path.`,
-        422,
-      )
-    }
     const repositoryKey = `${source.repoOwner}/${source.repoName}`.toLowerCase()
-    const entry = { index, source, skillPath: source.skillPath }
+    const entry = { index, source }
     const group = repositoryGroups.get(repositoryKey)
     if (group) group.push(entry)
     else repositoryGroups.set(repositoryKey, [entry])
@@ -181,10 +197,20 @@ async function packageSkills(skills: PublishableSkill[]) {
   }
 
   function retainArchive(
-    entry: { index: number; source: PublishableSkill },
+    entry: ResolvedRepositorySkill,
     archive: InstallableSkillArchive,
   ) {
     if (packagingError) throw packagingError
+
+    if (!matchesRecoveredCanonicalName({
+      actualName: archive.skillName,
+      expectedName: entry.expectedCanonicalName,
+    })) {
+      failPackaging(new CollectionPackagingError(
+        `${entry.source.title}: its GitHub source changed while it was being packaged. Try publishing again.`,
+        409,
+      ))
+    }
 
     if (archive.artifactBytes > MAX_ARTIFACT_BYTES) {
       failPackaging(new CollectionPackagingError(
@@ -221,6 +247,12 @@ async function packageSkills(skills: PublishableSkill[]) {
     }
 
     packaged[entry.index] = { archive, source: entry.source }
+    if (entry.source.skillPath === null) {
+      recoveredPaths[entry.index] = {
+        id: entry.source.id,
+        skillPath: archive.skillPath,
+      }
+    }
   }
 
   async function worker() {
@@ -229,14 +261,95 @@ async function packageSkills(skills: PublishableSkill[]) {
       const group = groups[groupIndex]
       nextGroupIndex += 1
 
-      const entriesByPath = new Map<string, typeof group>()
-      for (const entry of group) {
-        const entries = entriesByPath.get(entry.skillPath)
-        if (entries) entries.push(entry)
-        else entriesByPath.set(entry.skillPath, [entry])
-      }
       try {
+        let resolvedGroup: ResolvedRepositorySkill[]
+        let expectedCommitSha: string | undefined
+        const legacyEntries = group.filter(({ source }) => source.skillPath === null)
+        if (legacyEntries.length) {
+          const discovery = await discoverGitHubSkillCandidates(group[0].source.githubUrl)
+          expectedCommitSha = discovery.commitSha
+          const resolution = resolveLegacySkillPaths({
+            candidates: discovery.skills,
+            claimedPaths: group.flatMap(({ source }) => (
+              source.skillPath === null ? [] : [source.skillPath]
+            )),
+            legacySkills: legacyEntries.map(({ source }) => ({
+              id: source.id,
+              skillName: source.skillName,
+            })),
+          })
+
+          if (!resolution.ok) {
+            const source = group.find((entry) => entry.source.id === resolution.skillId)?.source
+              ?? group[0].source
+            if (resolution.code === "path_collision") {
+              failPackaging(new CollectionPackagingError(
+                `${source.title}: more than one saved skill resolves to the same GitHub source folder. Remove one of the duplicate skills from this collection before publishing.`,
+                422,
+              ))
+            }
+            if (resolution.code === "no_candidates") {
+              failPackaging(new CollectionPackagingError(
+                `${source.title}: Skills Board could not find a current skill definition in this repository. Its GitHub source must be verified before publishing.`,
+                422,
+              ))
+            }
+            failPackaging(new CollectionPackagingError(
+              `${source.title}: this repository contains multiple skills and the saved name no longer identifies one safely. Its exact GitHub source must be verified before publishing.`,
+              422,
+            ))
+          }
+
+          const recoveredById = new Map(resolution.resolved.map((item) => [item.id, item]))
+          resolvedGroup = group.map(({ index, source }) => {
+            if (source.skillPath !== null) {
+              return {
+                expectedCanonicalName: null,
+                index,
+                skillPath: source.skillPath,
+                source,
+              }
+            }
+            const recovered = recoveredById.get(source.id)
+            if (!recovered) {
+              failPackaging(new CollectionPackagingError(
+                `${source.title}: its saved source path could not be recovered.`,
+                422,
+              ))
+            }
+            return {
+              expectedCanonicalName: recovered.canonicalName,
+              index,
+              skillPath: recovered.skillPath,
+              source,
+            }
+          })
+        } else {
+          resolvedGroup = group.map(({ index, source }) => {
+            if (source.skillPath === null) {
+              failPackaging(new CollectionPackagingError(
+                `${source.title}: its saved source path could not be recovered.`,
+                422,
+              ))
+            }
+            return {
+              expectedCanonicalName: null,
+              index,
+              skillPath: source.skillPath,
+              source,
+            }
+          })
+        }
+
+        const entriesByPath = new Map<string, ResolvedRepositorySkill[]>()
+        for (const entry of resolvedGroup) {
+          const entries = entriesByPath.get(entry.skillPath)
+          if (entries) entries.push(entry)
+          else entriesByPath.set(entry.skillPath, [entry])
+        }
+
         await buildInstallableSkillArchives({
+          expectedCommitSha,
           githubUrl: group[0].source.githubUrl,
           onArchiveBuilt: (archive) => {
             const entries = entriesByPath.get(archive.skillPath)
@@ -250,12 +363,15 @@ async function packageSkills(skills: PublishableSkill[]) {
             // back out so each saved skill retains its prior storage and budget semantics.
             for (const entry of entries) retainArchive(entry, archive)
           },
-          skillPaths: group.map((item) => item.skillPath),
+          skillPaths: resolvedGroup.map((item) => item.skillPath),
         })
       } catch (error) {
         if (error instanceof CollectionPackagingError) throw error
+        const repository = `${group[0].source.repoOwner}/${group[0].source.repoName}`
+        if (error instanceof GitHubSkillDiscoveryError) {
+          throw new SkillArchiveError(`${repository}: ${error.message}`, error.status, { cause: error })
+        }
         if (error instanceof SkillArchiveError) {
-          const repository = `${group[0].source.repoOwner}/${group[0].source.repoName}`
           throw new SkillArchiveError(`${repository}: ${error.message}`, error.status, { cause: error })
         }
         throw error
@@ -290,7 +406,12 @@ async function packageSkills(skills: PublishableSkill[]) {
     )
   }
 
-  return packaged
+  return {
+    packaged,
+    recoveredPaths: recoveredPaths.filter(
+      (item): item is RecoveredSkillPath => item !== undefined,
+    ),
+  }
 }
 
 export async function publishCollectionDistribution(
@@ -310,6 +431,7 @@ export async function publishCollectionDistribution(
         id: skill.id,
         repoName: skill.repoName,
         repoOwner: skill.repoOwner,
+        skillName: skill.skillName,
         skillPath: skill.skillPath,
         title: skill.title,
       })
@@ -341,9 +463,9 @@ export async function publishCollectionDistribution(
     }
   }
 
-  let packaged: PackagedSkill[]
+  let packagingResult: Awaited<ReturnType<typeof packageSkills>>
   try {
-    packaged = await packageSkills(skills)
+    packagingResult = await packageSkills(skills)
   } catch (error) {
     if (error instanceof SkillArchiveError) {
       return { ok: false as const, error: error.message }
@@ -351,10 +473,55 @@ export async function publishCollectionDistribution(
     console.error("Unable to package installable collection", error)
     return { ok: false as const, error: "We couldn’t package this collection. Try again." }
   }
+  const { packaged, recoveredPaths } = packagingResult
 
   const now = new Date()
   const nextShareId = createShareId()
+  const expectedPathBySkillId = new Map(packaged.map(({ archive, source }) => (
+    [source.id, archive.skillPath]
+  )))
+  const recoveredPathBySkillId = new Map(recoveredPaths.map((item) => (
+    [item.id, item.skillPath]
+  )))
+  const sourceSkillIds = [...expectedPathBySkillId.keys()].sort()
   const published = await db.transaction(async (tx) => {
+    // Keep the same skill -> collection lock order used by deletion and
+    // membership changes. Stable ordering also prevents two collections that
+    // share skills from locking the source rows in opposite orders.
+    const currentSources = await tx
+      .select({
+        id: skill.id,
+        skillPath: skill.skillPath,
+      })
+      .from(skill)
+      .where(and(
+        eq(skill.organizationId, organizationId),
+        inArray(skill.id, sourceSkillIds),
+      ))
+      .orderBy(asc(skill.id))
+      .for("update")
+
+    if (currentSources.length !== sourceSkillIds.length) {
+      return { status: "source_changed" as const }
+    }
+
+    const sourcePathRepairs: RecoveredSkillPath[] = []
+    for (const currentSource of currentSources) {
+      const expectedPath = expectedPathBySkillId.get(currentSource.id)
+      if (expectedPath === undefined) return { status: "source_changed" as const }
+
+      const recoveredPath = recoveredPathBySkillId.get(currentSource.id) ?? null
+      const decision = decideLegacySkillPathPersistence({
+        currentPath: currentSource.skillPath,
+        expectedPath,
+        recoveredPath,
+      })
+      if (decision === "conflict") return { status: "source_changed" as const }
+      if (decision === "repair") {
+        sourcePathRepairs.push({ id: currentSource.id, skillPath: expectedPath })
+      }
+    }
+
     const [currentCollection] = await tx
       .select({
         createdBy: collection.createdBy,
@@ -410,6 +577,17 @@ export async function publishCollectionDistribution(
     const retainSupersededReleaseGrace = shouldRetainSupersededReleaseGrace(
       Boolean(currentDistribution?.revokedAt),
     )
+
+    await Promise.all(sourcePathRepairs.map((repair) => (
+      tx
+        .update(skill)
+        .set({ skillPath: repair.skillPath, updatedAt: now })
+        .where(and(
+          eq(skill.id, repair.id),
+          eq(skill.organizationId, organizationId),
+          isNull(skill.skillPath),
+        ))
+    )))
 
     await tx
       .insert(collectionDistribution)
@@ -505,6 +683,7 @@ export async function publishCollectionDistribution(
 
     return {
       status: "published" as const,
+      repairedSkillCount: sourcePathRepairs.length,
       revision: distribution.activeRevision,
       shareId: distribution.shareId,
     }
@@ -528,14 +707,24 @@ export async function publishCollectionDistribution(
       error: "The install link changed while this release was being packaged. Review its current state and publish again.",
     }
   }
+  if (published.status === "source_changed") {
+    return {
+      ok: false as const,
+      error: "A skill source changed while this release was being packaged. Refresh the page and publish again.",
+    }
+  }
 
   updateTag(cacheTags.organizationCollections(organizationId))
+  if (published.repairedSkillCount > 0) {
+    updateTag(cacheTags.organizationSkills(organizationId))
+  }
   captureTeamEvent({
     distinctId: userId,
     event: "collection_distribution_published",
     properties: {
       collection_id: found.id,
       is_update: Boolean(existingDistribution?.activeReleaseId && !existingDistribution.revokedAt),
+      recovered_source_count: published.repairedSkillCount,
       revision: published.revision,
       skill_count: packaged.length,
     },

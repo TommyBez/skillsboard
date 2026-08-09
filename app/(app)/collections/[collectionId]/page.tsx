@@ -61,6 +61,9 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
   const canManageLibrary = isOrganizationAdmin(role)
   const canManageCollection = collection.createdBy === userId || canManageLibrary
   const canManageMembership = !distributionState || canManageCollection
+  const sourceVerificationCount = collectionSkills.filter(
+    (item) => item.skillPath === null,
+  ).length
   const collectionSkillIds = new Set(collectionSkills.map((item) => item.id))
   const distributedCollectionIds = new Set(distributionRows.map((item) => item.collectionId))
   const collectionOptions = allCollections.map((item) => ({
@@ -179,6 +182,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
         canManage={canManageCollection}
         disabledDistribution={disabledDistribution}
         skillCount={collectionSkills.length}
+        sourceVerificationCount={sourceVerificationCount}
         teamId={activeId}
         distribution={activeDistribution}
       />
