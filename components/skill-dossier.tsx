@@ -1,5 +1,5 @@
 import type { ReactNode } from "react"
-import { ArrowUpRightIcon, GitForkIcon } from "lucide-react"
+import { GitForkIcon } from "lucide-react"
 
 import { ShowMore } from "@/components/interior/show-more"
 
@@ -202,7 +202,6 @@ export function SkillDossier({
                   rel="noreferrer"
                 >
                   {href.includes("github.com") ? <GitHubMark className="size-4" /> : hrefLabel}
-                  <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />
                 </TrackedAnchor>
               ) : null}
             </div>

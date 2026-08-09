@@ -80,15 +80,16 @@ export function EditSkillPromptsDialog({
         render={(
           <Button
             variant="outline"
-            size="sm"
+            size="icon-sm"
+            className="size-8 rounded-lg"
             aria-label={`${hasPrompts ? "Edit" : "Add"} example prompts for ${skillName}`}
+            title={hasPrompts ? "Edit prompts" : "Add prompts"}
           />
         )}
       >
         {hasPrompts
-          ? <PencilLineIcon data-icon="inline-start" />
-          : <MessageSquarePlusIcon data-icon="inline-start" />}
-        {hasPrompts ? "Edit prompts" : "Add prompts"}
+          ? <PencilLineIcon aria-hidden="true" />
+          : <MessageSquarePlusIcon aria-hidden="true" />}
       </DialogTrigger>
       <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-x-hidden overflow-y-auto p-0 sm:max-w-2xl">
         <form action={handleSubmit}>

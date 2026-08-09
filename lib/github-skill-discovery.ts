@@ -90,6 +90,7 @@ const AGENT_SKILL_CONTAINERS = [
 
 interface GitHubRepositoryResponse {
   default_branch: string
+  private: boolean
   stargazers_count: number
   updated_at: string
 }
@@ -129,6 +130,7 @@ export interface GitHubSkillDiscovery {
   repoName: string
   repoStars: number
   repoUpdatedAt: Date
+  isPrivate: boolean
   defaultBranch: string
   /** Commit on the repository's default branch used for both the tree and descriptors. */
   commitSha: string
@@ -715,6 +717,7 @@ async function discoverDescriptors(
   repoOwner: string,
   repoName: string,
   commitSha: string,
+  options: { deduplicateNames?: boolean } = {},
 ) {
   const parsed = new Array<DiscoveredGitHubSkill | null>(candidates.length).fill(null)
   const downloadsBySha = new Map<string, Promise<Uint8Array>>()
@@ -750,16 +753,18 @@ async function discoverDescriptors(
     Array.from({ length: Math.min(DESCRIPTOR_CONCURRENCY, candidates.length) }, () => worker()),
   )
 
-  const skills: DiscoveredGitHubSkill[] = []
+  const skills = parsed.filter((skill): skill is DiscoveredGitHubSkill => skill !== null)
+  if (options.deduplicateNames === false) return skills
+
+  const deduplicatedSkills: DiscoveredGitHubSkill[] = []
   const canonicalNames = new Set<string>()
-  for (const skill of parsed) {
-    if (!skill) continue
+  for (const skill of skills) {
     const canonicalName = skill.name.toLowerCase()
     if (canonicalNames.has(canonicalName)) continue
     canonicalNames.add(canonicalName)
-    skills.push(skill)
+    deduplicatedSkills.push(skill)
   }
-  return skills
+  return deduplicatedSkills
 }
 
 function parseRepositoryUrl(value: string) {
@@ -800,6 +805,7 @@ async function fetchGitHubRepositorySnapshot(value: string): Promise<GitHubRepos
     || typeof repository !== "object"
     || typeof repository.default_branch !== "string"
     || !repository.default_branch
+    || typeof repository.private !== "boolean"
     || !Number.isSafeInteger(repository.stargazers_count)
     || repository.stargazers_count < 0
     || typeof repository.updated_at !== "string"
@@ -846,13 +852,17 @@ async function fetchGitHubRepositorySnapshot(value: string): Promise<GitHubRepos
     ...parsedUrl,
     repoStars: repository.stargazers_count,
     repoUpdatedAt,
+    isPrivate: repository.private,
     defaultBranch: repository.default_branch,
     commitSha: commit.sha,
     tree,
   }
 }
 
-export async function discoverGitHubSkills(value: string): Promise<GitHubSkillDiscovery> {
+async function discoverGitHubSkillsWithOptions(
+  value: string,
+  options: { deduplicateNames: boolean },
+): Promise<GitHubSkillDiscovery> {
   const snapshot = await fetchGitHubRepositorySnapshot(value)
   const candidates = collectDescriptorCandidates(snapshot.tree)
 
@@ -861,6 +871,7 @@ export async function discoverGitHubSkills(value: string): Promise<GitHubSkillDi
     snapshot.repoOwner,
     snapshot.repoName,
     snapshot.commitSha,
+    { deduplicateNames: options.deduplicateNames },
   )
 
   const parsedLink = parseGitHubSkillLink(value)
@@ -955,6 +966,21 @@ export async function discoverGitHubSkills(value: string): Promise<GitHubSkillDi
   const skills = await inspectCandidates(selectFallbackCandidates(candidates))
 
   return { ...snapshot, skills, linkedSkillPath: null }
+}
+
+export async function discoverGitHubSkills(value: string): Promise<GitHubSkillDiscovery> {
+  return discoverGitHubSkillsWithOptions(value, { deduplicateNames: true })
+}
+
+/**
+ * Uses the same authoritative discovery tier as normal saves while preserving
+ * duplicate canonical names. Legacy recovery must see those duplicates before
+ * deciding whether a saved name still identifies one source path safely.
+ */
+export async function discoverGitHubSkillCandidates(
+  value: string,
+): Promise<GitHubSkillDiscovery> {
+  return discoverGitHubSkillsWithOptions(value, { deduplicateNames: false })
 }
 
 async function resolveDescriptors(

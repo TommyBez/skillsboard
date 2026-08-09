@@ -6,7 +6,8 @@ import { z } from "zod"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
-import { collection, collectionSkill, skill } from "@/lib/db/schema"
+import { mutateCollectionMembership } from "@/lib/db/collection-memberships"
+import { collection, collectionSkill } from "@/lib/db/schema"
 import { captureTeamEvent } from "@/lib/posthog-server"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
 
@@ -170,23 +171,6 @@ const collectionMembershipSchema = z.object({
   surface: z.enum(["collection_detail", "library"]).default("library"),
 })
 
-async function findCollectionAndSkill(organizationId: string, collectionId: string, skillId: string) {
-  const [[existingCollection], [existingSkill]] = await Promise.all([
-    db
-      .select({ id: collection.id })
-      .from(collection)
-      .where(and(eq(collection.id, collectionId), eq(collection.organizationId, organizationId)))
-      .limit(1),
-    db
-      .select({ id: skill.id })
-      .from(skill)
-      .where(and(eq(skill.id, skillId), eq(skill.organizationId, organizationId)))
-      .limit(1),
-  ])
-
-  return { existingCollection, existingSkill }
-}
-
 export async function addSkillToCollection(input: z.input<typeof collectionMembershipSchema>) {
   const session = await requireSession()
   const { organizationId, userId } = await requireActiveOrganization(session)
@@ -196,36 +180,37 @@ export async function addSkillToCollection(input: z.input<typeof collectionMembe
     return { ok: false as const, error: "Collection or skill not found" }
   }
 
-  const { existingCollection, existingSkill } = await findCollectionAndSkill(
-    organizationId,
-    parsed.data.collectionId,
-    parsed.data.skillId,
-  )
-  if (!existingCollection || !existingSkill) {
+  const outcome = await mutateCollectionMembership({
+    collectionId: parsed.data.collectionId,
+    expectedOrganizationId: organizationId,
+    mutation: "add",
+    skillId: parsed.data.skillId,
+    userId,
+  })
+  if (outcome.status === "not_found") {
     return { ok: false as const, error: "Collection or skill not found" }
   }
+  if (outcome.status === "forbidden") {
+    return {
+      ok: false as const,
+      error: "Only the collection creator or a team admin can change an installable collection.",
+    }
+  }
 
-  await db
-    .insert(collectionSkill)
-    .values({
-      collectionId: parsed.data.collectionId,
-      skillId: parsed.data.skillId,
-      addedBy: userId,
+  if (outcome.changed) {
+    updateTag(cacheTags.organizationCollections(outcome.organizationId))
+    captureTeamEvent({
+      distinctId: userId,
+      event: "collection_skill_added",
+      properties: {
+        collection_id: parsed.data.collectionId,
+        skill_id: parsed.data.skillId,
+        surface: parsed.data.surface,
+      },
+      teamId: outcome.organizationId,
     })
-    .onConflictDoNothing()
-
-  updateTag(cacheTags.organizationCollections(organizationId))
-  captureTeamEvent({
-    distinctId: userId,
-    event: "collection_skill_added",
-    properties: {
-      collection_id: parsed.data.collectionId,
-      skill_id: parsed.data.skillId,
-      surface: parsed.data.surface,
-    },
-    teamId: organizationId,
-  })
-  return { ok: true as const }
+  }
+  return { ok: true as const, changed: outcome.changed }
 }
 
 export async function removeSkillFromCollection(input: z.input<typeof collectionMembershipSchema>) {
@@ -237,32 +222,35 @@ export async function removeSkillFromCollection(input: z.input<typeof collection
     return { ok: false as const, error: "Collection or skill not found" }
   }
 
-  const { existingCollection } = await findCollectionAndSkill(
-    organizationId,
-    parsed.data.collectionId,
-    parsed.data.skillId,
-  )
-  if (!existingCollection) {
+  const outcome = await mutateCollectionMembership({
+    collectionId: parsed.data.collectionId,
+    expectedOrganizationId: organizationId,
+    mutation: "remove",
+    skillId: parsed.data.skillId,
+    userId,
+  })
+  if (outcome.status === "not_found") {
     return { ok: false as const, error: "Collection not found" }
   }
+  if (outcome.status === "forbidden") {
+    return {
+      ok: false as const,
+      error: "Only the collection creator or a team admin can change an installable collection.",
+    }
+  }
 
-  await db
-    .delete(collectionSkill)
-    .where(and(
-      eq(collectionSkill.collectionId, parsed.data.collectionId),
-      eq(collectionSkill.skillId, parsed.data.skillId),
-    ))
-
-  updateTag(cacheTags.organizationCollections(organizationId))
-  captureTeamEvent({
-    distinctId: userId,
-    event: "collection_skill_removed",
-    properties: {
-      collection_id: parsed.data.collectionId,
-      skill_id: parsed.data.skillId,
-      surface: parsed.data.surface,
-    },
-    teamId: organizationId,
-  })
-  return { ok: true as const }
+  if (outcome.changed) {
+    updateTag(cacheTags.organizationCollections(outcome.organizationId))
+    captureTeamEvent({
+      distinctId: userId,
+      event: "collection_skill_removed",
+      properties: {
+        collection_id: parsed.data.collectionId,
+        skill_id: parsed.data.skillId,
+        surface: parsed.data.surface,
+      },
+      teamId: outcome.organizationId,
+    })
+  }
+  return { ok: true as const, changed: outcome.changed }
 }

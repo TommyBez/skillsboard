@@ -30,6 +30,7 @@ type NonTeamEventPropertiesMap = {
       | "create_collection"
       | "discover_repository_skills"
       | "discover_skills"
+      | "get_collection_install_command"
       | "get_collection_skills"
       | "get_skill_command"
       | "list_collections"
@@ -142,6 +143,22 @@ type TeamEventPropertiesMap = {
     collection_id: string
     skill_id: string
     surface: "collection_detail" | "library" | "mcp"
+  }
+  collection_distribution_published: {
+    collection_id: string
+    is_update: boolean
+    recovered_source_count: number
+    revision: number
+    skill_count: number
+  }
+  collection_distribution_disabled: {
+    collection_id: string
+  }
+  collection_distribution_link_rotated: {
+    collection_id: string
+  }
+  collection_install_command_copied: {
+    collection_id: string
   }
 }
 
