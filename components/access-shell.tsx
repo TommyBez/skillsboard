@@ -66,7 +66,7 @@ export function AccessShell({
           <div className="flex flex-1 items-center px-5 py-8 sm:px-9 sm:py-10 lg:px-14 xl:px-20">
             <div className="mx-auto w-full max-w-[520px]">
               <div className="mb-7">
-                <h1 className="text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.035em] sm:text-5xl">
+                <h1 data-testid="access-shell" className="text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.035em] sm:text-5xl">
                   {title}
                 </h1>
                 <p className="mt-3 max-w-md text-pretty text-base leading-7 text-muted-foreground">

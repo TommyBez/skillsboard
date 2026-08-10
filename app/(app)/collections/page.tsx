@@ -23,7 +23,7 @@ async function CollectionsStats() {
   const grouped = collections.reduce((total, item) => total + item.skillCount, 0)
 
   return (
-    <div className="flex flex-wrap items-center gap-5 lg:justify-end">
+    <div data-testid="collections-content" className="flex flex-wrap items-center gap-5 lg:justify-end">
       <div className="min-w-20">
         <p className="font-mono text-3xl font-semibold tabular-nums tracking-display">
           <ValueFlash value={collections.length} label="Collections" />
@@ -173,7 +173,7 @@ export default function CollectionsPage({ searchParams }: CollectionsPageProps) 
       <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="font-mono text-sm text-primary">Collections</p>
-          <h1 className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
+          <h1 data-testid="collections-shell" className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
             Skills, grouped by use case.
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">

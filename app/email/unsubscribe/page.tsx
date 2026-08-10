@@ -51,7 +51,7 @@ async function UnsubscribeContent({ searchParams }: UnsubscribePageProps) {
         title="You are unsubscribed"
         description="You will not receive Skills Board product updates. Sign-in codes and team invitations are unchanged."
       >
-        <section className="rounded-[16px] border border-primary/20 bg-primary/5 p-6">
+        <section data-testid="unsubscribe-content" className="rounded-[16px] border border-primary/20 bg-primary/5 p-6">
           <CheckCircle2Icon className="size-8 text-primary" aria-hidden="true" />
           <h2 className="mt-5">Preference saved</h2>
           <p>
@@ -75,7 +75,7 @@ async function UnsubscribeContent({ searchParams }: UnsubscribePageProps) {
         title="This link is not valid"
         description="The unsubscribe link is missing or invalid. No email preference was changed."
       >
-        <section className="rounded-[16px] border border-border bg-card p-6">
+        <section data-testid="unsubscribe-content" className="rounded-[16px] border border-border bg-card p-6">
           <MailXIcon className="size-8 text-muted-foreground" aria-hidden="true" />
           <h2 className="mt-5">Manage your preference another way</h2>
           <p>
@@ -96,7 +96,7 @@ async function UnsubscribeContent({ searchParams }: UnsubscribePageProps) {
       title="Unsubscribe from product emails"
       description="This stops optional product updates without requiring you to sign in."
     >
-      <section className="rounded-[16px] border border-border bg-card p-6">
+      <section data-testid="unsubscribe-content" className="rounded-[16px] border border-border bg-card p-6">
         <MailXIcon className="size-8 text-primary" aria-hidden="true" />
         <h2 className="mt-5">Stop product communications</h2>
         <p>

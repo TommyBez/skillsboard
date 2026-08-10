@@ -67,7 +67,7 @@ export default function AboutPage() {
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               About
             </p>
-            <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+            <h1 data-testid="about-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
               AI skills worth sharing. One place to keep them.
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-base leading-7 text-muted-foreground">

@@ -34,7 +34,7 @@ function buildOAuthQuery(params: Awaited<ConsentPageProps["searchParams"]>) {
 
 function InvalidAuthorizationRequest() {
   return (
-    <div className="grid gap-5 border-t border-border pt-6">
+    <div data-testid="consent-content" className="grid gap-5 border-t border-border pt-6">
       <div>
         <h2 className="text-xl font-semibold tracking-tight">This authorization request is invalid</h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

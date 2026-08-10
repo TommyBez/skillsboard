@@ -51,7 +51,7 @@ async function MemberDirectory() {
   const { members } = await getOrganizationDetails()
 
   return (
-    <section className="mt-6 overflow-hidden rounded-[16px] border bg-card">
+    <section data-testid="org-settings-content" className="mt-6 overflow-hidden rounded-[16px] border bg-card">
       <div className="flex flex-col gap-2 px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-6">
         <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Access</p>
@@ -130,7 +130,7 @@ export default function OrganizationSettingsPage() {
       <header className="mt-8 grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-end">
         <div>
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Members</p>
-          <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">Team access</h1>
+          <h1 data-testid="org-settings-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">Team access</h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
             See who can use this shared skill library.
           </p>

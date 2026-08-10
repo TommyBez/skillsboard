@@ -74,7 +74,7 @@ export function HeroSection() {
             <span className="lp-hero-spine" aria-hidden="true" />
 
             <div className="lp-hero-copy-col lp-hero-exit">
-              <h1 className="lp-hero-headline">
+              <h1 data-testid="home-shell" className="lp-hero-headline">
                 <span className="lp-hero-line-mask">
                   {/* U+2019, not the typewriter prime: at a 74px cap height a
                       straight vertical tick is the loudest wrong mark on the

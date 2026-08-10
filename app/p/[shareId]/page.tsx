@@ -68,7 +68,7 @@ async function SharedCollection({ params }: SharedCollectionProps) {
   )
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-8 md:px-8 md:py-12">
+    <main data-testid="share-content" className="mx-auto flex min-h-dvh w-full max-w-5xl flex-col px-4 py-8 md:px-8 md:py-12">
       <header className="flex items-center justify-between border-b border-border pb-5">
         <Link href="/" className="font-semibold tracking-tight">{siteConfig.name}</Link>
         <Badge variant="outline">Unlisted release</Badge>
@@ -168,7 +168,7 @@ async function SharedCollection({ params }: SharedCollectionProps) {
 
 function SharedCollectionFallback() {
   return (
-    <main className="mx-auto grid min-h-dvh w-full max-w-5xl content-start gap-8 px-4 py-12 md:px-8">
+    <main data-testid="share-shell" className="mx-auto grid min-h-dvh w-full max-w-5xl content-start gap-8 px-4 py-12 md:px-8">
       <Skeleton className="h-10 w-40" />
       <Skeleton className="h-52 rounded-2xl" />
       <Skeleton className="h-36 rounded-2xl" />

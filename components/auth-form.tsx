@@ -338,7 +338,7 @@ export function AuthForm({
   }
 
   return (
-    <form onSubmit={handleEmailFormSubmit} className="flex flex-col gap-5">
+    <form data-testid={`${mode}-content`} onSubmit={handleEmailFormSubmit} className="flex flex-col gap-5">
       <FieldGroup className="gap-4">
         {isSignUp ? (
           <Field>

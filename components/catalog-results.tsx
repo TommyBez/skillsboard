@@ -170,7 +170,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
   }, [canLoadMore, skills.length, error, autoExhausted, loadMore])
 
   return (
-    <div className="grid gap-6">
+    <div data-testid="discover-content" className="grid gap-6">
       {searchTruncated ? (
         <p className="text-sm tabular-nums text-muted-foreground" role="status">
           {atSearchCap
@@ -262,7 +262,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
 export function CatalogEmptyState() {
   return (
-    <section className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+    <section data-testid="discover-content" className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
       <SearchIcon className="size-9 text-primary" aria-hidden="true" />
       <div>
         <h2 className="text-3xl font-semibold tracking-display">No skills found</h2>

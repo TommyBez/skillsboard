@@ -241,6 +241,12 @@
       "skillPath": "skills/marketing-psychology/SKILL.md",
       "computedHash": "50d735eb0f5c36f379ed2200f21aeacc9b9ad85667b5d33ec6111857352a1340"
     },
+    "next-cache-components-optimizer": {
+      "source": "vercel/next.js",
+      "sourceType": "github",
+      "skillPath": "skills/next-cache-components-optimizer/SKILL.md",
+      "computedHash": "aefb01afebac59c0359cfd15214e871d12e5d242867dc486087a4560363ee28c"
+    },
     "offers": {
       "source": "coreyhaines31/marketingskills",
       "sourceType": "github",

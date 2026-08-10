@@ -24,6 +24,11 @@ next-env.d.ts
 !.env.example
 .env.local
 
+# Instant-navigation e2e artifacts (session storage state, seeded fixture ids)
+e2e/.auth/
+test-results/
+playwright-report/
+
 # Remotion render output
 out/
 

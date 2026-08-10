@@ -67,7 +67,7 @@ export default function McpSettingsPage() {
 
       <header className="mt-8 border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
-        <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+        <h1 data-testid="mcp-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
           Connect your agent
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">

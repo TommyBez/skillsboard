@@ -77,7 +77,7 @@ async function EmailPreferenceStatusCard() {
   const { lastPreferenceChange, preference, status } = await loadEmailPreferencePage()
 
   return (
-    <aside className="rounded-[16px] border bg-card p-5">
+    <aside data-testid="email-settings-content" className="rounded-[16px] border bg-card p-5">
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium">Product emails</span>
         <Badge variant={status === "On" ? "default" : status === "Blocked" ? "destructive" : "outline"}>
@@ -141,7 +141,7 @@ export default function EmailSettingsPage() {
       <header className="mt-8 grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
         <div>
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Communication</p>
-          <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+          <h1 data-testid="email-settings-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
             Email preferences
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">

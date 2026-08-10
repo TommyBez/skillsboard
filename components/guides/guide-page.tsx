@@ -104,7 +104,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                 {guide.eyebrow}
               </p>
-              <h1 className="mt-5 max-w-[18ch] text-balance text-5xl font-semibold leading-[0.95] tracking-display md:text-7xl">
+              <h1 data-testid="guide-shell" className="mt-5 max-w-[18ch] text-balance text-5xl font-semibold leading-[0.95] tracking-display md:text-7xl">
                 {guide.title}
               </h1>
               <p className="mt-7 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">

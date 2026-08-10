@@ -2,6 +2,13 @@ import type { NextConfig } from 'next'
 
 const nextConfig = {
   cacheComponents: true,
+  experimental: {
+    // Enables the @next/playwright instant() testing API on measured builds
+    // (local EXPOSE_TESTING_API=1 builds, Vercel previews). Never in production.
+    exposeTestingApiInProductionBuild:
+      process.env.EXPOSE_TESTING_API === "1" ||
+      process.env.VERCEL_ENV === "preview",
+  },
   // PostHog capture endpoints use trailing slashes (for example, `/ingest/e/`).
   // Keep Next.js from normalizing those requests and handle canonical page URLs
   // explicitly below instead.

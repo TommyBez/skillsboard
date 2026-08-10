@@ -226,7 +226,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
   }
 
   return (
-    <section className="overflow-hidden rounded-[16px] border bg-card">
+    <section data-testid="mcp-content" className="overflow-hidden rounded-[16px] border bg-card">
       <div className="flex flex-col gap-3 border-b px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-6">
         <div>
           <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Setup guide</p>

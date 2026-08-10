@@ -67,7 +67,7 @@ export default function PricingPage() {
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
             Pricing
           </p>
-          <h1 className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">
+          <h1 data-testid="pricing-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl">
             Free forever. No trial, no credit card, no paid tier.
           </h1>
           <p className="mt-5 text-pretty text-base leading-7 text-muted-foreground">

@@ -117,7 +117,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
 
   return (
     <>
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <section data-testid="collection-detail-content" className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <Link
             href="/collections"
@@ -289,7 +289,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
 
 function CollectionDetailFallback() {
   return (
-    <div className="grid gap-8" aria-label="Loading collection">
+    <div data-testid="collection-detail-shell" className="grid gap-8" aria-label="Loading collection">
       <Skeleton className="h-40 rounded-2xl" />
       <div className="grid gap-4 md:grid-cols-2">
         <Skeleton className="h-72 rounded-2xl" />

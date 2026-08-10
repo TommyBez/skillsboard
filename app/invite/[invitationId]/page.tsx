@@ -73,7 +73,7 @@ async function InvitationDetails({ params }: InvitationPageProps) {
 
 function InvitationFallback() {
   return (
-    <div className="grid min-h-[100dvh] place-items-center bg-background px-4">
+    <div data-testid="invite-shell" className="grid min-h-[100dvh] place-items-center bg-background px-4">
       <Skeleton className="h-[32rem] w-full max-w-2xl rounded-[24px]" aria-label="Loading invitation" />
     </div>
   )

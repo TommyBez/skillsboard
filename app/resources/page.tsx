@@ -51,7 +51,7 @@ export default function ResourcesPage() {
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-primary">
             Resources
           </p>
-          <h1 className="mt-5 max-w-[16ch] text-balance text-5xl font-semibold leading-[0.95] tracking-display md:text-7xl">
+          <h1 data-testid="resources-shell" className="mt-5 max-w-[16ch] text-balance text-5xl font-semibold leading-[0.95] tracking-display md:text-7xl">
             Practical thinking for teams working with AI skills.
           </h1>
           <p className="mt-7 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground md:text-xl">
