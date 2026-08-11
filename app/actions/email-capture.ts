@@ -11,6 +11,7 @@ import {
 } from "@/lib/email/email-capture"
 import { hashEmailAddress } from "@/lib/email/email-privacy"
 import { PRODUCT_COMMUNICATIONS_TOPIC } from "@/lib/email/product-communications"
+import { capturePostHogEvent } from "@/lib/posthog-server"
 
 export interface EmailCaptureState {
   message: string
@@ -33,6 +34,14 @@ const successState: EmailCaptureState = {
  * topic a signed-in preference uses. Its null `userId` records that no account
  * was involved, and its `subscribe` action keeps a visitor capture readable
  * apart from an account-scoped grant.
+ *
+ * `email_capture_submitted` is emitted here rather than from the card, and
+ * only on the path that actually created a row. Every other path answers
+ * success too, so a client-side emission counted duplicates, bots, and
+ * rate-limited posts as subscribers, and attributed a duplicate to the page it
+ * was re-submitted from rather than the page in its stored row. The event
+ * distinct id is the same hashed address the ledger stores, so a capture can
+ * be reconciled against `emailSubscriber` without an address in PostHog.
  *
  * Three things this deliberately does not do. It never reports whether an
  * address was already stored, so the form cannot be used to enumerate the
@@ -60,7 +69,9 @@ export async function subscribeEmail(
   const source = normalizeCaptureSource(formData.get("source"))
 
   try {
-    await db.transaction(async (tx) => {
+    const emailHash = hashEmailAddress(email)
+
+    const stored = await db.transaction(async (tx) => {
       const inserted = await tx
         .insert(emailSubscriber)
         .values({ email, source })
@@ -70,18 +81,28 @@ export async function subscribeEmail(
       // An empty array is the on-conflict path: the address is already on the
       // list and its first consent already stands in the ledger. A second
       // event would record a decision the visitor did not make again.
-      if (inserted.length === 0) return
+      if (inserted.length === 0) return false
 
       await tx.insert(emailConsentEvent).values({
         userId: null,
-        emailHash: hashEmailAddress(email),
+        emailHash,
         topic: PRODUCT_COMMUNICATIONS_TOPIC,
         action: "subscribe",
         source,
         noticeVersion: EMAIL_CAPTURE_NOTICE_VERSION,
         noticeText: EMAIL_CAPTURE_NOTICE_TEXT,
       })
+
+      return true
     })
+
+    if (stored) {
+      capturePostHogEvent({
+        distinctId: emailHash,
+        event: "email_capture_submitted",
+        properties: { source },
+      })
+    }
   } catch (error) {
     // The address itself never reaches the log.
     console.error("Unable to save an email capture", {

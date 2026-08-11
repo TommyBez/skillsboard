@@ -21,14 +21,28 @@ const emailPattern = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)+$/
 
 /**
  * The capture surfaces, as a shape rather than an enumeration: guides and
- * alternative pages each carry their own slug, and the analytics property in
- * `analytics/posthog/events.ts` is typed the same way. Anything else is folded
- * into `unknown`, so a crafted form post cannot write arbitrary strings into
- * the column or into PostHog.
+ * alternative pages each carry their own slug. This is the single definition;
+ * the card prop and the analytics property in `analytics/posthog/events.ts`
+ * both refer back to it, so the two cannot drift apart.
  */
+export type EmailCaptureSource =
+  | `alternatives_${string}`
+  | `guide_${string}`
+  | "landing"
+
 const sourcePattern = /^(?:alternatives_[a-z0-9_-]{1,80}|guide_[a-z0-9_-]{1,80}|landing)$/
 
 export const UNKNOWN_EMAIL_CAPTURE_SOURCE = "unknown"
+
+/**
+ * What the column and the analytics property can actually hold. A crafted form
+ * post is folded into `unknown` rather than written through, so neither the
+ * column nor PostHog can be made to hold arbitrary strings, and a submission
+ * that did not come from a surface we render stays visible as such.
+ */
+export type StoredEmailCaptureSource =
+  | EmailCaptureSource
+  | typeof UNKNOWN_EMAIL_CAPTURE_SOURCE
 
 /**
  * The consent notice, kept beside the rules so the card renders exactly what
@@ -64,11 +78,15 @@ export function normalizeCapturedEmail(value: unknown): string | null {
 }
 
 /** The submitting surface, or `unknown` when it is not one we render. */
-export function normalizeCaptureSource(value: unknown): string {
+export function normalizeCaptureSource(value: unknown): StoredEmailCaptureSource {
   if (typeof value !== "string") return UNKNOWN_EMAIL_CAPTURE_SOURCE
 
   const normalized = value.trim().toLowerCase()
-  return sourcePattern.test(normalized) ? normalized : UNKNOWN_EMAIL_CAPTURE_SOURCE
+  // The pattern is the runtime spelling of `EmailCaptureSource`: a value that
+  // passes it is one of the shapes, which the compiler cannot see from a regex.
+  return sourcePattern.test(normalized)
+    ? (normalized as EmailCaptureSource)
+    : UNKNOWN_EMAIL_CAPTURE_SOURCE
 }
 
 /**

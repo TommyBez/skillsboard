@@ -1,21 +1,19 @@
 "use client"
 
-import { useActionState, useEffect, useId, useRef } from "react"
+import { useActionState, useId } from "react"
 import { CheckIcon } from "lucide-react"
 
-import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { subscribeEmail, type EmailCaptureState } from "@/app/actions/email-capture"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { Input } from "@/components/ui/input"
-import { captureAnalyticsEvent } from "@/lib/analytics-client"
 import {
   EMAIL_CAPTURE_NOTICE_FOOTNOTE,
   EMAIL_CAPTURE_PROMISE,
+  type EmailCaptureSource,
 } from "@/lib/email/email-capture"
 import { cn } from "@/lib/utils"
 
-export type EmailCaptureSource =
-  AnalyticsCapturedEventProperties<"email_capture_submitted">["source"]
+export type { EmailCaptureSource }
 
 const initialState: EmailCaptureState = { message: "", status: "idle" }
 
@@ -23,11 +21,14 @@ const initialState: EmailCaptureState = { message: "", status: "idle" }
  * The one thing a reader who is not ready to create a library can still do.
  *
  * Mounted on the landing band, at the end of every guide, and in the closing
- * section of the alternative pages. The `source` prop is both the analytics
- * property and the stored column, so a submission can be attributed to the
- * page that earned it. The two notice lines come from the shared capture
- * constants rather than from this file, so the consent event the action writes
- * stores the same words the visitor read here. The form carries
+ * section of the alternative pages. The `source` prop is submitted with the
+ * form and becomes the stored column, so a submission can be attributed to the
+ * page that earned it. The card emits no analytics of its own: every response
+ * this form can receive says success, so only the action can tell a stored
+ * address from a duplicate, and it emits `email_capture_submitted` there. The
+ * two notice lines come from the shared capture constants rather than from
+ * this file, so the consent event the action writes stores the same words the
+ * visitor read here. The form carries
  * `ph-no-capture`, the guard the invite form puts on its link block, so the
  * address stays out of autocapture and session recordings.
  */
@@ -44,13 +45,6 @@ export function EmailCaptureCard({
   const headingId = `${idPrefix}-heading`
   const noteId = `${idPrefix}-note`
   const errorId = `${idPrefix}-error`
-  const captured = useRef(false)
-
-  useEffect(() => {
-    if (state.status !== "success" || captured.current) return
-    captured.current = true
-    captureAnalyticsEvent("email_capture_submitted", { source })
-  }, [source, state.status])
 
   return (
     <section

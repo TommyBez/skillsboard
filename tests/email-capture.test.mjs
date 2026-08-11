@@ -111,7 +111,21 @@ test("writes the consent event with the address, and only for a new one", () => 
   assert.match(actionSource, /if \(inserted\.length === 0\) return/)
   assert.match(actionSource, /insert\(emailConsentEvent\)/)
   assert.match(actionSource, /userId: null/)
-  assert.match(actionSource, /emailHash: hashEmailAddress\(email\)/)
+  assert.match(actionSource, /const emailHash = hashEmailAddress\(email\)/)
+  assert.match(actionSource, /^\s+emailHash,$/m)
   assert.match(actionSource, /noticeVersion: EMAIL_CAPTURE_NOTICE_VERSION/)
   assert.match(actionSource, /noticeText: EMAIL_CAPTURE_NOTICE_TEXT/)
+})
+
+test("counts the capture on the server, only when a row was created", () => {
+  assert.match(actionSource, /const stored = await db\.transaction\(/)
+  assert.match(
+    actionSource,
+    /if \(stored\) \{\s*capturePostHogEvent\(\{\s*distinctId: emailHash,\s*event: "email_capture_submitted",/,
+  )
+  // The card answers success on every path, so it cannot tell a stored address
+  // from a duplicate, a bot, or a refused post, and it counts nothing.
+  assert.ok(!cardSource.includes("captureAnalyticsEvent"))
+  assert.ok(!cardSource.includes("@/lib/analytics-client"))
+  assert.ok(!/captureAnalyticsEvent\(|posthog\.capture\(/.test(cardSource))
 })

@@ -1,7 +1,14 @@
+import type { StoredEmailCaptureSource } from "@/lib/email/email-capture"
+
 type NonTeamEventPropertiesMap = {
   email_capture_submitted: {
-    /** The capture surface: the landing band, a guide, or an alternative page. */
-    source: `alternatives_${string}` | `guide_${string}` | "landing"
+    /**
+     * The capture surface: the landing band, a guide, or an alternative page,
+     * or `unknown` when a direct post carried a source we do not render. The
+     * type comes from the capture rules rather than being spelled twice, so
+     * the property and the stored column cannot drift apart.
+     */
+    source: StoredEmailCaptureSource
   }
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
