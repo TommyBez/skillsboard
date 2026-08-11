@@ -142,7 +142,6 @@
 
 /* --- Index: one pad below the trim, one pad above the head rule ------------ */
 
-.lp-pricing-index-num,
 .lp-pricing-index-name {
   grid-row: 1;
   align-self: start;
@@ -156,10 +155,6 @@
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--plate-quiet);
-}
-
-.lp-pricing-index-num {
-  grid-column: 1;
 }
 
 .lp-pricing-index-name {
@@ -473,9 +468,6 @@
 
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
-  .lp-pricing-index-num,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="pricing"]
   .lp-pricing-index-name,
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"]
@@ -493,9 +485,6 @@
 
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
-  .lp-pricing-index-num,
-[data-landing-motion-root][data-motion-enabled="true"]
-  [data-motion-group="pricing"][data-motion-state="pending"]
   .lp-pricing-index-name,
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="pricing"][data-motion-state="pending"]
@@ -508,10 +497,6 @@
   .lp-pricing-spec-row {
   opacity: 0;
   transform: translate3d(0, 10px, 0);
-}
-
-.lp-pricing-index-num {
-  --d: 40ms;
 }
 
 .lp-pricing-index-name {
@@ -572,7 +557,6 @@
   }
 
   .lp-pricing-plate,
-  .lp-pricing-index-num,
   .lp-pricing-index-name,
   .lp-pricing-heading,
   .lp-pricing-lede,

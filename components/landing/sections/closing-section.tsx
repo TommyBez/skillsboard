@@ -1,7 +1,6 @@
 import Link from "next/link"
 
 import { ClosingPlate } from "@/components/landing/closing/closing-plate"
-import { DecodeText } from "@/components/landing/decode-text"
 import { HomeFinalActions } from "@/components/landing/landing-ctas"
 import { chapterMark } from "@/components/landing/styles"
 import { guidePaths } from "@/lib/seo/guides/types"
@@ -37,16 +36,8 @@ export function ClosingSection() {
         {/* The column rail: the gutter's rule, from the chapter rule down to
             the footer rule. The sheet's left border is drawn on it. */}
         <span className="lp-closing-split" aria-hidden="true" />
-        {/* Chapter index, in the page's numbering: 01 hero … 06 start. Same
-            mono voice, size and measure rule as every other chapter mark. */}
         <p className={`${chapterMark} lp-closing-mark uppercase`}>
-          <span className="inline-flex items-center gap-[0.6rem] ml-[-0.65px]">
-            <DecodeText text="06" />
-            <span className="lp-closing-mark-sep" aria-hidden="true">
-              ·
-            </span>
-            <span>Start</span>
-          </span>
+          <span className="ml-[-0.65px]">Start</span>
         </p>
 
         <div className="lp-closing-grid">

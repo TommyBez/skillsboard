@@ -194,15 +194,8 @@
 /* Tracked uppercase carries a trailing letter-space after its last glyph.
    Left in, it makes every gap that follows a word 2.3px wider than every gap
    that follows a rule. Pulled back, the gaps in the bar measure alike. */
-.lp-faq-strip-num,
 .lp-faq-strip-name {
   margin-right: -0.22em;
-}
-
-.lp-faq-strip-num {
-  flex: none;
-  color: var(--foreground);
-  font-variant-numeric: tabular-nums;
 }
 
 .lp-faq-strip-name {
@@ -766,7 +759,6 @@
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="faq"][data-motion-state="pending"]
   :is(
-    .lp-faq-strip-num,
     .lp-faq-strip-name,
     .lp-faq-heading,
     .lp-faq-intro,
@@ -780,7 +772,6 @@
 [data-landing-motion-root][data-motion-enabled="true"]
   [data-motion-group="faq"][data-motion-state="visible"]
   :is(
-    .lp-faq-strip-num,
     .lp-faq-strip-name,
     .lp-faq-heading,
     .lp-faq-intro,
@@ -925,7 +916,6 @@
   [data-landing-motion-root][data-motion-enabled="true"]
     [data-motion-group="faq"][data-motion-state="pending"]
     :is(
-      .lp-faq-strip-num,
       .lp-faq-strip-name,
       .lp-faq-heading,
       .lp-faq-intro,

@@ -118,17 +118,6 @@
 }
 
 
-.lp-flow-index {
-  font-family: var(--font-mono);
-  font-size: var(--m-meta);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-}
-
-
-
 /* The shared chapter mark's `after:` rule is what continues the caption (see
    `components/landing/styles.ts`); this parks the
    value at the end of it. The clear space is deliberately unequal: 12px from

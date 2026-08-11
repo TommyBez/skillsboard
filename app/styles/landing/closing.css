@@ -164,10 +164,6 @@
 /* Optical: the mono zero is round, so its ink is set a hair left of the
    column's stem line — the same correction the display and body copy carry. */
 
-.lp-closing-mark-sep {
-  color: color-mix(in oklab, var(--foreground) 34%, transparent);
-}
-
 /* ---------------------------------------------------------------------------
    The band — claim over action on the left, the index beside them
 

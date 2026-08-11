@@ -51,10 +51,7 @@ export function FlowSection() {
         data-motion-state="pending"
       >
         <div className="lp-flow-head">
-          <div className="flex items-center gap-3">
-            <span className="lp-flow-index" aria-hidden="true">
-              02
-            </span>
+          <div className="flex items-center">
             {/* The chapter head is the same object the three columns close
                 with: caption, hairline, measured value. Top and bottom of the
                 chapter now rhyme instead of the top being bare text. The value
