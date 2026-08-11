@@ -192,20 +192,6 @@
   }
 }
 
-.lp-mcp-frame-index {
-  flex: none;
-  /* 0.75rem of ink-to-ink joint: the nominal gap less this run's own trailing
-     slack (tracking minus the final glyph's right bearing = 0.145em). */
-  margin-right: calc(0.75rem - 0.145em);
-  font-family: var(--font-mono);
-  font-size: 0.675rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-  color: var(--foreground);
-}
-
-
 /* The trailing-tracking pull for the mark lives on the shared chapter mark's
    `after:` rule (see `components/landing/styles.ts`), so this chapter uses the
    page's joint rather than compensating for it locally. The readout takes the

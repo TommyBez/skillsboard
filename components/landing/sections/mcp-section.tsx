@@ -18,9 +18,6 @@ export function McpSection() {
       <div className="lp-mcp-sticky">
         <div className="lp-mcp-frame">
           <div className="lp-mcp-frame-top">
-            <span className="lp-mcp-frame-index" aria-hidden="true">
-              03
-            </span>
             <DecodeText
               as="p"
               className={`${chapterMark} min-w-0 flex-1 uppercase`}

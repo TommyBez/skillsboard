@@ -284,7 +284,7 @@
   gap: var(--joint);
   /* the chapter's right edge — 11px inboard of the frame's right rail, the
      same edge the drawer's right border stands on */
-  padding-inline-end: var(--copy-x);
+  padding-inline: var(--copy-x);
   /* A definite height, so the band below it starts on a whole pixel and the
      copy column's rhythm is authored against a fixed origin. */
   height: 1.5rem;
@@ -309,25 +309,6 @@
   .lp-hero-top {
     margin-bottom: 1.25rem;
   }
-}
-
-/* Chapter index — identical spec to the other chapters' header marks. */
-.lp-hero-index {
-  flex: none;
-  /* the mono '0' bowl carries a left side bearing; giving it back lands the
-     ink on the same 41 as the headline, the paragraph and the button */
-  margin-inline-start: calc(var(--copy-x) + var(--optic-index, 0px));
-  /* and the numeral's right side bearing is given back, so the gap the eye
-     reads between the '1' and the marker is the declared --joint */
-  margin-inline-end: var(--optic-index-trail, 0px);
-  font-family: var(--font-mono);
-  font-size: 0.675rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  font-variant-numeric: tabular-nums;
-  color: var(--hero-label-quiet);
-  animation: lp-hero-rise var(--lp-dur-reveal) var(--lp-ease-emph)
-    var(--lp-beat-1) both;
 }
 
 /* The chapter's header rule. It starts one --joint after the eyebrow's last
@@ -2072,7 +2053,6 @@
   .lp-hero-field,
   .lp-hero-spine,
   .lp-hero-eyebrow,
-  .lp-hero-index,
   .lp-hero-blurb,
   .lp-hero-cta,
   .lp-hero-rail {

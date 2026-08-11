@@ -1,4 +1,3 @@
-import { DecodeText } from "@/components/landing/decode-text"
 import { landingFaqs } from "@/lib/seo/landing-faq"
 
 /** FAQ — chapter 05, set as a ruled register. */
@@ -17,7 +16,6 @@ export function FaqSection() {
       >
         {/* Chapter strip, same grammar as 03 (MCP) and 04 (pricing). */}
         <p className="lp-faq-strip" aria-hidden="true">
-          <DecodeText className="lp-faq-strip-num" text="05" />
           <span className="lp-faq-strip-hair" />
           <span className="lp-faq-strip-name">FAQ</span>
           <span className="lp-faq-strip-hair" data-flex="" />

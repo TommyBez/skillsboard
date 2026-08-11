@@ -47,10 +47,6 @@ export function HeroSection() {
           <div className="lp-hero-field" aria-hidden="true" />
 
           <div className="lp-hero-top">
-            {/* Chapter index, same grammar as 02–06. */}
-            <span className="lp-hero-index" aria-hidden="true">
-              01
-            </span>
             <DecodeText
               as="p"
               className="lp-hero-eyebrow"
