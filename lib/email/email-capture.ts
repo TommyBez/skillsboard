@@ -1,5 +1,6 @@
 /**
- * Marketing email capture: normalization and validation.
+ * Marketing email capture: normalization, validation, and the rate limit
+ * budget.
  *
  * Deliberately dependency-free so the rules can be exercised by the unit
  * suite, which loads modules through `stripTypeScriptTypes` and cannot resolve
@@ -65,6 +66,43 @@ export const EMAIL_CAPTURE_NOTICE_FOOTNOTE =
 export const EMAIL_CAPTURE_NOTICE_TEXT =
   `${EMAIL_CAPTURE_PROMISE} ${EMAIL_CAPTURE_NOTICE_FOOTNOTE}`
 
+/**
+ * The capture budget for one client address.
+ *
+ * The action is a public server action: anyone can post to it directly, with
+ * a fresh address every time, and fill the table. Five submissions an hour is
+ * far above what a person does (the card is a single field and one visit
+ * produces one address) and far below what filling a table needs.
+ *
+ * The window is fixed rather than sliding, so the check is one indexed count
+ * instead of a moving range scan. The cost of that choice is a burst of up to
+ * twice the budget across a window boundary, which is still a rounding error
+ * against the abuse this exists to stop.
+ */
+export const EMAIL_CAPTURE_RATE_LIMIT_MAX = 5
+export const EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
+
+/**
+ * Attempt rows exist only to answer "how many in this window". A day is long
+ * enough that pruning can never race a live window, and short enough that the
+ * table stays a counter rather than a log of who submitted when.
+ */
+export const EMAIL_CAPTURE_ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000
+
+/**
+ * Pruning is opportunistic: a small share of accepted submissions pays for the
+ * delete, so expired rows leave without a scheduled job and without adding a
+ * second query to every submission.
+ */
+export const EMAIL_CAPTURE_PRUNE_SAMPLE_RATE = 0.02
+
+/** An IPv6 address in its longest textual form is 45 characters. */
+export const CAPTURE_IP_MAX_LENGTH = 45
+
+const ipv4Pattern = /^\d{1,3}(?:\.\d{1,3}){3}$/
+const ipv4WithPortPattern = /^(\d{1,3}(?:\.\d{1,3}){3}):\d{1,5}$/
+const ipv6Pattern = /^[0-9a-f:]+$/
+
 /** Lowercased, trimmed address, or `null` when the input cannot be one. */
 export function normalizeCapturedEmail(value: unknown): string | null {
   if (typeof value !== "string") return null
@@ -87,6 +125,64 @@ export function normalizeCaptureSource(value: unknown): StoredEmailCaptureSource
   return sourcePattern.test(normalized)
     ? (normalized as EmailCaptureSource)
     : UNKNOWN_EMAIL_CAPTURE_SOURCE
+}
+
+/**
+ * The client address to bucket a submission under, or `null` when the request
+ * does not carry one we can read.
+ *
+ * `x-forwarded-for` is a list and the client sits at its head. A value that is
+ * not an address is treated as no address at all: the bucket key has to be
+ * something a person actually shares with themselves across submissions, and
+ * an unparseable one would only create a private bucket per garbage string.
+ */
+export function normalizeCaptureIpAddress(value: unknown): string | null {
+  if (typeof value !== "string") return null
+
+  const [first] = value.split(",")
+  let candidate = (first ?? "").trim().toLowerCase()
+
+  // An IPv6 literal can arrive bracketed, with or without a trailing port.
+  if (candidate.startsWith("[")) {
+    const closing = candidate.indexOf("]")
+    if (closing === -1) return null
+    candidate = candidate.slice(1, closing)
+  }
+
+  // A proxy can append a port. The address alone is the bucket.
+  const withoutPort = ipv4WithPortPattern.exec(candidate)
+  if (withoutPort?.[1]) candidate = withoutPort[1]
+
+  if (candidate.length === 0 || candidate.length > CAPTURE_IP_MAX_LENGTH) return null
+
+  if (ipv4Pattern.test(candidate)) {
+    return candidate.split(".").every((octet) => Number(octet) <= 255)
+      ? candidate
+      : null
+  }
+
+  return candidate.includes(":") && ipv6Pattern.test(candidate) ? candidate : null
+}
+
+/** The start of the fixed window `now` falls in. */
+export function captureRateLimitWindowStart(now: Date): Date {
+  const windowMs = EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS
+  return new Date(Math.floor(now.getTime() / windowMs) * windowMs)
+}
+
+/** Attempt rows older than this are past their purpose and can go. */
+export function captureAttemptRetentionCutoff(now: Date): Date {
+  return new Date(now.getTime() - EMAIL_CAPTURE_ATTEMPT_RETENTION_MS)
+}
+
+/** Whether a submission arriving after `attempts` in the window is over budget. */
+export function isOverCaptureRateLimit(attempts: number): boolean {
+  return attempts >= EMAIL_CAPTURE_RATE_LIMIT_MAX
+}
+
+/** Whether this submission is the one that pays for the prune. */
+export function shouldPruneCaptureAttempts(sample: number): boolean {
+  return sample < EMAIL_CAPTURE_PRUNE_SAMPLE_RATE
 }
 
 /**

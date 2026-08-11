@@ -18,7 +18,7 @@ interface UnsubscribeTokenPayload {
   version: typeof TOKEN_VERSION
 }
 
-type EmailPrivacyPurpose = "email-hash" | "unsubscribe-token"
+type EmailPrivacyPurpose = "capture-ip-hash" | "email-hash" | "unsubscribe-token"
 
 function decodeEmailPrivacyRoot(value: string, name: string, allowPlainText = false): Buffer {
   if (/^[a-f0-9]{64,}$/i.test(value) && value.length % 2 === 0) {
@@ -99,6 +99,23 @@ export function hashEmailAddressCandidates(email: string): [string, ...string[]]
   const [current, ...previous] = candidates
   if (!current) throw new Error("An email privacy root is required")
   return [current, ...previous]
+}
+
+/**
+ * The bucket key for the email capture rate limit.
+ *
+ * A client address is personal data and never reaches a column in plain text.
+ * It is keyed under its own purpose, so the value cannot be joined against an
+ * email hash, and only the current root is used: a key rotation resets the
+ * counters, which costs one window of budget and nothing else.
+ */
+export function hashCaptureIpAddress(ipAddress: string): string {
+  const [rootSecret] = getEmailPrivacyRoots()
+  if (!rootSecret) throw new Error("An email privacy root is required")
+
+  return createHmac("sha256", deriveEmailPrivacyKey(rootSecret, "capture-ip-hash"))
+    .update(`capture-ip-address\0${ipAddress}`)
+    .digest("hex")
 }
 
 export function createProductCommunicationsUnsubscribeToken(input: {

@@ -9,6 +9,7 @@ import {
   normalizeCapturedEmail,
   normalizeCaptureSource,
 } from "@/lib/email/email-capture"
+import { claimEmailCaptureAttempt } from "@/lib/email/email-capture-rate-limit"
 import { hashEmailAddress } from "@/lib/email/email-privacy"
 import { PRODUCT_COMMUNICATIONS_TOPIC } from "@/lib/email/product-communications"
 import { capturePostHogEvent } from "@/lib/posthog-server"
@@ -44,11 +45,10 @@ const successState: EmailCaptureState = {
  * be reconciled against `emailSubscriber` without an address in PostHog.
  *
  * Three things this deliberately does not do. It never reports whether an
- * address was already stored, so the form cannot be used to enumerate the
- * list: a duplicate takes the on-conflict path, writes no second consent
- * event, and still answers "you are on the list". It never answers a filled
- * honeypot differently from a real submission, so a bot learns nothing from
- * the response. And it sends nothing: delivery to these addresses is a
+ * address was already stored, whether the honeypot caught it, or whether the
+ * client is out of budget, so the form cannot be used to enumerate the list or
+ * to probe the limit: all three take the same "you are on the list" answer a
+ * new address gets. And it sends nothing: delivery to these addresses is a
  * separate change and goes through the existing suppression and unsubscribe
  * pipeline.
  */
@@ -69,6 +69,11 @@ export async function subscribeEmail(
   const source = normalizeCaptureSource(formData.get("source"))
 
   try {
+    // Out of budget writes nothing and says what a stored address says, for
+    // the same reason a duplicate does: the response is the one thing a caller
+    // can observe, and it has to be the same on every path.
+    if (!(await claimEmailCaptureAttempt())) return successState
+
     const emailHash = hashEmailAddress(email)
 
     const stored = await db.transaction(async (tx) => {

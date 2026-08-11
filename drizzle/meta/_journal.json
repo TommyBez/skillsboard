@@ -43,6 +43,13 @@
       "when": 1786446783300,
       "tag": "0005_email_subscribers",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1786480508031,
+      "tag": "0006_email_capture_attempts",
+      "breakpoints": true
     }
   ]
 }
