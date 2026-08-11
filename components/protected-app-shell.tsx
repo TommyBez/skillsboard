@@ -5,6 +5,7 @@ import { Brand } from "@/components/brand"
 import { CommandMenu } from "@/components/command-menu"
 import { CommandMenuIndex } from "@/components/command-menu-index"
 import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
+import { FirstSkillInviteProvider } from "@/components/first-skill-invite-provider"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -47,14 +48,19 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
       <Suspense fallback={null}>
         <ExistingUserEmailConsentPrompt />
       </Suspense>
-      <div id="main-content" tabIndex={-1} className="outline-none">
-        {children}
-      </div>
-      {/* Navigation and actions work from the first paint; the searchable
-          skill/collection rows stream in with the index. */}
-      <Suspense fallback={<CommandMenu />}>
-        <CommandMenuIndex />
-      </Suspense>
+      {/* Every save control lives under here, and the follow-up invite step
+          has to outlive the list refresh that a save triggers, so the shell
+          owns it rather than the control that opened it. */}
+      <FirstSkillInviteProvider>
+        <div id="main-content" tabIndex={-1} className="outline-none">
+          {children}
+        </div>
+        {/* Navigation and actions work from the first paint; the searchable
+            skill/collection rows stream in with the index. */}
+        <Suspense fallback={<CommandMenu />}>
+          <CommandMenuIndex />
+        </Suspense>
+      </FirstSkillInviteProvider>
     </div>
   )
 }

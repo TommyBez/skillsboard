@@ -106,10 +106,18 @@ type TeamEventPropertiesMap = {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
   }
   team_invite_prompt_viewed: {
-    surface: "library_after_first_skill"
+    actor_is_skill_creator: boolean
+    surface: "first_skill_invite_step" | "library_after_first_skill"
+    trigger: "first_skill_saved" | "library_revisit"
   }
   team_invite_prompt_clicked: {
-    surface: "library_after_first_skill"
+    actor_is_skill_creator: boolean
+    surface: "first_skill_invite_step" | "library_after_first_skill"
+    trigger: "first_skill_saved" | "library_revisit"
+  }
+  team_invite_link_copied: {
+    actor_is_skill_creator: boolean
+    surface: "first_skill_invite_step" | "organization_settings"
   }
   skill_note_updated: {
     has_note: boolean

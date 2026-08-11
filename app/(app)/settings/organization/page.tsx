@@ -11,10 +11,11 @@ import { InviteMemberForm } from "@/components/invite-member-form"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
 import { db } from "@/lib/db"
+import { hasOrganizationSkillCreatedBy } from "@/lib/db/queries"
 import { member, user } from "@/lib/db/schema"
 
 const getOrganizationDetails = cache(async () => {
-  const { organizations, activeId } = await getAppContext()
+  const { organizations, activeId, session } = await getAppContext()
   const activeOrganization = organizations.find((organization) => organization.id === activeId) ?? organizations[0]
   const members = await db
     .select({
@@ -27,7 +28,7 @@ const getOrganizationDetails = cache(async () => {
     .innerJoin(user, eq(member.userId, user.id))
     .where(eq(member.organizationId, activeId))
 
-  return { activeOrganization, members }
+  return { activeId, activeOrganization, members, userId: session.user.id }
 })
 
 async function OrganizationSummary() {
@@ -94,8 +95,11 @@ async function MemberDirectory() {
 }
 
 async function InvitationPanel() {
-  const { activeOrganization } = await getOrganizationDetails()
+  const { activeId, activeOrganization, userId } = await getOrganizationDetails()
   const canInvite = activeOrganization.role === "owner" || activeOrganization.role === "admin"
+  // Same reading as the first-skill step: has this person put anything in the
+  // library they are inviting someone into.
+  const actorIsSkillCreator = canInvite ? await hasOrganizationSkillCreatedBy(activeId, userId) : false
 
   return (
     <section id="invite" className="mt-8 scroll-mt-24 rounded-[16px] border bg-card p-5 sm:p-6">
@@ -107,7 +111,16 @@ async function InvitationPanel() {
         </p>
       </div>
       {canInvite ? (
-        <InviteMemberForm />
+        <InviteMemberForm
+          linkCopyAnalytics={{
+            event: "team_invite_link_copied",
+            properties: {
+              actor_is_skill_creator: actorIsSkillCreator,
+              surface: "organization_settings",
+              team_id: activeId,
+            },
+          }}
+        />
       ) : (
         <p className="mt-6 border-t pt-5 text-sm text-muted-foreground">Only team owners and admins can send invitations.</p>
       )}

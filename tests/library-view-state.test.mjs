@@ -12,7 +12,11 @@ const outputText = stripTypeScriptTypes(source, { mode: "transform" })
 const libraryViewState = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 )
-const { findRecentTeammateRecommendation } = libraryViewState
+const {
+  findRecentTeammateRecommendation,
+  isFirstTeamSkillSave,
+  isInvitePromptEligible,
+} = libraryViewState
 
 const now = new Date("2026-07-29T08:00:00.000Z")
 const userId = "current-user"
@@ -59,4 +63,48 @@ test("ignores future timestamps", () => {
   ]
 
   assert.equal(findRecentTeammateRecommendation(skills, userId, now), undefined)
+})
+
+test("treats a single first save as the team's zero-to-one transition", () => {
+  assert.equal(isFirstTeamSkillSave({ savedCount: 1, teamSkillCount: 1 }), true)
+})
+
+test("treats a bulk import into an empty library as one transition", () => {
+  assert.equal(isFirstTeamSkillSave({ savedCount: 7, teamSkillCount: 7 }), true)
+})
+
+test("does not treat a save into a stocked library as the transition", () => {
+  assert.equal(isFirstTeamSkillSave({ savedCount: 1, teamSkillCount: 2 }), false)
+  assert.equal(isFirstTeamSkillSave({ savedCount: 3, teamSkillCount: 10 }), false)
+})
+
+test("does not treat an all-duplicates save as the transition", () => {
+  assert.equal(isFirstTeamSkillSave({ savedCount: 0, teamSkillCount: 0 }), false)
+  assert.equal(isFirstTeamSkillSave({ savedCount: 0, teamSkillCount: 4 }), false)
+})
+
+test("offers the invite ask to a solo team with skills and no pending invitation", () => {
+  assert.equal(
+    isInvitePromptEligible({
+      canManageLibrary: true,
+      memberCount: 1,
+      pendingInvitationCount: 0,
+      skillCount: 1,
+    }),
+    true,
+  )
+})
+
+test("withholds the invite ask once the team is no longer alone or already invited", () => {
+  const base = {
+    canManageLibrary: true,
+    memberCount: 1,
+    pendingInvitationCount: 0,
+    skillCount: 1,
+  }
+
+  assert.equal(isInvitePromptEligible({ ...base, memberCount: 2 }), false)
+  assert.equal(isInvitePromptEligible({ ...base, pendingInvitationCount: 1 }), false)
+  assert.equal(isInvitePromptEligible({ ...base, canManageLibrary: false }), false)
+  assert.equal(isInvitePromptEligible({ ...base, skillCount: 0 }), false)
 })
