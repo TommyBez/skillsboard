@@ -8,6 +8,10 @@ import { subscribeEmail, type EmailCaptureState } from "@/app/actions/email-capt
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { Input } from "@/components/ui/input"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import {
+  EMAIL_CAPTURE_NOTICE_FOOTNOTE,
+  EMAIL_CAPTURE_PROMISE,
+} from "@/lib/email/email-capture"
 import { cn } from "@/lib/utils"
 
 export type EmailCaptureSource =
@@ -21,9 +25,11 @@ const initialState: EmailCaptureState = { message: "", status: "idle" }
  * Mounted on the landing band, at the end of every guide, and in the closing
  * section of the alternative pages. The `source` prop is both the analytics
  * property and the stored column, so a submission can be attributed to the
- * page that earned it. The form carries `ph-no-capture`, the guard the invite
- * form puts on its link block, so the address stays out of autocapture and
- * session recordings.
+ * page that earned it. The two notice lines come from the shared capture
+ * constants rather than from this file, so the consent event the action writes
+ * stores the same words the visitor read here. The form carries
+ * `ph-no-capture`, the guard the invite form puts on its link block, so the
+ * address stays out of autocapture and session recordings.
  */
 export function EmailCaptureCard({
   className,
@@ -64,8 +70,7 @@ export function EmailCaptureCard({
         Follow the build
       </h2>
       <p className="mt-3 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-        An occasional email when Skills Board ships a new feature or publishes a
-        new guide.
+        {EMAIL_CAPTURE_PROMISE}
       </p>
 
       {state.status === "success" ? (
@@ -137,7 +142,7 @@ export function EmailCaptureCard({
       ) : null}
 
       <p id={noteId} className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        Only Skills Board updates. Unsubscribe anytime.
+        {EMAIL_CAPTURE_NOTICE_FOOTNOTE}
       </p>
     </section>
   )

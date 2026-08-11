@@ -30,6 +30,27 @@ const sourcePattern = /^(?:alternatives_[a-z0-9_-]{1,80}|guide_[a-z0-9_-]{1,80}|
 
 export const UNKNOWN_EMAIL_CAPTURE_SOURCE = "unknown"
 
+/**
+ * The consent notice, kept beside the rules so the card renders exactly what
+ * the ledger stores. `EMAIL_CAPTURE_NOTICE_TEXT` is the two lines a visitor
+ * reads, in the order the card stacks them. Bump the version whenever either
+ * line changes, so a row written today keeps the promise that was actually on
+ * screen when it was written.
+ */
+export const EMAIL_CAPTURE_NOTICE_VERSION = "email-capture-v1"
+
+/** The supporting line under the card heading. */
+export const EMAIL_CAPTURE_PROMISE =
+  "An occasional email when Skills Board ships a new feature or publishes a new guide."
+
+/** The footnote under the card form. */
+export const EMAIL_CAPTURE_NOTICE_FOOTNOTE =
+  "Only Skills Board updates. Unsubscribe anytime."
+
+/** What the visitor read before submitting, stored on the consent event. */
+export const EMAIL_CAPTURE_NOTICE_TEXT =
+  `${EMAIL_CAPTURE_PROMISE} ${EMAIL_CAPTURE_NOTICE_FOOTNOTE}`
+
 /** Lowercased, trimmed address, or `null` when the input cannot be one. */
 export function normalizeCapturedEmail(value: unknown): string | null {
   if (typeof value !== "string") return null

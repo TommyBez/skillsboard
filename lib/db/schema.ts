@@ -133,6 +133,12 @@ export const emailProactiveDelivery = pgTable("emailProactiveDelivery", {
  * pages. Separate from `emailPreference`, which records account-scoped consent
  * for signed-in users: this table holds addresses left by visitors who have no
  * account, and nothing is sent to them from here.
+ *
+ * Every new subscription writes a matching `emailConsentEvent` in the same
+ * transaction, with a null `userId`, the hashed address, the capturing page,
+ * and the notice that was on screen. A visitor capture therefore leaves the
+ * same audit trail as a signed-in consent change, and a duplicate submission
+ * writes neither row.
  */
 export const emailSubscriber = pgTable("emailSubscriber", {
   id: uuid("id").primaryKey().defaultRandom(),
