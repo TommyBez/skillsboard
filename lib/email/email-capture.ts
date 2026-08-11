@@ -102,6 +102,11 @@ export const CAPTURE_IP_MAX_LENGTH = 45
 const ipv4Pattern = /^\d{1,3}(?:\.\d{1,3}){3}$/
 const ipv4WithPortPattern = /^(\d{1,3}(?:\.\d{1,3}){3}):\d{1,5}$/
 const ipv6Pattern = /^[0-9a-f:]+$/
+/**
+ * `::ffff:203.0.113.7`, and the deprecated `::203.0.113.7`: an IPv4 client
+ * wearing IPv6, which a dual stack proxy in front of the app can produce.
+ */
+const ipv4MappedPattern = /^::(?:ffff:)?(\d{1,3}(?:\.\d{1,3}){3})$/
 
 /** Lowercased, trimmed address, or `null` when the input cannot be one. */
 export function normalizeCapturedEmail(value: unknown): string | null {
@@ -152,6 +157,12 @@ export function normalizeCaptureIpAddress(value: unknown): string | null {
   // A proxy can append a port. The address alone is the bucket.
   const withoutPort = ipv4WithPortPattern.exec(candidate)
   if (withoutPort?.[1]) candidate = withoutPort[1]
+
+  // Unwrap a mapped address rather than bucketing it separately, so one client
+  // reaching the app under both spellings still spends one budget. The octets
+  // are checked below with every other IPv4 address.
+  const mapped = ipv4MappedPattern.exec(candidate)
+  if (mapped?.[1]) candidate = mapped[1]
 
   if (candidate.length === 0 || candidate.length > CAPTURE_IP_MAX_LENGTH) return null
 

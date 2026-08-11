@@ -72,7 +72,15 @@ export async function subscribeEmail(
     // Out of budget writes nothing and says what a stored address says, for
     // the same reason a duplicate does: the response is the one thing a caller
     // can observe, and it has to be the same on every path.
-    if (!(await claimEmailCaptureAttempt())) return successState
+    if (!(await claimEmailCaptureAttempt())) {
+      // Which makes this the only place a genuine loss can surface. Visitors
+      // behind one shared egress address share one bucket, so a busy office
+      // can spend the budget on real people, and the next one is told they are
+      // on the list. The source measures that; the bucket is a per client
+      // identifier and stays out of the log, like the address does.
+      console.warn("Email capture refused by the rate limit", { source })
+      return successState
+    }
 
     const emailHash = hashEmailAddress(email)
 

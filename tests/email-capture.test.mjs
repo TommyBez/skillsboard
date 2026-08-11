@@ -139,6 +139,14 @@ test("reads the client address out of a forwarded header", () => {
   assert.equal(normalizeCaptureIpAddress("[2001:db8::1]:41234"), "2001:db8::1")
 })
 
+test("gives a mapped IPv4 client the bucket its plain address would get", () => {
+  assert.equal(normalizeCaptureIpAddress("::ffff:203.0.113.7"), "203.0.113.7")
+  assert.equal(normalizeCaptureIpAddress("::FFFF:203.0.113.7"), "203.0.113.7")
+  assert.equal(normalizeCaptureIpAddress("::203.0.113.7"), "203.0.113.7")
+  assert.equal(normalizeCaptureIpAddress("[::ffff:203.0.113.7]:41234"), "203.0.113.7")
+  assert.equal(normalizeCaptureIpAddress("::ffff:203.0.113.999"), null)
+})
+
 test("treats an address it cannot read as no address at all", () => {
   for (const value of [
     "",
@@ -225,7 +233,13 @@ test("spends the budget before writing, and answers the refusal like a success",
 
   assert.ok(claimIndex > -1 && insertIndex > -1)
   assert.ok(claimIndex < insertIndex, "the budget is spent before the insert")
-  assert.match(actionSource, /if \(!\(await claimEmailCaptureAttempt\(\)\)\) return successState/)
+  assert.match(actionSource, /if \(!\(await claimEmailCaptureAttempt\(\)\)\) \{/)
+  // The refusal is indistinguishable to the caller, so the log is the only
+  // place a dropped subscription can be counted.
+  assert.match(
+    actionSource,
+    /console\.warn\("Email capture refused by the rate limit", \{ source \}\)/,
+  )
 })
 
 test("counts the capture on the server, only when a row was created", () => {
