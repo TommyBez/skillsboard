@@ -241,8 +241,17 @@ export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }
 
-export async function countOrganizationSkills(organizationId: string) {
-  const [result] = await db
+/**
+ * Accepts an open transaction so a caller that just inserted can count in the
+ * same unit of work, seeing its own rows and holding whatever lock it took.
+ */
+type SkillCountExecutor = Pick<typeof db, "select">
+
+export async function countOrganizationSkills(
+  organizationId: string,
+  executor: SkillCountExecutor = db,
+) {
+  const [result] = await executor
     .select({ value: count() })
     .from(skill)
     .where(eq(skill.organizationId, organizationId))

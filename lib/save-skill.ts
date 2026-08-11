@@ -1,3 +1,5 @@
+import { sql } from "drizzle-orm"
+
 import { db } from "@/lib/db"
 import { countOrganizationSkills } from "@/lib/db/queries"
 import { skill } from "@/lib/db/schema"
@@ -40,24 +42,42 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
     const note = input.note || null
     const examplePrompts = [...new Set(input.examplePrompts)]
     const tags = [...new Set(input.tags.map((tag) => tag.toLowerCase()))]
-    const savedSkills = await db.insert(skill).values(repository.skills.map((selectedSkill) => ({
-      organizationId: input.organizationId,
-      createdBy: input.userId,
-      githubUrl: repository.githubUrl,
-      skillName: selectedSkill.name,
-      title: selectedSkill.name.replaceAll("-", " "),
-      description: selectedSkill.description,
-      repoOwner: repository.repoOwner,
-      repoName: repository.repoName,
-      repoStars: repository.repoStars,
-      repoUpdatedAt: repository.repoUpdatedAt,
-      skillPath: selectedSkill.path,
-      tags,
-      note,
-      examplePrompts,
-    }))).onConflictDoNothing({
-      target: [skill.organizationId, skill.githubUrl, skill.skillName],
-    }).returning()
+    /* The insert and the count that reads the empty-to-stocked transition run
+       in one transaction, behind a lock taken on this team alone. Two people
+       saving into the same empty library otherwise each count after the other
+       has committed, both read a library that already held a skill, and
+       neither save is reported as the team's first. Other teams are never
+       held up: the lock key is the organization id. */
+    const { savedSkills, teamSkillCount } = await db.transaction(async (tx) => {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${input.organizationId}, 0))`)
+
+      const inserted = await tx.insert(skill).values(repository.skills.map((selectedSkill) => ({
+        organizationId: input.organizationId,
+        createdBy: input.userId,
+        githubUrl: repository.githubUrl,
+        skillName: selectedSkill.name,
+        title: selectedSkill.name.replaceAll("-", " "),
+        description: selectedSkill.description,
+        repoOwner: repository.repoOwner,
+        repoName: repository.repoName,
+        repoStars: repository.repoStars,
+        repoUpdatedAt: repository.repoUpdatedAt,
+        skillPath: selectedSkill.path,
+        tags,
+        note,
+        examplePrompts,
+      }))).onConflictDoNothing({
+        target: [skill.organizationId, skill.githubUrl, skill.skillName],
+      }).returning()
+
+      return {
+        savedSkills: inserted,
+        // Only pay for the count when something was actually inserted.
+        teamSkillCount: inserted.length
+          ? await countOrganizationSkills(input.organizationId, tx)
+          : 0,
+      }
+    })
 
     // Correlate by path, not name: two selected paths can resolve to the same
     // skill name, and only one of them wins the unique-name insert.
@@ -83,10 +103,6 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
       })
     }
 
-    // Only pay for the count when something was actually inserted.
-    const teamSkillCount = savedSkills.length
-      ? await countOrganizationSkills(input.organizationId)
-      : 0
     const isFirstTeamSkill = isFirstTeamSkillSave({
       savedCount: savedSkills.length,
       teamSkillCount,
