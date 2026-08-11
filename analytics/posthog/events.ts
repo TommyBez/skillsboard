@@ -1,4 +1,8 @@
 type NonTeamEventPropertiesMap = {
+  email_capture_submitted: {
+    /** The capture surface: the landing band, a guide, or an alternative page. */
+    source: `alternatives_${string}` | `guide_${string}` | "landing"
+  }
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
     location:

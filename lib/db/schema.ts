@@ -128,6 +128,23 @@ export const emailProactiveDelivery = pgTable("emailProactiveDelivery", {
   index("emailProactiveDelivery_email_sent_idx").on(table.emailHash, table.sentAt),
 ])
 
+/**
+ * Marketing list for Skills Board product updates, captured from the public
+ * pages. Separate from `emailPreference`, which records account-scoped consent
+ * for signed-in users: this table holds addresses left by visitors who have no
+ * account, and nothing is sent to them from here.
+ */
+export const emailSubscriber = pgTable("emailSubscriber", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Lowercased and trimmed before insert; the unique key is the raw column. */
+  email: text("email").notNull(),
+  /** The page that captured the address: landing, guide_<slug>, alternatives_<slug>. */
+  source: text("source").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique("emailSubscriber_email_key").on(table.email),
+])
+
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),

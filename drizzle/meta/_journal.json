@@ -36,6 +36,13 @@
       "when": 1786198824355,
       "tag": "0004_collection_release_retention_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786446783300,
+      "tag": "0005_email_subscribers",
+      "breakpoints": true
     }
   ]
 }

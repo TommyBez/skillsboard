@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { ExternalLinkIcon } from "lucide-react"
 
+import { EmailCaptureCard } from "@/components/email-capture-card"
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import {
@@ -366,6 +367,8 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
               <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
             </a>
           </div>
+
+          <EmailCaptureCard className="mx-auto mt-12 max-w-2xl" source={entry.ctaLocation} />
         </section>
       </div>
     </>
