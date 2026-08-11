@@ -7,7 +7,10 @@ const {
   INVITE_PROMPT_STORAGE_PREFIX,
   invitePromptStorageKey,
   parseInvitePromptState,
+  readInvitePromptState,
   resolveInvitePromptStateAfterStep,
+  subscribeToInvitePromptState,
+  writeInvitePromptState,
 } = await loadTsModule(new URL("../lib/invite-prompt-state.ts", import.meta.url))
 
 test("keys the dismissal record per team on the shipped storage prefix", () => {
@@ -35,4 +38,27 @@ test("closing the first-skill step folds the library banner instead of removing 
 
 test("closing the first-skill step never revives an already dismissed banner", () => {
   assert.equal(resolveInvitePromptStateAfterStep("dismissed"), "dismissed")
+})
+
+/* No window here, so localStorage always throws: the same shape as a browser
+   with storage blocked. The record still has to hold for the rest of the
+   session, and every mounted surface still has to hear about it. */
+test("a write reaches surfaces that are already on screen", () => {
+  const seen = []
+  const unsubscribe = subscribeToInvitePromptState(() => seen.push(readInvitePromptState("team-live")))
+
+  assert.equal(readInvitePromptState("team-live"), "expanded")
+  writeInvitePromptState("team-live", "collapsed")
+  assert.deepEqual(seen, ["collapsed"])
+
+  unsubscribe()
+  writeInvitePromptState("team-live", "dismissed")
+  assert.deepEqual(seen, ["collapsed"])
+})
+
+test("remembers the choice per team even when storage cannot hold it", () => {
+  writeInvitePromptState("team-a", "dismissed")
+
+  assert.equal(readInvitePromptState("team-a"), "dismissed")
+  assert.equal(readInvitePromptState("team-b"), "expanded")
 })

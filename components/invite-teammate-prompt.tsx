@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 import {
   readInvitePromptState,
+  subscribeToInvitePromptState,
   writeInvitePromptState,
   type InvitePromptState,
 } from "@/lib/invite-prompt-state"
@@ -43,6 +44,15 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
       trigger: "library_revisit",
     })
   }, [actorIsSkillCreator, teamId])
+
+  /* The first-skill step can be on screen with this banner already mounted
+     behind it, and closing that step folds the ask. Without this the banner
+     stayed expanded until the next reload, contradicting the answer the user
+     had just given. */
+  useEffect(
+    () => subscribeToInvitePromptState(() => setState(readInvitePromptState(teamId))),
+    [teamId],
+  )
 
   function persist(next: BannerState) {
     setState(next)

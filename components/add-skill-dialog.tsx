@@ -6,7 +6,7 @@ import { toast } from "sonner"
 
 import { addSkills, discoverRepositorySkills } from "@/app/actions/skills"
 import { ButtonPendingContent } from "@/components/button-pending-content"
-import { FirstSkillInviteStep } from "@/components/first-skill-invite-step"
+import { useFirstSkillInvite } from "@/components/first-skill-invite-provider"
 import { TagInput } from "@/components/interior/tag-input"
 import { PromptExamplesEditor } from "@/components/prompt-examples-editor"
 import { Button } from "@/components/ui/button"
@@ -64,9 +64,11 @@ export function AddSkillDialog({
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
   const discoveryRequest = useRef(0)
   const lastSinglePath = useRef<string | null>(null)
-  /* Set only when the save just took this team from an empty library to a
-     stocked one and the server judged the invite ask eligible. */
-  const [inviteStepTeamId, setInviteStepTeamId] = useState<string | null>(null)
+  /* Asked for only when the save just took this team from an empty library to
+     a stocked one and the server judged the invite ask eligible. The step is
+     opened through the shell because this dialog, and the control that
+     rendered it, are usually unmounted by the refresh the save sets off. */
+  const openFirstSkillInvite = useFirstSkillInvite()
 
   const lockedName = lockedSkillName.trim()
   const isLocked = lockedName.length > 0
@@ -204,7 +206,7 @@ export function AddSkillDialog({
       )
       // Queued before the save dialog closes so the invite step is what the
       // user lands on, not the page they were already looking at.
-      if (result.inviteTeammateStep) setInviteStepTeamId(result.inviteTeammateStep.teamId)
+      if (result.inviteTeammateStep) openFirstSkillInvite?.(result.inviteTeammateStep.teamId)
       handleOpenChange(false)
     } catch (error) {
       console.error("Unable to save skills", error)
@@ -222,7 +224,6 @@ export function AddSkillDialog({
   }
 
   return (
-    <>
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       {isControlled ? null : (
         <DialogTrigger render={<Button aria-label={triggerAriaLabel} onClick={onTriggerClick} />}>
@@ -391,15 +392,5 @@ export function AddSkillDialog({
         </form>
       </DialogContent>
     </Dialog>
-    {inviteStepTeamId ? (
-      <FirstSkillInviteStep
-        open
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen) setInviteStepTeamId(null)
-        }}
-        teamId={inviteStepTeamId}
-      />
-    ) : null}
-    </>
   )
 }
