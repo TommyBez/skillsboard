@@ -6,12 +6,17 @@ import { z } from "zod"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
+import {
+  countOrganizationMembers,
+  countPendingOrganizationInvitations,
+} from "@/lib/db/queries"
 import { collection, collectionDistribution, collectionSkill, skill } from "@/lib/db/schema"
 import { getGitHubMetadata } from "@/lib/github"
 import {
   discoverGitHubSkills,
   GitHubSkillDiscoveryError,
 } from "@/lib/github-skill-discovery"
+import { isInvitePromptEligible } from "@/lib/library-view-state"
 import { captureTeamEvent } from "@/lib/posthog-server"
 import { saveSkillsToLibrary } from "@/lib/save-skill"
 import { isOrganizationAdmin, requireActiveOrganization, requireSession } from "@/lib/session"
@@ -71,9 +76,45 @@ export async function discoverRepositorySkills(input: z.input<typeof githubRepos
   }
 }
 
+/**
+ * The team is multiplayer but the funnel never asked for the second player.
+ * The one moment where the ask is obviously true is the transition from an
+ * empty library to a library with something in it, so the save action reports
+ * it back and the client opens the invite step there.
+ *
+ * Eligibility mirrors the library banner exactly (solo team, no pending
+ * invitation, actor allowed to invite), so the two surfaces never contradict
+ * each other and someone joining a stocked library never sees it.
+ */
+async function resolveFirstSkillInviteStep({
+  organizationId,
+  role,
+  skillCount,
+}: {
+  organizationId: string
+  role: string
+  skillCount: number
+}) {
+  if (!isOrganizationAdmin(role)) return null
+
+  const [memberCount, pendingInvitationCount] = await Promise.all([
+    countOrganizationMembers(organizationId),
+    countPendingOrganizationInvitations(organizationId),
+  ])
+
+  return isInvitePromptEligible({
+    canManageLibrary: true,
+    memberCount,
+    pendingInvitationCount,
+    skillCount,
+  })
+    ? { teamId: organizationId }
+    : null
+}
+
 export async function addSkills(input: z.input<typeof skillsSchema>) {
   const session = await requireSession()
-  const { organizationId, userId } = await requireActiveOrganization(session)
+  const { organizationId, userId, role } = await requireActiveOrganization(session)
   const parsed = skillsSchema.safeParse(input)
 
   if (!parsed.success) {
@@ -92,10 +133,19 @@ export async function addSkills(input: z.input<typeof skillsSchema>) {
   })
   if (!result.ok) return { ok: false as const, error: result.error }
   if (result.saved.length) updateTag(cacheTags.organizationSkills(organizationId))
+  const inviteTeammateStep = result.isFirstTeamSkill
+    ? await resolveFirstSkillInviteStep({
+        organizationId,
+        role,
+        skillCount: result.saved.length,
+      })
+    : null
+
   return {
     ok: true as const,
     savedCount: result.saved.length,
     alreadySaved: result.alreadySaved,
+    inviteTeammateStep,
   }
 }
 

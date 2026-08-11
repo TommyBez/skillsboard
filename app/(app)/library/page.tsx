@@ -178,7 +178,10 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         teamId={activeId}
       />
       {showInvitePrompt ? (
-        <InviteTeammatePrompt teamId={activeId} />
+        <InviteTeammatePrompt
+          actorIsSkillCreator={allSkills.some((item) => item.createdBy === userId)}
+          teamId={activeId}
+        />
       ) : null}
 
       {teammateRecommendation ? (

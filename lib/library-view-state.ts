@@ -42,6 +42,24 @@ export function findRecentTeammateRecommendation<
   })
 }
 
+/**
+ * True when this save is what took the team from an empty library to a stocked
+ * one, which is the single moment the invite step is allowed to appear.
+ *
+ * The count is taken after the insert, not before, so a bulk import stays
+ * correct: several rows land in one statement and the whole batch is still the
+ * team's first save.
+ */
+export function isFirstTeamSkillSave({
+  savedCount,
+  teamSkillCount,
+}: {
+  savedCount: number
+  teamSkillCount: number
+}) {
+  return savedCount > 0 && teamSkillCount === savedCount
+}
+
 interface InvitePromptEligibility {
   canManageLibrary: boolean
   memberCount: number

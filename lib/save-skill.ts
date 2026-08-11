@@ -1,9 +1,11 @@
 import { db } from "@/lib/db"
+import { countOrganizationSkills } from "@/lib/db/queries"
 import { skill } from "@/lib/db/schema"
 import {
   GitHubSkillDiscoveryError,
   resolveGitHubSkills,
 } from "@/lib/github-skill-discovery"
+import { isFirstTeamSkillSave } from "@/lib/library-view-state"
 import { captureTeamEvent } from "@/lib/posthog-server"
 
 export interface SaveSkillsInput {
@@ -24,7 +26,7 @@ export interface SaveSkillInput extends Omit<SaveSkillsInput, "skillPaths"> {
 export type SavedSkill = typeof skill.$inferSelect
 
 export type SaveSkillsResult =
-  | { ok: true; saved: SavedSkill[]; alreadySaved: string[] }
+  | { ok: true; saved: SavedSkill[]; alreadySaved: string[]; isFirstTeamSkill: boolean }
   | { ok: false; error: string }
 
 export type SaveSkillResult =
@@ -81,7 +83,16 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
       })
     }
 
-    return { ok: true, saved: savedSkills, alreadySaved }
+    // Only pay for the count when something was actually inserted.
+    const teamSkillCount = savedSkills.length
+      ? await countOrganizationSkills(input.organizationId)
+      : 0
+    const isFirstTeamSkill = isFirstTeamSkillSave({
+      savedCount: savedSkills.length,
+      teamSkillCount,
+    })
+
+    return { ok: true, saved: savedSkills, alreadySaved, isFirstTeamSkill }
   } catch (error) {
     console.error("Unable to save skills", error)
     return {

@@ -241,6 +241,25 @@ export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }
 
+export async function countOrganizationSkills(organizationId: string) {
+  const [result] = await db
+    .select({ value: count() })
+    .from(skill)
+    .where(eq(skill.organizationId, organizationId))
+
+  return result?.value ?? 0
+}
+
+export async function hasOrganizationSkillCreatedBy(organizationId: string, userId: string) {
+  const [existing] = await db
+    .select({ id: skill.id })
+    .from(skill)
+    .where(and(eq(skill.organizationId, organizationId), eq(skill.createdBy, userId)))
+    .limit(1)
+
+  return Boolean(existing)
+}
+
 export async function countOrganizationMembers(organizationId: string) {
   const [result] = await db
     .select({ value: count() })

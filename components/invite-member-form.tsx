@@ -8,6 +8,8 @@ import { FormSubmitButton } from "@/components/form-submit-button"
 import { CopyButton } from "@/components/copy-button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import type { ClientAnalyticsEvent } from "@/lib/analytics-client"
+import { cn } from "@/lib/utils"
 
 const initialState = { emailError: "", error: "", expiresAt: "", invitedEmail: "", inviteUrl: "", role: "" as const }
 const expiryFormatter = new Intl.DateTimeFormat("en-US", {
@@ -20,16 +22,46 @@ const expiryFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 })
 
-export function InviteMemberForm() {
+interface InviteMemberFormProps {
+  /** Wrapper classes. The settings panel keeps its rule and top margin; the
+      first-skill step sits flush inside a dialog. */
+  className?: string
+  /** Distinct field ids so two copies of the form can never collide. */
+  idPrefix?: string
+  /** "row" is the settings panel; "stack" fits the narrow dialog column. */
+  layout?: "row" | "stack"
+  /** Fired when the invite link is copied, so the share path is measurable
+      next to the emailed invitation. */
+  linkCopyAnalytics?: ClientAnalyticsEvent
+  /** Fired when the user submits the form, before the invitation exists. */
+  onSubmitIntent?: () => void
+}
+
+export function InviteMemberForm({
+  className,
+  idPrefix = "invite",
+  layout = "row",
+  linkCopyAnalytics,
+  onSubmitIntent,
+}: InviteMemberFormProps = {}) {
   const [state, action] = useActionState(createInvitationLink, initialState)
+  const emailFieldId = `${idPrefix}-email`
+  const roleFieldId = `${idPrefix}-role`
 
   return (
-    <div className="mt-6 border-t pt-6">
-      <form action={action} className="grid gap-4 md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end">
+    <div className={cn(className ?? "mt-6 border-t pt-6")}>
+      <form
+        action={action}
+        onSubmit={onSubmitIntent}
+        className={cn(
+          "grid gap-4",
+          layout === "row" && "md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end",
+        )}
+      >
         <Field>
-          <FieldLabel htmlFor="invite-email">Email</FieldLabel>
+          <FieldLabel htmlFor={emailFieldId}>Email</FieldLabel>
           <Input
-            id="invite-email"
+            id={emailFieldId}
             name="email"
             type="email"
             autoComplete="email"
@@ -39,10 +71,10 @@ export function InviteMemberForm() {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="invite-role">Role</FieldLabel>
+          <FieldLabel htmlFor={roleFieldId}>Role</FieldLabel>
           <div className="relative">
             <select
-              id="invite-role"
+              id={roleFieldId}
               name="role"
               aria-label="Role"
               defaultValue="member"
@@ -58,7 +90,10 @@ export function InviteMemberForm() {
           </div>
         </Field>
 
-        <FormSubmitButton className="h-11 rounded-[12px] px-4" pendingLabel="Sending invitation…">
+        <FormSubmitButton
+          className={cn("h-11 rounded-[12px] px-4", layout === "stack" && "w-full")}
+          pendingLabel="Sending invitation…"
+        >
           <MailIcon data-icon="inline-start" />
           Send invitation
         </FormSubmitButton>
@@ -84,11 +119,17 @@ export function InviteMemberForm() {
           <FieldDescription className="mt-1">
             {state.emailError
               ? `This link grants ${state.role} access and expires ${expiryFormatter.format(new Date(state.expiresAt))}.`
-              : `We emailed ${state.invitedEmail} with a link to join as ${state.role}. It expires ${expiryFormatter.format(new Date(state.expiresAt))}. Copy the link below if you need a backup.`}
+              : `We emailed ${state.invitedEmail} with a link to join as ${state.role}. It expires ${expiryFormatter.format(new Date(state.expiresAt))}. Copy the link below to paste it in Slack or a chat.`}
           </FieldDescription>
           <div className="mt-3 flex min-w-0 items-center gap-2 rounded-[10px] border bg-background p-1.5 pl-3">
             <code className="min-w-0 flex-1 truncate font-mono text-xs text-muted-foreground">{state.inviteUrl}</code>
-            <CopyButton value={state.inviteUrl} label="Copy invite link" ariaLabel="Copy invite link" copiedAriaLabel="Invite link copied" />
+            <CopyButton
+              analytics={linkCopyAnalytics}
+              value={state.inviteUrl}
+              label="Copy invite link"
+              ariaLabel="Copy invite link"
+              copiedAriaLabel="Invite link copied"
+            />
           </div>
         </div>
       ) : null}
