@@ -49,6 +49,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/claude-skills/",
+        destination: "/claude-skills",
+        permanent: true,
+      },
+      {
         source: "/pricing/",
         destination: "/pricing",
         permanent: true,
