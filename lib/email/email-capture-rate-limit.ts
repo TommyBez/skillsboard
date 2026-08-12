@@ -23,9 +23,10 @@ import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
  * is a budget rather than a boundary: it stops an unattended script from
  * filling the table, not a determined attacker with addresses to spend.
  *
- * A header that is there but carries no address is bucketed too, in the one
- * bucket every unreadable value shares, so it cannot buy a fresh budget per
- * spelling.
+ * A header that is present and unreadable is bucketed too, in the one bucket
+ * every unreadable value shares, so it cannot buy a fresh budget per spelling.
+ * A header that is absent or empty carries no address at all: it is left
+ * unbucketed, and the submission goes through.
  */
 async function readCaptureIpHash(): Promise<string | null> {
   const requestHeaders = await headers()
