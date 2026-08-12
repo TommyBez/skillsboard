@@ -7,6 +7,9 @@
  * bare specifiers from a data: URL. Everything here runs on untrusted form
  * input, so each helper returns a normalized value or rejects it rather than
  * trusting the caller.
+ *
+ * The client address a submission is bucketed under lives in
+ * `email-capture-ip.ts`, which needs `node:net` and stays off the client.
  */
 
 /** RFC 5321 caps an address at 254 characters; anything longer is not one. */
@@ -96,18 +99,6 @@ export const EMAIL_CAPTURE_ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000
  */
 export const EMAIL_CAPTURE_PRUNE_SAMPLE_RATE = 0.02
 
-/** An IPv6 address in its longest textual form is 45 characters. */
-export const CAPTURE_IP_MAX_LENGTH = 45
-
-const ipv4Pattern = /^\d{1,3}(?:\.\d{1,3}){3}$/
-const ipv4WithPortPattern = /^(\d{1,3}(?:\.\d{1,3}){3}):\d{1,5}$/
-const ipv6Pattern = /^[0-9a-f:]+$/
-/**
- * `::ffff:203.0.113.7`, and the deprecated `::203.0.113.7`: an IPv4 client
- * wearing IPv6, which a dual stack proxy in front of the app can produce.
- */
-const ipv4MappedPattern = /^::(?:ffff:)?(\d{1,3}(?:\.\d{1,3}){3})$/
-
 /** Lowercased, trimmed address, or `null` when the input cannot be one. */
 export function normalizeCapturedEmail(value: unknown): string | null {
   if (typeof value !== "string") return null
@@ -130,49 +121,6 @@ export function normalizeCaptureSource(value: unknown): StoredEmailCaptureSource
   return sourcePattern.test(normalized)
     ? (normalized as EmailCaptureSource)
     : UNKNOWN_EMAIL_CAPTURE_SOURCE
-}
-
-/**
- * The client address to bucket a submission under, or `null` when the request
- * does not carry one we can read.
- *
- * `x-forwarded-for` is a list and the client sits at its head. A value that is
- * not an address is treated as no address at all: the bucket key has to be
- * something a person actually shares with themselves across submissions, and
- * an unparseable one would only create a private bucket per garbage string.
- */
-export function normalizeCaptureIpAddress(value: unknown): string | null {
-  if (typeof value !== "string") return null
-
-  const [first] = value.split(",")
-  let candidate = (first ?? "").trim().toLowerCase()
-
-  // An IPv6 literal can arrive bracketed, with or without a trailing port.
-  if (candidate.startsWith("[")) {
-    const closing = candidate.indexOf("]")
-    if (closing === -1) return null
-    candidate = candidate.slice(1, closing)
-  }
-
-  // A proxy can append a port. The address alone is the bucket.
-  const withoutPort = ipv4WithPortPattern.exec(candidate)
-  if (withoutPort?.[1]) candidate = withoutPort[1]
-
-  // Unwrap a mapped address rather than bucketing it separately, so one client
-  // reaching the app under both spellings still spends one budget. The octets
-  // are checked below with every other IPv4 address.
-  const mapped = ipv4MappedPattern.exec(candidate)
-  if (mapped?.[1]) candidate = mapped[1]
-
-  if (candidate.length === 0 || candidate.length > CAPTURE_IP_MAX_LENGTH) return null
-
-  if (ipv4Pattern.test(candidate)) {
-    return candidate.split(".").every((octet) => Number(octet) <= 255)
-      ? candidate
-      : null
-  }
-
-  return candidate.includes(":") && ipv6Pattern.test(candidate) ? candidate : null
 }
 
 /** The start of the fixed window `now` falls in. */

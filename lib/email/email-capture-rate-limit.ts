@@ -9,9 +9,9 @@ import {
   captureAttemptRetentionCutoff,
   captureRateLimitWindowStart,
   isOverCaptureRateLimit,
-  normalizeCaptureIpAddress,
   shouldPruneCaptureAttempts,
 } from "@/lib/email/email-capture"
+import { resolveCaptureIpAddress } from "@/lib/email/email-capture-ip"
 import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
 
 /**
@@ -22,12 +22,17 @@ import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
  * as the second spelling of the same value. Neither is authenticated, so this
  * is a budget rather than a boundary: it stops an unattended script from
  * filling the table, not a determined attacker with addresses to spend.
+ *
+ * A header that is there but carries no address is bucketed too, in the one
+ * bucket every unreadable value shares, so it cannot buy a fresh budget per
+ * spelling.
  */
 async function readCaptureIpHash(): Promise<string | null> {
   const requestHeaders = await headers()
-  const ipAddress =
-    normalizeCaptureIpAddress(requestHeaders.get("x-forwarded-for"))
-    ?? normalizeCaptureIpAddress(requestHeaders.get("x-real-ip"))
+  const ipAddress = resolveCaptureIpAddress(
+    requestHeaders.get("x-forwarded-for"),
+    requestHeaders.get("x-real-ip"),
+  )
 
   return ipAddress ? hashCaptureIpAddress(ipAddress) : null
 }

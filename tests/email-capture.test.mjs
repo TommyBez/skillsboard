@@ -5,7 +5,6 @@ import { test } from "node:test"
 import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
 const {
-  CAPTURE_IP_MAX_LENGTH,
   EMAIL_CAPTURE_ATTEMPT_RETENTION_MS,
   EMAIL_CAPTURE_MAX_LENGTH,
   EMAIL_CAPTURE_NOTICE_FOOTNOTE,
@@ -19,11 +18,17 @@ const {
   captureRateLimitWindowStart,
   isHoneypotFilled,
   isOverCaptureRateLimit,
-  normalizeCaptureIpAddress,
   normalizeCaptureSource,
   normalizeCapturedEmail,
   shouldPruneCaptureAttempts,
 } = await loadTsModule(new URL("../lib/email/email-capture.ts", import.meta.url))
+
+const {
+  CAPTURE_IP_MAX_LENGTH,
+  INVALID_CAPTURE_IP_BUCKET,
+  normalizeCaptureIpAddress,
+  resolveCaptureIpAddress,
+} = await loadTsModule(new URL("../lib/email/email-capture-ip.ts", import.meta.url))
 
 const cardSource = await readFile(
   new URL("../components/email-capture-card.tsx", import.meta.url),
@@ -169,6 +174,82 @@ test("treats an address it cannot read as no address at all", () => {
       `expected ${String(value)} to be unreadable`,
     )
   }
+})
+
+test("rejects a spelling that only looks like an address", () => {
+  // Every accepted value is a bucket key of its own, so a pattern loose enough
+  // to take these hands out a fresh budget per string.
+  for (const value of [
+    ":::",
+    "::::::::",
+    "a:b",
+    "cafe:",
+    ":cafe",
+    "1:2:3:4:5:6:7:8:9",
+    "2001:db8:::1",
+    "001.002.003.004",
+    "01.2.3.4",
+    "::ffff:001.002.003.004",
+    "fe80::1%eth0",
+  ]) {
+    assert.equal(
+      normalizeCaptureIpAddress(value),
+      null,
+      `expected ${value} to be rejected`,
+    )
+  }
+})
+
+test("gives one client one bucket across the spellings of its address", () => {
+  const equivalents = [
+    ["2001:db8::1", "2001:0db8::1", "2001:db8:0:0:0:0:0:1", "2001:0DB8:0000:0000:0000:0000:0000:0001"],
+    ["::1", "0:0:0:0:0:0:0:1", "0000:0000:0000:0000:0000:0000:0000:0001"],
+    ["203.0.113.7", "::ffff:203.0.113.7", "::ffff:cb00:7107", "0:0:0:0:0:ffff:203.0.113.7"],
+    ["::", "0:0:0:0:0:0:0:0"],
+  ]
+
+  for (const [canonical, ...spellings] of equivalents) {
+    const expected = normalizeCaptureIpAddress(canonical)
+    assert.ok(expected, `expected ${canonical} to be readable`)
+
+    for (const spelling of spellings) {
+      assert.equal(
+        normalizeCaptureIpAddress(spelling),
+        expected,
+        `expected ${spelling} to share the bucket of ${canonical}`,
+      )
+    }
+  }
+})
+
+test("folds every unreadable header into one shared bucket", () => {
+  const unreadable = [":::", "not-an-address", "203.0.113.999", "<script>", "a".repeat(40)]
+
+  for (const value of unreadable) {
+    assert.equal(
+      resolveCaptureIpAddress(value),
+      INVALID_CAPTURE_IP_BUCKET,
+      `expected ${value} to share the unreadable bucket`,
+    )
+  }
+
+  assert.equal(new Set(unreadable.map((value) => resolveCaptureIpAddress(value))).size, 1)
+  // The shared bucket is not a spelling of any address, so it cannot be reached
+  // by a client and taken from a real budget.
+  assert.equal(normalizeCaptureIpAddress(INVALID_CAPTURE_IP_BUCKET), null)
+})
+
+test("leaves a request with no address header unbucketed", () => {
+  assert.equal(resolveCaptureIpAddress(null, null), null)
+  assert.equal(resolveCaptureIpAddress("", "   "), null)
+  assert.equal(resolveCaptureIpAddress(undefined, ""), null)
+})
+
+test("reads the headers in order, and prefers an address to garbage", () => {
+  assert.equal(resolveCaptureIpAddress("203.0.113.7", "70.41.3.18"), "203.0.113.7")
+  assert.equal(resolveCaptureIpAddress(null, "70.41.3.18"), "70.41.3.18")
+  assert.equal(resolveCaptureIpAddress(":::", "70.41.3.18"), "70.41.3.18")
+  assert.equal(resolveCaptureIpAddress(":::", ":::"), INVALID_CAPTURE_IP_BUCKET)
 })
 
 test("buckets a submission into the fixed window it arrived in", () => {
