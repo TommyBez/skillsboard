@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import type { ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 
 export const guidePaths = {
   sharedMcpSkillLibrary: "/guides/shared-mcp-skill-library-for-teams",
@@ -56,7 +57,8 @@ export interface GuideDefinition {
   path: GuidePath
   contentType: "guide"
   topics: readonly string[]
-  relatedGuidePaths: readonly GuidePath[]
+  /** Curated related resources, rendered before topic matches. */
+  relatedGuidePaths: readonly (GuidePath | ClaudeSkillsPath)[]
   eyebrow: string
   title: string
   /** Full document <title>, including the brand suffix. */

@@ -1,3 +1,5 @@
+import { claudeSkills } from "@/lib/seo/claude-skills"
+import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
@@ -7,6 +9,9 @@ export const resourcePaths = {
 } as const
 
 export type ResourceContentType = "guide" | "article"
+
+/** Every path the resource hub, related links, and sitemap can address. */
+export type ResourcePath = GuidePath | ClaudeSkillsPath
 
 export interface ResourceIndexEntry {
   path: string
@@ -19,8 +24,11 @@ export interface ResourceIndexEntry {
   modifiedAt: string
 }
 
-/** Single registration point: guide modules feed the resources hub, related links, and sitemap. */
-export const resourceEntries = guides satisfies readonly ResourceIndexEntry[]
+/** Single registration point: content modules feed the resources hub, related links, and sitemap. */
+export const resourceEntries = [
+  ...guides,
+  claudeSkills,
+] satisfies readonly ResourceIndexEntry[]
 
 const resourceEntriesByPath = new Map(
   resourceEntries.map((entry) => [entry.path, entry]),
@@ -30,7 +38,7 @@ interface ResourceClusterDefinition {
   id: "cross-agent-sharing" | "team-governance-onboarding" | "ai-coding-practices"
   title: string
   description: string
-  paths: readonly GuidePath[]
+  paths: readonly ResourcePath[]
 }
 
 const resourceClusterDefinitions = [
@@ -40,6 +48,7 @@ const resourceClusterDefinitions = [
     description:
       "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
+      claudeSkillsPath,
       guidePaths.shareTeamSkills,
       guidePaths.manageCrossAgentSkills,
       guidePaths.sharedMcpSkillLibrary,
@@ -85,7 +94,7 @@ if (unclusteredEntries.length > 0) {
   )
 }
 
-function getResourceEntry(path: GuidePath): ResourceIndexEntry {
+function getResourceEntry(path: ResourcePath): ResourceIndexEntry {
   const entry = resourceEntriesByPath.get(path)
 
   if (!entry) {
