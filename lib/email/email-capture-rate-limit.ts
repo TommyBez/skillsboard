@@ -1,6 +1,6 @@
 import "server-only"
 
-import { and, count, eq, gte, lt } from "drizzle-orm"
+import { and, count, eq, gte, lt, sql } from "drizzle-orm"
 import { headers } from "next/headers"
 
 import { db } from "@/lib/db"
@@ -57,27 +57,46 @@ async function pruneExpiredCaptureAttempts(now: Date) {
  *
  * A request with no readable client address is always allowed: there is
  * nothing to bucket it under, and refusing it would turn a missing header into
- * a way to lock the form. The count and the insert are two statements rather
- * than one transaction, so a burst of simultaneous submissions can overshoot
- * the budget by the width of that gap. That is the intended trade: the budget
- * only has to hold at the scale a script works at.
+ * a way to lock the form.
+ *
+ * The count and the insert are one claim, so they run in one transaction
+ * behind an advisory lock on the bucket. Read committed would otherwise let a
+ * burst of simultaneous submissions from one client each count the same rows,
+ * each find room, and each insert: the budget would hold against a script
+ * posting in sequence and not against the same script posting in parallel,
+ * which is the easier of the two to write. The lock is keyed on the hashed
+ * address rather than taken on the table, so two clients never wait on each
+ * other, and `pg_advisory_xact_lock` is released by the commit rather than by
+ * a call this function has to remember to make on every path out.
  */
 export async function claimEmailCaptureAttempt(): Promise<boolean> {
   const ipHash = await readCaptureIpHash()
   if (!ipHash) return true
 
   const now = new Date()
-  const [used] = await db
-    .select({ attempts: count() })
-    .from(emailCaptureAttempt)
-    .where(and(
-      eq(emailCaptureAttempt.ipHash, ipHash),
-      gte(emailCaptureAttempt.createdAt, captureRateLimitWindowStart(now)),
-    ))
+  const claimed = await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${ipHash}, 0))`)
 
-  if (isOverCaptureRateLimit(used?.attempts ?? 0)) return false
+    const [used] = await tx
+      .select({ attempts: count() })
+      .from(emailCaptureAttempt)
+      .where(and(
+        eq(emailCaptureAttempt.ipHash, ipHash),
+        gte(emailCaptureAttempt.createdAt, captureRateLimitWindowStart(now)),
+      ))
 
-  await db.insert(emailCaptureAttempt).values({ ipHash })
+    if (isOverCaptureRateLimit(used?.attempts ?? 0)) return false
+
+    await tx.insert(emailCaptureAttempt).values({ ipHash })
+
+    return true
+  })
+
+  if (!claimed) return false
+
+  // Outside the claim: pruning is housekeeping for every bucket, and holding
+  // this one's lock across it would make unrelated clients queue behind a
+  // delete. A failure there must not roll back a claim that already succeeded.
   await pruneExpiredCaptureAttempts(now)
 
   return true

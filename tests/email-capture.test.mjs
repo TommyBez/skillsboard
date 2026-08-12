@@ -227,6 +227,35 @@ test("counts a client address only as a salted hash", () => {
   )
 })
 
+test("claims the budget atomically, behind a lock on the bucket", () => {
+  const transactionIndex = rateLimitSource.indexOf("db.transaction(")
+  // From the transaction on: the prose above the function names the lock too.
+  const lockIndex = rateLimitSource.indexOf("pg_advisory_xact_lock", transactionIndex)
+  const countIndex = rateLimitSource.indexOf("select({ attempts: count() })")
+  const insertIndex = rateLimitSource.indexOf("insert(emailCaptureAttempt)")
+  const pruneIndex = rateLimitSource.indexOf("await pruneExpiredCaptureAttempts(now)")
+
+  assert.ok(transactionIndex > -1, "the claim is one transaction")
+  assert.ok(transactionIndex < lockIndex, "the lock is taken inside the transaction")
+  assert.ok(
+    lockIndex < countIndex && countIndex < insertIndex && insertIndex < pruneIndex,
+    "the lock is held across the count and the insert, and released before the prune",
+  )
+  // Keyed on the bucket, so two clients never queue behind each other, and
+  // released by the commit rather than by a call on every path out.
+  assert.match(
+    rateLimitSource,
+    /pg_advisory_xact_lock\(hashtextextended\(\$\{ipHash\}, 0\)\)/,
+  )
+  // Both statements run on the transaction handle. One of them on `db` would
+  // sit outside the lock, and a burst could still count rows the others are
+  // about to write.
+  assert.ok(
+    !/\bdb\s*\n?\s*\.(select|insert)\(/.test(rateLimitSource),
+    "the count and the insert must not bypass the transaction",
+  )
+})
+
 test("spends the budget before writing, and answers the refusal like a success", () => {
   const claimIndex = actionSource.indexOf("claimEmailCaptureAttempt()")
   const insertIndex = actionSource.indexOf("insert(emailSubscriber)")
