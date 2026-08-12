@@ -31,6 +31,7 @@ export const INVALID_CAPTURE_IP_BUCKET = "invalid-client-address"
 const IPV6_GROUP_COUNT = 8
 
 const ipv4WithPortPattern = /^(\d{1,3}(?:\.\d{1,3}){3}):\d{1,5}$/
+const portSuffixPattern = /^:\d{1,5}$/
 
 /**
  * The groups of one half of a validated IPv6 address, with a trailing dotted
@@ -154,9 +155,16 @@ export function normalizeCaptureIpAddress(value: unknown): string | null {
   let candidate = (first ?? "").trim().toLowerCase()
 
   // An IPv6 literal can arrive bracketed, with or without a trailing port.
+  // Anything else after the bracket is a header a proxy did not write, so
+  // `[2001:db8::1]junk` takes the shared bucket rather than the private one
+  // belonging to the client it names.
   if (candidate.startsWith("[")) {
     const closing = candidate.indexOf("]")
     if (closing === -1) return null
+
+    const suffix = candidate.slice(closing + 1)
+    if (suffix.length > 0 && !portSuffixPattern.test(suffix)) return null
+
     candidate = candidate.slice(1, closing)
   }
 

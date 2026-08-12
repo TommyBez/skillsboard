@@ -165,6 +165,29 @@ test("gives the deprecated IPv4 compatible form one bucket in every spelling", (
   assert.notEqual(canonical, normalizeCaptureIpAddress("203.0.113.7"))
 })
 
+test("refuses trailing data after a bracketed literal", () => {
+  assert.equal(normalizeCaptureIpAddress("[2001:db8::1]"), "2001:db8::1")
+  assert.equal(normalizeCaptureIpAddress("[2001:db8::1]:41234"), "2001:db8::1")
+
+  // A bracket followed by anything but a port was not written by the proxy in
+  // front of the app, so it shares the unreadable bucket rather than holding a
+  // real client's private one.
+  for (const value of [
+    "[2001:db8::1]junk",
+    "[2001:db8::1]:",
+    "[2001:db8::1]:41234junk",
+    "[2001:db8::1]]",
+    "[203.0.113.7]junk",
+  ]) {
+    assert.equal(
+      normalizeCaptureIpAddress(value),
+      null,
+      `expected ${value} to be unreadable`,
+    )
+    assert.equal(resolveCaptureIpAddress(value), INVALID_CAPTURE_IP_BUCKET)
+  }
+})
+
 test("treats an address it cannot read as no address at all", () => {
   for (const value of [
     "",
