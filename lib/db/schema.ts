@@ -128,6 +128,48 @@ export const emailProactiveDelivery = pgTable("emailProactiveDelivery", {
   index("emailProactiveDelivery_email_sent_idx").on(table.emailHash, table.sentAt),
 ])
 
+/**
+ * Marketing list for Skills Board product updates, captured from the public
+ * pages. Separate from `emailPreference`, which records account-scoped consent
+ * for signed-in users: this table holds addresses left by visitors who have no
+ * account, and nothing is sent to them from here.
+ *
+ * Every new subscription writes a matching `emailConsentEvent` in the same
+ * transaction, with a null `userId`, the hashed address, the capturing page,
+ * and the notice that was on screen. A visitor capture therefore leaves the
+ * same audit trail as a signed-in consent change, and a duplicate submission
+ * writes neither row.
+ */
+export const emailSubscriber = pgTable("emailSubscriber", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** Lowercased and trimmed before insert; the unique key is the raw column. */
+  email: text("email").notNull(),
+  /** The page that captured the address: landing, guide_<slug>, alternatives_<slug>. */
+  source: text("source").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique("emailSubscriber_email_key").on(table.email),
+])
+
+/**
+ * The counter behind the email capture rate limit: one row per submission that
+ * was allowed to reach `emailSubscriber`, bucketed by client address.
+ *
+ * The address is stored only as a salted hash under its own derivation purpose
+ * (`hashCaptureIpAddress`), so the table can answer "how many from this client
+ * in this window" without holding a client address or anything that joins to
+ * an email. Nothing links a row to the address that was submitted, and rows
+ * are pruned a day after they are written.
+ */
+export const emailCaptureAttempt = pgTable("emailCaptureAttempt", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  /** HMAC of the client address; never the address itself. */
+  ipHash: text("ipHash").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("emailCaptureAttempt_ip_created_idx").on(table.ipHash, table.createdAt),
+])
+
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),

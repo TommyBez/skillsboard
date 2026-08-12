@@ -2,12 +2,13 @@ import Link from "next/link"
 import { ArrowRightIcon, CheckIcon, ExternalLinkIcon } from "lucide-react"
 
 import { CopyButton } from "@/components/copy-button"
+import { EmailCaptureCard } from "@/components/email-capture-card"
 import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { GuideEvidenceAssetSection } from "@/components/guides/guide-evidence-asset"
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildGuideSchema } from "@/lib/seo/guide-schema"
-import { estimateGuideWordCount, type GuideDefinition } from "@/lib/seo/guides"
+import { estimateGuideWordCount, slugFromPath, type GuideDefinition } from "@/lib/seo/guides"
 import type { GuideSource } from "@/lib/seo/guides/types"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
@@ -443,6 +444,11 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 <ResourceCta location="guide_closing" />
               </div>
             </section>
+
+            <EmailCaptureCard
+              className="mb-16"
+              source={`guide_${slugFromPath(guide.path)}`}
+            />
           </div>
         </div>
       </article>
