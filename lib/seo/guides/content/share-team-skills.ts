@@ -1,3 +1,4 @@
+import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { guidePaths, type GuideDefinition } from "@/lib/seo/guides/types"
 
 export const shareTeamSkillsGuide: GuideDefinition = {
@@ -5,9 +6,9 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   contentType: "guide",
   topics: ["team operations", "skill sharing", "governance", "mixed-agent teams"],
   relatedGuidePaths: [
+    claudeSkillsPath,
     guidePaths.manageCrossAgentSkills,
     guidePaths.chooseFirstTeamSkill,
-    guidePaths.onboardNewTeammateSkills,
   ],
   eyebrow: "Team skill operations",
   title: "How to share AI agent skills with your team",

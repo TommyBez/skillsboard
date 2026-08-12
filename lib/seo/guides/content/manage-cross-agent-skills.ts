@@ -1,3 +1,4 @@
+import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import {
   guideEvidencePaths,
   guidePaths,
@@ -10,9 +11,9 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   contentType: "guide",
   topics: ["team operations", "skill sharing", "compatibility", "mixed-agent teams"],
   relatedGuidePaths: [
+    claudeSkillsPath,
     guidePaths.shareTeamSkills,
     guidePaths.sharedMcpSkillLibrary,
-    guidePaths.onboardNewTeammateSkills,
   ],
   eyebrow: "Cross-agent operations",
   title: "Manage skills across Claude Code, Codex, and Cursor",
