@@ -147,9 +147,22 @@ test("reads the client address out of a forwarded header", () => {
 test("gives a mapped IPv4 client the bucket its plain address would get", () => {
   assert.equal(normalizeCaptureIpAddress("::ffff:203.0.113.7"), "203.0.113.7")
   assert.equal(normalizeCaptureIpAddress("::FFFF:203.0.113.7"), "203.0.113.7")
-  assert.equal(normalizeCaptureIpAddress("::203.0.113.7"), "203.0.113.7")
   assert.equal(normalizeCaptureIpAddress("[::ffff:203.0.113.7]:41234"), "203.0.113.7")
   assert.equal(normalizeCaptureIpAddress("::ffff:203.0.113.999"), null)
+})
+
+test("gives the deprecated IPv4 compatible form one bucket in every spelling", () => {
+  // `::203.0.113.7` and `::cb00:7107` are the same address written two ways, so
+  // reading the dotted one as the plain address it embeds handed the same
+  // client a second budget it could alternate into.
+  const canonical = normalizeCaptureIpAddress("::203.0.113.7")
+
+  assert.equal(canonical, "::cb00:7107")
+  assert.equal(normalizeCaptureIpAddress("::cb00:7107"), canonical)
+  assert.equal(normalizeCaptureIpAddress("0:0:0:0:0:0:203.0.113.7"), canonical)
+  // RFC 4291 retired this prefix and RFC 5952 keeps the dotted quad for the
+  // mapped one, so it stays IPv6 rather than landing in an IPv4 client's bucket.
+  assert.notEqual(canonical, normalizeCaptureIpAddress("203.0.113.7"))
 })
 
 test("treats an address it cannot read as no address at all", () => {
@@ -203,7 +216,7 @@ test("rejects a spelling that only looks like an address", () => {
 test("gives one client one bucket across the spellings of its address", () => {
   const equivalents = [
     ["2001:db8::1", "2001:0db8::1", "2001:db8:0:0:0:0:0:1", "2001:0DB8:0000:0000:0000:0000:0000:0001"],
-    ["::1", "0:0:0:0:0:0:0:1", "0000:0000:0000:0000:0000:0000:0000:0001"],
+    ["::1", "0:0:0:0:0:0:0:1", "0000:0000:0000:0000:0000:0000:0000:0001", "::0.0.0.1"],
     ["203.0.113.7", "::ffff:203.0.113.7", "::ffff:cb00:7107", "0:0:0:0:0:ffff:203.0.113.7"],
     ["::", "0:0:0:0:0:0:0:0"],
   ]

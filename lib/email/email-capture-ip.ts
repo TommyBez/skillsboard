@@ -112,20 +112,27 @@ function formatEmbeddedIpv4(groups: number[]): string {
   return `${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`
 }
 
-/** The one spelling of a validated IPv6 address, as a bucket key. */
+/**
+ * The one spelling of a validated IPv6 address, as a bucket key.
+ *
+ * Read from the eight groups the address expands to and never from how those
+ * groups were written, so one address is one key however it arrives.
+ */
 function canonicalizeIpv6(address: string): string {
   const groups = expandIpv6(address)
-  const prefixIsZero = groups.slice(0, 5).every((group) => group === 0)
 
-  // `::ffff:203.0.113.7`, and the deprecated `::203.0.113.7`: an IPv4 client
-  // wearing IPv6, which a dual stack proxy in front of the app can produce.
-  // Unwrapped rather than bucketed separately, so one client reaching the app
-  // under both spellings still spends one budget. The hex spelling of the same
-  // address, `::ffff:cb00:7107`, lands here too.
+  // `::ffff:203.0.113.7`: an IPv4 client wearing IPv6, which a dual stack proxy
+  // in front of the app can produce. Unwrapped rather than bucketed separately,
+  // so one client reaching the app under both spellings still spends one
+  // budget. The hex spelling of the same address, `::ffff:cb00:7107`, lands
+  // here too, and RFC 5952 section 5 asks for the dotted quad on this prefix.
+  //
+  // The deprecated `::203.0.113.7` does not: RFC 4291 retired that prefix, and
+  // unwrapping it would both split the client that writes `::cb00:7107` off
+  // into a second bucket and drop the rest into the bucket of an unrelated
+  // IPv4 client.
+  const prefixIsZero = groups.slice(0, 5).every((group) => group === 0)
   if (prefixIsZero && groups[5] === 0xffff) return formatEmbeddedIpv4(groups)
-  if (prefixIsZero && groups[5] === 0 && address.includes(".")) {
-    return formatEmbeddedIpv4(groups)
-  }
 
   return formatIpv6(groups)
 }
