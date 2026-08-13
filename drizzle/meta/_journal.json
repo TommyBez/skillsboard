@@ -50,6 +50,13 @@
       "when": 1786480508031,
       "tag": "0006_email_capture_attempts",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1786603258608,
+      "tag": "0007_drop-email-capture-attempt",
+      "breakpoints": true
     }
   ]
 }

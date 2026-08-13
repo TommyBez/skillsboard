@@ -151,25 +151,6 @@ export const emailSubscriber = pgTable("emailSubscriber", {
   unique("emailSubscriber_email_key").on(table.email),
 ])
 
-/**
- * The counter behind the email capture rate limit: one row per submission that
- * was allowed to reach `emailSubscriber`, bucketed by client address.
- *
- * The address is stored only as a salted hash under its own derivation purpose
- * (`hashCaptureIpAddress`), so the table can answer "how many from this client
- * in this window" without holding a client address or anything that joins to
- * an email. Nothing links a row to the address that was submitted, and rows
- * are pruned a day after they are written.
- */
-export const emailCaptureAttempt = pgTable("emailCaptureAttempt", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  /** HMAC of the client address; never the address itself. */
-  ipHash: text("ipHash").notNull(),
-  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [
-  index("emailCaptureAttempt_ip_created_idx").on(table.ipHash, table.createdAt),
-])
-
 export const session = pgTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
