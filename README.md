@@ -110,12 +110,16 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `RESEND_WEBHOOK_SECRET` | Yes for hosted email delivery | Verifies Resend bounce, complaint, suppression, and unsubscribe webhooks. |
 | `EMAIL_PRIVACY_SECRET` | Yes in Vercel Production | At least 32 random bytes encoded as base64 or hex; the dedicated root for email hashes and encrypted unsubscribe links. Local/self-hosted environments can fall back to a domain-separated key derived from `BETTER_AUTH_SECRET`. |
 | `EMAIL_PRIVACY_SECRET_PREVIOUS` | Only during key rotation | JSON array of retained base64/hex roots used for dual-hash suppression lookup and unsubscribe-token decryption. A prior root cannot be removed while retained records still depend on it. |
+| `UPSTASH_REDIS_REST_URL` | Yes outside development | REST endpoint of the Upstash Redis database that counts email capture submissions per client address. |
+| `UPSTASH_REDIS_REST_TOKEN` | Yes outside development | REST token for that database. With either value missing, the capture form keeps working and is not rate limited. |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
 Sign-in and sign-up use email one-time codes (no passwords). Outside development, configure both `RESEND_API_KEY` and a domain-verified `EMAIL_FROM`; the fallback Resend test sender only works for Resend’s own test recipients. In development, OTP emails are skipped and any 6-digit code works. Without Vercel OIDC, the Discover catalog degrades gracefully while team libraries continue to work.
 
 Hosted deployments run the collection-release retention cleanup once per day. Set `CRON_SECRET` in the Vercel Production environment before deploying; the endpoint fails closed when the secret is absent. Self-hosted deployments can invoke `/api/cron/collection-release-retention` from their scheduler with `Authorization: Bearer <CRON_SECRET>`.
+
+The public email capture form is rate limited to five submissions an hour per client address, counted in Upstash Redis under hashed addresses. Create the database from the Vercel Marketplace or `console.upstash.com`, in a region close to the deployment, and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Production and Preview. The form fails open: with no credentials, or with Redis unreachable, submissions are accepted uncounted and the gap is logged.
 
 Product communications are separate from transactional OTP and invitation email. Signup consent is optional and off by default, can be changed under **Settings → Email**, and is enforced with local consent history, suppression records, signed unsubscribe links, and verified Resend delivery webhooks. See [`docs/email-compliance.md`](./docs/email-compliance.md) before configuring a product broadcast.
 
