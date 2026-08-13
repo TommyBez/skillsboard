@@ -5,23 +5,22 @@ import { test } from "node:test"
 import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
 const {
-  EMAIL_CAPTURE_ATTEMPT_RETENTION_MS,
   EMAIL_CAPTURE_MAX_LENGTH,
   EMAIL_CAPTURE_NOTICE_FOOTNOTE,
   EMAIL_CAPTURE_NOTICE_TEXT,
   EMAIL_CAPTURE_PROMISE,
-  EMAIL_CAPTURE_PRUNE_SAMPLE_RATE,
-  EMAIL_CAPTURE_RATE_LIMIT_MAX,
-  EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS,
   UNKNOWN_EMAIL_CAPTURE_SOURCE,
-  captureAttemptRetentionCutoff,
-  captureRateLimitWindowStart,
   isHoneypotFilled,
-  isOverCaptureRateLimit,
   normalizeCaptureSource,
   normalizeCapturedEmail,
-  shouldPruneCaptureAttempts,
 } = await loadTsModule(new URL("../lib/email/email-capture.ts", import.meta.url))
+
+const {
+  EMAIL_CAPTURE_RATE_LIMIT_MAX,
+  EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
+  EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
+  claimCaptureBudget,
+} = await loadTsModule(new URL("../lib/email/email-capture-budget.ts", import.meta.url))
 
 const {
   CAPTURE_IP_MAX_LENGTH,
@@ -42,6 +41,29 @@ const rateLimitSource = await readFile(
   new URL("../lib/email/email-capture-rate-limit.ts", import.meta.url),
   "utf8",
 )
+
+/** The bucket key a client address is counted under, in the tests' spelling. */
+const hashAddress = (ipAddress) => `hash(${ipAddress})`
+
+/**
+ * A limiter with the same budget as the real one, counting in memory. Standing
+ * in for Upstash keeps the claim under test rather than the network under it.
+ */
+function countingLimiter(max = EMAIL_CAPTURE_RATE_LIMIT_MAX) {
+  const spent = new Map()
+  const asked = []
+
+  return {
+    asked,
+    async limit(identifier) {
+      asked.push(identifier)
+      const used = spent.get(identifier) ?? 0
+      spent.set(identifier, used + 1)
+
+      return { success: used < max }
+    },
+  }
+}
 
 test("trims and lowercases a submitted address", () => {
   assert.equal(normalizeCapturedEmail("  Person@Example.COM  "), "person@example.com")
@@ -288,89 +310,123 @@ test("reads the headers in order, and prefers an address to garbage", () => {
   assert.equal(resolveCaptureIpAddress(":::", ":::"), INVALID_CAPTURE_IP_BUCKET)
 })
 
-test("buckets a submission into the fixed window it arrived in", () => {
-  const windowMs = EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS
-  const start = captureRateLimitWindowStart(new Date("2026-08-11T13:37:42.500Z"))
-
-  assert.equal(start.toISOString(), "2026-08-11T13:00:00.000Z")
-  assert.equal(start.getTime() % windowMs, 0)
-  assert.equal(
-    captureRateLimitWindowStart(new Date(start.getTime() + windowMs - 1)).getTime(),
-    start.getTime(),
-  )
-  assert.equal(
-    captureRateLimitWindowStart(new Date(start.getTime() + windowMs)).getTime(),
-    start.getTime() + windowMs,
-  )
-})
-
-test("spends the budget and refuses the submission after it", () => {
-  for (let attempts = 0; attempts < EMAIL_CAPTURE_RATE_LIMIT_MAX; attempts += 1) {
-    assert.equal(isOverCaptureRateLimit(attempts), false)
-  }
-
-  assert.equal(isOverCaptureRateLimit(EMAIL_CAPTURE_RATE_LIMIT_MAX), true)
-  assert.equal(isOverCaptureRateLimit(EMAIL_CAPTURE_RATE_LIMIT_MAX + 1), true)
-})
-
-test("keeps attempt rows for a day, well past any live window", () => {
-  const now = new Date("2026-08-11T13:37:42.500Z")
-  const cutoff = captureAttemptRetentionCutoff(now)
-
-  assert.equal(now.getTime() - cutoff.getTime(), EMAIL_CAPTURE_ATTEMPT_RETENTION_MS)
-  assert.ok(
-    EMAIL_CAPTURE_ATTEMPT_RETENTION_MS > EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS,
-    "pruning must never reach a window that is still being counted",
-  )
-  assert.ok(cutoff < captureRateLimitWindowStart(now))
-})
-
-test("prunes on a small share of submissions rather than all of them", () => {
-  assert.ok(EMAIL_CAPTURE_PRUNE_SAMPLE_RATE > 0 && EMAIL_CAPTURE_PRUNE_SAMPLE_RATE < 1)
-  assert.equal(shouldPruneCaptureAttempts(0), true)
-  assert.equal(shouldPruneCaptureAttempts(EMAIL_CAPTURE_PRUNE_SAMPLE_RATE), false)
-  assert.equal(shouldPruneCaptureAttempts(0.99), false)
-})
-
-test("counts a client address only as a salted hash", () => {
-  assert.match(rateLimitSource, /hashCaptureIpAddress\(ipAddress\)/)
-  assert.match(rateLimitSource, /x-forwarded-for/)
-  assert.match(rateLimitSource, /x-real-ip/)
-  // A request with no readable address is allowed rather than refused.
-  assert.match(rateLimitSource, /if \(!ipHash\) return true/)
-  assert.ok(
-    !/values\(\{\s*ipAddress/.test(rateLimitSource),
-    "the attempt row must never hold a client address",
-  )
-})
-
-test("claims the budget atomically, behind a lock on the bucket", () => {
-  const transactionIndex = rateLimitSource.indexOf("db.transaction(")
-  // From the transaction on: the prose above the function names the lock too.
-  const lockIndex = rateLimitSource.indexOf("pg_advisory_xact_lock", transactionIndex)
-  const countIndex = rateLimitSource.indexOf("select({ attempts: count() })")
-  const insertIndex = rateLimitSource.indexOf("insert(emailCaptureAttempt)")
-  const pruneIndex = rateLimitSource.indexOf("await pruneExpiredCaptureAttempts(now)")
-
-  assert.ok(transactionIndex > -1, "the claim is one transaction")
-  assert.ok(transactionIndex < lockIndex, "the lock is taken inside the transaction")
-  assert.ok(
-    lockIndex < countIndex && countIndex < insertIndex && insertIndex < pruneIndex,
-    "the lock is held across the count and the insert, and released before the prune",
-  )
-  // Keyed on the bucket, so two clients never queue behind each other, and
-  // released by the commit rather than by a call on every path out.
+test("counts five submissions an hour, under one readable key prefix", () => {
+  assert.equal(EMAIL_CAPTURE_RATE_LIMIT_MAX, 5)
+  assert.equal(EMAIL_CAPTURE_RATE_LIMIT_WINDOW, "1 h")
+  assert.equal(EMAIL_CAPTURE_RATE_LIMIT_PREFIX, "email-capture")
+  // The limiter is built from the constants rather than from a second copy of
+  // them, so the budget the tests describe is the budget Redis enforces.
   assert.match(
     rateLimitSource,
-    /pg_advisory_xact_lock\(hashtextextended\(\$\{ipHash\}, 0\)\)/,
+    /Ratelimit\.slidingWindow\(\s*EMAIL_CAPTURE_RATE_LIMIT_MAX,\s*EMAIL_CAPTURE_RATE_LIMIT_WINDOW,\s*\)/,
   )
-  // Both statements run on the transaction handle. One of them on `db` would
-  // sit outside the lock, and a burst could still count rows the others are
-  // about to write.
-  assert.ok(
-    !/\bdb\s*\n?\s*\.(select|insert)\(/.test(rateLimitSource),
-    "the count and the insert must not bypass the transaction",
+  assert.match(rateLimitSource, /prefix: EMAIL_CAPTURE_RATE_LIMIT_PREFIX/)
+})
+
+test("spends the budget and refuses the submission after it", async () => {
+  const limiter = countingLimiter()
+  const claim = (ipAddress) => claimCaptureBudget({ hashAddress, ipAddress, limiter })
+
+  for (let attempt = 0; attempt < EMAIL_CAPTURE_RATE_LIMIT_MAX; attempt += 1) {
+    assert.equal(await claim("203.0.113.7"), true)
+  }
+
+  assert.equal(await claim("203.0.113.7"), false)
+  // One client out of budget says nothing about the next one.
+  assert.equal(await claim("198.51.100.9"), true)
+})
+
+test("counts a client address only as a salted hash", async () => {
+  const limiter = countingLimiter()
+
+  await claimCaptureBudget({ hashAddress, ipAddress: "203.0.113.7", limiter })
+  await claimCaptureBudget({ hashAddress, ipAddress: INVALID_CAPTURE_IP_BUCKET, limiter })
+
+  // The identifier reaches someone else's database, so it is the hash and
+  // never the address: the shared unreadable bucket is hashed like any other.
+  assert.deepEqual(limiter.asked, [
+    "hash(203.0.113.7)",
+    `hash(${INVALID_CAPTURE_IP_BUCKET})`,
+  ])
+  // And it is the same hash the old counter used, over the same two headers.
+  assert.match(rateLimitSource, /hashAddress: hashCaptureIpAddress/)
+  assert.match(rateLimitSource, /x-forwarded-for/)
+  assert.match(rateLimitSource, /x-real-ip/)
+})
+
+test("leaves a request with no client address unbucketed", async () => {
+  const limiter = countingLimiter()
+
+  assert.equal(await claimCaptureBudget({ hashAddress, ipAddress: null, limiter }), true)
+  // Nothing to bucket it under, so nothing is spent and nothing is asked.
+  assert.deepEqual(limiter.asked, [])
+})
+
+test("lets a submission through when the environment has no counter", async () => {
+  let hashed = 0
+  const allowed = await claimCaptureBudget({
+    hashAddress: (ipAddress) => {
+      hashed += 1
+
+      return hashAddress(ipAddress)
+    },
+    ipAddress: "203.0.113.7",
+    limiter: null,
+  })
+
+  assert.equal(allowed, true)
+  assert.equal(hashed, 0)
+  // Missing credentials are a real gap, so the wiring names both of them, and
+  // the memo makes it one line per process rather than one per visitor.
+  assert.match(rateLimitSource, /console\.warn\(/)
+  assert.match(rateLimitSource, /UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN/)
+  assert.match(
+    rateLimitSource,
+    /if \(captureRateLimiter !== undefined\) return captureRateLimiter/,
   )
+})
+
+test("lets a submission through when the counter cannot be reached", async () => {
+  const logged = []
+  const originalError = console.error
+  console.error = (...entry) => logged.push(entry)
+
+  try {
+    const allowed = await claimCaptureBudget({
+      hashAddress,
+      ipAddress: "203.0.113.7",
+      limiter: {
+        async limit() {
+          throw new Error("fetch failed")
+        },
+      },
+    })
+
+    assert.equal(allowed, true)
+  } finally {
+    console.error = originalError
+  }
+
+  // Redis being unreachable is an outage of the counter and not of the form,
+  // and the address never reaches the log that records it.
+  assert.equal(logged.length, 1)
+  assert.deepEqual(logged[0][1], { errorName: "Error" })
+  assert.ok(!JSON.stringify(logged).includes("203.0.113.7"))
+})
+
+test("keeps the counter in Upstash, and out of the database", () => {
+  for (const gone of ["@/lib/db", "emailCaptureAttempt", "pg_advisory_xact_lock", "db.transaction("]) {
+    assert.ok(
+      !rateLimitSource.includes(gone),
+      `the rate limit must not reach for ${gone}`,
+    )
+  }
+
+  // Built once per process: the instance carries the cache that refuses a
+  // client already over budget without paying for a round trip, and a fresh
+  // one per invocation would throw that away.
+  assert.match(rateLimitSource, /ephemeralCache: new Map\(\)/)
+  assert.match(rateLimitSource, /timeout: CAPTURE_RATE_LIMIT_TIMEOUT_MS/)
 })
 
 test("spends the budget before writing, and answers the refusal like a success", () => {

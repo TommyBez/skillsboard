@@ -1,6 +1,6 @@
 /**
- * Marketing email capture: normalization, validation, and the rate limit
- * budget.
+ * Marketing email capture: what the form accepts, and what the card says while
+ * it accepts it.
  *
  * Deliberately dependency-free so the rules can be exercised by the unit
  * suite, which loads modules through `stripTypeScriptTypes` and cannot resolve
@@ -8,8 +8,10 @@
  * input, so each helper returns a normalized value or rejects it rather than
  * trusting the caller.
  *
- * The client address a submission is bucketed under lives in
- * `email-capture-ip.ts`, which needs `node:net` and stays off the client.
+ * Two neighbours hold the rest. The client address a submission is bucketed
+ * under lives in `email-capture-ip.ts`, which needs `node:net` and stays off
+ * the client; how much that client may spend lives in
+ * `email-capture-budget.ts`.
  */
 
 /** RFC 5321 caps an address at 254 characters; anything longer is not one. */
@@ -69,36 +71,6 @@ export const EMAIL_CAPTURE_NOTICE_FOOTNOTE =
 export const EMAIL_CAPTURE_NOTICE_TEXT =
   `${EMAIL_CAPTURE_PROMISE} ${EMAIL_CAPTURE_NOTICE_FOOTNOTE}`
 
-/**
- * The capture budget for one client address.
- *
- * The action is a public server action: anyone can post to it directly, with
- * a fresh address every time, and fill the table. Five submissions an hour is
- * far above what a person does (the card is a single field and one visit
- * produces one address) and far below what filling a table needs.
- *
- * The window is fixed rather than sliding, so the check is one indexed count
- * instead of a moving range scan. The cost of that choice is a burst of up to
- * twice the budget across a window boundary, which is still a rounding error
- * against the abuse this exists to stop.
- */
-export const EMAIL_CAPTURE_RATE_LIMIT_MAX = 5
-export const EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000
-
-/**
- * Attempt rows exist only to answer "how many in this window". A day is long
- * enough that pruning can never race a live window, and short enough that the
- * table stays a counter rather than a log of who submitted when.
- */
-export const EMAIL_CAPTURE_ATTEMPT_RETENTION_MS = 24 * 60 * 60 * 1000
-
-/**
- * Pruning is opportunistic: a small share of accepted submissions pays for the
- * delete, so expired rows leave without a scheduled job and without adding a
- * second query to every submission.
- */
-export const EMAIL_CAPTURE_PRUNE_SAMPLE_RATE = 0.02
-
 /** Lowercased, trimmed address, or `null` when the input cannot be one. */
 export function normalizeCapturedEmail(value: unknown): string | null {
   if (typeof value !== "string") return null
@@ -121,27 +93,6 @@ export function normalizeCaptureSource(value: unknown): StoredEmailCaptureSource
   return sourcePattern.test(normalized)
     ? (normalized as EmailCaptureSource)
     : UNKNOWN_EMAIL_CAPTURE_SOURCE
-}
-
-/** The start of the fixed window `now` falls in. */
-export function captureRateLimitWindowStart(now: Date): Date {
-  const windowMs = EMAIL_CAPTURE_RATE_LIMIT_WINDOW_MS
-  return new Date(Math.floor(now.getTime() / windowMs) * windowMs)
-}
-
-/** Attempt rows older than this are past their purpose and can go. */
-export function captureAttemptRetentionCutoff(now: Date): Date {
-  return new Date(now.getTime() - EMAIL_CAPTURE_ATTEMPT_RETENTION_MS)
-}
-
-/** Whether a submission arriving after `attempts` in the window is over budget. */
-export function isOverCaptureRateLimit(attempts: number): boolean {
-  return attempts >= EMAIL_CAPTURE_RATE_LIMIT_MAX
-}
-
-/** Whether this submission is the one that pays for the prune. */
-export function shouldPruneCaptureAttempts(sample: number): boolean {
-  return sample < EMAIL_CAPTURE_PRUNE_SAMPLE_RATE
 }
 
 /**

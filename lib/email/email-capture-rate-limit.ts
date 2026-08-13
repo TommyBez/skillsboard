@@ -1,21 +1,80 @@
 import "server-only"
 
-import { and, count, eq, gte, lt, sql } from "drizzle-orm"
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 import { headers } from "next/headers"
 
-import { db } from "@/lib/db"
-import { emailCaptureAttempt } from "@/lib/db/schema"
 import {
-  captureAttemptRetentionCutoff,
-  captureRateLimitWindowStart,
-  isOverCaptureRateLimit,
-  shouldPruneCaptureAttempts,
-} from "@/lib/email/email-capture"
+  type CaptureRateLimiter,
+  claimCaptureBudget,
+  EMAIL_CAPTURE_RATE_LIMIT_MAX,
+  EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
+  EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
+} from "@/lib/email/email-capture-budget"
 import { resolveCaptureIpAddress } from "@/lib/email/email-capture-ip"
 import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
 
 /**
- * The hashed client address for this request, or `null` when the request does
+ * How long a submission waits on Redis before it is let through.
+ *
+ * Well under the five seconds `Ratelimit` allows by default: the visitor is
+ * holding a form open, and a counter that has stopped answering must not be
+ * what they wait on.
+ */
+const CAPTURE_RATE_LIMIT_TIMEOUT_MS = 1_000
+
+/**
+ * `undefined` until the first submission this process handles: `null` once it
+ * is known there are no credentials to build a limiter from.
+ */
+let captureRateLimiter: CaptureRateLimiter | null | undefined
+
+/**
+ * The limiter every submission is counted against, built once per process.
+ *
+ * Serverless is why it is memoized rather than constructed per request: the
+ * instance carries the cache that lets a client already over its budget be
+ * refused without a round trip, and a fresh instance per invocation would
+ * throw that away and pay Redis for every submission.
+ *
+ * A missing credential is not fatal. It is announced once, on the first
+ * submission, and then the memo answers `null` without saying it again, so the
+ * warning names a real gap in the logs instead of one line per visitor.
+ */
+function getCaptureRateLimiter(): CaptureRateLimiter | null {
+  if (captureRateLimiter !== undefined) return captureRateLimiter
+
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim()
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+
+  if (!url || !token) {
+    console.warn(
+      "Email capture is not rate limited: set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN",
+    )
+    captureRateLimiter = null
+
+    return captureRateLimiter
+  }
+
+  captureRateLimiter = new Ratelimit({
+    // Analytics writes a second key per request to fill a dashboard nobody
+    // here reads. The budget is the whole point of this limiter.
+    analytics: false,
+    ephemeralCache: new Map(),
+    limiter: Ratelimit.slidingWindow(
+      EMAIL_CAPTURE_RATE_LIMIT_MAX,
+      EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
+    ),
+    prefix: EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
+    redis: new Redis({ token, url }),
+    timeout: CAPTURE_RATE_LIMIT_TIMEOUT_MS,
+  })
+
+  return captureRateLimiter
+}
+
+/**
+ * The client address this request is bucketed under, or `null` when it does
  * not carry one.
  *
  * On Vercel the client address arrives in `x-forwarded-for`, with `x-real-ip`
@@ -28,82 +87,34 @@ import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
  * A header that is absent or empty carries no address at all: it is left
  * unbucketed, and the submission goes through.
  */
-async function readCaptureIpHash(): Promise<string | null> {
+async function readCaptureIpAddress(): Promise<string | null> {
   const requestHeaders = await headers()
-  const ipAddress = resolveCaptureIpAddress(
+
+  return resolveCaptureIpAddress(
     requestHeaders.get("x-forwarded-for"),
     requestHeaders.get("x-real-ip"),
   )
-
-  return ipAddress ? hashCaptureIpAddress(ipAddress) : null
-}
-
-/**
- * Expired rows leave on a small share of accepted submissions. A failure here
- * costs disk and nothing else, so it never reaches the visitor: the submission
- * it happens to ride along with still gets stored.
- */
-async function pruneExpiredCaptureAttempts(now: Date) {
-  if (!shouldPruneCaptureAttempts(Math.random())) return
-
-  try {
-    await db
-      .delete(emailCaptureAttempt)
-      .where(lt(emailCaptureAttempt.createdAt, captureAttemptRetentionCutoff(now)))
-  } catch (error) {
-    console.error("Unable to prune email capture attempts", {
-      errorName: error instanceof Error ? error.name : "UnknownError",
-    })
-  }
 }
 
 /**
  * Takes one submission out of this client's budget, and reports whether there
  * was one to take.
  *
- * A request with no readable client address is always allowed: there is
- * nothing to bucket it under, and refusing it would turn a missing header into
- * a way to lock the form.
+ * The counting lives in Upstash rather than in a table of our own: a sliding
+ * window in Redis is one round trip on a store built for it, where the same
+ * budget in Postgres was a row per submission, an advisory lock to make the
+ * count and the insert one claim, and a pruning job to keep the rows from
+ * outliving their purpose.
  *
- * The count and the insert are one claim, so they run in one transaction
- * behind an advisory lock on the bucket. Read committed would otherwise let a
- * burst of simultaneous submissions from one client each count the same rows,
- * each find room, and each insert: the budget would hold against a script
- * posting in sequence and not against the same script posting in parallel,
- * which is the easier of the two to write. The lock is keyed on the hashed
- * address rather than taken on the table, so two clients never wait on each
- * other, and `pg_advisory_xact_lock` is released by the commit rather than by
- * a call this function has to remember to make on every path out.
+ * The limiter is a parameter so a test can hand in one that counts in memory.
+ * Callers in the app take the default, which is the process-wide Upstash one.
  */
-export async function claimEmailCaptureAttempt(): Promise<boolean> {
-  const ipHash = await readCaptureIpHash()
-  if (!ipHash) return true
-
-  const now = new Date()
-  const claimed = await db.transaction(async (tx) => {
-    await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${ipHash}, 0))`)
-
-    const [used] = await tx
-      .select({ attempts: count() })
-      .from(emailCaptureAttempt)
-      .where(and(
-        eq(emailCaptureAttempt.ipHash, ipHash),
-        gte(emailCaptureAttempt.createdAt, captureRateLimitWindowStart(now)),
-      ))
-
-    if (isOverCaptureRateLimit(used?.attempts ?? 0)) return false
-
-    await tx.insert(emailCaptureAttempt).values({ ipHash })
-
-    return true
+export async function claimEmailCaptureAttempt(
+  limiter: CaptureRateLimiter | null = getCaptureRateLimiter(),
+): Promise<boolean> {
+  return claimCaptureBudget({
+    hashAddress: hashCaptureIpAddress,
+    ipAddress: await readCaptureIpAddress(),
+    limiter,
   })
-
-  if (!claimed) return false
-
-  // Outside the claim: pruning is housekeeping for every bucket, and holding
-  // this one's lock across it would make unrelated clients queue behind a
-  // delete. A failure there must not roll back a claim that already succeeded.
-  await pruneExpiredCaptureAttempts(now)
-
-  return true
 }
