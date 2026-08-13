@@ -10,6 +10,8 @@ import {
   EMAIL_CAPTURE_RATE_LIMIT_MAX,
   EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
   EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
+  MISSING_CAPTURE_CREDENTIALS_WARNING,
+  resolveCaptureRedisCredentials,
 } from "@/lib/email/email-capture-budget"
 import { resolveCaptureIpAddress } from "@/lib/email/email-capture-ip"
 import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
@@ -40,17 +42,18 @@ let captureRateLimiter: CaptureRateLimiter | null | undefined
  * A missing credential is not fatal. It is announced once, on the first
  * submission, and then the memo answers `null` without saying it again, so the
  * warning names a real gap in the logs instead of one line per visitor.
+ *
+ * Which variables the credentials are read from lives in the budget module,
+ * because two spellings reach this: the pair the Vercel integration writes and
+ * the pair a self-hosted deployment sets by hand.
  */
 function getCaptureRateLimiter(): CaptureRateLimiter | null {
   if (captureRateLimiter !== undefined) return captureRateLimiter
 
-  const url = process.env.UPSTASH_REDIS_REST_URL?.trim()
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+  const credentials = resolveCaptureRedisCredentials(process.env)
 
-  if (!url || !token) {
-    console.warn(
-      "Email capture is not rate limited: set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN",
-    )
+  if (!credentials) {
+    console.warn(MISSING_CAPTURE_CREDENTIALS_WARNING)
     captureRateLimiter = null
 
     return captureRateLimiter
@@ -66,7 +69,7 @@ function getCaptureRateLimiter(): CaptureRateLimiter | null {
       EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
     ),
     prefix: EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
-    redis: new Redis({ token, url }),
+    redis: new Redis(credentials),
     timeout: CAPTURE_RATE_LIMIT_TIMEOUT_MS,
   })
 

@@ -5,10 +5,14 @@
  * The counting happens in Upstash Redis, which takes a network call and a REST
  * token, so the limiter and the hash are handed in rather than reached for
  * here: this module is the decision and `email-capture-rate-limit.ts` is the
- * wiring. Keeping the two apart also keeps the decision loadable by the unit
- * suite, which reads modules through `stripTypeScriptTypes` and cannot resolve
- * a bare specifier, so every path below is exercised by a test rather than by
- * a regex over its own source.
+ * wiring. Which names the credentials arrive under is a decision too, and it
+ * is taken here as a function over a plain environment record, leaving
+ * `process.env` and the client it builds to the wiring.
+ *
+ * Keeping the two apart also keeps the decision loadable by the unit suite,
+ * which reads modules through `stripTypeScriptTypes` and cannot resolve a bare
+ * specifier, so every path below is exercised by a test rather than by a regex
+ * over its own source.
  */
 
 /**
@@ -33,6 +37,72 @@ export const EMAIL_CAPTURE_RATE_LIMIT_WINDOW = "1 h"
  * from colliding with a second limiter that ends up sharing the database.
  */
 export const EMAIL_CAPTURE_RATE_LIMIT_PREFIX = "email-capture"
+
+/**
+ * The two spellings the Redis REST credentials arrive under, in the order they
+ * are tried.
+ *
+ * The hosted database is provisioned through the Vercel Marketplace, and that
+ * integration writes the pair into the project as `KV_REST_API_URL` and
+ * `KV_REST_API_TOKEN`, the names the older Vercel KV product used. Nothing
+ * fills in the canonical Upstash spelling there, so it is the fallback: a
+ * self-hosted deployment pointing at a database created in the Upstash console
+ * has no integration writing anything and sets those two by hand.
+ *
+ * A pair is taken whole. Reading each half on its own would let the URL of one
+ * database meet the token of another, which authenticates against neither.
+ *
+ * The read-only token the integration also writes is not on the list: a claim
+ * increments a counter, and that is a write.
+ */
+export const CAPTURE_REDIS_CREDENTIAL_NAMES = [
+  { token: "KV_REST_API_TOKEN", url: "KV_REST_API_URL" },
+  { token: "UPSTASH_REDIS_REST_TOKEN", url: "UPSTASH_REDIS_REST_URL" },
+] as const
+
+const [VERCEL_CREDENTIAL_NAMES, UPSTASH_CREDENTIAL_NAMES] = CAPTURE_REDIS_CREDENTIAL_NAMES
+
+/**
+ * What the wiring logs, once per process, when neither pair is set.
+ *
+ * It is built from the names above so the two cannot drift apart, and it names
+ * both pairs because which one a reader should set depends on where they are:
+ * on Vercel the integration writes the first, and everywhere else the second
+ * is what an Upstash database of your own is reached with.
+ */
+export const MISSING_CAPTURE_CREDENTIALS_WARNING =
+  "Email capture is not rate limited: set " +
+  `${VERCEL_CREDENTIAL_NAMES.url} and ${VERCEL_CREDENTIAL_NAMES.token} ` +
+  "(written by the Vercel Upstash integration), or " +
+  `${UPSTASH_CREDENTIAL_NAMES.url} and ${UPSTASH_CREDENTIAL_NAMES.token} ` +
+  "for an Upstash database configured by hand"
+
+export interface CaptureRedisCredentials {
+  token: string
+  url: string
+}
+
+/**
+ * The first credential pair this environment has both halves of, or `null`
+ * when it has neither.
+ *
+ * Blank counts as absent. A variable that is defined and empty is ordinary in
+ * a Vercel project and in a shell, and an empty token would build a client
+ * that fails every call at runtime instead of a limiter that is honestly
+ * missing here.
+ */
+export function resolveCaptureRedisCredentials(
+  env: Record<string, string | undefined>,
+): CaptureRedisCredentials | null {
+  for (const names of CAPTURE_REDIS_CREDENTIAL_NAMES) {
+    const url = env[names.url]?.trim()
+    const token = env[names.token]?.trim()
+
+    if (url && token) return { token, url }
+  }
+
+  return null
+}
 
 /**
  * As much of a rate limiter as a claim uses.

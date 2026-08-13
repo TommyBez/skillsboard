@@ -19,7 +19,9 @@ const {
   EMAIL_CAPTURE_RATE_LIMIT_MAX,
   EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
   EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
+  MISSING_CAPTURE_CREDENTIALS_WARNING,
   claimCaptureBudget,
+  resolveCaptureRedisCredentials,
 } = await loadTsModule(new URL("../lib/email/email-capture-budget.ts", import.meta.url))
 
 const {
@@ -39,6 +41,10 @@ const actionSource = await readFile(
 )
 const rateLimitSource = await readFile(
   new URL("../lib/email/email-capture-rate-limit.ts", import.meta.url),
+  "utf8",
+)
+const budgetSource = await readFile(
+  new URL("../lib/email/email-capture-budget.ts", import.meta.url),
   "utf8",
 )
 
@@ -376,14 +382,90 @@ test("lets a submission through when the environment has no counter", async () =
 
   assert.equal(allowed, true)
   assert.equal(hashed, 0)
-  // Missing credentials are a real gap, so the wiring names both of them, and
-  // the memo makes it one line per process rather than one per visitor.
-  assert.match(rateLimitSource, /console\.warn\(/)
-  assert.match(rateLimitSource, /UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN/)
+  // Missing credentials are a real gap, so the wiring says so, and the memo
+  // makes it one line per process rather than one per visitor.
+  assert.match(rateLimitSource, /console\.warn\(MISSING_CAPTURE_CREDENTIALS_WARNING\)/)
   assert.match(
     rateLimitSource,
     /if \(captureRateLimiter !== undefined\) return captureRateLimiter/,
   )
+})
+
+test("names both credential pairs in the warning about the missing counter", () => {
+  // Whoever reads that line is either on Vercel, where the integration writes
+  // the KV names, or self-hosting an Upstash database under the canonical
+  // ones, and the warning has to be actionable in both places.
+  for (const name of [
+    "KV_REST_API_URL",
+    "KV_REST_API_TOKEN",
+    "UPSTASH_REDIS_REST_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+  ]) {
+    assert.ok(
+      MISSING_CAPTURE_CREDENTIALS_WARNING.includes(name),
+      `the warning must name ${name}`,
+    )
+  }
+})
+
+test("reads the credentials the Vercel integration writes, before the Upstash names", () => {
+  // The Marketplace integration provisions the database and writes the pair
+  // under the names the older Vercel KV product used, so those come first.
+  assert.deepEqual(
+    resolveCaptureRedisCredentials({
+      KV_REST_API_TOKEN: "vercel-token",
+      KV_REST_API_URL: "https://vercel.upstash.io",
+      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
+      UPSTASH_REDIS_REST_URL: "https://own.upstash.io",
+    }),
+    { token: "vercel-token", url: "https://vercel.upstash.io" },
+  )
+})
+
+test("falls back to the Upstash names when nothing wrote the Vercel pair", () => {
+  // A self-hosted deployment against a database created in the Upstash console
+  // has no integration filling anything in, and sets these two by hand.
+  assert.deepEqual(
+    resolveCaptureRedisCredentials({
+      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
+      UPSTASH_REDIS_REST_URL: "https://own.upstash.io",
+    }),
+    { token: "upstash-token", url: "https://own.upstash.io" },
+  )
+})
+
+test("takes a credential pair whole, and treats blank as absent", () => {
+  // Half of one pair and half of the other is the URL of one database meeting
+  // the token of another, which authenticates against neither.
+  assert.equal(
+    resolveCaptureRedisCredentials({
+      KV_REST_API_URL: "https://vercel.upstash.io",
+      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
+    }),
+    null,
+  )
+  // A variable that is defined and empty is ordinary in a Vercel project.
+  assert.equal(
+    resolveCaptureRedisCredentials({
+      KV_REST_API_TOKEN: "   ",
+      KV_REST_API_URL: "https://vercel.upstash.io",
+    }),
+    null,
+  )
+  assert.equal(resolveCaptureRedisCredentials({}), null)
+})
+
+test("never counts with the read-only token the integration also writes", () => {
+  // A claim increments a counter, and that is a write.
+  assert.equal(
+    resolveCaptureRedisCredentials({
+      KV_REST_API_READ_ONLY_TOKEN: "read-only-token",
+      KV_REST_API_URL: "https://vercel.upstash.io",
+    }),
+    null,
+  )
+  assert.ok(!budgetSource.includes("READ_ONLY"))
+  assert.ok(!rateLimitSource.includes("READ_ONLY"))
 })
 
 test("lets a submission through when the counter cannot be reached", async () => {
