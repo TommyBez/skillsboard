@@ -2,6 +2,7 @@ import "server-only"
 
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
+import { ipAddress } from "@vercel/functions"
 import { headers } from "next/headers"
 
 import {
@@ -12,7 +13,6 @@ import {
   EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
   MISSING_CAPTURE_CREDENTIALS_WARNING,
 } from "@/lib/email/email-capture-budget"
-import { resolveCaptureIpAddress } from "@/lib/email/email-capture-ip"
 import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
 
 /**
@@ -89,23 +89,29 @@ function getCaptureRateLimiter(): CaptureRateLimiter | null {
  * The client address this request is bucketed under, or `null` when it does
  * not carry one.
  *
- * On Vercel the client address arrives in `x-forwarded-for`, with `x-real-ip`
- * as the second spelling of the same value. Neither is authenticated, so this
- * is a budget rather than a boundary: it stops an unattended script from
- * filling the table, not a determined attacker with addresses to spend.
+ * Whatever the platform put on the request, taken as it comes. On Vercel that
+ * is the proxy's own reading of the connection rather than anything the client
+ * said about itself: "we currently overwrite the X-Forwarded-For header and do
+ * not forward external IPs. This restriction is in place to prevent IP
+ * spoofing" (https://vercel.com/docs/headers/request-headers), and `x-real-ip`,
+ * which `ipAddress` reads, is that same value under a second name. One request
+ * carries one address, in one spelling, and the client does not choose it.
  *
- * A header that is present and unreadable is bucketed too, in the one bucket
- * every unreadable value shares, so it cannot buy a fresh budget per spelling.
- * A header that is absent or empty carries no address at all: it is left
- * unbucketed, and the submission goes through.
+ * So nothing is validated or canonicalized here, because there is nothing left
+ * for either to defend. Where the proxy in front of the app is not Vercel's,
+ * the header is forgeable outright: a script puts a fresh and perfectly well
+ * formed address on every submission, and agreeing with it on how to spell an
+ * address it invented buys nothing. This is a budget rather than a boundary,
+ * which is what an unauthenticated header is worth in both places.
+ *
+ * A request with no address carries nothing to bucket under. It is left
+ * unbucketed and the submission goes through: refusing it would turn a missing
+ * header into a way to lock the form.
  */
 async function readCaptureIpAddress(): Promise<string | null> {
-  const requestHeaders = await headers()
-
-  return resolveCaptureIpAddress(
-    requestHeaders.get("x-forwarded-for"),
-    requestHeaders.get("x-real-ip"),
-  )
+  // A header that is present and empty says as little as one that is absent,
+  // and neither is a bucket, so this is `||` rather than `??`.
+  return ipAddress(await headers()) || null
 }
 
 /**

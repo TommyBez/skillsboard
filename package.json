@@ -54,6 +54,7 @@
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.2",
     "@vercel/analytics": "1.6.1",
+    "@vercel/functions": "^3.9.3",
     "@vercel/oidc": "^3.8.0",
     "better-auth": "^1.6.23",
     "class-variance-authority": "^0.7.1",

@@ -8,10 +8,10 @@
  * input, so each helper returns a normalized value or rejects it rather than
  * trusting the caller.
  *
- * Two neighbours hold the rest. The client address a submission is bucketed
- * under lives in `email-capture-ip.ts`, which needs `node:net` and stays off
- * the client; how much that client may spend lives in
- * `email-capture-budget.ts`.
+ * Two neighbours hold the rest. How much one client may spend on the form
+ * lives in `email-capture-budget.ts`; the address that client is bucketed
+ * under, which the platform puts on the request, is read in
+ * `email-capture-rate-limit.ts` and never reaches the browser.
  */
 
 /** RFC 5321 caps an address at 254 characters; anything longer is not one. */

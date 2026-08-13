@@ -68,7 +68,7 @@ export interface CaptureRateLimiter {
 export interface CaptureBudgetClaim {
   /** Turns a client address into the key its counter lives under. */
   hashAddress(ipAddress: string): string
-  /** The canonical client address, or `null` when the request carries none. */
+  /** The client address, or `null` when the request carries none. */
   ipAddress: string | null
   /** The limiter, or `null` when this environment has no Upstash credentials. */
   limiter: CaptureRateLimiter | null
@@ -81,8 +81,8 @@ export interface CaptureBudgetClaim {
  * Three ways out say yes without counting anything, and all three are
  * deliberate.
  *
- * A request with no readable client address has nothing to bucket under, and
- * refusing it would turn a missing header into a way to lock the form.
+ * A request with no client address has nothing to bucket under, and refusing
+ * it would turn a missing header into a way to lock the form.
  *
  * An environment with no Upstash credentials has nowhere to count, so the form
  * keeps working without a rate limit rather than refusing every visitor. That
