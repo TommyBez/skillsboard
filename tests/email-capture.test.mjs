@@ -21,7 +21,6 @@ const {
   EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
   MISSING_CAPTURE_CREDENTIALS_WARNING,
   claimCaptureBudget,
-  resolveCaptureRedisCredentials,
 } = await loadTsModule(new URL("../lib/email/email-capture-budget.ts", import.meta.url))
 
 const {
@@ -408,64 +407,41 @@ test("names both credential pairs in the warning about the missing counter", () 
   }
 })
 
-test("reads the credentials the Vercel integration writes, before the Upstash names", () => {
-  // The Marketplace integration provisions the database and writes the pair
-  // under the names the older Vercel KV product used, so those come first.
-  assert.deepEqual(
-    resolveCaptureRedisCredentials({
-      KV_REST_API_TOKEN: "vercel-token",
-      KV_REST_API_URL: "https://vercel.upstash.io",
-      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
-      UPSTASH_REDIS_REST_URL: "https://own.upstash.io",
-    }),
-    { token: "vercel-token", url: "https://vercel.upstash.io" },
-  )
-})
-
-test("falls back to the Upstash names when nothing wrote the Vercel pair", () => {
-  // A self-hosted deployment against a database created in the Upstash console
-  // has no integration filling anything in, and sets these two by hand.
-  assert.deepEqual(
-    resolveCaptureRedisCredentials({
-      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
-      UPSTASH_REDIS_REST_URL: "https://own.upstash.io",
-    }),
-    { token: "upstash-token", url: "https://own.upstash.io" },
-  )
-})
-
-test("takes a credential pair whole, and treats blank as absent", () => {
-  // Half of one pair and half of the other is the URL of one database meeting
-  // the token of another, which authenticates against neither.
-  assert.equal(
-    resolveCaptureRedisCredentials({
-      KV_REST_API_URL: "https://vercel.upstash.io",
-      UPSTASH_REDIS_REST_TOKEN: "upstash-token",
-    }),
-    null,
-  )
-  // A variable that is defined and empty is ordinary in a Vercel project.
-  assert.equal(
-    resolveCaptureRedisCredentials({
-      KV_REST_API_TOKEN: "   ",
-      KV_REST_API_URL: "https://vercel.upstash.io",
-    }),
-    null,
-  )
-  assert.equal(resolveCaptureRedisCredentials({}), null)
-})
-
 test("never counts with the read-only token the integration also writes", () => {
-  // A claim increments a counter, and that is a write.
-  assert.equal(
-    resolveCaptureRedisCredentials({
-      KV_REST_API_READ_ONLY_TOKEN: "read-only-token",
-      KV_REST_API_URL: "https://vercel.upstash.io",
-    }),
-    null,
-  )
+  // A claim increments a counter, and that is a write, so the third variable
+  // the Vercel integration writes is named in neither half of the limiter.
+  // `Redis.fromEnv()` cannot reach for it either: it reads the token under
+  // `UPSTASH_REDIS_REST_TOKEN` and `KV_REST_API_TOKEN`, and nothing else.
   assert.ok(!budgetSource.includes("READ_ONLY"))
   assert.ok(!rateLimitSource.includes("READ_ONLY"))
+})
+
+test("asks the SDK for the credentials, and only after deciding they are there", () => {
+  // `Redis.fromEnv()` already reads both spellings, so the wiring does not
+  // resolve them a second time.
+  assert.match(rateLimitSource, /redis: Redis\.fromEnv\(\)/)
+  assert.ok(!rateLimitSource.includes("new Redis("))
+
+  // What it does keep is the presence check, because `fromEnv` does not throw
+  // on a missing variable: it warns in its own words and builds a client that
+  // fails on the first call, and the fail-open has to be decided before that.
+  for (const name of [
+    "UPSTASH_REDIS_REST_URL",
+    "KV_REST_API_URL",
+    "UPSTASH_REDIS_REST_TOKEN",
+    "KV_REST_API_TOKEN",
+  ]) {
+    assert.ok(
+      rateLimitSource.includes(`process.env.${name}`),
+      `the presence check must read ${name}, as fromEnv does`,
+    )
+  }
+
+  const warnIndex = rateLimitSource.indexOf("console.warn(MISSING_CAPTURE_CREDENTIALS_WARNING)")
+  const buildIndex = rateLimitSource.indexOf("redis: Redis.fromEnv()")
+
+  assert.ok(warnIndex > -1 && buildIndex > -1)
+  assert.ok(warnIndex < buildIndex, "the missing credential path returns before the client")
 })
 
 test("lets a submission through when the counter cannot be reached", async () => {

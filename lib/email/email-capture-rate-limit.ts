@@ -11,7 +11,6 @@ import {
   EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
   EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
   MISSING_CAPTURE_CREDENTIALS_WARNING,
-  resolveCaptureRedisCredentials,
 } from "@/lib/email/email-capture-budget"
 import { resolveCaptureIpAddress } from "@/lib/email/email-capture-ip"
 import { hashCaptureIpAddress } from "@/lib/email/email-privacy"
@@ -43,16 +42,26 @@ let captureRateLimiter: CaptureRateLimiter | null | undefined
  * submission, and then the memo answers `null` without saying it again, so the
  * warning names a real gap in the logs instead of one line per visitor.
  *
- * Which variables the credentials are read from lives in the budget module,
- * because two spellings reach this: the pair the Vercel integration writes and
- * the pair a self-hosted deployment sets by hand.
+ * Which variables the credentials are read from is `Redis.fromEnv()`'s
+ * business: it takes the canonical Upstash names, and falls back to the pair
+ * the Vercel integration writes into the project under the older Vercel KV
+ * spelling. Whether they are there is this function's business, and it is
+ * asked first, because `fromEnv` does not throw on a missing one. It warns in
+ * its own words and returns a client built around `undefined` that fails on
+ * the first call, which is a limiter that refuses every submission rather than
+ * the honestly missing one the fail-open needs.
  */
 function getCaptureRateLimiter(): CaptureRateLimiter | null {
   if (captureRateLimiter !== undefined) return captureRateLimiter
 
-  const credentials = resolveCaptureRedisCredentials(process.env)
+  // The same two reads `fromEnv` makes, in the same order, so this decides on
+  // the value it would build the client from. Blank counts as absent: a
+  // variable that is defined and empty is ordinary in a Vercel project and in
+  // a shell, and an empty token builds a client that fails every call.
+  const url = (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL)?.trim()
+  const token = (process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN)?.trim()
 
-  if (!credentials) {
+  if (!(url && token)) {
     console.warn(MISSING_CAPTURE_CREDENTIALS_WARNING)
     captureRateLimiter = null
 
@@ -69,7 +78,7 @@ function getCaptureRateLimiter(): CaptureRateLimiter | null {
       EMAIL_CAPTURE_RATE_LIMIT_WINDOW,
     ),
     prefix: EMAIL_CAPTURE_RATE_LIMIT_PREFIX,
-    redis: new Redis(credentials),
+    redis: Redis.fromEnv(),
     timeout: CAPTURE_RATE_LIMIT_TIMEOUT_MS,
   })
 
