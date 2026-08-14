@@ -52,7 +52,14 @@ export function ClosingSection() {
               className="lp-closing-copy mt-6 text-balance text-lg leading-relaxed text-muted-foreground"
             >
               Save the recommendation where the whole team can find it. The next
-              person can get started without asking where to look.
+              person can get started without asking where to look, and the{" "}
+              <Link
+                href="/claude-skills"
+                className="underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+              >
+                guide to Claude skills
+              </Link>{" "}
+              covers the format for anyone meeting it for the first time.
             </p>
             <nav
               aria-label="Starting guides"

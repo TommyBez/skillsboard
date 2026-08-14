@@ -36,11 +36,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
       url: siteConfig.url,
+      lastModified: new Date("2026-08-14"),
       changeFrequency: "weekly",
       priority: 1,
     },
     {
       url: `${siteConfig.url}/sign-up`,
+      lastModified: new Date("2026-08-06"),
       changeFrequency: "monthly",
       priority: 0.7,
     },
@@ -64,6 +66,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: `${siteConfig.url}/contact`,
+      lastModified: new Date("2026-08-06"),
       changeFrequency: "yearly",
       priority: 0.3,
     },

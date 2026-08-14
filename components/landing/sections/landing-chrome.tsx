@@ -134,14 +134,25 @@ export function LandingFooter() {
             aria-label="Footer"
             className="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
           >
-            <a href="#pricing" className={footerNavLink}>
+            {/* The colophon is the home page's only route out to the rest of
+                the site, so it names the pages people actually search for
+                rather than only the chapters below. "Pricing" points at the
+                standalone page instead of the chapter anchor: the chapter is
+                two screens up and the page is the one that has to rank. */}
+            <Link href="/pricing" className={footerNavLink}>
               Pricing
-            </a>
+            </Link>
             <a href="#faq" className={footerNavLink}>
               FAQ
             </a>
+            <Link href="/claude-skills" className={footerNavLink}>
+              Claude skills
+            </Link>
             <Link href="/resources" className={footerNavLink}>
               Resources
+            </Link>
+            <Link href="/alternatives" className={footerNavLink}>
+              Alternatives
             </Link>
             <Link href="/about" className={footerNavLink}>
               About
