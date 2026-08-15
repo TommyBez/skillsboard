@@ -123,19 +123,35 @@ function absoluteHref(href: string): string {
 }
 
 function link(label: string, href: string): string {
-  return `[${collapse(label)}](${absoluteHref(href)})`
+  return `[${prose(label)}](${absoluteHref(href)})`
 }
 
 function collapse(value: string): string {
   return value.replace(/\s+/g, " ").trim()
 }
 
+/**
+ * A Markdown renderer reads `<name>` as a raw HTML element and drops it, so a
+ * placeholder path such as `~/.claude/skills/<name>/SKILL.md` would render as
+ * `~/.claude/skills//SKILL.md`. Prose escapes the opening bracket to keep the
+ * placeholder visible; a fenced block is left alone, since nothing inside a
+ * fence is parsed as markup.
+ */
+function escapeMarkup(value: string): string {
+  return value.replace(/</g, "\\<")
+}
+
+/** Collapsed page copy, safe to place in the body of the document. */
+function prose(value: string): string {
+  return escapeMarkup(collapse(value))
+}
+
 function heading(level: number, text: string): string {
-  return `${"#".repeat(Math.min(level, 6))} ${collapse(text)}`
+  return `${"#".repeat(Math.min(level, 6))} ${prose(text)}`
 }
 
 function paragraph(text: string): string {
-  return collapse(text)
+  return prose(text)
 }
 
 function bulletList(items: readonly string[]): string {
@@ -153,7 +169,7 @@ function codeBlock(value: string): string {
 
 function cell(value: unknown): string {
   if (typeof value !== "string") return ""
-  return collapse(value).replace(/\|/g, "\\|")
+  return prose(value).replace(/\|/g, "\\|")
 }
 
 function table(
@@ -185,7 +201,7 @@ function inlineLinkSentence(value: Record<string, unknown>): string {
   const href = typeof value.href === "string" ? value.href : ""
   const trail = typeof value.trail === "string" ? value.trail : ""
 
-  return collapse(`${lead} ${link(label, href)}${trail}`)
+  return collapse(`${prose(lead)} ${link(label, href)}${prose(trail)}`)
 }
 
 function linkLabelOf(item: Record<string, unknown>): string | undefined {
@@ -214,7 +230,7 @@ function describedLine(entry: { key: string; value: string }): string {
   if (unlabeledKeys.has(entry.key) || entry.key === "answer" || entry.key === "description") {
     return paragraph(entry.value)
   }
-  return `**${humanize(entry.key)}:** ${collapse(entry.value)}`
+  return `**${humanize(entry.key)}:** ${prose(entry.value)}`
 }
 
 function renderRecordArray(
@@ -229,7 +245,7 @@ function renderRecordArray(
           const label = linkLabelOf(item) ?? ""
           const href = item.href as string
           const note = remainingStrings(item, ["label", "linkLabel", "name", "title", "href"])
-          const suffix = note.length > 0 ? `: ${collapse(note[0].value)}` : ""
+          const suffix = note.length > 0 ? `: ${prose(note[0].value)}` : ""
           return `${link(label, href)}${suffix}`
         }),
       ),
@@ -269,7 +285,7 @@ function renderRecordArray(
         bulletList(
           items.map((item) => {
             const rest = remainingStrings(item, [labelKey])
-            return `**${collapse(item[labelKey] as string)}:** ${collapse(rest[0].value)}`
+            return `**${prose(item[labelKey] as string)}:** ${prose(rest[0].value)}`
           }),
         ),
       ]
@@ -394,7 +410,8 @@ function renderValue(key: string, value: unknown, level: number): string[] {
     if (value.length === 0) return []
     if (isStringArray(value)) {
       if (proseArrayKeys.has(key)) return value.map(paragraph)
-      return [key === "steps" ? orderedList(value) : bulletList(value)]
+      const items = value.map(prose)
+      return [key === "steps" ? orderedList(items) : bulletList(items)]
     }
     if (isRecordArray(value)) return renderRecordArray(value, level)
     return []
@@ -518,7 +535,7 @@ export function buildContentMarkdown(entry: MarkdownContentEntry): string {
     typeof record.subject === "string"
       ? typeof record.subjectHref === "string"
         ? link(record.subject, record.subjectHref)
-        : record.subject
+        : prose(record.subject)
       : undefined
 
   const header = [
@@ -531,7 +548,7 @@ export function buildContentMarkdown(entry: MarkdownContentEntry): string {
       `Published: ${entry.publishedAt}`,
       `Last updated: ${entry.modifiedAt}`,
       ...(subject ? [`Compared with: ${subject}`] : []),
-      ...(topics ? [`Topics: ${topics.join(", ")}`] : []),
+      ...(topics ? [`Topics: ${prose(topics.join(", "))}`] : []),
     ]),
   ]
 

@@ -101,3 +101,35 @@ test("only a page with a twin advertises the Markdown alternate", () => {
   })
   assert.deepEqual(markdownTwinAlternates("/pricing"), { canonical: "/pricing" })
 })
+
+/** Everything outside a fenced block, where Markdown syntax is live. */
+function prose(markdown) {
+  let inFence = false
+  return markdown
+    .split("\n")
+    .filter((line) => {
+      if (/^`{3,}$/.test(line.trim())) {
+        inFence = !inFence
+        return false
+      }
+      return !inFence
+    })
+    .join("\n")
+}
+
+test("angle-bracket placeholders read as text rather than as markup", () => {
+  const claudeMarkdown = renderMarkdownTwin("/claude-skills") ?? ""
+
+  assert.ok(
+    claudeMarkdown.includes("~/.claude/skills/\\<name>/SKILL.md"),
+    "the placeholder path lost its escape",
+  )
+
+  for (const path of markdownTwinPaths) {
+    assert.doesNotMatch(
+      prose(renderMarkdownTwin(path) ?? ""),
+      /(?<!\\)</,
+      `unescaped angle bracket in the twin of ${path}`,
+    )
+  }
+})
