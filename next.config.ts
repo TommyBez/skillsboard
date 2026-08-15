@@ -48,6 +48,20 @@ const nextConfig = {
         destination: "/guides/:slug",
         permanent: true,
       },
+      // There is no guides index: the guides live under `/guides/<slug>` and
+      // the hub that lists them is `/resources`. Both spellings of the bare
+      // segment used to 404, wasting crawl budget on a path that external
+      // links and manual URL edits reach often enough to matter.
+      {
+        source: "/guides",
+        destination: "/resources",
+        permanent: true,
+      },
+      {
+        source: "/guides/",
+        destination: "/resources",
+        permanent: true,
+      },
       {
         source: "/claude-skills/",
         destination: "/claude-skills",
