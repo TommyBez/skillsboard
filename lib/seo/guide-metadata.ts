@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import type { GuideDefinition } from "@/lib/seo/guides"
 import { siteConfig } from "@/lib/site"
@@ -21,7 +22,7 @@ export function buildGuideMetadata(guide: GuideDefinition): Metadata {
   return {
     title: { absolute: guide.seoTitle },
     description: guide.description,
-    alternates: { canonical: guide.path },
+    alternates: markdownTwinAlternates(guide.path),
     openGraph: {
       type: "article",
       url: guide.path,

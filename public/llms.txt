@@ -14,6 +14,8 @@ Key facts:
 - MCP limits: cannot edit or delete saved team skills, install skills in an agent, or execute skills
 - Hosted product: free forever, no trial, credit card, or paid tier
 
+Markdown versions: every guide, skill format explainer, and alternatives page listed below is also served as Markdown at the same URL with a `.md` suffix (for example https://www.skillsboard.sh/codex-skills.md), and the page URL returns the same Markdown when the request sends `Accept: text/markdown`.
+
 ## Core pages
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://www.skillsboard.sh/): Product overview, pricing, and common questions

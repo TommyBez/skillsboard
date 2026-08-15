@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import {
   alternativesIndexDescription,
@@ -38,7 +39,7 @@ export function buildAlternativeMetadata(
   return {
     title: { absolute: entry.seoTitle },
     description: entry.description,
-    alternates: { canonical: entry.path },
+    alternates: markdownTwinAlternates(entry.path),
     openGraph: {
       type: "article",
       url: entry.path,

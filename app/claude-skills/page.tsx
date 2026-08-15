@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { ClaudeSkillsPage } from "@/components/claude-skills/claude-skills-page"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { siteConfig } from "@/lib/site"
@@ -10,7 +11,7 @@ const socialTitle = "Claude Skills, explained"
 export const metadata: Metadata = {
   title: { absolute: claudeSkills.seoTitle },
   description: claudeSkills.description,
-  alternates: { canonical: claudeSkills.path },
+  alternates: markdownTwinAlternates(claudeSkills.path),
   openGraph: {
     type: "article",
     url: claudeSkills.path,
