@@ -2,6 +2,8 @@ import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
 import { codexSkillsPath, type CodexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { cursorSkills } from "@/lib/seo/cursor-skills"
+import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
@@ -13,7 +15,11 @@ export const resourcePaths = {
 export type ResourceContentType = "guide" | "article"
 
 /** Every path the resource hub, related links, and sitemap can address. */
-export type ResourcePath = GuidePath | ClaudeSkillsPath | CodexSkillsPath
+export type ResourcePath =
+  | GuidePath
+  | ClaudeSkillsPath
+  | CodexSkillsPath
+  | CursorSkillsPath
 
 export interface ResourceIndexEntry {
   path: string
@@ -31,6 +37,7 @@ export const resourceEntries = [
   ...guides,
   claudeSkills,
   codexSkills,
+  cursorSkills,
 ] satisfies readonly ResourceIndexEntry[]
 
 const resourceEntriesByPath = new Map(
@@ -53,6 +60,7 @@ const resourceClusterDefinitions = [
     paths: [
       claudeSkillsPath,
       codexSkillsPath,
+      cursorSkillsPath,
       guidePaths.shareTeamSkills,
       guidePaths.manageCrossAgentSkills,
       guidePaths.sharedMcpSkillLibrary,

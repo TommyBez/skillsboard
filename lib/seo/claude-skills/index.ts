@@ -2,6 +2,7 @@ import type { OgTemplateContent } from "@/lib/og/template"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
@@ -56,7 +57,11 @@ export interface ClaudeSkillsDefinition {
   path: typeof claudeSkillsPath
   contentType: "article"
   topics: readonly string[]
-  relatedGuidePaths: readonly GuidePath[]
+  relatedGuidePaths: readonly (
+    | GuidePath
+    | typeof codexSkillsPath
+    | typeof cursorSkillsPath
+  )[]
   eyebrow: string
   title: string
   /** Full document title, including the brand suffix. */
@@ -108,6 +113,8 @@ export const claudeSkills: ClaudeSkillsDefinition = {
   contentType: "article",
   topics: ["claude skills", "skill format", "compatibility", "skill sharing"],
   relatedGuidePaths: [
+    codexSkillsPath,
+    cursorSkillsPath,
     guidePaths.manageCrossAgentSkills,
     guidePaths.shareTeamSkills,
     guidePaths.sharedMcpSkillLibrary,
@@ -515,6 +522,12 @@ A Markdown section ready to paste into the release description.`,
       href: codexSkillsPath,
       description:
         "The same standard read by OpenAI's agent, the directories it scans, and what a skill keeps when it moves.",
+    },
+    {
+      label: "Cursor skills: what they are and how to use them",
+      href: cursorSkillsPath,
+      description:
+        "Every directory Cursor scans, including the Claude ones, and the two frontmatter fields it adds.",
     },
     {
       label: "Manage skills across Claude Code, Codex, and Cursor",

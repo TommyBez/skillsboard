@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
@@ -53,7 +54,11 @@ export interface CodexSkillsDefinition {
   path: typeof codexSkillsPath
   contentType: "article"
   topics: readonly string[]
-  relatedGuidePaths: readonly (GuidePath | typeof claudeSkillsPath)[]
+  relatedGuidePaths: readonly (
+    | GuidePath
+    | typeof claudeSkillsPath
+    | typeof cursorSkillsPath
+  )[]
   eyebrow: string
   title: string
   /** Full document title, including the brand suffix. */
@@ -113,6 +118,7 @@ export const codexSkills: CodexSkillsDefinition = {
   topics: ["codex skills", "skill format", "compatibility", "skill sharing"],
   relatedGuidePaths: [
     claudeSkillsPath,
+    cursorSkillsPath,
     guidePaths.manageCrossAgentSkills,
     guidePaths.shareTeamSkills,
   ],
@@ -477,6 +483,12 @@ A Markdown section titled with the version and date.`,
       href: claudeSkillsPath,
       description:
         "The same explainer for the other side of the standard: the format, the surfaces, and how a skill loads.",
+    },
+    {
+      label: "Cursor skills: what they are and how to use them",
+      href: cursorSkillsPath,
+      description:
+        "The one product that documents reading .agents/skills and the Claude directories alike.",
     },
     {
       label: "Manage skills across Claude Code, Codex, and Cursor",

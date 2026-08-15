@@ -27,6 +27,7 @@ Key facts:
 ## Skill format explainers
 - [Claude skills](https://www.skillsboard.sh/claude-skills): What a Claude Skill is, the SKILL.md format, where skills run, and how to install, write, and share one
 - [Codex skills](https://www.skillsboard.sh/codex-skills): What a Codex skill is, the .agents/skills locations Codex scans, what transfers from a Claude skill, and how to add one
+- [Cursor skills](https://www.skillsboard.sh/cursor-skills): What a Cursor skill is, every directory Cursor scans including the Claude and Codex ones, the frontmatter fields it documents, and how to add one
 
 ## Team skill workflows
 - [AI agent skill use cases for teams](https://www.skillsboard.sh/guides/ai-skill-use-cases-for-teams): Eight repeatable workflows with triggers, inputs, outputs, human checks, and stop boundaries
