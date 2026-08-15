@@ -8,6 +8,7 @@ const { markdownTwinAlternates, markdownTwinPaths, renderMarkdownTwin } =
 const { codexSkills } = await import("../lib/seo/codex-skills/index.ts")
 const { alternatives } = await import("../lib/seo/alternatives.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
+const { default: nextConfig } = await import("../next.config.ts")
 
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
 
@@ -131,5 +132,41 @@ test("angle-bracket placeholders read as text rather than as markup", () => {
       /(?<!\\)</,
       `unescaped angle bracket in the twin of ${path}`,
     )
+  }
+})
+
+test("the Accept rewrite reads media ranges, not the bare token", async () => {
+  const { beforeFiles } = await nextConfig.rewrites()
+  const values = new Set(beforeFiles.map((rule) => rule.has[0].value))
+  assert.equal(values.size, 1, "the twin routes disagree on the Accept match")
+
+  // The anchoring Next.js applies to a `has` value.
+  const accept = new RegExp(`^${[...values][0]}$`)
+
+  const negotiated = [
+    "text/markdown",
+    "text/markdown, text/html;q=0.9",
+    "text/html;q=0.9, text/markdown;q=1.0",
+    "text/markdown;charset=utf-8",
+    // A positive weight is still an acceptable Markdown.
+    "text/html, text/markdown;q=0.5",
+  ]
+
+  const html = [
+    "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+    "*/*",
+    "text/html",
+    // q=0 is a refusal, whatever else the header asks for.
+    "text/html, text/markdown;q=0",
+    "text/html, text/markdown;q=0.0",
+    "text/html, text/markdown; q=0",
+    "text/html, text/markdown; charset=utf-8; q=0",
+  ]
+
+  for (const header of negotiated) {
+    assert.match(header, accept, `should serve the twin: ${header}`)
+  }
+  for (const header of html) {
+    assert.doesNotMatch(header, accept, `should keep the HTML page: ${header}`)
   }
 })

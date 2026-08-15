@@ -1,10 +1,18 @@
 import type { NextConfig } from 'next'
 
-/** Requests that ask for Markdown get the twin of the page they addressed. */
+/**
+ * Requests that ask for Markdown get the twin of the page they addressed.
+ *
+ * `q=0` on a media range means the client refuses it (RFC 9110), so the token
+ * cannot be matched anywhere in the header. The lookahead reads the parameters
+ * of this media range only, stopping at the comma that starts the next one, and
+ * rejects a zero weight (`q=0`, `q=0.0`) while leaving a positive one (`q=0.5`,
+ * `q=1`) alone.
+ */
 const MARKDOWN_ACCEPT = {
   type: "header",
   key: "accept",
-  value: ".*text/markdown.*",
+  value: String.raw`.*text/markdown(?![^,]*;\s*q\s*=\s*0(?:\.0*)?(?![.\d])).*`,
 } as const
 
 const nextConfig = {
