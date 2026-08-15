@@ -195,7 +195,7 @@ export const codexSkills: CodexSkillsDefinition = {
     title: "Codex skills and Claude skills: what actually transfers",
     intro:
       "The file transfers. The setup around it does not. Both products implement the same Agent Skills standard, so a SKILL.md written for one is usually readable by the other, but the directories, the invocation syntax, and every field beyond the standard are product-specific.",
-    columns: ["Codex", "Claude Code", "What that means"],
+    columns: ["Area", "Codex", "Claude Code", "What that means"],
     rows: [
       {
         label: "Skill file",
@@ -296,9 +296,7 @@ export const codexSkills: CodexSkillsDefinition = {
         body: "Inside Codex, $skill-creator drafts a skill by asking what it does, when it should trigger, and whether it needs scripts. Record and Replay captures a workflow you demonstrate and drafts a skill from it. $skill-installer followed by a curated skill name installs one of OpenAI's, and can be prompted to download skills from other repositories.",
       },
     ],
-    template: `.agents/skills/release-notes/SKILL.md
-
----
+    template: `---
 name: release-notes
 description: Draft release notes from merged pull requests. Use when the user asks for release notes, a changelog entry, or a summary of what shipped.
 ---
