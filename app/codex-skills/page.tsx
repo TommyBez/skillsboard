@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 
 import { CodexSkillsPage } from "@/components/codex-skills/codex-skills-page"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import { codexSkills } from "@/lib/seo/codex-skills"
 import { siteConfig } from "@/lib/site"
@@ -10,7 +11,7 @@ const socialTitle = "Codex skills, explained"
 export const metadata: Metadata = {
   title: { absolute: codexSkills.seoTitle },
   description: codexSkills.description,
-  alternates: { canonical: codexSkills.path },
+  alternates: markdownTwinAlternates(codexSkills.path),
   openGraph: {
     type: "article",
     url: codexSkills.path,

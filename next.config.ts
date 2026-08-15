@@ -1,5 +1,12 @@
 import type { NextConfig } from 'next'
 
+/** Requests that ask for Markdown get the twin of the page they addressed. */
+const MARKDOWN_ACCEPT = {
+  type: "header",
+  key: "accept",
+  value: ".*text/markdown.*",
+} as const
+
 const nextConfig = {
   cacheComponents: true,
   experimental: {
@@ -22,6 +29,18 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        // Site wide pointer to the machine readable description of the site,
+        // so an agent that only reads response headers can find llms.txt
+        // without fetching a page first.
+        source: "/:path*",
+        headers: [
+          {
+            key: "Link",
+            value: '</llms.txt>; rel="describedby"; type="text/markdown"',
+          },
+        ],
+      },
       {
         source: "/p/:path*",
         headers: [
@@ -100,20 +119,55 @@ const nextConfig = {
     ]
   },
   async rewrites() {
-    return [
-      {
-        source: "/ingest/static/:path*",
-        destination: "https://eu-assets.i.posthog.com/static/:path*",
-      },
-      {
-        source: "/ingest/array/:path*",
-        destination: "https://eu-assets.i.posthog.com/array/:path*",
-      },
-      {
-        source: "/ingest/:path*",
-        destination: "https://eu.i.posthog.com/:path*",
-      },
-    ]
+    return {
+      // Content negotiation. `beforeFiles` is what makes these win over the
+      // HTML page that owns the same URL. The header value is matched as an
+      // anchored regular expression, and no browser or RSC request asks for
+      // `text/markdown`, so ordinary page traffic never reaches these.
+      //
+      // Scoped to the URL shapes that have a Markdown twin instead of the whole
+      // site: `/<something>-skills`, a guide, or an alternative. A request for
+      // a page outside those shapes keeps returning HTML rather than a 404.
+      beforeFiles: [
+        {
+          source: "/:slug([^/]*-skills)",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/:slug",
+        },
+        {
+          source: "/guides/:slug",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/guides/:slug",
+        },
+        {
+          source: "/alternatives/:slug",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/alternatives/:slug",
+        },
+      ],
+      afterFiles: [
+        {
+          source: "/ingest/static/:path*",
+          destination: "https://eu-assets.i.posthog.com/static/:path*",
+        },
+        {
+          source: "/ingest/array/:path*",
+          destination: "https://eu-assets.i.posthog.com/array/:path*",
+        },
+        {
+          source: "/ingest/:path*",
+          destination: "https://eu.i.posthog.com/:path*",
+        },
+        // The Markdown twin of every data driven content page. `afterFiles`
+        // leaves the hand written Markdown in `public` (`/pricing.md`, the
+        // compatibility fixture) serving itself as a static file. Paths with no
+        // twin fall through to a 404 from the route handler.
+        {
+          source: "/:path(.*)\\.md",
+          destination: "/api/markdown?path=/:path",
+        },
+      ],
+    }
   },
 } satisfies NextConfig
 
