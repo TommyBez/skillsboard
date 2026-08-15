@@ -1,4 +1,5 @@
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
+import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import {
   guideEvidencePaths,
   guidePaths,
@@ -11,6 +12,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   contentType: "guide",
   topics: ["team operations", "skill sharing", "compatibility", "mixed-agent teams"],
   relatedGuidePaths: [
+    codexSkillsPath,
     claudeSkillsPath,
     guidePaths.shareTeamSkills,
     guidePaths.sharedMcpSkillLibrary,
@@ -255,5 +257,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-15",
 }

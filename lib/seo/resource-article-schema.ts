@@ -1,8 +1,25 @@
 import { OG_SIZE } from "@/lib/og/template"
-import type { ClaudeSkillsDefinition } from "@/lib/seo/claude-skills"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
-export function buildClaudeSkillsSchema(entry: ClaudeSkillsDefinition) {
+/**
+ * The shape a resource article has to expose to be described in JSON-LD.
+ * Structural on purpose: each article keeps its own definition type and
+ * satisfies this without importing anything from here.
+ */
+export interface ResourceArticleSchemaEntry {
+  path: string
+  eyebrow: string
+  title: string
+  description: string
+  publishedAt: string
+  modifiedAt: string
+  ogAlt: string
+  sources: readonly { href: string }[]
+  faq: readonly { question: string; answer: string }[]
+}
+
+/** TechArticle, FAQPage, and BreadcrumbList for a top-level resource article. */
+export function buildResourceArticleSchema(entry: ResourceArticleSchemaEntry) {
   const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
   const logoId = absoluteUrl("/#logo")

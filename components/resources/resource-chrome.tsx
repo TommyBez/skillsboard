@@ -14,6 +14,7 @@ import {
   type AlternativeCtaPlacement,
 } from "@/lib/seo/alternatives"
 import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
+import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
@@ -21,6 +22,7 @@ type ResourceHeaderLocation =
   | "about_header"
   | "alternatives_header"
   | "claude_skills_header"
+  | "codex_skills_header"
   | "guide_header"
   | "pricing_header"
   | "resources_header"
@@ -28,6 +30,7 @@ type ResourceCtaLocation =
   | "alternatives_index"
   | AlternativeCtaPlacement
   | ClaudeSkillsCtaPlacement
+  | CodexSkillsCtaPlacement
   | "guide_inline"
   | "guide_closing"
   | "resources_closing"

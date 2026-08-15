@@ -68,6 +68,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/codex-skills/",
+        destination: "/codex-skills",
+        permanent: true,
+      },
+      {
         source: "/pricing/",
         destination: "/pricing",
         permanent: true,

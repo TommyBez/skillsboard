@@ -1,5 +1,7 @@
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
+import { codexSkills } from "@/lib/seo/codex-skills"
+import { codexSkillsPath, type CodexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
@@ -11,7 +13,7 @@ export const resourcePaths = {
 export type ResourceContentType = "guide" | "article"
 
 /** Every path the resource hub, related links, and sitemap can address. */
-export type ResourcePath = GuidePath | ClaudeSkillsPath
+export type ResourcePath = GuidePath | ClaudeSkillsPath | CodexSkillsPath
 
 export interface ResourceIndexEntry {
   path: string
@@ -28,6 +30,7 @@ export interface ResourceIndexEntry {
 export const resourceEntries = [
   ...guides,
   claudeSkills,
+  codexSkills,
 ] satisfies readonly ResourceIndexEntry[]
 
 const resourceEntriesByPath = new Map(
@@ -49,6 +52,7 @@ const resourceClusterDefinitions = [
       "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
       claudeSkillsPath,
+      codexSkillsPath,
       guidePaths.shareTeamSkills,
       guidePaths.manageCrossAgentSkills,
       guidePaths.sharedMcpSkillLibrary,
