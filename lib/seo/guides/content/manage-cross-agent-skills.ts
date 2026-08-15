@@ -1,5 +1,6 @@
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import {
   guideEvidencePaths,
   guidePaths,
@@ -12,6 +13,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   contentType: "guide",
   topics: ["team operations", "skill sharing", "compatibility", "mixed-agent teams"],
   relatedGuidePaths: [
+    cursorSkillsPath,
     codexSkillsPath,
     claudeSkillsPath,
     guidePaths.shareTeamSkills,

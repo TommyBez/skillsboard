@@ -73,6 +73,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/cursor-skills/",
+        destination: "/cursor-skills",
+        permanent: true,
+      },
+      {
         source: "/pricing/",
         destination: "/pricing",
         permanent: true,
