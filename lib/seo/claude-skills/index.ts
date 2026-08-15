@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
+import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
@@ -510,6 +511,12 @@ A Markdown section ready to paste into the release description.`,
   ],
   related: [
     {
+      label: "Codex skills: what they are and how to use them",
+      href: codexSkillsPath,
+      description:
+        "The same standard read by OpenAI's agent, the directories it scans, and what a skill keeps when it moves.",
+    },
+    {
       label: "Manage skills across Claude Code, Codex, and Cursor",
       href: guidePaths.manageCrossAgentSkills,
       description:
@@ -548,5 +555,5 @@ A Markdown section ready to paste into the release description.`,
   ogAlt:
     "Explainer on Claude Skills: the SKILL.md format, where skills run, and how teams share them.",
   publishedAt: "2026-08-12",
-  modifiedAt: "2026-08-12",
+  modifiedAt: "2026-08-15",
 }

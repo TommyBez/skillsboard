@@ -12,12 +12,30 @@ import {
   StepList,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
+import type {
+  CodexSkillsDefinition,
+  CodexSkillsInlineLink,
+} from "@/lib/seo/codex-skills"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
-import type { ClaudeSkillsDefinition } from "@/lib/seo/claude-skills"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
+function InlineLink({ link }: { link: CodexSkillsInlineLink }) {
+  return (
+    <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
+      {link.lead}{" "}
+      <Link
+        href={link.href}
+        className="font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+      >
+        {link.label}
+      </Link>
+      {link.trail}
+    </p>
+  )
+}
+
+export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
   return (
     <>
       <JsonLd data={buildResourceArticleSchema(entry)} />
@@ -49,7 +67,7 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="claude_skills_hero" />
+            <ResourceCta location="codex_skills_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -99,103 +117,70 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             id="answer-heading"
             className="text-2xl font-semibold tracking-tight md:text-3xl"
           >
-            What is a Claude Skill?
+            What a Codex skill is
           </h2>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
             {entry.answer}
           </p>
+          <NoteList notes={entry.answerNotes} />
           <SectionSources
             sourceIds={entry.answerSourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="format-heading" className="pt-16">
+        <section aria-labelledby="locations-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Format"
-            id="format"
-            title={entry.format.title}
-            intro={entry.format.intro}
+            eyebrow="01 / Locations"
+            id="locations"
+            title={entry.locations.title}
+            intro={entry.locations.intro}
           />
           <SectionTable
-            caption="SKILL.md frontmatter fields defined by the Agent Skills specification."
-            columns={entry.format.columns}
-            rows={entry.format.rows}
-            labelWidth="w-[20%]"
+            caption="The locations Codex scans for skills, and what each scope is for."
+            columns={entry.locations.columns}
+            rows={entry.locations.rows}
+            labelWidth="w-[12%]"
           />
-          <CodeBlock label="Skill directory" value={entry.format.tree} />
-          <NoteList notes={entry.format.notes} />
+          <NoteList notes={entry.locations.notes} />
           <SectionSources
-            sourceIds={entry.format.sourceIds}
+            sourceIds={entry.locations.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="loading-heading" className="pt-16">
+        <section aria-labelledby="transfers-heading" className="pt-16">
           <SectionHeading
-            eyebrow="02 / Loading"
-            id="loading"
-            title={entry.loading.title}
-            intro={entry.loading.intro}
+            eyebrow="02 / Portability"
+            id="transfers"
+            title={entry.transfers.title}
+            intro={entry.transfers.intro}
           />
           <SectionTable
-            caption="The three stages of progressive disclosure and what each one costs."
-            columns={entry.loading.columns}
-            rows={entry.loading.rows}
+            caption="What a skill written for one agent keeps when the other one reads it."
+            columns={entry.transfers.columns}
+            rows={entry.transfers.rows}
             labelWidth="w-[16%]"
           />
-          <NoteList notes={entry.loading.notes} />
+          <NoteList notes={entry.transfers.notes} />
+          <InlineLink link={entry.transfers.link} />
           <SectionSources
-            sourceIds={entry.loading.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="surfaces-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="03 / Surfaces"
-            id="surfaces"
-            title={entry.surfaces.title}
-            intro={entry.surfaces.intro}
-          />
-          <SectionTable
-            caption="How skills are installed, shared, and sandboxed on each surface."
-            columns={entry.surfaces.columns}
-            rows={entry.surfaces.rows}
-            labelWidth="w-[16%]"
-          />
-          <NoteList notes={entry.surfaces.notes} />
-          <SectionSources
-            sourceIds={entry.surfaces.sourceIds}
+            sourceIds={entry.transfers.sourceIds}
             sources={entry.sources}
           />
         </section>
 
         <section aria-labelledby="install-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Install"
+            eyebrow="03 / Install"
             id="install"
             title={entry.install.title}
             intro={entry.install.intro}
           />
           <StepList steps={entry.install.steps} />
-          <SectionSources
-            sourceIds={entry.install.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="authoring-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="05 / Authoring"
-            id="authoring"
-            title={entry.authoring.title}
-            intro={entry.authoring.intro}
-          />
-          <StepList steps={entry.authoring.steps} />
           <CodeBlock
             label="SKILL.md starting point"
-            value={entry.authoring.template}
+            value={entry.install.template}
             copy={{
               buttonLabel: "Copy SKILL.md",
               ariaLabel: "Copy the SKILL.md starting point",
@@ -203,51 +188,14 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             }}
           />
           <SectionSources
-            sourceIds={entry.authoring.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="ecosystem-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="06 / Ecosystem"
-            id="ecosystem"
-            title={entry.ecosystem.title}
-            intro={entry.ecosystem.intro}
-          />
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {entry.ecosystem.entries.map((source) => (
-              <div
-                key={source.name}
-                className="rounded-[3px] border border-border bg-card p-5"
-              >
-                <h3 className="font-mono text-sm font-semibold">
-                  <a
-                    href={source.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 items-center gap-1.5 underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
-                  >
-                    {source.name}
-                    <ExternalLinkIcon className="size-3" aria-hidden="true" />
-                  </a>
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {source.body}
-                </p>
-              </div>
-            ))}
-          </div>
-          <NoteList notes={entry.ecosystem.notes} />
-          <SectionSources
-            sourceIds={entry.ecosystem.sourceIds}
+            sourceIds={entry.install.sourceIds}
             sources={entry.sources}
           />
         </section>
 
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="07 / Teams"
+            eyebrow="04 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -272,8 +220,9 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
               </li>
             ))}
           </ul>
+          <InlineLink link={entry.team.link} />
           <div className="mt-8">
-            <ResourceCta location="claude_skills_inline" />
+            <ResourceCta location="codex_skills_inline" />
           </div>
           <SectionSources
             sourceIds={entry.team.sourceIds}
@@ -281,9 +230,37 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
           />
         </section>
 
+        <section aria-labelledby="open-questions-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="05 / Limits"
+            id="open-questions"
+            title={entry.openQuestions.title}
+            intro={entry.openQuestions.intro}
+          />
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {entry.openQuestions.entries.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[3px] border border-border bg-card p-5"
+              >
+                <h3 className="text-base font-semibold leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+          <SectionSources
+            sourceIds={entry.openQuestions.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            08 / Questions
+            06 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -316,9 +293,11 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every claim about the format and the products that run it comes from
-            the first-party documentation below. Product behavior changes, so
-            check the linked pages before you rely on a detail.
+            every claim about how Codex handles skills comes from the first-party
+            documentation below, checked on the date at the top of this page.
+            Where the documentation says nothing, this page says so instead of
+            filling the gap. Product behavior changes, so check the linked pages
+            before you rely on a detail.
           </p>
           <ul className="mt-6 space-y-4">
             {entry.sources.map((source) => (
@@ -382,7 +361,7 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="claude_skills_closing" />
+            <ResourceCta location="codex_skills_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
