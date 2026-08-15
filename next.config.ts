@@ -78,6 +78,16 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/compare/",
+        destination: "/compare",
+        permanent: true,
+      },
+      {
+        source: "/compare/:slug/",
+        destination: "/compare/:slug",
+        permanent: true,
+      },
+      {
         source: "/pricing/",
         destination: "/pricing",
         permanent: true,

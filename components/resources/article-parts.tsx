@@ -4,7 +4,8 @@ import { CopyButton } from "@/components/copy-button"
 
 /**
  * Presentational parts shared by the resource articles that answer a head
- * query on their own route (/claude-skills, /codex-skills, /cursor-skills).
+ * query on their own route (/claude-skills, /codex-skills, /cursor-skills) and
+ * by the comparison pages under /compare.
  * The content lives
  * in `lib/seo/<article>`; these components only render it, so a second article
  * does not fork the markup, the table semantics, or the focus styles.

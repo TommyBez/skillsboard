@@ -15,6 +15,11 @@ import {
 } from "@/lib/seo/alternatives"
 import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
+import { compareIndexPath } from "@/lib/seo/compare/types"
+import type {
+  ComparisonCtaPlacement,
+  ComparisonHeaderLocation,
+} from "@/lib/seo/compare/types"
 import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
@@ -24,6 +29,8 @@ type ResourceHeaderLocation =
   | "alternatives_header"
   | "claude_skills_header"
   | "codex_skills_header"
+  | "compare_header"
+  | ComparisonHeaderLocation
   | "cursor_skills_header"
   | "guide_header"
   | "pricing_header"
@@ -33,6 +40,8 @@ type ResourceCtaLocation =
   | AlternativeCtaPlacement
   | ClaudeSkillsCtaPlacement
   | CodexSkillsCtaPlacement
+  | "compare_index"
+  | ComparisonCtaPlacement
   | CursorSkillsCtaPlacement
   | "guide_inline"
   | "guide_closing"
@@ -184,6 +193,12 @@ export function ResourceFooter() {
               className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
             >
               Resources
+            </Link>
+            <Link
+              href={compareIndexPath}
+              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            >
+              Compare
             </Link>
             <Link
               href={alternativesIndexPath}
