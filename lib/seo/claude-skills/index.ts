@@ -2,6 +2,7 @@ import type { OgTemplateContent } from "@/lib/og/template"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { comparePaths } from "@/lib/seo/compare/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
@@ -517,6 +518,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Claude skills vs subagents: when to use each",
+      href: comparePaths.skillsVsSubagents,
+      description:
+        "The other primitive in the same directory tree, and the dimensions that decide which one a job belongs to.",
+    },
     {
       label: "Codex skills: what they are and how to use them",
       href: codexSkillsPath,

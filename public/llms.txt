@@ -31,6 +31,10 @@ Markdown versions: every guide, skill format explainer, and alternatives page li
 - [Codex skills](https://www.skillsboard.sh/codex-skills): What a Codex skill is, the .agents/skills locations Codex scans, what transfers from a Claude skill, and how to add one
 - [Cursor skills](https://www.skillsboard.sh/cursor-skills): What a Cursor skill is, every directory Cursor scans including the Claude and Codex ones, the frontmatter fields it documents, and how to add one
 
+## Comparisons
+- [Comparisons](https://www.skillsboard.sh/compare): Sourced comparisons of the AI agent primitives that look interchangeable, with the date each was last checked
+- [Claude skills vs subagents](https://www.skillsboard.sh/compare/claude-skills-vs-subagents): What each primitive is, where each lives, what triggers each, when each is the right choice, and the two documented ways they combine
+
 ## Team skill workflows
 - [AI agent skill use cases for teams](https://www.skillsboard.sh/guides/ai-skill-use-cases-for-teams): Eight repeatable workflows with triggers, inputs, outputs, human checks, and stop boundaries
 - [AI skills onboarding checklist](https://www.skillsboard.sh/guides/onboard-new-teammate-ai-skills-checklist): Help a new teammate find, choose, and verify one team-recommended skill
