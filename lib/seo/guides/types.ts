@@ -10,6 +10,7 @@ export const guidePaths = {
   chooseFirstTeamSkill: "/guides/choose-first-ai-agent-skill-for-your-team",
   shareTeamSkills: "/guides/share-agent-skills-with-your-team",
   manageCrossAgentSkills: "/guides/manage-skills-across-claude-codex-cursor",
+  installClaudeSkills: "/guides/install-claude-skills-in-claude-code",
   aiCodingTeamOnboarding: "/guides/ai-coding-team-onboarding",
   aiCodingGuidelinesTemplate: "/guides/ai-coding-guidelines-template",
 } as const
@@ -36,6 +37,35 @@ export interface GuideCitations {
   decision?: readonly string[]
   /** Zero-based step index mapped to the sources that support that step. */
   steps?: Readonly<Record<number, readonly string[]>>
+}
+
+/** One contextual link out of a section, rendered as a sentence. */
+export interface GuideInlineLink {
+  lead: string
+  label: string
+  href: GuidePath | ClaudeSkillsPath | CodexSkillsPath | CursorSkillsPath
+  trail: string
+}
+
+/** Question and answer pair, extracted into FAQPage schema when present. */
+export interface GuideFaqEntry {
+  question: string
+  answer: string
+}
+
+/**
+ * Optional closing section for a guide whose workflow ends at a team handoff.
+ * When a guide defines it, it replaces the generic library callout, so the page
+ * keeps one product mention rather than two.
+ */
+export interface GuideTeamSection {
+  title: string
+  intro: string
+  paths: readonly {
+    label: string
+    body: string
+  }[]
+  limits: readonly string[]
 }
 
 export interface GuideEvidenceAsset {
@@ -74,6 +104,8 @@ export interface GuideDefinition {
   intro: string
   /** Concise, answer-first summary shown near the start of the guide. */
   answer: string
+  /** Contextual link out of the answer, for the page that defines the subject. */
+  answerLink?: GuideInlineLink
   /** Source keys rendered beside the material claims they support. */
   citations?: GuideCitations
   corePrinciple: string
@@ -85,6 +117,13 @@ export interface GuideDefinition {
     label: string
     cells: readonly string[]
   }[]
+  /**
+   * True when the steps are an ordered procedure, which is what lets the page
+   * publish a HowTo. A guide whose steps are independent alternatives sets
+   * this to false, so the collection is not misread as positions in a single
+   * procedure.
+   */
+  stepsAreSequential: boolean
   stepsTitle: string
   stepsIntro: string
   steps: readonly {
@@ -92,6 +131,9 @@ export interface GuideDefinition {
     body: string
     output: string
   }[]
+  /** Contextual link out of the workflow, for the guide that continues it. */
+  stepsLink?: GuideInlineLink
+  team?: GuideTeamSection
   templateTitle: string
   templateIntro: string
   templateFields: readonly {
@@ -107,6 +149,7 @@ export interface GuideDefinition {
     body: string
   }[]
   checklist: readonly string[]
+  faq?: readonly GuideFaqEntry[]
   sources: readonly GuideSource[]
   /** Intentional social creative — not auto-derived from title. */
   og: OgTemplateContent

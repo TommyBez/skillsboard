@@ -7,9 +7,13 @@ import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { GuideEvidenceAssetSection } from "@/components/guides/guide-evidence-asset"
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
-import { buildGuideSchema } from "@/lib/seo/guide-schema"
+import { buildGuideSchema, stepAnchorId } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, slugFromPath, type GuideDefinition } from "@/lib/seo/guides"
-import type { GuideSource } from "@/lib/seo/guides/types"
+import type {
+  GuideInlineLink,
+  GuideSource,
+  GuideTeamSection,
+} from "@/lib/seo/guides/types"
 import { getRelatedResources, resourcePaths } from "@/lib/seo/resources"
 
 const guideDateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -66,6 +70,67 @@ function SectionCitations({
   )
 }
 
+function InlineLink({ link }: { link: GuideInlineLink }) {
+  return (
+    <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
+      {link.lead}{" "}
+      <Link
+        href={link.href}
+        className="font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+      >
+        {link.label}
+      </Link>
+      {link.trail}
+    </p>
+  )
+}
+
+/**
+ * The library callout, written by the guide instead of by the shell. A guide
+ * that names the four ways a teammate can act on a saved skill replaces the
+ * generic copy below, so the page keeps one product mention rather than two.
+ */
+function GuideTeamCallout({ team }: { team: GuideTeamSection }) {
+  return (
+    <section
+      id="team"
+      aria-labelledby="team-heading"
+      className="mt-16 scroll-mt-24 rounded-[3px] bg-[var(--surface-ink)] px-6 py-8 text-[var(--surface-ink-foreground)] md:px-9 md:py-10"
+    >
+      <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+        Make the recommendation findable
+      </p>
+      <h2
+        id="team-heading"
+        className="mt-4 max-w-2xl text-pretty text-2xl font-semibold leading-tight md:text-3xl"
+      >
+        {team.title}
+      </h2>
+      <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
+        {team.intro}
+      </p>
+      <dl className="mt-7 grid gap-4 md:grid-cols-2">
+        {team.paths.map((path) => (
+          <div key={path.label} className="border-l-2 border-primary pl-4">
+            <dt className="font-semibold">{path.label}</dt>
+            <dd className="mt-2 text-sm leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
+              {path.body}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <ul className="mt-7 space-y-2 text-sm leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
+        {team.limits.map((limit) => (
+          <li key={limit}>{limit}</li>
+        ))}
+      </ul>
+      <div className="mt-7">
+        <ResourceCta location="guide_inline" />
+      </div>
+    </section>
+  )
+}
+
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
   const chapters = [
@@ -74,9 +139,11 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
     ...(guide.evidenceAsset
       ? [{ href: "#evidence-asset", label: "Run the fixture" }]
       : []),
+    ...(guide.team ? [{ href: "#team", label: "Share with the team" }] : []),
     { href: "#record", label: "Keep the record" },
     { href: "#pitfalls", label: "Avoid pitfalls" },
     { href: "#checklist", label: "Use the checklist" },
+    ...(guide.faq?.length ? [{ href: "#faq", label: "Read the FAQ" }] : []),
   ]
 
   return (
@@ -165,6 +232,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-4 text-pretty text-lg leading-relaxed">
                 {guide.answer}
               </p>
+              {guide.answerLink ? <InlineLink link={guide.answerLink} /> : null}
               <SectionCitations sourceIds={guide.citations?.answer} sources={guide.sources} />
             </section>
 
@@ -241,7 +309,8 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 {guide.steps.map((step, index) => (
                   <li
                     key={step.title}
-                    className="grid gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
+                    id={stepAnchorId(index)}
+                    className="grid scroll-mt-24 gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
                   >
                     <span className="font-mono text-sm font-semibold text-primary">
                       {String(index + 1).padStart(2, "0")}
@@ -260,29 +329,34 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   </li>
                 ))}
               </ol>
+              {guide.stepsLink ? <InlineLink link={guide.stepsLink} /> : null}
             </section>
 
             {guide.evidenceAsset ? (
               <GuideEvidenceAssetSection asset={guide.evidenceAsset} />
             ) : null}
 
-            <section
-              aria-label="Create a shared skill library"
-              className="mt-16 rounded-[3px] bg-[var(--surface-ink)] px-6 py-8 text-[var(--surface-ink-foreground)] md:px-9 md:py-10"
-            >
-              <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                Make the recommendation findable
-              </p>
-              <p className="mt-4 max-w-2xl text-pretty text-2xl font-semibold leading-tight md:text-3xl">
-                Skills Board keeps the source, install path, notes, and team recommendation in one searchable library.
-              </p>
-              <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
-                It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
-              </p>
-              <div className="mt-7">
-                <ResourceCta location="guide_inline" />
-              </div>
-            </section>
+            {guide.team ? (
+              <GuideTeamCallout team={guide.team} />
+            ) : (
+              <section
+                aria-label="Create a shared skill library"
+                className="mt-16 rounded-[3px] bg-[var(--surface-ink)] px-6 py-8 text-[var(--surface-ink-foreground)] md:px-9 md:py-10"
+              >
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                  Make the recommendation findable
+                </p>
+                <p className="mt-4 max-w-2xl text-pretty text-2xl font-semibold leading-tight md:text-3xl">
+                  Skills Board keeps the source, install path, notes, and team recommendation in one searchable library.
+                </p>
+                <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
+                  It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
+                </p>
+                <div className="mt-7">
+                  <ResourceCta location="guide_inline" />
+                </div>
+              </section>
+            )}
 
             <section id="record" aria-labelledby="record-heading" className="scroll-mt-24 pt-16">
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
@@ -362,6 +436,27 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 ))}
               </ul>
             </section>
+
+            {guide.faq?.length ? (
+              <section id="faq" aria-labelledby="faq-heading" className="scroll-mt-24 pt-16">
+                <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+                  06 / Questions
+                </p>
+                <h2 id="faq-heading" className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
+                  Frequently asked questions
+                </h2>
+                <dl className="mt-8 divide-y divide-border border-y border-border">
+                  {guide.faq.map((entry) => (
+                    <div key={entry.question} className="py-6">
+                      <dt className="text-lg font-semibold">{entry.question}</dt>
+                      <dd className="mt-3 text-pretty leading-relaxed text-muted-foreground">
+                        {entry.answer}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </section>
+            ) : null}
 
             <section aria-labelledby="sources-heading" className="pt-16">
               <h2 id="sources-heading" className="text-2xl font-semibold tracking-tight">

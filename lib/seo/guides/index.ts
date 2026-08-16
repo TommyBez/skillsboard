@@ -2,6 +2,7 @@ import { aiCodingGuidelinesTemplateGuide } from "@/lib/seo/guides/content/ai-cod
 import { aiCodingTeamOnboardingGuide } from "@/lib/seo/guides/content/ai-coding-team-onboarding"
 import { aiSkillUseCasesGuide } from "@/lib/seo/guides/content/ai-skill-use-cases"
 import { chooseFirstTeamSkillGuide } from "@/lib/seo/guides/content/choose-first-team-skill"
+import { installClaudeSkillsGuide } from "@/lib/seo/guides/content/install-claude-skills"
 import { manageCrossAgentSkillsGuide } from "@/lib/seo/guides/content/manage-cross-agent-skills"
 import { onboardNewTeammateSkillsGuide } from "@/lib/seo/guides/content/onboard-new-teammate-skills"
 import { shareTeamSkillsGuide } from "@/lib/seo/guides/content/share-team-skills"
@@ -20,6 +21,7 @@ export {
   aiCodingTeamOnboardingGuide,
   aiSkillUseCasesGuide,
   chooseFirstTeamSkillGuide,
+  installClaudeSkillsGuide,
   manageCrossAgentSkillsGuide,
   onboardNewTeammateSkillsGuide,
   shareTeamSkillsGuide,
@@ -35,6 +37,7 @@ export const guides = [
   aiCodingTeamOnboardingGuide,
   shareTeamSkillsGuide,
   manageCrossAgentSkillsGuide,
+  installClaudeSkillsGuide,
 ] as const satisfies readonly GuideDefinition[]
 
 function validateGuideAuthority(guide: GuideDefinition) {
@@ -119,6 +122,14 @@ export function estimateGuideWordCount(guide: GuideDefinition): number {
     ...guide.templateFields.map((field) => field.value),
     ...guide.pitfalls.map((pitfall) => pitfall.body),
     ...guide.checklist,
+    ...(guide.team
+      ? [
+          guide.team.intro,
+          ...guide.team.paths.map((path) => path.body),
+          ...guide.team.limits,
+        ]
+      : []),
+    ...(guide.faq ?? []).map((entry) => entry.answer),
     ...guide.sources.map((source) => source.note),
     ...(guide.evidenceAsset
       ? [

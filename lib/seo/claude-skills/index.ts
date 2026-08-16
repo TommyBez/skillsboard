@@ -4,7 +4,11 @@ import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
-import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import {
+  type GuideInlineLink,
+  guidePaths,
+  type GuidePath,
+} from "@/lib/seo/guides/types"
 
 export {
   claudeSkillsPath,
@@ -24,6 +28,13 @@ export interface ClaudeSkillsFaqEntry {
   question: string
   answer: string
 }
+
+/**
+ * One contextual link out of a section, rendered as a sentence. Same contract
+ * as a guide's inline link, so an internal path that does not exist fails the
+ * build instead of shipping as a dead link.
+ */
+export type ClaudeSkillsInlineLink = GuideInlineLink
 
 export interface ClaudeSkillsRelatedLink {
   label: string
@@ -51,6 +62,8 @@ export interface ClaudeSkillsStepSection {
     title: string
     body: string
   }[]
+  /** Optional contextual link out of the section. */
+  link?: ClaudeSkillsInlineLink
   sourceIds: readonly string[]
 }
 
@@ -301,6 +314,12 @@ export const claudeSkills: ClaudeSkillsDefinition = {
         body: "npx skills add owner/repo installs from the skills.sh directory. /plugin marketplace add anthropics/skills registers Anthropic's repository as a plugin marketplace in Claude Code, and the document and example skill plugins install from there.",
       },
     ],
+    link: {
+      lead: "For the Claude Code half of this in full, including the precedence rules between scopes, the verification commands, and what to do when a skill does not appear, see",
+      label: "how to install Claude skills in Claude Code",
+      href: guidePaths.installClaudeSkills,
+      trail: ".",
+    },
     sourceIds: [
       "claude-code-skills",
       "anthropic-overview",
@@ -575,5 +594,5 @@ A Markdown section ready to paste into the release description.`,
   ogAlt:
     "Explainer on Claude Skills: the SKILL.md format, where skills run, and how teams share them.",
   publishedAt: "2026-08-12",
-  modifiedAt: "2026-08-15",
+  modifiedAt: "2026-08-16",
 }

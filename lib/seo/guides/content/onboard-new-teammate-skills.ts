@@ -67,6 +67,7 @@ export const onboardNewTeammateSkillsGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A six-step new teammate handoff",
   stepsIntro:
     "Assume the team library and at least one recommendation already exist. The new teammate should make the important discovery and usage decisions while an owner supplies the task, boundaries, and review criteria.",

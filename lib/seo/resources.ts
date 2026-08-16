@@ -59,6 +59,7 @@ const resourceClusterDefinitions = [
       "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
       claudeSkillsPath,
+      guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
       guidePaths.shareTeamSkills,

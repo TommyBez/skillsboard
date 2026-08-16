@@ -58,6 +58,7 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: false,
   stepsTitle: "Eight practical team skill use cases",
   stepsIntro:
     "Treat these as workflow patterns, not claims that a particular public skill is available or approved. For each one, define the team's own sources, constraints, fixture, and reviewer before recommending an implementation.",

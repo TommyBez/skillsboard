@@ -57,6 +57,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A six-step sharing workflow",
   stepsIntro:
     "Keep the first rollout small. One useful skill with a clear owner teaches you more than a large directory nobody is responsible for.",
