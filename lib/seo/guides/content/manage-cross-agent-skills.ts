@@ -125,6 +125,12 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
       output: "One version history and explicit per-agent lifecycle states.",
     },
   ],
+  stepsLink: {
+    lead: "The Claude Code adapter note is the one most teams write first, and the documented directories, precedence rules, and verification commands behind it are in",
+    label: "how to install Claude skills in Claude Code",
+    href: guidePaths.installClaudeSkills,
+    trail: ".",
+  },
   templateTitle: "The compatibility record",
   templateIntro:
     "Keep this beside the recommendation. It records evidence, not a timeless promise: agent behavior and supported setup paths can change.",

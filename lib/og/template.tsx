@@ -3,8 +3,9 @@ import { join } from "node:path"
 
 import { ImageResponse } from "next/og"
 
-export const OG_SIZE = { width: 1200, height: 630 } as const
-export const TWITTER_SIZE = { width: 1200, height: 675 } as const
+import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/size"
+
+export { OG_SIZE, TWITTER_SIZE } from "@/lib/og/size"
 
 export interface OgTitleLine {
   text: string

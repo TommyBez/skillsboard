@@ -24,6 +24,14 @@ export interface ClaudeSkillsFaqEntry {
   answer: string
 }
 
+/** One contextual link out of a section, rendered as a sentence. */
+export interface ClaudeSkillsInlineLink {
+  lead: string
+  label: string
+  href: string
+  trail: string
+}
+
 export interface ClaudeSkillsRelatedLink {
   label: string
   href: string
@@ -50,6 +58,8 @@ export interface ClaudeSkillsStepSection {
     title: string
     body: string
   }[]
+  /** Optional contextual link out of the section. */
+  link?: ClaudeSkillsInlineLink
   sourceIds: readonly string[]
 }
 
@@ -300,6 +310,12 @@ export const claudeSkills: ClaudeSkillsDefinition = {
         body: "npx skills add owner/repo installs from the skills.sh directory. /plugin marketplace add anthropics/skills registers Anthropic's repository as a plugin marketplace in Claude Code, and the document and example skill plugins install from there.",
       },
     ],
+    link: {
+      lead: "For the Claude Code half of this in full, including the precedence rules between scopes, the verification commands, and what to do when a skill does not appear, see",
+      label: "how to install Claude skills in Claude Code",
+      href: guidePaths.installClaudeSkills,
+      trail: ".",
+    },
     sourceIds: [
       "claude-code-skills",
       "anthropic-overview",

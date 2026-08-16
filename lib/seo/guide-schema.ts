@@ -1,7 +1,12 @@
 import type { GuideDefinition } from "@/lib/seo/guides"
-import { OG_SIZE } from "@/lib/og/template"
+import { OG_SIZE } from "@/lib/og/size"
 import { resourcePaths } from "@/lib/seo/resources"
 import { absoluteUrl, siteConfig } from "@/lib/site"
+
+/** Anchor of the nth workflow step, shared by the page markup and HowTo. */
+export function stepAnchorId(index: number): string {
+  return `step-${index + 1}`
+}
 
 export function buildGuideSchema(guide: GuideDefinition) {
   const organizationId = absoluteUrl("/#organization")
@@ -69,6 +74,36 @@ export function buildGuideSchema(guide: GuideDefinition) {
         citation: guide.sources.map((source) => source.href),
       },
       {
+        "@type": "HowTo",
+        "@id": `${pageUrl}#howto`,
+        name: guide.stepsTitle,
+        description: guide.stepsIntro,
+        inLanguage: "en",
+        mainEntityOfPage: pageUrl,
+        isPartOf: { "@id": websiteId },
+        step: guide.steps.map((step, index) => ({
+          "@type": "HowToStep",
+          position: index + 1,
+          name: step.title,
+          text: step.body,
+          url: `${pageUrl}#${stepAnchorId(index)}`,
+        })),
+      },
+      ...(guide.faq?.length
+        ? [
+            {
+              "@type": "FAQPage",
+              "@id": `${pageUrl}#faq`,
+              isPartOf: { "@id": websiteId },
+              mainEntity: guide.faq.map((item) => ({
+                "@type": "Question",
+                name: item.question,
+                acceptedAnswer: { "@type": "Answer", text: item.answer },
+              })),
+            },
+          ]
+        : []),
+      {
         "@type": "BreadcrumbList",
         "@id": `${pageUrl}#breadcrumbs`,
         itemListElement: [
@@ -93,5 +128,5 @@ export function buildGuideSchema(guide: GuideDefinition) {
         ],
       },
     ],
-  } as const
+  }
 }

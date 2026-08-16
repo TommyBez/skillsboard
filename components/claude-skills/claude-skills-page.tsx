@@ -13,9 +13,27 @@ import {
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
-import type { ClaudeSkillsDefinition } from "@/lib/seo/claude-skills"
+import type {
+  ClaudeSkillsDefinition,
+  ClaudeSkillsInlineLink,
+} from "@/lib/seo/claude-skills"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
+
+function InlineLink({ link }: { link: ClaudeSkillsInlineLink }) {
+  return (
+    <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
+      {link.lead}{" "}
+      <Link
+        href={link.href}
+        className="font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+      >
+        {link.label}
+      </Link>
+      {link.trail}
+    </p>
+  )
+}
 
 export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
   return (
@@ -179,6 +197,7 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             intro={entry.install.intro}
           />
           <StepList steps={entry.install.steps} />
+          {entry.install.link ? <InlineLink link={entry.install.link} /> : null}
           <SectionSources
             sourceIds={entry.install.sourceIds}
             sources={entry.sources}
