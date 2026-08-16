@@ -117,6 +117,13 @@ export interface GuideDefinition {
     label: string
     cells: readonly string[]
   }[]
+  /**
+   * True when the steps are an ordered procedure, which is what lets the page
+   * publish a HowTo. A guide whose steps are independent alternatives sets
+   * this to false, so the collection is not misread as positions in a single
+   * procedure.
+   */
+  stepsAreSequential: boolean
   stepsTitle: string
   stepsIntro: string
   steps: readonly {

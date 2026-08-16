@@ -91,6 +91,7 @@ export const installClaudeSkillsGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "Install a skill and confirm Claude Code loaded it",
   stepsIntro:
     "The manual path is worth learning first, because the plugin path and the sync path produce the same result: a SKILL.md folder in a directory Claude Code reads. Commands below are quoted from the documentation cited beside each step.",

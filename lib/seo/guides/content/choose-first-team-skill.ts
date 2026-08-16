@@ -53,6 +53,7 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A six-step selection test",
   stepsIntro:
     "Compare no more than three candidates for one real task. Reject unsafe or uninspectable options first, score the remainder, and hand only the winner to a teammate who did not select it.",

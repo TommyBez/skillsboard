@@ -57,6 +57,7 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A six-step AI coding onboarding plan",
   stepsIntro:
     "Run the first cycle with a small group and one workflow. The goal is not maximum usage; it is a team playbook that another engineer can follow and improve.",

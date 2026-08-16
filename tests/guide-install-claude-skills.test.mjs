@@ -61,7 +61,9 @@ test("the install guide answers the query with the documented paths", () => {
   assert.ok(guide.answer.includes("~/.claude/skills/"), "answer omits the personal path")
   assert.ok(guide.sources.length >= 4, "too few primary sources")
   for (const source of guide.sources) {
-    assert.match(source.note, /Checked 16 August 2026\.$/)
+    // Each note has to record the date it was checked, not one fixed date, so
+    // re-verifying a single source does not break the others.
+    assert.match(source.note, /Checked \d{1,2} [A-Z][a-z]+ \d{4}\.$/)
   }
 })
 
@@ -127,6 +129,21 @@ test("a guide without an FAQ still gets HowTo and no FAQPage", () => {
   const graph = buildGuideSchema(manageCrossAgentSkillsGuide)["@graph"]
   assert.ok(graph.some((node) => node["@type"] === "HowTo"))
   assert.ok(!graph.some((node) => node["@type"] === "FAQPage"))
+})
+
+test("only a sequential guide publishes HowTo", () => {
+  assert.equal(guide.stepsAreSequential, true)
+
+  const collection = guides.find((entry) => !entry.stepsAreSequential)
+  assert.ok(collection, "no guide models its steps as a collection")
+  assert.equal(collection.path, "/guides/ai-skill-use-cases-for-teams")
+
+  const graph = buildGuideSchema(collection)["@graph"]
+  assert.ok(
+    !graph.some((node) => node["@type"] === "HowTo"),
+    "independent alternatives were published as HowTo steps",
+  )
+  assert.ok(graph.some((node) => node["@type"] === "TechArticle"))
 })
 
 test("the Markdown twin carries the new sections", () => {

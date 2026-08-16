@@ -90,6 +90,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A cross-agent rollout that stays understandable",
   stepsIntro:
     "Pilot one skill across the three agents before generalizing the process. The goal is to expose differences early and keep them in a small compatibility record.",
@@ -265,5 +266,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-15",
+  modifiedAt: "2026-08-16",
 }

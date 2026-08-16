@@ -70,6 +70,7 @@ export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "Build the guidelines in six passes",
   stepsIntro:
     "Start from a real workflow and the failures you need to prevent. The first version should be short enough to test this week and explicit enough that a teammate can tell when to stop.",

@@ -58,6 +58,7 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
       ],
     },
   ],
+  stepsAreSequential: true,
   stepsTitle: "A six-step MCP team-library test",
   stepsIntro:
     "Start with one existing team recommendation and one teammate. The goal is to prove that the teammate can reach the right library, understand the granted access, and retrieve a useful path without private setup guidance.",

@@ -4,7 +4,11 @@ import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
-import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import {
+  type GuideInlineLink,
+  guidePaths,
+  type GuidePath,
+} from "@/lib/seo/guides/types"
 
 export {
   claudeSkillsPath,
@@ -25,13 +29,12 @@ export interface ClaudeSkillsFaqEntry {
   answer: string
 }
 
-/** One contextual link out of a section, rendered as a sentence. */
-export interface ClaudeSkillsInlineLink {
-  lead: string
-  label: string
-  href: string
-  trail: string
-}
+/**
+ * One contextual link out of a section, rendered as a sentence. Same contract
+ * as a guide's inline link, so an internal path that does not exist fails the
+ * build instead of shipping as a dead link.
+ */
+export type ClaudeSkillsInlineLink = GuideInlineLink
 
 export interface ClaudeSkillsRelatedLink {
   label: string
@@ -591,5 +594,5 @@ A Markdown section ready to paste into the release description.`,
   ogAlt:
     "Explainer on Claude Skills: the SKILL.md format, where skills run, and how teams share them.",
   publishedAt: "2026-08-12",
-  modifiedAt: "2026-08-15",
+  modifiedAt: "2026-08-16",
 }

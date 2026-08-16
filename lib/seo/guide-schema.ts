@@ -73,22 +73,31 @@ export function buildGuideSchema(guide: GuideDefinition) {
         thumbnailUrl: articleImageUrl,
         citation: guide.sources.map((source) => source.href),
       },
-      {
-        "@type": "HowTo",
-        "@id": `${pageUrl}#howto`,
-        name: guide.stepsTitle,
-        description: guide.stepsIntro,
-        inLanguage: "en",
-        mainEntityOfPage: pageUrl,
-        isPartOf: { "@id": websiteId },
-        step: guide.steps.map((step, index) => ({
-          "@type": "HowToStep",
-          position: index + 1,
-          name: step.title,
-          text: step.body,
-          url: `${pageUrl}#${stepAnchorId(index)}`,
-        })),
-      },
+      /**
+       * Only an ordered procedure is published as a HowTo. A guide whose steps
+       * are independent alternatives would otherwise be read as positions in
+       * one procedure, which is not what the page says.
+       */
+      ...(guide.stepsAreSequential
+        ? [
+            {
+              "@type": "HowTo",
+              "@id": `${pageUrl}#howto`,
+              name: guide.stepsTitle,
+              description: guide.stepsIntro,
+              inLanguage: "en",
+              mainEntityOfPage: pageUrl,
+              isPartOf: { "@id": websiteId },
+              step: guide.steps.map((step, index) => ({
+                "@type": "HowToStep",
+                position: index + 1,
+                name: step.title,
+                text: step.body,
+                url: `${pageUrl}#${stepAnchorId(index)}`,
+              })),
+            },
+          ]
+        : []),
       ...(guide.faq?.length
         ? [
             {
