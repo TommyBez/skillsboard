@@ -1,3 +1,4 @@
+import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { guidePaths, type GuideDefinition } from "@/lib/seo/guides/types"
 
 export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
@@ -23,6 +24,12 @@ export const aiCodingGuidelinesTemplateGuide: GuideDefinition = {
     "A useful AI coding policy should make everyday engineering decisions easier. It should tell people and agents which work is appropriate, which context is authoritative, how output is verified, and when a human must take over. This template gives a small team a practical starting point without pretending one file can replace security, privacy, or legal review.",
   answer:
     "Effective AI coding guidelines separate short, universal boundaries from repository context and task-specific playbooks. Define permitted work, authoritative context, verification, human handoffs, and ownership. Then test the guidance on real work; one policy file cannot replace security or review.",
+  answerLink: {
+    lead: "The two file formats that carry those layers today are AGENTS.md for repository context and SKILL.md for a packaged procedure, compared field by field in",
+    label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
+    href: agentsMdVsSkillMdPath,
+    trail: ".",
+  },
   citations: {
     answer: [
       "github-custom-instructions",

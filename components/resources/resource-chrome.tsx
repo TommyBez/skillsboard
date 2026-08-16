@@ -9,6 +9,7 @@ import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
+import type { AgentsMdVsSkillMdCtaPlacement } from "@/lib/seo/agents-md-vs-skill-md/types"
 import {
   alternativesIndexPath,
   type AlternativeCtaPlacement,
@@ -26,6 +27,7 @@ import { siteConfig } from "@/lib/site"
 
 type ResourceHeaderLocation =
   | "about_header"
+  | "agents_md_header"
   | "alternatives_header"
   | "claude_skills_header"
   | "codex_skills_header"
@@ -36,6 +38,7 @@ type ResourceHeaderLocation =
   | "pricing_header"
   | "resources_header"
 type ResourceCtaLocation =
+  | AgentsMdVsSkillMdCtaPlacement
   | "alternatives_index"
   | AlternativeCtaPlacement
   | ClaudeSkillsCtaPlacement

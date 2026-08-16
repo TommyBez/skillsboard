@@ -90,6 +90,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/agents-md-vs-skill-md/",
+        destination: "/agents-md-vs-skill-md",
+        permanent: true,
+      },
+      {
         source: "/claude-skills/",
         destination: "/claude-skills",
         permanent: true,
@@ -149,13 +154,19 @@ const nextConfig = {
       // `text/markdown`, so ordinary page traffic never reaches these.
       //
       // Scoped to the URL shapes that have a Markdown twin instead of the whole
-      // site: `/<something>-skills`, a guide, or an alternative. A request for
-      // a page outside those shapes keeps returning HTML rather than a 404.
+      // site: `/<something>-skills`, a top-level article that does not end in
+      // `-skills`, a guide, or an alternative. A request for a page outside
+      // those shapes keeps returning HTML rather than a 404.
       beforeFiles: [
         {
           source: "/:slug([^/]*-skills)",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/:slug",
+        },
+        {
+          source: "/agents-md-vs-skill-md",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/agents-md-vs-skill-md",
         },
         {
           source: "/guides/:slug",

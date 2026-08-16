@@ -1,3 +1,8 @@
+import { agentsMdVsSkillMd } from "@/lib/seo/agents-md-vs-skill-md"
+import {
+  agentsMdVsSkillMdPath,
+  type AgentsMdVsSkillMdPath,
+} from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
@@ -17,6 +22,7 @@ export type ResourceContentType = "guide" | "article"
 /** Every path the resource hub, related links, and sitemap can address. */
 export type ResourcePath =
   | GuidePath
+  | AgentsMdVsSkillMdPath
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CursorSkillsPath
@@ -38,6 +44,7 @@ export const resourceEntries = [
   claudeSkills,
   codexSkills,
   cursorSkills,
+  agentsMdVsSkillMd,
 ] satisfies readonly ResourceIndexEntry[]
 
 const resourceEntriesByPath = new Map(
@@ -62,6 +69,7 @@ const resourceClusterDefinitions = [
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
+      agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,
       guidePaths.manageCrossAgentSkills,
       guidePaths.sharedMcpSkillLibrary,

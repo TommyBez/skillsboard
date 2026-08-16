@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
@@ -70,7 +71,7 @@ export interface CodexSkillsDefinition {
   answer: string
   answerNotes: readonly string[]
   answerSourceIds: readonly string[]
-  locations: CodexSkillsTableSection
+  locations: CodexSkillsTableSection & { link: CodexSkillsInlineLink }
   transfers: CodexSkillsTableSection & { link: CodexSkillsInlineLink }
   install: {
     title: string
@@ -195,6 +196,12 @@ export const codexSkills: CodexSkillsDefinition = {
       "You can turn a skill off without deleting it. A [[skills.config]] entry in ~/.codex/config.toml takes the path to the skill folder containing SKILL.md and an enabled flag, and the config reference documents both keys. Restart Codex after changing the file.",
       "Codex detects skill changes automatically, and OpenAI's instruction when an update does not show up is to restart Codex. The same applies to skills you have just installed.",
     ],
+    link: {
+      lead: "Skills are not the only file Codex reads. It also builds an AGENTS.md chain before doing any work, and the two formats answer different questions, which is the subject of",
+      label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
+      href: agentsMdVsSkillMdPath,
+      trail: ".",
+    },
     sourceIds: ["codex-skills", "codex-config-reference"],
   },
   transfers: {
@@ -478,6 +485,12 @@ A Markdown section titled with the version and date.`,
     },
   ],
   related: [
+    {
+      label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
+      href: agentsMdVsSkillMdPath,
+      description:
+        "The other file Codex reads, what belongs in each, and how the two work together.",
+    },
     {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,

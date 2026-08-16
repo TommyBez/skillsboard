@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
@@ -557,6 +558,12 @@ A Markdown section titled with the version and date.`,
     },
   ],
   related: [
+    {
+      label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
+      href: agentsMdVsSkillMdPath,
+      description:
+        "The plain Markdown file Cursor reads beside its rules, and what belongs there rather than in a skill.",
+    },
     {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,
