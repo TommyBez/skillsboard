@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { skillsVsMcp } from "@/lib/seo/compare/skills-vs-mcp"
 import { skillsVsSubagents } from "@/lib/seo/compare/skills-vs-subagents"
 import type {
   ComparePath,
@@ -25,7 +26,10 @@ export {
  * ItemList schema, and the sitemap all read this array, so adding a pair means
  * adding a content module and one entry here.
  */
-export const comparisons: readonly ComparisonDefinition[] = [skillsVsSubagents]
+export const comparisons: readonly ComparisonDefinition[] = [
+  skillsVsSubagents,
+  skillsVsMcp,
+]
 
 const comparisonsByPath = new Map(
   comparisons.map((entry) => [entry.path, entry]),
@@ -51,7 +55,7 @@ export const compareIndexDescription =
   "Short, sourced comparisons of the primitives an AI coding agent gives you. What each one is, where it lives, when it is the right choice, and what the documentation does not say."
 
 export const compareIndexOgAlt =
-  "Skills Board comparison hub: sourced comparisons of AI agent primitives such as skills and subagents."
+  "Skills Board comparison hub: sourced comparisons of AI agent primitives such as skills, subagents, and MCP."
 
 export const compareIndexOg: OgTemplateContent = {
   eyebrow: "Comparisons",
@@ -62,7 +66,7 @@ export const compareIndexOg: OgTemplateContent = {
   description:
     "Sourced comparisons of the AI agent primitives that look interchangeable and are not.",
   contextLabel: "skillsboard.sh/compare",
-  chips: ["Skills", "Subagents"],
+  chips: ["Skills", "Subagents", "MCP"],
 }
 
 /** Newest modification across the set, used for the hub's sitemap entry. */

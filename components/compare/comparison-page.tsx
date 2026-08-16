@@ -16,6 +16,7 @@ import type {
   ComparisonDefinition,
   ComparisonInlineLink,
   ComparisonPrimitiveCase,
+  ComparisonTeamSection,
 } from "@/lib/seo/compare/types"
 import { buildComparisonSchema } from "@/lib/seo/compare-schema"
 import { resourcePaths } from "@/lib/seo/resources"
@@ -95,7 +96,56 @@ function PrimitiveCase({
   )
 }
 
+/**
+ * The team section is optional: some pairs end on a primitive, and some end on
+ * a route a team walks. When a definition supplies it, it renders between the
+ * "together" section and the FAQ, and the section numbering shifts by one.
+ */
+function TeamPaths({
+  eyebrow,
+  section,
+  sources,
+}: {
+  eyebrow: string
+  section: ComparisonTeamSection
+  sources: ComparisonDefinition["sources"]
+}) {
+  return (
+    <section aria-labelledby="team-heading" className="pt-16">
+      <SectionHeading
+        eyebrow={eyebrow}
+        id="team"
+        title={section.title}
+        intro={section.intro}
+      />
+      <ol className="mt-9 border-t border-border">
+        {section.paths.map((item, index) => (
+          <li
+            key={item.title}
+            className="grid gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
+          >
+            <span className="font-mono text-sm font-semibold text-primary">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div>
+              <h3 className="text-xl font-semibold">{item.title}</h3>
+              <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
+                {item.body}
+              </p>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <NoteList notes={section.notes} />
+      <SectionSources sourceIds={section.sourceIds} sources={sources} />
+    </section>
+  )
+}
+
 export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
+  const team = entry.team
+  const number = (position: number) => String(position).padStart(2, "0")
+
   return (
     <>
       <JsonLd data={buildComparisonSchema(entry)} />
@@ -198,13 +248,13 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
 
         <section aria-labelledby="side-by-side-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Comparison"
+            eyebrow={`${number(1)} / Comparison`}
             id="side-by-side"
             title={entry.sideBySide.title}
             intro={entry.sideBySide.intro}
           />
           <SectionTable
-            caption="The dimensions on which a skill and a subagent differ."
+            caption={entry.sideBySide.caption}
             columns={entry.sideBySide.columns}
             rows={entry.sideBySide.rows}
             labelWidth="w-[18%]"
@@ -217,28 +267,28 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
         </section>
 
         <PrimitiveCase
-          eyebrow="02 / Skills"
-          id="skill-case"
-          section={entry.skillCase}
+          eyebrow={`${number(2)} / ${entry.leftCase.eyebrowLabel}`}
+          id="left-case"
+          section={entry.leftCase}
           sources={entry.sources}
         />
 
         <PrimitiveCase
-          eyebrow="03 / Subagents"
-          id="subagent-case"
-          section={entry.subagentCase}
+          eyebrow={`${number(3)} / ${entry.rightCase.eyebrowLabel}`}
+          id="right-case"
+          section={entry.rightCase}
           sources={entry.sources}
         />
 
         <section aria-labelledby="together-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Together"
+            eyebrow={`${number(4)} / Together`}
             id="together"
             title={entry.together.title}
             intro={entry.together.intro}
           />
           <SectionTable
-            caption="The two documented ways a skill and a subagent combine."
+            caption={entry.together.caption}
             columns={entry.together.directions.columns}
             rows={entry.together.directions.rows}
             labelWidth="w-[24%]"
@@ -247,11 +297,7 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
           <CodeBlock
             label={entry.together.templateLabel}
             value={entry.together.template}
-            copy={{
-              buttonLabel: "Copy example",
-              ariaLabel: "Copy the subagent example",
-              copiedAriaLabel: "Subagent example copied",
-            }}
+            copy={entry.together.templateCopy}
           />
           <InlineLink link={entry.together.link} />
           <div className="mt-8">
@@ -263,9 +309,17 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
           />
         </section>
 
+        {team ? (
+          <TeamPaths
+            eyebrow={`${number(5)} / Teams`}
+            section={team}
+            sources={entry.sources}
+          />
+        ) : null}
+
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            05 / Questions
+            {number(team ? 6 : 5)} / Questions
           </p>
           <h2
             id="faq-heading"
@@ -298,9 +352,9 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every claim about how skills and subagents behave comes from the
-            first-party documentation below, checked on the date at the top of
-            this page. Where the documentation says nothing, this page says so
+            every claim about how {entry.editorialSubject} behave comes from
+            the first-party documentation below, checked on the date at the top
+            of this page. Where the documentation says nothing, this page says so
             instead of filling the gap. Product behavior changes, so check the
             linked pages before you rely on a detail.
           </p>
@@ -357,12 +411,10 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Whichever primitive you pick, someone still has to find it.
+            {entry.closing.title}
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-            Skills Board is a shared library for the skills a team recommends.
-            Free forever, MIT licensed, and open source. Save the first one and
-            invite the person who keeps asking which one to use.
+            {entry.closing.body}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
             <ResourceCta location={`${entry.ctaLocation}_closing`} />

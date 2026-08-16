@@ -62,6 +62,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
   answerSourceIds: ["claude-code-subagents", "claude-code-skills"],
   sideBySide: {
     title: "Side by side",
+    caption: "The dimensions on which a skill and a subagent differ.",
     intro:
       "Seven dimensions that actually differ. Everything here comes from the Claude Code documentation for each primitive and from the Agent Skills specification, not from inference about how they behave.",
     columns: ["Dimension", "Skill", "Subagent"],
@@ -129,7 +130,8 @@ export const skillsVsSubagents: ComparisonDefinition = {
       "anthropic-agent-skills",
     ],
   },
-  skillCase: {
+  leftCase: {
+    eyebrowLabel: "Skills",
     title: "When a skill is the right primitive",
     intro:
       "A skill is the right choice when the value is in the instructions and the work belongs where you already are. Four cases where that holds, each traceable to something the documentation says rather than to a preference.",
@@ -159,7 +161,8 @@ export const skillsVsSubagents: ComparisonDefinition = {
     ],
     sourceIds: ["claude-code-skills", "claude-code-subagents", "agentskills-spec"],
   },
-  subagentCase: {
+  rightCase: {
+    eyebrowLabel: "Subagents",
     title: "When a subagent is the right primitive",
     intro:
       "A subagent is the right choice when the value is in the isolation. The documentation gives three conditions, and two more follow from what the frontmatter can set.",
@@ -196,6 +199,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
   },
   together: {
     title: "Using both in the same repo",
+    caption: "The two documented ways a skill and a subagent combine.",
     intro:
       "The two primitives are not alternatives at the file level. Anthropic documents them composing in two directions, and a repository that uses both keeps .claude/skills/ and .claude/agents/ side by side in version control.",
     directions: {
@@ -227,6 +231,11 @@ export const skillsVsSubagents: ComparisonDefinition = {
     ],
     template: subagentFileTemplate,
     templateLabel: "A subagent that preloads a skill",
+    templateCopy: {
+      buttonLabel: "Copy example",
+      ariaLabel: "Copy the subagent example",
+      copiedAriaLabel: "Subagent example copied",
+    },
     link: {
       lead: "Once more than one person depends on the same file, the harder problem is agreement rather than syntax:",
       label: "how to share AI agent skills with your team",
@@ -301,6 +310,12 @@ export const skillsVsSubagents: ComparisonDefinition = {
   ],
   related: [
     {
+      label: "Claude skills vs MCP: what each one is for",
+      href: comparePaths.skillsVsMcp,
+      description:
+        "The other pair people read as a choice: instructions the agent loads against a protocol for reaching systems it does not own.",
+    },
+    {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,
       description:
@@ -341,6 +356,11 @@ export const skillsVsSubagents: ComparisonDefinition = {
       "What each primitive is, where each lives, when each is the right choice, and the two documented ways they combine.",
     contextLabel: "skillsboard.sh/compare",
     chips: ["SKILL.md", ".claude/agents", "context: fork"],
+  },
+  editorialSubject: "skills and subagents",
+  closing: {
+    title: "Whichever primitive you pick, someone still has to find it.",
+    body: "Skills Board is a shared library for the skills a team recommends. Free forever, MIT licensed, and open source. Save the first one and invite the person who keeps asking which one to use.",
   },
   ogAlt:
     "Comparison of Claude skills and subagents: what each one is, where each lives, and when to use each.",
