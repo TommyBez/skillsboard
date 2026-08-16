@@ -4,11 +4,16 @@ import { test } from "node:test"
 
 import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
-const { compareIndexPath, comparePaths } = await loadTsModule(
-  new URL("../lib/seo/compare/types.ts", import.meta.url),
+const { compareIndexPath, comparePaths, comparisons } = await loadTsModule(
+  new URL("../lib/seo/compare/index.ts", import.meta.url),
 )
 
-const paths = Object.values(comparePaths)
+/**
+ * Read the paths off the registry rather than off the path map: registration
+ * is what puts a comparison on the hub, in the ItemList schema, and in the
+ * sitemap, so that is what the route and llms.txt checks have to follow.
+ */
+const paths = comparisons.map((entry) => entry.path)
 
 async function exists(relative) {
   try {
@@ -32,6 +37,14 @@ test("every comparison lives under the hub that lists it", () => {
 
 test("comparison paths are unique", () => {
   assert.equal(new Set(paths).size, paths.length)
+})
+
+test("the path map lists exactly the registered comparisons", () => {
+  assert.deepEqual(
+    [...paths].sort(),
+    Object.values(comparePaths).sort(),
+    "comparePaths and the comparisons array disagree, so one of them points at a page the other does not know about",
+  )
 })
 
 test("every registered comparison has a route", async () => {

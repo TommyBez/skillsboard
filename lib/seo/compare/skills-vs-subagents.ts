@@ -12,6 +12,16 @@ const subagentFileTemplate = `.claude/
   agents/
     api-reviewer.md
 
+# .claude/skills/api-conventions/SKILL.md
+---
+name: api-conventions
+description: The REST conventions this repository follows for route handlers, status codes, and error shapes.
+---
+
+Route handlers validate input before touching the database, return 422 with a
+field-level message on validation failure, and never return an internal error
+string to the client.
+
 # .claude/agents/api-reviewer.md
 ---
 name: api-reviewer
