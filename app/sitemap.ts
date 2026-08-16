@@ -5,6 +5,11 @@ import {
   alternativesIndexModifiedAt,
   alternativesIndexPath,
 } from "@/lib/seo/alternatives"
+import {
+  compareIndexModifiedAt,
+  compareIndexPath,
+  comparisons,
+} from "@/lib/seo/compare"
 import { guideEvidencePaths } from "@/lib/seo/guides/types"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
@@ -16,6 +21,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "1970-01-01",
   )
   const resourceSitemapEntries: MetadataRoute.Sitemap = resourceEntries.map(
+    (entry) => ({
+      url: `${siteConfig.url}${entry.path}`,
+      lastModified: new Date(entry.modifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    }),
+  )
+
+  const comparisonSitemapEntries: MetadataRoute.Sitemap = comparisons.map(
     (entry) => ({
       url: `${siteConfig.url}${entry.path}`,
       lastModified: new Date(entry.modifiedAt),
@@ -96,5 +110,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
     },
     ...alternativeSitemapEntries,
+    {
+      url: `${siteConfig.url}${compareIndexPath}`,
+      lastModified: new Date(compareIndexModifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    ...comparisonSitemapEntries,
   ]
 }
