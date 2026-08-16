@@ -37,6 +37,7 @@ Markdown versions: every guide, skill format explainer, and alternatives page li
 ## Comparisons
 - [Comparisons](https://www.skillsboard.sh/compare): Sourced comparisons of the AI agent primitives that look interchangeable, with the date each was last checked
 - [Claude skills vs subagents](https://www.skillsboard.sh/compare/claude-skills-vs-subagents): What each primitive is, where each lives, what triggers each, when each is the right choice, and the two documented ways they combine
+- [Claude skills vs MCP](https://www.skillsboard.sh/compare/claude-skills-vs-mcp): What a skill is for and what the Model Context Protocol is for, why they are not alternatives, and what a repository that commits both looks like
 
 ## Team skill workflows
 - [AI agent skill use cases for teams](https://www.skillsboard.sh/guides/ai-skill-use-cases-for-teams): Eight repeatable workflows with triggers, inputs, outputs, human checks, and stop boundaries

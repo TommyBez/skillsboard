@@ -544,6 +544,12 @@ A Markdown section ready to paste into the release description.`,
         "The other primitive in the same directory tree, and the dimensions that decide which one a job belongs to.",
     },
     {
+      label: "Claude skills vs MCP: what each one is for",
+      href: comparePaths.skillsVsMcp,
+      description:
+        "Instructions the agent loads next to a protocol for reaching systems it does not own, and why teams end up with both.",
+    },
+    {
       label: "Codex skills: what they are and how to use them",
       href: codexSkillsPath,
       description:

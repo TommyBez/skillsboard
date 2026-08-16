@@ -10,6 +10,7 @@ export const compareIndexPath = "/compare" as const
 
 export const comparePaths = {
   skillsVsSubagents: "/compare/claude-skills-vs-subagents",
+  skillsVsMcp: "/compare/claude-skills-vs-mcp",
 } as const
 
 export type CompareIndexPath = typeof compareIndexPath
@@ -17,7 +18,9 @@ export type CompareIndexPath = typeof compareIndexPath
 export type ComparePath = (typeof comparePaths)[keyof typeof comparePaths]
 
 /** One value per comparison page, used as the analytics location prefix. */
-export type ComparisonCtaLocation = "compare_skills_subagents"
+export type ComparisonCtaLocation =
+  | "compare_skills_subagents"
+  | "compare_skills_mcp"
 
 /**
  * The sticky shell CTA for a comparison page. It is per page rather than per
@@ -64,6 +67,8 @@ export interface ComparisonInlineLink {
 export interface ComparisonSideBySide {
   title: string
   intro: string
+  /** Table caption, since the dimensions differ from pair to pair. */
+  caption: string
   columns: readonly string[]
   rows: readonly {
     label: string
@@ -78,8 +83,13 @@ export interface ComparisonSideBySide {
  * One half of the verdict: the situations where a primitive is the right
  * choice, plus the counterweight that says when it is not. Both halves carry
  * the counterweight so neither section reads as a recommendation.
+ *
+ * `leftCase` and `rightCase` on the definition line up with the second and
+ * third column of the side-by-side table, in that order.
  */
 export interface ComparisonPrimitiveCase {
+  /** Section eyebrow, named after the primitive rather than the page. */
+  eyebrowLabel: string
   title: string
   intro: string
   cases: readonly {
@@ -91,9 +101,17 @@ export interface ComparisonPrimitiveCase {
   sourceIds: readonly string[]
 }
 
+/** Copy on the button that duplicates a section's code template. */
+export interface ComparisonTemplateCopy {
+  buttonLabel: string
+  ariaLabel: string
+  copiedAriaLabel: string
+}
+
 export interface ComparisonTogether {
   title: string
   intro: string
+  caption: string
   directions: {
     columns: readonly string[]
     rows: readonly {
@@ -104,7 +122,24 @@ export interface ComparisonTogether {
   notes: readonly string[]
   template: string
   templateLabel: string
+  templateCopy: ComparisonTemplateCopy
   link: ComparisonInlineLink
+  sourceIds: readonly string[]
+}
+
+/**
+ * Optional section for pairs where the team-level answer is a route rather
+ * than a primitive: the ordered paths a team walks, starting with the ones
+ * that need no product at all.
+ */
+export interface ComparisonTeamSection {
+  title: string
+  intro: string
+  paths: readonly {
+    title: string
+    body: string
+  }[]
+  notes: readonly string[]
   sourceIds: readonly string[]
 }
 
@@ -127,12 +162,19 @@ export interface ComparisonDefinition {
   answerNotes: readonly string[]
   answerSourceIds: readonly string[]
   sideBySide: ComparisonSideBySide
-  skillCase: ComparisonPrimitiveCase
-  subagentCase: ComparisonPrimitiveCase
+  leftCase: ComparisonPrimitiveCase
+  rightCase: ComparisonPrimitiveCase
   together: ComparisonTogether
+  team?: ComparisonTeamSection
   faq: readonly ComparisonFaqEntry[]
   sources: readonly ComparisonSource[]
   related: readonly ComparisonRelatedLink[]
+  /** Fills "every claim about how <subject> behave comes from ...". */
+  editorialSubject: string
+  closing: {
+    title: string
+    body: string
+  }
   og: OgTemplateContent
   ogAlt: string
   publishedAt: string
