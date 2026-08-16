@@ -55,13 +55,15 @@ export const skillsVsMcp: ComparisonDefinition = {
   answer:
     "A skill is a folder of Markdown instructions that an agent loads into context when your request matches its description. MCP is an open protocol that connects an agent to external systems and exposes their tools, resources, and prompts. Skills change what the agent knows how to do. MCP changes what the agent can reach. Most real setups need both.",
   answerNotes: [
-    "The sharpest way to see the split is what each one cannot do. A skill carries no connectivity: on the Claude API, custom Skills run inside the code execution container with no network access and no runtime package installation, so a skill alone cannot call your issue tracker there. MCP carries no procedure: the protocol specification is about context exchange and, in the words of the architecture overview, does not dictate how AI applications use LLMs or manage the provided context. A connected server hands the agent capabilities, not judgement about when to use them or in what order.",
+    "The sharpest way to see the split is what each one leans on the host for. A skill carries no connectivity of its own: on the Claude API, custom Skills run inside the code execution container with no network access and no runtime package installation, so a skill alone cannot call your issue tracker there. On a host that does hand the session a shell and a network, such as Claude Code, a skill can reach out through that shell, so the honest framing is per surface rather than per format. MCP carries little procedure: the protocol specification is about context exchange and, in the words of the architecture overview, does not dictate how AI applications use LLMs or manage the provided context. It is not none, either. Prompts are a documented server primitive, user-controlled templates a client usually surfaces as slash commands, and Claude Code loads each server's instructions at session start, truncated at 2KB. What a connected server does not decide is when the agent should reach for any of it, or in what order.",
     "Nobody first-party frames these as competitors. Anthropic's launch post for Agent Skills closed by saying the company would explore how Skills can complement MCP servers by teaching agents more complex workflows that involve external tools and software. The MCP project, for its part, runs a Skills Over MCP Working Group whose stated long-term goal is interoperable skill distribution across MCP servers and clients. The two formats are being pushed together, not apart.",
-    "If you are choosing under time pressure: write the skill first. It is a file, it costs almost nothing until it is used, it works in every product that reads the Agent Skills standard, and you can tell whether it is any good by reading it. Add an MCP server at the point where the agent has to reach something outside your machine.",
+    "If you are choosing under time pressure: write the skill first. It is a file, it costs almost nothing until it is used, it works in every product that reads the Agent Skills standard, and you can tell whether it is any good by reading it. Add an MCP server at the point where you want that reach to be a reusable, typed, credential-aware integration rather than a shell command a single skill improvises, or where your host or your policy does not give the session the shell and the network in the first place. The two answers stack, and neither one closes the door on the other.",
   ],
   answerSourceIds: [
     "anthropic-agent-skills",
     "mcp-architecture",
+    "mcp-server-concepts",
+    "claude-code-mcp",
     "anthropic-skills-post",
     "mcp-skills-wg",
   ],
@@ -170,7 +172,7 @@ export const skillsVsMcp: ComparisonDefinition = {
     ],
     counterweightTitle: "When a skill is the wrong tool",
     counterweight: [
-      "It needs live data, or a write to a system of record. Through the Claude API, custom Skills run with no network access and no runtime package installation, so the skill cannot go and get the data. In Claude Code a skill inherits your machine's network access, which means a skill that works on your laptop is not evidence that it works anywhere else.",
+      "It needs live data, or a write to a system of record, and it has to be portable. Through the Claude API, custom Skills run with no network access and no runtime package installation, so the skill cannot go and get the data at all. In Claude Code the picture is different: a skill can run Bash under your permission settings and inherits your machine's network access, so it can reach a system without any MCP server. What it cannot do is carry that reach with it, which is why a skill that works on your laptop is not evidence that it works anywhere else.",
       "You need to know exactly what ran with what arguments. A skill is prose the model may follow loosely. An MCP tool has a JSON Schema input, a defined tools/call operation, and, in clients that implement it, an approval dialog and an activity log. If the requirement is auditability, instructions are the wrong shape.",
       "The capability belongs to a product that changes without telling you. Server authors ship tool changes and clients refresh on a list_changed notification. A skill that hardcodes another product's API surface is stale the day that product ships a change, and nothing will notify you.",
     ],
@@ -190,11 +192,11 @@ export const skillsVsMcp: ComparisonDefinition = {
     cases: [
       {
         title: "The agent has to reach a system it does not own",
-        body: "Issue trackers, monitoring, databases, design files, mail. The use cases Claude Code documents for MCP are all of this shape: implement the feature described in a tracker ticket, check the error monitor, query the production database, update a template from a design. None of that is expressible as instructions, because instructions cannot make a network call on their own.",
+        body: "Issue trackers, monitoring, databases, design files, mail. The use cases Claude Code documents for MCP are all of this shape: implement the feature described in a tracker ticket, check the error monitor, query the production database, update a template from a design. Instructions alone do not make the call, but on a host that gives the session a shell they can drive one, and in Claude Code a skill can shell out under your permission settings. What that improvised path does not give you is a reusable connection: the skill re-derives the API surface, carries its own credentials, and stops working on every surface where the shell or the network is absent. MCP is the standardized boundary for the same job, which is the reason to reach for it here rather than a rule that instructions cannot.",
       },
       {
         title: "You want typed operations with consent, not prose",
-        body: "Tools are schema-defined interfaces validated with JSON Schema, each performing one operation with declared inputs and outputs. The specification is explicit that tools may require user consent before execution, and it expects clients to offer approval dialogs, permission settings, and activity logs. That is a different guarantee than a paragraph asking the model to be careful.",
+        body: "Tools are schema-defined interfaces, each performing one operation. The input side is the guarantee: every tool declares an inputSchema in JSON Schema, so the arguments are typed and validatable. The output side is weaker than the pitch suggests. outputSchema is optional in the specification, and a tool that omits it returns unstructured content with no declared shape, so a typed result is a property of the server you connected, not of MCP. Where a tool does declare one, servers must return structured results that conform to it and clients should validate them. The specification is explicit that tools may require user consent before execution, and it expects clients to offer approval dialogs, permission settings, and activity logs. That is a different guarantee than a paragraph asking the model to be careful.",
       },
       {
         title: "The connection needs credentials that are not on disk",
@@ -219,6 +221,7 @@ export const skillsVsMcp: ComparisonDefinition = {
     sourceIds: [
       "claude-code-mcp",
       "mcp-server-concepts",
+      "mcp-tools-spec",
       "mcp-architecture",
       "anthropic-mcp-connector",
     ],
@@ -342,7 +345,13 @@ export const skillsVsMcp: ComparisonDefinition = {
       id: "mcp-server-concepts",
       label: "Model Context Protocol: understanding MCP servers",
       href: "https://modelcontextprotocol.io/docs/learn/server-concepts",
-      note: "The three server features and who controls each, JSON Schema validation of tool inputs, the tools/list and tools/call operations, the note that tools may require user consent, and the client-side controls the specification expects, including approval dialogs and activity logs.",
+      note: "The three server features and who controls each, prompts as user-controlled templates surfaced as slash commands, JSON Schema validation of tool inputs, the tools/list and tools/call operations, the note that tools may require user consent, and the client-side controls the specification expects, including approval dialogs and activity logs.",
+    },
+    {
+      id: "mcp-tools-spec",
+      label: "Model Context Protocol specification: tools",
+      href: "https://modelcontextprotocol.io/specification/2025-06-18/server/tools",
+      note: "The tool definition fields, with inputSchema required and outputSchema optional, the structured and unstructured forms a tool result can take, the rule that a server must conform to an output schema when it declares one and that clients should validate against it, the consent expectations, and the list_changed notification.",
     },
     {
       id: "mcp-skills-wg",
