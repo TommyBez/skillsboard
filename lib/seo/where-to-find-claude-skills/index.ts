@@ -184,7 +184,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
         label: "anthropics/skills",
         cells: [
           "Anthropic's own public repository of Agent Skills: examples, the document skills behind Claude's file creation, the specification, and a template. It is not a catalog of other people's work.",
-          "Clone it and copy a folder, or register the repository itself as a marketplace with /plugin marketplace add anthropics/skills and install its two plugins.",
+          "Clone it and copy a folder, or register the repository itself as a marketplace with /plugin marketplace add anthropics/skills and install whichever plugins its manifest defines.",
         ],
       },
       {
@@ -240,7 +240,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       {
         name: "anthropics/skills",
         href: "https://github.com/anthropics/skills",
-        body: "Anthropic's public repository for Agent Skills, at 169,863 stars when we checked. It holds example skills across creative, technical, and enterprise tasks, the specification under spec, and a skill template. Many skills are Apache 2.0. The docx, pdf, pptx, and xlsx skills that power Claude's document capabilities are source-available rather than open source, published as a reference for more complex skills. Register it in Claude Code with /plugin marketplace add anthropics/skills and it exposes two plugins, document-skills and example-skills, under the marketplace name anthropic-agent-skills.",
+        body: "Anthropic's public repository for Agent Skills, at 169,863 stars when we checked. It holds example skills across creative, technical, and enterprise tasks, the specification under spec, and a skill template. Many skills are Apache 2.0. The docx, pdf, pptx, and xlsx skills that power Claude's document capabilities are source-available rather than open source, published as a reference for more complex skills. Register it in Claude Code with /plugin marketplace add anthropics/skills and it exposes whatever its marketplace manifest defines under the name anthropic-agent-skills, which was document-skills, example-skills, claude-api, and claude-academy-guide when we last read the file. That manifest gains an entry whenever a skill ships, so read it rather than trusting a count.",
       },
       {
         name: "The Skills API and claude.ai",
@@ -347,7 +347,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       {
         label: "Official marketplace",
         cells: [
-          "Curated by Anthropic, and inclusion is at Anthropic's discretion. Some listings carry an Anthropic verified badge.",
+          "Curated by Anthropic, and inclusion is at Anthropic's discretion. The catalog says every submission gets a basic automated review before it is listed, and that entries badged Anthropic verified have had additional review for quality and safety.",
           "Anthropic states that it does not control what MCP servers, files, or other software are included in plugins and cannot verify that they work as intended.",
         ],
       },
@@ -461,7 +461,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       },
       {
         title: "Anthropic verified is a badge without published criteria",
-        body: "The claude.com/plugins listings carry an Anthropic verified marker on some entries. We found no documentation stating what verification involves, who performs it, or how often it is rechecked. The plugin documentation says only that the official marketplace is curated by Anthropic and that inclusion is at Anthropic's discretion.",
+        body: "The claude.com/plugins listings carry an Anthropic verified marker on some entries. The catalog does say what the badge means in outline: submissions get a basic automated review before they are listed, badged entries have had additional review for quality and safety, and Anthropic adds that there are limits to what it can review and that you should install only from developers you trust. What nobody publishes is the criteria that review applies, who applies them, or how often a badge is rechecked, so the badge tells you a review happened rather than what it found. The plugin documentation adds only that the official marketplace is curated by Anthropic and that inclusion is at Anthropic's discretion.",
       },
       {
         title: "The Agent Skills specification carries no version number",
@@ -554,7 +554,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       id: "anthropic-skills-repo",
       label: "anthropics/skills on GitHub",
       href: "https://github.com/anthropics/skills",
-      note: "What the repository contains, the Apache 2.0 and source-available split, the spec and template folders, and the marketplace registration that exposes document-skills and example-skills.",
+      note: "What the repository contains, the Apache 2.0 and source-available split, the spec and template folders, and the marketplace manifest that defines the plugins the repository exposes.",
     },
     {
       id: "platform-skills-overview",

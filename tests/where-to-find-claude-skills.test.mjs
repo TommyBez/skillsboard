@@ -194,7 +194,7 @@ test("undocumented claims are declared rather than asserted", () => {
   )
   assert.ok(
     limits.includes("Anthropic verified"),
-    "the page does not flag the undocumented verification badge",
+    "the page does not flag the unpublished verification criteria",
   )
 })
 
