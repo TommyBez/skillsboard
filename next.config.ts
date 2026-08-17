@@ -110,6 +110,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/where-to-find-claude-skills/",
+        destination: "/where-to-find-claude-skills",
+        permanent: true,
+      },
+      {
         source: "/compare/",
         destination: "/compare",
         permanent: true,

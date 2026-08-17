@@ -31,6 +31,7 @@ Markdown versions: every guide, skill format explainer, and alternatives page li
 - [Codex skills](https://www.skillsboard.sh/codex-skills): What a Codex skill is, the .agents/skills locations Codex scans, what transfers from a Claude skill, and how to add one
 - [Cursor skills](https://www.skillsboard.sh/cursor-skills): What a Cursor skill is, every directory Cursor scans including the Claude and Codex ones, the frontmatter fields it documents, and how to add one
 - [AGENTS.md vs SKILL.md](https://www.skillsboard.sh/agents-md-vs-skill-md): What each format describes, which of Claude Code, Codex, and Cursor reads which, minimal examples of both, and how the two work together
+- [Where to find Claude skills](https://www.skillsboard.sh/where-to-find-claude-skills): Where Claude skills actually come from today: the official plugin marketplace, the claude.com catalog, skills.sh, anthropics/skills, and the awesome lists, with what each one screens
 
 ## Install and verify
 - [How to install Claude skills in Claude Code](https://www.skillsboard.sh/guides/install-claude-skills-in-claude-code): The documented skill locations on disk, the personal, project, plugin, managed, and claude.ai sync install paths, and how to confirm a skill loaded

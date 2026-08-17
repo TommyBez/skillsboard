@@ -3,6 +3,7 @@ import type { AgentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/type
 import type { ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsPath } from "@/lib/seo/codex-skills/types"
 import type { CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
+import type { WhereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export const guidePaths = {
   sharedMcpSkillLibrary: "/guides/shared-mcp-skill-library-for-teams",
@@ -50,6 +51,7 @@ export interface GuideInlineLink {
     | ClaudeSkillsPath
     | CodexSkillsPath
     | CursorSkillsPath
+    | WhereToFindClaudeSkillsPath
   trail: string
 }
 

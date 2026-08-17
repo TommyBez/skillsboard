@@ -3,24 +3,24 @@ import { ExternalLinkIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import {
-  CodeBlock,
   formatArticleDate,
   NoteList,
   SectionHeading,
   SectionSources,
   SectionTable,
-  StepList,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
-import type {
-  ClaudeSkillsDefinition,
-  ClaudeSkillsInlineLink,
-} from "@/lib/seo/claude-skills"
 import { resourcePaths } from "@/lib/seo/resources"
+import type {
+  WhereSkillsInlineLink,
+  WhereSkillsPlaceSection,
+  WhereSkillsSource,
+  WhereToFindClaudeSkillsDefinition,
+} from "@/lib/seo/where-to-find-claude-skills"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: ClaudeSkillsInlineLink }) {
+function InlineLink({ link }: { link: WhereSkillsInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -35,7 +35,40 @@ function InlineLink({ link }: { link: ClaudeSkillsInlineLink }) {
   )
 }
 
-export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
+function PlaceList({
+  entries,
+}: {
+  entries: WhereSkillsPlaceSection["entries"]
+}) {
+  return (
+    <div className="mt-9 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border">
+      {entries.map((place) => (
+        <div key={place.name} className="bg-card p-5 md:p-6">
+          <a
+            href={place.href}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-1.5 text-base font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
+          >
+            {place.name}
+            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
+          </a>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {place.body}
+          </p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export function WhereToFindClaudeSkillsPage({
+  entry,
+}: {
+  entry: WhereToFindClaudeSkillsDefinition
+}) {
+  const sources: readonly WhereSkillsSource[] = entry.sources
+
   return (
     <>
       <JsonLd data={buildResourceArticleSchema(entry)} />
@@ -67,7 +100,7 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="claude_skills_hero" />
+            <ResourceCta location="where_skills_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -117,157 +150,112 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             id="answer-heading"
             className="text-2xl font-semibold tracking-tight md:text-3xl"
           >
-            What is a Claude Skill?
+            The short answer
           </h2>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
             {entry.answer}
           </p>
+          <NoteList notes={entry.answerNotes} />
           <SectionSources
             sourceIds={entry.answerSourceIds}
-            sources={entry.sources}
+            sources={sources}
           />
         </section>
 
-        <section aria-labelledby="format-heading" className="pt-16">
+        <section aria-labelledby="landscape-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Format"
-            id="format"
-            title={entry.format.title}
-            intro={entry.format.intro}
+            eyebrow="01 / Landscape"
+            id="landscape"
+            title={entry.landscape.title}
+            intro={entry.landscape.intro}
           />
           <SectionTable
-            caption="SKILL.md frontmatter fields defined by the Agent Skills specification."
-            columns={entry.format.columns}
-            rows={entry.format.rows}
-            labelWidth="w-[20%]"
+            caption="Every documented channel a Claude skill travels through, and what each one actually installs."
+            columns={entry.landscape.columns}
+            rows={entry.landscape.rows}
+            labelWidth="w-[18%]"
           />
-          <CodeBlock label="Skill directory" value={entry.format.tree} />
-          <NoteList notes={entry.format.notes} />
+          <NoteList notes={entry.landscape.notes} />
+          <InlineLink link={entry.landscape.link} />
           <SectionSources
-            sourceIds={entry.format.sourceIds}
-            sources={entry.sources}
+            sourceIds={entry.landscape.sourceIds}
+            sources={sources}
           />
         </section>
 
-        <section aria-labelledby="loading-heading" className="pt-16">
+        <section aria-labelledby="official-heading" className="pt-16">
           <SectionHeading
-            eyebrow="02 / Loading"
-            id="loading"
-            title={entry.loading.title}
-            intro={entry.loading.intro}
+            eyebrow="02 / Official"
+            id="official"
+            title={entry.official.title}
+            intro={entry.official.intro}
           />
-          <SectionTable
-            caption="The three stages of progressive disclosure and what each one costs."
-            columns={entry.loading.columns}
-            rows={entry.loading.rows}
-            labelWidth="w-[16%]"
-          />
-          <NoteList notes={entry.loading.notes} />
+          <PlaceList entries={entry.official.entries} />
+          <NoteList notes={entry.official.notes} />
+          <InlineLink link={entry.official.link} />
           <SectionSources
-            sourceIds={entry.loading.sourceIds}
-            sources={entry.sources}
+            sourceIds={entry.official.sourceIds}
+            sources={sources}
           />
         </section>
 
-        <section aria-labelledby="surfaces-heading" className="pt-16">
+        <section aria-labelledby="catalogs-heading" className="pt-16">
           <SectionHeading
-            eyebrow="03 / Surfaces"
-            id="surfaces"
-            title={entry.surfaces.title}
-            intro={entry.surfaces.intro}
+            eyebrow="03 / Catalogs"
+            id="catalogs"
+            title={entry.catalogs.title}
+            intro={entry.catalogs.intro}
           />
-          <SectionTable
-            caption="How skills are installed, shared, and sandboxed on each surface."
-            columns={entry.surfaces.columns}
-            rows={entry.surfaces.rows}
-            labelWidth="w-[16%]"
-          />
-          <NoteList notes={entry.surfaces.notes} />
-          <SectionSources
-            sourceIds={entry.surfaces.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="install-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="04 / Install"
-            id="install"
-            title={entry.install.title}
-            intro={entry.install.intro}
-          />
-          <StepList steps={entry.install.steps} />
-          {entry.install.link ? <InlineLink link={entry.install.link} /> : null}
-          <SectionSources
-            sourceIds={entry.install.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="authoring-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="05 / Authoring"
-            id="authoring"
-            title={entry.authoring.title}
-            intro={entry.authoring.intro}
-          />
-          <StepList steps={entry.authoring.steps} />
-          <CodeBlock
-            label="SKILL.md starting point"
-            value={entry.authoring.template}
-            copy={{
-              buttonLabel: "Copy SKILL.md",
-              ariaLabel: "Copy the SKILL.md starting point",
-              copiedAriaLabel: "SKILL.md starting point copied",
-            }}
-          />
-          <SectionSources
-            sourceIds={entry.authoring.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="ecosystem-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="06 / Ecosystem"
-            id="ecosystem"
-            title={entry.ecosystem.title}
-            intro={entry.ecosystem.intro}
-          />
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {entry.ecosystem.entries.map((source) => (
-              <div
-                key={source.name}
-                className="rounded-[3px] border border-border bg-card p-5"
-              >
-                <h3 className="font-mono text-sm font-semibold">
-                  <a
-                    href={source.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 items-center gap-1.5 underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
-                  >
-                    {source.name}
-                    <ExternalLinkIcon className="size-3" aria-hidden="true" />
-                  </a>
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {source.body}
-                </p>
-              </div>
-            ))}
+          <PlaceList entries={entry.catalogs.entries} />
+          <NoteList notes={entry.catalogs.notes} />
+          <div className="mt-8">
+            <ResourceCta location="where_skills_inline" />
           </div>
-          <NoteList notes={entry.ecosystem.notes} />
-          <InlineLink link={entry.ecosystem.link} />
           <SectionSources
-            sourceIds={entry.ecosystem.sourceIds}
-            sources={entry.sources}
+            sourceIds={entry.catalogs.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="community-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="04 / Repositories"
+            id="community"
+            title={entry.community.title}
+            intro={entry.community.intro}
+          />
+          <PlaceList entries={entry.community.entries} />
+          <NoteList notes={entry.community.notes} />
+          <SectionSources
+            sourceIds={entry.community.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="vetting-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="05 / Vetting"
+            id="vetting"
+            title={entry.vetting.title}
+            intro={entry.vetting.intro}
+          />
+          <SectionTable
+            caption="What each source screens before it lists something, and what it leaves to you."
+            columns={entry.vetting.columns}
+            rows={entry.vetting.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.vetting.notes} />
+          <InlineLink link={entry.vetting.link} />
+          <SectionSources
+            sourceIds={entry.vetting.sourceIds}
+            sources={sources}
           />
         </section>
 
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="07 / Teams"
+            eyebrow="06 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -292,12 +280,35 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
               </li>
             ))}
           </ul>
-          <div className="mt-8">
-            <ResourceCta location="claude_skills_inline" />
+          <InlineLink link={entry.team.link} />
+          <SectionSources sourceIds={entry.team.sourceIds} sources={sources} />
+        </section>
+
+        <section aria-labelledby="open-questions-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="07 / Limits"
+            id="open-questions"
+            title={entry.openQuestions.title}
+            intro={entry.openQuestions.intro}
+          />
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {entry.openQuestions.entries.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[3px] border border-border bg-card p-5"
+              >
+                <h3 className="text-base font-semibold leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
           </div>
           <SectionSources
-            sourceIds={entry.team.sourceIds}
-            sources={entry.sources}
+            sourceIds={entry.openQuestions.sourceIds}
+            sources={sources}
           />
         </section>
 
@@ -336,12 +347,14 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every claim about the format and the products that run it comes from
-            the first-party documentation below. Product behavior changes, so
-            check the linked pages before you rely on a detail.
+            every claim on this page comes from the first-party sources below,
+            fetched on the date at the top. Star counts and install counts were
+            read on that date and move constantly. Where nothing is documented,
+            this page says so instead of filling the gap, and the section on
+            what we could not verify lists those cases explicitly.
           </p>
           <ul className="mt-6 space-y-4">
-            {entry.sources.map((source) => (
+            {sources.map((source) => (
               <li key={source.id} className="text-sm leading-6">
                 <a
                   href={source.href}
@@ -393,16 +406,16 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Put the skills your team recommends somewhere everyone can find
-            them.
+            A catalog tells you what exists. It cannot tell your team which one
+            to use.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the first skill, and invite the people who keep asking which one to
-            use.
+            the skills you actually recommend, and invite the people who keep
+            asking.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="claude_skills_closing" />
+            <ResourceCta location="where_skills_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

@@ -61,6 +61,10 @@ type NonTeamEventPropertiesMap = {
       | "pricing_header"
       | "resources_header"
       | "resources_closing"
+      | "where_skills_header"
+      | "where_skills_hero"
+      | "where_skills_inline"
+      | "where_skills_closing"
   }
   mcp_entry_clicked: {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
