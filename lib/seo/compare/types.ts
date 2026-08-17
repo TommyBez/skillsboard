@@ -11,6 +11,7 @@ export const compareIndexPath = "/compare" as const
 export const comparePaths = {
   skillsVsSubagents: "/compare/claude-skills-vs-subagents",
   skillsVsMcp: "/compare/claude-skills-vs-mcp",
+  skillsVsPlugins: "/compare/claude-skills-vs-plugins",
 } as const
 
 export type CompareIndexPath = typeof compareIndexPath
@@ -21,6 +22,7 @@ export type ComparePath = (typeof comparePaths)[keyof typeof comparePaths]
 export type ComparisonCtaLocation =
   | "compare_skills_subagents"
   | "compare_skills_mcp"
+  | "compare_skills_plugins"
 
 /**
  * The sticky shell CTA for a comparison page. It is per page rather than per
