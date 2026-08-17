@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
@@ -537,6 +538,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
+      href: agentsMdVsSkillMdPath,
+      description:
+        "The repository file Claude Code does not read by default, and what belongs in it instead of a skill.",
+    },
     {
       label: "Claude skills vs subagents: when to use each",
       href: comparePaths.skillsVsSubagents,

@@ -9,18 +9,17 @@ import {
   SectionHeading,
   SectionSources,
   SectionTable,
-  StepList,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import type {
-  CodexSkillsDefinition,
-  CodexSkillsInlineLink,
-} from "@/lib/seo/codex-skills"
+  AgentsMdInlineLink,
+  AgentsMdVsSkillMdDefinition,
+} from "@/lib/seo/agents-md-vs-skill-md"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: CodexSkillsInlineLink }) {
+function InlineLink({ link }: { link: AgentsMdInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -35,7 +34,11 @@ function InlineLink({ link }: { link: CodexSkillsInlineLink }) {
   )
 }
 
-export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
+export function AgentsMdVsSkillMdPage({
+  entry,
+}: {
+  entry: AgentsMdVsSkillMdDefinition
+}) {
   return (
     <>
       <JsonLd data={buildResourceArticleSchema(entry)} />
@@ -67,7 +70,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="codex_skills_hero" />
+            <ResourceCta location="agents_md_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -117,7 +120,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
             id="answer-heading"
             className="text-2xl font-semibold tracking-tight md:text-3xl"
           >
-            What a Codex skill is
+            The short answer
           </h2>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
             {entry.answer}
@@ -129,74 +132,117 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
           />
         </section>
 
-        <section aria-labelledby="locations-heading" className="pt-16">
+        <section aria-labelledby="comparison-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Locations"
-            id="locations"
-            title={entry.locations.title}
-            intro={entry.locations.intro}
+            eyebrow="01 / Compare"
+            id="comparison"
+            title={entry.comparison.title}
+            intro={entry.comparison.intro}
           />
           <SectionTable
-            caption="The locations Codex scans for skills, and what each scope is for."
-            columns={entry.locations.columns}
-            rows={entry.locations.rows}
-            labelWidth="w-[12%]"
+            caption="AGENTS.md and SKILL.md compared across the dimensions that decide which one a job belongs to."
+            columns={entry.comparison.columns}
+            rows={entry.comparison.rows}
+            labelWidth="w-[18%]"
           />
-          <NoteList notes={entry.locations.notes} />
-          <InlineLink link={entry.locations.link} />
+          <NoteList notes={entry.comparison.notes} />
+          <InlineLink link={entry.comparison.link} />
           <SectionSources
-            sourceIds={entry.locations.sourceIds}
+            sourceIds={entry.comparison.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="transfers-heading" className="pt-16">
+        <section aria-labelledby="support-heading" className="pt-16">
           <SectionHeading
-            eyebrow="02 / Portability"
-            id="transfers"
-            title={entry.transfers.title}
-            intro={entry.transfers.intro}
+            eyebrow="02 / Support"
+            id="support"
+            title={entry.support.title}
+            intro={entry.support.intro}
           />
           <SectionTable
-            caption="What a skill written for one agent keeps when the other one reads it."
-            columns={entry.transfers.columns}
-            rows={entry.transfers.rows}
+            caption="What Claude Code, Codex, and Cursor each document reading."
+            columns={entry.support.columns}
+            rows={entry.support.rows}
             labelWidth="w-[16%]"
           />
-          <NoteList notes={entry.transfers.notes} />
-          <InlineLink link={entry.transfers.link} />
+          <NoteList notes={entry.support.notes} />
           <SectionSources
-            sourceIds={entry.transfers.sourceIds}
+            sourceIds={entry.support.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="install-heading" className="pt-16">
+        <section aria-labelledby="examples-heading" className="pt-16">
           <SectionHeading
-            eyebrow="03 / Install"
-            id="install"
-            title={entry.install.title}
-            intro={entry.install.intro}
+            eyebrow="03 / Examples"
+            id="examples"
+            title={entry.examples.title}
+            intro={entry.examples.intro}
           />
-          <StepList steps={entry.install.steps} />
-          <CodeBlock
-            label="SKILL.md starting point"
-            value={entry.install.template}
-            copy={{
-              buttonLabel: "Copy SKILL.md",
-              ariaLabel: "Copy the SKILL.md starting point",
-              copiedAriaLabel: "SKILL.md starting point copied",
-            }}
-          />
+          {entry.examples.entries.map((example) => (
+            <div key={example.title} className="mt-10">
+              <h3 className="text-xl font-semibold">{example.title}</h3>
+              <p className="mt-3 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
+                {example.body}
+              </p>
+              {example.tree ? (
+                <CodeBlock label="Directory layout" value={example.tree} />
+              ) : null}
+              <CodeBlock
+                label={example.title}
+                value={example.template}
+                copy={{
+                  buttonLabel: "Copy file",
+                  ariaLabel: `Copy the example: ${example.title}`,
+                  copiedAriaLabel: `Example copied: ${example.title}`,
+                }}
+              />
+            </div>
+          ))}
+          <NoteList notes={entry.examples.notes} />
           <SectionSources
-            sourceIds={entry.install.sourceIds}
+            sourceIds={entry.examples.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
+        <section aria-labelledby="together-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="04 / Together"
+            id="together"
+            title={entry.together.title}
+            intro={entry.together.intro}
+          />
+          <NoteList notes={entry.together.body} />
+          <div className="mt-9 grid gap-4 md:grid-cols-2">
+            {entry.together.entries.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[3px] border border-border bg-card p-5"
+              >
+                <h3 className="text-base font-semibold leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+          <InlineLink link={entry.together.link} />
+          <div className="mt-8">
+            <ResourceCta location="agents_md_inline" />
+          </div>
+          <SectionSources
+            sourceIds={entry.together.sourceIds}
             sources={entry.sources}
           />
         </section>
 
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Teams"
+            eyebrow="05 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -222,9 +268,6 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
             ))}
           </ul>
           <InlineLink link={entry.team.link} />
-          <div className="mt-8">
-            <ResourceCta location="codex_skills_inline" />
-          </div>
           <SectionSources
             sourceIds={entry.team.sourceIds}
             sources={entry.sources}
@@ -233,7 +276,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
 
         <section aria-labelledby="open-questions-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Limits"
+            eyebrow="06 / Limits"
             id="open-questions"
             title={entry.openQuestions.title}
             intro={entry.openQuestions.intro}
@@ -261,7 +304,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
 
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            06 / Questions
+            07 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -294,11 +337,12 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every claim about how Codex handles skills comes from the first-party
-            documentation below, checked on the date at the top of this page.
-            Where the documentation says nothing, this page says so instead of
-            filling the gap. Product behavior changes, so check the linked pages
-            before you rely on a detail.
+            every claim about AGENTS.md, the Agent Skills format, Claude Code,
+            Codex, and Cursor comes from the first-party documentation below,
+            checked on the date at the top of this page. Where the documentation
+            says nothing, this page says so instead of filling the gap. Product
+            behavior changes, so check the linked pages before you rely on a
+            detail.
           </p>
           <ul className="mt-6 space-y-4">
             {entry.sources.map((source) => (
@@ -353,8 +397,8 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Put the skills your team recommends somewhere everyone can find
-            them.
+            Your repository file travels with the clone. Your skills need
+            somewhere to live.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
@@ -362,7 +406,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
             use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="codex_skills_closing" />
+            <ResourceCta location="agents_md_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

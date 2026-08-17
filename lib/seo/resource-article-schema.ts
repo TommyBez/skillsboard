@@ -1,4 +1,4 @@
-import { OG_SIZE } from "@/lib/og/template"
+import { OG_SIZE } from "@/lib/og/size"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 /**
