@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { skillsVsMcp } from "@/lib/seo/compare/skills-vs-mcp"
 import { skillsVsPlugins } from "@/lib/seo/compare/skills-vs-plugins"
+import { skillsVsSlashCommands } from "@/lib/seo/compare/skills-vs-slash-commands"
 import { skillsVsSubagents } from "@/lib/seo/compare/skills-vs-subagents"
 import type {
   ComparePath,
@@ -31,6 +32,7 @@ export const comparisons: readonly ComparisonDefinition[] = [
   skillsVsSubagents,
   skillsVsMcp,
   skillsVsPlugins,
+  skillsVsSlashCommands,
 ]
 
 const comparisonsByPath = new Map(
