@@ -74,12 +74,11 @@ test("the article is listed in the static llms.txt", async () => {
 test("the canonical URL is reachable with and without a trailing slash", async () => {
   const { redirects, rewrites } = nextConfig
   const redirectRules = await redirects()
-  assert.ok(
-    redirectRules.some(
-      (rule) => rule.source === `${entry.path}/` && rule.destination === entry.path,
-    ),
-    "the trailing-slash spelling has no permanent redirect",
+  const redirect = redirectRules.find(
+    (rule) => rule.source === `${entry.path}/` && rule.destination === entry.path,
   )
+  assert.ok(redirect, "the trailing-slash spelling has no redirect")
+  assert.equal(redirect.permanent, true, "the trailing-slash redirect is not permanent")
 
   const { beforeFiles } = await rewrites()
   const negotiated = beforeFiles.find((rule) => rule.source === entry.path)
@@ -88,6 +87,19 @@ test("the canonical URL is reachable with and without a trailing slash", async (
     "the path does not end in -skills, so it needs its own Accept rewrite to serve the twin",
   )
   assert.equal(negotiated.destination, `/api/markdown?path=${entry.path}`)
+
+  // The rewrite only fires when the request asks for Markdown, so an ordinary
+  // browser request keeps getting the HTML page. Next.js anchors a `has` value.
+  const condition = negotiated.has?.find(
+    (rule) => rule.type === "header" && rule.key === "accept",
+  )
+  assert.ok(condition?.value, "the Markdown rewrite has no Accept condition")
+  const accept = new RegExp(`^${condition.value}$`)
+  assert.match("text/markdown", accept)
+  assert.doesNotMatch(
+    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    accept,
+  )
 })
 
 test("the Markdown twin carries every section, both files, and the FAQ", () => {
