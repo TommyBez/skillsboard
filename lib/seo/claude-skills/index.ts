@@ -10,6 +10,7 @@ import {
   guidePaths,
   type GuidePath,
 } from "@/lib/seo/guides/types"
+import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export {
   claudeSkillsPath,
@@ -101,6 +102,8 @@ export interface ClaudeSkillsDefinition {
       body: string
     }[]
     notes: readonly string[]
+    /** Contextual link out to the page that maps these sources in full. */
+    link: ClaudeSkillsInlineLink
     sourceIds: readonly string[]
   }
   team: {
@@ -408,6 +411,12 @@ A Markdown section ready to paste into the release description.`,
     notes: [
       "Read before you install. Anthropic's guidance is to use skills only from sources you trust, because a skill gives an agent new instructions and executable code, and a malicious one can direct the agent to call tools in ways the stated purpose does not suggest. If a skill comes from somewhere unfamiliar, audit every file in it, including scripts and anything it fetches from an external URL, and treat the decision the way you would treat installing software.",
     ],
+    link: {
+      lead: "For the full map, including what the official plugin marketplace distributes and what each catalog screens before it lists a skill, see",
+      label: "Where to find Claude skills",
+      href: whereToFindClaudeSkillsPath,
+      trail: ".",
+    },
     sourceIds: [
       "anthropic-skills-repo",
       "superpowers",
@@ -538,6 +547,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Where to find Claude skills",
+      href: whereToFindClaudeSkillsPath,
+      description:
+        "The honest map of marketplaces, directories, and repositories, and what each one is and is not.",
+    },
     {
       label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
       href: agentsMdVsSkillMdPath,

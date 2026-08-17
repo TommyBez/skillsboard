@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { guidePaths } from "@/lib/seo/guides/types"
 import { pricingPath } from "@/lib/seo/pricing-schema"
+import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export const alternativesIndexPath = "/alternatives"
 
@@ -521,6 +522,12 @@ const skillsSh: AlternativeDefinition = {
     },
   ],
   related: [
+    {
+      label: "Where to find Claude skills",
+      href: whereToFindClaudeSkillsPath,
+      description:
+        "Every directory, marketplace, and repository skills come from, and what each one screens.",
+    },
     {
       label: "A shared MCP skill library for teams",
       href: guidePaths.sharedMcpSkillLibrary,

@@ -11,6 +11,11 @@ import { cursorSkills } from "@/lib/seo/cursor-skills"
 import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { whereToFindClaudeSkills } from "@/lib/seo/where-to-find-claude-skills"
+import {
+  whereToFindClaudeSkillsPath,
+  type WhereToFindClaudeSkillsPath,
+} from "@/lib/seo/where-to-find-claude-skills/types"
 
 export const resourcePaths = {
   index: "/resources",
@@ -26,6 +31,7 @@ export type ResourcePath =
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CursorSkillsPath
+  | WhereToFindClaudeSkillsPath
 
 export interface ResourceIndexEntry {
   path: string
@@ -45,6 +51,7 @@ export const resourceEntries = [
   codexSkills,
   cursorSkills,
   agentsMdVsSkillMd,
+  whereToFindClaudeSkills,
 ] satisfies readonly ResourceIndexEntry[]
 
 const resourceEntriesByPath = new Map(
@@ -81,6 +88,7 @@ const resourceClusterDefinitions = [
     description:
       "Choose useful skills, define accountable workflows, and help a second teammate reproduce the result without private context.",
     paths: [
+      whereToFindClaudeSkillsPath,
       guidePaths.chooseFirstTeamSkill,
       guidePaths.onboardNewTeammateSkills,
       guidePaths.aiSkillUseCases,

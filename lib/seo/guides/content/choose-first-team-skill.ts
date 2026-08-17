@@ -1,4 +1,5 @@
 import { guidePaths, type GuideDefinition } from "@/lib/seo/guides/types"
+import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export const chooseFirstTeamSkillGuide: GuideDefinition = {
   path: guidePaths.chooseFirstTeamSkill,
@@ -18,6 +19,12 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
     "The best first skill is not the most impressive one in a catalog. It is the smallest repeatable workflow your team can inspect, test, and hand to a second teammate with a clear expected result. This guide turns that choice into an observable team decision.",
   answer:
     "Choose your first AI agent skill around one repeated team problem. Compare a small set of inspectable candidates, reject unsafe or opaque options, and test the winner on a representative task. Recommend it only after a second teammate reproduces the result.",
+  answerLink: {
+    lead: "For where the candidates come from in the first place, and what each source screens before it lists one, see",
+    label: "Where to find Claude skills",
+    href: whereToFindClaudeSkillsPath,
+    trail: ".",
+  },
   citations: {
     answer: ["openai-skills", "anthropic-agent-skills-sdk", "github-add-agent-skills"],
     decision: ["openai-skills", "anthropic-agent-skills-sdk", "github-add-agent-skills"],
