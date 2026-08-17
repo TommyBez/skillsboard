@@ -133,7 +133,7 @@ test("the page stays short by choice", () => {
 
   assert.ok(
     words >= 700 && words <= 1200,
-    `body is ${words} words, outside the 700 to 1200 budget this page was planned at`,
+    `body is ${words} words, outside the 700 to 1200 budget this page was planned at, where 1200 is a deliberate ceiling and not a target`,
   )
   assert.equal(
     entry.team,

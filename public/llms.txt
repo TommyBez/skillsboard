@@ -1,7 +1,7 @@
 # Skills Board
 > Skills Board is the shared library where a team collects the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
 
-Last reviewed: 2026-08-16
+Last reviewed: 2026-08-17
 
 Skills Board is free hosted SaaS with open-source code. A saved skill is a team recommendation, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
 

@@ -43,7 +43,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
     "Not two formats competing for the same job. One is what you write, the other is how you ship it, and a plugin can carry skills inside it.",
   intro: [
     "Both arrive as folders you install into Claude Code and show up as slash commands in one listing, so the query reads like a choice.",
-    "It is a layering. A skill is content: a SKILL.md file of instructions loaded when your request matches its description. A plugin is packaging: a directory carrying skills, subagents, hooks, and MCP servers, installed from a marketplace. A plugin can contain skills. A skill cannot contain a plugin.",
+    "It is a layering. A skill is content: a SKILL.md file of instructions. A plugin is packaging: a directory carrying skills, subagents, hooks, and MCP servers. A plugin can contain skills. A skill cannot contain a plugin.",
   ],
   answer:
     "A skill is a unit of content: one SKILL.md file of instructions the agent loads when your request matches its description. A plugin is a unit of distribution: a Claude Code package bundling skills, agents, hooks, and MCP servers, installed from a marketplace and versioned as one. Skills are what you write. Plugins are how you ship them.",
@@ -81,7 +81,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
         label: "What you type",
         cells: [
           "/skill-name, from the directory name. Enterprise overrides personal, personal overrides project.",
-          "/plugin-name:skill-name for every skill it ships, which the docs say prevents conflicts between plugins carrying the same name.",
+          "/plugin-name:skill-name, namespaced to prevent conflicts. The last segment can come from frontmatter name, and the bare /skill-name works when nothing else claims it.",
         ],
       },
       {
@@ -101,7 +101,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
     ],
     notes: [
       "The trust asymmetry comes first. A skill is text you read in a minute. Claude Code's wording for plugins and marketplaces is that they can execute arbitrary code with your user privileges, which is why the plugin manager lists what will install.",
-      "The documentation does not rank them, and its closest table sets standalone .claude/ configuration against plugins, not skills against plugins. If that changes, so does this page.",
+      "The documentation does not rank them, and no first-party table sets skills against plugins. If that changes, so does this page.",
     ],
     sourceIds: [
       "claude-code-plugins",
@@ -157,7 +157,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
       },
       {
         title: "Name collisions are a real risk",
-        body: "Plugin skills are always namespaced, and a namespaced one loads alongside a same-named project skill rather than overriding it.",
+        body: "Every plugin skill gets a namespaced command, and the namespaced form loads alongside a same-named project skill rather than overriding it.",
       },
     ],
     counterweightTitle: "When the plugin wrapper is overhead",
@@ -228,7 +228,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
     {
       question: "Can a Claude Code plugin contain skills?",
       answer:
-        "Yes. They live in a skills/ directory at the plugin root, each as a folder with its own SKILL.md. Plugin skills are always namespaced plugin-name:skill-name, which the docs say prevents conflicts between plugins, so hello inside a plugin named my-first-plugin is invoked as /my-first-plugin:hello.",
+        "Yes. They live in a skills/ directory at the plugin root, each as a folder with its own SKILL.md. Every plugin skill gets a namespaced command, plugin-name:skill-name, which the docs say prevents conflicts between plugins, so hello inside a plugin named my-first-plugin is invoked as /my-first-plugin:hello.",
     },
     {
       question: "Do I need a plugin to share a skill with my team?",
