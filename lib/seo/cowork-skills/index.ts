@@ -153,7 +153,7 @@ export const coworkSkills: CoworkSkillsDefinition = {
     "What a skill is inside Claude Cowork, how a session finds and invokes one, the four channels that put a skill in front of it, what changes between desktop, web, and mobile, and how to write one. Every claim checked against first-party documentation.",
   intro: [
     "A skill in Claude Cowork is the same object it is everywhere else Claude runs: a folder with a SKILL.md file, YAML frontmatter carrying a name and a description, and Markdown instructions Claude follows once it decides the skill applies. Anthropic describes skills as folders of instructions, scripts, and resources that Claude loads dynamically, and publishes the format as an open standard at agentskills.io. None of that changes because the session is a Cowork task rather than a chat.",
-    "What changes is where the folder has to be sitting, and that is documented in one sentence most people never read. Cowork sessions do not read the skills directory on your machine. They load the skills enabled for your claude.ai account, synced at session start. A skill you dropped into a local folder yesterday is not in today's Cowork task until you enable it on the account.",
+    "What changes is where the folder has to be sitting, and that is documented in one sentence most people never read. Cowork sessions do not read the skills directory on your machine. They load the skills enabled for your claude.ai account, synced at session start. A skill you dropped into a local folder yesterday is not in today's Cowork task until you enable it on the account. Desktop scheduled tasks are the one documented exception: they run locally on your machine and load skills from the same locations as any other local session.",
     "So the useful question is not what a skill is. It is which channel puts one in front of a Cowork session, what that channel implies about who else on your team gets it, and which parts stop working when the desktop app is closed. This page separates those, cites the first-party source under each section, and keeps a list at the end of the things no first-party page states at all.",
   ],
   answer:
@@ -262,7 +262,7 @@ export const coworkSkills: CoworkSkillsDefinition = {
         label: "1. Sync",
         cells: [
           "The session collects the skills it is allowed to see.",
-          "Cowork sessions load the skills enabled for your claude.ai account, synced at session start, and do not read the skills directory on your machine. You manage that set from Customize in the Desktop app sidebar or from the skills settings on claude.ai.",
+          "Cowork sessions load the skills enabled for your claude.ai account, synced at session start, and do not read the skills directory on your machine. You manage that set from Customize in the Desktop app sidebar or from the skills settings on claude.ai. Desktop scheduled tasks are different: they run locally on your machine and load skills from the same locations as any other local session.",
         ],
       },
       {
@@ -577,7 +577,7 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
     {
       question: "Does Cowork read the skills folder on my machine?",
       answer:
-        "No. The Claude Code documentation states that Cowork and cloud sessions do not read the skills directory on your machine. They load the skills enabled for your claude.ai account, synced at session start. Cloud sessions additionally load project skills committed to the cloned repository.",
+        "No, with one documented exception. Cowork and cloud sessions do not read the skills directory on your machine. They load the skills enabled for your claude.ai account at session start, and cloud sessions add project skills from the cloned repository. Desktop scheduled tasks are different: they run locally and load skills from the same locations as any other local session.",
     },
     {
       question: "How do I share a Cowork skill with my team?",
@@ -647,7 +647,7 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
       id: "claude-code-skills",
       label: "Claude Code: extend Claude with skills",
       href: "https://code.claude.com/docs/en/skills",
-      note: "That Cowork and cloud sessions do not read the local skills directory and load the skills enabled for your claude.ai account synced at session start, the shell execution placeholder in Cowork bodies, the six spec fields valid outside Claude Code, and the listing and compaction budgets.",
+      note: "That Cowork and cloud sessions do not read the local skills directory and load the skills enabled for your claude.ai account synced at session start, that desktop scheduled tasks instead run locally and load skills from the same locations as any other local session, the shell execution placeholder in Cowork bodies, the six spec fields valid outside Claude Code, and the listing and compaction budgets.",
     },
     {
       id: "cowork-plugins-blog",
