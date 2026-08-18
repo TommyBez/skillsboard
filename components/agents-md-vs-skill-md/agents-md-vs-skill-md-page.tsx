@@ -167,6 +167,9 @@ export function AgentsMdVsSkillMdPage({
             labelWidth="w-[16%]"
           />
           <NoteList notes={entry.support.notes} />
+          {entry.support.link ? (
+            <InlineLink link={entry.support.link} />
+          ) : null}
           <SectionSources
             sourceIds={entry.support.sourceIds}
             sources={entry.sources}

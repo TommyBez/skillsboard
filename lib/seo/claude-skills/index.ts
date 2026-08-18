@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
@@ -54,6 +55,8 @@ export interface ClaudeSkillsTableSection {
   }[]
   /** Prose that follows the table, one paragraph per entry. */
   notes: readonly string[]
+  /** Optional contextual link out of the section. */
+  link?: ClaudeSkillsInlineLink
   sourceIds: readonly string[]
 }
 
@@ -208,6 +211,12 @@ export const claudeSkills: ClaudeSkillsDefinition = {
       "Everything beyond SKILL.md is optional. The specification suggests scripts for executable code, references for documentation the agent reads only when it needs it, and assets for templates and other static files. There is no restriction on the Markdown body itself.",
       "Claude Code accepts extra frontmatter fields of its own, such as disable-model-invocation and argument declarations. Outside Claude Code, the claude.ai upload path, the Skills API, and Anthropic's packaging script accept only the six fields in the spec, and an unexpected key fails with a hard error rather than being ignored. Frontmatter that stays inside the spec loads everywhere, including Claude Code.",
     ],
+    link: {
+      lead: "Only six of those fields belong to the open standard this format is built on, and the rest are Claude Code extensions. For the vendor-neutral version, including which other agents read a SKILL.md and where they look for one, see",
+      label: "Agent Skills: the open standard for extending AI agents",
+      href: agentSkillsPath,
+      trail: ".",
+    },
     sourceIds: ["agentskills-spec", "claude-code-skills"],
   },
   loading: {
@@ -547,6 +556,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Agent Skills: the open standard for extending AI agents",
+      href: agentSkillsPath,
+      description:
+        "The vendor-neutral version of this format: what the specification defines, and which agents implement it.",
+    },
     {
       label: "Where to find Claude skills",
       href: whereToFindClaudeSkillsPath,

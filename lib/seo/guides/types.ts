@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import type { AgentSkillsPath } from "@/lib/seo/agent-skills/types"
 import type { AgentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import type { ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsPath } from "@/lib/seo/codex-skills/types"
@@ -47,6 +48,7 @@ export interface GuideInlineLink {
   label: string
   href:
     | GuidePath
+    | AgentSkillsPath
     | AgentsMdVsSkillMdPath
     | ClaudeSkillsPath
     | CodexSkillsPath

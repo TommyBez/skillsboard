@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
@@ -48,6 +49,8 @@ export interface AgentsMdTableSection {
   }[]
   /** Prose that follows the table, one paragraph per entry. */
   notes: readonly string[]
+  /** Optional contextual link out of the section. */
+  link?: AgentsMdInlineLink
   sourceIds: readonly string[]
 }
 
@@ -281,6 +284,12 @@ export const agentsMdVsSkillMd: AgentsMdVsSkillMdDefinition = {
       "cursor-rules-help",
       "cursor-skills",
     ],
+    link: {
+      lead: "Those SKILL.md directories are per-product decisions rather than part of the format. For what the standard itself specifies, and what actually travels when a skill moves between these agents, see",
+      label: "Agent Skills: the open standard for extending AI agents",
+      href: agentSkillsPath,
+      trail: ".",
+    },
   },
   examples: {
     title: "What each file actually looks like",
@@ -586,6 +595,12 @@ including it.
     },
   ],
   related: [
+    {
+      label: "Agent Skills: the open standard for extending AI agents",
+      href: agentSkillsPath,
+      description:
+        "What a SKILL.md is outside any one product, which agents read it, and what travels between them.",
+    },
     {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,
