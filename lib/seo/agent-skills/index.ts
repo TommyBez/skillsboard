@@ -315,7 +315,7 @@ export const agentSkills: AgentSkillsDefinition = {
     ],
     notes: [
       "The .agents/skills convention is the closest thing to a cross-client answer, and it is worth being precise about its status. The client implementation guide calls it a widely adopted convention for cross-client sharing and recommends scanning it, while stating plainly that the specification does not mandate where skill directories live. Codex, Cursor, Copilot, and Gemini CLI all read it. Claude Code's skills documentation does not mention it.",
-      "Collision handling is convention too. The implementation guide records one universal rule, that project-level skills override user-level skills, and leaves the rest to the client. Claude Code inverts part of it: across its own levels, enterprise overrides personal and personal overrides project. Codex does not merge same-named skills at all and lets both appear in the picker. Cursor derives a skill's identity from the folder holding SKILL.md, not from any category folder above it.",
+      "Collision handling is convention too, and here the recommendation is not the behavior. The client implementation guide tells implementers that project-level skills should override user-level skills, and calls that the universal convention across existing implementations, but two of the clients on this page document something else. Claude Code resolves it the other way: across levels, enterprise overrides personal, and personal overrides project, so a personal deploy skill wins over a project one with the same name. Codex does not merge same-named skills at all and lets both appear in the skill selectors. Cursor derives a skill's identity from the folder holding SKILL.md, not from any category folder above it. Read project-over-user as advice to implementers, and check the collision handling your own client documents before relying on it.",
       "Two products document a migration path from their older primitive into skills, which says something about where this is heading. Cursor ships a built-in /migrate-to-skills that converts dynamic rules and slash commands, giving converted commands disable-model-invocation so they still only run when typed. Anthropic went further and merged custom slash commands into skills in the documentation itself: a file in .claude/commands/ and a SKILL.md both produce /deploy, and when both exist the skill wins.",
     ],
     link: {
@@ -428,7 +428,7 @@ export const agentSkills: AgentSkillsDefinition = {
     ],
     notes: [
       "Read before you install, in every case. Anthropic's guidance is to use skills only from sources you trust, because a skill hands an agent new instructions and executable code, and a malicious one can direct the agent to call tools in ways its stated purpose does not suggest. The client implementation guide makes the same point from the other side, suggesting clients gate project-level skills behind a workspace trust check so a freshly cloned repository cannot inject instructions silently.",
-      "The examples also show where the format's ceiling is. A skill is instructions plus files. It cannot hold credentials, it cannot describe an API contract the way a server can, and nothing in it is enforced. What it is good at is the thing a checklist is good at: making a procedure repeatable when the alternative is a paragraph somebody pastes from memory.",
+      "The examples also show where the format's ceiling is, and the ceiling is about what the format guarantees rather than what a folder can physically hold. Nothing in a skill is enforced: no runtime validates the instructions, and Markdown can describe an API contract perfectly well without exposing or enforcing a typed one the way a server's tool definitions do. Credentials are a recommendation, not a limit. A skill folder takes arbitrary files, so a secret pasted into one ships to everybody who installs it, which is why the advice is to keep secrets out rather than to assume the format keeps them out. What the format is good at is the thing a checklist is good at: making a procedure repeatable when the alternative is a paragraph somebody pastes from memory.",
     ],
     sourceIds: [
       "anthropic-skills-repo",
@@ -581,7 +581,7 @@ export const agentSkills: AgentSkillsDefinition = {
     {
       question: "Do agent skills really work across different agents?",
       answer:
-        "The file loads anywhere. Behavior does not always follow. A skill using only the six specified fields with a self-contained body moves cleanly, while product-specific frontmatter and body features do not. Uploading a skill with a non-spec key to claude.ai or the Skills API fails with an unexpected-key error.",
+        "A valid skill loads only once it sits in a directory a compatible client scans, and each client scans different ones. Behavior does not always follow either. A skill using only the six specified fields with a self-contained body moves cleanly, while product-specific frontmatter does not: claude.ai rejects a non-spec key outright. No conformance test exists.",
     },
     {
       question: "Where can I find agent skills examples to read?",
@@ -616,7 +616,7 @@ export const agentSkills: AgentSkillsDefinition = {
       id: "agentskills-implementation",
       label: "How to add skills support to your agent",
       href: "https://agentskills.io/client-implementation/adding-skills-support",
-      note: "That the specification does not mandate where skill directories live, the .agents/skills cross-client convention, the project-over-user collision rule, model-driven activation, lenient validation, and the trust check recommended for project-level skills.",
+      note: "That the specification does not mandate where skill directories live, the .agents/skills cross-client convention, the project-over-user collision rule it recommends to implementers, model-driven activation, lenient validation, and the trust check recommended for project-level skills.",
     },
     {
       id: "agentskills-repo",
