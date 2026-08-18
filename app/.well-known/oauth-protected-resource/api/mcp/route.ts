@@ -1,12 +1,19 @@
+import { connection } from "next/server"
+
+import { getMcpResource } from "@/lib/auth-environment"
 import { oauthScopes } from "@/lib/oauth-scopes"
 
-export async function GET(request: Request) {
-  const url = new URL(request.url)
-  const origin = `${url.protocol}//${url.host}`
+export async function GET() {
+  await connection()
+  // The canonical RFC 8707 identifier tokens are audience-bound to; a
+  // request-derived origin could advertise a resource the authorization
+  // server would reject with invalid_target.
+  const resource = getMcpResource()
+  const authOrigin = new URL(resource).origin
   return Response.json(
     {
-      resource: `${origin}/api/mcp`,
-      authorization_servers: [`${origin}/api/auth`],
+      resource,
+      authorization_servers: [`${authOrigin}/api/auth`],
       scopes_supported: [...oauthScopes],
       bearer_methods_supported: ["header"],
     },
