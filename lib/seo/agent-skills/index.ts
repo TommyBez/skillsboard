@@ -2,6 +2,7 @@ import type { OgTemplateContent } from "@/lib/og/template"
 import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
+import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
@@ -65,6 +66,8 @@ export interface AgentSkillsPlaceSection {
     body: string
   }[]
   notes: readonly string[]
+  /** Optional, because only some place sections have somewhere to send you. */
+  link?: AgentSkillsInlineLink
   sourceIds: readonly string[]
 }
 
@@ -437,6 +440,12 @@ export const agentSkills: AgentSkillsDefinition = {
       "Read before you install, in every case. Anthropic's guidance is to use skills only from sources you trust, because a skill hands an agent new instructions and executable code, and a malicious one can direct the agent to call tools in ways its stated purpose does not suggest. The client implementation guide makes the same point from the other side, suggesting clients gate project-level skills behind a workspace trust check so a freshly cloned repository cannot inject instructions silently.",
       "The examples also show where the format's ceiling is, and the ceiling is about what the format guarantees rather than what a folder can physically hold. Nothing in a skill is enforced: no runtime validates the instructions, and Markdown can describe an API contract perfectly well without exposing or enforcing a typed one the way a server's tool definitions do. Credentials are a recommendation, not a limit. A skill folder takes arbitrary files, so a secret pasted into one ships to everybody who installs it, which is why the advice is to keep secrets out rather than to assume the format keeps them out. What the format is good at is the thing a checklist is good at: making a procedure repeatable when the alternative is a paragraph somebody pastes from memory.",
     ],
+    link: {
+      lead: "For the first of those four read folder by folder, with what each skill does, which surface loads it, and how it is licensed, see",
+      label: "Anthropic skills: every first-party skill and where it loads",
+      href: anthropicSkillsPath,
+      trail: ".",
+    },
     sourceIds: [
       "anthropic-skills-repo",
       "openai-skills-repo",
@@ -693,6 +702,12 @@ export const agentSkills: AgentSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Anthropic skills: every first-party skill and where it loads",
+      href: anthropicSkillsPath,
+      description:
+        "The first-party catalog: four pre-built document skills, nineteen repository folders, thirteen bundled with Claude Code.",
+    },
     {
       label: "Claude Cowork skills",
       href: coworkSkillsPath,

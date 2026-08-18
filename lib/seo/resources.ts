@@ -5,6 +5,11 @@ import {
   agentsMdVsSkillMdPath,
   type AgentsMdVsSkillMdPath,
 } from "@/lib/seo/agents-md-vs-skill-md/types"
+import { anthropicSkills } from "@/lib/seo/anthropic-skills"
+import {
+  anthropicSkillsPath,
+  type AnthropicSkillsPath,
+} from "@/lib/seo/anthropic-skills/types"
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
@@ -33,6 +38,7 @@ export type ResourcePath =
   | GuidePath
   | AgentSkillsPath
   | AgentsMdVsSkillMdPath
+  | AnthropicSkillsPath
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CoworkSkillsPath
@@ -54,6 +60,7 @@ export interface ResourceIndexEntry {
 export const resourceEntries = [
   ...guides,
   agentSkills,
+  anthropicSkills,
   claudeSkills,
   codexSkills,
   coworkSkills,
@@ -81,6 +88,7 @@ const resourceClusterDefinitions = [
       "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
       agentSkillsPath,
+      anthropicSkillsPath,
       claudeSkillsPath,
       guidePaths.installClaudeSkills,
       codexSkillsPath,

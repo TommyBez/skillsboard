@@ -100,6 +100,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/anthropic-skills/",
+        destination: "/anthropic-skills",
+        permanent: true,
+      },
+      {
         source: "/claude-skills/",
         destination: "/claude-skills",
         permanent: true,

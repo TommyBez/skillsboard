@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import type { AgentSkillsPath } from "@/lib/seo/agent-skills/types"
 import type { AgentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
+import type { AnthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
 import type { ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsPath } from "@/lib/seo/codex-skills/types"
 import type { CoworkSkillsPath } from "@/lib/seo/cowork-skills/types"
@@ -51,6 +52,7 @@ export interface GuideInlineLink {
     | GuidePath
     | AgentSkillsPath
     | AgentsMdVsSkillMdPath
+    | AnthropicSkillsPath
     | ClaudeSkillsPath
     | CodexSkillsPath
     | CoworkSkillsPath

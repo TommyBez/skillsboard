@@ -1,5 +1,6 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { alternativePaths } from "@/lib/seo/alternatives"
+import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
 import {
@@ -67,7 +68,11 @@ export interface WhereToFindClaudeSkillsDefinition {
   path: typeof whereToFindClaudeSkillsPath
   contentType: "article"
   topics: readonly string[]
-  relatedGuidePaths: readonly (GuidePath | typeof claudeSkillsPath)[]
+  relatedGuidePaths: readonly (
+    | GuidePath
+    | typeof anthropicSkillsPath
+    | typeof claudeSkillsPath
+  )[]
   eyebrow: string
   title: string
   /** Full document title, including the brand suffix. */
@@ -258,9 +263,9 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       "Reserved marketplace names are a small detail with a useful implication. Anthropic blocks third parties from registering names such as claude-plugins-official, claude-plugins-community, agent-skills, and anthropic-agent-skills, along with lookalikes like official-claude-plugins. So if you are told to add a marketplace whose name sounds official, the name itself is evidence of nothing, but a name in the reserved set could only have come from Anthropic.",
     ],
     link: {
-      lead: "For what a skill is before you go looking for one, including the frontmatter and the surfaces it runs on, see",
-      label: "Claude skills: what they are and how to use them",
-      href: claudeSkillsPath,
+      lead: "For the contents of the first two of those, every skill Anthropic publishes itself with what it does and how it is licensed, see",
+      label: "Anthropic skills: every first-party skill and where it loads",
+      href: anthropicSkillsPath,
       trail: ".",
     },
     sourceIds: [
@@ -606,6 +611,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Anthropic skills: every first-party skill and where it loads",
+      href: anthropicSkillsPath,
+      description:
+        "The catalog behind the first two official sources above, skill by skill, with licenses.",
+    },
     {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,

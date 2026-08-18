@@ -2,6 +2,7 @@ import type { OgTemplateContent } from "@/lib/og/template"
 import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
+import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
@@ -563,6 +564,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Anthropic skills: every first-party skill and where it loads",
+      href: anthropicSkillsPath,
+      description:
+        "The catalog of the skills Anthropic publishes itself, with the surface each one loads on and its license.",
+    },
     {
       label: "Claude Cowork skills",
       href: coworkSkillsPath,
