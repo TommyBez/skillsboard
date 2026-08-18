@@ -1,0 +1,367 @@
+import assert from "node:assert/strict"
+import { access, readFile } from "node:fs/promises"
+import { test } from "node:test"
+
+import "./helpers/register-app-aliases.mjs"
+
+const { agentSkills, agentSkillsPath } = await import(
+  "../lib/seo/agent-skills/index.ts"
+)
+const { claudeSkills } = await import("../lib/seo/claude-skills/index.ts")
+const { agentsMdVsSkillMd } = await import(
+  "../lib/seo/agents-md-vs-skill-md/index.ts"
+)
+const { resourceClusters, resourceEntries } = await import(
+  "../lib/seo/resources.ts"
+)
+const { markdownTwinAlternates, renderMarkdownTwin } = await import(
+  "../lib/markdown/twins.ts"
+)
+const { buildResourceArticleSchema } = await import(
+  "../lib/seo/resource-article-schema.ts"
+)
+const { default: sitemap } = await import("../app/sitemap.ts")
+const { default: nextConfig } = await import("../next.config.ts")
+
+const entry = agentSkills
+const canonical = `https://www.skillsboard.sh${agentSkillsPath}`
+const markdown = renderMarkdownTwin(agentSkillsPath) ?? ""
+
+/** Em dash and en dash are not allowed anywhere in published copy. */
+const dashPattern = /[\u2013\u2014]/
+
+async function exists(relative) {
+  try {
+    await access(new URL(relative, import.meta.url))
+    return true
+  } catch {
+    return false
+  }
+}
+
+test("the article is registered everywhere a resource is addressed", () => {
+  assert.equal(entry.path, "/agent-skills")
+  assert.ok(
+    resourceEntries.some((candidate) => candidate.path === entry.path),
+    "missing from the resource registry",
+  )
+  assert.ok(
+    resourceClusters.some((cluster) =>
+      cluster.entries.some((candidate) => candidate.path === entry.path),
+    ),
+    "missing from every topic cluster",
+  )
+  assert.ok(
+    sitemap().some((candidate) => candidate.url === canonical),
+    "missing from the sitemap",
+  )
+})
+
+test("the route renders the page and its social images", async () => {
+  for (const file of [
+    "page.tsx",
+    "layout.tsx",
+    "opengraph-image.tsx",
+    "twitter-image.tsx",
+  ]) {
+    assert.ok(
+      await exists(`../app${entry.path}/${file}`),
+      `app${entry.path}/${file} does not exist`,
+    )
+  }
+})
+
+test("the page mounts its own four CTA locations", async () => {
+  const layout = await readFile(
+    new URL(`../app${entry.path}/layout.tsx`, import.meta.url),
+    "utf8",
+  )
+  assert.ok(
+    layout.includes("agent_skills_header"),
+    "the shell reports another page's location",
+  )
+
+  const page = await readFile(
+    new URL(
+      "../components/agent-skills/agent-skills-page.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  )
+  for (const suffix of ["hero", "inline", "closing"]) {
+    assert.ok(
+      page.includes(`agent_skills_${suffix}`),
+      `the page never renders the agent_skills_${suffix} CTA`,
+    )
+  }
+
+  const events = await readFile(
+    new URL("../analytics/posthog/events.ts", import.meta.url),
+    "utf8",
+  )
+  for (const suffix of ["header", "hero", "inline", "closing"]) {
+    assert.ok(
+      events.includes(`"agent_skills_${suffix}"`),
+      `landing_cta_clicked cannot report agent_skills_${suffix}`,
+    )
+  }
+})
+
+test("the article is listed in the static llms.txt", async () => {
+  const llms = await readFile(
+    new URL("../public/llms.txt", import.meta.url),
+    "utf8",
+  )
+  assert.ok(llms.includes(`${canonical})`), "missing from public/llms.txt")
+  assert.ok(
+    llms.includes(`Last reviewed: ${entry.modifiedAt}`),
+    "llms.txt was not re-reviewed alongside the new entry",
+  )
+})
+
+test("the canonical URL is reachable with and without a trailing slash", async () => {
+  const { redirects, rewrites } = nextConfig
+  const redirectRules = await redirects()
+  const redirect = redirectRules.find(
+    (rule) =>
+      rule.source === `${entry.path}/` && rule.destination === entry.path,
+  )
+  assert.ok(redirect, "the trailing-slash spelling has no redirect")
+  assert.equal(
+    redirect.permanent,
+    true,
+    "the trailing-slash redirect is not permanent",
+  )
+
+  // The path ends in `-skills`, so the existing Accept rewrite already covers
+  // it and no rule of its own is needed.
+  const { beforeFiles } = await rewrites()
+  const negotiated = beforeFiles.find(
+    (rule) => rule.source === "/:slug([^/]*-skills)",
+  )
+  assert.ok(negotiated, "the shared -skills Markdown rewrite is missing")
+  assert.match(entry.path.slice(1), /^[^/]*-skills$/)
+
+  const condition = negotiated.has?.find(
+    (rule) => rule.type === "header" && rule.key === "accept",
+  )
+  assert.ok(condition?.value, "the Markdown rewrite has no Accept condition")
+  const accept = new RegExp(`^${condition.value}$`)
+  assert.match("text/markdown", accept)
+  assert.doesNotMatch(
+    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    accept,
+  )
+})
+
+test("the Markdown twin carries every section, the tables, and the FAQ", () => {
+  assert.ok(markdown.startsWith(`# ${entry.title}\n`))
+  assert.ok(markdown.includes(`Canonical URL: ${canonical}`))
+  assert.deepEqual(markdownTwinAlternates(entry.path), {
+    canonical: entry.path,
+    types: { "text/markdown": `${entry.path}.md` },
+  })
+
+  for (const title of [
+    entry.format.title,
+    entry.loading.title,
+    entry.support.title,
+    entry.portability.title,
+    entry.examples.title,
+    entry.governance.title,
+    entry.team.title,
+    entry.openQuestions.title,
+  ]) {
+    assert.ok(
+      markdown.includes(`## ${title}`),
+      `missing section heading: ${title}`,
+    )
+  }
+
+  for (const section of [
+    entry.format,
+    entry.loading,
+    entry.support,
+    entry.portability,
+  ]) {
+    const header = `| ${section.columns.join(" | ")} |`
+    assert.ok(markdown.includes(header), `${section.title} lost its header row`)
+  }
+
+  for (const item of entry.faq) {
+    assert.ok(markdown.includes(`### ${item.question}`), item.question)
+    assert.ok(markdown.includes(item.answer), "missing FAQ answer")
+  }
+})
+
+test("the page defines the standard rather than one vendor's feature", () => {
+  const copy = JSON.stringify(entry)
+
+  // The definitional answer the cluster is asking for.
+  assert.ok(
+    /open standard/i.test(entry.answer),
+    "the short answer does not call Agent Skills an open standard",
+  )
+  assert.ok(
+    entry.answer.includes("SKILL.md"),
+    "the short answer never names the file",
+  )
+
+  // Every field the specification defines is listed, and only those.
+  const fields = entry.format.rows.map((row) => row.label)
+  assert.deepEqual(fields, [
+    "name",
+    "description",
+    "license",
+    "compatibility",
+    "metadata",
+    "allowed-tools",
+  ])
+  assert.deepEqual(
+    entry.format.rows.filter((row) => row.cells[0] === "Yes").map((r) => r.label),
+    ["name", "description"],
+  )
+
+  // The cross-client convention that is the practical answer to portability.
+  assert.ok(
+    copy.includes(".agents/skills"),
+    "the page never mentions the cross-client .agents/skills convention",
+  )
+
+  // Vendor neutrality: no single product owns the page.
+  const agents = entry.support.rows.map((row) => row.label)
+  for (const agent of [
+    "Claude Code",
+    "ChatGPT and Codex",
+    "Cursor",
+    "GitHub Copilot",
+    "Gemini CLI",
+  ]) {
+    assert.ok(agents.includes(agent), `the adoption table omits ${agent}`)
+  }
+  assert.ok(entry.sources.length >= 12, "too few primary sources")
+})
+
+test("undocumented claims are declared rather than asserted", () => {
+  assert.ok(entry.openQuestions.entries.length >= 4)
+
+  const limits = JSON.stringify(entry.openQuestions)
+  assert.ok(
+    limits.includes("no version"),
+    "the page does not flag the missing specification version",
+  )
+  assert.ok(
+    limits.includes("does not mandate where skill directories live"),
+    "the page does not flag that directory locations are outside the standard",
+  )
+  assert.ok(
+    limits.includes("conformance"),
+    "the page does not flag the absence of a conformance test",
+  )
+})
+
+test("the FAQ is self-contained, extractable, and covers the cluster", () => {
+  assert.ok(entry.faq.length >= 6)
+
+  for (const item of entry.faq) {
+    const words = item.answer.trim().split(/\s+/).filter(Boolean).length
+    assert.ok(
+      words >= 40 && words <= 60,
+      `"${item.question}" answer is ${words} words`,
+    )
+  }
+
+  for (const term of ["standard", "specification", "examples", "library"]) {
+    assert.ok(
+      entry.faq.some((item) => item.question.includes(term)),
+      `no FAQ entry addresses ${term}`,
+    )
+  }
+})
+
+test("the article reads as a full page rather than a stub", () => {
+  const words = markdown.trim().split(/\s+/).filter(Boolean).length
+  assert.ok(words >= 2500, `word count is ${words}`)
+})
+
+test("no copy on the page uses an em dash or an en dash", () => {
+  assert.doesNotMatch(JSON.stringify(entry), dashPattern)
+  assert.doesNotMatch(markdown, dashPattern)
+})
+
+test("the page links out, and existing pages link in", () => {
+  const outbound = new Set(
+    [
+      entry.format.link.href,
+      entry.support.link.href,
+      entry.portability.link.href,
+      entry.team.link.href,
+      ...entry.related.map((link) => link.href),
+    ].filter((href) => href.startsWith("/")),
+  )
+  assert.ok(outbound.size >= 3, "fewer than three internal outbound links")
+
+  // QW9: contextual inbound links, not only navigation.
+  assert.equal(claudeSkills.format.link?.href, entry.path)
+  assert.equal(agentsMdVsSkillMd.support.link?.href, entry.path)
+
+  assert.ok(
+    claudeSkills.related.some((link) => link.href === entry.path),
+    `${claudeSkills.path} does not link to ${entry.path}`,
+  )
+  assert.ok(
+    agentsMdVsSkillMd.related.some((link) => link.href === entry.path),
+    `${agentsMdVsSkillMd.path} does not link to ${entry.path}`,
+  )
+})
+
+test("the schema carries TechArticle, FAQPage, and a breadcrumb", () => {
+  const graph = buildResourceArticleSchema(entry)["@graph"]
+  const byType = (type) => graph.find((node) => node["@type"] === type)
+
+  const article = byType("TechArticle")
+  assert.ok(article, "missing TechArticle")
+  assert.equal(article.headline, entry.title)
+  assert.equal(article.url, canonical)
+  assert.deepEqual(
+    article.citation,
+    entry.sources.map((source) => source.href),
+  )
+
+  const faq = byType("FAQPage")
+  assert.ok(faq, "missing FAQPage")
+  assert.equal(faq.mainEntity.length, entry.faq.length)
+  assert.equal(faq.mainEntity[0].acceptedAnswer.text, entry.faq[0].answer)
+
+  const breadcrumbs = byType("BreadcrumbList")
+  assert.ok(breadcrumbs, "missing BreadcrumbList")
+  assert.equal(breadcrumbs.itemListElement.at(-1).item, canonical)
+})
+
+test("every section cites a source that the page actually lists", () => {
+  const known = new Set(entry.sources.map((source) => source.id))
+  const cited = [
+    entry.answerSourceIds,
+    entry.format.sourceIds,
+    entry.loading.sourceIds,
+    entry.support.sourceIds,
+    entry.portability.sourceIds,
+    entry.examples.sourceIds,
+    entry.governance.sourceIds,
+    entry.team.sourceIds,
+    entry.openQuestions.sourceIds,
+  ]
+
+  for (const ids of cited) {
+    assert.ok(ids.length > 0, "a section cites nothing")
+    for (const id of ids) {
+      assert.ok(known.has(id), `unknown source id: ${id}`)
+    }
+  }
+
+  // Every listed source is actually used by a section.
+  const used = new Set(cited.flat())
+  for (const source of entry.sources) {
+    assert.ok(used.has(source.id), `${source.id} is listed but never cited`)
+  }
+})

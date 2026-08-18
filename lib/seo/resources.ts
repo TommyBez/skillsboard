@@ -1,3 +1,5 @@
+import { agentSkills } from "@/lib/seo/agent-skills"
+import { agentSkillsPath, type AgentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMd } from "@/lib/seo/agents-md-vs-skill-md"
 import {
   agentsMdVsSkillMdPath,
@@ -27,6 +29,7 @@ export type ResourceContentType = "guide" | "article"
 /** Every path the resource hub, related links, and sitemap can address. */
 export type ResourcePath =
   | GuidePath
+  | AgentSkillsPath
   | AgentsMdVsSkillMdPath
   | ClaudeSkillsPath
   | CodexSkillsPath
@@ -47,6 +50,7 @@ export interface ResourceIndexEntry {
 /** Single registration point: content modules feed the resources hub, related links, and sitemap. */
 export const resourceEntries = [
   ...guides,
+  agentSkills,
   claudeSkills,
   codexSkills,
   cursorSkills,
@@ -72,6 +76,7 @@ const resourceClusterDefinitions = [
     description:
       "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
+      agentSkillsPath,
       claudeSkillsPath,
       guidePaths.installClaudeSkills,
       codexSkillsPath,

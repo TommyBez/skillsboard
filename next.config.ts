@@ -90,6 +90,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/agent-skills/",
+        destination: "/agent-skills",
+        permanent: true,
+      },
+      {
         source: "/agents-md-vs-skill-md/",
         destination: "/agents-md-vs-skill-md",
         permanent: true,
