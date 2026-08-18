@@ -17,6 +17,7 @@ import {
 } from "@/lib/seo/alternatives"
 import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
+import type { CoworkSkillsCtaPlacement } from "@/lib/seo/cowork-skills/types"
 import { compareIndexPath } from "@/lib/seo/compare/types"
 import type {
   ComparisonCtaPlacement,
@@ -36,6 +37,7 @@ type ResourceHeaderLocation =
   | "codex_skills_header"
   | "compare_header"
   | ComparisonHeaderLocation
+  | "cowork_skills_header"
   | "cursor_skills_header"
   | "guide_header"
   | "pricing_header"
@@ -50,6 +52,7 @@ type ResourceCtaLocation =
   | CodexSkillsCtaPlacement
   | "compare_index"
   | ComparisonCtaPlacement
+  | CoworkSkillsCtaPlacement
   | CursorSkillsCtaPlacement
   | "guide_inline"
   | "guide_closing"

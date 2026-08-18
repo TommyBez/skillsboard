@@ -110,6 +110,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/cowork-skills/",
+        destination: "/cowork-skills",
+        permanent: true,
+      },
+      {
         source: "/cursor-skills/",
         destination: "/cursor-skills",
         permanent: true,
