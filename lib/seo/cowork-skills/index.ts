@@ -408,7 +408,7 @@ export const coworkSkills: CoworkSkillsDefinition = {
     ],
     notes: [
       "The split looks arbitrary until you notice it is not about skills at all. Cowork runs your tasks in the cloud, in beta, in an isolated environment on Anthropic's servers, and reaches anything on your computer through the Claude Desktop app. So a skill whose instructions open a local folder or drive your browser needs that app open even though the session itself is running somewhere else entirely.",
-      "Plan availability differs by surface too, which is worth checking before you promise a teammate a skill will be there. Cowork is on paid plans only. Desktop for macOS and Windows is on all paid plans. Web and mobile are on Pro, Max, and Team, and on Enterprise where an admin has enabled it. The Chrome side panel is on Max and Team, rolling out to Pro, and on Enterprise where an admin has enabled it, and opening that panel starts a Cowork session directly.",
+      "Plan availability differs by surface too, which is worth checking before you promise a teammate a skill will be there. Cowork is on paid plans only. The desktop app carries it on macOS, Windows, and Linux in beta, on all paid plans. Web and mobile are in beta on Pro, Max, and Team, and on Enterprise where an admin has enabled it. The Chrome side panel is on Max and Team, rolling out to Pro, and on Enterprise where an admin has enabled it, and opening that panel starts a Cowork session directly.",
       "A skill also adapts to the surface rather than producing the same artifact everywhere. Anthropic's example is a research skill that may produce a Word document in Cowork and detailed data breakdowns in Excel, with the caveat that some skills work better on one surface than others. If you build a skill around a specific Excel or PowerPoint template, the Microsoft 365 add-ins can load that template into the open file.",
     ],
     link: {
@@ -424,6 +424,7 @@ export const coworkSkills: CoworkSkillsDefinition = {
       "use-skills",
       "use-plugins",
       "cowork-product",
+      "install-desktop",
     ],
   },
   authoring: {
@@ -654,6 +655,12 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
       label: "Customize Cowork with plugins",
       href: "https://claude.com/blog/cowork-plugins",
       note: "The January 2026 announcement that plugin support in Cowork shipped as a research preview for all paid Claude users, the eleven open-sourced plugins, and that plugins were saved locally at the time with organization-wide management still to come.",
+    },
+    {
+      id: "install-desktop",
+      label: "Install Claude Desktop",
+      href: "https://support.claude.com/en/articles/10065433-install-claude-desktop",
+      note: "That Cowork is available for all paid plans using the Claude Desktop app on macOS, Windows, and Linux in beta, the Linux system requirements, and the virtualization, package, disk, and memory setup Cowork needs on Linux.",
     },
     {
       id: "cowork-product",
