@@ -195,6 +195,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
             labelWidth="w-[18%]"
           />
           <NoteList notes={entry.loading.notes} />
+          <InlineLink link={entry.loading.link} />
           <SectionSources
             sourceIds={entry.loading.sourceIds}
             sources={sources}

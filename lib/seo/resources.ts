@@ -9,6 +9,8 @@ import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
 import { codexSkillsPath, type CodexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { coworkSkills } from "@/lib/seo/cowork-skills"
+import { coworkSkillsPath, type CoworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkills } from "@/lib/seo/cursor-skills"
 import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
@@ -33,6 +35,7 @@ export type ResourcePath =
   | AgentsMdVsSkillMdPath
   | ClaudeSkillsPath
   | CodexSkillsPath
+  | CoworkSkillsPath
   | CursorSkillsPath
   | WhereToFindClaudeSkillsPath
 
@@ -53,6 +56,7 @@ export const resourceEntries = [
   agentSkills,
   claudeSkills,
   codexSkills,
+  coworkSkills,
   cursorSkills,
   agentsMdVsSkillMd,
   whereToFindClaudeSkills,
@@ -81,6 +85,7 @@ const resourceClusterDefinitions = [
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
+      coworkSkillsPath,
       agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,
       guidePaths.manageCrossAgentSkills,

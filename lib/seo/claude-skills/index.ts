@@ -5,6 +5,7 @@ import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
+import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import {
   type GuideInlineLink,
@@ -299,6 +300,12 @@ export const claudeSkills: ClaudeSkillsDefinition = {
       "Custom skills do not sync across surfaces. Anthropic documents this plainly: a skill uploaded to claude.ai is not available through the API, a skill uploaded through the API is not available on claude.ai, and Claude Code skills are filesystem-based and separate from both. Each surface is managed on its own.",
       "Anthropic also ships pre-built skills for PowerPoint, Excel, Word, and PDF. Those are available on claude.ai and the Claude API, and they are not available in Claude Code.",
     ],
+    link: {
+      lead: "Claude Cowork is a surface of its own here, and the one that surprises people: a Cowork session loads the skills enabled for your claude.ai account rather than the ones in your local skills directory. For the channels, the per-surface differences, and how to write a skill for it, see",
+      label: "Claude Cowork skills",
+      href: coworkSkillsPath,
+      trail: ".",
+    },
     sourceIds: ["anthropic-overview", "claude-code-skills", "agentskills-home"],
   },
   install: {
@@ -556,6 +563,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Claude Cowork skills",
+      href: coworkSkillsPath,
+      description:
+        "The surface that loads skills from your account instead of your disk, and the four channels that fill it.",
+    },
     {
       label: "Agent Skills: the open standard for extending AI agents",
       href: agentSkillsPath,

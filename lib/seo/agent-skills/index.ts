@@ -5,6 +5,7 @@ import { alternativePaths } from "@/lib/seo/alternatives"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
+import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import {
   type GuideInlineLink,
@@ -89,7 +90,7 @@ export interface AgentSkillsDefinition {
   answerNotes: readonly string[]
   answerSourceIds: readonly string[]
   format: AgentSkillsTableSection & { tree: string; link: AgentSkillsInlineLink }
-  loading: AgentSkillsTableSection
+  loading: AgentSkillsTableSection & { link: AgentSkillsInlineLink }
   support: AgentSkillsTableSection & { link: AgentSkillsInlineLink }
   portability: AgentSkillsTableSection & { link: AgentSkillsInlineLink }
   examples: AgentSkillsPlaceSection
@@ -263,6 +264,12 @@ export const agentSkills: AgentSkillsDefinition = {
       "Activation is a model decision in every implementation we checked, not a keyword rule in the harness. The client implementation guide is explicit that most implementations rely on the model's own judgment rather than harness-side trigger matching, which is why the guidance everywhere is to front-load the trigger case in the description rather than to tune something in the client.",
       "Explicit invocation exists alongside the automatic path in every product on this page. Claude Code and Cursor use a slash prefix, Codex uses a dollar prefix in the CLI and an at prefix in ChatGPT. The specification says nothing about invocation syntax, so this is a place where the same skill feels different in each tool even though the file is identical.",
     ],
+    link: {
+      lead: "For the same three tiers inside a product with no terminal, where the set a session can load comes from an account rather than a directory, see",
+      label: "Claude Cowork skills",
+      href: coworkSkillsPath,
+      trail: ".",
+    },
     sourceIds: [
       "agentskills-spec",
       "agentskills-implementation",
@@ -686,6 +693,12 @@ export const agentSkills: AgentSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Claude Cowork skills",
+      href: coworkSkillsPath,
+      description:
+        "How the standard behaves in Claude Cowork, which loads the skills enabled on an account rather than on disk.",
+    },
     {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,
