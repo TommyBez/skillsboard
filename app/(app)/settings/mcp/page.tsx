@@ -3,6 +3,7 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { ArrowLeftIcon } from "lucide-react"
 
+import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { getAppContext } from "@/lib/app-context"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
@@ -75,6 +76,10 @@ export default function McpSettingsPage() {
           key to copy.
         </p>
       </header>
+
+      <div className="mt-8">
+        <McpPluginInstall />
+      </div>
 
       <div className="mt-8">
         <Suspense
