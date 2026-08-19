@@ -745,5 +745,5 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
   ogAlt:
     "Explainer for skills in Claude Cowork: the SKILL.md format, how a session loads and invokes a skill, the four channels that deliver one, and what only works on desktop.",
   publishedAt: "2026-08-18",
-  modifiedAt: "2026-08-18",
+  modifiedAt: "2026-08-19",
 }
