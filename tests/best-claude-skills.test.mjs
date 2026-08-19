@@ -213,6 +213,34 @@ test("the register is grouped, complete, and cites how each entry ships", () => 
   const rows = registers.flatMap((section) => section.rows)
   assert.equal(rows.length, 27, `the register holds ${rows.length} entries`)
 
+  // The unit is the entry. One entry, Prisma's, is a curated set of nine
+  // folders that share a single job, so twenty-seven entries cover
+  // thirty-five individual skills and the copy has to say both numbers.
+  const prismaSet = rows.find((row) => row.label === "The Prisma set")
+  assert.ok(prismaSet, "the Prisma set is no longer a single entry")
+  assert.match(
+    prismaSet.cells[0],
+    /^Nine folders/,
+    "the Prisma entry no longer describes nine folders",
+  )
+  const individualSkills = rows.length - 1 + 9
+  assert.equal(
+    individualSkills,
+    35,
+    `the entries cover ${individualSkills} individual skills`,
+  )
+
+  const copy = JSON.stringify(entry)
+  assert.ok(
+    copy.includes("thirty-five"),
+    "the page never states how many individual skills the entries cover",
+  )
+  assert.doesNotMatch(
+    copy,
+    /twenty-seven (?:Claude )?skills/i,
+    "the page still counts twenty-seven entries as twenty-seven skills",
+  )
+
   const labels = rows.map((row) => row.label)
   assert.equal(
     new Set(labels).size,

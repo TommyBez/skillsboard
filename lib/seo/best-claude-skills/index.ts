@@ -165,14 +165,14 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
   seoTitle:
     "Best Claude Skills: A Register With the Criteria Behind It | Skills Board",
   description:
-    "Twenty-seven Claude skills that cleared a stated bar, grouped by the job they do, each read from its own SKILL.md on August 19, 2026. Includes the seven criteria we applied, what every entry is licensed under, and the nine popular things we dropped and why.",
+    "Twenty-seven register entries covering thirty-five Claude skills that cleared a stated bar, grouped by the job they do, each read from its own SKILL.md on August 19, 2026. Includes the seven criteria we applied, what every entry is licensed under, and the nine popular things we dropped and why.",
   intro: [
-    "Almost every list that answers this query is a pile of repository links. The links are usually real and the ordering is usually nothing: no stated bar, no sign that anybody opened the files, and no account of what was left out. This page is the other shape. It says what a skill had to clear, it lists the twenty-seven that cleared it, and it names the nine popular things we removed and the reason for each.",
+    "Almost every list that answers this query is a pile of repository links. The links are usually real and the ordering is usually nothing: no stated bar, no sign that anybody opened the files, and no account of what was left out. This page is the other shape. It says what a skill had to clear, it lists the twenty-seven entries that cleared it, thirty-five individual skills once Prisma's set is counted folder by folder, and it names the nine popular things we removed and the reason for each.",
     "Everything below was read on August 19, 2026 from the skill's own SKILL.md, its repository license file, and the GitHub API, not from a directory blurb or another list. Where a number appears it comes from a named source on that date, and where nothing is published we say so rather than fill the gap. The register is grouped by the job the skill does, because a ranked one to twenty-seven would imply a comparison nobody can make between a PDF toolkit and a debugging discipline.",
     "This page is a selection. It is not the map of where skills come from, which is what our page on where to find Claude skills is for, it is not a definition of the format, which lives on our Claude skills page, and it is not the first-party catalog, which lives on our Anthropic skills page. Nothing here repeats those.",
   ],
   answer:
-    "There is no measured ranking of Claude skills, because nobody publishes per-skill quality data. What can be done honestly is a selection against a stated bar. Ours had seven criteria, the strictest being that we opened the SKILL.md and that the skill has a license we can name. Twenty-seven skills cleared it, from Anthropic, Vercel, Supabase, Prisma, NVIDIA, shadcn, Jesse Vincent, Matt Pocock, Emil Kowalski, Hassan El Mghari, and Ahmad Othman Ammar Adi.",
+    "There is no measured ranking of Claude skills, because nobody publishes per-skill quality data. What can be done honestly is a selection against a stated bar. Ours had seven criteria, the strictest being that we opened the SKILL.md and that the skill has a license we can name. Twenty-seven register entries cleared it, covering thirty-five individual skills because one entry is Prisma's set of nine folders, from Anthropic, Vercel, Supabase, Prisma, NVIDIA, shadcn, Jesse Vincent, Matt Pocock, Emil Kowalski, Hassan El Mghari, and Ahmad Othman Ammar Adi.",
   answerNotes: [
     "The bar removed things that a popularity list would have kept. The caveman skill had 445.0K installs on the skills.sh leaderboard and 99,212 stars on the day we read it, and it is not here, because GitHub reports its license as NOASSERTION and we could not name the terms. Five of the nine skill folders Vercel publishes are not here either, for the same reason: their frontmatter states no license and the repository carries no license file anywhere in its tree.",
     "The bar also let in things a popularity list would have missed. Prisma's nine skill folders sat at fifty-three repository stars when we read the API, next to obra/superpowers at 274,156. Stars measure a repository's attention, not a skill's usefulness, and a vendor writing down how its own product works is one of the few cases where the author is unambiguously the right one.",
@@ -195,7 +195,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
       },
       {
         label: "2. One nameable job",
-        body: "The skill folder describes a single procedure with a stated trigger, so it can be explained in a sentence and a reader can tell when it should fire. A folder that is really a table of contents for two hundred other folders is a source, and sources belong on a different page.",
+        body: "The register entry describes a single procedure with a stated trigger, so it can be explained in a sentence and a reader can tell when it should fire. Where one publisher ships a set of folders that share that single job, as Prisma does with nine, the set is one entry and the count says so. A folder that is really a table of contents for two hundred other folders is a source, and sources belong on a different page.",
       },
       {
         label: "3. A license we can name",
@@ -221,7 +221,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     notes: [
       "Popularity is not on the list, and that is deliberate. The one public install number in this space comes from skills.sh, whose FAQ says the leaderboard is anonymous telemetry from its own CLI, counting runs of npx skills add. It does not count a plugin install, a git clone, a copied folder, or a single invocation of the skill afterwards. It is a useful discovery signal and a poor quality signal, so we use it as colour in the notes and never as a reason to include something.",
       "Stars are not on the list either, for a sharper reason: GitHub counts stars per repository, and skills ship in folders. obra/superpowers holds fourteen skills behind one star count. anthropics/skills holds nineteen. Nothing tells you which folder earned the attention, so a list ordered by stars is ordering repositories while claiming to order skills.",
-      "The register is grouped rather than ranked. Four groups, in the order most teams meet them: engineering workflow, interface work, documents and data, and skills for writing skills. Within a group the order is not a ranking either. If a page tells you the third best Claude skill, ask what it measured.",
+      "The register is grouped rather than ranked. Four groups, in the order most teams meet them: engineering workflow, interface work, documents and data, and skills for writing skills. Within a group the order is not a ranking either. The unit we count is the entry: twenty-seven of them, covering thirty-five individual skill folders, because the Prisma entry is a set of nine that share one job. If a page tells you the third best Claude skill, ask what it measured.",
     ],
     link: {
       lead: "For a scorecard that turns these criteria into something a team can repeat on a candidate we never saw, see",
@@ -311,7 +311,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
       },
     ],
     notes: [
-      "Five of these nine come from one repository, and that is a finding rather than an oversight. obra/superpowers is not a bag of tips; it is one methodology split into skills that call each other, so brainstorming hands off to writing-plans, which hands off to subagent-driven-development, which calls requesting-code-review. Installing one of the five without the others gets you a gate with nothing behind it, and the repository's own using-superpowers skill exists to wire them together.",
+      "Four of these nine come from one repository, and that is a finding rather than an oversight. obra/superpowers is not a bag of tips; it is one methodology split into skills that call each other, so brainstorming hands off to writing-plans, which hands off to subagent-driven-development, which calls requesting-code-review. Installing one of the four without the others gets you a gate with nothing behind it, and the repository's own using-superpowers skill exists to wire them together.",
       "Matt Pocock's three are the opposite shape and pair well with it: each is self-contained and assumes nothing about the rest of the folder. If you want one skill rather than a methodology, that is the collection to read first. Note that the repository also has a skills/in-progress directory whose contents we left out, because the author's own folder name says they are not finished.",
       "webapp-testing is the only Anthropic entry in this group, and it is here for a specific reason: it is the clearest published example of a skill that ships executable scripts and tells the agent how to treat them. If you are writing a skill with a scripts folder, read that file before you write yours.",
     ],
@@ -418,7 +418,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
   delivery: {
     title: "Documents and data: the five that touch real files",
     intro:
-      "The group that produces something a colleague opens, and the group with the most license variation. Two of these five are not open source, and their own license file is explicit about it.",
+      "The group that produces something a colleague opens, and the group with the most license variation. Two of these five entries are not open source, and their own license file is explicit about it. One of the five, the Prisma set, is nine folders counted as a single entry because they share one job.",
     columns: [
       "Skill",
       "What its SKILL.md says it does",
@@ -529,7 +529,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     notes: [
       "skill-inspector is the entry we would install first, and the reasoning is uncomfortable rather than clever. Every other skill on this page is instructions an agent will follow and, in several cases, scripts it will run. Reading the file is what we did and it is the minimum; a scanner plus a semantic review is more than most teams will do by hand, and the skill's own advice not to trust its score is the part that makes it worth having.",
       "writing-skills and writing-for-agents disagree in useful ways, and reading both is better than picking one. The superpowers file is process-first and treats a skill as something you verify before deployment. The mattpocock file is writing-first and treats a skill as one member of a family of agent-facing documents. Teams tend to need the second question answered before the first.",
-      "There is a gap in this group that nobody fills. skill-creator can benchmark a description for trigger accuracy, but none of the twenty-seven skills we read shipped an eval report next to its SKILL.md. The tooling to measure a skill is public; published measurements of specific skills are not.",
+      "There is a gap in this group that nobody fills. skill-creator can benchmark a description for trigger accuracy, but none of the thirty-five skills we read shipped an eval report next to its SKILL.md. The tooling to measure a skill is public; published measurements of specific skills are not.",
     ],
     link: {
       lead: "For what a skill actually is before you write one, the SKILL.md frontmatter fields, and what each Claude surface allows, see",
@@ -612,7 +612,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
       },
       {
         title: "Nobody publishes eval results for their own skills",
-        body: "Anthropic's skill-creator ships an eval harness and a viewer, and Claude Code documents running evals on a skill. None of the twenty-seven skills in this register shipped an eval report alongside its SKILL.md. There is public tooling to measure a skill and no public measurement of a specific one.",
+        body: "Anthropic's skill-creator ships an eval harness and a viewer, and Claude Code documents running evals on a skill. None of the thirty-five skills in this register shipped an eval report alongside its SKILL.md. There is public tooling to measure a skill and no public measurement of a specific one.",
       },
       {
         title: "Licenses sit at the repository level almost everywhere",
@@ -642,7 +642,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
   team: {
     title: "A list is not a decision",
     intro:
-      "Twenty-seven is more than any team should install. The useful output of a page like this is a shortlist of three or four your team agrees on, and somewhere those three or four stay visible after the person who found them moves on.",
+      "Twenty-seven entries are more than any team should install. The useful output of a page like this is a shortlist of three or four your team agrees on, and somewhere those three or four stay visible after the person who found them moves on.",
     body: [
       "The pattern that fails is familiar and has nothing to do with the skills. Somebody reads a register, installs six, keeps two, and the two live in a personal ~/.claude/skills/ folder nobody else can see. A teammate asks which skill to use for a task, gets a link in chat, and the link is to whichever repository was top of a list that month. Six weeks later two people are running different versions of the same idea and neither knows.",
       "The fix is small and unglamorous. Pick a job your team does every week, choose one skill from this register that does it, and record the decision somewhere searchable with the source repository, the folder path, and the license visible. That is enough for the next teammate to open the SKILL.md and judge it themselves, which is the only part of this that does not transfer.",
@@ -683,7 +683,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     {
       question: "What are the best Claude skills?",
       answer:
-        "Nobody can rank them, because no per-skill quality data is published. Against a stated bar, twenty-seven cleared ours: nine engineering workflow skills, eight for interface work, five for documents and data, and five for writing and checking skills. Publishers include Anthropic, Vercel, Supabase, Prisma, NVIDIA, and shadcn.",
+        "Nobody can rank them, because no per-skill quality data is published. Against a stated bar, twenty-seven register entries cleared ours, covering thirty-five skills: nine for engineering workflow, eight for interface work, five for documents and data, and five for writing and checking skills. Publishers include Anthropic, Vercel, Supabase, Prisma, NVIDIA, and shadcn.",
     },
     {
       question: "Which Claude skills are best for coding?",
@@ -718,7 +718,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     {
       question: "How many Claude skills are in this list, and what got cut?",
       answer:
-        "Twenty-seven are in, and nine groups of candidates were dropped. The cuts include the single most installed skill we looked at, five skills published by Vercel, every awesome list, three mega-bundles too large to read, and two Anthropic skills we removed on editorial judgment rather than on a rule.",
+        "Twenty-seven entries are in, covering thirty-five skills because the Prisma entry is a set of nine folders. Nine groups of candidates were dropped: the single most installed skill we looked at, five skills published by Vercel, every awesome list, three mega-bundles too large to read, and two Anthropic skills cut on judgment.",
     },
   ],
   sources: [
@@ -848,7 +848,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
       label: "Anthropic skills: every first-party skill and where it loads",
       href: anthropicSkillsPath,
       description:
-        "The full first-party catalog behind the six Anthropic entries here, with the license on each folder.",
+        "The full first-party catalog behind the seven Anthropic entries here, with the license on each folder.",
     },
     {
       label: "Claude skills: what they are and how to use them",
@@ -890,7 +890,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
   og: {
     eyebrow: "Best Claude Skills",
     title: [
-      { text: "Twenty-seven skills," },
+      { text: "Twenty-seven entries," },
       { text: "and the bar they cleared.", accent: true },
     ],
     description:
@@ -899,7 +899,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     chips: ["Criteria", "Register", "Dropped"],
   },
   ogAlt:
-    "A curated register of twenty-seven Claude skills grouped by job, with the seven selection criteria applied and the candidates that were dropped.",
+    "A curated register of twenty-seven entries covering thirty-five Claude skills, grouped by job, with the seven selection criteria applied and the candidates that were dropped.",
   publishedAt: "2026-08-19",
   modifiedAt: "2026-08-19",
 }

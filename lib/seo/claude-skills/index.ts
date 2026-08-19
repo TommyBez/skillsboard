@@ -569,7 +569,7 @@ A Markdown section ready to paste into the release description.`,
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,
       description:
-        "Twenty-seven skills that cleared seven stated criteria, grouped by job, with the license on every entry.",
+        "Twenty-seven entries covering thirty-five skills that cleared seven stated criteria, grouped by job, with the license on every entry.",
     },
     {
       label: "Anthropic skills: every first-party skill and where it loads",

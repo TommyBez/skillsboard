@@ -797,7 +797,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,
       description:
-        "Six of the folders above, set beside twenty-one third-party skills that cleared the same seven criteria.",
+        "Seven of the folders above, set beside twenty third-party entries that cleared the same seven criteria.",
     },
     {
       label: "Claude skills: what they are and how to use them",

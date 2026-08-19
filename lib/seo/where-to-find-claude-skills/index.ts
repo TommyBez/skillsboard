@@ -622,7 +622,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,
       description:
-        "Twenty-seven skills from these sources that cleared seven stated criteria, and the nine popular candidates that did not.",
+        "Twenty-seven entries covering thirty-five skills from these sources that cleared seven stated criteria, and the nine popular candidates that did not.",
     },
     {
       label: "Anthropic skills: every first-party skill and where it loads",
