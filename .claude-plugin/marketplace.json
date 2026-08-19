@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "skills-board",
+  "description": "Official marketplace for the Skills Board plugin.",
+  "version": "0.1.0",
+  "owner": {
+    "name": "Skills Board",
+    "url": "https://github.com/TommyBez/skillsboard"
+  },
+  "plugins": [
+    {
+      "name": "skills-board",
+      "source": "./plugin",
+      "version": "0.1.0",
+      "description": "Search your team's Skills Board library over MCP and get the install command for a saved skill or a published collection.",
+      "author": {
+        "name": "Skills Board",
+        "url": "https://www.skillsboard.sh"
+      },
+      "homepage": "https://www.skillsboard.sh",
+      "repository": "https://github.com/TommyBez/skillsboard",
+      "license": "MIT",
+      "keywords": [
+        "agent-skills",
+        "skills",
+        "mcp",
+        "team-library",
+        "skills-board"
+      ]
+    }
+  ]
+}
