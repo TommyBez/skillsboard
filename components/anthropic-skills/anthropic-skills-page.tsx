@@ -3,7 +3,6 @@ import { ExternalLinkIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import {
-  CodeBlock,
   formatArticleDate,
   NoteList,
   SectionHeading,
@@ -12,16 +11,15 @@ import {
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import type {
-  AgentSkillsDefinition,
-  AgentSkillsInlineLink,
-  AgentSkillsPlaceSection,
-  AgentSkillsSource,
-} from "@/lib/seo/agent-skills"
+  AnthropicSkillsDefinition,
+  AnthropicSkillsInlineLink,
+  AnthropicSkillsSource,
+} from "@/lib/seo/anthropic-skills"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: AgentSkillsInlineLink }) {
+function InlineLink({ link }: { link: AnthropicSkillsInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -36,35 +34,12 @@ function InlineLink({ link }: { link: AgentSkillsInlineLink }) {
   )
 }
 
-function PlaceList({
-  entries,
+export function AnthropicSkillsPage({
+  entry,
 }: {
-  entries: AgentSkillsPlaceSection["entries"]
+  entry: AnthropicSkillsDefinition
 }) {
-  return (
-    <div className="mt-9 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border">
-      {entries.map((place) => (
-        <div key={place.name} className="bg-card p-5 md:p-6">
-          <a
-            href={place.href}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-1.5 text-base font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
-          >
-            {place.name}
-            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
-          </a>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {place.body}
-          </p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
-  const sources: readonly AgentSkillsSource[] = entry.sources
+  const sources: readonly AnthropicSkillsSource[] = entry.sources
 
   return (
     <>
@@ -97,7 +72,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_hero" />
+            <ResourceCta location="anthropic_skills_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -159,128 +134,114 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
           />
         </section>
 
-        <section aria-labelledby="format-heading" className="pt-16">
+        <section aria-labelledby="sets-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Specification"
-            id="format"
-            title={entry.format.title}
-            intro={entry.format.intro}
+            eyebrow="01 / Sets"
+            id="sets"
+            title={entry.sets.title}
+            intro={entry.sets.intro}
           />
           <SectionTable
-            caption="Every frontmatter field the Agent Skills specification defines, and the constraints it places on each."
-            columns={entry.format.columns}
-            rows={entry.format.rows}
+            caption="The three sets of first-party Anthropic skills, and the surfaces each one reaches."
+            columns={entry.sets.columns}
+            rows={entry.sets.rows}
             labelWidth="w-[20%]"
           />
-          <CodeBlock label="Skill directory" value={entry.format.tree} />
-          <NoteList notes={entry.format.notes} />
-          <InlineLink link={entry.format.link} />
-          <SectionSources
-            sourceIds={entry.format.sourceIds}
-            sources={sources}
-          />
+          <NoteList notes={entry.sets.notes} />
+          <InlineLink link={entry.sets.link} />
+          <SectionSources sourceIds={entry.sets.sourceIds} sources={sources} />
         </section>
 
-        <section aria-labelledby="loading-heading" className="pt-16">
+        <section aria-labelledby="catalog-heading" className="pt-16">
           <SectionHeading
-            eyebrow="02 / Loading"
-            id="loading"
-            title={entry.loading.title}
-            intro={entry.loading.intro}
+            eyebrow="02 / Catalog"
+            id="catalog"
+            title={entry.catalog.title}
+            intro={entry.catalog.intro}
           />
           <SectionTable
-            caption="The three progressive disclosure tiers, what each one puts in context, and when."
-            columns={entry.loading.columns}
-            rows={entry.loading.rows}
-            labelWidth="w-[18%]"
+            caption="Every skill folder published in the anthropics/skills repository, what it does, and how it ships."
+            columns={entry.catalog.columns}
+            rows={entry.catalog.rows}
+            labelWidth="w-[16%]"
           />
-          <NoteList notes={entry.loading.notes} />
-          <InlineLink link={entry.loading.link} />
-          <SectionSources
-            sourceIds={entry.loading.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="support-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="03 / Adoption"
-            id="support"
-            title={entry.support.title}
-            intro={entry.support.intro}
-          />
-          <SectionTable
-            caption="The directories each documented agent scans for skills, at project and user scope."
-            columns={entry.support.columns}
-            rows={entry.support.rows}
-            labelWidth="w-[18%]"
-          />
-          <NoteList notes={entry.support.notes} />
-          <InlineLink link={entry.support.link} />
+          <NoteList notes={entry.catalog.notes} />
+          <InlineLink link={entry.catalog.link} />
           <div className="mt-8">
-            <ResourceCta location="agent_skills_inline" />
+            <ResourceCta location="anthropic_skills_inline" />
           </div>
           <SectionSources
-            sourceIds={entry.support.sourceIds}
+            sourceIds={entry.catalog.sourceIds}
             sources={sources}
           />
         </section>
 
-        <section aria-labelledby="portability-heading" className="pt-16">
+        <section aria-labelledby="bundled-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Portability"
-            id="portability"
-            title={entry.portability.title}
-            intro={entry.portability.intro}
+            eyebrow="03 / Bundled"
+            id="bundled"
+            title={entry.bundled.title}
+            intro={entry.bundled.intro}
           />
           <SectionTable
-            caption="What survives when a skill moves between agents, and the documented place each part stops."
-            columns={entry.portability.columns}
-            rows={entry.portability.rows}
-            labelWidth="w-[20%]"
+            caption="The skills Claude Code ships with, marked Skill in Anthropic's own commands reference."
+            columns={entry.bundled.columns}
+            rows={entry.bundled.rows}
+            labelWidth="w-[18%]"
           />
-          <NoteList notes={entry.portability.notes} />
-          <InlineLink link={entry.portability.link} />
+          <NoteList notes={entry.bundled.notes} />
+          <InlineLink link={entry.bundled.link} />
           <SectionSources
-            sourceIds={entry.portability.sourceIds}
+            sourceIds={entry.bundled.sourceIds}
             sources={sources}
           />
         </section>
 
-        <section aria-labelledby="examples-heading" className="pt-16">
+        <section aria-labelledby="surfaces-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Examples"
-            id="examples"
-            title={entry.examples.title}
-            intro={entry.examples.intro}
+            eyebrow="04 / Surfaces"
+            id="surfaces"
+            title={entry.surfaces.title}
+            intro={entry.surfaces.intro}
           />
-          <PlaceList entries={entry.examples.entries} />
-          <NoteList notes={entry.examples.notes} />
-          {entry.examples.link ? <InlineLink link={entry.examples.link} /> : null}
+          <SectionTable
+            caption="What each Claude surface already carries, and what you still have to install yourself."
+            columns={entry.surfaces.columns}
+            rows={entry.surfaces.rows}
+            labelWidth="w-[16%]"
+          />
+          <NoteList notes={entry.surfaces.notes} />
+          <InlineLink link={entry.surfaces.link} />
           <SectionSources
-            sourceIds={entry.examples.sourceIds}
+            sourceIds={entry.surfaces.sourceIds}
             sources={sources}
           />
         </section>
 
-        <section aria-labelledby="governance-heading" className="pt-16">
+        <section aria-labelledby="licensing-heading" className="pt-16">
           <SectionHeading
-            eyebrow="06 / Governance"
-            id="governance"
-            title={entry.governance.title}
-            intro={entry.governance.intro}
+            eyebrow="05 / Licenses"
+            id="licensing"
+            title={entry.licensing.title}
+            intro={entry.licensing.intro}
           />
-          <PlaceList entries={entry.governance.entries} />
-          <NoteList notes={entry.governance.notes} />
+          <SectionTable
+            caption="How the skills in the repository are licensed, group by group."
+            columns={entry.licensing.columns}
+            rows={entry.licensing.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.licensing.notes} />
+          <InlineLink link={entry.licensing.link} />
           <SectionSources
-            sourceIds={entry.governance.sourceIds}
+            sourceIds={entry.licensing.sourceIds}
             sources={sources}
           />
         </section>
 
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="07 / Teams"
+            eyebrow="06 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -311,7 +272,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
 
         <section aria-labelledby="open-questions-heading" className="pt-16">
           <SectionHeading
-            eyebrow="08 / Limits"
+            eyebrow="07 / Limits"
             id="open-questions"
             title={entry.openQuestions.title}
             intro={entry.openQuestions.intro}
@@ -339,7 +300,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
 
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            09 / Questions
+            08 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -373,11 +334,12 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
               Editorial method:
             </span>{" "}
             every claim on this page comes from the first-party sources below,
-            fetched on the date at the top. Counts of skills, clients, and
-            directories were read on that date and change without notice. Where
-            nothing is documented, this page says so instead of filling the gap,
-            and the section on what is not documented lists those cases
-            explicitly.
+            fetched on the date at the top. Skill names, counts, and license
+            files were read directly from the GitHub API and from the raw files
+            in the repository that day, and the repository changes without
+            notice. Where nothing is documented, this page says so instead of
+            filling the gap, and the section on what is not documented lists
+            those cases explicitly.
           </p>
           <ul className="mt-6 space-y-4">
             {sources.map((source) => (
@@ -432,15 +394,15 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            A shared format is not a shared decision.
+            Anthropic ships the skills. Your team still has to pick.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills your team actually recommends, and invite the people who
-            keep asking which one to use.
+            the skills your team actually recommends, and keep the source and
+            the license one click away from every entry.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_closing" />
+            <ResourceCta location="anthropic_skills_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

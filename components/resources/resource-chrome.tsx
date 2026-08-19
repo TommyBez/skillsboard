@@ -15,6 +15,7 @@ import {
   alternativesIndexPath,
   type AlternativeCtaPlacement,
 } from "@/lib/seo/alternatives"
+import type { AnthropicSkillsCtaPlacement } from "@/lib/seo/anthropic-skills/types"
 import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
 import type { CoworkSkillsCtaPlacement } from "@/lib/seo/cowork-skills/types"
@@ -32,6 +33,7 @@ type ResourceHeaderLocation =
   | "about_header"
   | "agent_skills_header"
   | "agents_md_header"
+  | "anthropic_skills_header"
   | "alternatives_header"
   | "claude_skills_header"
   | "codex_skills_header"
@@ -46,6 +48,7 @@ type ResourceHeaderLocation =
 type ResourceCtaLocation =
   | AgentSkillsCtaPlacement
   | AgentsMdVsSkillMdCtaPlacement
+  | AnthropicSkillsCtaPlacement
   | "alternatives_index"
   | AlternativeCtaPlacement
   | ClaudeSkillsCtaPlacement
