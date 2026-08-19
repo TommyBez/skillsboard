@@ -14,20 +14,6 @@ const SKILL_NAME = "team-skill-library"
 /** Em dash and en dash are not allowed anywhere in published copy. */
 const dashPattern = /[\u2013\u2014]/
 
-/** Agent Plugins 1.0.0 closes the manifest to this set of top-level fields. */
-const portableManifestFields = new Set([
-  "$schema",
-  "name",
-  "version",
-  "description",
-  "author",
-  "homepage",
-  "repository",
-  "license",
-  "keywords",
-  "extensions",
-])
-
 async function readJson(relative) {
   return JSON.parse(await readFile(new URL(relative, import.meta.url), "utf8"))
 }
@@ -44,6 +30,13 @@ const portableMcp = await readJson("../plugin/mcp.json")
 const claudeMcp = await readJson("../plugin/.mcp.json")
 const skillSource = await readText(`../plugin/skills/${SKILL_NAME}/SKILL.md`)
 const mcpRoute = await readText("../app/api/[transport]/route.ts")
+
+/**
+ * Pinned copy of the published Agent Plugins 1.0.0 manifest schema. Reading the
+ * fixture keeps the test offline while the contract stays the one the spec
+ * publishes, instead of a hand written restatement of it.
+ */
+const pluginSchema = await readJson("./fixtures/agent-plugins-plugin.schema.1.0.0.json")
 
 const manifests = [portableManifest, openPluginManifest, claudeManifest]
 
@@ -76,20 +69,112 @@ test("every manifest agrees on the plugin name and version", () => {
   }
 })
 
-test("the portable manifest matches the Agent Plugins 1.0.0 contract", () => {
-  assert.equal(
-    portableManifest.$schema,
-    "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
-  )
+/**
+ * Validator for the keyword subset the pinned schema uses: type, const,
+ * required, properties, additionalProperties, items, pattern, minLength and
+ * maxLength. Every constraint comes from the fixture, so this file holds no
+ * second copy of the contract. Returns one message per violation.
+ */
+function validateAgainstSchema(schema, value, path = "manifest") {
+  const errors = []
 
-  for (const field of Object.keys(portableManifest)) {
-    assert.ok(portableManifestFields.has(field), `unexpected portable field: ${field}`)
+  if ("const" in schema && value !== schema.const) {
+    errors.push(`${path} must equal ${JSON.stringify(schema.const)}`)
   }
 
-  assert.match(portableManifest.name, /^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$/)
-  assert.ok(portableManifest.name.length <= 64)
-  assert.ok(!portableManifest.name.includes("--"))
-  assert.ok(!portableManifest.name.includes(".."))
+  if (schema.type === "object") {
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      return [...errors, `${path} must be an object`]
+    }
+
+    for (const key of schema.required ?? []) {
+      if (!(key in value)) {
+        errors.push(`${path} is missing the required ${key} property`)
+      }
+    }
+
+    for (const [key, member] of Object.entries(value)) {
+      const memberSchema = schema.properties?.[key]
+      if (memberSchema) {
+        errors.push(...validateAgainstSchema(memberSchema, member, `${path}.${key}`))
+      } else if (schema.additionalProperties === false) {
+        errors.push(`${path} has an unexpected ${key} property`)
+      } else if (typeof schema.additionalProperties === "object") {
+        errors.push(
+          ...validateAgainstSchema(schema.additionalProperties, member, `${path}.${key}`),
+        )
+      }
+    }
+
+    return errors
+  }
+
+  if (schema.type === "array") {
+    if (!Array.isArray(value)) {
+      return [...errors, `${path} must be an array`]
+    }
+    if (schema.items) {
+      value.forEach((item, index) => {
+        errors.push(...validateAgainstSchema(schema.items, item, `${path}[${index}]`))
+      })
+    }
+    return errors
+  }
+
+  if (schema.type === "string") {
+    if (typeof value !== "string") {
+      return [...errors, `${path} must be a string`]
+    }
+    if (schema.minLength !== undefined && value.length < schema.minLength) {
+      errors.push(`${path} must be at least ${schema.minLength} characters`)
+    }
+    if (schema.maxLength !== undefined && value.length > schema.maxLength) {
+      errors.push(`${path} must be at most ${schema.maxLength} characters`)
+    }
+    if (schema.pattern && !new RegExp(schema.pattern, "u").test(value)) {
+      errors.push(`${path} must match ${schema.pattern}`)
+    }
+    return errors
+  }
+
+  return errors
+}
+
+test("the portable manifest validates against the pinned Agent Plugins 1.0.0 schema", () => {
+  assert.equal(pluginSchema.$id, "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json")
+  assert.equal(portableManifest.$schema, pluginSchema.$id)
+  assert.deepEqual(validateAgainstSchema(pluginSchema, portableManifest), [])
+})
+
+test("the pinned schema rejects the manifest shapes the spec forbids", () => {
+  const cases = {
+    "unexpected top level field": { ...portableManifest, plugins: [] },
+    "unexpected author member": {
+      ...portableManifest,
+      author: { ...portableManifest.author, github: "TommyBez" },
+    },
+    "non string keyword": { ...portableManifest, keywords: [...portableManifest.keywords, 7] },
+    "non string version": { ...portableManifest, version: 1 },
+    "missing schema declaration": (() => {
+      const { $schema, ...rest } = portableManifest
+      return rest
+    })(),
+    "wrong schema declaration": { ...portableManifest, $schema: "https://example.com/other.json" },
+    "uppercase name": { ...portableManifest, name: "Skills-Board" },
+    "double dash in name": { ...portableManifest, name: "skills--board" },
+    "over long name": { ...portableManifest, name: "s".repeat(65) },
+    "extension namespace that is not an object": {
+      ...portableManifest,
+      extensions: { "sh.skillsboard": "yes" },
+    },
+  }
+
+  for (const [label, candidate] of Object.entries(cases)) {
+    assert.ok(
+      validateAgainstSchema(pluginSchema, candidate).length > 0,
+      `the schema accepted a manifest with a ${label}`,
+    )
+  }
 })
 
 test("both MCP configurations point at the hosted endpoint over HTTPS", () => {
