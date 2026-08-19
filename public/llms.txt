@@ -1,7 +1,7 @@
 # Skills Board
 > Skills Board is the shared library where a team collects the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
 
-Last reviewed: 2026-08-18
+Last reviewed: 2026-08-19
 
 Skills Board is free hosted SaaS with open-source code. A saved skill is a team recommendation, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
 
@@ -27,6 +27,7 @@ Markdown versions: every guide, skill format explainer, and alternatives page li
 - [Product homepage with FAQ](https://www.skillsboard.sh/#faq): Extractable answers about compatibility, MCP, catalogs, and free pricing
 
 ## Skill format explainers
+- [Best Claude skills: a curated register](https://www.skillsboard.sh/best-claude-skills): Twenty-seven Claude skills that cleared seven stated criteria, grouped by job, each read from its own SKILL.md with publisher, license, and where it runs, plus the nine popular candidates that were dropped and why
 - [Anthropic skills: the first-party catalog](https://www.skillsboard.sh/anthropic-skills): Every skill Anthropic publishes itself, in three sets: the four pre-built document skills, the nineteen folders in anthropics/skills, and the thirteen bundled with Claude Code, with what each does, where it loads, and how it is licensed
 - [Agent Skills: the open standard](https://www.skillsboard.sh/agent-skills): What the Agent Skills specification defines, which agents implement it and where each one looks on disk, what travels between them, and where to read real examples
 - [Claude skills](https://www.skillsboard.sh/claude-skills): What a Claude Skill is, the SKILL.md format, where skills run, and how to install, write, and share one

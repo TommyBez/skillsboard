@@ -1,6 +1,7 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
+import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
 import {
@@ -87,7 +88,7 @@ export interface WhereToFindClaudeSkillsDefinition {
   landscape: WhereSkillsTableSection & { link: WhereSkillsInlineLink }
   official: WhereSkillsPlaceSection & { link: WhereSkillsInlineLink }
   catalogs: WhereSkillsPlaceSection
-  community: WhereSkillsPlaceSection
+  community: WhereSkillsPlaceSection & { link: WhereSkillsInlineLink }
   vetting: WhereSkillsTableSection & { link: WhereSkillsInlineLink }
   team: {
     title: string
@@ -335,6 +336,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       "Vendor repositories are the underrated part of this map. Many of the skills worth having are published by the team that maintains the tool the skill is about, and they never appear in a general catalog because their owners have no reason to submit them anywhere. If you want a skill for a specific framework or service, the first place to look is that project's own repository, not a directory.",
       "Anthropic's own guidance applies with the most force here, because a GitHub listing is not a review. A skill gives an agent new instructions and executable code, so audit every file in an unfamiliar one, including scripts and anything it fetches from an external URL, and treat the decision the way you would treat installing software from an unknown publisher.",
     ],
+    link: {
+      lead: "For the skills inside these repositories that cleared a stated bar, read folder by folder with the license on each one, see",
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
+      trail: ".",
+    },
     sourceIds: [
       "superpowers",
       "awesome-voltagent",
@@ -611,6 +618,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
+      description:
+        "Twenty-seven skills from these sources that cleared seven stated criteria, and the nine popular candidates that did not.",
+    },
     {
       label: "Anthropic skills: every first-party skill and where it loads",
       href: anthropicSkillsPath,

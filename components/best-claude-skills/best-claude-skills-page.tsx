@@ -10,17 +10,16 @@ import {
   SectionTable,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
+import type {
+  BestClaudeSkillsDefinition,
+  BestClaudeSkillsInlineLink,
+  BestClaudeSkillsSource,
+} from "@/lib/seo/best-claude-skills"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import { resourcePaths } from "@/lib/seo/resources"
-import type {
-  WhereSkillsInlineLink,
-  WhereSkillsPlaceSection,
-  WhereSkillsSource,
-  WhereToFindClaudeSkillsDefinition,
-} from "@/lib/seo/where-to-find-claude-skills"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: WhereSkillsInlineLink }) {
+function InlineLink({ link }: { link: BestClaudeSkillsInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -35,39 +34,12 @@ function InlineLink({ link }: { link: WhereSkillsInlineLink }) {
   )
 }
 
-function PlaceList({
-  entries,
-}: {
-  entries: WhereSkillsPlaceSection["entries"]
-}) {
-  return (
-    <div className="mt-9 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border">
-      {entries.map((place) => (
-        <div key={place.name} className="bg-card p-5 md:p-6">
-          <a
-            href={place.href}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-1.5 text-base font-semibold underline decoration-border underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
-          >
-            {place.name}
-            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
-          </a>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            {place.body}
-          </p>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-export function WhereToFindClaudeSkillsPage({
+export function BestClaudeSkillsPage({
   entry,
 }: {
-  entry: WhereToFindClaudeSkillsDefinition
+  entry: BestClaudeSkillsDefinition
 }) {
-  const sources: readonly WhereSkillsSource[] = entry.sources
+  const sources: readonly BestClaudeSkillsSource[] = entry.sources
 
   return (
     <>
@@ -100,7 +72,7 @@ export function WhereToFindClaudeSkillsPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="where_skills_hero" />
+            <ResourceCta location="best_claude_skills_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -132,7 +104,7 @@ export function WhereToFindClaudeSkillsPage({
               </dd>
             </div>
             <div className="flex gap-2">
-              <dt className="font-semibold text-foreground">Last checked</dt>
+              <dt className="font-semibold text-foreground">Last reviewed</dt>
               <dd>
                 <time dateTime={entry.modifiedAt}>
                   {formatArticleDate(entry.modifiedAt)}
@@ -162,127 +134,146 @@ export function WhereToFindClaudeSkillsPage({
           />
         </section>
 
-        <section aria-labelledby="landscape-heading" className="pt-16">
+        <section aria-labelledby="method-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Landscape"
-            id="landscape"
-            title={entry.landscape.title}
-            intro={entry.landscape.intro}
+            eyebrow="01 / Method"
+            id="method"
+            title={entry.method.title}
+            intro={entry.method.intro}
           />
-          <SectionTable
-            caption="Every documented channel a Claude skill travels through, and what each one actually installs."
-            columns={entry.landscape.columns}
-            rows={entry.landscape.rows}
-            labelWidth="w-[18%]"
-          />
-          <NoteList notes={entry.landscape.notes} />
-          <InlineLink link={entry.landscape.link} />
-          <SectionSources
-            sourceIds={entry.landscape.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="official-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="02 / Official"
-            id="official"
-            title={entry.official.title}
-            intro={entry.official.intro}
-          />
-          <PlaceList entries={entry.official.entries} />
-          <NoteList notes={entry.official.notes} />
-          <InlineLink link={entry.official.link} />
-          <SectionSources
-            sourceIds={entry.official.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="catalogs-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="03 / Catalogs"
-            id="catalogs"
-            title={entry.catalogs.title}
-            intro={entry.catalogs.intro}
-          />
-          <PlaceList entries={entry.catalogs.entries} />
-          <NoteList notes={entry.catalogs.notes} />
-          <div className="mt-8">
-            <ResourceCta location="where_skills_inline" />
-          </div>
-          <SectionSources
-            sourceIds={entry.catalogs.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="community-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="04 / Repositories"
-            id="community"
-            title={entry.community.title}
-            intro={entry.community.intro}
-          />
-          <PlaceList entries={entry.community.entries} />
-          <NoteList notes={entry.community.notes} />
-          <InlineLink link={entry.community.link} />
-          <SectionSources
-            sourceIds={entry.community.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="vetting-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="05 / Vetting"
-            id="vetting"
-            title={entry.vetting.title}
-            intro={entry.vetting.intro}
-          />
-          <SectionTable
-            caption="What each source screens before it lists something, and what it leaves to you."
-            columns={entry.vetting.columns}
-            rows={entry.vetting.rows}
-            labelWidth="w-[18%]"
-          />
-          <NoteList notes={entry.vetting.notes} />
-          <InlineLink link={entry.vetting.link} />
-          <SectionSources
-            sourceIds={entry.vetting.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="team-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="06 / Teams"
-            id="team"
-            title={entry.team.title}
-            intro={entry.team.intro}
-          />
-          <NoteList notes={entry.team.body} />
           <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
-            {entry.team.paths.map((path) => (
-              <div key={path.label} className="bg-card p-5">
+            {entry.method.criteria.map((criterion) => (
+              <div key={criterion.label} className="bg-card p-5">
                 <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                  {path.label}
+                  {criterion.label}
                 </dt>
                 <dd className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {path.body}
+                  {criterion.body}
                 </dd>
               </div>
             ))}
           </dl>
-          <ul className="mt-7 ml-5 list-disc space-y-3 text-[0.95rem] leading-7 text-muted-foreground">
-            {entry.team.limits.map((limit) => (
-              <li key={limit} className="pl-1">
-                {limit}
-              </li>
+          <NoteList notes={entry.method.notes} />
+          <InlineLink link={entry.method.link} />
+          <SectionSources
+            sourceIds={entry.method.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="engineering-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="02 / Engineering"
+            id="engineering"
+            title={entry.engineering.title}
+            intro={entry.engineering.intro}
+          />
+          <SectionTable
+            caption="Engineering workflow skills that cleared the selection criteria, with publisher, license, and where each one runs."
+            columns={entry.engineering.columns}
+            rows={entry.engineering.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.engineering.notes} />
+          <InlineLink link={entry.engineering.link} />
+          <div className="mt-8">
+            <ResourceCta location="best_claude_skills_inline" />
+          </div>
+          <SectionSources
+            sourceIds={entry.engineering.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="interfaces-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="03 / Interfaces"
+            id="interfaces"
+            title={entry.interfaces.title}
+            intro={entry.interfaces.intro}
+          />
+          <SectionTable
+            caption="Front-end, design, and UI skills that cleared the selection criteria."
+            columns={entry.interfaces.columns}
+            rows={entry.interfaces.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.interfaces.notes} />
+          <InlineLink link={entry.interfaces.link} />
+          <SectionSources
+            sourceIds={entry.interfaces.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="delivery-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="04 / Documents"
+            id="delivery"
+            title={entry.delivery.title}
+            intro={entry.delivery.intro}
+          />
+          <SectionTable
+            caption="Document, file, and database skills that cleared the selection criteria, including the two that are not open source."
+            columns={entry.delivery.columns}
+            rows={entry.delivery.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.delivery.notes} />
+          <InlineLink link={entry.delivery.link} />
+          <SectionSources
+            sourceIds={entry.delivery.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="authoring-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="05 / Authoring"
+            id="authoring"
+            title={entry.authoring.title}
+            intro={entry.authoring.intro}
+          />
+          <SectionTable
+            caption="Skills for writing, measuring, and reviewing other skills."
+            columns={entry.authoring.columns}
+            rows={entry.authoring.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.authoring.notes} />
+          <InlineLink link={entry.authoring.link} />
+          <SectionSources
+            sourceIds={entry.authoring.sourceIds}
+            sources={sources}
+          />
+        </section>
+
+        <section aria-labelledby="dropped-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="06 / Dropped"
+            id="dropped"
+            title={entry.dropped.title}
+            intro={entry.dropped.intro}
+          />
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {entry.dropped.entries.map((item) => (
+              <div
+                key={item.title}
+                className="rounded-[3px] border border-border bg-card p-5"
+              >
+                <h3 className="text-base font-semibold leading-snug">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {item.body}
+                </p>
+              </div>
             ))}
-          </ul>
-          <InlineLink link={entry.team.link} />
-          <SectionSources sourceIds={entry.team.sourceIds} sources={sources} />
+          </div>
+          <SectionSources
+            sourceIds={entry.dropped.sourceIds}
+            sources={sources}
+          />
         </section>
 
         <section aria-labelledby="open-questions-heading" className="pt-16">
@@ -313,9 +304,40 @@ export function WhereToFindClaudeSkillsPage({
           />
         </section>
 
+        <section aria-labelledby="team-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="08 / Teams"
+            id="team"
+            title={entry.team.title}
+            intro={entry.team.intro}
+          />
+          <NoteList notes={entry.team.body} />
+          <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
+            {entry.team.paths.map((path) => (
+              <div key={path.label} className="bg-card p-5">
+                <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                  {path.label}
+                </dt>
+                <dd className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {path.body}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <ul className="mt-7 ml-5 list-disc space-y-3 text-[0.95rem] leading-7 text-muted-foreground">
+            {entry.team.limits.map((limit) => (
+              <li key={limit} className="pl-1">
+                {limit}
+              </li>
+            ))}
+          </ul>
+          <InlineLink link={entry.team.link} />
+          <SectionSources sourceIds={entry.team.sourceIds} sources={sources} />
+        </section>
+
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            08 / Questions
+            09 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -348,11 +370,14 @@ export function WhereToFindClaudeSkillsPage({
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every claim on this page comes from the first-party sources below,
-            fetched on the date at the top. Star counts and install counts were
-            read on that date and move constantly. Where nothing is documented,
-            this page says so instead of filling the gap, and the section on
-            what we could not verify lists those cases explicitly.
+            every skill in the register was read from its own SKILL.md and its
+            own license file on the date at the top of this page, using
+            raw.githubusercontent.com and the GitHub API. Install figures come
+            from the skills.sh leaderboard read on the same day, and the section
+            on what is not documented says exactly what that number can and
+            cannot mean. Nothing here is sponsored, no publisher was contacted,
+            and where nobody publishes a fact we say so instead of estimating
+            it.
           </p>
           <ul className="mt-6 space-y-4">
             {sources.map((source) => (
@@ -407,16 +432,15 @@ export function WhereToFindClaudeSkillsPage({
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            A catalog tells you what exists. It cannot tell your team which one
-            to use.
+            Twenty-seven is a reading list. Three is a decision.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills you actually recommend, and invite the people who keep
-            asking.
+            the few skills your team actually recommends, and keep the source,
+            the path, and the license one click away from every entry.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="where_skills_closing" />
+            <ResourceCta location="best_claude_skills_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
