@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "skills-board": {
+      "type": "http",
+      "url": "https://www.skillsboard.sh/api/mcp"
+    }
+  }
+}
