@@ -110,6 +110,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/agent-skills-support/",
+        destination: "/agent-skills-support",
+        permanent: true,
+      },
+      {
         source: "/claude-skills/",
         destination: "/claude-skills",
         permanent: true,
@@ -187,6 +192,11 @@ const nextConfig = {
           source: "/:slug([^/]*-skills)",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/:slug",
+        },
+        {
+          source: "/agent-skills-support",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/agent-skills-support",
         },
         {
           source: "/agents-md-vs-skill-md",

@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentSkillsSupportPath } from "@/lib/seo/agent-skills-support/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
@@ -485,6 +486,12 @@ A Markdown section titled with the version and date.`,
     },
   ],
   related: [
+    {
+      label: "Agent Skills support: which AI clients read SKILL.md",
+      href: agentSkillsSupportPath,
+      description:
+        "Which clients document reading the format, and which of them scan the same .agents/skills path.",
+    },
     {
       label: "AGENTS.md vs SKILL.md: two formats, two different jobs",
       href: agentsMdVsSkillMdPath,
