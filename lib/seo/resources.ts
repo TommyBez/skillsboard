@@ -10,6 +10,11 @@ import {
   anthropicSkillsPath,
   type AnthropicSkillsPath,
 } from "@/lib/seo/anthropic-skills/types"
+import { bestClaudeSkills } from "@/lib/seo/best-claude-skills"
+import {
+  bestClaudeSkillsPath,
+  type BestClaudeSkillsPath,
+} from "@/lib/seo/best-claude-skills/types"
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
@@ -39,6 +44,7 @@ export type ResourcePath =
   | AgentSkillsPath
   | AgentsMdVsSkillMdPath
   | AnthropicSkillsPath
+  | BestClaudeSkillsPath
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CoworkSkillsPath
@@ -61,6 +67,7 @@ export const resourceEntries = [
   ...guides,
   agentSkills,
   anthropicSkills,
+  bestClaudeSkills,
   claudeSkills,
   codexSkills,
   coworkSkills,
@@ -107,6 +114,7 @@ const resourceClusterDefinitions = [
       "Choose useful skills, define accountable workflows, and help a second teammate reproduce the result without private context.",
     paths: [
       whereToFindClaudeSkillsPath,
+      bestClaudeSkillsPath,
       guidePaths.chooseFirstTeamSkill,
       guidePaths.onboardNewTeammateSkills,
       guidePaths.aiSkillUseCases,

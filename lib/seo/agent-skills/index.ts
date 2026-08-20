@@ -3,6 +3,7 @@ import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
+import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
@@ -703,6 +704,12 @@ export const agentSkills: AgentSkillsDefinition = {
   ],
   related: [
     {
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
+      description:
+        "A selection against stated criteria, including skills from Vercel, Supabase, Prisma, NVIDIA, and shadcn.",
+    },
+    {
       label: "Anthropic skills: every first-party skill and where it loads",
       href: anthropicSkillsPath,
       description:
@@ -777,5 +784,5 @@ export const agentSkills: AgentSkillsDefinition = {
   ogAlt:
     "Explainer for the Agent Skills open standard: the SKILL.md format, the agents that implement it, the directories each one scans, and what travels between them.",
   publishedAt: "2026-08-18",
-  modifiedAt: "2026-08-18",
+  modifiedAt: "2026-08-19",
 }

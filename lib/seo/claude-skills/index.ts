@@ -3,6 +3,7 @@ import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
+import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
@@ -564,6 +565,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
+      description:
+        "Twenty-seven entries covering thirty-five skills that cleared seven stated criteria, grouped by job, with the license on every entry.",
+    },
     {
       label: "Anthropic skills: every first-party skill and where it loads",
       href: anthropicSkillsPath,

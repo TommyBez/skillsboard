@@ -2,6 +2,7 @@ import type { OgTemplateContent } from "@/lib/og/template"
 import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
+import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { type ComparePath, comparePaths } from "@/lib/seo/compare/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
@@ -45,6 +46,7 @@ export interface AnthropicSkillsInlineLink {
     | GuidePath
     | ComparePath
     | typeof agentSkillsPath
+    | typeof bestClaudeSkillsPath
     | typeof claudeSkillsPath
     | typeof coworkSkillsPath
     | typeof whereToFindClaudeSkillsPath
@@ -357,9 +359,9 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       "Five folders carry no reference material at all: brand-guidelines, frontend-design, doc-coauthoring, discernment-nudge, and academy-guide are a SKILL.md and, in four of five cases, a license. A first-party skill does not have to be a package to be useful, which is worth knowing before you overbuild your first one.",
     ],
     link: {
-      lead: "For the wider map of where skills come from, including the official plugin marketplace, the community marketplace, and the public directories nobody at Anthropic runs, see",
-      label: "Where to find Claude skills",
-      href: whereToFindClaudeSkillsPath,
+      lead: "For the handful of these folders we would put in front of a team, judged against a stated bar and set beside third-party skills that clear the same one, see",
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
       trail: ".",
     },
     sourceIds: [
@@ -792,6 +794,12 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   ],
   related: [
     {
+      label: "Best Claude skills: a register with the criteria behind it",
+      href: bestClaudeSkillsPath,
+      description:
+        "Seven of the folders above, set beside twenty third-party entries that cleared the same seven criteria.",
+    },
+    {
       label: "Claude skills: what they are and how to use them",
       href: claudeSkillsPath,
       description:
@@ -854,5 +862,5 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   ogAlt:
     "Catalog of Anthropic's first-party skills: the four pre-built document skills, the nineteen folders in the anthropics/skills repository, and the thirteen skills bundled with Claude Code.",
   publishedAt: "2026-08-18",
-  modifiedAt: "2026-08-18",
+  modifiedAt: "2026-08-19",
 }

@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "skills-board",
+  "version": "0.1.0",
+  "description": "Search your team's Skills Board library over MCP and get the install command for a saved skill or a published collection.",
+  "author": {
+    "name": "Skills Board",
+    "url": "https://www.skillsboard.sh"
+  },
+  "homepage": "https://www.skillsboard.sh",
+  "repository": "https://github.com/TommyBez/skillsboard",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "skills",
+    "mcp",
+    "team-library",
+    "skills-board"
+  ]
+}

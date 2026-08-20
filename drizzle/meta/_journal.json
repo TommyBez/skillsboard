@@ -57,6 +57,20 @@
       "when": 1786603258608,
       "tag": "0007_drop-email-capture-attempt",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787085931469,
+      "tag": "0008_better_auth_1_7",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1787085941666,
+      "tag": "0009_better_auth_1_7_drop_legacy_client_columns",
+      "breakpoints": true
     }
   ]
 }

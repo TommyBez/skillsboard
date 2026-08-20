@@ -1,4 +1,4 @@
-import { oauthProvider } from "@better-auth/oauth-provider"
+import { mcp } from "@better-auth/mcp"
 import { betterAuth } from "better-auth"
 import { emailOTP, jwt, organization } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
@@ -6,7 +6,7 @@ import { nextCookies } from "better-auth/next-js"
 import {
   getAuthBaseUrl as resolveAuthBaseUrl,
   getDeploymentEnvironment,
-  getOAuthValidAudiences,
+  getMcpResource,
   getTrustedOrigins,
 } from "@/lib/auth-environment"
 import { sendSignInOtp } from "@/lib/email/send-sign-in-otp"
@@ -124,14 +124,21 @@ export const auth = betterAuth({
       },
     }),
     jwt(),
-    oauthProvider({
+    // `mcp()` is the oauth-provider plugin configured for MCP: it seeds the
+    // resource row, audience-binds issued tokens to it, and links it to newly
+    // registered clients.
+    mcp({
       loginPage: "/sign-in",
       consentPage: "/consent",
       allowDynamicClientRegistration: true,
       allowUnauthenticatedClientRegistration: true,
       allowPublicClientPrelogin: true,
       scopes: [...oauthScopes],
-      validAudiences: getOAuthValidAudiences(),
+      resource: getMcpResource(),
+      // Clients registered on 1.6 have no `oauthClientResource` link and would
+      // fail per-client resource checks. This server exposes exactly one
+      // resource, so implicit access is equivalent to linking every client.
+      enforcePerClientResources: false,
     }),
     nextCookies(),
   ],
