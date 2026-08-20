@@ -172,6 +172,10 @@ export const session = pgTable("session", {
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
+  // Trusted identity issuer added in Better Auth 1.7. Credential-style
+  // accounts use the synthetic "local:<providerId>" namespace; OAuth
+  // providers without their own issuer use "local:oauth:<providerId>".
+  issuer: text("issuer").notNull(),
   accountId: text("accountId").notNull(),
   providerId: text("providerId").notNull(),
   userId: text("userId").notNull(),
@@ -185,6 +189,7 @@ export const account = pgTable("account", {
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull(),
 }, (table) => [
+  uniqueIndex("account_issuer_accountId_uidx").on(table.issuer, table.accountId),
   foreignKey({
     columns: [table.userId],
     foreignColumns: [user.id],
@@ -260,6 +265,8 @@ export const jwks = pgTable("jwks", {
   privateKey: text("privateKey").notNull(),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull(),
   expiresAt: timestamp("expiresAt", { withTimezone: true }),
+  alg: text("alg"),
+  crv: text("crv"),
 })
 
 // Better Auth's Kysely adapter stores string[] as JSON text (supportsArrays=false).
@@ -267,11 +274,13 @@ export const oauthClient = pgTable("oauthClient", {
   id: text("id").primaryKey(),
   clientId: text("clientId").notNull(),
   clientSecret: text("clientSecret"),
+  clientDiscoveryId: text("clientDiscoveryId"),
   disabled: boolean("disabled").default(false),
   skipConsent: boolean("skipConsent").default(false),
   enableEndSession: boolean("enableEndSession"),
   subjectType: text("subjectType"),
   scopes: text("scopes"),
+  clientCredentialsScopes: text("clientCredentialsScopes"),
   userId: text("userId"),
   referenceId: text("referenceId"),
   name: text("name"),
@@ -285,12 +294,16 @@ export const oauthClient = pgTable("oauthClient", {
   softwareStatement: text("softwareStatement"),
   redirectUris: text("redirectUris").notNull(),
   postLogoutRedirectUris: text("postLogoutRedirectUris"),
+  backchannelLogoutUri: text("backchannelLogoutUri"),
+  backchannelLogoutSessionRequired: boolean("backchannelLogoutSessionRequired"),
   tokenEndpointAuthMethod: text("tokenEndpointAuthMethod"),
+  applicationType: text("applicationType"),
+  jwks: text("jwks"),
+  jwksUri: text("jwksUri"),
   grantTypes: text("grantTypes"),
   responseTypes: text("responseTypes"),
-  public: boolean("public"),
-  type: text("type"),
   requirePKCE: boolean("requirePKCE"),
+  dpopBoundAccessTokens: boolean("dpopBoundAccessTokens").default(false),
   metadata: text("metadata"),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -306,7 +319,12 @@ export const oauthAccessToken = pgTable("oauthAccessToken", {
   refreshId: text("refreshId"),
   userId: text("userId"),
   referenceId: text("referenceId"),
+  authorizationCodeId: text("authorizationCodeId"),
+  resources: text("resources"),
+  requestedUserInfoClaims: text("requestedUserInfoClaims"),
   scopes: text("scopes").notNull(),
+  revoked: timestamp("revoked", { withTimezone: true }),
+  confirmation: text("confirmation"),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
 }, (table) => [
@@ -316,6 +334,7 @@ export const oauthAccessToken = pgTable("oauthAccessToken", {
     name: "oauthAccessToken_clientId_fkey",
   }).onDelete("cascade"),
   unique("oauthAccessToken_token_key").on(table.token),
+  index("oauthAccessToken_authorizationCodeId_idx").on(table.authorizationCodeId),
 ])
 
 export const oauthRefreshToken = pgTable("oauthRefreshToken", {
@@ -325,9 +344,16 @@ export const oauthRefreshToken = pgTable("oauthRefreshToken", {
   sessionId: text("sessionId"),
   userId: text("userId").notNull(),
   referenceId: text("referenceId"),
+  authorizationCodeId: text("authorizationCodeId"),
+  resources: text("resources"),
+  requestedUserInfoClaims: text("requestedUserInfoClaims"),
   scopes: text("scopes").notNull(),
   revoked: timestamp("revoked", { withTimezone: true }),
+  rotatedAt: timestamp("rotatedAt", { withTimezone: true }),
+  rotationReplayResponse: text("rotationReplayResponse"),
+  rotationReplayExpiresAt: timestamp("rotationReplayExpiresAt", { withTimezone: true }),
   authTime: timestamp("authTime", { withTimezone: true }),
+  confirmation: text("confirmation"),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
 }, (table) => [
@@ -337,13 +363,17 @@ export const oauthRefreshToken = pgTable("oauthRefreshToken", {
     name: "oauthRefreshToken_clientId_fkey",
   }).onDelete("cascade"),
   unique("oauthRefreshToken_token_key").on(table.token),
+  index("oauthRefreshToken_authorizationCodeId_idx").on(table.authorizationCodeId),
 ])
 
 export const oauthConsent = pgTable("oauthConsent", {
   id: text("id").primaryKey(),
-  userId: text("userId").notNull(),
+  // Nullable since 1.7: client-credentials grants record consent with no user.
+  userId: text("userId"),
   clientId: text("clientId").notNull(),
   referenceId: text("referenceId"),
+  resources: text("resources"),
+  requestedUserInfoClaims: text("requestedUserInfoClaims"),
   scopes: text("scopes").notNull(),
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -354,6 +384,60 @@ export const oauthConsent = pgTable("oauthConsent", {
     name: "oauthConsent_clientId_fkey",
   }).onDelete("cascade"),
 ])
+
+/**
+ * Protected resources (RFC 8707) the authorization server issues tokens for.
+ * Seeded at boot from the `mcp()` plugin's `resource` option (insert-only) and
+ * editable through the admin resource CRUD endpoints.
+ */
+export const oauthResource = pgTable("oauthResource", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  name: text("name").notNull(),
+  accessTokenTtl: integer("accessTokenTtl"),
+  refreshTokenTtl: integer("refreshTokenTtl"),
+  signingAlgorithm: text("signingAlgorithm"),
+  signingKeyId: text("signingKeyId"),
+  allowedScopes: text("allowedScopes"),
+  customClaims: text("customClaims"),
+  dpopBoundAccessTokensRequired: boolean("dpopBoundAccessTokensRequired").default(false),
+  disabled: boolean("disabled").default(false),
+  policyVersion: integer("policyVersion").default(1),
+  metadata: text("metadata"),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  unique("oauthResource_identifier_key").on(table.identifier),
+])
+
+export const oauthClientResource = pgTable("oauthClientResource", {
+  id: text("id").primaryKey(),
+  clientId: text("clientId").notNull(),
+  resourceId: text("resourceId").notNull(),
+  metadata: text("metadata"),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  uniqueIndex("oauthClientResource_clientId_resourceId_uidx").on(table.clientId, table.resourceId),
+  foreignKey({
+    columns: [table.clientId],
+    foreignColumns: [oauthClient.clientId],
+    name: "oauthClientResource_clientId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.resourceId],
+    foreignColumns: [oauthResource.identifier],
+    name: "oauthClientResource_resourceId_fkey",
+  }).onDelete("cascade"),
+])
+
+/**
+ * Single-use `jti` replay tombstones for OAuth client assertions
+ * (RFC 7523 private_key_jwt). Rows exist only until `expiresAt`.
+ */
+export const oauthClientAssertion = pgTable("oauthClientAssertion", {
+  id: text("id").primaryKey(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+})
 
 export const skill = pgTable("skill", {
   id: uuid("id").primaryKey().defaultRandom(),

@@ -1,11 +1,11 @@
-import { mcpHandler } from "@better-auth/oauth-provider"
-import { and, eq } from "drizzle-orm"
+import { requireMcpAuth } from "@better-auth/mcp"
 import { createMcpHandler } from "mcp-handler"
 import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
+import { auth } from "@/lib/auth"
 import { cacheTags } from "@/lib/cache-tags"
-import { getAuthBaseUrl } from "@/lib/auth-environment"
+import { getAuthBaseUrl, getMcpResource } from "@/lib/auth-environment"
 import { db } from "@/lib/db"
 import { mutateCollectionMembership } from "@/lib/db/collection-memberships"
 import { getCollectionDistribution } from "@/lib/db/collection-distributions"
@@ -31,12 +31,6 @@ import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
 import { saveSkillToLibrary } from "@/lib/save-skill"
 import { siteConfig } from "@/lib/site"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
-
-function getOrigin(request: Request) {
-  const forwardedHost = request.headers.get("x-forwarded-host")
-  const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https"
-  return forwardedHost ? `${forwardedProto}://${forwardedHost}` : new URL(request.url).origin
-}
 
 type McpToolName =
   | "add_skill"
@@ -134,14 +128,15 @@ async function resolveSkillPath(githubUrl: string, skillPath?: string) {
   }
 }
 
-async function route(request: Request) {
-  const origin = getOrigin(request)
-  const resource = `${origin}/api/mcp`
-  return mcpHandler({ jwksUrl: `${origin}/api/auth/jwks`, verifyOptions: { issuer: `${origin}/api/auth`, audience: resource } }, async (req, jwt) => {
+// Issuer and JWKS URL default to the auth server's resolved base URL
+// (`<baseURL>/api/auth`), matching what the `jwt` plugin stamps into tokens.
+// `requireMcpAuth` also answers unauthenticated requests with the RFC 9728
+// challenge and missing-scope tokens with an RFC 6750 insufficient_scope
+// challenge for the required `skills:read` scope.
+const route = requireMcpAuth(
+  auth,
+  async (req, jwt) => {
     if (!jwt.sub) return new Response("Token subject is required", { status: 401 })
-    if (!tokenHasScope(jwt, "skills:read")) {
-      return new Response("This connection is missing the skills:read scope", { status: 403 })
-    }
     return createMcpHandler((server) => {
       server.registerTool("list_skills", {
         title: "List team skills",
@@ -598,7 +593,8 @@ async function route(request: Request) {
         }, null, 2))
       })
     }, { serverInfo: { name: "skills-board", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
-  })(request)
-}
+  },
+  { resource: getMcpResource(), requiredScopes: ["skills:read"] },
+)
 
 export { route as GET, route as POST, route as DELETE }

@@ -149,16 +149,19 @@ export function getTrustedOrigins():
 }
 
 /**
- * Single audience for RFC 8707 `resource` on the token endpoint.
+ * Canonical RFC 8707 protected-resource identifier for the MCP server.
  *
- * On `@better-auth/oauth-provider` 1.6.x, a multi-entry `validAudiences`
- * allowlist is unsafe (GHSA-p2fr-6hmx-4528): clients can mint a JWT for any
- * allow-listed resource without binding it to the authorization grant.
- * Keep exactly one audience — the MCP resource URL — until upgrading to a
- * release that binds resources to the grant.
+ * Better Auth 1.7 replaced the `validAudiences` allowlist with persisted
+ * resources that are bound to the authorization grant (closing
+ * GHSA-p2fr-6hmx-4528), so this deployment now declares its one protected
+ * resource — the MCP endpoint — and tokens are audience-bound to it. The
+ * loopback fallback keeps local `next dev` working, where the `mcp` plugin
+ * accepts http on loopback hosts only.
  */
-export function getOAuthValidAudiences(): string[] | undefined {
-  const base = getAuthBaseUrl()?.replace(/\/$/, "")
-  if (!base) return undefined
-  return [`${base}/api/mcp`]
+export function getMcpResource(): string {
+  const base = (getAuthBaseUrl() ?? `http://localhost:${localPort()}`).replace(
+    /\/$/,
+    "",
+  )
+  return `${base}/api/mcp`
 }
