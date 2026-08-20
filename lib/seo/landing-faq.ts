@@ -2,7 +2,7 @@ export const landingFaqs = [
   {
     question: "What is Skills Board?",
     answer:
-      "Skills Board is a shared library where a team collects the AI skills it recommends. Teammates search that library, see where each skill comes from, and choose the source, install command, or ZIP that fits their agent setup.",
+      "Skills Board is a web app where a team collects the AI skills it recommends. Teammates search that library, see where each skill comes from, and choose the source, install command, or ZIP that fits their agent setup.",
   },
   {
     question: "How is Skills Board different from a public skill catalog?",

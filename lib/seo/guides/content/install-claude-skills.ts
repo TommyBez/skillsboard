@@ -141,7 +141,7 @@ export const installClaudeSkillsGuide: GuideDefinition = {
   team: {
     title: "What a team still has to hand over",
     intro:
-      "None of the locations above records the part teammates keep asking about: which skill to use for this task, and why this one. A personal folder is invisible to everyone else, a repository only reaches the people working in it, and a plugin distributes files rather than a recommendation. Skills Board is a shared library for that layer. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
+      "None of the locations above records the part teammates keep asking about: which skill to use for this task, and why this one. A personal folder is invisible to everyone else, a repository only reaches the people working in it, and a plugin distributes files rather than a recommendation. Skills Board is a web app for that layer. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
     paths: [
       {
         label: "Open the original source",

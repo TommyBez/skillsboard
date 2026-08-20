@@ -3,6 +3,7 @@ import Link from "next/link"
 import { headers } from "next/headers"
 import { ArrowLeftIcon } from "lucide-react"
 
+import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { getAppContext } from "@/lib/app-context"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
@@ -71,10 +72,23 @@ export default function McpSettingsPage() {
           Connect your agent
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Search your team libraries and retrieve install commands from your agent. Sign in through the browser — no API
-          key to copy.
+          Search your team libraries and retrieve install commands from your agent. There are two ways to set this up:
+          install the official plugin, which brings this configuration with it, or add the MCP server to your client by
+          hand. Pick one. Either way you sign in through the browser, with no API key to copy.
         </p>
       </header>
+
+      <div className="mt-8">
+        <McpPluginInstall />
+      </div>
+
+      <div className="mt-8 flex items-center gap-4" data-testid="mcp-setup-or-divider">
+        <span aria-hidden="true" className="h-px flex-1 bg-border" />
+        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          or
+        </span>
+        <span aria-hidden="true" className="h-px flex-1 bg-border" />
+      </div>
 
       <div className="mt-8">
         <Suspense

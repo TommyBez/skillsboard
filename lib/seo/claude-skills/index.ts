@@ -449,7 +449,7 @@ A Markdown section ready to paste into the release description.`,
       "Nothing in the format does it for you. The SKILL.md folder is portable, but distribution is per surface, and the recommendation itself usually is not stored anywhere at all.",
     body: [
       "Look at what the surfaces actually offer a team. On claude.ai, custom skills belong to the individual user, are not shared organization-wide, and cannot be centrally managed by admins. Through the API, uploaded skills are workspace-wide. In Claude Code, a skill lives in a personal folder, in one repository, or in a plugin. None of those places holds the part teammates keep asking about: which skill to use for this, and why this one.",
-      "That part ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a shared library for exactly that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry.",
+      "That part ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app built for exactly that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry.",
     ],
     paths: [
       {

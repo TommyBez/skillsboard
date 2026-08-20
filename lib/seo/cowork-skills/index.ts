@@ -490,7 +490,7 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
     body: [
       "Enabling is a per-account act, provisioning is an owner act, and a plugin is a package. None of the three records who read the skill, what they used it for, or whether it held up on a real task. The recommendation ends up in a chat thread, and the next person starts over at a public directory.",
       "The seams are visible in Anthropic's own documentation once you look for them. Custom skills you upload are private to your individual account. Organization-wide sharing publishes into a directory with no approval step. Scoping to a group runs through plugins rather than through the skills list. And the audit log captures that a skill was shared, not what was in it, with no admin view for browsing the contents.",
-      "Skills Board is a shared library for that smaller layer: the set your team actually recommends, in one searchable place, with the source repository and path visible on every entry, and no assumption about whether a teammate is working in Cowork, in a terminal, or in a different agent altogether.",
+      "Skills Board is a web app for that smaller layer: the set your team actually recommends, in one searchable place, with the source repository and path visible on every entry, and no assumption about whether a teammate is working in Cowork, in a terminal, or in a different agent altogether.",
     ],
     paths: [
       {

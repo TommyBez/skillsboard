@@ -646,7 +646,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     body: [
       "The pattern that fails is familiar and has nothing to do with the skills. Somebody reads a register, installs six, keeps two, and the two live in a personal ~/.claude/skills/ folder nobody else can see. A teammate asks which skill to use for a task, gets a link in chat, and the link is to whichever repository was top of a list that month. Six weeks later two people are running different versions of the same idea and neither knows.",
       "The fix is small and unglamorous. Pick a job your team does every week, choose one skill from this register that does it, and record the decision somewhere searchable with the source repository, the folder path, and the license visible. That is enough for the next teammate to open the SKILL.md and judge it themselves, which is the only part of this that does not transfer.",
-      "Skills Board is where we keep that: a shared library of the skills a team recommends, with the original source one click from every entry, a compatible install command where one exists, and a ZIP of the latest source files. A saved skill is a team recommendation rather than an approval or a security review, which is exactly what a register like this one produces. It is free, MIT licensed, and open source.",
+      "Skills Board is where we keep that: a web app holding the skills a team recommends, with the original source one click from every entry, a compatible install command where one exists, and a ZIP of the latest source files. A saved skill is a team recommendation rather than an approval or a security review, which is exactly what a register like this one produces. It is free, MIT licensed, and open source.",
     ],
     paths: [
       {

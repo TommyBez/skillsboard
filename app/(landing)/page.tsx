@@ -7,6 +7,7 @@ import { FaqSection } from "@/components/landing/sections/faq-section"
 import { FlowSection } from "@/components/landing/sections/flow-section"
 import { HeroSection } from "@/components/landing/sections/hero-section"
 import { McpSection } from "@/components/landing/sections/mcp-section"
+import { PluginSection } from "@/components/landing/sections/plugin-section"
 import { PricingSection } from "@/components/landing/sections/pricing-section"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { siteConfig } from "@/lib/site"
@@ -36,6 +37,7 @@ export default function HomePage() {
       <HeroSection />
       <FlowSection />
       <McpSection />
+      <PluginSection />
       <PricingSection />
       <FaqSection />
       <EmailCaptureSection />

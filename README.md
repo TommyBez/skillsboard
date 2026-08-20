@@ -129,16 +129,18 @@ Product communications are separate from transactional OTP and invitation email.
 
 Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** to connect it. The tools can search team skills and collections, retrieve install commands, and discover public or repository skills. With `skills:write`, they can save new skills and organize collections. They cannot edit or delete saved team skills, install them in an agent, or execute them.
 
-## Claude Code plugin
+## Official plugin
 
-This repository is also the marketplace for the official Skills Board plugin. The plugin ships the MCP server configuration above and one skill that explains how to use a team library from an agent. In Claude Code:
+This repository is also the marketplace for the official Skills Board plugin. The plugin ships the MCP server configuration above and one skill that explains how to use a team library from an agent. It is not tied to one client: the directory in [`plugin/`](./plugin) carries an [Agent Plugins](https://agent-plugins.org) 1.0.0 manifest, and a Claude Code manifest alongside it. Installing it is an alternative to the manual MCP setup above rather than a step after it.
+
+In Claude Code:
 
 ```bash
 /plugin marketplace add TommyBez/skillsboard
 /plugin install skills-board@skills-board
 ```
 
-The plugin directory in [`plugin/`](./plugin) also carries an [Agent Plugins](https://agent-plugins.org) 1.0.0 manifest, so clients supported by the `plugins` CLI can install the same directory:
+In any client the `plugins` CLI supports:
 
 ```bash
 npx plugins add TommyBez/skillsboard

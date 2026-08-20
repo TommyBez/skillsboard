@@ -102,8 +102,7 @@ export default function AlternativesPage() {
             What Skills Board is, in one paragraph
           </h2>
           <p className="mt-5 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Skills Board is a shared library for the AI skills a team
-            recommends. A teammate saves a skill from its original repository
+            Skills Board is a web app for the AI skills a team recommends. A teammate saves a skill from its original repository
             and path, adds the tags the team searches by, and everyone else
             finds it later. Each person then picks how to use it: open the
             source, copy an install command, download a ZIP of the latest

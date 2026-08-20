@@ -1,7 +1,7 @@
 {
   "name": "skillsboard",
   "version": "0.1.0",
-  "description": "A shared library for the AI skills your team recommends.",
+  "description": "The web app for the AI skills your team recommends.",
   "private": true,
   "license": "MIT",
   "homepage": "https://www.skillsboard.sh",

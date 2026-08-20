@@ -360,7 +360,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
   editorialSubject: "skills and subagents",
   closing: {
     title: "Whichever primitive you pick, someone still has to find it.",
-    body: "Skills Board is a shared library for the skills a team recommends. Free forever, MIT licensed, and open source. Save the first one and invite the person who keeps asking which one to use.",
+    body: "Skills Board is a web app for the skills a team recommends. Free forever, MIT licensed, and open source. Save the first one and invite the person who keeps asking which one to use.",
   },
   ogAlt:
     "Comparison of Claude skills and subagents: what each one is, where each lives, and when to use each.",

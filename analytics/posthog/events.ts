@@ -90,6 +90,14 @@ type NonTeamEventPropertiesMap = {
     destination: "#mcp" | "/settings/mcp" | "/sign-up"
     location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
   }
+  /**
+   * Copying the plugin install commands. Non team scoped on purpose: the same
+   * block runs on the landing page, where there is no team yet, and `location`
+   * keeps the two surfaces apart.
+   */
+  plugin_install_copied: {
+    location: "landing" | "mcp_settings"
+  }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
