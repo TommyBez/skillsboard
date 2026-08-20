@@ -3,9 +3,10 @@ import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
 
-const { markdownTwinAlternates, markdownTwinPaths, renderMarkdownTwin } =
+const { markdownTwinAlternates, markdownTwinPath, markdownTwinPaths, renderMarkdownTwin } =
   await import("../lib/markdown/twins.ts")
 const { codexSkills } = await import("../lib/seo/codex-skills/index.ts")
+const { home } = await import("../lib/seo/home.ts")
 const { alternatives } = await import("../lib/seo/alternatives.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
 const { default: nextConfig } = await import("../next.config.ts")
@@ -13,7 +14,9 @@ const { default: nextConfig } = await import("../next.config.ts")
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
 
 test("every registered resource and alternative has a Markdown twin", () => {
-  const registered = [...resourceEntries, ...alternatives].map((entry) => entry.path)
+  // The home page is not in either registry: it is built from section
+  // components, and `lib/seo/home` is the content definition written for it.
+  const registered = [home, ...resourceEntries, ...alternatives].map((entry) => entry.path)
 
   assert.deepEqual([...markdownTwinPaths], registered)
 
@@ -137,7 +140,10 @@ test("angle-bracket placeholders read as text rather than as markup", () => {
 
 test("the Accept rewrite reads media ranges, not the bare token", async () => {
   const { beforeFiles } = await nextConfig.rewrites()
-  const values = new Set(beforeFiles.map((rule) => rule.has[0].value))
+  // `/index.md` is a plain path rewrite: it publishes the home twin at a URL
+  // the generic `<path>.md` rule cannot spell, and negotiates nothing.
+  const negotiating = beforeFiles.filter((rule) => rule.has)
+  const values = new Set(negotiating.map((rule) => rule.has[0].value))
   assert.equal(values.size, 1, "the twin routes disagree on the Accept match")
 
   // The anchoring Next.js applies to a `has` value.

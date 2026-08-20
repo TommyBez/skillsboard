@@ -183,6 +183,20 @@ const nextConfig = {
       // `-skills`, a guide, or an alternative. A request for a page outside
       // those shapes keeps returning HTML rather than a 404.
       beforeFiles: [
+        // The home page. It is the URL an agent scanning the site reaches
+        // first, so it is the one that most needs to answer in Markdown.
+        {
+          source: "/",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/",
+        },
+        // `/` + `.md` is not a path, so the home twin is published at
+        // `/index.md`. Stated here because the generic `<path>.md` rule below
+        // would resolve it to the page `/index`, which does not exist.
+        {
+          source: "/index.md",
+          destination: "/api/markdown?path=/",
+        },
         {
           source: "/:slug([^/]*-skills)",
           has: [MARKDOWN_ACCEPT],

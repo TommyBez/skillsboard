@@ -7,9 +7,13 @@ import {
 } from "@/lib/agent-discovery"
 
 /**
- * RFC 9728 metadata for `<origin>/api/mcp`, at the path the resource identifier
- * derives. Shares its body with the origin-level document in
- * `app/.well-known/oauth-protected-resource/route.ts`.
+ * Origin-level RFC 9728 entry point.
+ *
+ * Agents that scan a site look here first, before they know which path holds
+ * the protected API. The path-derived document at
+ * `/.well-known/oauth-protected-resource/api/mcp` stays the canonical one for a
+ * client that already has the resource identifier; both are built from the same
+ * function, so they always describe the same resource.
  */
 export async function GET() {
   await connection()

@@ -8,9 +8,10 @@ import { auth } from "@/lib/auth"
 const getMetadata = oauthProviderAuthServerMetadata(auth)
 
 /**
- * RFC 8414 metadata at the path derived from the issuer (`<origin>/api/auth`),
- * extended with the auth.md `agent_auth` block. The origin-level document in
- * `app/.well-known/oauth-authorization-server/route.ts` serves the same body.
+ * Origin-level RFC 8414 entry point. Better Auth's issuer is `<origin>/api/auth`,
+ * so the spec-derived location is the nested route beside this one; an agent
+ * scanning the site root has no way to guess that path, and this document hands
+ * it the same metadata, `agent_auth` block included.
  */
 export async function GET(request: Request) {
   await connection()
