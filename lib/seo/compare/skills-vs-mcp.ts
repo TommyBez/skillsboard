@@ -287,7 +287,7 @@ export const skillsVsMcp: ComparisonDefinition = {
         body: "The gap opens when the number of repositories exceeds the number of people who remember what is in them. Skills are discoverable only if you already have the checkout and know to look, neither format carries a reason for existing beyond its description, and nothing tells a new teammate which of the five forks of the same skill is the recommended one. A shared document closes most of it.",
       },
       {
-        title: "Skills Board as the shared library",
+        title: "Skills Board as the team's web app",
         body: "Skills Board is a library of the skills a team recommends: each entry keeps its source repository, the install command, and a note about why it is recommended, grouped into collections by project or use case. This path involves no protocol at all, it is a page in a browser. Free forever, MIT licensed, and open source, so the honest comparison for it is a shared document rather than a competitor.",
       },
       {
@@ -444,7 +444,7 @@ export const skillsVsMcp: ComparisonDefinition = {
   editorialSubject: "skills and MCP",
   closing: {
     title: "The agent can reach everything. It still has to be told what matters.",
-    body: "Skills Board is a shared library for the skills a team recommends, and an authenticated MCP server for the agents that read it. Free forever, MIT licensed, and open source.",
+    body: "Skills Board is a web app for the skills a team recommends, and an authenticated MCP server for the agents that read it. Free forever, MIT licensed, and open source.",
   },
   og: {
     eyebrow: "Claude Skills vs MCP",

@@ -384,7 +384,7 @@ A Markdown section titled with the version and date.`,
     body: [
       "If every skill your team uses lives in a repository everyone works in, the answer is short: commit them to .cursor/skills/ or .agents/skills/ at the project root and Cursor picks them up with no extra tooling. That is the best setup for a single-repository team, and no shared library improves on it. Nothing here should talk you out of it.",
       "It stops being enough when the skills come from other people's repositories, when they are useful in more than one repository, or when teammates run different agents. Cursor's answer to the first two is plugins: it supports the Agent Plugins standard alongside its own Cursor Plugin format and offers team marketplaces on Teams and Enterprise plans with per-plugin install modes. That covers packaging and rollout, but not teammates outside Cursor, because a Cursor Plugin is not what Claude Code or Codex installs.",
-      "The recommendation layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a shared library for that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
+      "The recommendation layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app for that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {

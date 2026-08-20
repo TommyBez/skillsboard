@@ -6,9 +6,10 @@ license: MIT
 
 # Skills Board team library
 
-Skills Board keeps the skills a team recommends in one searchable library. This
-skill covers how to use that library from an agent: find a recommendation,
-hand off an install command, and save a new skill back to the team.
+Skills Board is a web app where a team keeps the skills it recommends in one
+searchable library. This skill covers how to use that library from an agent:
+find a recommendation, hand off an install command, and save a new skill back
+to the team.
 
 ## Before the first call
 
@@ -59,8 +60,8 @@ so the last step is always a command the user runs, or a file the user downloads
   installing is the honest default: a saved skill is a team recommendation, not
   a review or a pinned release.
 
-Downloading a skill as a ZIP is a web app action on https://www.skillsboard.sh,
-not an MCP tool.
+Downloading a skill as a ZIP happens in the web app on
+https://www.skillsboard.sh, not through an MCP tool.
 
 ## Look outside the library
 

@@ -307,7 +307,7 @@ export const skillsVsSlashCommands: ComparisonDefinition = {
   editorialSubject: "skills and slash commands",
   closing: {
     title: "The format stopped being the argument. The library did not.",
-    body: "Skills Board is a shared library for the skills a team recommends, whichever folder they started in. Free forever, MIT licensed, and open source.",
+    body: "Skills Board is a web app for the skills a team recommends, whichever folder they started in. Free forever, MIT licensed, and open source.",
   },
   og: {
     eyebrow: "Claude Skills vs Slash Commands",

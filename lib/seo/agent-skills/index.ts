@@ -502,7 +502,7 @@ export const agentSkills: AgentSkillsDefinition = {
     body: [
       "Once the format stops being the obstacle, the obstacle becomes selection. There are tens of thousands of public skills across the repositories on this page and the directories that index them, and a team needs perhaps five: the ones somebody read, ran on a real task, and is willing to stand behind. That set is almost never written down anywhere a new teammate can find it.",
       "The surfaces do not carry it, because none of them was built to. A skill in .claude/skills/ or .agents/skills/ records nothing about who chose it or why. A skill uploaded to claude.ai belongs to one person, and Anthropic documents that claude.ai has no centralized admin management or org-wide distribution for custom skills. Through the API a skill is workspace-wide but arrives with no recommendation attached.",
-      "So the recommendation ends up in a chat thread, and the next person starts over at a leaderboard. Skills Board is a shared library for that layer specifically: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
+      "So the recommendation ends up in a chat thread, and the next person starts over at a leaderboard. Skills Board is a web app for that layer specifically: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {

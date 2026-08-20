@@ -2,12 +2,14 @@ import { CopyButton } from "@/components/copy-button"
 import { claudeCodeInstallSnippet, pluginInstall } from "@/lib/plugin-install"
 
 /**
- * The shortest setup on the connection page.
+ * One of the two ways to connect, not the first step of one way.
  *
  * The plugin ships the same server entry the guide below prints, so installing
- * it replaces the config step for Claude Code users. It stands above the client
- * guide for that reason, and it stops where the guide takes over: the sign in
- * step is identical either way, so it is stated there once.
+ * it stands in for the manual configuration instead of preceding it. The page
+ * puts an `or` between the two cards and both headings name the choice, because
+ * the earlier draft read as step one of a sequence. Whichever path a reader
+ * takes, the sign in at the end is the same, so this card states it too rather
+ * than sending the reader down the manual guide to finish.
  */
 export function McpPluginInstall() {
   return (
@@ -18,16 +20,17 @@ export function McpPluginInstall() {
     >
       <div className="px-5 py-5 sm:px-6 sm:py-6">
         <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
-          Plugin
+          Option 1: the plugin
         </p>
         <h2 id="mcp-plugin-heading" className="mt-2 text-2xl font-semibold tracking-tight">
-          Start with the plugin
+          Prefer a one-step setup? The plugin includes this MCP configuration
         </h2>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          The official Skills Board plugin carries this MCP server entry, so
-          installing it registers <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{pluginInstall.name}</code> for you.
-          Run both commands in Claude Code, then sign in as the guide below
-          describes.
+          The official Skills Board plugin already carries the{" "}
+          <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{pluginInstall.name}</code>{" "}
+          server entry, so installing it replaces the manual setup in option 2.
+          Do one or the other, not both. Claude Code is one client that installs
+          it:
         </p>
 
         <div className="mt-4 overflow-hidden rounded-[12px] border">
@@ -54,11 +57,13 @@ export function McpPluginInstall() {
         </div>
 
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-          Clients the plugins CLI supports can install the same directory with{" "}
+          In any other client the plugins CLI supports, the same directory
+          installs with{" "}
           <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">
             {pluginInstall.cliCommand}
           </code>
-          .
+          . Either way, the last step is signing in through your browser when
+          the client asks, and then you are done here.
         </p>
       </div>
     </section>

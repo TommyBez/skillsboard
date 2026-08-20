@@ -319,7 +319,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
   editorialSubject: "skills and plugins",
   closing: {
     title: "Packaging is easy. Deciding what deserves packaging is not.",
-    body: "Skills Board is a shared library for the skills a team recommends, loose or inside a plugin. Free forever, MIT licensed, and open source.",
+    body: "Skills Board is a web app for the skills a team recommends, loose or inside a plugin. Free forever, MIT licensed, and open source.",
   },
   og: {
     eyebrow: "Claude Skills vs Plugins",

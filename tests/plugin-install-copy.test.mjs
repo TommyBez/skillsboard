@@ -17,6 +17,12 @@ const settingsBlock = await readText("../components/mcp-plugin-install.tsx")
 const landingPage = await readText("../app/(landing)/page.tsx")
 const settingsPage = await readText("../app/(app)/settings/mcp/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
+const setupGuide = await readText("../components/mcp-setup-guide.tsx")
+const skill = await readText("../plugin/skills/team-skill-library/SKILL.md")
+const llms = await readText("../public/llms.txt")
+const landingFaq = await readText("../lib/seo/landing-faq.ts")
+const packageJson = await readText("../package.json")
+const readme = await readText("../README.md")
 
 async function readText(relative) {
   return readFile(new URL(relative, import.meta.url), "utf8")
@@ -59,6 +65,41 @@ test("each copy control reports the surface it was copied from", () => {
 
 test("no plugin install copy uses an em dash or an en dash", () => {
   for (const source of [landingSection, settingsBlock]) {
+    assert.doesNotMatch(source, dashPattern)
+  }
+})
+
+test("the plugin copy does not present the plugin as a Claude Code exclusive", () => {
+  assert.doesNotMatch(landingSection, /Add Skills Board to Claude Code/)
+  assert.match(landingSection, /Agent Plugins\n?\s*standard/)
+  assert.match(landingSection, /any client that supports it/)
+  assert.doesNotMatch(readme, /## Claude Code plugin/)
+})
+
+test("the connection page offers the plugin as an alternative to the manual setup", () => {
+  assert.match(settingsBlock, /Option 1: the plugin/)
+  assert.match(settingsBlock, /replaces the manual setup in option 2/)
+  assert.match(settingsBlock, /Do one or the other, not both\./)
+  assert.match(setupGuide, /Option 2: manual MCP setup/)
+  assert.match(setupGuide, /Skip this if you installed the plugin above/)
+  assert.match(settingsPage, /data-testid="mcp-setup-or-divider"/)
+  assert.match(settingsPage, /There are two ways to set this up/)
+})
+
+test("Skills Board is described as a web app, never as a shared library", () => {
+  const productCopy = [landingSection, settingsBlock, skill, llms, landingFaq, packageJson]
+  for (const source of productCopy) {
+    assert.doesNotMatch(source, /Skills Board is (?:a|the) shared library/)
+    assert.doesNotMatch(source, /A shared library for the AI skills/)
+  }
+  assert.match(landingSection, /Skills Board is a web app/)
+  assert.match(skill, /Skills Board is a web app/)
+  assert.match(llms, /Skills Board is the web app/)
+  assert.match(landingFaq, /Skills Board is a web app/)
+})
+
+test("no dash rule violations in the copy this page owns", () => {
+  for (const source of [landingSection, settingsBlock, settingsPage]) {
     assert.doesNotMatch(source, dashPattern)
   }
 })

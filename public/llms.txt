@@ -1,5 +1,5 @@
 # Skills Board
-> Skills Board is the shared library where a team collects the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
+> Skills Board is the web app where a team collects the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
 
 Last reviewed: 2026-08-19
 

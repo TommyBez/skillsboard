@@ -3,7 +3,9 @@
 *Last updated: July 24, 2026*
 
 ## Product Overview
-**One-liner:** Skills Board is the shared library where a team collects the AI skills it recommends, so every teammate can find and reuse them.
+**One-liner:** Skills Board is the web app where a team collects the AI skills it recommends, so every teammate can find and reuse them.
+
+**Never describe the product as "a shared library" on its own.** Skills Board is a web app teams sign in to; the shared library is what a team builds inside it.
 
 **What it does:** A team saves skills it considers useful in one searchable library. Teammates can see what the team recommends, understand where each skill comes from, and choose the most suitable way to use its latest source: open the repository, copy an install command, or download the skill as a ZIP.
 
@@ -199,7 +201,7 @@
 | Open access | Hosted product free forever and open-source code |
 
 ## Goals
-**Business goal:** Make Skills Board the default shared library teams use to collect and reuse their AI skill recommendations.
+**Business goal:** Make Skills Board the default web app teams use to collect and reuse their AI skill recommendations.
 
 **Conversion action:** Create a team library.
 

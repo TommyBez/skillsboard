@@ -229,10 +229,13 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
     <section data-testid="mcp-content" className="overflow-hidden rounded-[16px] border bg-card">
       <div className="flex flex-col gap-3 border-b px-5 py-5 sm:flex-row sm:items-end sm:justify-between sm:px-6 sm:py-6">
         <div>
-          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">Setup guide</p>
-          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Choose your agent</h2>
+          <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.16em] text-primary">
+            Option 2: manual MCP setup
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight">Configure your client by hand</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Pick a client and follow its connection steps.
+            Skip this if you installed the plugin above: it already registers the same server. Otherwise pick a client
+            and follow its connection steps.
           </p>
         </div>
         <CopyButton
