@@ -178,6 +178,7 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
     entry.loading.title,
     entry.frontmatter.title,
     entry.permissions.title,
+    entry.versions.title,
     entry.transfers.title,
     entry.install.title,
     entry.team.title,
@@ -194,6 +195,7 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
     entry.loading,
     entry.frontmatter,
     entry.permissions,
+    entry.versions,
     entry.transfers,
   ]) {
     const header = `| ${section.columns.join(" | ")} |`
@@ -271,6 +273,60 @@ test("the page answers the OpenCode question rather than a generic one", () => {
   assert.ok(entry.sources.length >= 10, "too few primary sources")
 })
 
+test("the two OpenCode documentation sets are separated rather than blended", () => {
+  const sourceIds = new Set(entry.sources.map((source) => source.id))
+  assert.ok(
+    sourceIds.has("opencode-skills") && sourceIds.has("opencode-v2-skills"),
+    "the page cites only one of the two documentation sets",
+  )
+
+  const stable = entry.sources.find((source) => source.id === "opencode-skills")
+  const beta = entry.sources.find((source) => source.id === "opencode-v2-skills")
+  assert.match(stable.href, /^https:\/\/opencode\.ai\/docs\/skills$/)
+  assert.match(beta.href, /^https:\/\/opencode\.ai\/v2\/docs\/skills$/)
+  assert.match(beta.note, /beta/i, "the beta source is not labelled as a beta")
+
+  // Every versions row prints both columns, so a reader always sees which set
+  // an answer comes from.
+  assert.deepEqual(entry.versions.columns, [
+    "Area",
+    "Stable documentation",
+    "OpenCode 2 beta",
+  ])
+  for (const row of entry.versions.rows) {
+    assert.equal(
+      row.cells.length,
+      2,
+      `${row.label} does not answer for both documentation sets`,
+    )
+  }
+
+  // The three questions the beta answers and the stable set does not.
+  const versions = JSON.stringify(entry.versions)
+  for (const topic of ["Precedence", "Supporting files", "HTTP catalogs"]) {
+    assert.ok(versions.includes(topic), `the versions table omits ${topic}`)
+  }
+})
+
+test("no table row repeats a cell value in a way the renderer cannot key", () => {
+  for (const section of [
+    entry.locations,
+    entry.loading,
+    entry.frontmatter,
+    entry.permissions,
+    entry.versions,
+    entry.transfers,
+  ]) {
+    for (const row of section.rows) {
+      assert.equal(
+        row.cells.length,
+        section.columns.length - 1,
+        `${section.title}: row "${row.label}" does not fill the table`,
+      )
+    }
+  }
+})
+
 test("undocumented claims are declared rather than asserted", () => {
   assert.ok(entry.openQuestions.entries.length >= 4)
 
@@ -330,6 +386,7 @@ test("the page links out, and existing pages link in", () => {
       entry.loading.link.href,
       entry.frontmatter.link.href,
       entry.permissions.link.href,
+      entry.versions.link.href,
       entry.transfers.link.href,
       entry.team.link.href,
       ...entry.related.map((link) => link.href),
@@ -380,6 +437,7 @@ test("every section cites a source that the page actually lists", () => {
     entry.loading.sourceIds,
     entry.frontmatter.sourceIds,
     entry.permissions.sourceIds,
+    entry.versions.sourceIds,
     entry.transfers.sourceIds,
     entry.install.sourceIds,
     entry.team.sourceIds,

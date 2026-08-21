@@ -79,6 +79,7 @@ export interface OpencodeSkillsDefinition {
   loading: OpencodeSkillsTableSection & { link: OpencodeSkillsInlineLink }
   frontmatter: OpencodeSkillsTableSection & { link: OpencodeSkillsInlineLink }
   permissions: OpencodeSkillsTableSection & { link: OpencodeSkillsInlineLink }
+  versions: OpencodeSkillsTableSection & { link: OpencodeSkillsInlineLink }
   transfers: OpencodeSkillsTableSection & { link: OpencodeSkillsInlineLink }
   install: {
     title: string
@@ -139,18 +140,20 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
   seoTitle:
     "OpenCode Skills: What They Are and How to Use Them | Skills Board",
   description:
-    "An OpenCode skill is a folder with a SKILL.md file that OpenCode loads on demand through a built-in skill tool. The six directories it scans, the five frontmatter fields it recognizes, the allow, ask, and deny model it puts in front of every skill, and how a team distributes one.",
+    "An OpenCode skill is a folder with a SKILL.md file that OpenCode loads on demand through a built-in skill tool. The six directories it scans, the five frontmatter fields it recognizes, the allow, ask, and deny model it puts in front of every skill, what the OpenCode 2 beta changes, and how a team distributes one.",
   intro: [
     "OpenCode reads the same SKILL.md file that Claude Code, Codex, and Cursor read, and then does two things none of them do. It exposes skills to the model as a tool call rather than as a list of instructions, and it puts a permission decision in front of every single one. Both are documented, and both change how you would design a skill for a team that runs OpenCode.",
     "The file itself is the ordinary one. A folder, a SKILL.md inside it, YAML frontmatter with a name and a description, then Markdown. The Agent Skills specification at agentskills.io defines that shape, and OpenCode appears on its client showcase alongside Claude Code, Codex, and Cursor. Nothing you write for one of them has to be rewritten for OpenCode.",
-    "What follows is what OpenCode's own documentation says, checked on August 21, 2026: every directory it scans, the walk it does to find them, the five frontmatter fields it accepts and what happens to the rest, the skill tool and the permission model wrapped around it, what changes when the same file moves between agents, what a team does once more than one person depends on a skill, and the parts nobody has documented.",
+    "One thing to settle before anything else. OpenCode publishes two documentation sets right now, and they do not describe the same behavior. The stable set at opencode.ai/docs is what a normal install follows, and it is what this page describes by default. A second set at opencode.ai/v2/docs covers a beta that will become OpenCode 2.0, and its skills page answers several questions the stable one leaves open. Every claim below is labelled with the set it came from.",
+    "What follows is what those pages say, fetched on August 21, 2026: every directory OpenCode scans, the walk it does to find them, the five frontmatter fields it accepts and what happens to the rest, the skill tool and the permission model wrapped around it, what the beta changes, what happens when the same file moves between agents, what a team does once more than one person depends on a skill, and the parts neither set documents.",
   ],
   answer:
     "An OpenCode skill is a directory containing a SKILL.md file: YAML frontmatter with a name and a description, then Markdown instructions. OpenCode discovers skills from six directories at startup, lists each name and description inside the description of a built-in skill tool, and the agent loads the full file by calling that tool when a task matches.",
   answerNotes: [
     "The loading route is the part that is specific to OpenCode. Other clients present discovered skills as context the model reads. OpenCode publishes an available_skills block inside the description of its skill tool, one entry per skill with its name and description, and the agent activates one by calling skill with that name. Loading a skill is a tool call, which is why it can be permissioned like any other tool call.",
     "Every activation passes a permission check. OpenCode documents a skill key in its permission config that takes allow, ask, or deny, supports wildcard patterns over skill names, and can be overridden per agent. A skill set to deny is hidden from the agent entirely rather than merely refused, and the whole tool can be switched off for an agent that should not have skills at all.",
-    "The frontmatter allowlist is closed and short. OpenCode recognizes name, description, license, compatibility, and metadata, and states that unknown frontmatter fields are ignored. That makes it the one documented client on our compatibility matrix that says out loud what it does with a field it does not know, and it also means the specification's experimental allowed-tools field does nothing here.",
+    "The frontmatter allowlist is closed and short. The stable documentation recognizes name, description, license, compatibility, and metadata, and states that unknown frontmatter fields are ignored. That makes it the one documented client on our compatibility matrix that says out loud what it does with a field it does not know, and it also means the specification's experimental allowed-tools field does nothing here.",
+    "The beta moves several of these answers. The OpenCode 2 documentation derives a skill ID from the path rather than the frontmatter, stops enforcing the name rules, reads a different set of frontmatter fields, publishes a precedence order between sources, adds skill sources you configure yourself including HTTP catalogs, and switches the permission config to an ordered array of rules. The versions section below is the row by row difference.",
   ],
   answerSourceIds: ["opencode-skills", "opencode-tools", "agentskills-home"],
   locations: {
@@ -268,7 +271,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
   frontmatter: {
     title: "The five frontmatter fields OpenCode recognizes",
     intro:
-      "OpenCode publishes an allowlist rather than a set of extensions. Two fields are required, three are optional, and the documentation states plainly that anything else in the frontmatter is ignored.",
+      "The stable documentation publishes an allowlist rather than a set of extensions. Two fields are required, three are optional, and it states plainly that anything else in the frontmatter is ignored. The OpenCode 2 beta reads a different set, which the versions section below sets out side by side.",
     columns: ["Field", "Required", "What OpenCode does with it"],
     rows: [
       {
@@ -317,7 +320,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
     notes: [
       "Ignoring allowed-tools is not the same as ignoring the problem it solves. OpenCode's answer to which tools a skill may use is the permission config in the next section, which sits outside the skill file and belongs to the person running the agent rather than to the person who wrote the skill. That is a defensible split, and it means a skill cannot pre-approve its own tools here.",
       "One widely circulated compatibility table disagrees with the vendor on this point. The README of the skills CLI, the one behind npx skills add, lists allowed-tools as supported for OpenCode. OpenCode's own documentation publishes a five-field allowlist that does not include it and says unknown fields are ignored. We treat the vendor documentation as authoritative and record the disagreement rather than smoothing it over.",
-      "The body below the frontmatter is ordinary Markdown with no documented restrictions, and the whole of it is returned into the conversation once the skill is activated. The specification recommends keeping SKILL.md under 500 lines and moving detail into separate files, which is advice OpenCode does not restate. Whether OpenCode does anything special with a scripts or references folder is covered in the limits section.",
+      "The body below the frontmatter is ordinary Markdown with no documented restrictions, and the whole of it is returned into the conversation once the skill is activated. The specification recommends keeping SKILL.md under 500 lines and moving detail into separate files, which is advice the stable page does not restate. The beta does: it hands the agent the skill base directory and a sample of up to ten supporting file paths, without loading their contents.",
     ],
     link: {
       lead: "For the same field by field walkthrough on the OpenAI side, including the separate agents/openai.yaml metadata file Codex reads, see",
@@ -330,7 +333,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
   permissions: {
     title: "The permission model in front of every skill",
     intro:
-      "Two other clients get close. Codex publishes an enabled flag per skill path in its config file, and our own client matrix found that Gemini CLI shows a confirmation prompt before a skill activates. Only OpenCode publishes a rule language: allow, ask, or deny matched against skill names, in the same config that gates bash and file edits. It is the single most useful thing to know before a team turns a shared skills folder on.",
+      "Two other clients get close. Codex publishes an enabled flag per skill path in its config file, and our own client matrix found that Gemini CLI shows a confirmation prompt before a skill activates. Only OpenCode publishes a rule language: allow, ask, or deny matched against skill names, in the same config that gates bash and file edits. It is the single most useful thing to know before a team turns a shared skills folder on. The syntax below is the stable one; the beta keeps the same three effects and changes the shape of the config.",
     columns: ["Where it goes", "Example", "What it does"],
     rows: [
       {
@@ -395,6 +398,95 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
       "codex-skills",
     ],
   },
+  versions: {
+    title: "What the OpenCode 2 beta changes about skills",
+    intro:
+      "The beta documentation carries its own banner: these are the docs for the beta version of OpenCode, which will become OpenCode 2.0, and things may still break. Its skills page is not a rewrite of the stable one, it is a different design, and it answers three questions the stable page leaves open. Nothing in this column is a promise about the release you have installed today.",
+    columns: ["Area", "Stable documentation", "OpenCode 2 beta"],
+    rows: [
+      {
+        label: "Skill identity",
+        cells: [
+          "The frontmatter name is the identifier, and it has to match the directory that contains SKILL.md",
+          "The ID comes from the path and the frontmatter name is only a display label. A root-level Markdown file works too, so skills/git-release.md and skills/git-release/SKILL.md both produce the ID git-release",
+        ],
+      },
+      {
+        label: "Name validation",
+        cells: [
+          "1 to 64 characters, lowercase alphanumerics with single hyphens, matching the directory, with the regular expression published",
+          "Not enforced. The beta states plainly that it does not currently enforce the Agent Skills name regex, the length limits, the directory match, or the description cap, and recommends the same shape anyway",
+        ],
+      },
+      {
+        label: "Frontmatter read",
+        cells: [
+          "name and description required, license, compatibility, and metadata optional, everything else ignored",
+          "name, description, a slash field, and two metadata keys under opencode/. Frontmatter is optional at runtime, but a skill without a description is not advertised to the model. license and compatibility are accepted for portability and not interpreted",
+        ],
+      },
+      {
+        label: "Precedence between sources",
+        cells: [
+          "Not published. The troubleshooting list only says to keep names unique",
+          "Published as an ordered list, later source wins: built-in skills, then the Claude paths, then the neutral paths, then the OpenCode global folder, then the project folder, then explicit config entries",
+        ],
+      },
+      {
+        label: "Extra skill sources",
+        cells: [
+          "None. The six directories are the whole discovery surface",
+          "A skills array in opencode.json takes additional local directories and HTTP catalogs, and the arrays from every discovered config document add up rather than replacing each other",
+        ],
+      },
+      {
+        label: "Supporting files",
+        cells: [
+          "Not mentioned. The page describes SKILL.md and its frontmatter only",
+          "On activation the agent is given the skill base directory and a sample of up to ten supporting file paths. Contents are not loaded automatically, and a flat Markdown skill gets no neighboring file list at all",
+        ],
+      },
+      {
+        label: "Permission syntax",
+        cells: [
+          "An object under permission with a skill key holding a pattern to action map",
+          "An ordered array under permissions of action, resource, and effect rules, where skill is the action and the skill ID is the resource. The beta warns that V1 field and action names are not valid in V2 configuration",
+        ],
+      },
+      {
+        label: "Default when no rule matches",
+        cells: [
+          "Allow. Most permissions default to allow, with only the repeated-call and external directory guards defaulting to ask",
+          "Ask. The beta states that if no rule matches, the result is ask, and then lists the ordered defaults each shipped agent starts from",
+        ],
+      },
+      {
+        label: "Invoking a skill on purpose",
+        cells: [
+          "No documented user-facing syntax",
+          "A skill can be activated explicitly by its exact ID, and a slash field hides a skill from interactive command catalogs when set to false",
+        ],
+      },
+    ],
+    notes: [
+      "The practical reading is that a skill written to the stable rules keeps working in the beta, and the reverse is not true. Lowercase kebab-case IDs, a directory per skill, a real description, and no reliance on frontmatter beyond name and description survive both. A skill that leans on the beta's slash or autoinvoke keys, or on an HTTP catalog, has nothing to fall back on in the stable release.",
+      "The HTTP catalog is the most interesting thing in either document for a team, and also the least settled. A base URL serving an index.json that lists skills with a name, a version, and a file list is a distribution channel that needs no package manager and no repository clone, with the version field acting as the cache buster. It is beta, it is same-origin only, and the beta itself notes an ID quirk for root-level SKILL.md files, so treat it as a direction rather than a plan.",
+      "Neither document states which released binary implements which behavior beyond the beta banner, and OpenCode updates itself on startup unless you turn that off. If a detail on this page matters to your team, check it against the version you actually run rather than against a date.",
+    ],
+    link: {
+      lead: "For the wider question of which clients read the format at all, and how little of this is standardized across them, see",
+      label: "Agent Skills support: which AI clients read SKILL.md",
+      href: agentSkillsSupportPath,
+      trail: ".",
+    },
+    sourceIds: [
+      "opencode-v2-skills",
+      "opencode-v2-permissions",
+      "opencode-skills",
+      "opencode-permissions",
+      "opencode-config",
+    ],
+  },
   transfers: {
     title: "OpenCode skills, Codex skills, and Cursor skills: what transfers",
     intro:
@@ -428,7 +520,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
       {
         label: "Unknown frontmatter fields",
         cells: [
-          "Documented as ignored",
+          "Documented as ignored in the stable set, and the beta reads a different set entirely",
           "Not documented",
           "Not documented",
         ],
@@ -452,7 +544,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
       {
         label: "Published context budget for the listing",
         cells: [
-          "None published",
+          "None published in either documentation set",
           "At most 2 percent of the context window, or 8,000 characters when it is unknown",
           "None published",
         ],
@@ -536,7 +628,8 @@ A Markdown section titled with the version and the date.`,
       "Two problems hide behind the word sharing. Distribution is getting the files onto each teammate's machine. Recommendation is knowing which skill to use for a task and why that one. OpenCode has a good answer to the first inside a repository and no answer at all to the second.",
     body: [
       "If every skill your team uses belongs to one repository everybody works in, commit them to .agents/skills/ and you are finished. OpenCode picks them up by walking up from the working directory, Codex and Cursor read the same folder, and no tooling is involved. That is the right setup for a single-repository team and nothing here should talk you out of it.",
-      "It stops being enough the moment the skills come from someone else's repository, are useful in more than one repository, or have to reach a teammate who is not in OpenCode at all. OpenCode's own extension mechanisms do not close that gap: plugins here are JavaScript or TypeScript modules loaded from a plugins folder or from npm, and the documentation describes them as hooks, events, and custom tools rather than as a way to package a skill. Its central config and managed settings can push configuration to a fleet, including permission rules, but the documentation does not describe them delivering skill files.",
+      "It stops being enough the moment the skills come from someone else's repository, are useful in more than one repository, or have to reach a teammate who is not in OpenCode at all. OpenCode's stable extension mechanisms do not close that gap: plugins here are JavaScript or TypeScript modules loaded from a plugins folder or from npm, and the documentation describes them as hooks, events, and custom tools rather than as a way to package a skill. Its central config and managed settings can push configuration to a fleet, including permission rules, but the documentation does not describe them delivering skill files.",
+      "The beta is the first place OpenCode addresses distribution directly, and it is worth watching. A skills array in opencode.json accepts extra local directories and HTTP catalogs, where a catalog is a base URL serving an index.json that lists each skill with a name, a version, and a file list. That is a real answer to getting files onto machines, and it is beta, same-origin only, and not something to build a team process on this month. It also still answers only the distribution half.",
       "Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends. Each saved entry keeps the original source repository and path visible, teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run. It makes no assumption that everyone is in OpenCode, which is the assumption every per-product mechanism above has to make.",
     ],
     paths: [
@@ -561,6 +654,7 @@ A Markdown section titled with the version and the date.`,
       "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "The official Skills Board plugin is an Agent Plugins package. OpenCode plugins are a different thing entirely, so on OpenCode the MCP entry in opencode.json is the route, not the plugin.",
+      "Skills Board does not publish an OpenCode HTTP catalog. The beta's skills array expects a base URL serving an index.json in its own shape, and nothing here serves that shape today.",
       "An MCP connection cannot install or run a skill inside OpenCode, and it cannot edit or delete saved team skills. The files still have to land in a directory OpenCode scans.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
@@ -570,46 +664,52 @@ A Markdown section titled with the version and the date.`,
       href: guidePaths.manageCrossAgentSkills,
       trail: ".",
     },
-    sourceIds: ["opencode-plugins", "opencode-mcp", "opencode-config", "skills-cli"],
+    sourceIds: [
+      "opencode-plugins",
+      "opencode-mcp",
+      "opencode-config",
+      "opencode-v2-skills",
+      "skills-cli",
+    ],
   },
   openQuestions: {
     title: "What is not documented",
     intro:
-      "Six things OpenCode's documentation does not answer, found while reading it on August 21, 2026. Each one is a place where a confident claim usually gets invented, so each one is written down as a gap instead. The implementation is public and MIT licensed at anomalyco/opencode, the repository the older sst/opencode path now redirects to, but reading source code is not a documented guarantee and this page does not treat it as one.",
+      "Six things neither documentation set answers, or answers only in the beta, found while reading both on August 21, 2026. Each one is a place where a confident claim usually gets invented, so each one is written down as a gap instead. The implementation is public and MIT licensed at anomalyco/opencode, the repository the older sst/opencode path now redirects to, but reading source code is not a documented guarantee and this page does not treat it as one.",
     entries: [
       {
-        title: "What happens when two skills share a name",
-        body: "The troubleshooting list says to ensure skill names are unique across all locations, which implies collisions are a real failure mode, but no precedence order between the six directories is published. Codex documents that it does not merge same-named skills and may show both. OpenCode documents neither the merge behavior nor a winner, so treat duplicate names as untested.",
+        title: "The stable documentation has no precedence rule",
+        body: "Its troubleshooting list says to ensure skill names are unique across all locations, which implies collisions are a real failure mode, but it never says which of the six directories wins. The beta does publish an ordered list where the later source wins. That is a beta answer to a stable question, so on a current install treat two skills that share a name as untested.",
       },
       {
-        title: "There is no published context budget for the skill listing",
-        body: "Every discovered skill contributes a name and a description to the description of the skill tool, and OpenCode publishes no figure for how large that block may grow or what happens when it does not fit. Codex publishes a specific budget for the equivalent list. How many skills you can keep installed in OpenCode is something you observe rather than look up.",
+        title: "Neither set publishes a context budget for the skill listing",
+        body: "Every discovered skill contributes a name and a description to the listing the model sees, and no figure is published anywhere for how large that block may grow or what happens when it does not fit. Codex publishes a specific budget for the equivalent list. How many skills you can keep installed in OpenCode is something you observe rather than look up.",
       },
       {
-        title: "Whether OpenCode does anything with scripts, references, or assets",
-        body: "The specification defines those three optional folders and the progressive disclosure they enable. OpenCode's skills page describes the SKILL.md file and its frontmatter and never mentions them. The agent can obviously read a file with its own read tool, subject to the read permission, but there is no documented special handling of a bundled script, and no documented sandbox around one.",
+        title: "The stable page says nothing about scripts, references, or assets",
+        body: "The specification defines those three optional folders and the progressive disclosure they enable, and the stable skills page describes SKILL.md and its frontmatter only. The beta fills the gap, handing the agent a base directory and a sample of up to ten supporting file paths without loading their contents. What the stable release does with a bundled script is still unstated, and neither set documents a sandbox around one.",
       },
       {
         title: "Whether the custom config directory includes skills",
-        body: "OPENCODE_CONFIG_DIR is documented as a directory searched for agents, commands, modes, and plugins just like the standard .opencode directory. The skills folder is named in the plural-subdirectory list elsewhere in the same page but is absent from that sentence. Whether a skills folder inside a custom config directory is discovered is not stated.",
+        body: "OPENCODE_CONFIG_DIR is documented as a directory searched for agents, commands, modes, and plugins just like the standard .opencode directory. The skills folder is named in the plural-subdirectory list elsewhere on the same page but is absent from that sentence. Whether a skills folder inside a custom config directory is discovered is not stated.",
       },
       {
         title: "Which surfaces beyond the terminal load skills",
-        body: "OpenCode ships a TUI, a desktop app, an IDE extension, a web UI, an ACP integration, a server, an SDK, and GitHub and GitLab integrations. The skills page describes discovery from your repository or home directory without naming a surface, and none of the surface pages mention skills. Assume the terminal behavior and verify anywhere else.",
+        body: "OpenCode ships a TUI, a desktop app, an IDE extension, a web UI, an ACP integration, a server, an SDK, and GitHub and GitLab integrations. Both skills pages describe discovery from your repository or home directory without naming a surface, and none of the surface pages mention skills. Assume the terminal behavior and verify anywhere else.",
       },
       {
-        title: "How a skill is expected to be invoked on purpose",
-        body: "Selection is documented as the agent's decision through the tool listing. There is no documented user-facing syntax for forcing a specific skill, the way Codex documents a slash command and a prefix character and Cursor documents a forward slash in Agent chat. A custom command whose template names the skill is the nearest documented equivalent, not an official one.",
+        title: "Which behavior the binary you have actually implements",
+        body: "Neither set states which released version it describes, beyond the beta banner on the second one, and OpenCode updates itself on startup unless autoupdate is turned off. Two pages that disagree about identity, validation, precedence, and permission syntax, with no version boundary printed on either, is the one gap on this list that affects every other line of it.",
       },
     ],
     sourceIds: [
       "opencode-skills",
+      "opencode-v2-skills",
       "opencode-config",
       "opencode-cli",
       "opencode-repo",
       "agentskills-spec",
       "codex-skills",
-      "cursor-skills",
     ],
   },
   faq: [
@@ -642,6 +742,11 @@ A Markdown section titled with the version and the date.`,
       question: "Do OpenCode plugins bundle skills?",
       answer:
         "No, not as documented. An OpenCode plugin is a JavaScript or TypeScript module loaded from a plugins folder or from npm that hooks into events and can register custom tools. The documentation describes hooks, events, and tools, and never describes a plugin shipping a SKILL.md file the way some other clients do.",
+    },
+    {
+      question: "Does the OpenCode 2 beta change how skills work?",
+      answer:
+        "Yes, in ways worth knowing. The beta derives the skill ID from the path instead of the frontmatter, stops enforcing the name rules, publishes a precedence order where the later source wins, adds configurable skill sources including HTTP catalogs, hands the agent a sample of supporting file paths, and switches permissions to an ordered rule array.",
     },
     {
       question: "How does a team share OpenCode skills?",
@@ -703,6 +808,18 @@ A Markdown section titled with the version and the date.`,
       label: "OpenCode: CLI",
       href: "https://opencode.ai/docs/cli",
       note: "The agent create command with skill among the permissions it accepts, and the environment variable table including the two that disable Claude Code compatibility for skills.",
+    },
+    {
+      id: "opencode-v2-skills",
+      label: "OpenCode 2 beta: Skills",
+      href: "https://opencode.ai/v2/docs/skills",
+      note: "The beta documentation set, which carries its own banner saying it covers the version that will become OpenCode 2.0. Path-derived skill IDs, the frontmatter fields it reads, the precedence order between sources, the configurable skills array and its HTTP catalogs, the supporting-file sample on activation, and the array form of the skill permission.",
+    },
+    {
+      id: "opencode-v2-permissions",
+      label: "OpenCode 2 beta: Permissions",
+      href: "https://opencode.ai/v2/docs/permissions",
+      note: "The action, resource, and effect rule schema, the skill action keyed on the skill ID, last matching rule wins, and the beta default of ask when no rule matches, which inverts the stable default.",
     },
     {
       id: "agentskills-spec",

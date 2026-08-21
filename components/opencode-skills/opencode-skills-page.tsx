@@ -217,9 +217,30 @@ export function OpencodeSkillsPage({
           />
         </section>
 
+        <section aria-labelledby="versions-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="05 / Versions"
+            id="versions"
+            title={entry.versions.title}
+            intro={entry.versions.intro}
+          />
+          <SectionTable
+            caption="What the stable documentation says about skills, and what the OpenCode 2 beta says instead."
+            columns={entry.versions.columns}
+            rows={entry.versions.rows}
+            labelWidth="w-[18%]"
+          />
+          <NoteList notes={entry.versions.notes} />
+          <InlineLink link={entry.versions.link} />
+          <SectionSources
+            sourceIds={entry.versions.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
         <section aria-labelledby="transfers-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Portability"
+            eyebrow="06 / Portability"
             id="transfers"
             title={entry.transfers.title}
             intro={entry.transfers.intro}
@@ -240,7 +261,7 @@ export function OpencodeSkillsPage({
 
         <section aria-labelledby="install-heading" className="pt-16">
           <SectionHeading
-            eyebrow="06 / Install"
+            eyebrow="07 / Install"
             id="install"
             title={entry.install.title}
             intro={entry.install.intro}
@@ -263,7 +284,7 @@ export function OpencodeSkillsPage({
 
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="07 / Teams"
+            eyebrow="08 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -300,7 +321,7 @@ export function OpencodeSkillsPage({
 
         <section aria-labelledby="open-questions-heading" className="pt-16">
           <SectionHeading
-            eyebrow="08 / Limits"
+            eyebrow="09 / Limits"
             id="open-questions"
             title={entry.openQuestions.title}
             intro={entry.openQuestions.intro}
@@ -328,7 +349,7 @@ export function OpencodeSkillsPage({
 
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            09 / Questions
+            10 / Questions
           </p>
           <h2
             id="faq-heading"
