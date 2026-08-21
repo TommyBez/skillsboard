@@ -206,7 +206,7 @@ Taken from a live scan of `https://www.skillsboard.sh` on 2026-08-21, so the
 record set above is aimed at the names that are really queried rather than at
 the ones the draft happens to use in its examples:
 
-```
+```text
 SVCB|HTTPS  _index._agents.www.skillsboard.sh    SVCB|HTTPS  _index._agents.skillsboard.sh
 SVCB|HTTPS  _a2a._agents.www.skillsboard.sh      SVCB|HTTPS  _a2a._agents.skillsboard.sh
 SVCB|HTTPS  _mcp._agents.www.skillsboard.sh      SVCB|HTTPS  _mcp._agents.skillsboard.sh

@@ -9,9 +9,30 @@ const {
   parseServiceBinding,
   problemsIn,
   queriesFor,
+  resolveOverDoh,
   targetOwner,
   TXT,
 } = await import("../scripts/check-dns-aid.mjs")
+
+/** Stubs global fetch with one canned response per resolver, in order. */
+function withFetch(responses, run) {
+  const original = globalThis.fetch
+  const seen = []
+  globalThis.fetch = async (url, init) => {
+    seen.push({ url: String(url), init })
+    const next = responses.shift()
+    if (!next) throw new Error("fetch called more times than the test allows")
+    if (next instanceof Error) throw next
+    return {
+      ok: next.ok ?? true,
+      status: next.httpStatus ?? 200,
+      json: async () => next.body,
+    }
+  }
+  return Promise.resolve(run(seen)).finally(() => {
+    globalThis.fetch = original
+  })
+}
 
 /** A DoH `application/dns-json` body, as Cloudflare and Google return one. */
 function answer(name, type, data, { ad = true, status = 0 } = {}) {
@@ -177,4 +198,51 @@ test("a resolver that throws fails the run instead of passing quietly", async ()
   assert.equal(totals.failures, 7)
   assert.equal(totals.usable, 0)
   assert.match(problemsIn(totals).join("\n"), /did not check everything/)
+})
+
+test("a resolver-level failure falls through to the next resolver", async () => {
+  // SERVFAIL is the resolver failing to reach the zone. Returning it as an
+  // empty answer would report "nothing is published" having learned nothing.
+  await withFetch(
+    [
+      { body: { Status: 2, AD: false, Answer: [] } },
+      { body: { Status: 0, AD: true, Answer: [{ name: "x", type: HTTPS, data: "1 www. alpn=h2" }] } },
+    ],
+    async (seen) => {
+      const result = await resolveOverDoh("x", HTTPS)
+
+      assert.equal(result.Status, 0)
+      assert.equal(result.Answer.length, 1)
+      assert.equal(seen.length, 2, "the second resolver should have been asked")
+      assert.match(seen[1].url, /dns\.google/)
+    },
+  )
+})
+
+test("NXDOMAIN is an answer, so the second resolver is never asked", async () => {
+  await withFetch([{ body: { Status: 3, AD: true, Answer: [] } }], async (seen) => {
+    const result = await resolveOverDoh("nope", HTTPS)
+
+    assert.equal(result.Status, 3)
+    assert.equal(seen.length, 1, "asking another resolver cannot change NXDOMAIN")
+  })
+})
+
+test("every DoH request carries a timeout so one stalled resolver cannot hang the scan", async () => {
+  await withFetch([{ body: { Status: 0, AD: true, Answer: [] } }], async (seen) => {
+    await resolveOverDoh("x", HTTPS)
+
+    const { signal } = seen[0].init
+    assert.ok(signal, "no abort signal was passed to fetch")
+    assert.equal(typeof signal.aborted, "boolean")
+  })
+})
+
+test("when no resolver can answer, the error surfaces instead of an empty result", async () => {
+  await withFetch(
+    [{ ok: false, httpStatus: 502, body: {} }, new Error("socket hang up")],
+    async () => {
+      await assert.rejects(() => resolveOverDoh("x", HTTPS), /socket hang up/)
+    },
+  )
 })

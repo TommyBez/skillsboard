@@ -19,12 +19,16 @@
 import { fileURLToPath } from "node:url"
 
 // The scanner's default resolver, and the one it falls back to on a
-// resolver-level failure. Not on a NOERROR-with-no-answers, which is a real
-// answer meaning the name does not exist.
+// resolver-level failure. Not on an empty answer: NODATA and NXDOMAIN are the
+// zone answering, and asking a second resolver cannot change either.
 const RESOLVERS = [
   "https://cloudflare-dns.com/dns-query",
   "https://dns.google/resolve",
 ]
+
+// Node's fetch has no default request timeout, so one stalled resolver would
+// hold up the whole sequential scan.
+const DOH_TIMEOUT_MS = 5000
 
 // SVCB is RR type 64 and HTTPS is 65. `dns-json` returns the numeric type, and
 // neither resolver accepts every spelling of the name, so ask by number.
@@ -42,17 +46,34 @@ export function typeName(type) {
   return { [SVCB]: "SVCB", [HTTPS]: "HTTPS", [TXT]: "TXT" }[type] ?? String(type)
 }
 
+/**
+ * NOERROR and NXDOMAIN are the zone speaking. Every other RCODE — SERVFAIL
+ * above all — is the resolver failing to reach it, and reporting that as an
+ * empty name would read as "nothing is published" when nothing was learned.
+ */
+function isAnswer(status) {
+  return status === 0 || status === 3
+}
+
 export async function resolveOverDoh(name, type) {
   let lastError
   for (const resolver of RESOLVERS) {
     const url = `${resolver}?name=${encodeURIComponent(name)}&type=${type}&do=1`
     try {
-      const response = await fetch(url, { headers: { accept: "application/dns-json" } })
+      const response = await fetch(url, {
+        headers: { accept: "application/dns-json" },
+        signal: AbortSignal.timeout(DOH_TIMEOUT_MS),
+      })
       if (!response.ok) {
         lastError = new Error(`${resolver} answered ${response.status}`)
         continue
       }
-      return await response.json()
+      const result = await response.json()
+      if (!isAnswer(result.Status)) {
+        lastError = new Error(`${resolver} returned DNS status ${result.Status}`)
+        continue
+      }
+      return result
     } catch (error) {
       lastError = error
     }
@@ -98,9 +119,11 @@ export async function chase(name, type, options = {}) {
   const authenticated = inherited && Boolean(result.AD)
 
   if (answers.length === 0) {
-    // NXDOMAIN (3) and NOERROR (0) both mean nothing is published here; say
-    // which, because NXDOMAIN also rules out the parent name existing.
-    const status = result.Status === 3 ? "NXDOMAIN" : `no answers (status ${result.Status})`
+    // Say which of the two empty answers this is. NXDOMAIN means the name does
+    // not exist at all; NODATA means it exists with other record types, which
+    // is what a zone looks like when the wrong RR type was published.
+    const status = result.Status === 3 ? "NXDOMAIN" : "NODATA"
+
     return { kind: depth === 0 ? "absent" : "dangling", name, status, authenticated }
   }
 
@@ -165,7 +188,7 @@ export async function checkDomains(domains, { resolve = resolveOverDoh, log = co
         }
         const answers = recordsOfType(result, type)
         if (answers.length === 0) {
-          log(`${label}  no answers (status ${result.Status})`)
+          log(`${label}  ${result.Status === 3 ? "NXDOMAIN" : "NODATA"}`)
           continue
         }
         // The draft specifies no RDATA format for the TXT index, so report it
