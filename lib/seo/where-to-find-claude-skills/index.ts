@@ -10,6 +10,7 @@ import {
   type GuidePath,
 } from "@/lib/seo/guides/types"
 import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
+import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export {
@@ -619,6 +620,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Vercel skills: the official collection, explained",
+      href: vercelSkillsPath,
+      description:
+        "One publisher's collection read folder by folder, with the licenses and the install counts skills.sh reports.",
+    },
     {
       label: "How to manage AI skills across an organization",
       href: manageAiSkillsPath,

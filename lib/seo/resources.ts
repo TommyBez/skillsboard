@@ -40,6 +40,11 @@ import {
   opencodeSkillsPath,
   type OpencodeSkillsPath,
 } from "@/lib/seo/opencode-skills/types"
+import { vercelSkills } from "@/lib/seo/vercel-skills"
+import {
+  vercelSkillsPath,
+  type VercelSkillsPath,
+} from "@/lib/seo/vercel-skills/types"
 import { whereToFindClaudeSkills } from "@/lib/seo/where-to-find-claude-skills"
 import {
   whereToFindClaudeSkillsPath,
@@ -67,6 +72,7 @@ export type ResourcePath =
   | CursorSkillsPath
   | ManageAiSkillsPath
   | OpencodeSkillsPath
+  | VercelSkillsPath
   | WhereToFindClaudeSkillsPath
 
 export interface ResourceIndexEntry {
@@ -92,6 +98,7 @@ export const resourceEntries = [
   coworkSkills,
   cursorSkills,
   opencodeSkills,
+  vercelSkills,
   agentsMdVsSkillMd,
   manageAiSkills,
   whereToFindClaudeSkills,
@@ -123,6 +130,7 @@ const resourceClusterDefinitions = [
       codexSkillsPath,
       cursorSkillsPath,
       opencodeSkillsPath,
+      vercelSkillsPath,
       coworkSkillsPath,
       agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,
