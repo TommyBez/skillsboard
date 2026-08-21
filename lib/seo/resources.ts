@@ -30,6 +30,11 @@ import { cursorSkills } from "@/lib/seo/cursor-skills"
 import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { manageAiSkills } from "@/lib/seo/manage-ai-skills"
+import {
+  manageAiSkillsPath,
+  type ManageAiSkillsPath,
+} from "@/lib/seo/manage-ai-skills/types"
 import { opencodeSkills } from "@/lib/seo/opencode-skills"
 import {
   opencodeSkillsPath,
@@ -60,6 +65,7 @@ export type ResourcePath =
   | CodexSkillsPath
   | CoworkSkillsPath
   | CursorSkillsPath
+  | ManageAiSkillsPath
   | OpencodeSkillsPath
   | WhereToFindClaudeSkillsPath
 
@@ -87,6 +93,7 @@ export const resourceEntries = [
   cursorSkills,
   opencodeSkills,
   agentsMdVsSkillMd,
+  manageAiSkills,
   whereToFindClaudeSkills,
 ] satisfies readonly ResourceIndexEntry[]
 
@@ -129,6 +136,7 @@ const resourceClusterDefinitions = [
     description:
       "Choose useful skills, define accountable workflows, and help a second teammate reproduce the result without private context.",
     paths: [
+      manageAiSkillsPath,
       whereToFindClaudeSkillsPath,
       bestClaudeSkillsPath,
       guidePaths.chooseFirstTeamSkill,

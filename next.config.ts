@@ -135,6 +135,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/manage-ai-skills/",
+        destination: "/manage-ai-skills",
+        permanent: true,
+      },
+      {
         source: "/opencode-skills/",
         destination: "/opencode-skills",
         permanent: true,
