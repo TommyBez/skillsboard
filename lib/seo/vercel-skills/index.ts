@@ -197,7 +197,7 @@ export const vercelSkills: VercelSkillsDefinition = {
       {
         label: "npx skills",
         cells: [
-          "The skills CLI, a separate Vercel project that adds, lists, finds, updates, and removes skills. It installs from GitHub, GitLab, any git URL, a local path, or a direct file URL, and its agent table maps sixty-eight rows of products to the directories each one reads. Nothing about it is limited to Vercel's own skills.",
+          "The skills CLI, a separate Vercel project that adds, lists, finds, updates, and removes skills. It installs from GitHub, GitLab, any git URL, a local path, or a direct file URL, and its agent table maps sixty-nine rows of products, seventy-seven named agents in all, to the directories each one reads. Nothing about it is limited to Vercel's own skills.",
           "github.com/vercel-labs/skills",
         ],
       },
@@ -616,7 +616,7 @@ export const vercelSkills: VercelSkillsDefinition = {
       },
       {
         title: "Know which directory you just wrote to",
-        body: "The directory depends on the agent. Claude Code gets .claude/skills, Codex, Cursor, Gemini CLI, Copilot, and OpenCode all get the neutral .agents/skills in a project, and each has its own global path. The CLI publishes the whole mapping, sixty-eight rows of it, in its own README.",
+        body: "The directory depends on the agent. Claude Code gets .claude/skills, Codex, Cursor, Gemini CLI, Copilot, and OpenCode all get the neutral .agents/skills in a project, and each has its own global path. The CLI publishes the whole mapping, sixty-nine rows of it, in its own README.",
       },
       {
         title: "If you copy by hand, rename the folder",
@@ -656,7 +656,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
     intro:
       "Installing is solved. One command puts nine folders on one machine. What is not solved is the next teammate knowing that your team uses four of the nine, ignores three, and has an opinion about the fifth, because none of that fits anywhere in the repository or the CLI.",
     body: [
-      "The distribution half is genuinely good here, and better than most vendors manage. One command, sixty-eight agent targets, a lock file, an update command, a remove command, and a directory with install counts and third-party audits attached. If your only problem is getting files onto machines, stop reading and run the command.",
+      "The distribution half is genuinely good here, and better than most vendors manage. One command, sixty-nine rows of agent targets, a lock file, an update command, a remove command, and a directory with install counts and third-party audits attached. If your only problem is getting files onto machines, stop reading and run the command.",
       "The recommendation half has no home. Which four of the nine your team decided to keep, why deploy-to-vercel is not one of them, that the two review skills fetch their rules live and somebody should re-check them quarterly, that the five unlicensed folders were cleared by your own counsel or were not: all of that is knowledge that currently lives in a thread. The lock file records what got installed, not what was chosen or why.",
       "This gets worse rather than better once a second collection arrives. The moment a team is running Vercel's nine alongside a first-party set and whatever a teammate found last week, the question stops being how to install and becomes which one to reach for. That question has no vendor answer, because every vendor mechanism assumes its own collection is the only one in the room.",
       "Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends. Each saved entry keeps the original source repository and path visible, so the folder-and-name mismatch above is right there rather than discovered later. Teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run.",
@@ -761,7 +761,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
     {
       question: "Do Vercel skills work outside Claude Code?",
       answer:
-        "Yes. They are ordinary Agent Skills, so any client that reads SKILL.md can load them, and the installer maps sixty-eight rows of products to the directories each one uses. Codex, Cursor, Gemini CLI, GitHub Copilot, and OpenCode all take the vendor-neutral .agents/skills path inside a project.",
+        "Yes. They are ordinary Agent Skills, so any client that reads SKILL.md can load them, and the installer maps sixty-nine rows of products to the directories each one uses. Codex, Cursor, Gemini CLI, GitHub Copilot, and OpenCode all take the vendor-neutral .agents/skills path inside a project.",
     },
     {
       question: "How do vercel-labs/agent-skills and vercel-labs/skills differ?",
@@ -797,7 +797,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
       id: "skills-cli",
       label: "vercel-labs/skills: the skills CLI",
       href: "https://github.com/vercel-labs/skills",
-      note: "The tool behind npx skills, MIT with a license file, read on August 21, 2026. The add, list, find, update, init, and remove commands and their flags, the sixty-eight row agent target table, the installer that names the destination directory after the frontmatter, the skills-lock.json shape, the compatibility matrix, and the telemetry section with the two variables that disable it.",
+      note: "The tool behind npx skills, MIT with a license file, read on August 21, 2026. The add, list, find, update, init, and remove commands and their flags, the sixty-nine row agent target table, seventy-seven named agents across those rows, the installer that names the destination directory after the frontmatter, the skills-lock.json shape, the compatibility matrix, and the telemetry section with the two variables that disable it.",
     },
     {
       id: "skills-sh-repo",
