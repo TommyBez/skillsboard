@@ -91,13 +91,21 @@ const counters = new Map<string, WindowCounter>()
  * for real time to pass; callers in the app pass neither.
  */
 export function claimApiRequest(
-  key: string,
+  key: string | null,
   {
     policy = PUBLIC_API_RATE_LIMIT,
     now = Date.now(),
     store = counters,
   }: { policy?: RateLimitPolicy; now?: number; store?: Map<string, WindowCounter> } = {},
-): RateLimitDecision {
+): RateLimitDecision | null {
+  // No key is no client. On Vercel the platform always supplies an address,
+  // but a self-hosted deployment behind a proxy that strips it would otherwise
+  // pool every caller into one bucket, where 120 requests from anyone refuse
+  // the endpoint to everyone else on that instance. An unattributable request
+  // is left uncounted, and the caller is told the policy rather than a
+  // remaining count that was never about them.
+  if (!key) return null
+
   const windowMs = policy.windowSeconds * 1000
   const window = Math.floor(now / windowMs)
   const elapsed = (now % windowMs) / windowMs
@@ -147,13 +155,24 @@ export function claimApiRequest(
  * the `RateLimit-Limit` / `-Remaining` / `-Reset` triplet is the older shape
  * most existing clients and SDKs already parse. They carry the same numbers.
  */
-export function rateLimitHeaders(decision: RateLimitDecision): Record<string, string> {
-  const { policy } = decision
+export function rateLimitHeaders(
+  decision: RateLimitDecision | null,
+  policy: RateLimitPolicy = PUBLIC_API_RATE_LIMIT,
+): Record<string, string> {
+  const inForce = decision?.policy ?? policy
+  const published = {
+    "RateLimit-Policy": `"${inForce.name}";q=${inForce.limit};w=${inForce.windowSeconds}`,
+    "RateLimit-Limit": String(inForce.limit),
+  }
+
+  // `RateLimit` reports what this client has left, so it is sent only when the
+  // request was actually counted against a client. The policy is stated either
+  // way: it is what the endpoint promises, not what one caller has spent.
+  if (!decision) return published
 
   return {
-    "RateLimit-Policy": `"${policy.name}";q=${policy.limit};w=${policy.windowSeconds}`,
-    RateLimit: `"${policy.name}";r=${decision.remaining};t=${decision.resetSeconds}`,
-    "RateLimit-Limit": String(decision.limit),
+    ...published,
+    RateLimit: `"${inForce.name}";r=${decision.remaining};t=${decision.resetSeconds}`,
     "RateLimit-Remaining": String(decision.remaining),
     "RateLimit-Reset": String(decision.resetSeconds),
   }

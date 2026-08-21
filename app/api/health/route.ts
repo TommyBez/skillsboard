@@ -35,13 +35,16 @@ export async function GET() {
     })
   }
 
-  // A request with no client address is left unbucketed rather than refused:
-  // an absent header is not a client, and turning it into one would let a
-  // missing header take the endpoint down for everyone behind it.
-  const budget = claimApiRequest(`health:${ipAddress(requestHeaders) || "unattributed"}`)
+  // A request the platform gave no address for is left uncounted rather than
+  // pooled with every other one: an absent header is not a client, and one
+  // bucket shared by everyone behind a proxy that strips it would let any
+  // caller spend the endpoint's budget for the rest. The response still states
+  // the policy; see `rateLimitHeaders`.
+  const client = ipAddress(requestHeaders)
+  const budget = claimApiRequest(client ? `health:${client}` : null)
   const budgetHeaders = { ...rateLimitHeaders(budget), ...apiVersionHeaders }
 
-  if (!budget.allowed) {
+  if (budget && !budget.allowed) {
     return problemResponse("rate_limited", {
       instance: "/api/health",
       retry_after: budget.resetSeconds,

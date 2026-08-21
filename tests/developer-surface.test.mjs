@@ -18,7 +18,8 @@ const { buildMcpRegistryManifest, buildMcpServerCard, mcpServerInfo, mcpToolSumm
 const { developers, developersPath, problemAnchor } = await import("../lib/seo/developers.ts")
 const { buildDevelopersSchema } = await import("../lib/seo/developers-schema.ts")
 const { renderMarkdownTwin } = await import("../lib/markdown/twins.ts")
-const { discoveryUrl, getDiscoveryOrigin } = await import("../lib/agent-discovery.ts")
+const { DISCOVERY_CORS_HEADERS, discoveryUrl, getDiscoveryOrigin } =
+  await import("../lib/agent-discovery.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 const { default: sitemap } = await import("../app/sitemap.ts")
 const { siteConfig } = await import("../lib/site.ts")
@@ -462,4 +463,99 @@ test("both MCP card paths answer with the same card", () => {
   )
   assert.equal(card.authentication.resource, endpoint)
   assert.equal(card.authentication.documentation, `${origin}/auth.md`)
+})
+
+test("a request with no client address is not counted against anyone", () => {
+  const store = new Map()
+  const now = 1_000_000_000_000
+
+  // Nothing to bucket under, so nothing is claimed: one unattributable caller
+  // cannot spend the endpoint's budget for every other one behind the same
+  // proxy.
+  for (let request = 0; request < PUBLIC_API_RATE_LIMIT.limit * 2; request += 1) {
+    assert.equal(claimApiRequest(null, { store, now }), null)
+  }
+  assert.equal(store.size, 0, "an unattributable request left a counter behind")
+
+  // A client that does have an address is still counted normally.
+  assert.equal(claimApiRequest("client", { store, now }).allowed, true)
+})
+
+test("an uncounted request is told the policy, without a remaining count", () => {
+  const headers = rateLimitHeaders(null)
+
+  assert.equal(
+    headers["RateLimit-Policy"],
+    `"${PUBLIC_API_RATE_LIMIT.name}";q=${PUBLIC_API_RATE_LIMIT.limit};w=${PUBLIC_API_RATE_LIMIT.windowSeconds}`,
+  )
+  assert.equal(headers["RateLimit-Limit"], String(PUBLIC_API_RATE_LIMIT.limit))
+  // `RateLimit` reports what this client has left, and there is no this client.
+  assert.equal(headers.RateLimit, undefined)
+  assert.equal(headers["RateLimit-Remaining"], undefined)
+
+  // The endpoint's own policy is named even when the default differs.
+  assert.match(rateLimitHeaders(null, MCP_RATE_LIMIT)["RateLimit-Policy"], /^"mcp";q=/)
+})
+
+test("a preflight allows the version header it gates requests on", () => {
+  const allowed = DISCOVERY_CORS_HEADERS["Access-Control-Allow-Headers"]
+
+  // A browser client that pins a version sends a non-simple header, so the
+  // request preflights; left out of this list the browser refuses it before
+  // the endpoint can honour the pin.
+  assert.ok(allowed.includes(API_VERSION_HEADER), `preflight does not allow ${API_VERSION_HEADER}`)
+  assert.ok(allowed.includes("Content-Type"))
+})
+
+test("the MCP endpoint refuses a pinned version before it dispatches", async () => {
+  const route = await readRepoFile("../app/api/[transport]/route.ts")
+  const wrapper = route.slice(route.indexOf("async function withRequestBudget"))
+  const dispatch = wrapper.indexOf("await (route as")
+
+  for (const guard of ["isSupportedApiVersion(requested)", "budget && !budget.allowed"]) {
+    const at = wrapper.indexOf(guard)
+    assert.ok(at > 0, `the MCP wrapper does not check ${guard}`)
+    assert.ok(at < dispatch, `${guard} is checked after the request was already dispatched`)
+  }
+})
+
+test("the MCP endpoint refuses in the shape MCP clients parse", async () => {
+  const route = await readRepoFile("../app/api/[transport]/route.ts")
+
+  // A problem document arriving from the MCP URL reaches an MCP client as a
+  // parse failure rather than as the typed error it is.
+  assert.ok(!route.includes("problemResponse"), "the MCP route answers with a problem document")
+  assert.ok(route.includes('jsonrpc: "2.0"'), "the refusal is not a JSON-RPC error object")
+
+  // The same vocabulary as the problem registry, one level down.
+  for (const code of Object.keys(problemCodes)) {
+    assert.ok(route.includes(`code: "${code}"`), `the MCP refusals do not carry ${code}`)
+  }
+
+  const mcp = spec.paths["/api/mcp"].post.responses
+  for (const status of ["400", "429"]) {
+    assert.equal(
+      mcp[status].content["application/json"].schema.$ref,
+      "#/components/schemas/JsonRpcError",
+      `the ${status} on /api/mcp is undocumented or documented as a problem document`,
+    )
+  }
+  assert.ok(mcp["429"].headers["Retry-After"], "the MCP 429 does not say when to come back")
+})
+
+test("the documented MCP budget is the one the endpoint enforces", () => {
+  const stated = developers.rateLimits.body.join(" ")
+
+  assert.ok(
+    stated.includes(`${MCP_RATE_LIMIT.limit} per ${MCP_RATE_LIMIT.windowSeconds} seconds`),
+    "the developer docs do not state the MCP budget",
+  )
+  assert.ok(
+    !stated.includes("not budgeted"),
+    "the developer docs still say the MCP endpoint carries no budget",
+  )
+  assert.ok(
+    spec.info.description.includes(`${MCP_RATE_LIMIT.limit} per ${MCP_RATE_LIMIT.windowSeconds} seconds`),
+    "the OpenAPI description does not state the MCP budget",
+  )
 })

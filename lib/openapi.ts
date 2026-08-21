@@ -1,5 +1,5 @@
 import { discoveryUrl, getDiscoveryOrigin } from "@/lib/agent-discovery"
-import { PUBLIC_API_RATE_LIMIT } from "@/lib/api-rate-limit"
+import { MCP_RATE_LIMIT, PUBLIC_API_RATE_LIMIT } from "@/lib/api-rate-limit"
 import { API_VERSION, API_VERSION_HEADER, SUPPORTED_API_VERSIONS } from "@/lib/api-version"
 import { getMcpResource } from "@/lib/auth-environment"
 import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
@@ -127,8 +127,8 @@ export function buildOpenApiDocument() {
         "Skills Board is a web app; the only programmatic surface it offers is the Model Context Protocol server at /api/mcp, plus the discovery documents an agent reads before connecting to it. Everything under /api that is not listed here backs the web UI, is session-authenticated rather than token-authenticated, and is not a supported integration point.",
         "The MCP endpoint speaks JSON-RPC 2.0 over streamable HTTP. Its methods and tool schemas are not enumerated in this document because MCP carries them itself: call `tools/list` on a live session, or read /.well-known/mcp/server-card.json. Authentication is described in /auth.md.",
         `Versioning: the current version is ${API_VERSION}, sent on every response in \`${API_VERSION_HEADER}\` and accepted on any request that wants to pin it. Within a version, members are added but never removed or retyped; a breaking change ships as the next version and both answer until the older one is withdrawn. A withdrawal is announced on the affected responses with \`Deprecation\` and \`Sunset\` at least 90 days ahead. Supported versions today: ${SUPPORTED_API_VERSIONS.join(", ")}.`,
-        `Rate limits: budgeted endpoints answer with \`RateLimit\` and \`RateLimit-Policy\`, and refuse with 429 and \`Retry-After\` once the budget is spent. The published budget is ${PUBLIC_API_RATE_LIMIT.limit} requests per ${PUBLIC_API_RATE_LIMIT.windowSeconds} seconds per client per endpoint, counted per serving instance, so it is a floor rather than a ceiling. The discovery documents are served from cache and carry no budget.`,
-        `Errors: every non-MCP failure is an RFC 9457 \`application/problem+json\` document with a stable \`code\` member (${Object.keys(problemCodes).join(", ")}) and a \`type\` URL that resolves to the paragraph describing it. ${discoveryUrl("/developers")} is the prose version of all of this.`,
+        `Rate limits: budgeted endpoints answer with \`RateLimit\` and \`RateLimit-Policy\`, and refuse with 429 and \`Retry-After\` once the budget is spent. The published budget is ${PUBLIC_API_RATE_LIMIT.limit} requests per ${PUBLIC_API_RATE_LIMIT.windowSeconds} seconds per client per endpoint, and ${MCP_RATE_LIMIT.limit} per ${MCP_RATE_LIMIT.windowSeconds} seconds on /api/mcp, counted per serving instance, so it is a floor rather than a ceiling. A request the platform gave no client address for is not counted, and its response states the policy without a remaining count. The discovery documents are served from cache and carry no budget.`,
+        `Errors: every non-MCP failure is an RFC 9457 \`application/problem+json\` document with a stable \`code\` member (${Object.keys(problemCodes).join(", ")}) and a \`type\` URL that resolves to the paragraph describing it. The MCP endpoint answers in JSON-RPC instead, including the refusals it makes before dispatch: those carry the same code in \`error.data.code\`, so one vocabulary covers both surfaces. ${discoveryUrl("/developers")} is the prose version of all of this.`,
       ].join("\n\n"),
       license: { name: "MIT", identifier: "MIT" },
       contact: { name: "Skills Board", url: discoveryUrl("/contact") },
@@ -184,6 +184,27 @@ export function buildOpenApiDocument() {
                     "type": "string",
                     "description": "Server-sent events, each `data:` line carrying one JSON-RPC response object.",
                   }
+                }
+              }
+            },
+            "400": {
+              "description": `The ${API_VERSION_HEADER} header pinned a version this deployment does not serve. Refused before the request is dispatched, so no tool runs under a version the client did not ask for. \`error.data.code\` is \`unsupported_api_version\`.`,
+              "headers": rateLimitResponseHeaders(),
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/JsonRpcError" }
+                }
+              }
+            },
+            "429": {
+              "description": "The client has spent its request budget for the current window. `error.data.code` is `rate_limited` and `error.data.retry_after` mirrors the Retry-After header.",
+              "headers": {
+                ...rateLimitResponseHeaders(),
+                "Retry-After": { "$ref": "#/components/headers/RetryAfter" },
+              },
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/JsonRpcError" }
                 }
               }
             },

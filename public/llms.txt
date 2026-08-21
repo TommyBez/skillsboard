@@ -42,8 +42,8 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 ## API conventions
 
 - Version: every response carries `Skills-Board-Api-Version: 1`; a request may send the same header to pin the version it was written against, and an unsupported one is refused with 400 rather than answered with a different version.
-- Errors: RFC 9457 `application/problem+json` on every endpoint except the MCP one, which reports failures as JSON-RPC error objects. Branch on the `code` member; the `type` member is a URL that resolves to the section of https://www.skillsboard.sh/developers describing that failure.
-- Rate limits: budgeted endpoints send `RateLimit` and `RateLimit-Policy` and refuse with 429 and `Retry-After`. The published budget is 120 requests per 60 seconds per client per endpoint, counted per serving instance.
+- Errors: RFC 9457 `application/problem+json` on every endpoint except the MCP one, which reports failures as JSON-RPC error objects, including the pinned-version (400) and spent-budget (429) refusals it makes before dispatch. Branch on the `code` member, which is `error.data.code` on the MCP endpoint; the `type` member is a URL that resolves to the section of https://www.skillsboard.sh/developers describing that failure.
+- Rate limits: budgeted endpoints send `RateLimit` and `RateLimit-Policy` and refuse with 429 and `Retry-After`. The published budget is 120 requests per 60 seconds per client per endpoint, and 600 per 60 seconds on /api/mcp, counted per serving instance. A request with no client address is not counted and its response states the policy only.
 - Deprecation policy: a withdrawal is announced on the affected responses with `Deprecation` (RFC 9745) and `Sunset` (RFC 8594) headers at least 90 days before the sunset date, stated at https://www.skillsboard.sh/developers#deprecation-policy and in the OpenAPI description under `info.x-deprecation-policy`.
 
 ## Skill format explainers

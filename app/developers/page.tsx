@@ -226,6 +226,7 @@ export default function DevelopersPage() {
               <p><Prose>{developers.errors.intro}</Prose></p>
               <CodeBlock>{developers.errors.template}</CodeBlock>
               <p className="mt-4"><Prose>{developers.errors.note}</Prose></p>
+              <p><Prose>{developers.errors.mcpRefusals}</Prose></p>
               {developers.errors.codes.rows.map((problem) => (
                 <div key={problem.label}>
                   <h3 id={problemAnchor(problem.label)} className="scroll-mt-20">

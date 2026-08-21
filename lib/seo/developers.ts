@@ -1,4 +1,4 @@
-import { PUBLIC_API_RATE_LIMIT } from "@/lib/api-rate-limit"
+import { MCP_RATE_LIMIT, PUBLIC_API_RATE_LIMIT } from "@/lib/api-rate-limit"
 import { API_VERSION, API_VERSION_HEADER, SUPPORTED_API_VERSIONS } from "@/lib/api-version"
 import { mcpServerInfo, mcpToolSummaries } from "@/lib/mcp-server-card"
 import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
@@ -176,14 +176,17 @@ RateLimit: "${PUBLIC_API_RATE_LIMIT.name}";r=0;t=37
   "retry_after": 37
 }`,
     note: "The `type` member is a URL that resolves to the section of this page describing that failure, so a client meeting an unfamiliar code can fetch the explanation instead of parsing the prose. `title` and `detail` are written for people and may be reworded; `code` and `status` are the stable pair.",
+    mcpRefusals:
+      "The MCP endpoint never answers with a problem document, including for the two refusals it makes before a request reaches the protocol: a pinned version it does not serve (400) and a spent budget (429). Both come back as JSON-RPC error objects, because that is the one body shape an MCP client parses, and both carry the same code from the table above in `error.data.code`, with `retry_after` beside it on a 429.",
   },
   rateLimits: {
     title: "Rate limits",
     body: [
-      `The budgeted endpoints publish what a client has left. The policy is ${PUBLIC_API_RATE_LIMIT.limit} requests per ${PUBLIC_API_RATE_LIMIT.windowSeconds} seconds per client per endpoint, counted over a sliding window.`,
+      `The budgeted endpoints publish what a client has left. The policy is ${PUBLIC_API_RATE_LIMIT.limit} requests per ${PUBLIC_API_RATE_LIMIT.windowSeconds} seconds per client per endpoint, and ${MCP_RATE_LIMIT.limit} per ${MCP_RATE_LIMIT.windowSeconds} seconds on the MCP endpoint, counted over a sliding window.`,
       "It is counted per serving instance rather than globally, so the numbers are a floor: a client that stays inside them is never refused, and a client spread across instances may get more. That is the honest reading of the headers, and it is the reading an agent needs to pace itself.",
-      "A refused request answers 429 with `Retry-After` and the `rate_limited` problem. Retrying before the window rolls over is refused again, and the refusal is not charged to the budget.",
-      "The discovery documents are served from cache and carry no budget. The MCP endpoint is not budgeted per token today; if that changes, it will carry the same headers.",
+      "A refused request answers 429 with `Retry-After`. Retrying before the window rolls over is refused again, and the refusal is not charged to the budget.",
+      "Clients are counted by the address the platform reports. A request that arrives without one is not counted against anybody, and its response states the policy without a remaining count rather than pooling every such caller into one bucket they could spend for each other.",
+      "The discovery documents are served from cache and carry no budget.",
     ],
     columns: ["Header", "What it says"],
     rows: [

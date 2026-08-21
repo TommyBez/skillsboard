@@ -6,7 +6,12 @@ import { z } from "zod"
 
 import { auth } from "@/lib/auth"
 import { claimApiRequest, MCP_RATE_LIMIT, rateLimitHeaders } from "@/lib/api-rate-limit"
-import { apiVersionHeaders } from "@/lib/api-version"
+import {
+  API_VERSION_HEADER,
+  apiVersionHeaders,
+  isSupportedApiVersion,
+  SUPPORTED_API_VERSIONS,
+} from "@/lib/api-version"
 import { cacheTags } from "@/lib/cache-tags"
 import { getAuthBaseUrl, getMcpResource } from "@/lib/auth-environment"
 import { db } from "@/lib/db"
@@ -31,7 +36,6 @@ import {
   buildInstallableCollectionUrl,
 } from "@/lib/installable-collection-protocol"
 import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
-import { problemResponse } from "@/lib/problem-json"
 import { saveSkillToLibrary } from "@/lib/save-skill"
 import { siteConfig } from "@/lib/site"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
@@ -602,6 +606,50 @@ const route = requireMcpAuth(
 )
 
 /**
+ * A refusal this endpoint makes before the MCP handler sees the request.
+ *
+ * JSON-RPC, not the RFC 9457 problem document the rest of the surface uses.
+ * The client here is an MCP client: it parses one body shape, and this
+ * endpoint already answers its own 401 as a JSON-RPC error object, so a
+ * problem document arriving from the same URL would reach the client as a
+ * parse failure rather than as the typed error it is. The HTTP status and the
+ * headers still carry what they carry, and `error.data.code` is the same
+ * machine-readable code the problem registry uses, so a client that talks to
+ * both surfaces branches on one vocabulary.
+ */
+function jsonRpcRefusal(
+  status: number,
+  {
+    code,
+    message,
+    data,
+    headers,
+  }: {
+    code: number
+    message: string
+    data?: Record<string, unknown>
+    headers: Record<string, string>
+  },
+): Response {
+  return new Response(
+    `${JSON.stringify({
+      jsonrpc: "2.0",
+      id: null,
+      error: { code, message, ...(data ? { data } : {}) },
+    })}\n`,
+    {
+      status,
+      headers: {
+        ...headers,
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      },
+    },
+  )
+}
+
+/**
  * The budget on the MCP endpoint, published on every answer it gives.
  *
  * An agent cannot pace itself against a limit it has to discover by being
@@ -618,14 +666,32 @@ async function withRequestBudget(
   request: Request,
   context: unknown,
 ): Promise<Response> {
-  const client = ipAddress(request) || "unattributed"
-  const budget = claimApiRequest(`mcp:${client}`, { policy: MCP_RATE_LIMIT })
-  const published = { ...rateLimitHeaders(budget), ...apiVersionHeaders }
+  // An address the platform supplied, or nothing to count against. Same
+  // decision as `/api/health`, argued in `claimApiRequest`.
+  const client = ipAddress(request)
+  const budget = claimApiRequest(client ? `mcp:${client}` : null, { policy: MCP_RATE_LIMIT })
+  const published = { ...rateLimitHeaders(budget, MCP_RATE_LIMIT), ...apiVersionHeaders }
 
-  if (!budget.allowed) {
-    return problemResponse("rate_limited", {
-      instance: "/api/mcp",
-      retry_after: budget.resetSeconds,
+  // Refused before dispatch rather than after. A client that pinned a version
+  // this deployment does not serve asked not to be answered under a different
+  // one, and a write tool running v1 semantics against a token pinned
+  // elsewhere is the case the pin exists for.
+  const requested = request.headers.get(API_VERSION_HEADER)
+  if (!isSupportedApiVersion(requested)) {
+    return jsonRpcRefusal(400, {
+      // Invalid Request: the envelope was fine, the version it pinned was not.
+      code: -32600,
+      message: `Unsupported API version: ${requested}`,
+      data: { code: "unsupported_api_version", supported: [...SUPPORTED_API_VERSIONS] },
+      headers: published,
+    })
+  }
+
+  if (budget && !budget.allowed) {
+    return jsonRpcRefusal(429, {
+      code: -32000,
+      message: "Too many requests. Retry after the window named in Retry-After.",
+      data: { code: "rate_limited", retry_after: budget.resetSeconds },
       headers: { ...published, "Retry-After": String(budget.resetSeconds) },
     })
   }
