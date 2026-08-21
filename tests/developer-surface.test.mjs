@@ -4,7 +4,7 @@ import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
 
-const { claimApiRequest, PUBLIC_API_RATE_LIMIT, rateLimitHeaders } =
+const { claimApiRequest, MCP_RATE_LIMIT, PUBLIC_API_RATE_LIMIT, rateLimitHeaders } =
   await import("../lib/api-rate-limit.ts")
 const { API_VERSION, API_VERSION_HEADER, isSupportedApiVersion, SUPPORTED_API_VERSIONS } =
   await import("../lib/api-version.ts")
@@ -13,11 +13,12 @@ const { buildNotFoundMarkdown, recoveryLinks } = await import("../lib/agent-reco
 const { buildOpenApiDocument } = await import("../lib/openapi.ts")
 const { buildArdCatalog } = await import("../lib/ard-catalog.ts")
 const { buildApiCatalog } = await import("../lib/api-catalog.ts")
-const { buildMcpRegistryManifest, mcpServerInfo } = await import("../lib/mcp-server-card.ts")
+const { buildMcpRegistryManifest, buildMcpServerCard, mcpServerInfo, mcpToolSummaries } =
+  await import("../lib/mcp-server-card.ts")
 const { developers, developersPath, problemAnchor } = await import("../lib/seo/developers.ts")
 const { buildDevelopersSchema } = await import("../lib/seo/developers-schema.ts")
 const { renderMarkdownTwin } = await import("../lib/markdown/twins.ts")
-const { getDiscoveryOrigin } = await import("../lib/agent-discovery.ts")
+const { discoveryUrl, getDiscoveryOrigin } = await import("../lib/agent-discovery.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 const { default: sitemap } = await import("../app/sitemap.ts")
 const { siteConfig } = await import("../lib/site.ts")
@@ -351,8 +352,13 @@ test("a 404 tells a client where to look next, in the format it asked for", () =
   assert.match(markdown, /^# 404/)
   assert.ok(markdown.includes("/no-such-page"), "the 404 does not name what was asked for")
 
+  // Absolute, and on the deployment that answered: a client that just guessed
+  // a path wrong should not have to resolve a relative link against it.
   for (const link of recoveryLinks) {
-    assert.ok(markdown.includes(`(${link.href})`), `the 404 does not point at ${link.href}`)
+    assert.ok(
+      markdown.includes(`(${discoveryUrl(link.href)})`),
+      `the 404 does not point at ${link.href}`,
+    )
   }
 
   // The recovery routes have to be real: a 404 that links to another 404 is
@@ -367,4 +373,93 @@ test("the new copy follows the site's dash convention", () => {
   assert.doesNotMatch(JSON.stringify(developers), dashPattern)
   assert.doesNotMatch(renderMarkdownTwin(developersPath), dashPattern)
   assert.doesNotMatch(buildNotFoundMarkdown("/no-such-page"), dashPattern)
+})
+
+test("a Markdown request for a path that does not exist reaches the Markdown 404", async () => {
+  const { fallback } = await nextConfig.rewrites()
+
+  const rule = fallback?.find((entry) => entry.source === "/:path*")
+  assert.ok(rule, "no fallback rule catches an unknown path")
+  assert.equal(rule.destination, "/api/markdown?path=/:path*")
+
+  // Only when Markdown was asked for: without the condition this would take
+  // every 404 on the site away from the HTML page that answers them.
+  const [accept] = rule.has
+  assert.equal(accept.type, "header")
+  assert.equal(accept.key, "accept")
+  assert.match("text/markdown", new RegExp(accept.value))
+
+  // `fallback` runs after pages, public files, and dynamic routes, so a real
+  // page and a static document are never reached by it. Both are also matched
+  // by earlier rules, which is what this pins.
+  const { beforeFiles, afterFiles } = await nextConfig.rewrites()
+  assert.ok(beforeFiles.some((entry) => entry.source === "/"), "the home page lost its Markdown rule")
+  assert.ok(
+    afterFiles.some((entry) => entry.source.includes(".md")),
+    "the .md twin rule is gone",
+  )
+})
+
+test("the MCP endpoint publishes a budget of its own", async () => {
+  const route = await readRepoFile("../app/api/[transport]/route.ts")
+
+  assert.ok(MCP_RATE_LIMIT.limit > PUBLIC_API_RATE_LIMIT.limit, "an agent session is not a page view")
+  assert.ok(route.includes("MCP_RATE_LIMIT"), "the MCP route does not claim its own policy")
+  assert.ok(
+    route.includes("withRequestBudget as GET") &&
+      route.includes("withRequestBudget as POST") &&
+      route.includes("withRequestBudget as DELETE"),
+    "a method escapes the budget wrapper",
+  )
+  // The headers have to ride on the 401 too: that is the first response an
+  // unauthenticated client sees, and the one it needs to pace itself from.
+  assert.ok(
+    route.includes("const headers = new Headers(response.headers)"),
+    "the wrapper no longer copies the inner response headers",
+  )
+  assert.ok(
+    route.includes("new Response(response.body"),
+    "the wrapper must stream the body rather than buffer an SSE response",
+  )
+})
+
+test("the deprecation policy is declared in the spec, not only in prose", () => {
+  const policy = spec.info["x-deprecation-policy"]
+
+  assert.equal(policy.notice_days, 90)
+  assert.deepEqual(policy.signals, ["Deprecation", "Sunset"])
+  assert.equal(policy.url, `${origin}${developersPath}#deprecation-policy`)
+
+  for (const header of ["Deprecation", "Sunset"]) {
+    assert.ok(spec.components.headers[header], `${header} is undeclared`)
+  }
+
+  // Every operation declares both, so a client knows the signal exists before
+  // the day it fires.
+  for (const [path, operations] of Object.entries(spec.paths)) {
+    for (const [method, operation] of Object.entries(operations)) {
+      const headers = operation.responses["200"].headers ?? {}
+      assert.ok(headers.Deprecation, `${method} ${path} does not announce deprecation`)
+      assert.ok(headers.Sunset, `${method} ${path} does not announce a sunset`)
+    }
+  }
+
+  // And the page the policy URL points at carries that anchor.
+  assert.equal(developers.deprecationPolicy.title, "Deprecation policy")
+  assert.ok(renderMarkdownTwin(developersPath).includes("## Deprecation policy"))
+})
+
+test("both MCP card paths answer with the same card", () => {
+  const endpoint = `${origin}/api/mcp`
+  const card = buildMcpServerCard(endpoint, (path) => `${origin}${path}`)
+
+  assert.equal(card.serverInfo.name, mcpServerInfo.name)
+  assert.equal(card.transport.endpoint, endpoint)
+  assert.deepEqual(card.transports, [card.transport])
+  assert.deepEqual(
+    card.tools.map((tool) => tool.name),
+    mcpToolSummaries.map((tool) => tool.name),
+  )
+  assert.equal(card.authentication.resource, endpoint)
+  assert.equal(card.authentication.documentation, `${origin}/auth.md`)
 })

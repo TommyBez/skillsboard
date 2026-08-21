@@ -63,7 +63,10 @@ export const developers = {
       },
       {
         label: "/.well-known/mcp/server-card.json",
-        cells: ["MCP Server Card (SEP-1649): transport, capabilities, tools, and scopes.", "None"],
+        cells: [
+          "MCP Server Card (SEP-1649): transport, capabilities, tools, and scopes. The same card answers at /.well-known/mcp.",
+          "None",
+        ],
       },
       {
         label: "/.well-known/oauth-protected-resource",
@@ -137,6 +140,14 @@ export const developers = {
       "The paths are deliberately unversioned. The MCP endpoint is the audience every issued token is bound to, and the well-known documents live where their specifications put them; moving either into a /v1 prefix would invalidate tokens and break spec-driven discovery. The version travels in the header instead.",
       "Within a version, members are added but never removed or retyped, and a tool never changes what it does under the same name. A breaking change ships as the next version, and both versions answer until the older one is withdrawn.",
       "A withdrawal is announced on the affected responses with `Deprecation` and `Sunset` headers at least 90 days before the sunset date, and the same dates appear on this page. Nothing is removed without that notice.",
+    ],
+  },
+  deprecationPolicy: {
+    title: "Deprecation policy",
+    body: [
+      "Nothing in the table above is withdrawn without notice. When an operation, a member, or a header is going away, every response it still serves carries `Deprecation` (RFC 9745) with the date the withdrawal was announced and `Sunset` (RFC 8594) with the date it stops answering.",
+      "The gap between those two dates is never less than 90 days. Until the sunset date the operation answers normally; after it, the path is gone and a request to it gets the ordinary 404.",
+      "A client that wants to be warned early should read both headers on every response and treat their appearance as work to schedule, not as an error. The same policy is stated in the OpenAPI description under `info.x-deprecation-policy`, which names this section, the notice period, and the two headers.",
     ],
   },
   errors: {

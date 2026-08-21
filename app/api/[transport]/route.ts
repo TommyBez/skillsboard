@@ -1,9 +1,12 @@
 import { requireMcpAuth } from "@better-auth/mcp"
+import { ipAddress } from "@vercel/functions"
 import { createMcpHandler } from "mcp-handler"
 import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
 import { auth } from "@/lib/auth"
+import { claimApiRequest, MCP_RATE_LIMIT, rateLimitHeaders } from "@/lib/api-rate-limit"
+import { apiVersionHeaders } from "@/lib/api-version"
 import { cacheTags } from "@/lib/cache-tags"
 import { getAuthBaseUrl, getMcpResource } from "@/lib/auth-environment"
 import { db } from "@/lib/db"
@@ -28,6 +31,7 @@ import {
   buildInstallableCollectionUrl,
 } from "@/lib/installable-collection-protocol"
 import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
+import { problemResponse } from "@/lib/problem-json"
 import { saveSkillToLibrary } from "@/lib/save-skill"
 import { siteConfig } from "@/lib/site"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
@@ -597,4 +601,54 @@ const route = requireMcpAuth(
   { resource: getMcpResource(), requiredScopes: ["skills:read"] },
 )
 
-export { route as GET, route as POST, route as DELETE }
+/**
+ * The budget on the MCP endpoint, published on every answer it gives.
+ *
+ * An agent cannot pace itself against a limit it has to discover by being
+ * refused, and the endpoint is the one an agent actually calls in a loop. The
+ * headers ride on every response, including the 401 that an unauthenticated
+ * client meets first, so a client learns the budget before it has a token.
+ *
+ * Bucketed by client address rather than by token, because the request that
+ * most needs a limit is the one carrying no token at all. The counter is the
+ * same per-instance sliding window `/api/health` uses; `lib/api-rate-limit`
+ * argues why it is not in Redis, and the headers say what they are worth.
+ */
+async function withRequestBudget(
+  request: Request,
+  context: unknown,
+): Promise<Response> {
+  const client = ipAddress(request) || "unattributed"
+  const budget = claimApiRequest(`mcp:${client}`, { policy: MCP_RATE_LIMIT })
+  const published = { ...rateLimitHeaders(budget), ...apiVersionHeaders }
+
+  if (!budget.allowed) {
+    return problemResponse("rate_limited", {
+      instance: "/api/mcp",
+      retry_after: budget.resetSeconds,
+      headers: { ...published, "Retry-After": String(budget.resetSeconds) },
+    })
+  }
+
+  const response = await (route as (req: Request, context: unknown) => Promise<Response>)(
+    request,
+    context,
+  )
+
+  // The body is passed through untouched: a `tools/call` answer may be an SSE
+  // stream, and reading it here to rebuild the response would buffer it.
+  const headers = new Headers(response.headers)
+  for (const [name, value] of Object.entries(published)) headers.set(name, value)
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
+export {
+  withRequestBudget as GET,
+  withRequestBudget as POST,
+  withRequestBudget as DELETE,
+}

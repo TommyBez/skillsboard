@@ -1,3 +1,5 @@
+import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
+
 /**
  * The parts of the MCP Server Card (SEP-1649) that describe this server rather
  * than the deployment serving it. Endpoints stay in the route handler, where
@@ -31,6 +33,14 @@ export const mcpServerInfo = {
  * server registers neither — declaring them would send an agent looking for a
  * list it will never get.
  */
+/** Every scope the card advertises, with the sentence the consent screen shows. */
+export function mcpScopeSummaries() {
+  return oauthScopes.map((scope) => ({
+    scope,
+    description: oauthScopeDescriptions[scope],
+  }))
+}
+
 export const mcpServerCapabilities = {
   tools: { listChanged: false },
 } as const
@@ -160,5 +170,34 @@ export function buildMcpRegistryManifest(endpoint: string) {
     websiteUrl: new URL(endpoint).origin,
     repository: { ...mcpServerInfo.repository },
     remotes: [{ type: "streamable-http", url: endpoint }],
+  }
+}
+
+/**
+ * The SEP-1649 server card for this deployment.
+ *
+ * `endpoint` is the MCP resource of the deployment serving the card, and
+ * `link` builds the sibling document URLs on the same origin, so a preview
+ * describes itself rather than production. Shared by
+ * `/.well-known/mcp/server-card.json` and the bare `/.well-known/mcp` path.
+ */
+export function buildMcpServerCard(endpoint: string, link: (path: string) => string) {
+  const transport = { type: "streamable-http", endpoint } as const
+
+  return {
+    serverInfo: mcpServerInfo,
+    transport,
+    // Some readers expect the transport list rather than the single object.
+    transports: [transport],
+    capabilities: mcpServerCapabilities,
+    tools: mcpToolSummaries,
+    authentication: {
+      type: "oauth2",
+      resource: endpoint,
+      authorization_servers: [link("/api/auth")],
+      protected_resource_metadata: link("/.well-known/oauth-protected-resource"),
+      scopes_supported: mcpScopeSummaries(),
+      documentation: link("/auth.md"),
+    },
   }
 }

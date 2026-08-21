@@ -16,6 +16,22 @@ function apiVersionParameter() {
   return { $ref: "#/components/parameters/ApiVersion" }
 }
 
+/**
+ * The RFC 9745 and RFC 8594 headers that announce a withdrawal.
+ *
+ * Declared on every operation, not only on withdrawn ones: a client reading
+ * this document has to know the signal exists before it has to act on it, and
+ * a header that appears for the first time on the day an operation is retired
+ * is a header nobody wrote code for. Both are absent while an operation is
+ * current, which is what the descriptions say.
+ */
+function deprecationHeaders() {
+  return {
+    Deprecation: { $ref: "#/components/headers/Deprecation" },
+    Sunset: { $ref: "#/components/headers/Sunset" },
+  }
+}
+
 /** The rate-limit headers the budgeted endpoints send on every response. */
 function rateLimitResponseHeaders() {
   return {
@@ -64,9 +80,12 @@ function discoveryOperation({
       responses: {
         "200": {
           description: summary,
-          ...(versioned
-            ? { headers: { [API_VERSION_HEADER]: { $ref: "#/components/headers/ApiVersion" } } }
-            : {}),
+          headers: {
+            ...(versioned
+              ? { [API_VERSION_HEADER]: { $ref: "#/components/headers/ApiVersion" } }
+              : {}),
+            ...deprecationHeaders(),
+          },
           content: { [mediaType]: { schema } },
         },
         ...(versioned ? { "400": { $ref: "#/components/responses/UnsupportedApiVersion" } } : {}),
@@ -113,6 +132,17 @@ export function buildOpenApiDocument() {
       ].join("\n\n"),
       license: { name: "MIT", identifier: "MIT" },
       contact: { name: "Skills Board", url: discoveryUrl("/contact") },
+      // The same policy the description states, in a shape a client can read
+      // without parsing English.
+      "x-deprecation-policy": {
+        url: discoveryUrl("/developers#deprecation-policy"),
+        notice_days: 90,
+        signals: ["Deprecation", "Sunset"],
+        specifications: [
+          "https://www.rfc-editor.org/info/rfc9745",
+          "https://www.rfc-editor.org/info/rfc8594",
+        ],
+      },
     },
     servers: [{ url: getDiscoveryOrigin() }],
     externalDocs: {
@@ -144,6 +174,7 @@ export function buildOpenApiDocument() {
           "responses": {
             "200": {
               "description": "JSON-RPC response, or an SSE stream when the client accepts text/event-stream.",
+              "headers": { ...rateLimitResponseHeaders(), ...deprecationHeaders() },
               "content": {
                 "application/json": {
                   "schema": { "$ref": "#/components/schemas/JsonRpcResponse" }
@@ -191,7 +222,7 @@ export function buildOpenApiDocument() {
           "responses": {
             "200": {
               "description": "The deployment is serving.",
-              "headers": rateLimitResponseHeaders(),
+              "headers": { ...rateLimitResponseHeaders(), ...deprecationHeaders() },
               "content": {
                 "application/health+json": {
                   "schema": { "$ref": "#/components/schemas/HealthReport" }
@@ -298,6 +329,18 @@ export function buildOpenApiDocument() {
         RateLimitReset: {
           description: "Seconds until the current window rolls over.",
           schema: { type: "integer", minimum: 0 },
+        },
+        Deprecation: {
+          description:
+            "RFC 9745. Present only once this operation is deprecated, carrying the date the deprecation was announced. Absent while the operation is current.",
+          required: false,
+          schema: { type: "string", examples: ["@1735689600"] },
+        },
+        Sunset: {
+          description:
+            "RFC 8594. Present alongside Deprecation, carrying the date the operation stops answering. Never less than 90 days after the Deprecation date.",
+          required: false,
+          schema: { type: "string", format: "http-date", examples: ["Wed, 31 Dec 2025 23:59:59 GMT"] },
         },
         RetryAfter: {
           description: "Seconds to wait before retrying.",

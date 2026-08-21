@@ -33,6 +33,21 @@ export const PUBLIC_API_RATE_LIMIT: RateLimitPolicy = {
   windowSeconds: 60,
 }
 
+/**
+ * The MCP endpoint's own budget, five times the public one.
+ *
+ * A single agent session opens with `initialize`, `tools/list`, and then a
+ * call per tool it decides to use, and a client bucketed by address may be a
+ * whole team behind one egress. The number is set where a runaway loop is
+ * still stopped and ordinary use never comes close, because a refusal here
+ * costs a user their session rather than a scraper its next page.
+ */
+export const MCP_RATE_LIMIT: RateLimitPolicy = {
+  name: "mcp",
+  limit: 600,
+  windowSeconds: 60,
+}
+
 export interface RateLimitDecision {
   allowed: boolean
   limit: number

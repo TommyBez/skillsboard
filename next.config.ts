@@ -302,6 +302,22 @@ const nextConfig = {
           destination: "/api/markdown?path=/:path",
         },
       ],
+      // Content negotiation for the paths nothing else claimed. `fallback`
+      // runs after every page, public file, and dynamic route, so this is
+      // reached only by a request that was going to 404 anyway: a real page
+      // asked for in Markdown still answers from the rules above, and
+      // `/llms.txt` still serves itself.
+      //
+      // What it buys is a 404 an agent can act on. Without it, a client that
+      // asked for Markdown and guessed a URL wrong got an HTML error document
+      // it has to parse to learn there is a sitemap.
+      fallback: [
+        {
+          source: "/:path*",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/:path*",
+        },
+      ],
     }
   },
 } satisfies NextConfig

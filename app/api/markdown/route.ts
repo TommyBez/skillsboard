@@ -38,6 +38,10 @@ export async function GET(request: Request) {
         "Cache-Control": "public, max-age=0, s-maxage=60",
         "x-markdown-tokens": String(estimateMarkdownTokens(notFound)),
         "X-Content-Type-Options": "nosniff",
+        // The same URL answers with the HTML 404 when Markdown was not asked
+        // for, and a missing page is not something to index.
+        Vary: "Accept",
+        "X-Robots-Tag": "noindex",
       },
     })
   }

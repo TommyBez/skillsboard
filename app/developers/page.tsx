@@ -213,6 +213,15 @@ export default function DevelopersPage() {
             </section>
 
             <section>
+              <SectionHeading id="deprecation-policy">
+                {developers.deprecationPolicy.title}
+              </SectionHeading>
+              {developers.deprecationPolicy.body.map((paragraph) => (
+                <p key={paragraph}><Prose>{paragraph}</Prose></p>
+              ))}
+            </section>
+
+            <section>
               <SectionHeading id="errors">{developers.errors.title}</SectionHeading>
               <p><Prose>{developers.errors.intro}</Prose></p>
               <CodeBlock>{developers.errors.template}</CodeBlock>

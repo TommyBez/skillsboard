@@ -1,3 +1,5 @@
+import { discoveryUrl } from "@/lib/agent-discovery"
+
 /**
  * Where to send a client that asked for something this site does not have.
  *
@@ -46,7 +48,9 @@ export function buildNotFoundMarkdown(path?: string): string {
     "",
     "## Where to look next",
     "",
-    ...recoveryLinks.map((link) => `- [${link.label}](${link.href}): ${link.description}`),
+    ...recoveryLinks.map(
+      (link) => `- [${link.label}](${discoveryUrl(link.href)}): ${link.description}`,
+    ),
     "",
     "Every public page also answers with Markdown: append `.md` to its path, or send `Accept: text/markdown`.",
     "",
