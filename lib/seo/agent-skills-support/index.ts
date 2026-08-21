@@ -8,6 +8,7 @@ import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 
 export {
   agentSkillsSupportPath,
@@ -666,6 +667,12 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
     },
   ],
   related: [
+    {
+      label: "How to manage AI skills across an organization",
+      href: manageAiSkillsPath,
+      description:
+        "The distribution mechanism each vendor documents, where it stops, and the selection layer none of them covers.",
+    },
     {
       label: "Agent Skills: the open standard",
       href: agentSkillsPath,

@@ -49,6 +49,7 @@ Markdown versions: every guide, skill format explainer, and alternatives page li
 - [Claude skills vs slash commands](https://www.skillsboard.sh/compare/claude-skills-vs-slash-commands): Why Claude Code documents custom commands as merged into skills, what still differs between a command file and a SKILL.md, and which file wins the same command name
 
 ## Team skill workflows
+- [Manage AI skills across an organization](https://www.skillsboard.sh/manage-ai-skills): What each vendor's organization-level distribution mechanism covers and where it stops, across Claude Code managed settings and plugins, claude.ai owner provisioning and sharing, the Claude API, Codex admin locations and plugins, and Cursor, plus the selection layer none of them records
 - [AI agent skill use cases for teams](https://www.skillsboard.sh/guides/ai-skill-use-cases-for-teams): Eight repeatable workflows with triggers, inputs, outputs, human checks, and stop boundaries
 - [AI skills onboarding checklist](https://www.skillsboard.sh/guides/onboard-new-teammate-ai-skills-checklist): Help a new teammate find, choose, and verify one team-recommended skill
 - [Choose the first AI agent skill for your team](https://www.skillsboard.sh/guides/choose-first-ai-agent-skill-for-your-team): Evaluate candidates with a scorecard, source review, disqualifiers, and a teammate test

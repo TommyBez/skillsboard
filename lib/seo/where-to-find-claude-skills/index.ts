@@ -9,6 +9,7 @@ import {
   guidePaths,
   type GuidePath,
 } from "@/lib/seo/guides/types"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export {
@@ -618,6 +619,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "How to manage AI skills across an organization",
+      href: manageAiSkillsPath,
+      description:
+        "The distribution mechanism each vendor documents, where it stops, and the selection layer none of them covers.",
+    },
     {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,

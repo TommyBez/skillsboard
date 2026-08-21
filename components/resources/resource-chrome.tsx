@@ -27,6 +27,7 @@ import type {
   ComparisonHeaderLocation,
 } from "@/lib/seo/compare/types"
 import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
+import type { ManageAiSkillsCtaPlacement } from "@/lib/seo/manage-ai-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
 import type { WhereToFindClaudeSkillsCtaPlacement } from "@/lib/seo/where-to-find-claude-skills/types"
 import { siteConfig } from "@/lib/site"
@@ -46,6 +47,7 @@ type ResourceHeaderLocation =
   | "cowork_skills_header"
   | "cursor_skills_header"
   | "guide_header"
+  | "manage_ai_skills_header"
   | "pricing_header"
   | "resources_header"
   | "where_skills_header"
@@ -63,6 +65,7 @@ type ResourceCtaLocation =
   | ComparisonCtaPlacement
   | CoworkSkillsCtaPlacement
   | CursorSkillsCtaPlacement
+  | ManageAiSkillsCtaPlacement
   | "guide_inline"
   | "guide_closing"
   | "resources_closing"
