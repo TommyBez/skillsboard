@@ -9,6 +9,7 @@ import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
+import { opencodeSkillsPath } from "@/lib/seo/opencode-skills/types"
 
 export {
   agentSkillsSupportPath,
@@ -52,6 +53,7 @@ export interface AgentSkillsSupportInlineLink {
     | typeof codexSkillsPath
     | typeof coworkSkillsPath
     | typeof cursorSkillsPath
+    | typeof opencodeSkillsPath
   trail: string
 }
 
@@ -114,6 +116,7 @@ export interface AgentSkillsSupportDefinition {
       title: string
       body: string
     }[]
+    link: AgentSkillsSupportInlineLink
     sourceIds: readonly string[]
   }
   team: {
@@ -492,6 +495,12 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
         body: "claude.ai, the Claude API, and Claude Cowork all support skills according to Anthropic's own documentation, and none of them read a project directory. The documentation states that custom skills do not sync across surfaces, so a team using both Claude Code and Cowork maintains the same skill in two places. No vendor documents a supported way to keep those two copies aligned.",
       },
     ],
+    link: {
+      lead: "The one client that publishes what it does with a field it does not recognize, and the one with the fullest per-skill permission rules, is covered row by row in",
+      label: "our explainer on OpenCode skills",
+      href: opencodeSkillsPath,
+      trail: ".",
+    },
     sourceIds: [
       "agentskills-spec",
       "agentskills-clients",
@@ -690,6 +699,12 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
       href: codexSkillsPath,
       description:
         "The neutral .agents/skills path in detail, and what a Claude skill keeps when Codex reads it.",
+    },
+    {
+      label: "OpenCode skills: what they are and how to use them",
+      href: opencodeSkillsPath,
+      description:
+        "The row with the closed frontmatter allowlist and the allow, ask, or deny rule, in full.",
     },
     {
       label: "Claude Cowork skills",

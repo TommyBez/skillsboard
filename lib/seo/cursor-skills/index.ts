@@ -4,6 +4,7 @@ import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
+import { opencodeSkillsPath } from "@/lib/seo/opencode-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
@@ -72,7 +73,7 @@ export interface CursorSkillsDefinition {
   answer: string
   answerNotes: readonly string[]
   answerSourceIds: readonly string[]
-  locations: CursorSkillsTableSection
+  locations: CursorSkillsTableSection & { link: CursorSkillsInlineLink }
   frontmatter: CursorSkillsTableSection & { link: CursorSkillsInlineLink }
   transfers: CursorSkillsTableSection & { link: CursorSkillsInlineLink }
   install: {
@@ -196,6 +197,12 @@ export const cursorSkills: CursorSkillsDefinition = {
       "Nested project directories are scoped automatically. A .cursor/skills/ or .agents/skills/ folder anywhere inside the repository is picked up, and Cursor documents that its skills surface only when the agent works with files inside that directory. In a monorepo, a skill in apps/web/.cursor/skills/ applies to apps/web while the repo-wide folder applies everywhere, with no frontmatter needed.",
       "You can see what was actually found. Open Customize in the sidebar and go to Skills, where skills from a plugin or from the project appear alongside rules in the Agent Decides section, filterable by user, workspace, or team scope.",
     ],
+    link: {
+      lead: "The other client that documents reading its own directory, the Claude one, and the neutral one alike is OpenCode, and its six locations are listed in",
+      label: "OpenCode skills: what they are and how to use them",
+      href: opencodeSkillsPath,
+      trail: ".",
+    },
     sourceIds: ["cursor-skills", "cursor-plugins"],
   },
   frontmatter: {
@@ -582,6 +589,12 @@ A Markdown section titled with the version and date.`,
       href: codexSkillsPath,
       description:
         "The directories OpenAI's agent scans, and what a skill keeps when it moves between the two.",
+    },
+    {
+      label: "OpenCode skills: what they are and how to use them",
+      href: opencodeSkillsPath,
+      description:
+        "Six directories, a skill tool that loads one, and an allow, ask, or deny rule per skill.",
     },
     {
       label: "Manage skills across Claude Code, Codex, and Cursor",

@@ -35,6 +35,11 @@ import {
   manageAiSkillsPath,
   type ManageAiSkillsPath,
 } from "@/lib/seo/manage-ai-skills/types"
+import { opencodeSkills } from "@/lib/seo/opencode-skills"
+import {
+  opencodeSkillsPath,
+  type OpencodeSkillsPath,
+} from "@/lib/seo/opencode-skills/types"
 import { whereToFindClaudeSkills } from "@/lib/seo/where-to-find-claude-skills"
 import {
   whereToFindClaudeSkillsPath,
@@ -61,6 +66,7 @@ export type ResourcePath =
   | CoworkSkillsPath
   | CursorSkillsPath
   | ManageAiSkillsPath
+  | OpencodeSkillsPath
   | WhereToFindClaudeSkillsPath
 
 export interface ResourceIndexEntry {
@@ -85,6 +91,7 @@ export const resourceEntries = [
   codexSkills,
   coworkSkills,
   cursorSkills,
+  opencodeSkills,
   agentsMdVsSkillMd,
   manageAiSkills,
   whereToFindClaudeSkills,
@@ -115,6 +122,7 @@ const resourceClusterDefinitions = [
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
+      opencodeSkillsPath,
       coworkSkillsPath,
       agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,
