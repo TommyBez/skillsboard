@@ -25,12 +25,21 @@ that moved provider changes which of the two record sets below applies.
 
 ## Vercel DNS cannot carry SVCB, only HTTPS
 
-This is the constraint that shapes everything else. Vercel's DNS record type
-enum — in the [create-a-DNS-record API](https://vercel.com/docs/rest-api/dns/create-a-dns-record)
-and in `vercel dns add` — is `A`, `AAAA`, `ALIAS`, `CAA`, `CNAME`, `HTTPS`,
-`MX`, `SRV`, `TXT`, `NS`. There is no `SVCB` (RR type 64). There is `HTTPS`
-(RR type 65), which is the same wire format and the same SvcParams, specialised
-for HTTPS origins by [RFC 9460](https://www.rfc-editor.org/rfc/rfc9460).
+This is the constraint that shapes everything else. The record type enum in the
+[create-a-DNS-record API](https://vercel.com/docs/rest-api/dns/create-a-dns-record)
+is `A`, `AAAA`, `ALIAS`, `CAA`, `CNAME`, `HTTPS`, `MX`, `SRV`, `TXT`, `NS`.
+There is no `SVCB` (RR type 64). There is `HTTPS` (RR type 65), which is the
+same wire format and the same SvcParams, specialised for HTTPS origins by
+[RFC 9460](https://www.rfc-editor.org/rfc/rfc9460).
+
+**Use the REST API, not the CLI.** `HTTPS` is an API-only type here.
+[`vercel dns add`](https://vercel.com/docs/cli/dns) documents
+`[A || AAAA || ALIAS || CNAME || TXT]` plus separate forms for `MX`, `SRV`, and
+`CAA`, and `vercel dns update --type` lists `A`, `AAAA`, `ALIAS`, `CAA`,
+`CNAME`, `MX`, `SRV`, `TXT`. Neither includes `HTTPS`, so the CLI cannot create
+these records and the commands below are `curl` against the API. Whether the
+dashboard offers the type is untested; the API is the path that is known to
+work.
 
 That is enough. Every endpoint DNS-AID would advertise here is an HTTPS origin,
 the draft permits the HTTPS RR for exactly that case, and the scanner queries
@@ -53,9 +62,13 @@ The split is not stylistic. The draft is explicit about the inventory leaf:
 
 So the parameters live on the primary owner, and `_agents` only redirects.
 
-Vercel's HTTPS record body is `{ priority, target, params }`, where `params` is
-the SvcParams in RFC 9460 presentation form as a single string. Priority `0` is
-AliasMode; anything higher is ServiceMode.
+Vercel's HTTPS record body is `{ priority, target, params }`, where `priority`
+and `target` are required and `params` is the SvcParams in RFC 9460
+presentation form as a single string. Priority `0` is AliasMode, which per
+RFC 9460 §2.4.2 carries no SvcParams at all — so the two `_agents` records below
+send no `params` key, and sending one would make them invalid rather than
+merely redundant. Anything above `0` is ServiceMode, where the parameters are
+legal to carry.
 
 ```sh
 # 1. The site's agent entry point, ServiceMode. `well-known` is relative to
@@ -247,6 +260,7 @@ move to a provider that both signs and supports RFC 9460 record types, and the
 
 1. Add the four records for whichever provider holds the zone: the two primary
    `agents-*` records first, then the two `_agents` aliases that point at them.
+   On Vercel that means the REST API, per the note above.
 2. Enable DNSSEC, per the section above.
 3. Keep the TTL at 3600. These records change roughly never, and a short TTL
    only multiplies lookups.
