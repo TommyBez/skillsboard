@@ -212,10 +212,10 @@ test("auth.md opens with an h1 naming itself and covers the whole flow", async (
 })
 
 test("the OpenAPI description covers the endpoints the API catalog advertises", async () => {
-  const spec = JSON.parse(await readRepoFile("../public/openapi.json"))
+  const { buildOpenApiDocument } = await import("../lib/openapi.ts")
+  const spec = buildOpenApiDocument()
 
   assert.equal(spec.openapi, "3.1.0")
-  assert.deepEqual(spec.servers, [{ url: siteConfig.url }])
 
   for (const path of [
     "/api/mcp",
@@ -231,6 +231,31 @@ test("the OpenAPI description covers the endpoints the API catalog advertises", 
 
   const scopes = Object.keys(spec.components.securitySchemes.oauth2.flows.authorizationCode.scopes)
   assert.deepEqual(scopes, [...oauthScopes])
+})
+
+test("the OpenAPI description names the deployment serving it, never production", async () => {
+  const { buildOpenApiDocument } = await import("../lib/openapi.ts")
+  const spec = buildOpenApiDocument()
+
+  // A preview links this document from its own catalog. A hard coded
+  // production origin here would point every operation, and the OAuth URLs,
+  // at production and its database rather than the preview's Neon branch.
+  assert.deepEqual(spec.servers, [{ url: origin }])
+
+  const flow = spec.components.securitySchemes.oauth2.flows.authorizationCode
+  for (const url of [flow.authorizationUrl, flow.tokenUrl, flow.refreshUrl]) {
+    assert.equal(new URL(url).origin, origin)
+  }
+
+  assert.equal(new URL(spec.externalDocs.url).origin, origin)
+  assert.equal(new URL(spec.info.contact.url).origin, origin)
+  assert.ok(spec.paths["/api/mcp"].post.description.includes(`${origin}/api/mcp`))
+
+  // Nothing anywhere in the document may hard code the production host unless
+  // this deployment is production.
+  if (origin !== siteConfig.url) {
+    assert.doesNotMatch(JSON.stringify(spec), new RegExp(siteConfig.url.replace(/[.]/g, "\\.")))
+  }
 })
 
 const { buildArdCatalog } = await import("../lib/ard-catalog.ts")
@@ -374,4 +399,35 @@ test("markdown requests resolve from the URL when the rewrite query is dropped",
   assert.equal(contentPathForMarkdownRequest("/"), "/")
   // A direct call to the route with nothing to resolve stays unresolvable.
   assert.equal(contentPathForMarkdownRequest("/api/markdown"), "/api/markdown")
+})
+
+const { sameOriginDestination } = await import("../lib/web-mcp-tools.ts")
+
+test("the WebMCP navigate guard rejects anything that resolves off-origin", () => {
+  const site = "https://www.skillsboard.sh"
+
+  assert.equal(sameOriginDestination("/library", site), `${site}/library`)
+  assert.equal(sameOriginDestination("/guides/x?a=1#b", site), `${site}/guides/x?a=1#b`)
+
+  for (const hostile of [
+    // The URL parser reads a backslash as a slash for http(s), so each of
+    // these resolves to another host despite starting with a single slash.
+    String.raw`/\attacker.example/x`,
+    String.raw`/\/attacker.example/x`,
+    String.raw`/\\attacker.example/x`,
+    // Protocol-relative, and absolute URLs off this origin.
+    "//attacker.example/x",
+    "https://attacker.example/x",
+    "http://www.skillsboard.sh/x",
+    "javascript:alert(1)",
+    // Not a path at all.
+    "library",
+    "",
+  ]) {
+    assert.equal(
+      sameOriginDestination(hostile, site),
+      undefined,
+      `navigate accepted an off-origin destination: ${JSON.stringify(hostile)}`,
+    )
+  }
 })

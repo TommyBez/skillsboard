@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { mcpEndpoint, webMcpPages } from "@/lib/web-mcp-tools"
+import { mcpEndpoint, sameOriginDestination, webMcpPages } from "@/lib/web-mcp-tools"
 
 /**
  * WebMCP: the tools an agent driving this page in a browser can call.
@@ -131,14 +131,13 @@ function buildTools(): WebMcpTool[] {
       },
       async execute(args) {
         const requested = typeof args.path === "string" ? args.path : ""
-        // Same-origin only, and no protocol-relative `//host` smuggled in as a
-        // path: a tool call originates from a model reading page content, so
-        // the destination is not trusted input.
-        if (!requested.startsWith("/") || requested.startsWith("//")) {
+        const destination = sameOriginDestination(requested, window.location.origin)
+
+        if (!destination) {
           return text("Path must start with a single slash and stay on this site.")
         }
 
-        window.location.assign(new URL(requested, window.location.origin).toString())
+        window.location.assign(destination)
         return text(`Navigating to ${requested}.`)
       },
     },

@@ -28,3 +28,30 @@ export const webMcpPages: readonly WebMcpPage[] = [home, ...resourceEntries, ...
 )
 
 export const mcpEndpoint = `${siteConfig.url}/api/mcp`
+
+/**
+ * Resolves a tool-supplied path against an origin, or returns undefined.
+ *
+ * A WebMCP tool call originates from a model reading page content, so the
+ * destination is untrusted. The check is on the resolved origin, not on the
+ * shape of the string: inspecting the string alone is not enough, because the
+ * URL parser treats a backslash as a slash for http(s) URLs, so `/\host/x`
+ * passes a "starts with exactly one slash" test and then resolves to
+ * `https://host/x`. The leading-slash test stays as well, to keep the argument
+ * a path rather than a URL.
+ */
+export function sameOriginDestination(
+  requested: string,
+  origin: string,
+): string | undefined {
+  if (!requested.startsWith("/")) return undefined
+
+  let destination: URL
+  try {
+    destination = new URL(requested, origin)
+  } catch {
+    return undefined
+  }
+
+  return destination.origin === origin ? destination.toString() : undefined
+}
