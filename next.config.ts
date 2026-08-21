@@ -135,6 +135,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/opencode-skills/",
+        destination: "/opencode-skills",
+        permanent: true,
+      },
+      {
         source: "/where-to-find-claude-skills/",
         destination: "/where-to-find-claude-skills",
         permanent: true,

@@ -30,6 +30,11 @@ import { cursorSkills } from "@/lib/seo/cursor-skills"
 import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { opencodeSkills } from "@/lib/seo/opencode-skills"
+import {
+  opencodeSkillsPath,
+  type OpencodeSkillsPath,
+} from "@/lib/seo/opencode-skills/types"
 import { whereToFindClaudeSkills } from "@/lib/seo/where-to-find-claude-skills"
 import {
   whereToFindClaudeSkillsPath,
@@ -55,6 +60,7 @@ export type ResourcePath =
   | CodexSkillsPath
   | CoworkSkillsPath
   | CursorSkillsPath
+  | OpencodeSkillsPath
   | WhereToFindClaudeSkillsPath
 
 export interface ResourceIndexEntry {
@@ -79,6 +85,7 @@ export const resourceEntries = [
   codexSkills,
   coworkSkills,
   cursorSkills,
+  opencodeSkills,
   agentsMdVsSkillMd,
   whereToFindClaudeSkills,
 ] satisfies readonly ResourceIndexEntry[]
@@ -108,6 +115,7 @@ const resourceClusterDefinitions = [
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
+      opencodeSkillsPath,
       coworkSkillsPath,
       agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,

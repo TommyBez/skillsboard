@@ -3,22 +3,24 @@ import { ExternalLinkIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import {
+  CodeBlock,
   formatArticleDate,
   NoteList,
   SectionHeading,
   SectionSources,
   SectionTable,
+  StepList,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import type {
-  AgentSkillsSupportDefinition,
-  AgentSkillsSupportInlineLink,
-} from "@/lib/seo/agent-skills-support"
+  OpencodeSkillsDefinition,
+  OpencodeSkillsInlineLink,
+} from "@/lib/seo/opencode-skills"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: AgentSkillsSupportInlineLink }) {
+function InlineLink({ link }: { link: OpencodeSkillsInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -33,10 +35,10 @@ function InlineLink({ link }: { link: AgentSkillsSupportInlineLink }) {
   )
 }
 
-export function AgentSkillsSupportPage({
+export function OpencodeSkillsPage({
   entry,
 }: {
-  entry: AgentSkillsSupportDefinition
+  entry: OpencodeSkillsDefinition
 }) {
   return (
     <>
@@ -69,7 +71,7 @@ export function AgentSkillsSupportPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_support_hero" />
+            <ResourceCta location="opencode_skills_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -119,7 +121,7 @@ export function AgentSkillsSupportPage({
             id="answer-heading"
             className="text-2xl font-semibold tracking-tight md:text-3xl"
           >
-            Which clients support Agent Skills
+            What an OpenCode skill is
           </h2>
           <p className="mt-4 text-pretty text-lg leading-relaxed">
             {entry.answer}
@@ -131,111 +133,180 @@ export function AgentSkillsSupportPage({
           />
         </section>
 
-        <section aria-labelledby="criteria-heading" className="pt-16">
+        <section aria-labelledby="locations-heading" className="pt-16">
           <SectionHeading
-            eyebrow="01 / Criteria"
-            id="criteria"
-            title={entry.criteria.title}
-            intro={entry.criteria.intro}
+            eyebrow="01 / Locations"
+            id="locations"
+            title={entry.locations.title}
+            intro={entry.locations.intro}
           />
-          <ol className="mt-8 space-y-6">
-            {entry.criteria.rules.map((rule) => (
-              <li
-                key={rule.label}
-                className="rounded-[3px] border border-border bg-card p-5"
-              >
-                <h3 className="text-base font-semibold leading-snug">
-                  {rule.label}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {rule.body}
-                </p>
-              </li>
-            ))}
-          </ol>
-          <NoteList notes={entry.criteria.notes} />
-          <InlineLink link={entry.criteria.link} />
+          <SectionTable
+            caption="The directories OpenCode scans for skills, and what each one is for."
+            columns={entry.locations.columns}
+            rows={entry.locations.rows}
+            labelWidth="w-[32%]"
+          />
+          <NoteList notes={entry.locations.notes} />
+          <InlineLink link={entry.locations.link} />
           <SectionSources
-            sourceIds={entry.criteria.sourceIds}
+            sourceIds={entry.locations.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="documented-heading" className="pt-16">
+        <section aria-labelledby="loading-heading" className="pt-16">
           <SectionHeading
-            eyebrow="02 / Vendor documented"
-            id="documented"
-            title={entry.documented.title}
-            intro={entry.documented.intro}
+            eyebrow="02 / Loading"
+            id="loading"
+            title={entry.loading.title}
+            intro={entry.loading.intro}
           />
           <SectionTable
-            caption="Clients whose first-party documentation states they read SKILL.md, with the locations that documentation names."
-            columns={entry.documented.columns}
-            rows={entry.documented.rows}
-            labelWidth="w-[18%]"
-          />
-          <NoteList notes={entry.documented.notes} />
-          <InlineLink link={entry.documented.link} />
-          <SectionSources
-            sourceIds={entry.documented.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="showcase-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="03 / Showcase listed"
-            id="showcase"
-            title={entry.showcase.title}
-            intro={entry.showcase.intro}
-          />
-          <SectionTable
-            caption="Products listed on the Agent Skills client showcase whose own documentation was not opened for this page."
-            columns={entry.showcase.columns}
-            rows={entry.showcase.rows}
+            caption="What happens between a folder on disk and a skill in the conversation."
+            columns={entry.loading.columns}
+            rows={entry.loading.rows}
             labelWidth="w-[24%]"
           />
-          <NoteList notes={entry.showcase.notes} />
-          <InlineLink link={entry.showcase.link} />
+          <NoteList notes={entry.loading.notes} />
+          <InlineLink link={entry.loading.link} />
           <SectionSources
-            sourceIds={entry.showcase.sourceIds}
+            sourceIds={entry.loading.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="paths-heading" className="pt-16">
+        <section aria-labelledby="frontmatter-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Directories"
-            id="paths"
-            title={entry.paths.title}
-            intro={entry.paths.intro}
+            eyebrow="03 / Format"
+            id="frontmatter"
+            title={entry.frontmatter.title}
+            intro={entry.frontmatter.intro}
           />
           <SectionTable
-            caption="Each skill directory, and the documented clients whose own documentation prints that path."
-            columns={entry.paths.columns}
-            rows={entry.paths.rows}
-            labelWidth="w-[22%]"
+            caption="The SKILL.md frontmatter fields OpenCode accepts, and what it does with each."
+            columns={entry.frontmatter.columns}
+            rows={entry.frontmatter.rows}
+            labelWidth="w-[20%]"
           />
-          <NoteList notes={entry.paths.notes} />
-          <InlineLink link={entry.paths.link} />
-          <div className="mt-8">
-            <ResourceCta location="agent_skills_support_inline" />
-          </div>
+          <NoteList notes={entry.frontmatter.notes} />
+          <InlineLink link={entry.frontmatter.link} />
           <SectionSources
-            sourceIds={entry.paths.sourceIds}
+            sourceIds={entry.frontmatter.sourceIds}
             sources={entry.sources}
           />
         </section>
 
-        <section aria-labelledby="not-documented-heading" className="pt-16">
+        <section aria-labelledby="permissions-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Gaps"
-            id="not-documented"
-            title={entry.notDocumented.title}
-            intro={entry.notDocumented.intro}
+            eyebrow="04 / Permissions"
+            id="permissions"
+            title={entry.permissions.title}
+            intro={entry.permissions.intro}
+          />
+          <SectionTable
+            caption="Where a skill permission rule goes, and what it changes."
+            columns={entry.permissions.columns}
+            rows={entry.permissions.rows}
+            labelWidth="w-[20%]"
+          />
+          <NoteList notes={entry.permissions.notes} />
+          <InlineLink link={entry.permissions.link} />
+          <SectionSources
+            sourceIds={entry.permissions.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
+        <section aria-labelledby="transfers-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="05 / Portability"
+            id="transfers"
+            title={entry.transfers.title}
+            intro={entry.transfers.intro}
+          />
+          <SectionTable
+            caption="What a skill written for one agent keeps when another one reads it."
+            columns={entry.transfers.columns}
+            rows={entry.transfers.rows}
+            labelWidth="w-[16%]"
+          />
+          <NoteList notes={entry.transfers.notes} />
+          <InlineLink link={entry.transfers.link} />
+          <SectionSources
+            sourceIds={entry.transfers.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
+        <section aria-labelledby="install-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="06 / Install"
+            id="install"
+            title={entry.install.title}
+            intro={entry.install.intro}
+          />
+          <StepList steps={entry.install.steps} />
+          <CodeBlock
+            label="SKILL.md starting point"
+            value={entry.install.template}
+            copy={{
+              buttonLabel: "Copy SKILL.md",
+              ariaLabel: "Copy the SKILL.md starting point",
+              copiedAriaLabel: "SKILL.md starting point copied",
+            }}
+          />
+          <SectionSources
+            sourceIds={entry.install.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
+        <section aria-labelledby="team-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="07 / Teams"
+            id="team"
+            title={entry.team.title}
+            intro={entry.team.intro}
+          />
+          <NoteList notes={entry.team.body} />
+          <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
+            {entry.team.paths.map((path) => (
+              <div key={path.label} className="bg-card p-5">
+                <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                  {path.label}
+                </dt>
+                <dd className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {path.body}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <ul className="mt-7 ml-5 list-disc space-y-3 text-[0.95rem] leading-7 text-muted-foreground">
+            {entry.team.limits.map((limit) => (
+              <li key={limit} className="pl-1">
+                {limit}
+              </li>
+            ))}
+          </ul>
+          <InlineLink link={entry.team.link} />
+          <div className="mt-8">
+            <ResourceCta location="opencode_skills_inline" />
+          </div>
+          <SectionSources
+            sourceIds={entry.team.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
+        <section aria-labelledby="open-questions-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="08 / Limits"
+            id="open-questions"
+            title={entry.openQuestions.title}
+            intro={entry.openQuestions.intro}
           />
           <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {entry.notDocumented.entries.map((item) => (
+            {entry.openQuestions.entries.map((item) => (
               <div
                 key={item.title}
                 className="rounded-[3px] border border-border bg-card p-5"
@@ -249,50 +320,15 @@ export function AgentSkillsSupportPage({
               </div>
             ))}
           </div>
-          <InlineLink link={entry.notDocumented.link} />
           <SectionSources
-            sourceIds={entry.notDocumented.sourceIds}
-            sources={entry.sources}
-          />
-        </section>
-
-        <section aria-labelledby="team-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="06 / Teams"
-            id="team"
-            title={entry.team.title}
-            intro={entry.team.intro}
-          />
-          <NoteList notes={entry.team.body} />
-          <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
-            {entry.team.options.map((option) => (
-              <div key={option.label} className="bg-card p-5">
-                <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                  {option.label}
-                </dt>
-                <dd className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {option.body}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <ul className="mt-7 ml-5 list-disc space-y-3 text-[0.95rem] leading-7 text-muted-foreground">
-            {entry.team.limits.map((limit) => (
-              <li key={limit} className="pl-1">
-                {limit}
-              </li>
-            ))}
-          </ul>
-          <InlineLink link={entry.team.link} />
-          <SectionSources
-            sourceIds={entry.team.sourceIds}
+            sourceIds={entry.openQuestions.sourceIds}
             sources={entry.sources}
           />
         </section>
 
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            07 / Questions
+            09 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -325,11 +361,11 @@ export function AgentSkillsSupportPage({
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every support claim on this page comes from the first-party
-            documentation below, fetched on the date at the top of this page.
-            Where the documentation says nothing, this page says so instead of
-            filling the gap. Product behavior changes, so check the linked pages
-            before you rely on a detail.
+            every claim about how OpenCode handles skills comes from the
+            first-party documentation below, fetched on the date at the top of
+            this page. Where the documentation says nothing, this page says so
+            instead of filling the gap. Product behavior changes, so check the
+            linked pages before you rely on a detail.
           </p>
           <ul className="mt-6 space-y-4">
             {entry.sources.map((source) => (
@@ -384,16 +420,16 @@ export function AgentSkillsSupportPage({
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Your teammates run different clients. Keep one recommendation
-            anyway.
+            Put the skills your team recommends somewhere everyone can find
+            them.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-            Free forever, MIT licensed, and open source. Save the skill once,
-            keep its source visible, and let each teammate take the source, the
-            command, or the files.
+            Free forever, MIT licensed, and open source. Create a library, save
+            the first skill, and invite the people who keep asking which one to
+            use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_support_closing" />
+            <ResourceCta location="opencode_skills_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

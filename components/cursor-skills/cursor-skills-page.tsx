@@ -143,6 +143,7 @@ export function CursorSkillsPage({ entry }: { entry: CursorSkillsDefinition }) {
             labelWidth="w-[26%]"
           />
           <NoteList notes={entry.locations.notes} />
+          <InlineLink link={entry.locations.link} />
           <SectionSources
             sourceIds={entry.locations.sourceIds}
             sources={entry.sources}

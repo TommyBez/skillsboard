@@ -4,6 +4,7 @@ import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
+import { opencodeSkillsPath } from "@/lib/seo/opencode-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
@@ -509,6 +510,12 @@ A Markdown section titled with the version and date.`,
       href: cursorSkillsPath,
       description:
         "The one product that documents reading .agents/skills and the Claude directories alike.",
+    },
+    {
+      label: "OpenCode skills: what they are and how to use them",
+      href: opencodeSkillsPath,
+      description:
+        "The other agent built around .agents/skills, with a permission decision in front of every skill.",
     },
     {
       label: "Manage skills across Claude Code, Codex, and Cursor",
