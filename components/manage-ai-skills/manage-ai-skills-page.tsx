@@ -142,7 +142,7 @@ export function ManageAiSkillsPage({
             intro={entry.scatter.intro}
           />
           <SectionTable
-            caption="The six places an AI skill ends up in a team, who can see each one, and what none of them records."
+            caption="The five places an AI skill ends up in a team, who can see each one, and what none of them records."
             columns={entry.scatter.columns}
             rows={entry.scatter.rows}
             labelWidth="w-[20%]"

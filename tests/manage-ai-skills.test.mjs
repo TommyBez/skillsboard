@@ -192,6 +192,70 @@ test("both spellings of the target query appear in the copy", () => {
   assert.match(copy, /across an organisation/i)
 })
 
+/** Count words a caption can open with, indexed by the number they name. */
+const numberWords = [
+  "zero",
+  "one",
+  "two",
+  "three",
+  "four",
+  "five",
+  "six",
+  "seven",
+  "eight",
+  "nine",
+  "ten",
+  "eleven",
+  "twelve",
+]
+
+test("every table caption counts the rows the table renders", async () => {
+  const page = await readFile(
+    new URL(
+      "../components/manage-ai-skills/manage-ai-skills-page.tsx",
+      import.meta.url,
+    ),
+    "utf8",
+  )
+
+  // A caption is read twice by a screen reader: once as the table caption and
+  // once as the label of the scrollable region around it. A count in it is
+  // announced before a single row is, so it has to match the row count.
+  const captions = [...page.matchAll(/caption="([^"]+)"/g)].map(
+    (match) => match[1],
+  )
+  assert.equal(
+    captions.length,
+    tables.length,
+    "the page renders a different number of tables than this test checks",
+  )
+
+  captions.forEach((caption, index) => {
+    const opening = /^The ([a-z]+) /.exec(caption)
+    const claimed = opening ? numberWords.indexOf(opening[1]) : -1
+    if (claimed === -1) {
+      return
+    }
+    assert.equal(
+      claimed,
+      tables[index].rows.length,
+      `a caption announces ${opening[1]} rows for a table of ${tables[index].rows.length}`,
+    )
+  })
+
+  // The first table is the one a reader meets first, and its section intro
+  // promises the same count in words, so the two have to agree.
+  const scatterCount = numberWords[entry.scatter.rows.length]
+  assert.ok(
+    captions[0].startsWith(`The ${scatterCount} places`),
+    `the first caption does not announce ${scatterCount} places`,
+  )
+  assert.ok(
+    entry.scatter.intro.includes(`${scatterCount} places`),
+    `the first section intro does not promise ${scatterCount} places`,
+  )
+})
+
 test("every documented mechanism states where it stops", () => {
   assert.deepEqual(entry.mechanisms.columns, [
     "Mechanism",
