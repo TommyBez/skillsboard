@@ -293,7 +293,7 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
       },
     ],
     notes: [
-      "Read the middle column and the pattern is clear: every one of the eleven loads name and description first and the body later, and after that they stop agreeing. Three add a permission or consent step. Two publish a closed list of frontmatter fields. Two add fields of their own that no other client will act on. One delivers the whole feature through an optional extension.",
+      "Read the middle column and the pattern is clear: every one of the eleven loads name and description first and the body later, and after that they stop agreeing. Three add a permission or consent step. Two publish a closed list of frontmatter fields. Four add frontmatter fields of their own that no other client is documented to act on, named one by one in the compatibility gaps below. One delivers the whole feature through an optional extension.",
       "Two of the eleven are not agents at all in the ordinary sense. The Claude API row describes skills that run inside a code execution container and are referenced by an identifier, and the Cowork row describes skills that arrive by account sync. Neither reads a folder you can commit to a repository, which matters if your plan for distributing a skill is a git repository.",
       "The Claude row and the Claude Code row are separate for a reason the vendor documentation states outright: custom skills do not sync across Anthropic's own surfaces. A skill uploaded on claude.ai is not present in Claude Code, and a skill in a project directory is not present in a claude.ai conversation.",
     ],
@@ -431,7 +431,7 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
         label: "No filesystem path at all",
         cells: [
           "claude.ai, the Claude API, Claude Cowork",
-          "Three of the eleven never read a folder on your machine. Skills arrive by zip upload, by an API endpoint, or by account sync at the start of a session. A git repository is not a distribution channel for these three.",
+          "Three surfaces, across two of the eleven rows, never read a folder on your machine. Skills arrive by zip upload, by an API endpoint, or by account sync at the start of a session. A git repository is not a distribution channel for these three.",
         ],
       },
     ],
