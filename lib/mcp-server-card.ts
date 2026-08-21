@@ -1,3 +1,5 @@
+import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
+
 /**
  * The parts of the MCP Server Card (SEP-1649) that describe this server rather
  * than the deployment serving it. Endpoints stay in the route handler, where
@@ -9,6 +11,10 @@
  * `mcp-server-card` unit test reads `server.json` and fails when the two
  * disagree.
  */
+/** The schema the committed `server.json` declares, repeated for the served copy. */
+export const MCP_SERVER_SCHEMA =
+  "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+
 export const mcpServerInfo = {
   name: "io.github.TommyBez/skillsboard",
   title: "Skills Board",
@@ -27,6 +33,14 @@ export const mcpServerInfo = {
  * server registers neither — declaring them would send an agent looking for a
  * list it will never get.
  */
+/** Every scope the card advertises, with the sentence the consent screen shows. */
+export function mcpScopeSummaries() {
+  return oauthScopes.map((scope) => ({
+    scope,
+    description: oauthScopeDescriptions[scope],
+  }))
+}
+
 export const mcpServerCapabilities = {
   tools: { listChanged: false },
 } as const
@@ -137,3 +151,53 @@ export const mcpToolSummaries: readonly McpToolSummary[] = [
     requiredScopes: WRITE,
   },
 ]
+
+/**
+ * The MCP registry manifest for this deployment.
+ *
+ * Same identity as the card above, in the shape the registry publishes, with
+ * the remote endpoint the caller passes rather than the production one baked
+ * into `mcpServerInfo`. The `mcp-registry-manifest` unit test compares the
+ * result against the committed `server.json` so the two cannot drift.
+ */
+export function buildMcpRegistryManifest(endpoint: string) {
+  return {
+    $schema: MCP_SERVER_SCHEMA,
+    name: mcpServerInfo.name,
+    title: mcpServerInfo.title,
+    description: mcpServerInfo.description,
+    version: mcpServerInfo.version,
+    websiteUrl: new URL(endpoint).origin,
+    repository: { ...mcpServerInfo.repository },
+    remotes: [{ type: "streamable-http", url: endpoint }],
+  }
+}
+
+/**
+ * The SEP-1649 server card for this deployment.
+ *
+ * `endpoint` is the MCP resource of the deployment serving the card, and
+ * `link` builds the sibling document URLs on the same origin, so a preview
+ * describes itself rather than production. Shared by
+ * `/.well-known/mcp/server-card.json` and the bare `/.well-known/mcp` path.
+ */
+export function buildMcpServerCard(endpoint: string, link: (path: string) => string) {
+  const transport = { type: "streamable-http", endpoint } as const
+
+  return {
+    serverInfo: mcpServerInfo,
+    transport,
+    // Some readers expect the transport list rather than the single object.
+    transports: [transport],
+    capabilities: mcpServerCapabilities,
+    tools: mcpToolSummaries,
+    authentication: {
+      type: "oauth2",
+      resource: endpoint,
+      authorization_servers: [link("/api/auth")],
+      protected_resource_metadata: link("/.well-known/oauth-protected-resource"),
+      scopes_supported: mcpScopeSummaries(),
+      documentation: link("/auth.md"),
+    },
+  }
+}

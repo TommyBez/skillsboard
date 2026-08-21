@@ -27,8 +27,18 @@ export function buildApiCatalog() {
             type: "application/json",
             title: "MCP Server Card (SEP-1649)",
           },
+          {
+            href: discoveryUrl("/server.json"),
+            type: "application/json",
+            title: "MCP registry manifest",
+          },
         ],
         "service-doc": [
+          {
+            href: discoveryUrl("/developers"),
+            type: "text/html",
+            title: "Developer documentation: tools, scopes, versioning, errors, and rate limits",
+          },
           {
             href: discoveryUrl("/auth.md"),
             type: "text/markdown",

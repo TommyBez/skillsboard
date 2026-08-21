@@ -1,9 +1,17 @@
 import { requireMcpAuth } from "@better-auth/mcp"
+import { ipAddress } from "@vercel/functions"
 import { createMcpHandler } from "mcp-handler"
 import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
 import { auth } from "@/lib/auth"
+import { claimApiRequest, MCP_RATE_LIMIT, rateLimitHeaders } from "@/lib/api-rate-limit"
+import {
+  API_VERSION_HEADER,
+  apiVersionHeaders,
+  isSupportedApiVersion,
+  SUPPORTED_API_VERSIONS,
+} from "@/lib/api-version"
 import { cacheTags } from "@/lib/cache-tags"
 import { getAuthBaseUrl, getMcpResource } from "@/lib/auth-environment"
 import { db } from "@/lib/db"
@@ -597,4 +605,116 @@ const route = requireMcpAuth(
   { resource: getMcpResource(), requiredScopes: ["skills:read"] },
 )
 
-export { route as GET, route as POST, route as DELETE }
+/**
+ * A refusal this endpoint makes before the MCP handler sees the request.
+ *
+ * JSON-RPC, not the RFC 9457 problem document the rest of the surface uses.
+ * The client here is an MCP client: it parses one body shape, and this
+ * endpoint already answers its own 401 as a JSON-RPC error object, so a
+ * problem document arriving from the same URL would reach the client as a
+ * parse failure rather than as the typed error it is. The HTTP status and the
+ * headers still carry what they carry, and `error.data.code` is the same
+ * machine-readable code the problem registry uses, so a client that talks to
+ * both surfaces branches on one vocabulary.
+ */
+function jsonRpcRefusal(
+  status: number,
+  {
+    code,
+    message,
+    data,
+    headers,
+  }: {
+    code: number
+    message: string
+    data?: Record<string, unknown>
+    headers: Record<string, string>
+  },
+): Response {
+  return new Response(
+    `${JSON.stringify({
+      jsonrpc: "2.0",
+      id: null,
+      error: { code, message, ...(data ? { data } : {}) },
+    })}\n`,
+    {
+      status,
+      headers: {
+        ...headers,
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      },
+    },
+  )
+}
+
+/**
+ * The budget on the MCP endpoint, published on every answer it gives.
+ *
+ * An agent cannot pace itself against a limit it has to discover by being
+ * refused, and the endpoint is the one an agent actually calls in a loop. The
+ * headers ride on every response, including the 401 that an unauthenticated
+ * client meets first, so a client learns the budget before it has a token.
+ *
+ * Bucketed by client address rather than by token, because the request that
+ * most needs a limit is the one carrying no token at all. The counter is the
+ * same per-instance sliding window `/api/health` uses; `lib/api-rate-limit`
+ * argues why it is not in Redis, and the headers say what they are worth.
+ */
+async function withRequestBudget(
+  request: Request,
+  context: unknown,
+): Promise<Response> {
+  // An address the platform supplied, or nothing to count against. Same
+  // decision as `/api/health`, argued in `claimApiRequest`.
+  const client = ipAddress(request)
+  const budget = claimApiRequest(client ? `mcp:${client}` : null, { policy: MCP_RATE_LIMIT })
+  const published = { ...rateLimitHeaders(budget, MCP_RATE_LIMIT), ...apiVersionHeaders }
+
+  // Refused before dispatch rather than after. A client that pinned a version
+  // this deployment does not serve asked not to be answered under a different
+  // one, and a write tool running v1 semantics against a token pinned
+  // elsewhere is the case the pin exists for.
+  const requested = request.headers.get(API_VERSION_HEADER)
+  if (!isSupportedApiVersion(requested)) {
+    return jsonRpcRefusal(400, {
+      // Invalid Request: the envelope was fine, the version it pinned was not.
+      code: -32600,
+      message: `Unsupported API version: ${requested}`,
+      data: { code: "unsupported_api_version", supported: [...SUPPORTED_API_VERSIONS] },
+      headers: published,
+    })
+  }
+
+  if (budget && !budget.allowed) {
+    return jsonRpcRefusal(429, {
+      code: -32000,
+      message: "Too many requests. Retry after the window named in Retry-After.",
+      data: { code: "rate_limited", retry_after: budget.resetSeconds },
+      headers: { ...published, "Retry-After": String(budget.resetSeconds) },
+    })
+  }
+
+  const response = await (route as (req: Request, context: unknown) => Promise<Response>)(
+    request,
+    context,
+  )
+
+  // The body is passed through untouched: a `tools/call` answer may be an SSE
+  // stream, and reading it here to rebuild the response would buffer it.
+  const headers = new Headers(response.headers)
+  for (const [name, value] of Object.entries(published)) headers.set(name, value)
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
+export {
+  withRequestBudget as GET,
+  withRequestBudget as POST,
+  withRequestBudget as DELETE,
+}

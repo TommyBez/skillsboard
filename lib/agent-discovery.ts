@@ -1,3 +1,4 @@
+import { API_VERSION_HEADER } from "@/lib/api-version"
 import { getMcpResource } from "@/lib/auth-environment"
 import { oauthScopes } from "@/lib/oauth-scopes"
 
@@ -46,11 +47,18 @@ export function buildProtectedResourceMetadata() {
   }
 }
 
-/** Every agent-facing endpoint answers cross-origin preflight the same way. */
+/**
+ * Every agent-facing endpoint answers cross-origin preflight the same way.
+ *
+ * The version header is in the allow list because a browser client that pins a
+ * version sends a non-simple header, which makes the request preflight. Left
+ * out, the browser refuses the request before the endpoint can honour, or
+ * refuse, the pin.
+ */
 export const DISCOVERY_CORS_HEADERS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": `Content-Type, ${API_VERSION_HEADER}`,
 } as const
 
 export function discoveryPreflight(): Response {

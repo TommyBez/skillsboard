@@ -87,6 +87,32 @@ export function buildArdCatalog() {
         ],
       },
       {
+        identifier: urn("doc", "developer-docs"),
+        displayName: "Skills Board developer documentation",
+        description:
+          "How to connect an agent to the MCP server, what each tool does and which scope it needs, and the versioning, error, and rate-limit conventions every public endpoint follows.",
+        type: "text/markdown",
+        url: discoveryUrl("/developers.md"),
+        representativeQueries: [
+          "how do I connect an agent to Skills Board",
+          "what MCP tools does Skills Board expose",
+          "Skills Board API rate limits and error codes",
+          "does the Skills Board API have a versioning policy",
+        ],
+      },
+      {
+        identifier: urn("server", "skills-board-mcp-manifest"),
+        displayName: "Skills Board MCP registry manifest",
+        description:
+          "The server.json manifest the MCP registry publishes this server from: identity, version, repository, and the remote streamable HTTP endpoint.",
+        type: "application/json",
+        url: discoveryUrl("/server.json"),
+        representativeQueries: [
+          "Skills Board MCP server manifest",
+          "what is the Skills Board MCP endpoint URL",
+        ],
+      },
+      {
         identifier: urn("doc", "agent-authentication"),
         displayName: "Agent authentication guide (auth.md)",
         description:

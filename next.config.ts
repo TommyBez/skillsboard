@@ -65,6 +65,38 @@ const nextConfig = {
         destination: "/resources",
         permanent: true,
       },
+      // The developer docs live at /developers. The other two spellings are
+      // what a person types and what an agent probes when it is looking for an
+      // API description, and both used to 404.
+      {
+        source: "/docs",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/docs/",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/api",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/developers/",
+        destination: "/developers",
+        permanent: true,
+      },
+      // The MCP endpoint is at /api/mcp, which is the audience every issued
+      // token is bound to and cannot move. A client that guesses the
+      // conventional root path is sent there rather than refused: 308 keeps the
+      // method and the body, so a POSTed JSON-RPC call survives the hop.
+      {
+        source: "/mcp",
+        destination: "/api/mcp",
+        permanent: true,
+      },
       {
         source: "/about/",
         destination: "/about",
@@ -228,6 +260,11 @@ const nextConfig = {
           destination: "/api/markdown?path=/agent-skills-support",
         },
         {
+          source: "/developers",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/developers",
+        },
+        {
           source: "/agents-md-vs-skill-md",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/agents-md-vs-skill-md",
@@ -263,6 +300,22 @@ const nextConfig = {
         {
           source: "/:path(.*)\\.md",
           destination: "/api/markdown?path=/:path",
+        },
+      ],
+      // Content negotiation for the paths nothing else claimed. `fallback`
+      // runs after every page, public file, and dynamic route, so this is
+      // reached only by a request that was going to 404 anyway: a real page
+      // asked for in Markdown still answers from the rules above, and
+      // `/llms.txt` still serves itself.
+      //
+      // What it buys is a 404 an agent can act on. Without it, a client that
+      // asked for Markdown and guessed a URL wrong got an HTML error document
+      // it has to parse to learn there is a sitemap.
+      fallback: [
+        {
+          source: "/:path*",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/:path*",
         },
       ],
     }

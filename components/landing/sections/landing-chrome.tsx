@@ -143,6 +143,9 @@ export function LandingFooter() {
             <Link href="/resources" className={footerNavLink}>
               Resources
             </Link>
+            <Link href="/developers" className={footerNavLink}>
+              Developers
+            </Link>
             <Link href="/about" className={footerNavLink}>
               About
             </Link>

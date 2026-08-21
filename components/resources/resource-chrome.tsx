@@ -36,6 +36,7 @@ import { siteConfig } from "@/lib/site"
 
 type ResourceHeaderLocation =
   | "about_header"
+  | "developers_header"
   | "agent_skills_header"
   | "agent_skills_support_header"
   | "agents_md_header"
@@ -235,6 +236,12 @@ export function ResourceFooter() {
               className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
             >
               Alternatives
+            </Link>
+            <Link
+              href="/developers"
+              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            >
+              Developers
             </Link>
             <Link
               href={resourcePaths.about}

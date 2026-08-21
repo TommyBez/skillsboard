@@ -1,4 +1,9 @@
 import { OG_SIZE } from "@/lib/og/size"
+import {
+  organizationId,
+  organizationLogoNode,
+  organizationNode,
+} from "@/lib/seo/organization"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 /**
@@ -20,10 +25,7 @@ export interface ResourceArticleSchemaEntry {
 
 /** TechArticle, FAQPage, and BreadcrumbList for a top-level resource article. */
 export function buildResourceArticleSchema(entry: ResourceArticleSchemaEntry) {
-  const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
-  const logoId = absoluteUrl("/#logo")
-  const logoUrl = absoluteUrl("/apple-icon.png")
   const pageUrl = absoluteUrl(entry.path)
   const imageId = `${pageUrl}#primaryimage`
   const imageUrl = absoluteUrl(`${entry.path}/opengraph-image`)
@@ -31,24 +33,8 @@ export function buildResourceArticleSchema(entry: ResourceArticleSchemaEntry) {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": organizationId,
-        name: siteConfig.name,
-        url: siteConfig.url,
-        description: siteConfig.description,
-        logo: { "@id": logoId },
-        sameAs: [siteConfig.githubUrl],
-      },
-      {
-        "@type": "ImageObject",
-        "@id": logoId,
-        url: logoUrl,
-        contentUrl: logoUrl,
-        width: 180,
-        height: 180,
-        caption: `${siteConfig.name} logo`,
-      },
+      organizationNode(),
+      organizationLogoNode(),
       {
         "@type": "WebSite",
         "@id": websiteId,

@@ -1,6 +1,11 @@
 import type { GuideDefinition } from "@/lib/seo/guides"
 import { OG_SIZE } from "@/lib/og/size"
 import { resourcePaths } from "@/lib/seo/resources"
+import {
+  organizationId,
+  organizationLogoNode,
+  organizationNode,
+} from "@/lib/seo/organization"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 /** Anchor of the nth workflow step, shared by the page markup and HowTo. */
@@ -9,35 +14,16 @@ export function stepAnchorId(index: number): string {
 }
 
 export function buildGuideSchema(guide: GuideDefinition) {
-  const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
   const pageUrl = absoluteUrl(guide.path)
   const articleImageId = `${pageUrl}#primaryimage`
   const articleImageUrl = absoluteUrl(`${guide.path}/opengraph-image`)
-  const logoId = absoluteUrl("/#logo")
-  const logoUrl = absoluteUrl("/apple-icon.png")
 
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": organizationId,
-        name: siteConfig.name,
-        url: siteConfig.url,
-        description: siteConfig.description,
-        logo: { "@id": logoId },
-        sameAs: [siteConfig.githubUrl],
-      },
-      {
-        "@type": "ImageObject",
-        "@id": logoId,
-        url: logoUrl,
-        contentUrl: logoUrl,
-        width: 180,
-        height: 180,
-        caption: `${siteConfig.name} logo`,
-      },
+      organizationNode(),
+      organizationLogoNode(),
       {
         "@type": "WebSite",
         "@id": websiteId,

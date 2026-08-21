@@ -1,3 +1,4 @@
+import { buildNotFoundMarkdown } from "@/lib/agent-recovery"
 import { estimateMarkdownTokens } from "@/lib/markdown/tokens"
 import {
   contentPathForMarkdownRequest,
@@ -23,12 +24,24 @@ export async function GET(request: Request) {
     url.searchParams.get("path") ?? contentPathForMarkdownRequest(url.pathname)
   const markdown = renderMarkdownTwin(requestedPath)
 
+  // A 404 with a body a client can act on. The status is the one that matters
+  // — the path really does not exist — and the body says where to look instead,
+  // in the format the client just asked for, so a wrong guess costs one request
+  // rather than a series of them.
   if (!markdown) {
-    return new Response("No Markdown version of this page.\n", {
+    const notFound = buildNotFoundMarkdown(requestedPath)
+
+    return new Response(notFound, {
       status: 404,
       headers: {
-        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Type": "text/markdown; charset=utf-8",
         "Cache-Control": "public, max-age=0, s-maxage=60",
+        "x-markdown-tokens": String(estimateMarkdownTokens(notFound)),
+        "X-Content-Type-Options": "nosniff",
+        // The same URL answers with the HTML 404 when Markdown was not asked
+        // for, and a missing page is not something to index.
+        Vary: "Accept",
+        "X-Robots-Tag": "noindex",
       },
     })
   }
