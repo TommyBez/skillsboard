@@ -4,6 +4,7 @@ import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 import { DeferredToaster } from "@/components/deferred-toaster"
 import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
+import { WebMcpTools } from "@/components/web-mcp"
 import { siteConfig } from "@/lib/site"
 
 import "./globals.css"
@@ -84,6 +85,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
+          <WebMcpTools />
           <DeferredToaster />
           {process.env.VERCEL_ENV === "production" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>

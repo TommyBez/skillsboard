@@ -9,6 +9,8 @@ import { HeroSection } from "@/components/landing/sections/hero-section"
 import { McpSection } from "@/components/landing/sections/mcp-section"
 import { PluginSection } from "@/components/landing/sections/plugin-section"
 import { PricingSection } from "@/components/landing/sections/pricing-section"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
+import { homePath } from "@/lib/seo/home"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
 import { siteConfig } from "@/lib/site"
 
@@ -26,7 +28,7 @@ import { siteConfig } from "@/lib/site"
 export const metadata: Metadata = {
   title: { absolute: "Skills Board, your team’s recommended AI skills" },
   description: siteConfig.description,
-  alternates: { canonical: "/" },
+  alternates: markdownTwinAlternates(homePath),
 }
 
 export default function HomePage() {

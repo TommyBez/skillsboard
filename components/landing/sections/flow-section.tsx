@@ -7,32 +7,24 @@ import {
   SearchFilterVisual,
 } from "@/components/landing/flow/flow-visuals"
 import { chapterMark } from "@/components/landing/styles"
+import { landingFlowSteps } from "@/lib/seo/landing-flow"
 
+const flowVisuals: Record<string, ReactNode> = {
+  "1": <PasteResolveVisual />,
+  "2": <SearchFilterVisual />,
+  "3": <RouteFanVisual />,
+}
+
+/** The copy lives in `lib/seo/landing-flow`, where the Markdown twin reads it. */
 const flowSteps: ReadonlyArray<{
   index: string
   title: string
   copy: string
   visual: ReactNode
-}> = [
-  {
-    index: "1",
-    title: "Save the skill",
-    copy: "Paste a GitHub skill URL you want the team to reuse. Skills Board keeps the name, description, and install command tied to it.",
-    visual: <PasteResolveVisual />,
-  },
-  {
-    index: "2",
-    title: "Find it later",
-    copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
-    visual: <SearchFilterVisual />,
-  },
-  {
-    index: "3",
-    title: "Use it your way",
-    copy: "Open the source, copy a compatible install command, download the latest files as a ZIP, or search the same library from your connected agent.",
-    visual: <RouteFanVisual />,
-  },
-]
+}> = landingFlowSteps.map((step) => ({
+  ...step,
+  visual: flowVisuals[step.index],
+}))
 
 /** Workflow — three moves, indexed like a manual, each one demonstrated. */
 export function FlowSection() {

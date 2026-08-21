@@ -9,6 +9,11 @@ import { absoluteUrl, siteConfig } from "@/lib/site"
  */
 export interface MarkdownContentEntry {
   path: string
+  /**
+   * Where the twin is published, when appending `.md` to `path` does not
+   * produce a URL. Only the home page needs it: `/` + `.md` is not a path.
+   */
+  markdownPath?: string
   title: string
   description: string
   publishedAt: string
@@ -18,6 +23,7 @@ export interface MarkdownContentEntry {
 /** Fields that carry presentation or routing metadata rather than page copy. */
 const skippedKeys = new Set([
   "path",
+  "markdownPath",
   "contentType",
   "topics",
   "eyebrow",
@@ -522,6 +528,11 @@ function baseKeyFor(key: string, bases: readonly string[]): string {
   return key
 }
 
+/** Where a page's twin is served, defaulting to the page path plus `.md`. */
+export function markdownPathOf(entry: MarkdownContentEntry): string {
+  return entry.markdownPath ?? `${entry.path}.md`
+}
+
 /** The full Markdown twin of a data driven page, header included. */
 export function buildContentMarkdown(entry: MarkdownContentEntry): string {
   const record = entry as unknown as Record<string, unknown>
@@ -543,7 +554,7 @@ export function buildContentMarkdown(entry: MarkdownContentEntry): string {
     `> ${paragraph(entry.description)}`,
     bulletList([
       `Canonical URL: ${canonical}`,
-      `Markdown URL: ${canonical}.md`,
+      `Markdown URL: ${absoluteUrl(markdownPathOf(entry))}`,
       `Publisher: ${siteConfig.name} (${siteConfig.url})`,
       `Published: ${entry.publishedAt}`,
       `Last updated: ${entry.modifiedAt}`,
