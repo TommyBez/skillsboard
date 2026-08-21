@@ -1,4 +1,4 @@
-import { discoveryUrl } from "@/lib/agent-discovery"
+import { discoveryUrl, protectedResourceMetadataUrl } from "@/lib/agent-discovery"
 import { getMcpResource } from "@/lib/auth-environment"
 
 export const API_CATALOG_MEDIA_TYPE =
@@ -49,7 +49,10 @@ export function buildApiCatalog() {
         ],
         "service-meta": [
           {
-            href: discoveryUrl("/.well-known/oauth-protected-resource"),
+            // The document for the anchor, not the origin-level entry point:
+            // a client validates the metadata it fetches against the resource
+            // it asked about, and the anchor here is the MCP resource.
+            href: protectedResourceMetadataUrl(getMcpResource()),
             type: "application/json",
             title: "OAuth Protected Resource Metadata (RFC 9728)",
           },

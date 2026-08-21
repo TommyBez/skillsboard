@@ -3,7 +3,7 @@
 How an AI agent registers with Skills Board and gets a token for the Skills
 Board MCP server at `https://www.skillsboard.sh/api/mcp`.
 
-Last reviewed: 2026-08-20
+Last reviewed: 2026-08-21
 
 ## What kind of access this is
 
@@ -16,15 +16,17 @@ library here.
 
 - Audience (RFC 8707 resource): `https://www.skillsboard.sh/api/mcp`
 - Authorization server: `https://www.skillsboard.sh/api/auth`
-- Protected resource metadata: `https://www.skillsboard.sh/.well-known/oauth-protected-resource`
+- Protected resource metadata: `https://www.skillsboard.sh/.well-known/oauth-protected-resource/api/mcp`
+- Origin-level discovery entry point:
+  `https://www.skillsboard.sh/.well-known/oauth-protected-resource`
 - Authorization server metadata: `https://www.skillsboard.sh/.well-known/oauth-authorization-server`
 
 ## 1. Discover
 
-Fetch the protected resource metadata:
+Fetch the protected resource metadata for the MCP server:
 
 ```http
-GET https://www.skillsboard.sh/.well-known/oauth-protected-resource
+GET https://www.skillsboard.sh/.well-known/oauth-protected-resource/api/mcp
 ```
 
 It names the `resource` identifier to request tokens for, the
@@ -32,9 +34,20 @@ It names the `resource` identifier to request tokens for, the
 authorization server metadata next; its `agent_auth` block repeats the
 registration entry point in machine-readable form and links back to this file.
 
+That path is not decoration. RFC 9728 builds a metadata URL by inserting
+`/.well-known/oauth-protected-resource` between the resource identifier's host
+and its path, and a client MUST reject a document whose `resource` is not the
+identifier it asked about. So `https://www.skillsboard.sh/api/mcp` is described
+at `/.well-known/oauth-protected-resource/api/mcp`, and the origin-level
+document at `/.well-known/oauth-protected-resource` describes the origin
+itself — the entry point for an agent that starts with nothing but a hostname.
+Both name the same authorization server and the same scopes. Only the one above
+names the audience: send `resource=https://www.skillsboard.sh/api/mcp` on the
+token request, because any other value is rejected with `invalid_target`.
+
 A call to `/api/mcp` without a usable token answers `401` with a
-`WWW-Authenticate` header carrying `resource_metadata`, so an agent that skipped
-discovery can recover from the challenge.
+`WWW-Authenticate` header carrying `resource_metadata`, pointing at that same
+document, so an agent that skipped discovery can recover from the challenge.
 
 ## 2. Register
 

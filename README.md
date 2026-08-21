@@ -129,6 +129,17 @@ Product communications are separate from transactional OTP and invitation email.
 
 Skills Board exposes an OAuth-protected MCP endpoint at `/api/mcp`. After signing in, open **Settings → MCP** to connect it. The tools can search team skills and collections, retrieve install commands, and discover public or repository skills. With `skills:write`, they can save new skills and organize collections. They cannot edit or delete saved team skills, install them in an agent, or execute them.
 
+An agent that has not signed in discovers all of this over HTTP. The RFC 9728
+protected resource metadata for the MCP server is at
+`/.well-known/oauth-protected-resource/api/mcp` — the path its resource
+identifier derives, and the one the `WWW-Authenticate` challenge from `/api/mcp`
+points at — and its `resource` is the audience to request a token for.
+`/.well-known/oauth-protected-resource` is the origin-level entry point for an
+agent that starts with nothing but the hostname. [`public/auth.md`](./public/auth.md)
+walks the whole flow. DNS-based discovery is the one part that lives outside
+this repository: [`docs/dns-aid-records.md`](./docs/dns-aid-records.md) holds the
+zone change, and `pnpm dns:check` reports whether it has been applied.
+
 ## Official plugin
 
 This repository is also the marketplace for the official Skills Board plugin. The plugin ships the MCP server configuration above and one skill that explains how to use a team library from an agent. It is not tied to one client: the directory in [`plugin/`](./plugin) carries an [Agent Plugins](https://agent-plugins.org) 1.0.0 manifest, and a Claude Code manifest alongside it. Installing it is an alternative to the manual MCP setup above rather than a step after it.
@@ -171,6 +182,7 @@ Installing the plugin configures the MCP server. Connecting it still requires si
 | `pnpm db:check` | Check that the schema and committed migration snapshots match. |
 | `pnpm db:migrate` | Apply pending migrations to the configured database. |
 | `pnpm db:push` | Push the schema only to a throwaway database used for prototyping. |
+| `pnpm dns:check` | Look up the DNS-AID discovery records over DNS-over-HTTPS. |
 | `pnpm build` | Create a production build. |
 | `pnpm start` | Start the production server. |
 | `pnpm email` | Preview React Email templates on port 3001. |

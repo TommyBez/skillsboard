@@ -1,7 +1,7 @@
 import { connection } from "next/server"
 
 import {
-  buildProtectedResourceMetadata,
+  buildOriginProtectedResourceMetadata,
   DISCOVERY_CORS_HEADERS,
   discoveryPreflight,
 } from "@/lib/agent-discovery"
@@ -10,14 +10,17 @@ import {
  * Origin-level RFC 9728 entry point.
  *
  * Agents that scan a site look here first, before they know which path holds
- * the protected API. The path-derived document at
- * `/.well-known/oauth-protected-resource/api/mcp` stays the canonical one for a
- * client that already has the resource identifier; both are built from the same
- * function, so they always describe the same resource.
+ * the protected API, so this document describes the origin: which
+ * authorization server guards it and which scopes that server issues. The
+ * document for the MCP server itself lives at the path its resource identifier
+ * derives, `/.well-known/oauth-protected-resource/api/mcp`, and is the one to
+ * read for the audience to request a token for. Both name the same
+ * authorization server; they differ only in the `resource` each describes,
+ * which RFC 9728 §3.3 requires them to.
  */
 export async function GET() {
   await connection()
-  return Response.json(buildProtectedResourceMetadata(), {
+  return Response.json(buildOriginProtectedResourceMetadata(), {
     headers: {
       "Cache-Control": "public, max-age=300",
       "Access-Control-Allow-Origin": DISCOVERY_CORS_HEADERS["Access-Control-Allow-Origin"],

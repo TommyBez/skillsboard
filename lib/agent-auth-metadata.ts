@@ -1,4 +1,4 @@
-import { discoveryUrl } from "@/lib/agent-discovery"
+import { discoveryUrl, protectedResourceMetadataUrl } from "@/lib/agent-discovery"
 import { getMcpResource } from "@/lib/auth-environment"
 import { oauthScopes } from "@/lib/oauth-scopes"
 
@@ -49,7 +49,10 @@ export function buildAgentAuthBlock(metadata: Record<string, unknown>) {
       },
     ],
     ...(revocationEndpoint ? { revocation_uri: revocationEndpoint } : {}),
-    protected_resource_metadata_uri: discoveryUrl("/.well-known/oauth-protected-resource"),
+    // Derived from the same resource the registration method names above, so
+    // an agent that follows this link reads metadata whose `resource` matches
+    // the audience it is about to request a token for.
+    protected_resource_metadata_uri: protectedResourceMetadataUrl(getMcpResource()),
   }
 }
 

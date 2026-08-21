@@ -5,8 +5,13 @@ import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
 
-const { buildProtectedResourceMetadata, discoveryUrl, getDiscoveryOrigin } =
-  await import("../lib/agent-discovery.ts")
+const {
+  buildOriginProtectedResourceMetadata,
+  buildProtectedResourceMetadata,
+  discoveryUrl,
+  getDiscoveryOrigin,
+  protectedResourceMetadataUrl,
+} = await import("../lib/agent-discovery.ts")
 const { buildAgentAuthBlock } = await import("../lib/agent-auth-metadata.ts")
 const { buildAgentSkillsIndex, TEAM_SKILL_LIBRARY_DESCRIPTION, TEAM_SKILL_LIBRARY_DIGEST, TEAM_SKILL_LIBRARY_SKILL_PATH } =
   await import("../lib/published-agent-skills.ts")
@@ -37,6 +42,55 @@ test("protected resource metadata names the audience Better Auth binds tokens to
   assert.deepEqual(metadata.bearer_methods_supported, ["header"])
 })
 
+test("the metadata URL for a resource is the path RFC 9728 derives from it", () => {
+  assert.equal(
+    protectedResourceMetadataUrl(`${origin}/api/mcp`),
+    `${origin}/.well-known/oauth-protected-resource/api/mcp`,
+  )
+  // A bare origin derives the well-known path with nothing appended, and a
+  // trailing slash must not turn into one either: `.../oauth-protected-resource/`
+  // is a different URL from the one a client builds for the origin.
+  assert.equal(
+    protectedResourceMetadataUrl(origin),
+    `${origin}/.well-known/oauth-protected-resource`,
+  )
+  assert.equal(
+    protectedResourceMetadataUrl(`${origin}/`),
+    `${origin}/.well-known/oauth-protected-resource`,
+  )
+})
+
+test("each protected resource document names the resource its own path derives", () => {
+  // RFC 9728 section 3.3: a client builds the metadata URL from the identifier
+  // it wants and rejects a document whose `resource` is not that identifier.
+  // Serving the MCP resource at the origin-level path failed that check.
+  for (const [metadata, resource] of [
+    [buildProtectedResourceMetadata(), `${origin}/api/mcp`],
+    [buildOriginProtectedResourceMetadata(), origin],
+  ]) {
+    assert.equal(metadata.resource, resource)
+    assert.equal(
+      protectedResourceMetadataUrl(metadata.resource),
+      protectedResourceMetadataUrl(resource),
+      `${resource} is not described at the path it derives`,
+    )
+  }
+})
+
+test("the two protected resource documents agree on everything but the resource", () => {
+  const { resource: mcpResource, resource_name: mcpName, ...mcp } =
+    buildProtectedResourceMetadata()
+  const { resource: originResource, resource_name: originName, ...site } =
+    buildOriginProtectedResourceMetadata()
+
+  // One Better Auth instance backs both, so a client that read either one must
+  // reach the same authorization server with the same scopes.
+  assert.deepEqual(site, mcp)
+  assert.equal(originResource, origin)
+  assert.notEqual(originResource, mcpResource)
+  assert.notEqual(originName, mcpName)
+})
+
 test("agent_auth points at the endpoints the auth server actually published", () => {
   const block = buildAgentAuthBlock({
     issuer: `${origin}/api/auth`,
@@ -57,6 +111,13 @@ test("agent_auth points at the endpoints the auth server actually published", ()
   assert.equal(method.token_uri, `${origin}/api/auth/oauth2/token`)
   assert.equal(method.resource, `${origin}/api/mcp`)
   assert.deepEqual(method.code_challenge_methods_supported, ["S256"])
+
+  // The metadata link beside the resource has to describe that resource, or an
+  // agent validating it per RFC 9728 discards the document it just fetched.
+  assert.equal(
+    block.protected_resource_metadata_uri,
+    protectedResourceMetadataUrl(method.resource),
+  )
 })
 
 test("agent_auth is omitted rather than invented when registration is unavailable", () => {
@@ -206,8 +267,12 @@ test("auth.md opens with an h1 naming itself and covers the whole flow", async (
 
   assert.ok(authMd.includes(`${siteConfig.url}/api/mcp`), "auth.md must name the resource")
   assert.ok(
-    authMd.includes(`${siteConfig.url}/.well-known/oauth-protected-resource`),
-    "auth.md must point at the protected resource metadata",
+    authMd.includes(`${siteConfig.url}/.well-known/oauth-protected-resource/api/mcp`),
+    "auth.md must point at the metadata document that names the MCP audience",
+  )
+  assert.ok(
+    authMd.includes("invalid_target"),
+    "auth.md must say what happens when an agent requests the wrong audience",
   )
 })
 
@@ -222,6 +287,7 @@ test("the OpenAPI description covers the endpoints the API catalog advertises", 
     "/api/health",
     "/.well-known/mcp/server-card.json",
     "/.well-known/oauth-protected-resource",
+    "/.well-known/oauth-protected-resource/api/mcp",
     "/.well-known/agent-skills/index.json",
     "/.well-known/ai-catalog.json",
     "/.well-known/api-catalog",
@@ -339,6 +405,13 @@ test("the API catalog is a linkset anchored on the MCP endpoint", () => {
     "service-desc has to lead with the OpenAPI description",
   )
   assert.equal(entry.status[0].href, `${origin}/api/health`)
+
+  // service-meta describes the anchor, so it is the anchor's own RFC 9728
+  // document, not the origin-level entry point.
+  assert.equal(
+    entry["service-meta"][0].href,
+    protectedResourceMetadataUrl(entry.anchor),
+  )
 })
 
 test("the token estimate scales with the document and is never zero for text", () => {

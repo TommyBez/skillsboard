@@ -10,12 +10,40 @@ and is already deployed.
 This file is the change to apply, so the zone edit is a copy-and-paste rather
 than a re-derivation.
 
-## What to publish
+## Where the zone stands today
+
+Checked 2026-08-21 over DNS-over-HTTPS, the same way the scanner checks:
+
+| Fact | Value | Consequence |
+| --- | --- | --- |
+| Authoritative nameservers | `ns1.vercel-dns.com.` (SOA `hostmaster.nsone.net.`) | The zone is on Vercel DNS, so Vercel's record-type support decides what can be published. |
+| `DS` and `DNSKEY` at `skillsboard.sh` | Absent | The zone is unsigned. Every answer comes back `AD: false`. |
+| `_index._agents` / `_mcp._agents` / `_a2a._agents`, under both the apex and `www` | `NOERROR`, no answers | Nothing is published yet. |
+
+Re-run the checks in [Verifying](#verifying) before applying anything; a zone
+that moved provider changes which of the two record sets below applies.
+
+## Vercel DNS cannot carry SVCB, only HTTPS
+
+This is the constraint that shapes everything else. Vercel's DNS record type
+enum — in the [create-a-DNS-record API](https://vercel.com/docs/rest-api/dns/create-a-dns-record)
+and in `vercel dns add` — is `A`, `AAAA`, `ALIAS`, `CAA`, `CNAME`, `HTTPS`,
+`MX`, `SRV`, `TXT`, `NS`. There is no `SVCB` (RR type 64). There is `HTTPS`
+(RR type 65), which is the same wire format and the same SvcParams, specialised
+for HTTPS origins by [RFC 9460](https://www.rfc-editor.org/rfc/rfc9460).
+
+That is enough. Every endpoint DNS-AID would advertise here is an HTTPS origin,
+the draft permits the HTTPS RR for exactly that case, and the scanner queries
+**both** `SVCB` and `HTTPS` at every name it probes (see the query list under
+[What the scanner actually asks for](#what-the-scanner-actually-asks-for)). So
+publish the HTTPS form while the zone is on Vercel DNS, and keep the SVCB form
+for a zone that moves to a provider supporting RR type 64.
+
+## What to publish (Vercel DNS, HTTPS records)
 
 Two primary ServiceMode records that describe the endpoints, and two AliasMode
 records under the `_agents` inventory leaf that point at them, per
-`draft-mozleywilliams-dnsop-dnsaid-02` and the SVCB/HTTPS wire format in
-[RFC 9460](https://www.rfc-editor.org/rfc/rfc9460).
+`draft-mozleywilliams-dnsop-dnsaid-02`.
 
 The split is not stylistic. The draft is explicit about the inventory leaf:
 
@@ -24,6 +52,91 @@ The split is not stylistic. The draft is explicit about the inventory leaf:
 > owner.
 
 So the parameters live on the primary owner, and `_agents` only redirects.
+
+Vercel's HTTPS record body is `{ priority, target, params }`, where `params` is
+the SvcParams in RFC 9460 presentation form as a single string. Priority `0` is
+AliasMode; anything higher is ServiceMode.
+
+```sh
+# 1. The site's agent entry point, ServiceMode. `well-known` is relative to
+#    /.well-known/, so this names the ARD manifest listing every resource an
+#    agent can fetch here.
+curl -X POST "https://api.vercel.com/v2/domains/skillsboard.sh/records" \
+  -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "HTTPS",
+    "name": "agents-index",
+    "ttl": 3600,
+    "https": {
+      "priority": 1,
+      "target": "www.skillsboard.sh",
+      "params": "alpn=h2,http/1.1 port=443 mandatory=alpn,port"
+    },
+    "comment": "DNS-AID entry point, draft-mozleywilliams-dnsop-dnsaid-02"
+  }'
+
+# 2. The MCP server, ServiceMode.
+curl -X POST "https://api.vercel.com/v2/domains/skillsboard.sh/records" \
+  -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "HTTPS",
+    "name": "agents-mcp",
+    "ttl": 3600,
+    "https": {
+      "priority": 1,
+      "target": "www.skillsboard.sh",
+      "params": "alpn=h2,http/1.1 port=443 mandatory=alpn,port"
+    },
+    "comment": "DNS-AID MCP endpoint, draft-mozleywilliams-dnsop-dnsaid-02"
+  }'
+
+# 3-4. The inventory leaves, AliasMode: priority 0, no params of their own.
+curl -X POST "https://api.vercel.com/v2/domains/skillsboard.sh/records" \
+  -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "HTTPS",
+    "name": "_index._agents",
+    "ttl": 3600,
+    "https": { "priority": 0, "target": "agents-index.skillsboard.sh" },
+    "comment": "DNS-AID inventory leaf"
+  }'
+
+curl -X POST "https://api.vercel.com/v2/domains/skillsboard.sh/records" \
+  -H "Authorization: Bearer $VERCEL_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "HTTPS",
+    "name": "_mcp._agents",
+    "ttl": 3600,
+    "https": { "priority": 0, "target": "agents-mcp.skillsboard.sh" },
+    "comment": "DNS-AID inventory leaf"
+  }'
+```
+
+The resulting zone, in presentation form:
+
+```zone
+agents-index.skillsboard.sh.   3600 IN HTTPS 1 www.skillsboard.sh. alpn="h2,http/1.1" port=443 mandatory=alpn,port
+agents-mcp.skillsboard.sh.     3600 IN HTTPS 1 www.skillsboard.sh. alpn="h2,http/1.1" port=443 mandatory=alpn,port
+_index._agents.skillsboard.sh. 3600 IN HTTPS 0 agents-index.skillsboard.sh.
+_mcp._agents.skillsboard.sh.   3600 IN HTTPS 0 agents-mcp.skillsboard.sh.
+```
+
+Note what is missing next to the SVCB form below: `bap` and `well-known`. Vercel
+passes `params` through to NS1, which validates SvcParams against the registered
+keys, and neither key is registered yet (the draft defers the numbers to IANA).
+Try the record with them; if it is rejected, publish without them. The draft's
+own guidance is to use the numeric `keyNNNNN` form once the numbers are
+assigned, and until then the same information is one HTTP request away at
+`/.well-known/ai-catalog.json`.
+
+## What to publish (a provider that supports SVCB)
+
+Identical records, as RR type 64, with the two experimental parameters the
+Vercel path has to drop:
 
 ```zone
 ; DNS for AI Discovery, draft-mozleywilliams-dnsop-dnsaid-02
@@ -87,56 +200,101 @@ deployment (`/.well-known/ai-catalog.json` names the origin serving it), so any
 digest committed to DNS would be wrong for every deployment but one. A digest
 that does not match is worse than no digest.
 
-One practical caveat: `bap`, `well-known`, `cap`, and `cap-sha256` have no IANA
-assignment yet. The names above are the draft's presentation names, and a
-provider that validates SvcParams against the registry may reject them. Where
-that happens, the draft's guidance is to use the numeric `keyNNNNN` form once
-the numbers are assigned; until then, publish the two records without those
-keys rather than guessing a number, since the same information is one HTTP
-request away at `/.well-known/ai-catalog.json`.
+## What the scanner actually asks for
 
-## Where to apply it
+Taken from a live scan of `https://www.skillsboard.sh` on 2026-08-21, so the
+record set above is aimed at the names that are really queried rather than at
+the ones the draft happens to use in its examples:
 
-`skillsboard.sh` is served through Vercel. Whichever nameservers hold the zone:
+```
+SVCB|HTTPS  _index._agents.www.skillsboard.sh    SVCB|HTTPS  _index._agents.skillsboard.sh
+SVCB|HTTPS  _a2a._agents.www.skillsboard.sh      SVCB|HTTPS  _a2a._agents.skillsboard.sh
+SVCB|HTTPS  _mcp._agents.www.skillsboard.sh      SVCB|HTTPS  _mcp._agents.skillsboard.sh
+TXT         _index._agents.www.skillsboard.sh    TXT         _index._agents.skillsboard.sh
+```
 
-1. Add all four records above as **SVCB** (record type 64): the two primary
+Three things follow from that list:
+
+1. **Both the apex and `www` are probed.** The records above are published at
+   the apex, which is where the zone is. If a scan reports the apex records but
+   the site is canonically `www`, publishing the same four names under
+   `_agents.www.skillsboard.sh` costs nothing and removes the ambiguity.
+2. **`HTTPS` is queried beside `SVCB` at every name**, which is what makes the
+   Vercel path viable at all.
+3. **A `TXT` fallback at `_index._agents` is read** (the draft discusses TXT as
+   a fallback in section 4, for exactly the case where a DNS provider has no
+   SVCB support). It is not used here: the draft specifies no RDATA format for
+   it, so anything published would be a guess, and Vercel's `HTTPS` support
+   means the fallback is not needed.
+
+## DNSSEC
+
+The zone is unsigned today — no `DS` at the registrar, no `DNSKEY` in the zone,
+and every answer comes back with `AD: false`. That matters more than it looks:
+an unauthenticated discovery record is one an on-path attacker can rewrite to
+point an agent at a host that is not ours, and the scanner reads `AD` from the
+DoH response, so a correct record on an unsigned zone is still reported as
+failing.
+
+Vercel's DNS documentation does not describe signing a zone served from
+`vercel-dns.com` nameservers. Before publishing, check whether signing is
+available for this domain in the Vercel dashboard. If it is not, the zone has to
+move to a provider that both signs and supports RFC 9460 record types, and the
+`DS` record then goes to the registrar for `.sh`. Allow for propagation of the
+`DS` before re-checking `AD`.
+
+## Applying it
+
+1. Add the four records for whichever provider holds the zone: the two primary
    `agents-*` records first, then the two `_agents` aliases that point at them.
-   If the provider's UI has no SVCB type, the zone cannot carry DNS-AID and the
-   domain needs a provider that supports RFC 9460 record types.
-2. Enable **DNSSEC** on the zone if it is not already signed. A validating
-   resolver only returns authenticated data for a signed zone, and an
-   unauthenticated discovery record is one an on-path attacker can rewrite to
-   point an agent at a host that is not ours. Turning DNSSEC on requires
-   publishing the DS record at the registrar, so allow for propagation before
-   verifying.
+2. Enable DNSSEC, per the section above.
 3. Keep the TTL at 3600. These records change roughly never, and a short TTL
    only multiplies lookups.
 
 ## Verifying
 
+`pnpm dns:check` runs every query the scanner runs, over the same DoH resolver,
+and prints what came back:
+
+```sh
+pnpm dns:check                      # www.skillsboard.sh and skillsboard.sh
+pnpm dns:check example.com          # any other domain
+```
+
+By hand:
+
 ```sh
 # The inventory leaves. Each answers with an AliasMode record (priority 0)
 # naming its primary owner, and no parameters of its own.
-dig +short _index._agents.skillsboard.sh SVCB
-dig +short _mcp._agents.skillsboard.sh SVCB
+dig +short _index._agents.skillsboard.sh HTTPS
+dig +short _mcp._agents.skillsboard.sh HTTPS
 
 # The primaries the aliases point at. The parameters live here.
-dig +short agents-index.skillsboard.sh SVCB
-dig +short agents-mcp.skillsboard.sh SVCB
+dig +short agents-index.skillsboard.sh HTTPS
+dig +short agents-mcp.skillsboard.sh HTTPS
 
 # Authenticated data: look for the `ad` flag.
-dig +dnssec _mcp._agents.skillsboard.sh SVCB | grep -E 'flags:|RRSIG'
+dig +dnssec _mcp._agents.skillsboard.sh HTTPS | grep -E 'flags:|RRSIG'
 
 # What the scanner does: DNS-over-HTTPS, Cloudflare first, Google as fallback.
 curl -sH 'accept: application/dns-json' \
-  'https://cloudflare-dns.com/dns-query?name=_index._agents.skillsboard.sh&type=SVCB'
+  'https://cloudflare-dns.com/dns-query?name=_index._agents.skillsboard.sh&type=HTTPS&do=1'
 ```
 
-The scanner reports this under `checks.discoverability.dnsAid.status`; it reads
-`AD: true` from the DoH response, so a correct record on an unsigned zone will
-still be reported as failing.
+Then re-run the scan; it reports this under `checks.discoverability.dnsAid`:
+
+```sh
+curl -sX POST https://isitagentready.com/api/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"url": "https://www.skillsboard.sh"}' |
+  python3 -c 'import json,sys; print(json.load(sys.stdin)["checks"]["discoverability"]["dnsAid"])'
+```
+
+Swap `SVCB` for `HTTPS` in every command above if the zone ends up on a provider
+that carries RR type 64.
 
 ## Reference
 
 - <https://datatracker.ietf.org/doc/draft-mozleywilliams-dnsop-dnsaid/>
 - <https://www.rfc-editor.org/rfc/rfc9460>
+- <https://vercel.com/docs/rest-api/dns/create-a-dns-record>

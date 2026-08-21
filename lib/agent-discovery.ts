@@ -25,25 +25,66 @@ export function getAuthorizationServerIssuer(): string {
 }
 
 /**
- * RFC 9728 metadata for the single protected resource this deployment exposes.
+ * The RFC 9728 §3.1 metadata URL for a resource identifier: insert
+ * `/.well-known/oauth-protected-resource` between the identifier's host and its
+ * path. `https://host` derives `/.well-known/oauth-protected-resource`;
+ * `https://host/api/mcp` derives `/.well-known/oauth-protected-resource/api/mcp`.
  *
- * Shared by the origin-level document and the path-derived one at
- * `/.well-known/oauth-protected-resource/api/mcp` so the two cannot drift. Both
- * name `<origin>/api/mcp` as the resource identifier because that is the exact
- * audience Better Auth binds tokens to (see `mcp({ resource })` in lib/auth.ts);
- * advertising the bare origin here would read well but make every token request
- * fail with `invalid_target`.
+ * Deriving it rather than writing it out twice keeps every link to a metadata
+ * document pointing at the document that actually describes that resource.
  */
-export function buildProtectedResourceMetadata() {
-  const resource = getMcpResource()
+export function protectedResourceMetadataUrl(resource: string): string {
+  const { origin, pathname } = new URL(resource)
+  const path = pathname.replace(/\/+$/, "")
+  return `${origin}/.well-known/oauth-protected-resource${path}`
+}
+
+/**
+ * RFC 9728 metadata for one resource identifier.
+ *
+ * A client builds the metadata URL from the identifier it wants to reach and
+ * then MUST reject a document whose `resource` is not that identifier
+ * (RFC 9728 §3.3). So the origin-level document and the MCP one cannot share a
+ * `resource` value, and each is built for the identifier its own path derives.
+ * Everything else — the authorization server, the scopes, the bearer method —
+ * is the same, because there is one Better Auth instance behind both.
+ */
+function buildResourceMetadata(resource: string, resourceName: string) {
   return {
     resource,
     authorization_servers: [getAuthorizationServerIssuer()],
     scopes_supported: [...oauthScopes],
     bearer_methods_supported: ["header"],
-    resource_name: "Skills Board MCP",
+    resource_name: resourceName,
     resource_documentation: discoveryUrl("/auth.md"),
   }
+}
+
+/**
+ * Metadata for the MCP server, served at the path `<origin>/api/mcp` derives.
+ *
+ * This is the canonical document: `<origin>/api/mcp` is the exact audience
+ * Better Auth binds tokens to (see `mcp({ resource })` in lib/auth.ts), it is
+ * what the `WWW-Authenticate` challenge from `/api/mcp` points a client at, and
+ * it is the identifier to send as `resource` on a token request. Asking for a
+ * token for anything else fails with `invalid_target`.
+ */
+export function buildProtectedResourceMetadata() {
+  return buildResourceMetadata(getMcpResource(), "Skills Board MCP")
+}
+
+/**
+ * Metadata for the origin, served at `/.well-known/oauth-protected-resource`.
+ *
+ * The entry point an agent that has only a hostname can reach: it names the
+ * authorization server guarding this origin's protected APIs and the scopes it
+ * issues. It deliberately does not claim `<origin>/api/mcp` as its `resource` —
+ * that document lives at its own derived path, and a client validating this one
+ * per RFC 9728 §3.3 would reject a mismatch outright. `resource_documentation`
+ * leads to auth.md, which names the MCP audience to request tokens for.
+ */
+export function buildOriginProtectedResourceMetadata() {
+  return buildResourceMetadata(getDiscoveryOrigin(), "Skills Board")
 }
 
 /** Every agent-facing endpoint answers cross-origin preflight the same way. */

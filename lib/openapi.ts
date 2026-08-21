@@ -161,7 +161,30 @@ export function buildOpenApiDocument() {
       "/.well-known/oauth-protected-resource": {
         "get": {
           "operationId": "getProtectedResourceMetadata",
-          "summary": "OAuth Protected Resource Metadata (RFC 9728)",
+          "summary": "OAuth Protected Resource Metadata for this origin (RFC 9728)",
+          "description":
+            "Entry point for an agent that has only the hostname. Names the origin as its `resource`, the authorization server guarding it, and the scopes that server issues. For the audience to request an MCP token for, read the document at `/.well-known/oauth-protected-resource/api/mcp`.",
+          "security": [],
+          "responses": {
+            "200": {
+              "description": "Resource identifier, authorization servers, and supported scopes.",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/.well-known/oauth-protected-resource/api/mcp": {
+        "get": {
+          "operationId": "getMcpProtectedResourceMetadata",
+          "summary": "OAuth Protected Resource Metadata for the MCP server (RFC 9728)",
+          "description":
+            "The document the `WWW-Authenticate` challenge from `/api/mcp` points at. Its `resource` is the RFC 8707 audience to send on a token request; any other value is rejected with `invalid_target`.",
           "security": [],
           "responses": {
             "200": {
