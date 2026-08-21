@@ -14,17 +14,22 @@ import { siteConfig } from "@/lib/site"
  * uses `url`; nothing this site publishes is small enough to be worth inlining.
  */
 export function buildArdCatalog() {
+  const origin = new URL(getDiscoveryOrigin())
   // `hostname`, not `host`: a URN segment is colon-delimited, so a port would
   // split the identifier. Production has no port; a preview or a local run
   // does, and would otherwise emit `urn:air:localhost:3000:...`.
-  const host = new URL(getDiscoveryOrigin()).hostname
+  const host = origin.hostname
+  // did:web is the opposite case: it identifies a host that must be resolvable,
+  // so a non-default port belongs in the identifier. The method encodes the
+  // delimiter as %3A, since a bare colon separates DID method segments.
+  const didWebHost = origin.port ? `${host}%3A${origin.port}` : host
   const urn = (namespace: string, name: string) => `urn:air:${host}:${namespace}:${name}`
 
   return {
     specVersion: "1.0",
     host: {
       displayName: siteConfig.name,
-      identifier: `did:web:${host}`,
+      identifier: `did:web:${didWebHost}`,
       description: siteConfig.description,
       url: getDiscoveryOrigin(),
     },

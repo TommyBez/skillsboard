@@ -23,7 +23,7 @@ library here.
 
 Fetch the protected resource metadata:
 
-```
+```http
 GET https://www.skillsboard.sh/.well-known/oauth-protected-resource
 ```
 
@@ -43,7 +43,7 @@ Register as an OAuth client with RFC 7591 dynamic client registration, at the
 `https://www.skillsboard.sh/api/auth/oauth2/register`). Registration is open: no
 credential is needed to obtain one.
 
-```
+```http
 POST https://www.skillsboard.sh/api/auth/oauth2/register
 Content-Type: application/json
 
@@ -70,7 +70,7 @@ Send the user to the `authorization_endpoint` with PKCE (`S256` is the only
 supported challenge method) and the `resource` parameter set to the MCP
 resource identifier:
 
-```
+```http
 GET https://www.skillsboard.sh/api/auth/oauth2/authorize
   ?response_type=code
   &client_id=<client_id>
@@ -95,7 +95,7 @@ Send the access token as a bearer token in the `Authorization` header. That is
 the only supported method. This server does not read tokens from the query
 string or a form body.
 
-```
+```http
 POST https://www.skillsboard.sh/api/mcp
 Authorization: Bearer <access token>
 Content-Type: application/json

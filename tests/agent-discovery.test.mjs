@@ -261,7 +261,7 @@ test("the OpenAPI description names the deployment serving it, never production"
 const { buildArdCatalog } = await import("../lib/ard-catalog.ts")
 const { API_CATALOG_MEDIA_TYPE, buildApiCatalog } = await import("../lib/api-catalog.ts")
 const { estimateMarkdownTokens } = await import("../lib/markdown/tokens.ts")
-const { mcpEndpoint, webMcpPages } = await import("../lib/web-mcp-tools.ts")
+const { mcpEndpointFor, webMcpPages } = await import("../lib/web-mcp-tools.ts")
 const { markdownTwinPaths } = await import("../lib/markdown/twins.ts")
 
 test("every ARD entry carries an identifier, a type, and one location", () => {
@@ -269,7 +269,16 @@ test("every ARD entry carries an identifier, a type, and one location", () => {
   const host = new URL(origin).hostname
 
   assert.equal(catalog.specVersion, "1.0")
-  assert.equal(catalog.host.identifier, `did:web:${host}`)
+  // did:web encodes a non-default port as %3A, so an origin carrying one stays
+  // resolvable; a bare colon would read as a DID method separator.
+  const originUrl = new URL(origin)
+  const didWebHost = originUrl.port ? `${host}%3A${originUrl.port}` : host
+  assert.equal(catalog.host.identifier, `did:web:${didWebHost}`)
+  assert.doesNotMatch(
+    catalog.host.identifier.slice("did:web:".length),
+    /:/,
+    "a raw colon in a did:web host splits the identifier",
+  )
   assert.ok(catalog.host.displayName.length > 0)
   assert.ok(catalog.entries.length > 0)
 
@@ -292,7 +301,11 @@ test("every ARD entry carries an identifier, a type, and one location", () => {
       1,
       `${entry.identifier} must carry exactly one of url and data`,
     )
-    assert.equal(new URL(entry.url).origin, origin, `${entry.identifier} points off-origin`)
+    // Only a url entry has an origin to check; constructing a URL from a
+    // data-only entry would throw before the assertion could report anything.
+    if ("url" in entry) {
+      assert.equal(new URL(entry.url).origin, origin, `${entry.identifier} points off-origin`)
+    }
 
     const queries = entry.representativeQueries
     assert.ok(
@@ -345,7 +358,15 @@ test("WebMCP can reach every page that has a Markdown twin", () => {
     [...markdownTwinPaths],
   )
 
-  assert.equal(mcpEndpoint, `${siteConfig.url}/api/mcp`)
+  // The endpoint an in-page agent is handed has to be the deployment it is
+  // reading, not production: a preview must not send an agent, or whatever it
+  // writes, to the production database.
+  assert.equal(mcpEndpointFor(origin), `${origin}/api/mcp`)
+  assert.equal(
+    mcpEndpointFor("https://preview.example"),
+    "https://preview.example/api/mcp",
+  )
+  assert.equal(mcpEndpointFor("https://preview.example/"), "https://preview.example/api/mcp")
 
   for (const page of webMcpPages) {
     assert.ok(page.markdownPath.startsWith("/"), `${page.path} has a non-relative twin path`)

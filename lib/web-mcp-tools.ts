@@ -2,7 +2,6 @@ import { markdownTwinPath } from "@/lib/markdown/twins"
 import { alternatives } from "@/lib/seo/alternatives"
 import { home } from "@/lib/seo/home"
 import { resourceEntries } from "@/lib/seo/resources"
-import { siteConfig } from "@/lib/site"
 
 export interface WebMcpPage {
   path: string
@@ -27,7 +26,18 @@ export const webMcpPages: readonly WebMcpPage[] = [home, ...resourceEntries, ...
   }),
 )
 
-export const mcpEndpoint = `${siteConfig.url}/api/mcp`
+/**
+ * The MCP endpoint of the deployment a page is being served from.
+ *
+ * Takes the origin rather than reading `siteConfig.url`, which is always
+ * production: a preview that told an agent to connect to the production server
+ * would send it, and whatever it writes, to the production database instead of
+ * the branch Neon isolates for the preview. The browser knows the origin it
+ * loaded, and that is the deployment whose MCP server it should name.
+ */
+export function mcpEndpointFor(origin: string): string {
+  return `${origin.replace(/\/$/, "")}/api/mcp`
+}
 
 /**
  * Resolves a tool-supplied path against an origin, or returns undefined.

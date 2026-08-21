@@ -2,7 +2,7 @@
 
 import { useEffect } from "react"
 
-import { mcpEndpoint, sameOriginDestination, webMcpPages } from "@/lib/web-mcp-tools"
+import { mcpEndpointFor, sameOriginDestination, webMcpPages } from "@/lib/web-mcp-tools"
 
 /**
  * WebMCP: the tools an agent driving this page in a browser can call.
@@ -94,7 +94,7 @@ function buildTools(): WebMcpTool[] {
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       async execute() {
         return json({
-          endpoint: mcpEndpoint,
+          endpoint: mcpEndpointFor(window.location.origin),
           transport: "streamable-http",
           authentication:
             "OAuth 2.1. The client registers dynamically, then a signed-in user approves the scopes. Full flow: /auth.md",
@@ -183,7 +183,9 @@ export function WebMcpTools() {
       // empty tool set is how a page withdraws what it offered.
       if (typeof modelContext.provideContext === "function") {
         try {
-          void modelContext.provideContext({ tools: [] })
+          // `provideContext` may reject rather than throw, and an unhandled
+          // rejection on unmount would surface as a page error.
+          void Promise.resolve(modelContext.provideContext({ tools: [] })).catch(() => {})
         } catch {
           // The page is going away regardless.
         }
