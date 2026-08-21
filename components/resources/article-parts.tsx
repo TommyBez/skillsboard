@@ -148,9 +148,9 @@ export function SectionTable({
               >
                 {row.label}
               </th>
-              {row.cells.map((cell) => (
+              {row.cells.map((cell, index) => (
                 <td
-                  key={cell}
+                  key={`${row.label}-${index}`}
                   className="px-5 py-5 align-top text-sm leading-relaxed text-muted-foreground"
                 >
                   {cell}

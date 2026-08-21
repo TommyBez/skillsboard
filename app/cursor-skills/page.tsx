@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { CursorSkillsPage } from "@/components/cursor-skills/cursor-skills-page"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import { cursorSkills } from "@/lib/seo/cursor-skills"
@@ -10,7 +11,7 @@ const socialTitle = "Cursor skills, explained"
 export const metadata: Metadata = {
   title: { absolute: cursorSkills.seoTitle },
   description: cursorSkills.description,
-  alternates: { canonical: cursorSkills.path },
+  alternates: markdownTwinAlternates(cursorSkills.path),
   openGraph: {
     type: "article",
     url: cursorSkills.path,
