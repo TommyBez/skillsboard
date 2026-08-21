@@ -17,6 +17,7 @@ type NonTeamEventPropertiesMap = {
       | "hero"
       | "closing"
       | "about_header"
+      | "developers_header"
       | "agent_skills_header"
       | "agent_skills_hero"
       | "agent_skills_inline"

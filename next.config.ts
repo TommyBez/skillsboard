@@ -65,6 +65,38 @@ const nextConfig = {
         destination: "/resources",
         permanent: true,
       },
+      // The developer docs live at /developers. The other two spellings are
+      // what a person types and what an agent probes when it is looking for an
+      // API description, and both used to 404.
+      {
+        source: "/docs",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/docs/",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/api",
+        destination: "/developers",
+        permanent: true,
+      },
+      {
+        source: "/developers/",
+        destination: "/developers",
+        permanent: true,
+      },
+      // The MCP endpoint is at /api/mcp, which is the audience every issued
+      // token is bound to and cannot move. A client that guesses the
+      // conventional root path is sent there rather than refused: 308 keeps the
+      // method and the body, so a POSTed JSON-RPC call survives the hop.
+      {
+        source: "/mcp",
+        destination: "/api/mcp",
+        permanent: true,
+      },
       {
         source: "/about/",
         destination: "/about",
@@ -226,6 +258,11 @@ const nextConfig = {
           source: "/agent-skills-support",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/agent-skills-support",
+        },
+        {
+          source: "/developers",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/developers",
         },
         {
           source: "/agents-md-vs-skill-md",

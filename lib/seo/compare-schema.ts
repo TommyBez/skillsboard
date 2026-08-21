@@ -6,34 +6,20 @@ import {
   comparisons,
   type ComparisonDefinition,
 } from "@/lib/seo/compare"
+import {
+  organizationId,
+  organizationLogoNode,
+  organizationNode,
+} from "@/lib/seo/organization"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
-const organizationId = absoluteUrl("/#organization")
 const websiteId = absoluteUrl("/#website")
-const logoId = absoluteUrl("/#logo")
-const logoUrl = absoluteUrl("/apple-icon.png")
 const compareUrl = absoluteUrl(compareIndexPath)
 
 function sharedGraphNodes() {
   return [
-    {
-      "@type": "Organization",
-      "@id": organizationId,
-      name: siteConfig.name,
-      url: siteConfig.url,
-      description: siteConfig.description,
-      logo: { "@id": logoId },
-      sameAs: [siteConfig.githubUrl],
-    },
-    {
-      "@type": "ImageObject",
-      "@id": logoId,
-      url: logoUrl,
-      contentUrl: logoUrl,
-      width: 180,
-      height: 180,
-      caption: `${siteConfig.name} logo`,
-    },
+    organizationNode(),
+    organizationLogoNode(),
     {
       "@type": "WebSite",
       "@id": websiteId,

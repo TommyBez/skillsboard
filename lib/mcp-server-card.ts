@@ -9,6 +9,10 @@
  * `mcp-server-card` unit test reads `server.json` and fails when the two
  * disagree.
  */
+/** The schema the committed `server.json` declares, repeated for the served copy. */
+export const MCP_SERVER_SCHEMA =
+  "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json"
+
 export const mcpServerInfo = {
   name: "io.github.TommyBez/skillsboard",
   title: "Skills Board",
@@ -137,3 +141,24 @@ export const mcpToolSummaries: readonly McpToolSummary[] = [
     requiredScopes: WRITE,
   },
 ]
+
+/**
+ * The MCP registry manifest for this deployment.
+ *
+ * Same identity as the card above, in the shape the registry publishes, with
+ * the remote endpoint the caller passes rather than the production one baked
+ * into `mcpServerInfo`. The `mcp-registry-manifest` unit test compares the
+ * result against the committed `server.json` so the two cannot drift.
+ */
+export function buildMcpRegistryManifest(endpoint: string) {
+  return {
+    $schema: MCP_SERVER_SCHEMA,
+    name: mcpServerInfo.name,
+    title: mcpServerInfo.title,
+    description: mcpServerInfo.description,
+    version: mcpServerInfo.version,
+    websiteUrl: new URL(endpoint).origin,
+    repository: { ...mcpServerInfo.repository },
+    remotes: [{ type: "streamable-http", url: endpoint }],
+  }
+}

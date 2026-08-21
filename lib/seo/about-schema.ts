@@ -1,5 +1,10 @@
 import { OG_SIZE, type OgTemplateContent } from "@/lib/og/template"
 import { resourcePaths } from "@/lib/seo/resources"
+import {
+  organizationId,
+  organizationLogoNode,
+  organizationNode,
+} from "@/lib/seo/organization"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 export const aboutDescription =
@@ -21,10 +26,7 @@ export const aboutSocialImageContent: OgTemplateContent = {
 }
 
 export function buildAboutSchema() {
-  const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
-  const logoId = absoluteUrl("/#logo")
-  const logoUrl = absoluteUrl("/apple-icon.png")
   const pageUrl = absoluteUrl(resourcePaths.about)
   const pageId = `${pageUrl}#page`
   const primaryImageId = `${pageUrl}#primaryimage`
@@ -33,29 +35,8 @@ export function buildAboutSchema() {
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": organizationId,
-        name: siteConfig.name,
-        url: siteConfig.url,
-        description: siteConfig.description,
-        logo: { "@id": logoId },
-        sameAs: [siteConfig.githubUrl],
-        contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "customer support",
-          email: siteConfig.contactEmail,
-        },
-      },
-      {
-        "@type": "ImageObject",
-        "@id": logoId,
-        url: logoUrl,
-        contentUrl: logoUrl,
-        width: 180,
-        height: 180,
-        caption: `${siteConfig.name} logo`,
-      },
+      organizationNode(),
+      organizationLogoNode(),
       {
         "@type": "WebSite",
         "@id": websiteId,

@@ -4,12 +4,22 @@ import { CompassIcon } from "lucide-react"
 
 import { Brand } from "@/components/brand"
 import { Button } from "@/components/ui/button"
+import { recoveryLinks } from "@/lib/agent-recovery"
 
 export const metadata: Metadata = {
   title: "Page not found",
   robots: { index: false, follow: false },
 }
 
+/**
+ * The 404 every wrong URL on the marketing surface reaches.
+ *
+ * The status is a real 404 and the body is a way out: the two buttons for a
+ * person, and a short index of the four entry points — home, the sitemap,
+ * llms.txt, the developer docs — for anyone, or anything, that arrived here by
+ * guessing a URL. The same list is what `/api/markdown` returns to a client
+ * that asked for Markdown, so both formats of this page give the same advice.
+ */
 export default function NotFound() {
   return (
     <main className="app-canvas flex min-h-[100dvh] flex-col p-4 md:p-6">
@@ -35,6 +45,33 @@ export default function NotFound() {
               Back home
             </Button>
           </div>
+
+          <nav aria-labelledby="not-found-recovery" className="mt-12 border-t border-white/12 pt-8">
+            <h2
+              id="not-found-recovery"
+              className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-(--surface-ink-foreground)/56"
+            >
+              Where to look next
+            </h2>
+            <ul className="mt-5 grid gap-3 text-(--surface-ink-foreground)/68 sm:grid-cols-2">
+              {recoveryLinks.map((link) => (
+                <li key={link.href} className="leading-relaxed">
+                  <a
+                    href={link.href}
+                    className="font-medium text-(--surface-ink-foreground) underline decoration-primary/50 underline-offset-4"
+                  >
+                    {link.label}
+                  </a>
+                  <span className="block text-sm">{link.description}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm leading-relaxed text-(--surface-ink-foreground)/56">
+              Every public page also answers with Markdown: append{" "}
+              <code className="font-mono">.md</code> to its path, or send{" "}
+              <code className="font-mono">Accept: text/markdown</code>.
+            </p>
+          </nav>
         </section>
       </div>
     </main>

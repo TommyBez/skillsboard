@@ -1,5 +1,6 @@
 import { markdownTwinPath } from "@/lib/markdown/twins"
 import { alternatives } from "@/lib/seo/alternatives"
+import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { resourceEntries } from "@/lib/seo/resources"
 
@@ -17,7 +18,12 @@ export interface WebMcpPage {
  * Built from the same registries the twins are built from, so a page added to
  * the resource registry becomes reachable from an agent with no change here.
  */
-export const webMcpPages: readonly WebMcpPage[] = [home, ...resourceEntries, ...alternatives].map(
+export const webMcpPages: readonly WebMcpPage[] = [
+  home,
+  ...resourceEntries,
+  ...alternatives,
+  developers,
+].map(
   (entry) => ({
     path: entry.path,
     markdownPath: markdownTwinPath(entry.path),

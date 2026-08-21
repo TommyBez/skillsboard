@@ -61,7 +61,13 @@ export function FaqSection() {
                 className="faq-disclosure lp-faq-item"
               >
                 <summary className="lp-faq-summary">
-                  <span className="lp-faq-question">{faq.question}</span>
+                  {/* A heading rather than a span: these eight questions are
+                      the page's only third-level structure, and a reader
+                      extracting the document outline — a screen reader, a
+                      crawler, an agent reading the raw HTML — sees a flat page
+                      without them. `summary` takes heading content, and the
+                      disclosure behaviour is unchanged. */}
+                  <h3 className="lp-faq-question">{faq.question}</h3>
                   {/* Leader: ties the entry to its control the way a contents
                       page ties a title to its folio. Its dots are phased from
                       the LEFT, off the ink of the question's final "?", so the

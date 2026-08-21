@@ -1,39 +1,20 @@
 import { landingFaqs } from "@/lib/seo/landing-faq"
+import {
+  organizationId,
+  organizationLogoNode,
+  organizationNode,
+} from "@/lib/seo/organization"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 export function buildLandingSchema() {
-  const organizationId = absoluteUrl("/#organization")
   const websiteId = absoluteUrl("/#website")
   const softwareId = absoluteUrl("/#software")
-  const logoId = absoluteUrl("/#logo")
-  const logoUrl = absoluteUrl("/apple-icon.png")
 
   return {
     "@context": "https://schema.org",
     "@graph": [
-      {
-        "@type": "Organization",
-        "@id": organizationId,
-        name: siteConfig.name,
-        url: siteConfig.url,
-        description: siteConfig.description,
-        logo: { "@id": logoId },
-        sameAs: [siteConfig.githubUrl],
-        contactPoint: {
-          "@type": "ContactPoint",
-          contactType: "customer support",
-          email: siteConfig.contactEmail,
-        },
-      },
-      {
-        "@type": "ImageObject",
-        "@id": logoId,
-        url: logoUrl,
-        contentUrl: logoUrl,
-        width: 180,
-        height: 180,
-        caption: `${siteConfig.name} logo`,
-      },
+      organizationNode(),
+      organizationLogoNode(),
       {
         "@type": "WebSite",
         "@id": websiteId,

@@ -10,6 +10,7 @@ import {
   compareIndexPath,
   comparisons,
 } from "@/lib/seo/compare"
+import { developers } from "@/lib/seo/developers"
 import { guideEvidencePaths } from "@/lib/seo/guides/types"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
@@ -83,6 +84,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-08-06"),
       changeFrequency: "yearly",
       priority: 0.3,
+    },
+    {
+      url: `${siteConfig.url}${developers.path}`,
+      lastModified: new Date(developers.modifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.7,
     },
     {
       url: `${siteConfig.url}${resourcePaths.about}`,

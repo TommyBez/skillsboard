@@ -1,10 +1,8 @@
+import { headers } from "next/headers"
 import { connection } from "next/server"
 
-import {
-  DISCOVERY_CORS_HEADERS,
-  discoveryPreflight,
-  discoveryUrl,
-} from "@/lib/agent-discovery"
+import { agentDocumentResponse } from "@/lib/agent-document"
+import { discoveryPreflight, discoveryUrl } from "@/lib/agent-discovery"
 import { getMcpResource } from "@/lib/auth-environment"
 import { mcpServerCapabilities, mcpServerInfo, mcpToolSummaries } from "@/lib/mcp-server-card"
 import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
@@ -16,8 +14,10 @@ import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
 export async function GET() {
   await connection()
 
-  return Response.json(
-    {
+  return agentDocumentResponse({
+    instance: "/.well-known/mcp/server-card.json",
+    requestHeaders: await headers(),
+    document: {
       serverInfo: mcpServerInfo,
       transport: {
         type: "streamable-http",
@@ -44,13 +44,7 @@ export async function GET() {
         documentation: discoveryUrl("/auth.md"),
       },
     },
-    {
-      headers: {
-        "Cache-Control": "public, max-age=300, s-maxage=3600",
-        "Access-Control-Allow-Origin": DISCOVERY_CORS_HEADERS["Access-Control-Allow-Origin"],
-      },
-    },
-  )
+  })
 }
 
 export function OPTIONS() {

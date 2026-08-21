@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { ShieldCheckIcon } from "lucide-react"
 
 import { DecodeText } from "@/components/landing/decode-text"
@@ -68,6 +69,20 @@ export function McpSection() {
                 <div className="mt-7">
                   <HomeMcpActions />
                 </div>
+                {/* The one link out of this chapter. The endpoint annotation
+                    below is decorative and hidden from assistive technology, so
+                    without this the page states that Skills Board has an API
+                    and never says where it is documented. */}
+                <p className="mt-6 text-sm leading-relaxed text-muted-foreground">
+                  <Link
+                    href="/developers"
+                    className="font-medium text-foreground underline decoration-primary/40 underline-offset-4"
+                  >
+                    Developer docs
+                  </Link>
+                  : the endpoint, its tools and scopes, and the versioning,
+                  error, and rate-limit conventions.
+                </p>
               </div>
 
               {/* Decorative annotation: the connection this chapter describes,

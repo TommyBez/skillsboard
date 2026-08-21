@@ -20,6 +20,7 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://www.skillsboard.sh/): Product overview, pricing, and common questions
 - [Resources](https://www.skillsboard.sh/resources): Practical guides for teams sharing, reviewing, and operating AI skills
+- [Developer docs](https://www.skillsboard.sh/developers): How an agent connects to the MCP server, the tools and scopes it gets, and the versioning, error, and rate-limit conventions of the HTTP surface
 - [About Skills Board](https://www.skillsboard.sh/about): Why the shared team library exists, how teams use it, and where to find the open-source project
 - [Cross-agent skill compatibility fixture](https://www.skillsboard.sh/cross-agent-skill-compatibility-fixture.md): Versioned discovery and instruction-transport protocol with fixed criteria and no claimed agent results
 - [Pricing](https://www.skillsboard.sh/pricing.md): Machine-readable pricing details
@@ -29,12 +30,20 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 ## Machine-readable discovery
 - [ARD capability manifest](https://www.skillsboard.sh/.well-known/ai-catalog.json): Every resource on this origin an agent can fetch, with representative queries
 - [MCP Server Card](https://www.skillsboard.sh/.well-known/mcp/server-card.json): Server identity, transport endpoint, capabilities, and the full tool list with the scope each needs
+- [MCP registry manifest](https://www.skillsboard.sh/server.json): The manifest the MCP registry publishes this server from, with the streamable HTTP endpoint
 - [Agent Skills index](https://www.skillsboard.sh/.well-known/agent-skills/index.json): The skills Skills Board publishes, each with a sha256 digest
 - [API catalog](https://www.skillsboard.sh/.well-known/api-catalog): RFC 9727 linkset for the MCP API, with its description, documentation, and status links
 - [OpenAPI description](https://www.skillsboard.sh/openapi.json): The public HTTP surface, OpenAPI 3.1
 - [Agent authentication](https://www.skillsboard.sh/auth.md): How an agent registers, gets a user-delegated token, and handles revocation
 - [Protected resource metadata](https://www.skillsboard.sh/.well-known/oauth-protected-resource): RFC 9728 resource identifier, authorization servers, and scopes
-- [Deployment liveness](https://www.skillsboard.sh/api/health): HTTP liveness only; backing services are not probed
+- [Deployment liveness](https://www.skillsboard.sh/api/health): HTTP liveness only; backing services are not probed, and the response carries the caller's remaining request budget
+
+## API conventions
+
+- Version: every response carries `Skills-Board-Api-Version: 1`; a request may send the same header to pin the version it was written against, and an unsupported one is refused with 400 rather than answered with a different version.
+- Errors: RFC 9457 `application/problem+json` on every endpoint except the MCP one, which reports failures as JSON-RPC error objects. Branch on the `code` member; the `type` member is a URL that resolves to the section of https://www.skillsboard.sh/developers describing that failure.
+- Rate limits: budgeted endpoints send `RateLimit` and `RateLimit-Policy` and refuse with 429 and `Retry-After`. The published budget is 120 requests per 60 seconds per client per endpoint, counted per serving instance.
+- Deprecation: a withdrawal is announced with `Deprecation` and `Sunset` headers at least 90 days ahead.
 
 ## Skill format explainers
 - [Agent Skills support: which clients read SKILL.md](https://www.skillsboard.sh/agent-skills-support): Eleven clients whose own documentation states they read SKILL.md with the directories each names, the thirty-six further entries on the agentskills.io client showcase, which directory reaches which client, and the behavior no vendor documents
