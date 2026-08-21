@@ -7,6 +7,7 @@ import { manageCrossAgentSkillsGuide } from "@/lib/seo/guides/content/manage-cro
 import { onboardNewTeammateSkillsGuide } from "@/lib/seo/guides/content/onboard-new-teammate-skills"
 import { shareTeamSkillsGuide } from "@/lib/seo/guides/content/share-team-skills"
 import { sharedMcpSkillLibraryGuide } from "@/lib/seo/guides/content/shared-mcp-skill-library"
+import { writeSkillMdGuide } from "@/lib/seo/guides/content/write-skill-md"
 import type { GuideDefinition, GuidePath, GuideSlug } from "@/lib/seo/guides/types"
 
 export {
@@ -26,6 +27,7 @@ export {
   onboardNewTeammateSkillsGuide,
   shareTeamSkillsGuide,
   sharedMcpSkillLibraryGuide,
+  writeSkillMdGuide,
 }
 
 export const guides = [
@@ -38,6 +40,7 @@ export const guides = [
   shareTeamSkillsGuide,
   manageCrossAgentSkillsGuide,
   installClaudeSkillsGuide,
+  writeSkillMdGuide,
 ] as const satisfies readonly GuideDefinition[]
 
 function validateGuideAuthority(guide: GuideDefinition) {

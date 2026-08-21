@@ -50,6 +50,9 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 - [AGENTS.md vs SKILL.md](https://www.skillsboard.sh/agents-md-vs-skill-md): What each format describes, which of Claude Code, Codex, and Cursor reads which, minimal examples of both, and how the two work together
 - [Where to find Claude skills](https://www.skillsboard.sh/where-to-find-claude-skills): Where Claude skills actually come from today: the official plugin marketplace, the claude.com catalog, skills.sh, anthropics/skills, and the awesome lists, with what each one screens
 
+## Write and validate
+- [How to write a SKILL.md file](https://www.skillsboard.sh/guides/how-to-write-a-skill-md): The six specification frontmatter fields and the Claude Code additions, the description rules that decide whether a skill triggers, the body and reference-file budgets, and how to validate a skill before sharing it
+
 ## Install and verify
 - [How to install Claude skills in Claude Code](https://www.skillsboard.sh/guides/install-claude-skills-in-claude-code): The documented skill locations on disk, the personal, project, plugin, managed, and claude.ai sync install paths, and how to confirm a skill loaded
 

@@ -17,6 +17,7 @@ export const guidePaths = {
   shareTeamSkills: "/guides/share-agent-skills-with-your-team",
   manageCrossAgentSkills: "/guides/manage-skills-across-claude-codex-cursor",
   installClaudeSkills: "/guides/install-claude-skills-in-claude-code",
+  writeSkillMd: "/guides/how-to-write-a-skill-md",
   aiCodingTeamOnboarding: "/guides/ai-coding-team-onboarding",
   aiCodingGuidelinesTemplate: "/guides/ai-coding-guidelines-template",
 } as const

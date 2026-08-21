@@ -216,6 +216,9 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
             intro={entry.authoring.intro}
           />
           <StepList steps={entry.authoring.steps} />
+          {entry.authoring.link ? (
+            <InlineLink link={entry.authoring.link} />
+          ) : null}
           <CodeBlock
             label="SKILL.md starting point"
             value={entry.authoring.template}

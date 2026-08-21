@@ -383,6 +383,12 @@ export const claudeSkills: ClaudeSkillsDefinition = {
         body: "Commit .claude/skills/ for a project, ship a skills directory inside a plugin for a wider audience, or deploy organization-wide through managed settings. Each scope answers a different question about who should get the skill by default.",
       },
     ],
+    link: {
+      lead: "For the frontmatter field by field, the description rules that decide whether a skill ever fires, and the validation step, see",
+      label: "how to write a SKILL.md file",
+      href: guidePaths.writeSkillMd,
+      trail: ".",
+    },
     template: `---
 name: release-notes
 description: Draft release notes from merged pull requests. Use when preparing a release, writing a changelog, or summarizing what shipped.
