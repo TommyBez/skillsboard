@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { agentSkillsSupportPath } from "@/lib/seo/agent-skills-support/types"
 import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
@@ -703,6 +704,12 @@ export const agentSkills: AgentSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Agent Skills support: which AI clients read SKILL.md",
+      href: agentSkillsSupportPath,
+      description:
+        "The compatibility matrix: eleven clients with vendor documentation, and the directories each one names.",
+    },
     {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,

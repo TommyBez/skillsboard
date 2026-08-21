@@ -9,6 +9,7 @@ import { LegalLinks } from "@/components/legal-links"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
+import type { AgentSkillsSupportCtaPlacement } from "@/lib/seo/agent-skills-support/types"
 import type { AgentSkillsCtaPlacement } from "@/lib/seo/agent-skills/types"
 import type { AgentsMdVsSkillMdCtaPlacement } from "@/lib/seo/agents-md-vs-skill-md/types"
 import {
@@ -33,6 +34,7 @@ import { siteConfig } from "@/lib/site"
 type ResourceHeaderLocation =
   | "about_header"
   | "agent_skills_header"
+  | "agent_skills_support_header"
   | "agents_md_header"
   | "anthropic_skills_header"
   | "best_claude_skills_header"
@@ -49,6 +51,7 @@ type ResourceHeaderLocation =
   | "where_skills_header"
 type ResourceCtaLocation =
   | AgentSkillsCtaPlacement
+  | AgentSkillsSupportCtaPlacement
   | AgentsMdVsSkillMdCtaPlacement
   | AnthropicSkillsCtaPlacement
   | BestClaudeSkillsCtaPlacement
