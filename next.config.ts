@@ -145,6 +145,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/vercel-skills/",
+        destination: "/vercel-skills",
+        permanent: true,
+      },
+      {
         source: "/where-to-find-claude-skills/",
         destination: "/where-to-find-claude-skills",
         permanent: true,

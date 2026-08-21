@@ -7,6 +7,7 @@ import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { opencodeSkillsPath } from "@/lib/seo/opencode-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 
 export {
   opencodeSkillsPath,
@@ -859,6 +860,12 @@ A Markdown section titled with the version and the date.`,
     },
   ],
   related: [
+    {
+      label: "Vercel skills: the official collection, explained",
+      href: vercelSkillsPath,
+      description:
+        "The publisher behind the skills CLI, and the nine skills its own collection ships.",
+    },
     {
       label: "Agent Skills support: which AI clients read SKILL.md",
       href: agentSkillsSupportPath,

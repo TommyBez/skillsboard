@@ -7,6 +7,7 @@ import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { type ComparePath, comparePaths } from "@/lib/seo/compare/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export {
@@ -49,6 +50,7 @@ export interface BestClaudeSkillsInlineLink {
     | typeof anthropicSkillsPath
     | typeof claudeSkillsPath
     | typeof coworkSkillsPath
+    | typeof vercelSkillsPath
     | typeof whereToFindClaudeSkillsPath
   trail: string
 }
@@ -401,9 +403,9 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
       "frontend-design placing third on a leaderboard of over a million tracked skills is the single strongest popularity signal in this register, and it still is not why it is here. It is here because we read it and it does one job well. The install number is context, and the limits section says exactly what that number can and cannot mean.",
     ],
     link: {
-      lead: "For the first-party folder frontend-design belongs to, all nineteen skills in it with their licenses, and the three separate sets Anthropic ships, see",
-      label: "Anthropic skills: every first-party skill and where it loads",
-      href: anthropicSkillsPath,
+      lead: "For all nine folders in vercel-labs/agent-skills, which four of them declare a license, and the four whose folder name is not the name of the skill inside it, see",
+      label: "Vercel skills: the official collection, explained",
+      href: vercelSkillsPath,
       trail: ".",
     },
     sourceIds: [
@@ -838,6 +840,12 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Vercel skills: the official collection, explained",
+      href: vercelSkillsPath,
+      description:
+        "All nine folders in vercel-labs/agent-skills, including the five this register dropped.",
+    },
     {
       label: "Where to find Claude skills",
       href: whereToFindClaudeSkillsPath,
