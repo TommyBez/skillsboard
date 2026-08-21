@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { OpencodeSkillsPage } from "@/components/opencode-skills/opencode-skills-page"
 import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import { opencodeSkills } from "@/lib/seo/opencode-skills"
@@ -10,7 +11,7 @@ const socialTitle = "OpenCode skills, explained"
 export const metadata: Metadata = {
   title: { absolute: opencodeSkills.seoTitle },
   description: opencodeSkills.description,
-  alternates: { canonical: opencodeSkills.path },
+  alternates: markdownTwinAlternates(opencodeSkills.path),
   openGraph: {
     type: "article",
     url: opencodeSkills.path,

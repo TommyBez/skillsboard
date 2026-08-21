@@ -27,6 +27,10 @@ const { default: nextConfig } = await import("../next.config.ts")
 const entry = opencodeSkills
 const canonical = `https://www.skillsboard.sh${opencodeSkillsPath}`
 const markdown = renderMarkdownTwin(opencodeSkillsPath) ?? ""
+const pageSource = await readFile(
+  new URL("../app/opencode-skills/page.tsx", import.meta.url),
+  "utf8",
+)
 
 /** Em dash and en dash are not allowed anywhere in published copy. */
 const dashPattern = /[\u2013\u2014]/
@@ -161,6 +165,13 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
     canonical: entry.path,
     types: { "text/markdown": `${entry.path}.md` },
   })
+
+  // The alternate has to reach the page head, not just the helper. Two sibling
+  // routes shipped without wiring it up, so this asserts the route file uses it.
+  assert.ok(
+    pageSource.includes("markdownTwinAlternates(opencodeSkills.path)"),
+    "the route does not advertise its Markdown twin in the page head",
+  )
 
   for (const title of [
     entry.locations.title,
