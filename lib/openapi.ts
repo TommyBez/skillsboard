@@ -163,7 +163,7 @@ export function buildOpenApiDocument() {
           "operationId": "getProtectedResourceMetadata",
           "summary": "OAuth Protected Resource Metadata for this origin (RFC 9728)",
           "description":
-            "Entry point for an agent that has only the hostname. Names the origin as its `resource`, the authorization server guarding it, and the scopes that server issues. For the audience to request an MCP token for, read the document at `/.well-known/oauth-protected-resource/api/mcp`.",
+            "Entry point for an agent that has only the hostname. Names the origin as its `resource`, the authorization server guarding it, and the scopes that server issues. The origin is not itself a token audience: the `protected_resources` array names the MCP resource to request tokens for and the document describing it.",
           "security": [],
           "responses": {
             "200": {

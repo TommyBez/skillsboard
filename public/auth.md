@@ -45,6 +45,26 @@ Both name the same authorization server and the same scopes. Only the one above
 names the audience: send `resource=https://www.skillsboard.sh/api/mcp` on the
 token request, because any other value is rejected with `invalid_target`.
 
+An agent that starts at the origin-level document does not have to guess its way
+here. That document carries a `protected_resources` array naming the audience
+and the metadata URL that describes it:
+
+```json
+{
+  "resource": "https://www.skillsboard.sh",
+  "protected_resources": [
+    {
+      "resource": "https://www.skillsboard.sh/api/mcp",
+      "resource_metadata": "https://www.skillsboard.sh/.well-known/oauth-protected-resource/api/mcp"
+    }
+  ]
+}
+```
+
+`protected_resources` is not a registered RFC 9728 parameter; the spec allows
+extra ones, and there is no standard field for this. Ignore it and the `401`
+challenge from `/api/mcp` still leads to the same place.
+
 A call to `/api/mcp` without a usable token answers `401` with a
 `WWW-Authenticate` header carrying `resource_metadata`, pointing at that same
 document, so an agent that skipped discovery can recover from the challenge.

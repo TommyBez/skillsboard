@@ -78,13 +78,35 @@ export function buildProtectedResourceMetadata() {
  *
  * The entry point an agent that has only a hostname can reach: it names the
  * authorization server guarding this origin's protected APIs and the scopes it
- * issues. It deliberately does not claim `<origin>/api/mcp` as its `resource` —
- * that document lives at its own derived path, and a client validating this one
- * per RFC 9728 §3.3 would reject a mismatch outright. `resource_documentation`
- * leads to auth.md, which names the MCP audience to request tokens for.
+ * issues. It cannot claim `<origin>/api/mcp` as its `resource` — that document
+ * lives at its own derived path, and a client validating this one per RFC 9728
+ * §3.3 rejects a mismatch outright.
+ *
+ * That leaves a trap this document has to defuse. The origin is a discovery
+ * entry point, not a token audience: Better Auth registers exactly one resource
+ * (`mcp({ resource })` in lib/auth.ts, a single string, not a list) and
+ * audience-binds every token to it, so a client that took this document's
+ * `resource` and requested a token for it would be refused with
+ * `invalid_target`. Registering the origin as a second audience would not help
+ * either — it would mint tokens `/api/mcp` still refuses.
+ *
+ * RFC 9728 has no registered field for "the requestable resources under this
+ * origin", so `protected_resources` below is a local extension, which §2
+ * permits. It names the audience to ask for and where its own metadata lives,
+ * so a hostname-first client reaches the working resource without having to
+ * guess or to provoke a 401 first.
  */
 export function buildOriginProtectedResourceMetadata() {
-  return buildResourceMetadata(getDiscoveryOrigin(), "Skills Board")
+  const mcpResource = getMcpResource()
+  return {
+    ...buildResourceMetadata(getDiscoveryOrigin(), "Skills Board"),
+    protected_resources: [
+      {
+        resource: mcpResource,
+        resource_metadata: protectedResourceMetadataUrl(mcpResource),
+      },
+    ],
+  }
 }
 
 /** Every agent-facing endpoint answers cross-origin preflight the same way. */

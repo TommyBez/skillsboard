@@ -80,8 +80,12 @@ test("each protected resource document names the resource its own path derives",
 test("the two protected resource documents agree on everything but the resource", () => {
   const { resource: mcpResource, resource_name: mcpName, ...mcp } =
     buildProtectedResourceMetadata()
-  const { resource: originResource, resource_name: originName, ...site } =
-    buildOriginProtectedResourceMetadata()
+  const {
+    resource: originResource,
+    resource_name: originName,
+    protected_resources: _pointer,
+    ...site
+  } = buildOriginProtectedResourceMetadata()
 
   // One Better Auth instance backs both, so a client that read either one must
   // reach the same authorization server with the same scopes.
@@ -89,6 +93,30 @@ test("the two protected resource documents agree on everything but the resource"
   assert.equal(originResource, origin)
   assert.notEqual(originResource, mcpResource)
   assert.notEqual(originName, mcpName)
+})
+
+test("the origin document points at the audience that tokens can be issued for", () => {
+  // The origin is a discovery entry point, not a token audience: Better Auth
+  // binds tokens to one resource, so a client that requested a token for this
+  // document's own `resource` would be refused with `invalid_target`. The
+  // pointer is what stops a hostname-first client from doing that.
+  const metadata = buildOriginProtectedResourceMetadata()
+
+  assert.deepEqual(metadata.protected_resources, [
+    {
+      resource: `${origin}/api/mcp`,
+      resource_metadata: `${origin}/.well-known/oauth-protected-resource/api/mcp`,
+    },
+  ])
+
+  // Whatever it points at has to be the audience Better Auth actually binds to,
+  // and has to be described by the document at the path it derives.
+  const [pointer] = metadata.protected_resources
+  assert.equal(pointer.resource, buildProtectedResourceMetadata().resource)
+  assert.equal(pointer.resource_metadata, protectedResourceMetadataUrl(pointer.resource))
+
+  // The MCP document is the leaf, so it does not point anywhere in turn.
+  assert.equal("protected_resources" in buildProtectedResourceMetadata(), false)
 })
 
 test("agent_auth points at the endpoints the auth server actually published", () => {
