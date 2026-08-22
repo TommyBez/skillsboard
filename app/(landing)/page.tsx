@@ -26,7 +26,7 @@ import { siteConfig } from "@/lib/site"
  * values, so inheriting them is both shorter and correct.
  */
 export const metadata: Metadata = {
-  title: { absolute: "Skills Board, your team’s recommended AI skills" },
+  title: { absolute: "Skills Board, the agent-native skills registry for teams" },
   description: siteConfig.description,
   alternates: markdownTwinAlternates(homePath),
 }

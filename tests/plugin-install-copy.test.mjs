@@ -94,7 +94,12 @@ test("Skills Board is described as a web app, never as a shared library", () => 
   }
   assert.match(landingSection, /Skills Board is a web app/)
   assert.match(skill, /Skills Board is a web app/)
-  assert.match(llms, /Skills Board is the web app/)
+  // The llms.txt summary now opens with the approved category phrase and
+  // keeps the web app formula right behind it, so the rule still holds.
+  assert.match(
+    llms,
+    /Skills Board is the agent-native skills registry for teams, the web app/,
+  )
   assert.match(landingFaq, /Skills Board is a web app/)
 })
 

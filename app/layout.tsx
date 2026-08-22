@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono"
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Skills Board, your team’s recommended AI skills",
+    default: "Skills Board, the agent-native skills registry for teams",
     template: "%s | Skills Board",
   },
   description: siteConfig.description,
@@ -44,13 +44,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: siteConfig.locale,
     url: siteConfig.url,
-    title: "Skills Board: Your team’s skills. All in one place.",
+    title: "Skills Board, the agent-native skills registry for teams",
     description: siteConfig.ogDescription,
     siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Skills Board: Your team’s skills. All in one place.",
+    title: "Skills Board, the agent-native skills registry for teams",
     description: siteConfig.ogDescription,
   },
   robots: {

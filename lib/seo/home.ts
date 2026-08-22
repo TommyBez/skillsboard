@@ -19,12 +19,12 @@ export const home = {
   path: homePath,
   // `/` + `.md` is not a URL, so the twin is published at `/index.md`.
   markdownPath: "/index.md",
-  title: "Skills Board, your team’s recommended AI skills",
+  title: "Skills Board, the agent-native skills registry for teams",
   description: siteConfig.description,
   publishedAt: "2026-01-15",
-  modifiedAt: "2026-08-20",
+  modifiedAt: "2026-08-22",
   intro: [
-    "Skills Board is a web app where a team collects the AI skills it recommends. Teammates search that library, see where each skill came from, and pick the way of using it that fits their agent.",
+    "Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares the AI skills it recommends. Teammates search that library, see where each skill came from, and pick the way of using it that fits their agent.",
     "A saved skill is a team recommendation. It is not a security review, an approval, or a compatibility certification, and Skills Board follows the latest version at the saved source rather than pinning the version a teammate used earlier.",
   ],
   workflowTitle: "How it works",
