@@ -794,6 +794,12 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   ],
   related: [
     {
+      label: "Skill examples: real SKILL.md files, explained",
+      href: "/skill-examples",
+      description:
+        "Eight of the folders catalogued here read line by line, with the pattern each one demonstrates.",
+    },
+    {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,
       description:
