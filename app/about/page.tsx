@@ -109,7 +109,7 @@ export default function AboutPage() {
                 </li>
                 <li>
                   Connect an MCP-compatible agent to search the library and,
-                  with permission, save or organize skills.
+                  with permission, save skills and organize collections.
                 </li>
               </ul>
               <p>

@@ -19,7 +19,7 @@
 
 Two facts license the wording, and neither is a new claim:
 - "Agent-native" is measured, not asserted. Two external scanners rated the live site: is-agentic.com 100/100, and isitagentready.com 87/100 at Level 5.
-- "Registry" names where a team keeps and shares its AI skills. It never implies version pinning. Skills Board follows the latest version at the saved source by design, and wherever the subject comes up that stays the honest answer.
+- "Registry" names where a team keeps and shares its AI skills. For a saved skill it never implies version pinning: Skills Board follows the latest version at the saved source by design, and wherever the subject comes up that stays the honest answer. A published collection release is the one surface where a version is fixed, because it records the source commit of every skill it packages.
 
 **What it does:** A team saves skills it considers useful in one searchable library. Teammates can see what the team keeps, understand where each skill comes from, and choose the most suitable way to use its latest source: open the repository, copy an install command, or download the skill as a ZIP.
 
@@ -31,9 +31,10 @@ Two facts license the wording, and neither is a new claim:
 
 **Core product contract:**
 - A saved skill is a team's own choice, not a formal security review, approval, or compatibility certification.
-- Skills Board points to the latest version available from the saved source. It does not pin or preserve historical versions.
+- A saved skill points to the latest version available from its source. Skills Board does not pin or preserve historical versions of saved skills.
 - Teammates choose how to use a skill: original source, install command, or ZIP download.
-- A ZIP contains the latest skill files available from the source at download time. It does not guarantee installation in every agent.
+- A ZIP of a saved skill contains the latest skill files available from the source at download time. It does not guarantee installation in every agent.
+- A published collection release is the exception to the latest source rule: it records the source commit of every skill it packages and keeps serving that packaged revision until the team publishes a new one.
 - MCP is a first-class authenticated way to access and contribute to the shared library from a compatible agent. With the granted scopes, it can list and search team skills and collections, retrieve install commands, discover public and repository skills, save new skills, create collections, and add or remove saved skills from collections. It cannot edit or delete saved team skills, install them in the agent, or execute them.
 
 ## Target Audience
@@ -120,7 +121,7 @@ Two facts license the wording, and neither is a new claim:
 | We do not all use the same agent. | That is expected. Each teammate can choose the source, a compatible command, or the latest files as a ZIP. |
 | Does every skill work with every agent? | No. Skills Board preserves choice and source visibility, but does not certify universal compatibility. |
 | Has every saved skill been reviewed or verified? | A saved skill is a team's own choice, not a formal security or quality certification. Teams should inspect the source and apply their own standards. |
-| Will I get the exact version someone on my team used? | Skills Board follows the latest version from the saved source. It does not pin historical versions. |
+| Will I get the exact version someone on my team used? | A saved skill follows the latest version from its source and does not pin historical versions. A published collection release does record the source commit of every skill it packages. |
 | We do not want another paid tool. | The hosted product is free forever and the code is open source. |
 
 **Anti-persona:** Teams that do not use reusable AI skills, organizations that need formal security approval and version governance, or companies looking for a universal installer that guarantees compatibility across every agent.
@@ -152,6 +153,7 @@ Two facts license the wording, and neither is a new claim:
 **Words to avoid:** the AI skills your team recommends, skills your team recommends, recommended by your team, team recommendation, recommended skill, skill champion, GitHub-backed, approved skill, verified skill, trusted skill, universal compatibility, works with every agent, automatically synchronized, agent capability platform, AI-native knowledge infrastructure, enterprise governance, unlock, supercharge, revolutionize
 
 **Glossary:**
+
 | Term | Meaning |
 |------|---------|
 | Skill | A reusable set of instructions and supporting files for an AI agent. |

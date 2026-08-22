@@ -523,7 +523,7 @@ A Markdown section ready to paste into the release description.`,
     {
       question: "Where should a team keep the skills it uses?",
       answer:
-        "Wherever teammates will actually look. If every skill belongs to one repository the whole team works in, commit them to .claude/skills/ and stop there. If the skills come from other people's repositories and teammates run different agents, a team library that keeps the source visible on every entry is easier to keep current. Skills Board is one option, and it is free and open source.",
+        "Wherever teammates will actually look. If every skill belongs to one repository the whole team works in, commit them to the directory the team's agent scans, .claude/skills/ for Claude Code or .agents/skills/ for Codex, and stop there. If the skills come from other people's repositories and teammates run different agents, a team library that keeps the source visible on every entry is easier to keep current. Skills Board is one option, and it is free and open source.",
     },
   ],
   sources: [
