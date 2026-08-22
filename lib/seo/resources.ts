@@ -26,6 +26,11 @@ import { codexSkills } from "@/lib/seo/codex-skills"
 import { codexSkillsPath, type CodexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { coworkSkills } from "@/lib/seo/cowork-skills"
 import { coworkSkillsPath, type CoworkSkillsPath } from "@/lib/seo/cowork-skills/types"
+import { copilotSkills } from "@/lib/seo/copilot-skills"
+import {
+  copilotSkillsPath,
+  type CopilotSkillsPath,
+} from "@/lib/seo/copilot-skills/types"
 import { cursorSkills } from "@/lib/seo/cursor-skills"
 import { cursorSkillsPath, type CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guides } from "@/lib/seo/guides"
@@ -74,6 +79,7 @@ export type ResourcePath =
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CoworkSkillsPath
+  | CopilotSkillsPath
   | CursorSkillsPath
   | ManageAiSkillsPath
   | OpencodeSkillsPath
@@ -106,6 +112,7 @@ export const resourceEntries = [
   opencodeSkills,
   skillExamples,
   vercelSkills,
+  copilotSkills,
   agentsMdVsSkillMd,
   manageAiSkills,
   whereToFindClaudeSkills,
@@ -140,6 +147,7 @@ const resourceClusterDefinitions = [
       cursorSkillsPath,
       opencodeSkillsPath,
       vercelSkillsPath,
+      copilotSkillsPath,
       coworkSkillsPath,
       agentsMdVsSkillMdPath,
       guidePaths.shareTeamSkills,

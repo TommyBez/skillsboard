@@ -8,6 +8,7 @@ import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
+import { copilotSkillsPath } from "@/lib/seo/copilot-skills/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import {
@@ -709,6 +710,12 @@ export const agentSkills: AgentSkillsDefinition = {
       href: "/skill-examples",
       description:
         "Eight skills written to this format, quoted, and the six places they diverge from the specification.",
+    },
+    {
+      label: "GitHub Copilot skills: what Copilot supports",
+      href: copilotSkillsPath,
+      description:
+        "One client in detail: the five directories it reads, and the four frontmatter fields VS Code adds on top.",
     },
     {
       label: "Agent Skills support: which AI clients read SKILL.md",
