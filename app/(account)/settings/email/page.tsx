@@ -138,7 +138,7 @@ export default function EmailSettingsPage() {
         <EmailPreferenceBackLink />
       </Suspense>
 
-      <header className="mt-8 grid gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
+      <header className="mt-8 grid grid-cols-1 gap-8 border-b pb-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
         <div>
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Communication</p>
           <h1 data-testid="email-settings-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">

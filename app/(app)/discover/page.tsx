@@ -48,7 +48,7 @@ async function DiscoverResults({ searchParams }: DiscoverPageProps) {
 
   if (catalog.unavailable || !catalog.page) {
     return (
-      <section data-testid="discover-content" className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+      <section data-testid="discover-content" className="grid min-h-64 grid-cols-1 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
         <SparklesIcon className="size-9 text-primary" aria-hidden="true" />
         <div>
           <h2 className="text-3xl font-semibold tracking-display md:text-4xl">The public catalog is unavailable</h2>

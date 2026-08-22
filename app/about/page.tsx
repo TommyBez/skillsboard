@@ -55,7 +55,7 @@ export default function AboutPage() {
       <JsonLd data={buildAboutSchema()} />
 
       <div className="mx-auto w-full max-w-[1200px] px-5 py-12 md:px-10 md:py-20">
-        <article className="grid gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
+        <article className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
           <header className="lg:sticky lg:top-28 lg:self-start">
             <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
               <Link href="/" className="transition-colors hover:text-foreground">

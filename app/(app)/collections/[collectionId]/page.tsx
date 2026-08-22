@@ -117,7 +117,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
 
   return (
     <>
-      <section data-testid="collection-detail-content" className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <section data-testid="collection-detail-content" className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <Link
             href="/collections"
@@ -188,7 +188,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
       />
 
       {collectionSkills.length ? (
-        <section aria-label={`Skills in the ${collection.title} collection`} className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <section aria-label={`Skills in the ${collection.title} collection`} className="cascade-grid grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {collectionSkills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             return (
@@ -263,7 +263,7 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
           })}
         </section>
       ) : (
-        <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+        <section className="grid min-h-64 grid-cols-1 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <FolderOpenIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
             <h2 className="text-3xl font-semibold tracking-display md:text-4xl">No skills in this collection yet</h2>
@@ -291,7 +291,7 @@ function CollectionDetailFallback() {
   return (
     <div data-testid="collection-detail-shell" className="grid gap-8" aria-label="Loading collection">
       <Skeleton className="h-40 rounded-2xl" />
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Skeleton className="h-72 rounded-2xl" />
         <Skeleton className="h-72 rounded-2xl" />
       </div>

@@ -54,7 +54,7 @@ export function InviteMemberForm({
         action={action}
         onSubmit={onSubmitIntent}
         className={cn(
-          "grid gap-4",
+          "grid grid-cols-1 gap-4",
           layout === "row" && "md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end",
         )}
       >

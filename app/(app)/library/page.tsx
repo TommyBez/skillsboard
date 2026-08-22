@@ -205,7 +205,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
               {params.tag ? <> tagged <span className="text-foreground">{params.tag}</span></> : null}
             </p>
           ) : null}
-          <div className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="cascade-grid grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {skills.map((item) => {
             const command = buildInstallCommand(item.githubUrl, item.skillName)
             const canEditNote = item.createdBy === userId
@@ -282,7 +282,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
           </div>
         </section>
       ) : (
-        <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+        <section className="grid min-h-64 grid-cols-1 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <LibraryBigIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
             <h2 className="text-3xl font-semibold tracking-display md:text-4xl">{hasFilters ? "No matching skills" : "Add your first skill"}</h2>
@@ -318,7 +318,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
 
 function LibraryResultsFallback() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading saved skills" aria-busy="true">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading saved skills" aria-busy="true">
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />
@@ -332,7 +332,7 @@ function LibraryResultsFallback() {
 export default function LibraryPage({ searchParams }: LibraryPageProps) {
   return (
     <main className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-10 pb-28 md:px-6 md:pb-12 lg:px-8 lg:py-14">
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="font-mono text-sm text-primary">Library</p>
           <h1 data-testid="library-shell" className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">

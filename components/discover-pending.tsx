@@ -15,7 +15,7 @@ export {
 
 export function DiscoverResultsFallback() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading public skills" aria-busy="true">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3" aria-label="Loading public skills" aria-busy="true">
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />
       <Skeleton className="h-72 rounded-2xl" />

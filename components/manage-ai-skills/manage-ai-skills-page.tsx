@@ -235,7 +235,7 @@ export function ManageAiSkillsPage({
             intro={entry.team.intro}
           />
           <NoteList notes={entry.team.body} />
-          <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
+          <dl className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
             {entry.team.options.map((option) => (
               <div key={option.label} className="bg-card p-5">
                 <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -265,7 +265,7 @@ export function ManageAiSkillsPage({
             title={entry.notDocumented.title}
             intro={entry.notDocumented.intro}
           />
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
             {entry.notDocumented.entries.map((item) => (
               <div
                 key={item.title}
@@ -360,7 +360,7 @@ export function ManageAiSkillsPage({
               View all resources
             </Link>
           </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
             {entry.related.map((link) => (
               <Link
                 key={link.href}

@@ -77,7 +77,7 @@ export default function ResourcesPage() {
             aria-labelledby={`${cluster.id}-heading`}
             className={clusterIndex > 0 ? "border-t border-border pt-14 md:pt-20" : undefined}
           >
-            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,30rem)] md:items-end">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_minmax(16rem,30rem)] md:items-end">
               <div>
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                   {String(clusterIndex + 1).padStart(2, "0")} / Topic
@@ -94,7 +94,7 @@ export default function ResourcesPage() {
               </p>
             </div>
 
-            <div className="mt-9 grid gap-4 lg:grid-cols-2">
+            <div className="mt-9 grid grid-cols-1 gap-4 lg:grid-cols-2">
               {cluster.entries.map((entry) => (
                 <Link
                   key={entry.path}

@@ -232,6 +232,9 @@
 .lp-faq-body {
   position: relative;
   display: grid;
+  /* Declared rather than implicit, so the stacked column is bounded by the
+     viewport and not by its widest child. See .lp-closing-grid. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 2.5rem;
 }
 

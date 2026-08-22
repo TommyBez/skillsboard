@@ -109,7 +109,7 @@ function GuideTeamCallout({ team }: { team: GuideTeamSection }) {
       <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
         {team.intro}
       </p>
-      <dl className="mt-7 grid gap-4 md:grid-cols-2">
+      <dl className="mt-7 grid grid-cols-1 gap-4 md:grid-cols-2">
         {team.paths.map((path) => (
           <div key={path.label} className="border-l-2 border-primary pl-4">
             <dt className="font-semibold">{path.label}</dt>
@@ -160,7 +160,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 "radial-gradient(circle at 78% 8%, color-mix(in oklch, var(--primary) 16%, transparent), transparent 34rem)",
             }}
           />
-          <div className="mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
+          <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
             <div>
               <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
                 <Link href={resourcePaths.index} className="transition-colors hover:text-foreground">
@@ -212,7 +212,16 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
           </div>
         </header>
 
-        <div className="mx-auto grid w-full max-w-[1320px] gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
+        {/*
+          grid-cols-1 rather than the implicit single column, same reason as
+          app/developers/page.tsx: the body below holds a min-w-[720px]
+          comparison table and a code block, and an implicit column is an auto
+          track sized to the widest min-content in it. Only the min-w-0 on the
+          content cell keeps this page on the viewport today, which is a thin
+          thing to rest a layout on. minmax(0, 1fr), which is what grid-cols-1
+          compiles to, states it.
+        */}
+        <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-12 px-5 py-14 md:px-10 md:py-20 lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-16">
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <GuideChapterNav
               chapters={chapters}
@@ -310,7 +319,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   <li
                     key={step.title}
                     id={stepAnchorId(index)}
-                    className="grid scroll-mt-24 gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
+                    className="grid grid-cols-1 scroll-mt-24 gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
                   >
                     <span className="font-mono text-sm font-semibold text-primary">
                       {String(index + 1).padStart(2, "0")}
@@ -368,7 +377,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <p className="mt-5 text-pretty text-lg leading-relaxed text-muted-foreground">
                 {guide.templateIntro}
               </p>
-              <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
+              <dl className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
                 {guide.templateFields.map((field) => (
                   <div key={field.label} className="bg-card p-5">
                     <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -410,7 +419,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
               <h2 id="pitfalls-heading" className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
                 {guide.pitfallsTitle}
               </h2>
-              <div className="mt-8 grid gap-4 md:grid-cols-2">
+              <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
                 {guide.pitfalls.map((pitfall) => (
                   <div key={pitfall.title} className="rounded-[3px] border border-border bg-card p-5">
                     <h3 className="font-semibold">{pitfall.title}</h3>
@@ -508,7 +517,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                     <Link
                       key={resource.path}
                       href={resource.path}
-                      className="group grid gap-3 rounded-[3px] border border-border bg-card p-5 transition-colors hover:border-primary/70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
+                      className="group grid grid-cols-1 gap-3 rounded-[3px] border border-border bg-card p-5 transition-colors hover:border-primary/70 md:grid-cols-[minmax(0,1fr)_auto] md:items-center"
                     >
                       <span>
                         <span className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
