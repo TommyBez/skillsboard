@@ -336,7 +336,7 @@ test("the limits say what the product cannot do", () => {
     "the page does not rule out the admin claim",
   )
   assert.ok(
-    limits.includes("team recommendation"),
+    limits.includes("a team's own choice"),
     "the page does not state what a save means",
   )
   assert.ok(
@@ -416,7 +416,7 @@ test("the product is never described as a shared library", () => {
   assert.doesNotMatch(copy, /shared library/i)
   assert.ok(
     copy.includes(
-      "a web application where a team keeps, searches, and shares the AI skills it recommends",
+      "a web application where a team keeps, searches, and shares its AI skills",
     ),
     "the page does not use the agreed product description",
   )

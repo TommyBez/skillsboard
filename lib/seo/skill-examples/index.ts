@@ -714,8 +714,8 @@ export const skillExamples: SkillExamplesDefinition = {
       "Reading files is a solo activity. The moment a second person on your team writes one, the question changes from what does a good SKILL.md look like to which one of ours is the one we use, and none of the examples above answers that.",
     body: [
       "The failure is quiet and familiar. One person reads anthropics/skills, adapts the internal-comms routing pattern, and lands a genuinely good skill in a repository. Three weeks later a teammate writes a second version of it in their own dotfiles because nobody knew the first one existed. Both work. Neither is the one.",
-      "Skills Board is a web application where a team keeps and shares the AI skills it recommends. A teammate opens it, sees which skill the team stands behind for a job, and takes it away as an install command for the agent they actually run, or as the original source, or as a ZIP of the latest files. The point is the recommendation, not the storage.",
-      "The honest boundary: saving a skill is a team recommendation, not a security review and not a compatibility certificate. Someone still has to read the SKILL.md before it lands on a machine, and the divergence table above is exactly the kind of thing that reading catches.",
+      "Skills Board is a web application where a team keeps and shares its AI skills. A teammate opens it, sees which skill the team stands behind for a job, and takes it away as an install command for the agent they actually run, or as the original source, or as a ZIP of the latest files. The point is the choice, not the storage.",
+      "The honest boundary: saving a skill is a team's own choice, not a security review and not a compatibility certificate. Someone still has to read the SKILL.md before it lands on a machine, and the divergence table above is exactly the kind of thing that reading catches.",
     ],
     paths: [
       {
@@ -736,13 +736,13 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         label: "The read the examples do not give you",
         body:
-          "An example repository is not reviewed for your codebase. The step a team adds is one person reading the file, saying what it is for, and putting their name on the recommendation.",
+          "An example repository is not reviewed for your codebase. The step a team adds is one person reading the file, saying what it is for, and putting their name on the entry.",
       },
     ],
     limits: [
       "Skills Board points at the latest version from the saved source and does not pin historical versions, so a skill you saved from an example repository moves when the upstream file moves.",
       "None of the nineteen example files carries a version or a review date inside it, so the date on your own entry is the only marker of when a teammate last looked at it.",
-      "A shared entry does not change what a client will do with the file. Portability is decided by the agent reading it, which is a separate question from where the recommendation lives.",
+      "A shared entry does not change what a client will do with the file. Portability is decided by the agent reading it, which is a separate question from where the team's choice lives.",
     ],
     link: {
       lead: "For the workflow of picking the first skill a team agrees on, rather than the file format, see",
@@ -820,7 +820,7 @@ export const skillExamples: SkillExamplesDefinition = {
     {
       question: "How does a team share the examples it settles on?",
       answer:
-        "By keeping one recommendation per job somewhere teammates can find it. Skills Board is a web application where a team keeps and shares the AI skills it recommends, handing over the source, a compatible install command, or a ZIP of the latest files for whichever agent a teammate runs.",
+        "By keeping one agreed skill per job somewhere teammates can find it. Skills Board is a web application where a team keeps and shares its AI skills, handing over the source, a compatible install command, or a ZIP of the latest files for whichever agent a teammate runs.",
     },
   ],
   sources: [

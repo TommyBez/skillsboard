@@ -38,8 +38,8 @@ export function PluginSection() {
             One plugin install, in whichever client your team runs
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Skills Board is a web app where a team keeps the skills it
-            recommends. The official plugin brings that library into an agent:
+            Skills Board is a web app where a team keeps and shares its AI
+            skills. The official plugin brings that library into an agent:
             it carries the MCP connection and one skill that explains how to
             search the library. The directory follows the Agent Plugins
             standard, so any client that supports it installs the same plugin.

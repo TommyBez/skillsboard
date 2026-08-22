@@ -1,14 +1,14 @@
 ---
 name: team-skill-library
-description: Work with a team's shared Agent Skills library on Skills Board through the Skills Board MCP server at https://www.skillsboard.sh/api/mcp. Use when the user asks which skills their team recommends, wants to search or list the team library or its collections, needs the install command for a saved skill or for a published collection, wants to check a GitHub repository for installable skills, or wants to save a skill to the team library. Do not use it to write or edit SKILL.md files, to install unrelated npm packages or MCP servers, to edit or delete skills already saved on Skills Board, or when the Skills Board MCP server is not connected to this client.
+description: Work with a team's shared Agent Skills library on Skills Board through the Skills Board MCP server at https://www.skillsboard.sh/api/mcp. Use when the user asks which AI skills their team uses, wants to search or list the team library or its collections, needs the install command for a saved skill or for a published collection, wants to check a GitHub repository for installable skills, or wants to save a skill to the team library. Do not use it to write or edit SKILL.md files, to install unrelated npm packages or MCP servers, to edit or delete skills already saved on Skills Board, or when the Skills Board MCP server is not connected to this client.
 license: MIT
 ---
 
 # Skills Board team library
 
-Skills Board is a web app where a team keeps the skills it recommends in one
+Skills Board is a web app where a team keeps and shares its AI skills in one
 searchable library. This skill covers how to use that library from an agent:
-find a recommendation, hand off an install command, and save a new skill back
+find a saved skill, hand off an install command, and save a new skill back
 to the team.
 
 ## Before the first call
@@ -28,7 +28,7 @@ Two scopes matter:
 Clients usually namespace tool names, for example `mcp__skills-board__list_skills`.
 Match on the trailing tool name.
 
-## Find what the team already recommends
+## Find what the team already saved
 
 - `search_skills` takes a `query` and matches saved skills by name, description,
   note, example prompt, repository, or tag. Start here.
@@ -44,7 +44,7 @@ wrote, before suggesting anything from outside the library.
 
 ## Hand off an install
 
-Skills Board records recommendations. It does not install skills into an agent,
+Skills Board records what a team saved. It does not install skills into an agent,
 so the last step is always a command the user runs, or a file the user downloads.
 
 - One saved skill: `get_skill_command` with its `skillId` returns
@@ -57,7 +57,7 @@ so the last step is always a command the user runs, or a file the user downloads
   path refreshes installed skills but does not remove skills deleted from the
   collection.
 - The original GitHub source is in every skill record. Reading the source before
-  installing is the honest default: a saved skill is a team recommendation, not
+  installing is the honest default: a saved skill is the team's own choice, not
   a review or a pinned release.
 
 Downloading a skill as a ZIP happens in the web app on

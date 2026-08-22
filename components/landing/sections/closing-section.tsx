@@ -51,8 +51,8 @@ export function ClosingSection() {
             <p
               className="lp-closing-copy mt-6 text-balance text-lg leading-relaxed text-muted-foreground"
             >
-              Save the recommendation where the whole team can find it. The next
-              person can get started without asking where to look.
+              Save the answer where the whole team can find it. The next person
+              can get started without asking where to look.
             </p>
             <nav
               aria-label="Starting guides"

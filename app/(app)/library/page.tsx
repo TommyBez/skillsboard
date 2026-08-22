@@ -197,7 +197,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
       ) : null}
 
       {skills.length ? (
-        <section aria-label="Team skill recommendations" className="grid gap-4">
+        <section aria-label="Team skills" className="grid gap-4">
           {hasFilters ? (
             <p className="font-mono text-sm text-muted-foreground" role="status">
               {skills.length} of {allSkills.length} {allSkills.length === 1 ? "skill" : "skills"}
@@ -291,7 +291,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 ? "Nothing matches both the search and the tag. Try dropping one of them."
                 : hasFilters
                   ? "Try another search or clear the active filters."
-                  : "Add a skill your team recommends, or browse the public catalog to find one."}
+                  : "Add a skill your team uses, or browse the public catalog to find one."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">
@@ -336,7 +336,7 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
         <div>
           <p className="font-mono text-sm text-primary">Library</p>
           <h1 data-testid="library-shell" className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
-            Skills your team recommends.
+            Your team’s AI skills.
           </h1>
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Find the right one, then open the source, copy the command, or download the latest ZIP.

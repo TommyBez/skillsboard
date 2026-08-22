@@ -424,8 +424,8 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       "Every source above answers what exists. None of them answers which one your team uses, and that is the question that gets asked most often in practice.",
     body: [
       "A catalog ranks what everybody installs. A team needs the opposite: the small set somebody already read, tried on a real task, and decided to stand behind. That set is usually four or five skills, and it is almost never written down anywhere a new teammate can find it.",
-      "The surfaces do not help, because none of them was built to. In Claude Code a skill lives in a personal folder, in one repository, or inside a plugin, and none of those locations records who chose it or why. On claude.ai, custom skills belong to the individual user rather than the organization. Through the API, uploaded skills are workspace-wide but carry no recommendation with them.",
-      "So the recommendation lands in a chat thread or one person's memory, and the next teammate starts their search back at the leaderboard. Skills Board is a web app for that layer specifically: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
+      "The surfaces do not help, because none of them was built to. In Claude Code a skill lives in a personal folder, in one repository, or inside a plugin, and none of those locations records who chose it or why. On claude.ai, custom skills belong to the individual user rather than the organization. Through the API, uploaded skills are workspace-wide but carry nothing to say why the team chose them.",
+      "So the choice lands in a chat thread or one person's memory, and the next teammate starts their search back at the leaderboard. Skills Board is a web app for that layer specifically: the smaller set of skills your team settled on, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {
@@ -446,14 +446,14 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board is not a marketplace and does not host, rank, or distribute skills to the public. It points at the sources on this page.",
       "It follows the latest version available from the saved source, and does not pin or preserve historical versions.",
       "The MCP connection cannot install or run a skill inside an agent, and it cannot edit or delete saved team skills.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
     link: {
-      lead: "For the ownership side of the same problem, one recommendation and a named owner per skill, see",
+      lead: "For the ownership side of the same problem, one agreed skill per job and a named owner, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",
@@ -528,9 +528,9 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
         "A different product, and a common wrong turn. Claude Marketplace at claude.com/platform/marketplace lets enterprises spend an existing Anthropic commitment on partner solutions such as Harvey, Snowflake, and GitLab. It lists companies, not skills or plugins. The plugin catalog is at claude.com/plugins instead.",
     },
     {
-      question: "Where should a team keep the skills it recommends?",
+      question: "Where should a team keep the skills it uses?",
       answer:
-        "Not in a catalog, because a catalog ranks what everyone installs rather than what your team chose. Claude Code stores skills personally, per repository, or in a plugin, and none of those records the recommendation. Skills Board is a web app for that layer, with the original source on every entry.",
+        "Not in a catalog, because a catalog ranks what everyone installs rather than what your team chose. Claude Code stores skills personally, per repository, or in a plugin, and none of those records the choice. Skills Board is a web app for that layer, with the original source on every entry.",
     },
   ],
   sources: [
@@ -678,7 +678,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Turning a skill that worked once into a recommendation the next teammate can find.",
+        "Turning a skill that worked once into an entry the next teammate can find.",
     },
   ],
   og: {

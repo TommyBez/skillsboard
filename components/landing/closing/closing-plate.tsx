@@ -29,7 +29,7 @@ export function ClosingPlate() {
           <span className="lp-closing-plate-label">Team library</span>
           <span className="flex min-w-0 items-center gap-[0.55rem]">
             <span className="lp-closing-plate-mark" data-legend="" />
-            <span className="lp-closing-plate-label">Recommended</span>
+            <span className="lp-closing-plate-label">Team pick</span>
           </span>
         </div>
         <span className="lp-closing-plate-edge" data-edge="head" />
@@ -50,7 +50,7 @@ export function ClosingPlate() {
           ))}
         </ul>
 
-        {/* The index closes on the entry it recommends — the heading's
+        {/* The index closes on the entry the team picked: the heading's
             question, answered once and filed. Mirrors the bar above it
             exactly, so the sheet is bracketed by two rules of one weight. */}
         <span className="lp-closing-plate-edge" data-edge="foot" />

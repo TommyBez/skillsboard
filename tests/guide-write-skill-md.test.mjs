@@ -117,7 +117,7 @@ test("the guide is not described as a shared library product", () => {
   assert.doesNotMatch(guide.team.intro, /Skills Board is a shared library/)
   assert.ok(
     guide.team.intro.includes(
-      "web app where a team keeps and shares the AI skills it recommends",
+      "web app where a team keeps and shares its AI skills",
     ),
     "the team section drops the product definition",
   )

@@ -135,7 +135,7 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
                 ? "Nothing matches both the search and the tag. Try dropping one of them."
                 : hasFilters
                   ? "Try another search or clear the active filters."
-                  : "Group the skills your team recommends by use case or project, so the whole set is easy to find."}
+                  : "Group your team’s skills by use case or project, so the whole set is easy to find."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3 md:justify-end">

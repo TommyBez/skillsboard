@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title description">
   <title id="title">Introducing Skills Board</title>
-  <desc id="description">One searchable library for the AI skills your team recommends.</desc>
+  <desc id="description">One searchable library for your team's AI skills.</desc>
   <rect width="1200" height="630" fill="#f4f3e9"/>
   <circle cx="1060" cy="74" r="280" fill="#dcebd9"/>
   <rect x="62" y="54" width="52" height="52" rx="9" fill="#05843f"/>
@@ -9,7 +9,7 @@
   <text x="64" y="202" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="3" fill="#05843f">INTRODUCING SKILLS BOARD</text>
   <text x="60" y="313" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700" letter-spacing="-3" fill="#071a10">A shared answer to</text>
   <text x="60" y="391" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700" letter-spacing="-3" fill="#071a10">“which skill should I use?”</text>
-  <text x="64" y="484" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#506058">One searchable library for the skills your team recommends.</text>
+  <text x="64" y="484" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#506058">One searchable library for your team’s AI skills.</text>
   <line x1="64" y1="548" x2="1136" y2="548" stroke="#cbd2c6" stroke-width="2"/>
   <text x="64" y="590" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" fill="#071a10">SAVE · FIND · USE</text>
   <text x="1136" y="590" text-anchor="end" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#506058">skillsboard.sh</text>

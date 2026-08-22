@@ -1,9 +1,9 @@
 # Skills Board
-> Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
+> Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares its AI skills. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
 
 Last reviewed: 2026-08-19
 
-Skills Board is free hosted SaaS with open-source code. A saved skill is a team recommendation, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
+Skills Board is free hosted SaaS with open-source code. A saved skill is a team's own choice, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
 
 Key facts:
 - Product category: agent-native skills registry for teams
@@ -77,13 +77,13 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 ## Team skill workflows
 - [Manage AI skills across an organization](https://www.skillsboard.sh/manage-ai-skills): What each vendor's organization-level distribution mechanism covers and where it stops, across Claude Code managed settings and plugins, claude.ai owner provisioning and sharing, the Claude API, Codex admin locations and plugins, and Cursor, plus the selection layer none of them records
 - [AI agent skill use cases for teams](https://www.skillsboard.sh/guides/ai-skill-use-cases-for-teams): Eight repeatable workflows with triggers, inputs, outputs, human checks, and stop boundaries
-- [AI skills onboarding checklist](https://www.skillsboard.sh/guides/onboard-new-teammate-ai-skills-checklist): Help a new teammate find, choose, and verify one team-recommended skill
+- [AI skills onboarding checklist](https://www.skillsboard.sh/guides/onboard-new-teammate-ai-skills-checklist): Help a new teammate find, choose, and verify one of the team's skills
 - [Choose the first AI agent skill for your team](https://www.skillsboard.sh/guides/choose-first-ai-agent-skill-for-your-team): Evaluate candidates with a scorecard, source review, disqualifiers, and a teammate test
-- [Share AI agent skills with your team](https://www.skillsboard.sh/guides/share-agent-skills-with-your-team): Set ownership, compare distribution models, and keep one recommendation library
+- [Share AI agent skills with your team](https://www.skillsboard.sh/guides/share-agent-skills-with-your-team): Set ownership, compare distribution models, and keep one team library
 - [Manage skills across Claude Code, Codex, and Cursor](https://www.skillsboard.sh/guides/manage-skills-across-claude-codex-cursor): Use one source of truth without assuming automatic synchronization
 
 ## MCP and engineering workflows
-- [Use a shared AI skill library through MCP](https://www.skillsboard.sh/guides/shared-mcp-skill-library-for-teams): Connect, authorize, search recommendations, and verify an MCP handoff
+- [Use a shared AI skill library through MCP](https://www.skillsboard.sh/guides/shared-mcp-skill-library-for-teams): Connect, authorize, search the team library, and verify an MCP handoff
 - [AI coding guidelines template](https://www.skillsboard.sh/guides/ai-coding-guidelines-template): Define allowed work, trusted context, verification, handoffs, and ownership
 - [Onboard an engineering team to AI coding tools](https://www.skillsboard.sh/guides/ai-coding-team-onboarding): Start with one workflow, trusted context, review gates, and measured adoption
 

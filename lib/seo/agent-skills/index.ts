@@ -502,8 +502,8 @@ export const agentSkills: AgentSkillsDefinition = {
       "A shared format means a teammate's skill will load in your agent. It says nothing about which skills your team decided to use, and that is the question people actually get stuck on.",
     body: [
       "Once the format stops being the obstacle, the obstacle becomes selection. There are tens of thousands of public skills across the repositories on this page and the directories that index them, and a team needs perhaps five: the ones somebody read, ran on a real task, and is willing to stand behind. That set is almost never written down anywhere a new teammate can find it.",
-      "The surfaces do not carry it, because none of them was built to. A skill in .claude/skills/ or .agents/skills/ records nothing about who chose it or why. A skill uploaded to claude.ai belongs to one person, and Anthropic documents that claude.ai has no centralized admin management or org-wide distribution for custom skills. Through the API a skill is workspace-wide but arrives with no recommendation attached.",
-      "So the recommendation ends up in a chat thread, and the next person starts over at a leaderboard. Skills Board is a web app for that layer specifically: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
+      "The surfaces do not carry it, because none of them was built to. A skill in .claude/skills/ or .agents/skills/ records nothing about who chose it or why. A skill uploaded to claude.ai belongs to one person, and Anthropic documents that claude.ai has no centralized admin management or org-wide distribution for custom skills. Through the API a skill is workspace-wide but arrives with nothing to say why the team chose it.",
+      "So the choice ends up in a chat thread, and the next person starts over at a leaderboard. Skills Board is a web app for that layer specifically: the smaller set of skills your team settled on, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {
@@ -524,14 +524,14 @@ export const agentSkills: AgentSkillsDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board is not a marketplace and does not host, rank, or distribute skills to the public. It points at the sources on this page.",
       "It follows the latest version available from the saved source, and does not pin or preserve historical versions.",
       "The MCP connection cannot install or run a skill inside an agent, and it cannot edit or delete saved team skills.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
     link: {
-      lead: "For the ownership side of the same problem, one recommendation and a named owner per skill, see",
+      lead: "For the ownership side of the same problem, one agreed skill per job and a named owner, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",
@@ -609,7 +609,7 @@ export const agentSkills: AgentSkillsDefinition = {
     {
       question: "What is an agent skills library?",
       answer:
-        "Usually one of two things. A public directory that indexes skills anyone published, ranked by installs, or a team library holding the smaller set your own team recommends. Skills Board is the second kind: a shared AI skills library that keeps the original source visible on every saved entry.",
+        "Usually one of two things. A public directory that indexes skills anyone published, ranked by installs, or a team library holding the smaller set your own team settled on. Skills Board is the second kind: a web app for your team's AI skills that keeps the original source visible on every saved entry.",
     },
     {
       question: "Are agent skills the same as MCP servers?",
@@ -780,7 +780,7 @@ export const agentSkills: AgentSkillsDefinition = {
       label: "Skills Board vs a GitHub repo",
       href: alternativePaths.githubRepo,
       description:
-        "Keeping recommendations in a repository next to keeping them in a library, and what each costs.",
+        "Keeping skills in a repository next to keeping them in a library, and what each costs.",
     },
   ],
   og: {

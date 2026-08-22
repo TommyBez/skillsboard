@@ -90,7 +90,7 @@ export function HeroSection() {
             <div className="lp-hero-lower lp-hero-exit">
               <p className="lp-hero-blurb">
                 Skills Board is the agent-native skills registry for teams.
-                Keep every recommendation searchable with its original source.
+                Keep every skill searchable with its original source.
                 Teammates can open the source, copy a compatible install
                 command, or download the latest files as a ZIP. Connected agents
                 can search the same library through MCP.

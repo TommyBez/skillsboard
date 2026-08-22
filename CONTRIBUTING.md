@@ -1,13 +1,13 @@
 # Contributing to Skills Board
 
-Thanks for helping make team skill recommendations easier to share. Contributions of code, documentation, bug reports, and focused product feedback are welcome.
+Thanks for helping make a team's AI skills easier to share. Contributions of code, documentation, bug reports, and focused product feedback are welcome.
 
 ## Before you start
 
 - Search the existing issues and pull requests before opening a new one.
 - Open an issue before a large feature or architectural change so the direction can be agreed on early.
 - Never include credentials, private skill content, access tokens, or production data in an issue or pull request.
-- Remember the product contract: a saved skill is a team recommendation, not a security review or compatibility guarantee.
+- Remember the product contract: a saved skill is a team's own choice, not a security review or compatibility guarantee.
 
 ## Development setup
 

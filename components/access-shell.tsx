@@ -47,7 +47,7 @@ export function AccessShell({
 
           <div className="relative border-t border-white/15 pt-5">
             <p className="max-w-lg text-sm leading-6 text-(--surface-ink-foreground) opacity-55">
-              Team recommendations, ready for different agent setups.
+              Your team’s skills, ready for different agent setups.
             </p>
           </div>
         </aside>

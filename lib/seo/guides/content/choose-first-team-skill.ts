@@ -14,11 +14,11 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
   title: "How to choose the first AI agent skill for your team",
   seoTitle: "Choose Your Team’s First AI Agent Skill | Skills Board",
   description:
-    "Evaluate AI agent skills with a selection scorecard, source review, disqualifier check, and teammate test before your team recommends one.",
+    "Evaluate AI agent skills with a selection scorecard, source review, disqualifier check, and teammate test before your team settles on one.",
   intro:
     "The best first skill is not the most impressive one in a catalog. It is the smallest repeatable workflow your team can inspect, test, and hand to a second teammate with a clear expected result. This guide turns that choice into an observable team decision.",
   answer:
-    "Choose your first AI agent skill around one repeated team problem. Compare a small set of inspectable candidates, reject unsafe or opaque options, and test the winner on a representative task. Recommend it only after a second teammate reproduces the result.",
+    "Choose your first AI agent skill around one repeated team problem. Compare a small set of inspectable candidates, reject unsafe or opaque options, and test the winner on a representative task. Adopt it only after a second teammate reproduces the result.",
   answerLink: {
     lead: "For where the candidates come from in the first place, and what each source screens before it lists one, see",
     label: "Where to find Claude skills",
@@ -56,7 +56,7 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
       label: "Repeated problem first",
       cells: [
         "A measurable improvement to a task the team already performs.",
-        "It requires a small test and honest review before the recommendation is shared.",
+        "It requires a small test and honest review before the skill is shared.",
       ],
     },
   ],
@@ -92,8 +92,8 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
     },
     {
       title: "Save and test the team handoff",
-      body: "Save the winner in Skills Board with the visible source, score, review date, truthful recommendation, and search tag. Invite a second teammate and ask them to choose the source, compatible install command, or ZIP path for their setup. Keep the recommendation only if they can find it and reproduce the expected result.",
-      output: "One searchable recommendation plus an independent keep, revise, or reject result.",
+      body: "Save the winner in Skills Board with the visible source, score, review date, an honest note on what it is for, and a search tag. Invite a second teammate and ask them to choose the source, compatible install command, or ZIP path for their setup. Keep the entry only if they can find it and reproduce the expected result.",
+      output: "One searchable entry plus an independent keep, revise, or reject result.",
     },
   ],
   stepsLink: {
@@ -104,7 +104,7 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
   },
   templateTitle: "First-skill selection scorecard",
   templateIntro:
-    "Score evidence, not enthusiasm. A candidate is ready to recommend only when the source is inspectable, the fixture passes, and another teammate can reproduce the path.",
+    "Score evidence, not enthusiasm. A candidate is ready for the library only when the source is inspectable, the fixture passes, and another teammate can reproduce the path.",
   templateFields: [
     {
       label: "Repeated problem",
@@ -168,8 +168,8 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
 - Agent and setup tested: [observed path only]
 - Result: [pass/fail plus evidence]
 
-## Team recommendation
-- Why we recommend it: [specific reason]
+## Team entry
+- Why we keep it: [specific reason]
 - What remains untested: [limits]
 - Upstream note: Skills Board surfaces the latest source files; re-review after changes.
 - Search tag: [term a teammate will use]
@@ -196,11 +196,11 @@ Review again when: [source, agent, permissions, or workflow changes]`,
     },
     {
       title: "Letting the selector run both tests",
-      body: "The author remembers context that the recommendation may not contain. A second teammate exposes missing setup and unclear language.",
+      body: "The author remembers context that the saved entry may not contain. A second teammate exposes missing setup and unclear language.",
     },
     {
       title: "Treating a save as certification",
-      body: "The team recommendation makes a choice visible. It does not certify security, guarantee compatibility, or freeze the upstream source.",
+      body: "The team entry makes a choice visible. It does not certify security, guarantee compatibility, or freeze the upstream source.",
     },
   ],
   checklist: [
@@ -208,8 +208,8 @@ Review again when: [source, agent, permissions, or workflow changes]`,
     "The shortlist contains no more than three candidates for the same expected result.",
     "The complete source passed every disqualifier and the candidate scored at least 8 of 10.",
     "The test recorded a representative fixture, reviewed source state, date, and actual agent path.",
-    "The Skills Board note explains the score, recommendation, limits, and upstream re-review trigger.",
-    "A second teammate found the recommendation and reproduced it, or the candidate was revised or rejected.",
+    "The Skills Board note explains the score, the reason to keep it, the limits, and the upstream re-review trigger.",
+    "A second teammate found the entry and reproduced it, or the candidate was revised or rejected.",
   ],
   sources: [
     {

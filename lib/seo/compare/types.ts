@@ -86,7 +86,7 @@ export interface ComparisonSideBySide {
 /**
  * One half of the verdict: the situations where a primitive is the right
  * choice, plus the counterweight that says when it is not. Both halves carry
- * the counterweight so neither section reads as a recommendation.
+ * the counterweight so neither section reads as an endorsement.
  *
  * `leftCase` and `rightCase` on the definition line up with the second and
  * third column of the side-by-side table, in that order.

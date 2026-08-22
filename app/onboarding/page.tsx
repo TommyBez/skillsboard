@@ -35,9 +35,9 @@ export default function OnboardingPage() {
     <AccessShell
       marker="Set up library"
       title="Create your team library"
-      description="Name the shared place where your team will collect the skills it recommends."
+      description="Name the shared place where your team will collect its AI skills."
       editorialTitle="Share what works. Let everyone choose how to use it."
-      editorialBody="Your team can find recommended skills in one place and choose the source, command, or ZIP that best fits each setup."
+      editorialBody="Your team can find every saved skill in one place and choose the source, command, or ZIP that best fits each setup."
     >
       <Suspense fallback={<OnboardingFormFallback />}>
         <OnboardingGate />

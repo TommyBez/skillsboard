@@ -64,7 +64,7 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
   return (
     <CollapsibleBanner
       title="Make it a team library."
-      description="You've saved a recommendation. Invite one teammate so they can find and use it from their own agent setup."
+      description="You've saved a skill. Invite one teammate so they can find and use it from their own agent setup."
       state={state}
       onStateChange={persist}
       icon={

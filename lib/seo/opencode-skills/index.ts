@@ -624,14 +624,14 @@ A Markdown section titled with the version and the date.`,
     sourceIds: ["opencode-skills", "agentskills-spec", "opencode-permissions"],
   },
   team: {
-    title: "How a team keeps one recommendation across OpenCode and everything else",
+    title: "How a team keeps one answer per job across OpenCode and everything else",
     intro:
-      "Two problems hide behind the word sharing. Distribution is getting the files onto each teammate's machine. Recommendation is knowing which skill to use for a task and why that one. OpenCode has a good answer to the first inside a repository and no answer at all to the second.",
+      "Two problems hide behind the word sharing. Distribution is getting the files onto each teammate's machine. Selection is knowing which skill to use for a task and why that one. OpenCode has a good answer to the first inside a repository and no answer at all to the second.",
     body: [
       "If every skill your team uses belongs to one repository everybody works in, commit them to .agents/skills/ and you are finished. OpenCode picks them up by walking up from the working directory, Codex and Cursor read the same folder, and no tooling is involved. That is the right setup for a single-repository team and nothing here should talk you out of it.",
       "It stops being enough the moment the skills come from someone else's repository, are useful in more than one repository, or have to reach a teammate who is not in OpenCode at all. OpenCode's stable extension mechanisms do not close that gap: plugins here are JavaScript or TypeScript modules loaded from a plugins folder or from npm, and the documentation describes them as hooks, events, and custom tools rather than as a way to package a skill. Its central config and managed settings can push configuration to a fleet, including permission rules, but the documentation does not describe them delivering skill files.",
       "The beta is the first place OpenCode addresses distribution directly, and it is worth watching. A skills array in opencode.json accepts extra local directories and HTTP catalogs, where a catalog is a base URL serving an index.json that lists each skill with a name, a version, and a file list. That is a real answer to getting files onto machines, and it is beta, same-origin only, and not something to build a team process on this month. It also still answers only the distribution half.",
-      "Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends. Each saved entry keeps the original source repository and path visible, teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run. It makes no assumption that everyone is in OpenCode, which is the assumption every per-product mechanism above has to make.",
+      "Skills Board is a web application where a team keeps, searches, and shares its AI skills. Each saved entry keeps the original source repository and path visible, teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run. It makes no assumption that everyone is in OpenCode, which is the assumption every per-product mechanism above has to make.",
     ],
     paths: [
       {
@@ -652,7 +652,7 @@ A Markdown section titled with the version and the date.`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "The official Skills Board plugin is an Agent Plugins package. OpenCode plugins are a different thing entirely, so on OpenCode the MCP entry in opencode.json is the route, not the plugin.",
       "Skills Board does not publish an OpenCode HTTP catalog. The beta's skills array expects a base URL serving an index.json in its own shape, and nothing here serves that shape today.",
@@ -752,7 +752,7 @@ A Markdown section titled with the version and the date.`,
     {
       question: "How does a team share OpenCode skills?",
       answer:
-        "Inside one repository, commit them to .agents/skills/ and OpenCode finds them by walking up from the working directory. Across repositories and across agents, nothing in OpenCode covers which skill the team recommends and why, which is the layer Skills Board holds beside the source, the command, and the ZIP.",
+        "Inside one repository, commit them to .agents/skills/ and OpenCode finds them by walking up from the working directory. Across repositories and across agents, nothing in OpenCode covers which skill the team settled on and why, which is the layer Skills Board holds beside the source, the command, and the ZIP.",
     },
   ],
   sources: [
@@ -906,7 +906,7 @@ A Markdown section titled with the version and the date.`,
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Turning a skill that worked once into a recommendation the next teammate can find.",
+        "Turning a skill that worked once into an entry the next teammate can find.",
     },
   ],
   og: {
@@ -916,7 +916,7 @@ A Markdown section titled with the version and the date.`,
       { text: "and a permission on every skill.", accent: true },
     ],
     description:
-      "What OpenCode skills are, every directory it scans, how the skill tool loads one, and how teams keep one recommendation.",
+      "What OpenCode skills are, every directory it scans, how the skill tool loads one, and how teams keep one answer per job.",
     contextLabel: "skillsboard.sh/opencode-skills",
     chips: ["SKILL.md", "skill tool", ".opencode/skills"],
   },

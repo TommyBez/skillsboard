@@ -14,11 +14,11 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   title: "How to share AI agent skills with your team",
   seoTitle: "How to Share AI Agent Skills With Your Team | Skills Board",
   description:
-    "A practical workflow to share AI agent skills across a team, set ownership, compare distribution models, and keep one visible team recommendation library.",
+    "A practical workflow to share AI agent skills across a team, set ownership, compare distribution models, and keep one visible team library.",
   intro:
     "Sharing a skill is easy. Making it inspectable, discoverable, and reusable by the next teammate is the real job. This guide gives you a lightweight operating model that works whether your team uses one agent or several.",
   answer:
-    "Share an agent skill through one versioned canonical source and one visible team recommendation. Record its purpose, owner, reviewed setup paths, and status. Test the agent paths teammates use, then link to the source instead of copying SKILL.md into multiple places.",
+    "Share an agent skill through one versioned canonical source and one visible team entry. Record its purpose, owner, reviewed setup paths, and status. Test the agent paths teammates use, then link to the source instead of copying SKILL.md into multiple places.",
   citations: {
     answer: ["openai-skills", "anthropic-skills", "github-agent-skills"],
     decision: ["openai-skills", "anthropic-skills", "github-agent-skills"],
@@ -27,19 +27,19 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     },
   },
   corePrinciple:
-    "One canonical source. One visible recommendation. Explicit setup for every agent path.",
+    "One canonical source. One visible team entry. Explicit setup for every agent path.",
   problem:
-    "A link in chat answers “where is the file?” once. It does not say who owns the skill, what problem it solves, which agents were tested, or whether the team should still use it. Treat the skill artifact, its distribution path, and the team recommendation as three separate layers.",
+    "A link in chat answers “where is the file?” once. It does not say who owns the skill, what problem it solves, which agents were tested, or whether the team should still use it. Treat the skill artifact, its distribution path, and the team entry as three separate layers.",
   decisionTitle: "Choose the sharing model that matches your team",
   decisionIntro:
-    "Most teams need a combination: a versioned source for the artifact and a shared catalog for discovery and recommendation. Vendor-native sharing is useful when everyone works in the same managed environment.",
+    "Most teams need a combination: a versioned source for the artifact and a shared catalog for discovery and selection. Vendor-native sharing is useful when everyone works in the same managed environment.",
   comparisonColumns: ["Sharing model", "Best fit", "Trade-off"],
   comparisonRows: [
     {
       label: "Vendor-native sharing",
       cells: [
         "One managed agent environment with central administration.",
-        "Simple inside that environment, but the recommendation can fragment when the team adds another agent.",
+        "Simple inside that environment, but the team entry can fragment when the team adds another agent.",
       ],
     },
     {
@@ -50,7 +50,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
       ],
     },
     {
-      label: "Shared recommendation library",
+      label: "Shared team library",
       cells: [
         "Mixed-agent teams that need one place to decide which skill to use.",
         "Improves discovery and context; it does not automatically provision the skill into every agent.",
@@ -73,13 +73,13 @@ export const shareTeamSkillsGuide: GuideDefinition = {
       output: "A canonical repository URL with visible history and ownership.",
     },
     {
-      title: "Review the artifact before recommending it",
+      title: "Review the artifact before saving it",
       body: "Check the instructions, bundled scripts, tool permissions, data handling, and final verification steps. Treat an externally sourced skill like code or automation—not like a harmless prompt snippet.",
       output: "A named reviewer and a recorded review date.",
     },
     {
-      title: "Publish a minimal recommendation record",
-      body: "Record what the skill is for, why the team recommends it, its source, install or access path, tested agents, owner, and current status. Keep operational notes next to the recommendation rather than in a separate chat thread.",
+      title: "Publish a minimal library record",
+      body: "Record what the skill is for, why the team keeps it, its source, install or access path, tested agents, owner, and current status. Keep operational notes next to the entry rather than in a separate chat thread.",
       output: "A searchable team record that points back to the canonical source.",
     },
     {
@@ -89,7 +89,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     },
     {
       title: "Review, update, or retire",
-      body: "Give every recommendation an owner and a review trigger. Source changes, tool changes, repeated failures, or a better replacement should start a new review—not leave two competing copies in circulation.",
+      body: "Give every entry an owner and a review trigger. Source changes, tool changes, repeated failures, or a better replacement should start a new review rather than leave two competing copies in circulation.",
       output: "An active, needs-review, or retired lifecycle state.",
     },
   ],
@@ -98,7 +98,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     "This record is deliberately small enough to maintain. Add fields only when they change a decision or reduce rollout risk.",
   templateFields: [
     { label: "Problem", value: "The repeated task this skill helps the team complete." },
-    { label: "Recommendation", value: "Why the team prefers this skill over the current alternative." },
+    { label: "Reason to keep", value: "Why the team prefers this skill over the current alternative." },
     { label: "Canonical source", value: "The repository path or source URL for the reviewed artifact." },
     { label: "Use paths", value: "Source, install command, ZIP, connected-agent search through MCP, or agent-specific instructions that actually exist." },
     { label: "Compatibility", value: "Agents and environments the team has tested—never an assumed universal claim." },
@@ -108,7 +108,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   pitfalls: [
     {
       title: "Copying instead of linking",
-      body: "Every copied SKILL.md becomes a possible fork. Keep one canonical source and let recommendation records point to it.",
+      body: "Every copied SKILL.md becomes a possible fork. Keep one canonical source and let library records point to it.",
     },
     {
       title: "Calling availability approval",
@@ -120,14 +120,14 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     },
     {
       title: "Growing the catalog without owners",
-      body: "More entries create more ambiguity when nobody is accountable for reviewing changes or retiring stale recommendations.",
+      body: "More entries create more ambiguity when nobody is accountable for reviewing changes or retiring stale ones.",
     },
   ],
   checklist: [
     "The skill solves a repeated team problem with a concrete expected output.",
     "One canonical source is versioned and accessible to the intended teammates.",
-    "Scripts, permissions, and data handling were reviewed before recommendation.",
-    "The recommendation says which agents were actually tested.",
+    "Scripts, permissions, and data handling were reviewed before the skill was saved.",
+    "The entry says which agents were actually tested.",
     "The record has an owner, status, and review trigger.",
     "The next teammate can find and use it without searching chat history.",
   ],

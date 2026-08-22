@@ -256,7 +256,7 @@ export const skillsVsMcp: ComparisonDefinition = {
       "Read as a stack, the failure modes are obvious in both directions. A connected agent with no procedure improvises: it has ten tools and no opinion about which three matter for an incident review. A well-written skill with nothing connected asks you to paste the data it cannot fetch. Neither is a smaller version of the other, and the repository above is the cheapest way to have both.",
       "One thing worth stating plainly, because its absence is easy to misread: the Claude Code skill frontmatter reference lists no field for declaring which MCP servers a skill needs. The binding is prose. The skill names the tools it expects and says what to do when they are missing, which is what the example above does. If a documented field appears later, this page will change.",
       "There is one documented artifact that packages both together. Adding a .claude-plugin/plugin.json to a skill folder loads it as a plugin, and a plugin can bundle agents, hooks, and MCP servers alongside the skill. That is the supported path when you want a capability and its connection to install as one unit rather than as two files a teammate has to remember to copy.",
-      "The convention that survives contact with a real team is boring. One repository, two committed files, and one line in the README that says which skills are the recommended ones and why. Everything past that is a distribution problem rather than a format problem.",
+      "The convention that survives contact with a real team is boring. One repository, two committed files, and one line in the README that says which skills the team settled on and why. Everything past that is a distribution problem rather than a format problem.",
     ],
     template: bothLayersTemplate,
     templateLabel: "A repository that commits both layers",
@@ -269,7 +269,7 @@ export const skillsVsMcp: ComparisonDefinition = {
       lead: "Once two people depend on the same two files, the hard part stops being syntax:",
       label: "how to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
-      trail: " covers ownership, the distribution models, and keeping one recommendation instead of five forks.",
+      trail: " covers ownership, the distribution models, and keeping one agreed skill instead of five forks.",
     },
     sourceIds: ["claude-code-skills", "claude-code-mcp"],
   },
@@ -284,11 +284,11 @@ export const skillsVsMcp: ComparisonDefinition = {
       },
       {
         title: "The repository, plus somewhere the list survives",
-        body: "The gap opens when the number of repositories exceeds the number of people who remember what is in them. Skills are discoverable only if you already have the checkout and know to look, neither format carries a reason for existing beyond its description, and nothing tells a new teammate which of the five forks of the same skill is the recommended one. A shared document closes most of it.",
+        body: "The gap opens when the number of repositories exceeds the number of people who remember what is in them. Skills are discoverable only if you already have the checkout and know to look, neither format carries a reason for existing beyond its description, and nothing tells a new teammate which of the five forks of the same skill the team settled on. A shared document closes most of it.",
       },
       {
         title: "Skills Board as the team's web app",
-        body: "Skills Board is a library of the skills a team recommends: each entry keeps its source repository, the install command, and a note about why it is recommended, grouped into collections by project or use case. This path involves no protocol at all, it is a page in a browser. Free forever, MIT licensed, and open source, so the honest comparison for it is a shared document rather than a competitor.",
+        body: "Skills Board is a library of a team's AI skills: each entry keeps its source repository, the install command, and a note about why it is there, grouped into collections by project or use case. This path involves no protocol at all, it is a page in a browser. Free forever, MIT licensed, and open source, so the honest comparison for it is a shared document rather than a competitor.",
       },
       {
         title: "Skills Board as an authenticated MCP server",
@@ -444,7 +444,7 @@ export const skillsVsMcp: ComparisonDefinition = {
   editorialSubject: "skills and MCP",
   closing: {
     title: "The agent can reach everything. It still has to be told what matters.",
-    body: "Skills Board is a web app for the skills a team recommends, and an authenticated MCP server for the agents that read it. Free forever, MIT licensed, and open source.",
+    body: "Skills Board is a web app for a team's AI skills, and an authenticated MCP server for the agents that read it. Free forever, MIT licensed, and open source.",
   },
   og: {
     eyebrow: "Claude Skills vs MCP",

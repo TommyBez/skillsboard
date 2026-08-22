@@ -174,7 +174,7 @@ export const writeSkillMdGuide: GuideDefinition = {
   team: {
     title: "What a team still has to hand over",
     intro:
-      "A finished SKILL.md answers what the skill does. It does not answer the question a teammate asks next: is this the one we use for this job, and who decided that. A folder in someone's home directory is invisible, a repository reaches only the people working in it, and a plugin distributes files rather than a decision. Skills Board is a web app where a team keeps and shares the AI skills it recommends. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
+      "A finished SKILL.md answers what the skill does. It does not answer the question a teammate asks next: is this the one we use for this job, and who decided that. A folder in someone's home directory is invisible, a repository reaches only the people working in it, and a plugin distributes files rather than a decision. Skills Board is a web app where a team keeps and shares its AI skills. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
     paths: [
       {
         label: "Open the original source",
@@ -190,11 +190,11 @@ export const writeSkillMdGuide: GuideDefinition = {
       },
       {
         label: "Connect an agent over MCP",
-        body: "An authenticated endpoint lets a compatible agent search the same set of recommendations and retrieve install commands. Sign-in happens in the browser, with no API key to copy.",
+        body: "An authenticated endpoint lets a compatible agent search the same set of saved skills and retrieve install commands. Sign-in happens in the browser, with no API key to copy.",
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "It does not write SKILL.md for you, create directories, or run skills inside your agent. The authoring above stays yours.",
     ],

@@ -361,7 +361,7 @@ test("the product is never described as a shared library", () => {
   assert.doesNotMatch(copy, /shared library/i)
   assert.match(
     entry.team.body.join(" "),
-    /web application where a team keeps and shares the AI skills it recommends/,
+    /web application where a team keeps and shares its AI skills/,
   )
 })
 

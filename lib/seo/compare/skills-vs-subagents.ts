@@ -227,7 +227,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
       "Reading the table left to right tells you who writes the task. With context: fork, the task is your skill: the skill content becomes the prompt that drives the subagent, it has no access to your conversation history, and the agent field picks which subagent type executes it, defaulting to general-purpose. Anthropic warns that this only makes sense for skills with explicit instructions, because a skill full of guidelines with no task gives the subagent nothing actionable to do.",
       "With a skills field on the subagent, the task is Claude's delegation message and the skill is reference material. The full content of each listed skill is injected into the subagent's context at startup, which is different from a normal session where only descriptions are preloaded. That field controls what is preloaded, not what the subagent can reach: without it, a subagent can still discover and invoke skills through the Skill tool, and skills that set disable-model-invocation cannot be preloaded at all.",
       "In practice one team convention covers most of it. Put the knowledge in a skill, because knowledge is what other people read, edit, and reuse in another tool. Put the isolation in a subagent, because tool limits, permissions, and model choice are the things you want enforced rather than suggested. When a subagent needs the knowledge, preload the skill instead of restating it in the system prompt, so there is one copy to keep current.",
-      "The honest caveat: none of this tells a new teammate which skill or subagent your team actually recommends. Both directories are discoverable only if you already have the repository checked out and know to look, and neither carries a reason for existing beyond what the description says. That gap is what a shared library closes, and it is the reason Skills Board exists, but a README that names the three skills your team stands behind closes most of it for free.",
+      "The honest caveat: none of this tells a new teammate which skill or subagent your team actually uses. Both directories are discoverable only if you already have the repository checked out and know to look, and neither carries a reason for existing beyond what the description says. That gap is what a shared library closes, and it is the reason Skills Board exists, but a README that names the three skills your team stands behind closes most of it for free.",
     ],
     template: subagentFileTemplate,
     templateLabel: "A subagent that preloads a skill",
@@ -240,7 +240,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
       lead: "Once more than one person depends on the same file, the harder problem is agreement rather than syntax:",
       label: "how to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
-      trail: " covers ownership, the distribution models, and keeping one recommendation instead of five forks.",
+      trail: " covers ownership, the distribution models, and keeping one agreed skill instead of five forks.",
     },
     sourceIds: ["claude-code-skills", "claude-code-subagents"],
   },
@@ -337,7 +337,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Ownership, distribution models, and keeping one recommendation instead of five forks.",
+        "Ownership, distribution models, and keeping one agreed skill instead of five forks.",
     },
     {
       label: "Skills Board vs a shared GitHub repository",
@@ -360,7 +360,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
   editorialSubject: "skills and subagents",
   closing: {
     title: "Whichever primitive you pick, someone still has to find it.",
-    body: "Skills Board is a web app for the skills a team recommends. Free forever, MIT licensed, and open source. Save the first one and invite the person who keeps asking which one to use.",
+    body: "Skills Board is a web app for a team's AI skills. Free forever, MIT licensed, and open source. Save the first one and invite the person who keeps asking which one to use.",
   },
   ogAlt:
     "Comparison of Claude skills and subagents: what each one is, where each lives, and when to use each.",

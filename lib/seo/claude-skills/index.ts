@@ -450,12 +450,12 @@ A Markdown section ready to paste into the release description.`,
     ],
   },
   team: {
-    title: "How does a team share the skills it recommends?",
+    title: "How does a team share the skills it uses?",
     intro:
-      "Nothing in the format does it for you. The SKILL.md folder is portable, but distribution is per surface, and the recommendation itself usually is not stored anywhere at all.",
+      "Nothing in the format does it for you. The SKILL.md folder is portable, but distribution is per surface, and the choice itself usually is not stored anywhere at all.",
     body: [
       "Look at what the surfaces actually offer a team. On claude.ai, custom skills belong to the individual user, are not shared organization-wide, and cannot be centrally managed by admins. Through the API, uploaded skills are workspace-wide. In Claude Code, a skill lives in a personal folder, in one repository, or in a plugin. None of those places holds the part teammates keep asking about: which skill to use for this, and why this one.",
-      "That part ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app built for exactly that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry.",
+      "That part ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app built for exactly that layer: the smaller set of skills your team settled on, in one searchable place, with the original source visible on every entry.",
     ],
     paths: [
       {
@@ -476,7 +476,7 @@ A Markdown section ready to paste into the release description.`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "It does not install or run skills inside your agent, and it does not claim a skill works in every agent your team uses.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
@@ -521,9 +521,9 @@ A Markdown section ready to paste into the release description.`,
         "A skill is a folder of instructions and resources the agent reads. MCP is a protocol for connecting an agent to external tools and data through a server. They answer different questions and are often used together: Skills Board publishes a team library over an authenticated MCP endpoint, while the skills themselves stay in SKILL.md folders at their original sources.",
     },
     {
-      question: "Where should a team keep the skills it recommends?",
+      question: "Where should a team keep the skills it uses?",
       answer:
-        "Wherever teammates will actually look. If every skill belongs to one repository the whole team works in, commit them to .claude/skills/ and stop there. If the recommendations come from other people's repositories and teammates run different agents, a shared library that keeps the source visible on every entry is easier to keep current. Skills Board is one option, and it is free and open source.",
+        "Wherever teammates will actually look. If every skill belongs to one repository the whole team works in, commit them to .claude/skills/ and stop there. If the skills come from other people's repositories and teammates run different agents, a team library that keeps the source visible on every entry is easier to keep current. Skills Board is one option, and it is free and open source.",
     },
   ],
   sources: [
@@ -641,7 +641,7 @@ A Markdown section ready to paste into the release description.`,
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Turning a skill that worked once into a recommendation the next teammate can find.",
+        "Turning a skill that worked once into an entry the next teammate can find.",
     },
     {
       label: "A shared MCP skill library for teams",
@@ -663,7 +663,7 @@ A Markdown section ready to paste into the release description.`,
       { text: "loaded when it matters.", accent: true },
     ],
     description:
-      "What Claude Skills are, where they run, how to write one, and how a team shares the ones it recommends.",
+      "What Claude Skills are, where they run, how to write one, and how a team shares the ones it uses.",
     contextLabel: "skillsboard.sh/claude-skills",
     chips: ["SKILL.md", "Claude Code", "claude.ai"],
   },

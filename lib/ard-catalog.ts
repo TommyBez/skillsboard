@@ -42,7 +42,7 @@ export function buildArdCatalog() {
         type: "application/mcp-server-card+json",
         url: discoveryUrl("/.well-known/mcp/server-card.json"),
         representativeQueries: [
-          "which AI skills does my team recommend",
+          "which AI skills does my team use",
           "search my team's skill library for a code review skill",
           "get the install command for a skill my team saved",
           "save this GitHub skill to our team library",
@@ -53,7 +53,7 @@ export function buildArdCatalog() {
         identifier: urn("skill", "team-skill-library"),
         displayName: "Skills Board team library skill",
         description:
-          "Agent Skill (SKILL.md) covering how to use a team's Skills Board library from an agent: find a recommendation, hand off an install command, and save a skill back.",
+          "Agent Skill (SKILL.md) covering how to use a team's Skills Board library from an agent: find a saved skill, hand off an install command, and save a skill back.",
         type: "text/markdown",
         url: discoveryUrl(TEAM_SKILL_LIBRARY_SKILL_PATH),
         representativeQueries: [

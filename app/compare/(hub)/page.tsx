@@ -123,8 +123,8 @@ export default function ComparePage() {
             Picking the primitive is the easy half.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-            The harder half is agreeing on which files your team actually
-            recommends. Skills Board keeps that list in one searchable place:
+            The harder half is agreeing on which files your team actually uses.
+            Skills Board keeps that list in one searchable place:
             free forever, MIT licensed, and open source.
           </p>
           <div className="mt-7 flex justify-center">

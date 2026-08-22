@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  Skills Board, the agent-native skills registry for teams. Keep the AI skills your team recommends in one place, so everyone knows where to find and use them.
+  Skills Board, the agent-native skills registry for teams. Keep your team's AI skills in one place, so everyone knows where to find and use them.
 </p>
 
 <p align="center">
@@ -40,21 +40,21 @@
 
 ## Why Skills Board
 
-Useful skill recommendations tend to disappear into chats, bookmarks, and personal agent setups. Skills Board gives a team one searchable place to collect the skills it recommends and lets every teammate choose how to use them.
+Useful skills tend to disappear into chats, bookmarks, and personal agent setups. Skills Board gives a team one searchable place to collect them and lets every teammate choose how to use them.
 
 - **One team library.** Save useful skills once, organize them with team-specific tags, and make them easy to find again.
-- **Different agents welcome.** Share the same recommendation across Claude, Codex, Cursor, and other agent setups.
+- **Different agents welcome.** Share the same entry across Claude, Codex, Cursor, and other agent setups.
 - **A choice of handoff.** Open the original source, copy a compatible install command, or download the latest skill files as a ZIP.
 - **Organization-scoped access.** Create a team, invite members, and keep each library available to its members.
 - **Optional MCP access.** Connect compatible agents to authenticated, scope-controlled tools for finding and organizing team skills and collections.
 
 > [!IMPORTANT]
-> A saved skill is a team recommendation, not a security review, compatibility certification, or pinned release. Skills Board reads the latest available source; inspect that source before using it in an agent.
+> A saved skill is a team's own choice, not a security review, compatibility certification, or pinned release. Skills Board reads the latest available source; inspect that source before using it in an agent.
 
 ## How it works
 
 1. Create a team library and add a skill from its GitHub repository.
-2. Skills Board keeps the original source visible and records the recommendation for the team.
+2. Skills Board keeps the original source visible and records the entry for the team.
 3. Teammates search by task, description, repository, or tag.
 4. Each teammate opens the source, copies a compatible command, or downloads the latest files as a ZIP.
 

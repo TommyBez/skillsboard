@@ -386,13 +386,13 @@ A Markdown section titled with the version and date.`,
     sourceIds: ["cursor-skills", "agentskills-spec", "cursor-plugins-reference"],
   },
   team: {
-    title: "How teams keep one recommendation across Cursor and other agents",
+    title: "How teams keep one answer per job across Cursor and other agents",
     intro:
-      "Two problems hide behind one word. Distribution is getting the files onto each teammate's machine. Recommendation is knowing which skill to use for a task and why that one. Cursor has good answers for the first. The second is not a Cursor problem at all.",
+      "Two problems hide behind one word. Distribution is getting the files onto each teammate's machine. Selection is knowing which skill to use for a task and why that one. Cursor has good answers for the first. The second is not a Cursor problem at all.",
     body: [
       "If every skill your team uses lives in a repository everyone works in, the answer is short: commit them to .cursor/skills/ or .agents/skills/ at the project root and Cursor picks them up with no extra tooling. That is the best setup for a single-repository team, and no shared library improves on it. Nothing here should talk you out of it.",
       "It stops being enough when the skills come from other people's repositories, when they are useful in more than one repository, or when teammates run different agents. Cursor's answer to the first two is plugins: it supports the Agent Plugins standard alongside its own Cursor Plugin format and offers team marketplaces on Teams and Enterprise plans with per-plugin install modes. That covers packaging and rollout, but not teammates outside Cursor, because a Cursor Plugin is not what Claude Code or Codex installs.",
-      "The recommendation layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app for that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
+      "The selection layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app for that layer: the smaller set of skills your team settled on, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {
@@ -413,7 +413,7 @@ A Markdown section titled with the version and date.`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "The MCP connection cannot install or run a skill inside Cursor, and it cannot edit or delete saved team skills.",
       "It is not a replacement for a skills directory. The files still have to land somewhere Cursor scans, by whichever route each teammate prefers.",
@@ -500,7 +500,7 @@ A Markdown section titled with the version and date.`,
     {
       question: "How does a team share Cursor skills?",
       answer:
-        "For one repository, commit them to .cursor/skills/ or .agents/skills/ and Cursor picks them up. Across repositories, Cursor distributes skills through plugins and team marketplaces on Teams and Enterprise plans. What neither covers is which skill the team recommends and why, especially when teammates run different agents, which is the layer a shared library like Skills Board holds.",
+        "For one repository, commit them to .cursor/skills/ or .agents/skills/ and Cursor picks them up. Across repositories, Cursor distributes skills through plugins and team marketplaces on Teams and Enterprise plans. What neither covers is which skill the team settled on and why, especially when teammates run different agents, which is the layer a team library like Skills Board holds.",
     },
   ],
   sources: [
@@ -606,7 +606,7 @@ A Markdown section titled with the version and date.`,
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Turning a skill that worked once into a recommendation the next teammate can find.",
+        "Turning a skill that worked once into an entry the next teammate can find.",
     },
     {
       label: "A shared MCP skill library for teams",
@@ -622,7 +622,7 @@ A Markdown section titled with the version and date.`,
       { text: "and eight places to put it.", accent: true },
     ],
     description:
-      "What Cursor skills are, every directory Cursor scans, the frontmatter fields it documents, and how teams keep one recommendation.",
+      "What Cursor skills are, every directory Cursor scans, the frontmatter fields it documents, and how teams keep one answer per job.",
     contextLabel: "skillsboard.sh/cursor-skills",
     chips: ["SKILL.md", "Cursor Agent", ".cursor/skills"],
   },

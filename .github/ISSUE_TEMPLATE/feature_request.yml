@@ -36,5 +36,5 @@ body:
     attributes:
       label: Product fit
       options:
-        - label: This keeps saved skills as team recommendations rather than security or compatibility certifications.
+        - label: This keeps a saved skill as the team's own choice rather than a security or compatibility certification.
           required: true

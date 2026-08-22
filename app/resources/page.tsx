@@ -134,7 +134,7 @@ export default function ResourcesPage() {
 
         <section className="mt-16 border-t border-border py-16 text-center md:mt-24 md:py-20">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Turn a useful workflow into a team recommendation.
+            Turn a useful workflow into a skill the team can find.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Keep the source, setup path, and operating notes in one searchable library your teammates can return to.

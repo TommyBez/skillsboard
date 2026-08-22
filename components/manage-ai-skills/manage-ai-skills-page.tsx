@@ -214,7 +214,7 @@ export function ManageAiSkillsPage({
             intro={entry.channels.intro}
           />
           <SectionTable
-            caption="The delivery channels Skills Board offers for one saved recommendation, and the limits of each."
+            caption="The delivery channels Skills Board offers for one saved skill, and the limits of each."
             columns={entry.channels.columns}
             rows={entry.channels.rows}
             labelWidth="w-[20%]"
@@ -380,11 +380,11 @@ export function ManageAiSkillsPage({
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Distribution is per vendor. The recommendation is yours.
+            Distribution is per vendor. The choice is yours.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills your team actually recommends, and invite the people who
+            the skills your team actually uses, and invite the people who
             keep asking which one to use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">

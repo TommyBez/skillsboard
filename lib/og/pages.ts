@@ -7,7 +7,7 @@ export const homeOgContent: OgTemplateContent = {
     { text: "All in one place.", accent: true },
   ],
   description:
-    "Keep team-recommended AI skills in one searchable library and connect it to your agent through MCP.",
+    "Keep your team's AI skills in one searchable library and connect it to your agent through MCP.",
   chips: ["Claude", "Codex", "Cursor", "MCP"],
 }
 
@@ -30,7 +30,7 @@ export const signUpOgContent: OgTemplateContent = {
     { text: "skill library today.", accent: true },
   ],
   description:
-    "Collect the skills your team recommends so colleagues can find them and install them in the setup they already use.",
+    "Collect your team's skills so colleagues can find them and install them in the setup they already use.",
   contextLabel: "skillsboard.sh/sign-up",
   chips: ["Free forever", "Open source"],
   footnote: "No credit card required",
@@ -43,7 +43,7 @@ export const signInOgContent: OgTemplateContent = {
     { text: "ready when you are.", accent: true },
   ],
   description:
-    "Sign in with a one-time email code to open the shared library of skills your team recommends.",
+    "Sign in with a one-time email code to open your team's skills library.",
   contextLabel: "skillsboard.sh/sign-in",
   chips: ["Claude", "Codex", "Cursor", "MCP"],
 }
@@ -55,7 +55,7 @@ export const inviteOgContent: OgTemplateContent = {
     { text: "shared skill library.", accent: true },
   ],
   description:
-    "A teammate wants to share the AI skills their team recommends. Accept the invite to browse and install them in your setup.",
+    "A teammate wants to share their team's AI skills. Accept the invite to browse and install them in your setup.",
   contextLabel: "skillsboard.sh",
   chips: ["Claude", "Codex", "Cursor", "MCP"],
 }

@@ -527,7 +527,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     ],
     notes: [
       "The line to remember is that nothing syncs. Anthropic states that custom skills do not sync across surfaces, that a skill uploaded to claude.ai must be separately uploaded to the API, that skills uploaded through the API are not available on claude.ai, and that Claude Code skills are filesystem-based and separate from both. The first-party skills inherit the same fragmentation, which is why a team of five people using three surfaces ends up with three different answers to what is installed.",
-      "Sharing scope differs per surface too, and it is the part that decides whether a recommendation survives. On claude.ai a custom skill is individual to each user, and the platform documentation says claude.ai does not support centralized admin management or org-wide distribution of custom skills. On the API, uploaded skills are workspace-wide. In Claude Code they are personal or project-based, or distributed through plugins.",
+      "Sharing scope differs per surface too, and it is the part that decides whether a team's choice survives. On claude.ai a custom skill is individual to each user, and the platform documentation says claude.ai does not support centralized admin management or org-wide distribution of custom skills. On the API, uploaded skills are workspace-wide. In Claude Code they are personal or project-based, or distributed through plugins.",
       "The runtime differs as well, which matters when you copy a first-party skill that shells out. On the Claude API, skills run in a sandboxed container with no network access and no runtime package installation, so only pre-installed packages are available. In Claude Code they have the same network access as any other program on your computer. On claude.ai, network access varies with user and admin settings.",
     ],
     link: {
@@ -609,7 +609,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     body: [
       "The scope you install at is different on every surface, which is exactly why a team ends up with three answers. On claude.ai a skill is enabled per person, and the platform documentation says custom skills there are individual to each user with no org-wide distribution and no central admin management. In Claude Code the thirteen bundled skills are present in every session with no install, while anything from the repository is added per user, per project, or through a plugin the project checks in. On the Claude API nothing is installed per person at all: the four pre-built skills are referenced by skill_id, and a custom skill uploaded through /v1/skills is workspace-wide for every member. Someone enables theme-factory on claude.ai, someone else installs example-skills in Claude Code, and a third person is on the API where neither is reachable, and Anthropic states that custom skills do not sync across surfaces, so the drift is designed in rather than accidental.",
       "The decision itself lives nowhere. The repository tells you a skill exists. It does not record that your team tried webapp-testing, found it worked, and agreed it is the one to reach for, or that someone read the docx license and decided the source-available terms rule it out for your fork. That gets said once in a chat thread and then it is gone.",
-      "Skills Board is a web app for that smaller layer: the set your team actually recommends, in one searchable place, with the source repository and path visible on every entry, so a teammate can open the original SKILL.md before installing anything anywhere.",
+      "Skills Board is a web app for that smaller layer: the set your team actually settled on, in one searchable place, with the source repository and path visible on every entry, so a teammate can open the original SKILL.md before installing anything anywhere.",
     ],
     paths: [
       {
@@ -630,14 +630,14 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a license clearance.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a license clearance.",
       "Skills Board does not install, enable, or provision anything inside Claude. Every path on this page still runs through Anthropic's own settings or your own filesystem.",
       "It follows the latest version available from the saved source, and does not pin or preserve historical versions. The repository above changed three times in the two days before we wrote this page: two skills added and one of them renamed the next day.",
       "The MCP connection cannot install or run a skill inside an agent, and it cannot edit or delete saved team skills.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
     link: {
-      lead: "For the ownership side of the same problem, one recommendation and a named owner per skill, see",
+      lead: "For the ownership side of the same problem, one agreed skill per job and a named owner, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",
@@ -851,7 +851,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       label: "Skills Board vs a GitHub repo",
       href: alternativePaths.githubRepo,
       description:
-        "Keeping recommendations in a repository next to keeping them in a library, and what each costs.",
+        "Keeping skills in a repository next to keeping them in a library, and what each costs.",
     },
   ],
   og: {

@@ -152,14 +152,14 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
   title: "How to manage AI skills across an organization",
   seoTitle: "How to Manage AI Skills Across an Organization | Skills Board",
   description:
-    "Skills scatter across personal folders, repositories, and accounts, and every vendor mechanism for distributing them stops at that vendor's own products. What each one covers, what a team has to solve itself, and how to keep one recommendation everyone can find. Sources checked on August 21, 2026.",
+    "Skills scatter across personal folders, repositories, and accounts, and every vendor mechanism for distributing them stops at that vendor's own products. What each one covers, what a team has to solve itself, and how to keep one answer everyone can find. Sources checked on August 21, 2026.",
   intro: [
-    "The question sounds like a tooling question and is not one. A team lead notices that four people run four versions of the same code review skill, that the useful one somebody wrote in June sits in a personal folder nobody else can list, and that a new hire has no way to find out what the team actually recommends. Nothing is broken. There is simply no place where the answer lives.",
+    "The question sounds like a tooling question and is not one. A team lead notices that four people run four versions of the same code review skill, that the useful one somebody wrote in June sits in a personal folder nobody else can list, and that a new hire has no way to find out what the team actually uses. Nothing is broken. There is simply no place where the answer lives.",
     "Every agent vendor has shipped something for this, and each one is scoped to its own products. Anthropic documents organization provisioning for claude.ai and Cowork, managed settings for Claude Code, and workspace-wide uploads for the Claude API, while stating in the same documentation that custom skills do not sync between those three. OpenAI documents a shared machine location and plugins for anything wider. Cursor documents project and user directories and no organization mechanism at all.",
     "So the answer is in two halves. Distribution is per vendor, it is documented, and this page maps it row by row with the date each source was fetched. Selection, meaning which skills your team decided are worth using and who stands behind each one, is covered by none of those mechanisms, and that is the half teams solve with a chat thread.",
   ],
   answer:
-    "Managing AI skills across an organization means solving two separate problems. Distribution is per vendor: Claude Code reads managed settings and plugins, claude.ai and Cowork have owner provisioning on Team and Enterprise plans, the Claude API shares skills workspace-wide, and Codex reads a shared machine location plus plugins. Selection is solved by none of them, because none records which skills the team recommends or who chose them. A team library covers the second half and stays neutral about the first.",
+    "Managing AI skills across an organization means solving two separate problems. Distribution is per vendor: Claude Code reads managed settings and plugins, claude.ai and Cowork have owner provisioning on Team and Enterprise plans, the Claude API shares skills workspace-wide, and Codex reads a shared machine location plus plugins. Selection is solved by none of them, because none records which skills the team settled on or who chose them. A team library covers the second half and stays neutral about the first.",
   answerNotes: [
     "One mechanism is never enough, and Anthropic's own documentation says why. Custom skills do not sync across surfaces: a skill uploaded to claude.ai is not available through the API, an API skill is not on claude.ai, and Claude Code skills are filesystem-based and separate from both. The enterprise guidance draws the conclusion and tells organizations to keep skill source files in Git as the single source of truth and to build their own synchronization across surfaces.",
     "That is inside one vendor. A team where some people use Claude Code, some Codex, and some Cursor multiplies it by three, because none of the three reads the others' distribution channels. The one thing they share is a file format, and a format tells a teammate how to read a skill, not which one to read.",
@@ -200,15 +200,15 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       {
         label: "A chat thread",
         cells: [
-          "Whoever was in the channel that day. This is where most recommendations actually are, and no vendor documentation covers it because no vendor built it.",
-          "Everything, in practice. The link survives, the reason does not, and a search six weeks later returns three messages recommending three different things.",
+          "Whoever was in the channel that day. This is where most of these decisions actually are, and no vendor documentation covers it because no vendor built it.",
+          "Everything, in practice. The link survives, the reason does not, and a search six weeks later returns three messages pointing at three different things.",
         ],
       },
       {
         label: "A public directory",
         cells: [
           "Anyone. Public catalogs and repositories are genuinely useful for discovery, and hold far more skills than a team will ever use.",
-          "Your team's choice. A leaderboard ranks by installs across everybody, which is a different question from which skill the two people here who tried it would recommend.",
+          "Your team's choice. A leaderboard ranks by installs across everybody, which is a different question from which skill the two people here who tried it would keep.",
         ],
       },
     ],
@@ -282,7 +282,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
         label: "ChatGPT and Codex plugins",
         cells: [
           "Distribution of reusable skills and connectors through a plugin directory shared by ChatGPT and Codex, working in Chat and Work across web, desktop, and mobile, in Codex in the desktop app, and through the Codex CLI.",
-          "Inside OpenAI's products. The documentation frames it as designing the workflow as a skill, then packaging it as a plugin when you want other people to install it, so the unit of sharing becomes the package rather than the recommendation.",
+          "Inside OpenAI's products. The documentation frames it as designing the workflow as a skill, then packaging it as a plugin when you want other people to install it, so the unit of sharing becomes the package rather than the choice.",
         ],
       },
       {
@@ -294,7 +294,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       },
     ],
     notes: [
-      "Read the right column as a whole and a shape appears. Every documented mechanism is one of three things: a file placed on a machine, a package somebody installs, or an upload confined to one vendor's hosted surfaces. None carries a recommendation and none crosses a vendor boundary, which are exactly the two properties a mixed-agent team needs.",
+      "Read the right column as a whole and a shape appears. Every documented mechanism is one of three things: a file placed on a machine, a package somebody installs, or an upload confined to one vendor's hosted surfaces. None carries the reason a team chose a skill and none crosses a vendor boundary, which are exactly the two properties a mixed-agent team needs.",
       "One contradiction sits inside a single vendor's documentation, and it is worth flagging rather than resolving. The Agent Skills overview states that claude.ai does not support centralized admin management or org-wide distribution of custom skills. The Claude Help Center article on provisioning, fetched the same day, documents exactly that. Both pages are Anthropic's. We treat the help center as operative because it is the more specific, and record that the overview has not been updated to match.",
       "Anthropic also publishes a page for the organizational side of this problem: a risk indicator table, an eight-step review checklist, a rule that a skill's author should not be its reviewer, a lifecycle from plan through deprecation, and an internal registry recording purpose, owner, version, dependencies, and evaluation status per skill.",
     ],
@@ -317,11 +317,11 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
   requirements: {
     title: "Five things centralizing has to do",
     intro:
-      "A team that has read the table above usually reaches for a document, which fails for a nameable reason: a document stores links and answers no question. These five are what separates a place recommendations survive in from a page nobody opens twice.",
+      "A team that has read the table above usually reaches for a document, which fails for a nameable reason: a document stores links and answers no question. These five are what separates a place these decisions survive in from a page nobody opens twice.",
     rules: [
       {
-        label: "1. One list, and it says who recommends what",
-        body: "The unit is the recommendation, not the file. A saved entry has to say that this team put it there, which makes the list deliberately smaller than any public catalog. Anthropic's enterprise guidance asks for an internal registry recording purpose, owner, version, dependencies, and evaluation status per skill, which is the same idea reached from the compliance direction.",
+        label: "1. One list, and it says who put each skill there",
+        body: "The unit is the decision, not the file. A saved entry has to say that this team put it there, which makes the list deliberately smaller than any public catalog. Anthropic's enterprise guidance asks for an internal registry recording purpose, owner, version, dependencies, and evaluation status per skill, which is the same idea reached from the compliance direction.",
       },
       {
         label: "2. The original source stays visible on every entry",
@@ -337,7 +337,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       },
       {
         label: "5. A stated review cadence, and honesty about what a save means",
-        body: "A saved entry is a recommendation, not a security review, an approval, or a compatibility certification, and saying so is part of the mechanism rather than a disclaimer bolted on. Anthropic's enterprise page treats every skill update as a new deployment requiring full security review, a heavier bar than most teams meet, and knowing which bar you apply beats claiming the heavier one.",
+        body: "A saved entry is a team's own choice, not a security review, an approval, or a compatibility certification, and saying so is part of the mechanism rather than a disclaimer bolted on. Anthropic's enterprise page treats every skill update as a new deployment requiring full security review, a heavier bar than most teams meet, and knowing which bar you apply beats claiming the heavier one.",
       },
     ],
     notes: [
@@ -359,7 +359,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
   channels: {
     title: "The delivery channels a mixed-agent team needs",
     intro:
-      "Requirement three said more than one way. This is what that looks like on Skills Board, which is a web application where a team keeps, searches, and shares the AI skills it recommends. Every channel below is in the open-source repository today.",
+      "Requirement three said more than one way. This is what that looks like on Skills Board, which is a web application where a team keeps, searches, and shares its AI skills. Every channel below is in the open-source repository today.",
     columns: ["Channel", "The teammate it fits", "What it does not do"],
     rows: [
       {
@@ -426,9 +426,9 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     intro:
       "Two honest sentences before the pitch. Skills Board replaces no mechanism in the second table, and it cannot put a file on a teammate's machine. It covers the half those mechanisms leave open.",
     body: [
-      "Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends. A library is scoped to an organization, teammates are invited into it, and each saved entry records the GitHub repository and path it came from plus the team's own tags, a note, and example prompts. Search runs across the title, description, note, example prompts, and tags, which is the sentence a teammate would actually type.",
+      "Skills Board is a web application where a team keeps, searches, and shares its AI skills. A library is scoped to an organization, teammates are invited into it, and each saved entry records the GitHub repository and path it came from plus the team's own tags, a note, and example prompts. Search runs across the title, description, note, example prompts, and tags, which is the sentence a teammate would actually type.",
       "That is deliberately the selection half. If a skill has to reach every managed laptop, managed settings does that and Skills Board does not. If every claude.ai member needs it enabled by default, owner provisioning does that and Skills Board does not. What none of them does is tell the person who joined last month which two skills this team stands behind for code review, who put them there, and where to read them first.",
-      "The two layers compose rather than compete. Keep the record of what the team recommends in one place, hand the reviewer the source, the Claude Code user a command, the browser user a ZIP, and still provision the three skills that belong on every machine through the vendor mechanism built for it. The record is what makes that decision explicable six months later.",
+      "The two layers compose rather than compete. Keep the record of what the team settled on in one place, hand the reviewer the source, the Claude Code user a command, the browser user a ZIP, and still provision the three skills that belong on every machine through the vendor mechanism built for it. The record is what makes that decision explicable six months later.",
     ],
     options: [
       {
@@ -449,7 +449,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation. It is not a security review, an approval, or a compatibility certification, and no channel here turns it into one.",
+      "A saved skill is a team's own choice. It is not a security review, an approval, or a compatibility certification, and no channel here turns it into one.",
       "Skills Board is not an administration control plane. It cannot deploy a skill to a machine, enforce a policy, block an install, or report what a teammate ran. The vendor mechanisms above are where those live.",
       "A library entry follows the latest version available from its saved source and pins no history. A published collection release is the exception, and the only place a commit is recorded.",
       "The MCP connection cannot install or execute a skill in an agent, and cannot edit or delete saved team skills.",
@@ -486,8 +486,8 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
         body: "The Cursor skills documentation lists four native directories, four compatibility directories, and recursive discovery in which a category folder is purely organizational and a skill's identity comes from the folder holding SKILL.md. On the day we checked it named no administrator-level, team-level, or organization-level distribution path. That is an absence in the documentation, not a tested claim about the product.",
       },
       {
-        title: "No format carries a recommendation",
-        body: "The Agent Skills specification defines a name, a description, and four optional fields, none of which express who recommends a skill, for which team, or on what evidence. No vendor extends the frontmatter with an owner or an endorsement field either. The record of why a skill is in your set is therefore something an organization keeps outside the file, whether that is a registry, a wiki page, or a library.",
+        title: "No format carries the reason a team chose a skill",
+        body: "The Agent Skills specification defines a name, a description, and four optional fields, none of which express who put a skill forward, for which team, or on what evidence. No vendor extends the frontmatter with an owner or an endorsement field either. The record of why a skill is in your set is therefore something an organization keeps outside the file, whether that is a registry, a wiki page, or a library.",
       },
     ],
     sourceIds: [
@@ -504,17 +504,17 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     {
       question: "How do you manage AI skills across an organization?",
       answer:
-        "Split it in two. Distribution is per vendor: managed settings or plugins for Claude Code, owner provisioning for claude.ai and Cowork, the Skills API for a workspace, a shared machine location or plugins for Codex. Selection is covered by none of them, so a team keeps its own record of what it recommends.",
+        "Split it in two. Distribution is per vendor: managed settings or plugins for Claude Code, owner provisioning for claude.ai and Cowork, the Skills API for a workspace, a shared machine location or plugins for Codex. Selection is covered by none of them, so a team keeps its own record of what it settled on.",
     },
     {
       question: "Is there one tool to manage AI skills across an organisation?",
       answer:
-        "Not for distribution. Every documented organization-level mechanism belongs to one vendor and reaches only that vendor's products, and Anthropic states that custom skills do not sync even between its own three surfaces. A team library can hold one recommendation for everyone, but a teammate still installs through their own client.",
+        "Not for distribution. Every documented organization-level mechanism belongs to one vendor and reaches only that vendor's products, and Anthropic states that custom skills do not sync even between its own three surfaces. A team library can hold one answer for everyone, but a teammate still installs through their own client.",
     },
     {
       question: "How do you share AI agent skills with a team?",
       answer:
-        "Commit the skill to a repository the team clones, package it as a plugin, or provision it through the vendor surface everyone uses. Then record the recommendation somewhere searchable, because none of those three says who chose the skill or why, which is what the next teammate needs.",
+        "Commit the skill to a repository the team clones, package it as a plugin, or provision it through the vendor surface everyone uses. Then record the choice somewhere searchable, because none of those three says who chose the skill or why, which is what the next teammate needs.",
     },
     {
       question: "How do you share Claude skills with your team?",
@@ -529,7 +529,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     {
       question: "How do you manage skills for a team on different agents?",
       answer:
-        "Keep one record of the recommendation and more than one way to use it. Claude Code, Codex, and Cursor read different directories and none reads the others' distribution channels, so a single install path always excludes somebody. Offer the source, a command, and the files, and let each teammate choose.",
+        "Keep one record of the choice and more than one way to use it. Claude Code, Codex, and Cursor read different directories and none reads the others' distribution channels, so a single install path always excludes somebody. Offer the source, a command, and the files, and let each teammate choose.",
     },
     {
       question: "Who should own AI skills in an organization?",
@@ -539,7 +539,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     {
       question: "Can Skills Board deploy a skill to my whole organization?",
       answer:
-        "No, and it does not try to. Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends, with the source, an install command, a ZIP, and an MCP endpoint per entry. Pushing a file to every machine is what managed settings and provisioning are for.",
+        "No, and it does not try to. Skills Board is a web application where a team keeps, searches, and shares its AI skills, with the source, an install command, a ZIP, and an MCP endpoint per entry. Pushing a file to every machine is what managed settings and provisioning are for.",
     },
   ],
   sources: [
@@ -621,7 +621,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "The ownership workflow: one named owner per recommendation, and the distribution models compared.",
+        "The ownership workflow: one named owner per skill, and the distribution models compared.",
     },
     {
       label: "Manage skills across Claude Code, Codex, and Cursor",
@@ -651,7 +651,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
       label: "Where to find Claude skills",
       href: whereToFindClaudeSkillsPath,
       description:
-        "The catalogs and repositories a recommendation comes from, and what each one screens for.",
+        "The catalogs and repositories a saved skill comes from, and what each one screens for.",
     },
     {
       label: "Best Claude skills: a register with the criteria behind it",
@@ -678,7 +678,7 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     chips: ["Distribution", "Selection", "Checked 2026-08-21"],
   },
   ogAlt:
-    "Guide to managing AI skills across an organization: the vendor distribution mechanisms, where each one stops, and the recommendation layer none of them covers.",
+    "Guide to managing AI skills across an organization: the vendor distribution mechanisms, where each one stops, and the selection layer none of them covers.",
   publishedAt: "2026-08-21",
   modifiedAt: "2026-08-21",
 }

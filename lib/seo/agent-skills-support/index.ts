@@ -516,11 +516,11 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
   team: {
     title: "What a team does with this",
     intro:
-      "A matrix is only useful if it changes a decision. For most teams it changes two: where the canonical file lives, and how a teammate on a different client finds out that the recommendation exists.",
+      "A matrix is only useful if it changes a decision. For most teams it changes two: where the canonical file lives, and how a teammate on a different client finds out that the skill exists.",
     body: [
       "The first decision is the cheap one. Put the canonical SKILL.md in .agents/skills in the repository, because eight of the eleven documented clients scan it, and add whatever second path your Claude Code users need. That is a five-minute change and it removes most of the per-teammate friction.",
       "The second decision is the one that actually costs something. Directories solve discovery for a repository somebody has already cloned. They do nothing for the teammate who has not, for the person on Cowork whose skills arrive by account sync, or for the colleague who asks in chat which skill to use for a task and gets a link that will be scrolled away by Thursday.",
-      "Skills Board is a web application where a team keeps and shares the AI skills it recommends. Each saved entry keeps its original source visible, and a teammate chooses how to use it: open the repository, copy an install command that suits their client, or download the latest files as a ZIP. That last option is what makes it usable by the three surfaces above that never read a folder.",
+      "Skills Board is a web application where a team keeps and shares its AI skills. Each saved entry keeps its original source visible, and a teammate chooses how to use it: open the repository, copy an install command that suits their client, or download the latest files as a ZIP. That last option is what makes it usable by the three surfaces above that never read a folder.",
     ],
     options: [
       {
@@ -541,12 +541,12 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation. It is not a security review, an approval, or a compatibility certification, and nothing on this page turns a documented directory into a guarantee that a skill runs correctly.",
+      "A saved skill is a team's own choice. It is not a security review, an approval, or a compatibility certification, and nothing on this page turns a documented directory into a guarantee that a skill runs correctly.",
       "Skills Board points at the latest version available from the saved source. It does not pin or preserve historical versions, so a skill that changes upstream changes for everyone who opens it next.",
       "A ZIP contains the latest files from the source at download time. It does not guarantee installation in every client, and the frontmatter differences in the section above are exactly why that guarantee cannot be made.",
     ],
     link: {
-      lead: "The step before this one, choosing what to recommend at all, is covered in",
+      lead: "The step before this one, choosing what to save at all, is covered in",
       label: "our guide to sharing AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",

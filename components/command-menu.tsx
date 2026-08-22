@@ -59,7 +59,7 @@ const navigationItems: CommandItem[] = [
     id: "go:library",
     label: "Team library",
     group: "Go to",
-    keywords: "skills saved recommendations home",
+    keywords: "skills saved team library home",
     icon: <LibraryBigIcon className="size-4" />,
   },
   {

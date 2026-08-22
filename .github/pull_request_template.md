@@ -15,5 +15,5 @@
 - [ ] Documentation reflects behavior or configuration changes
 - [ ] Database and environment changes are called out
 - [ ] No secrets, personal data, or private skill content are included
-- [ ] Saved skills remain recommendations, not security or compatibility certifications
+- [ ] A saved skill remains the team's own choice, not a security or compatibility certification
 
