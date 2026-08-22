@@ -640,7 +640,7 @@ export const copilotSkills: CopilotSkillsDefinition = {
         label: "gh skill install",
         cells: [
           "GitHub CLI, version 2.90.0 or later",
-          "Searches, previews, and installs skills from GitHub repositories, with @TAG and @SHA for a specific version and --pin to lock one. It picks the destination directory for you: --agent selects the agent host and --scope the scope, and the default is Copilot at project scope. Documented as public preview and subject to change.",
+          "Searches, previews, and installs skills from GitHub repositories, with SKILL@TAG or SKILL@SHA for a specific version and --pin TAG to lock one explicitly. It picks the destination directory for you: --agent selects the agent host and --scope the scope, and the default is Copilot at project scope. Documented as public preview and subject to change.",
         ],
       },
       {
@@ -760,7 +760,7 @@ export const copilotSkills: CopilotSkillsDefinition = {
       },
       {
         title: "Or skip all of it and install someone else's",
-        body: "gh skill preview OWNER/REPOSITORY SKILL prints the SKILL.md and the file tree without installing. gh skill install OWNER/REPOSITORY SKILL then puts it in the right directory for your agent host, with @TAG or @SHA for a version and --pin to freeze it. Preview first: GitHub says outright that skills are not verified and may contain prompt injections, hidden instructions, or malicious scripts.",
+        body: "gh skill preview OWNER/REPOSITORY SKILL prints the SKILL.md and the file tree without installing. gh skill install OWNER/REPOSITORY SKILL then puts it in the right directory for your agent host, with SKILL@TAG or SKILL@SHA for a version and --pin TAG to freeze it explicitly. Preview first: GitHub says outright that skills are not verified and may contain prompt injections, hidden instructions, or malicious scripts.",
       },
     ],
     template: `---
@@ -817,7 +817,7 @@ The failing job, the line that failed, the cause in one sentence, and the fix.`,
     ],
     limits: [
       "Saving a skill records that a team has it in use. It is not a security review, an approval, or a compatibility certification, and GitHub's warning about unverified skills applies to anything you find through us too.",
-      "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions, which is exactly what gh skill install --pin does do, so use the CLI when a frozen version is what you need.",
+      "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions, which is exactly what gh skill install --pin TAG does do, so use the CLI when a frozen version is what you need.",
       "The official Skills Board plugin is an Agent Plugins package. It is not published in a Copilot plugin marketplace today, so on Copilot the MCP entry is the route rather than an enabledPlugins line.",
       "An MCP connection cannot install or run a skill inside Copilot, and it cannot edit or delete saved team skills. The folder still has to land in a directory Copilot scans.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
