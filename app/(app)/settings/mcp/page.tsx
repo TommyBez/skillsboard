@@ -112,7 +112,7 @@ export default function McpSettingsPage() {
           {availableTools.map((tool) => (
             <div
               key={tool.name}
-              className="grid gap-0.5 border-b px-5 py-3.5 transition-colors last:border-b-0 hover:bg-accent/40 sm:grid-cols-[17rem_minmax(0,1fr)] sm:items-baseline sm:gap-6 sm:px-6"
+              className="grid grid-cols-1 gap-0.5 border-b px-5 py-3.5 transition-colors last:border-b-0 hover:bg-accent/40 sm:grid-cols-[17rem_minmax(0,1fr)] sm:items-baseline sm:gap-6 sm:px-6"
             >
               <code className="font-mono text-sm font-medium text-foreground">{tool.name}</code>
               <p className="text-sm leading-relaxed text-muted-foreground">{tool.description}</p>

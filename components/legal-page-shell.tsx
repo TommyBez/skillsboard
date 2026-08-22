@@ -32,7 +32,7 @@ export function LegalPageShell({
       </header>
 
       <main id="main-content" className="mx-auto w-full max-w-[1200px] px-5 py-12 md:px-10 md:py-20">
-        <article className="grid gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
+        <article className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1.3fr)] lg:gap-20">
           <header className="lg:sticky lg:top-28 lg:self-start">
             <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
               {eyebrow}
@@ -52,7 +52,7 @@ export function LegalPageShell({
       </main>
 
       <footer className="border-t border-border/70">
-        <div className="mx-auto grid w-full max-w-[1200px] gap-6 px-5 py-10 md:grid-cols-[auto_1fr] md:px-10">
+        <div className="mx-auto grid w-full max-w-[1200px] grid-cols-1 gap-6 px-5 py-10 md:grid-cols-[auto_1fr] md:px-10">
           <Brand />
           <div className="space-y-3 md:justify-self-end md:text-right">
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground md:justify-end">

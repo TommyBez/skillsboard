@@ -111,7 +111,7 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
               {params.tag ? <> tagged <span className="text-foreground">{params.tag}</span></> : null}
             </p>
           ) : null}
-          <div className="cascade-grid grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="cascade-grid grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {collections.map((item) => (
               <CollectionCard
                 key={item.id}
@@ -126,7 +126,7 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
           </div>
         </section>
       ) : (
-        <section className="grid min-h-64 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+        <section className="grid min-h-64 grid-cols-1 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
           <FolderOpenIcon className="size-9 text-primary" aria-hidden="true" />
           <div>
             <h2 className="text-3xl font-semibold tracking-display md:text-4xl">{hasFilters ? "No matching collections" : "Create your first collection"}</h2>
@@ -159,7 +159,7 @@ async function CollectionsResults({ searchParams }: CollectionsPageProps) {
 
 function CollectionsResultsFallback() {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Loading collections" aria-busy="true">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Loading collections" aria-busy="true">
       <Skeleton className="h-56 rounded-2xl" />
       <Skeleton className="h-56 rounded-2xl" />
       <Skeleton className="h-56 rounded-2xl" />
@@ -170,7 +170,7 @@ function CollectionsResultsFallback() {
 export default function CollectionsPage({ searchParams }: CollectionsPageProps) {
   return (
     <main className="mx-auto flex max-w-[1440px] flex-col gap-10 px-4 py-10 pb-28 md:px-6 md:pb-12 lg:px-8 lg:py-14">
-      <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+      <section className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
           <p className="font-mono text-sm text-primary">Collections</p>
           <h1 data-testid="collections-shell" className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">

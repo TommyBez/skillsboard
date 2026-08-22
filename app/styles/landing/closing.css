@@ -176,6 +176,11 @@
 
 .lp-closing-grid {
   display: grid;
+  /* The stacked column is declared, not implicit: an implicit column is an
+     auto track, sized to the widest min-content in it, so one unbreakable
+     child would widen the column the whole chapter sits in past the phone.
+     minmax(0, 1fr) keeps it on the viewport. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 3rem;
 }
 

@@ -77,7 +77,7 @@ export default function PricingPage() {
           </p>
         </header>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
           <section
             aria-labelledby="hosted-plan"
             className="rounded-lg border border-border bg-card p-7"

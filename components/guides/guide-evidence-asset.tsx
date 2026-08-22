@@ -33,7 +33,7 @@ export function GuideEvidenceAssetSection({ asset }: { asset: GuideEvidenceAsset
         {asset.summary}
       </p>
 
-      <dl className="mt-7 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border sm:grid-cols-3">
+      <dl className="mt-7 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-border bg-border sm:grid-cols-3">
         <div className="bg-card p-5">
           <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
             Protocol version
@@ -56,7 +56,7 @@ export function GuideEvidenceAssetSection({ asset }: { asset: GuideEvidenceAsset
         </div>
       </dl>
 
-      <div className="mt-8 grid gap-8 border-y border-border py-8 md:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-8 border-y border-border py-8 md:grid-cols-2">
         <div>
           <h3 className="text-xl font-semibold">What the fixture measures</h3>
           <ul className="mt-4 space-y-3 text-sm leading-relaxed text-muted-foreground">
@@ -80,7 +80,7 @@ export function GuideEvidenceAssetSection({ asset }: { asset: GuideEvidenceAsset
       </div>
 
       <h3 className="mt-8 text-xl font-semibold">Reproducible method</h3>
-      <ol className="mt-5 grid gap-4 md:grid-cols-2">
+      <ol className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
         {asset.methodology.map((step, index) => (
           <li key={step.title} className="rounded-[3px] border border-border bg-card p-5">
             <p className="font-mono text-xs font-semibold text-primary">

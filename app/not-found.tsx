@@ -53,7 +53,7 @@ export default function NotFound() {
             >
               Where to look next
             </h2>
-            <ul className="mt-5 grid gap-3 text-(--surface-ink-foreground)/68 sm:grid-cols-2">
+            <ul className="mt-5 grid grid-cols-1 gap-3 text-(--surface-ink-foreground)/68 sm:grid-cols-2">
               {recoveryLinks.map((link) => (
                 <li key={link.href} className="leading-relaxed">
                   <a

@@ -136,7 +136,7 @@ async function SharedCollection({ params }: SharedCollectionProps) {
           </div>
           <ol className="divide-y divide-border">
             {published.skills.map((skill) => (
-              <li key={skill.artifactId} className="grid gap-3 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+              <li key={skill.artifactId} className="grid grid-cols-1 gap-3 py-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                 <div className="min-w-0">
                   <h3 className="font-semibold">{skill.skillName}</h3>
                   <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">{skill.description}</p>

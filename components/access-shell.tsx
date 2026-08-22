@@ -24,7 +24,7 @@ export function AccessShell({
 }: AccessShellProps) {
   return (
     <main className="app-canvas relative min-h-svh overflow-hidden p-2 text-foreground sm:p-4 lg:p-6">
-      <div className="surface-shadow relative mx-auto grid min-h-[calc(100svh-1rem)] max-w-[1440px] overflow-hidden rounded-[16px] border border-border bg-card sm:min-h-[calc(100svh-2rem)] lg:min-h-[calc(100svh-3rem)] lg:grid-cols-[minmax(0,1fr)_minmax(480px,0.82fr)]">
+      <div className="surface-shadow relative mx-auto grid min-h-[calc(100svh-1rem)] max-w-[1440px] grid-cols-1 overflow-hidden rounded-[16px] border border-border bg-card sm:min-h-[calc(100svh-2rem)] lg:min-h-[calc(100svh-3rem)] lg:grid-cols-[minmax(0,1fr)_minmax(480px,0.82fr)]">
         <aside className="ink-panel relative hidden overflow-hidden @container lg:flex lg:flex-col lg:p-10 xl:p-14">
           <div className="relative flex items-center justify-between gap-6">
             <Brand />

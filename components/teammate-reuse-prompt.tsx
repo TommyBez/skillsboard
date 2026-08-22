@@ -52,7 +52,7 @@ export function TeammateReusePrompt({
   return (
     <section
       aria-labelledby="teammate-skill-heading"
-      className="grid items-center gap-5 rounded-2xl border border-primary/25 bg-primary/[0.045] p-5 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.05)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:p-6"
+      className="grid grid-cols-1 items-center gap-5 rounded-2xl border border-primary/25 bg-primary/[0.045] p-5 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.05)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:p-6"
     >
       <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
         <UsersIcon className="size-5" />

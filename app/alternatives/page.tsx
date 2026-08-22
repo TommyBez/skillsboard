@@ -61,7 +61,7 @@ export default function AlternativesPage() {
           <h2 id="comparisons-heading" className="sr-only">
             Comparisons
           </h2>
-          <div className="grid gap-4 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {alternatives.map((entry) => (
               <Link
                 key={entry.path}

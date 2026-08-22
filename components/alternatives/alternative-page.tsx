@@ -329,7 +329,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
           >
             Keep reading
           </h2>
-          <div className="mt-5 grid gap-4 md:grid-cols-3">
+          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
             {entry.related.map((link) => (
               <Link
                 key={link.href}

@@ -65,7 +65,7 @@ function PrimitiveCase({
         {section.cases.map((item, index) => (
           <li
             key={item.title}
-            className="grid gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
+            className="grid grid-cols-1 gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
           >
             <span className="font-mono text-sm font-semibold text-primary">
               {String(index + 1).padStart(2, "0")}
@@ -122,7 +122,7 @@ function TeamPaths({
         {section.paths.map((item, index) => (
           <li
             key={item.title}
-            className="grid gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
+            className="grid grid-cols-1 gap-3 border-b border-border py-7 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
           >
             <span className="font-mono text-sm font-semibold text-primary">
               {String(index + 1).padStart(2, "0")}
@@ -391,7 +391,7 @@ export function ComparisonPage({ entry }: { entry: ComparisonDefinition }) {
               View all resources
             </Link>
           </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
             {entry.related.map((link) => (
               <Link
                 key={link.href}

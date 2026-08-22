@@ -123,7 +123,17 @@ export default function DevelopersPage() {
       <JsonLd data={buildDevelopersSchema()} />
 
       <div className="mx-auto w-full max-w-[1200px] px-5 py-12 md:px-10 md:py-20">
-        <article className="grid gap-12 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-20">
+        {/*
+          grid-cols-1 rather than the implicit single column: an implicit column
+          is an auto track, and an auto track is sized to the widest min-content
+          in it, which here is a code block line or a table's min-width. That
+          widened the one column both the header and the body sit in past the
+          viewport on a phone, and the shell clips rather than scrolls, so the
+          headline and every paragraph were cut off mid-line. minmax(0, 1fr),
+          which is what grid-cols-1 compiles to, keeps the column at the
+          viewport and leaves the wide blocks to scroll inside their own boxes.
+        */}
+        <article className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,1.38fr)] lg:gap-20">
           <header className="lg:sticky lg:top-28 lg:self-start">
             <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
               <Link href="/" className="transition-colors hover:text-foreground">

@@ -198,7 +198,7 @@ export function InstallableCollectionPanel({
   if (!distribution) {
     return (
       <Card>
-        <CardHeader className="gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:grid-rows-[auto_auto]">
+        <CardHeader className="grid-cols-1 gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:grid-rows-[auto_auto]">
           <span className="row-span-2 flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
             <PackageOpenIcon className="size-5" />
           </span>
@@ -230,7 +230,7 @@ export function InstallableCollectionPanel({
 
   return (
     <Card>
-      <CardHeader className="gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:grid-rows-[auto_auto]">
+      <CardHeader className="grid-cols-1 gap-3 sm:grid-cols-[auto_minmax(0,1fr)_auto] sm:grid-rows-[auto_auto]">
         <span className="row-span-2 flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
           <PackageOpenIcon className="size-5" />
         </span>

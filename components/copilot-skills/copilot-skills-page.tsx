@@ -290,7 +290,7 @@ export function CopilotSkillsPage({
             intro={entry.team.intro}
           />
           <NoteList notes={entry.team.body} />
-          <dl className="mt-8 grid gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
+          <dl className="mt-8 grid grid-cols-1 gap-px overflow-hidden rounded-[3px] border border-border bg-border md:grid-cols-2">
             {entry.team.paths.map((path) => (
               <div key={path.label} className="bg-card p-5">
                 <dt className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-primary">
@@ -326,7 +326,7 @@ export function CopilotSkillsPage({
             title={entry.openQuestions.title}
             intro={entry.openQuestions.intro}
           />
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
             {entry.openQuestions.entries.map((item) => (
               <div
                 key={item.title}
@@ -421,7 +421,7 @@ export function CopilotSkillsPage({
               View all resources
             </Link>
           </div>
-          <div className="mt-5 grid gap-4 md:grid-cols-2">
+          <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
             {entry.related.map((link) => (
               <Link
                 key={link.href}

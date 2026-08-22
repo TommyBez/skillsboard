@@ -188,7 +188,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
         </p>
       )}
 
-      <section aria-label="Catalog results" className="cascade-grid grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <section aria-label="Catalog results" className="cascade-grid grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {skills.map((item) => (
           <SkillCard
             key={item.id}
@@ -241,7 +241,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       {canLoadMore && !error && !autoExhausted ? (
         <div
           ref={sentinelRef}
-          className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+          className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
           aria-hidden={!isLoadingMore}
           aria-busy={isLoadingMore}
         >
@@ -262,7 +262,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
 
 export function CatalogEmptyState() {
   return (
-    <section data-testid="discover-content" className="grid min-h-56 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+    <section data-testid="discover-content" className="grid min-h-56 grid-cols-1 items-center gap-7 border-y border-border py-10 md:grid-cols-[auto_minmax(0,1fr)_auto]">
       <SearchIcon className="size-9 text-primary" aria-hidden="true" />
       <div>
         <h2 className="text-3xl font-semibold tracking-display">No skills found</h2>
