@@ -17,6 +17,7 @@ export const guidePaths = {
   shareTeamSkills: "/guides/share-agent-skills-with-your-team",
   manageCrossAgentSkills: "/guides/manage-skills-across-claude-codex-cursor",
   installClaudeSkills: "/guides/install-claude-skills-in-claude-code",
+  writeSkillMd: "/guides/how-to-write-a-skill-md",
   aiCodingTeamOnboarding: "/guides/ai-coding-team-onboarding",
   aiCodingGuidelinesTemplate: "/guides/ai-coding-guidelines-template",
 } as const
@@ -127,6 +128,13 @@ export interface GuideDefinition {
   corePrinciple: string
   problem: string
   decisionTitle: string
+  /**
+   * Table-of-contents label for the decision section. Defaults to
+   * "Choose a model" for the guides whose decision is a choice between
+   * models; a guide whose decision section compares something else sets
+   * its own label so the chapter list matches the heading it jumps to.
+   */
+  decisionNavLabel?: string
   decisionIntro: string
   comparisonColumns: readonly string[]
   comparisonRows: readonly {

@@ -96,6 +96,12 @@ export const chooseFirstTeamSkillGuide: GuideDefinition = {
       output: "One searchable recommendation plus an independent keep, revise, or reject result.",
     },
   ],
+  stepsLink: {
+    lead: "When no published candidate fits the problem you named, the next move is to write the skill yourself, which is the subject of",
+    label: "how to write a SKILL.md file",
+    href: guidePaths.writeSkillMd,
+    trail: ".",
+  },
   templateTitle: "First-skill selection scorecard",
   templateIntro:
     "Score evidence, not enthusiasm. A candidate is ready to recommend only when the source is inspectable, the fixture passes, and another teammate can reproduce the path.",

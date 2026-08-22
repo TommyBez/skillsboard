@@ -134,7 +134,7 @@ function GuideTeamCallout({ team }: { team: GuideTeamSection }) {
 export function GuidePage({ guide }: { guide: GuideDefinition }) {
   const relatedResources = getRelatedResources(guide.path)
   const chapters = [
-    { href: "#decision", label: "Choose a model" },
+    { href: "#decision", label: guide.decisionNavLabel ?? "Choose a model" },
     { href: "#workflow", label: "Run the workflow" },
     ...(guide.evidenceAsset
       ? [{ href: "#evidence-asset", label: "Run the fixture" }]

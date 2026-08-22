@@ -126,6 +126,7 @@ const resourceClusterDefinitions = [
       agentSkillsSupportPath,
       anthropicSkillsPath,
       claudeSkillsPath,
+      guidePaths.writeSkillMd,
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
