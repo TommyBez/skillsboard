@@ -1,12 +1,12 @@
 # Skills Board
-> Skills Board is the web app where a team collects the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
+> Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares the AI skills it recommends. Teammates can open the source, copy a compatible install command, or download the latest files as a ZIP. MCP-compatible agents can search the same library.
 
 Last reviewed: 2026-08-19
 
 Skills Board is free hosted SaaS with open-source code. A saved skill is a team recommendation, not a formal security review or compatibility certification. The product points to the latest version from the saved source and does not pin historical versions.
 
 Key facts:
-- Product category: shared AI skill library for teams
+- Product category: agent-native skills registry for teams
 - Primary audience: small and mid-sized teams using a mix of Claude, Codex, Cursor, and other agents
 - Usage paths per skill: original source, compatible install command, or ZIP download of the latest source files
 - MCP read capabilities: list and search team skills and collections; retrieve install commands; discover public and repository skills

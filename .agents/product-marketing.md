@@ -1,15 +1,21 @@
 # Product Marketing Context
 
-*Last updated: July 24, 2026*
+*Last updated: August 22, 2026*
 
 ## Product Overview
 **One-liner:** Skills Board is the web app where a team collects the AI skills it recommends, so every teammate can find and reuse them.
 
 **Never describe the product as "a shared library" on its own.** Skills Board is a web app teams sign in to; the shared library is what a team builds inside it.
 
+**Official category phrase (approved by Tommy, August 22, 2026):** "Skills Board, the agent-native skills registry for teams." This is the permanent subtitle and the category vocabulary every future piece of copy inherits. It goes verbatim in the canonical positions: the home `<title>`, the Open Graph and Twitter titles, the hero line under the headline, the opening line of `public/llms.txt` and of the home Markdown twin at `/index.md`, the README tagline, and the JSON-LD descriptions. Everywhere else the copy stays natural: the phrase is a position, not a keyword to repeat.
+
+Two facts license the wording, and neither is a new claim:
+- "Agent-native" is measured, not asserted. Two external scanners rated the live site: is-agentic.com 100/100, and isitagentready.com 87/100 at Level 5.
+- "Registry" names where a team keeps and shares its recommended skills. It never implies version pinning. Skills Board follows the latest version at the saved source by design, and wherever the subject comes up that stays the honest answer.
+
 **What it does:** A team saves skills it considers useful in one searchable library. Teammates can see what the team recommends, understand where each skill comes from, and choose the most suitable way to use its latest source: open the repository, copy an install command, or download the skill as a ZIP.
 
-**Product category:** Shared AI skill library for teams
+**Product category:** Agent-native skills registry for teams
 
 **Product type:** Free hosted SaaS with open-source code
 
@@ -133,7 +139,7 @@
 - "Ognuno può scegliere la maniera più congeniale per utilizzare la skill."
 - "Your team's skills. All in one place."
 
-**Words to use:** recommended by your team, shared skill library, all in one place, connect your agent, search from your agent, scope-controlled MCP access, sign in through your browser, no API key to copy, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
+**Words to use:** agent-native skills registry for teams, recommended by your team, shared skill library, all in one place, connect your agent, search from your agent, scope-controlled MCP access, sign in through your browser, no API key to copy, find the right skill, choose how to use it, original source, copy the command, download the ZIP, latest source, free forever, open source
 
 **Words to avoid:** skill champion, GitHub-backed, approved skill, verified skill, trusted skill, universal compatibility, works with every agent, automatically synchronized, agent capability platform, AI-native knowledge infrastructure, enterprise governance, unlock, supercharge, revolutionize
 

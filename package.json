@@ -1,7 +1,7 @@
 {
   "name": "skillsboard",
   "version": "0.1.0",
-  "description": "The web app for the AI skills your team recommends.",
+  "description": "Skills Board, the agent-native skills registry for teams.",
   "private": true,
   "license": "MIT",
   "homepage": "https://www.skillsboard.sh",

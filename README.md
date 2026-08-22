@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  Keep your team’s recommended AI skills in one place, so everyone knows where to find and use them.
+  Skills Board, the agent-native skills registry for teams. Keep the AI skills your team recommends in one place, so everyone knows where to find and use them.
 </p>
 
 <p align="center">
