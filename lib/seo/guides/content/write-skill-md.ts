@@ -36,7 +36,11 @@ export const writeSkillMdGuide: GuideDefinition = {
       0: ["agentskills-best-practices"],
       1: ["agentskills-spec", "claude-code-skills", "anthropic-best-practices"],
       2: ["agentskills-descriptions", "anthropic-best-practices"],
-      3: ["agentskills-best-practices", "anthropic-best-practices"],
+      3: [
+        "agentskills-best-practices",
+        "anthropic-best-practices",
+        "claude-code-skills",
+      ],
       4: ["agentskills-spec", "anthropic-best-practices"],
       5: ["agentskills-best-practices", "anthropic-best-practices"],
       6: ["agentskills-spec", "skills-ref", "claude-code-skills"],
@@ -48,6 +52,7 @@ export const writeSkillMdGuide: GuideDefinition = {
   problem:
     "Most first drafts are readable, valid, and never fire. The reason is structural rather than stylistic: an agent sees only the name and description of every installed skill at startup, and reads the body only after it has already decided this skill is relevant. So a body full of careful instructions does nothing for triggering, and a description written as a title gives the agent nothing to match a request against. The second failure is quieter. Fields that work fine in Claude Code are rejected outright the first time the same folder is uploaded or packaged, because the specification allows six frontmatter fields and the products layer their own on top.",
   decisionTitle: "Which frontmatter fields travel, and which stop at Claude Code",
+  decisionNavLabel: "Compare the frontmatter fields",
   decisionIntro:
     "The Agent Skills specification defines six frontmatter fields. Claude Code accepts all six and adds fourteen more of its own. The distinction matters the moment a skill leaves the machine it was written on: claude.ai uploads, the Skills API, and packaging with the package_skill.py script from anthropics/skills accept only the six specification fields, and an extra key fails the operation with an unexpected-key error instead of being ignored.",
   comparisonColumns: [
@@ -136,7 +141,7 @@ export const writeSkillMdGuide: GuideDefinition = {
     },
     {
       title: "Write the body for an agent that is already competent",
-      body: "Once the skill activates, the whole body enters the context window and stays there for the rest of the session, so every line is a recurring cost. Add only what the agent would get wrong without you: project conventions, non-obvious edge cases, the specific tool to use. Skip the paragraph explaining what a PDF is. Match the specificity to the fragility of the task: leave room where several approaches work and explain why, and be exact where a sequence must not vary. Where several tools would do, give one default and one escape hatch instead of a menu.",
+      body: "Once the skill activates, the whole body enters the context window, and in Claude Code it stays there for the rest of the session, so every line is a recurring cost. Add only what the agent would get wrong without you: project conventions, non-obvious edge cases, the specific tool to use. Skip the paragraph explaining what a PDF is. Match the specificity to the fragility of the task: leave room where several approaches work and explain why, and be exact where a sequence must not vary. Where several tools would do, give one default and one escape hatch instead of a menu.",
       output: "A body where every paragraph would change what the agent does.",
     },
     {

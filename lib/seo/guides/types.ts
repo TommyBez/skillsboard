@@ -128,6 +128,13 @@ export interface GuideDefinition {
   corePrinciple: string
   problem: string
   decisionTitle: string
+  /**
+   * Table-of-contents label for the decision section. Defaults to
+   * "Choose a model" for the guides whose decision is a choice between
+   * models; a guide whose decision section compares something else sets
+   * its own label so the chapter list matches the heading it jumps to.
+   */
+  decisionNavLabel?: string
   decisionIntro: string
   comparisonColumns: readonly string[]
   comparisonRows: readonly {

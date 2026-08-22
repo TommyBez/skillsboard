@@ -195,3 +195,39 @@ test("the Markdown twin carries the new sections", () => {
     "the copyable SKILL.md template was dropped",
   )
 })
+
+test("the session lifetime is stated as Claude Code behavior, not a format guarantee", () => {
+  const index = guide.steps.findIndex((step) =>
+    step.body.includes("rest of the session"),
+  )
+  assert.notEqual(index, -1, "the body budget step no longer states the lifetime")
+  assert.match(
+    guide.steps[index].body,
+    /in Claude Code it stays there for the rest of the session/,
+    "a Claude Code lifecycle is prescribed for every client",
+  )
+  assert.ok(
+    guide.citations?.steps?.[index]?.includes("claude-code-skills"),
+    "the Claude Code claim cites no Claude Code source",
+  )
+  assert.ok(
+    guide.sources.some((source) => source.id === "claude-code-skills"),
+    "the cited Claude Code source is not listed on the page",
+  )
+})
+
+test("the decision chapter is labelled for the decision this guide makes", () => {
+  // The shared page falls back to "Choose a model", which this guide's
+  // frontmatter comparison is not. A guide that compares something else
+  // carries its own chapter label.
+  assert.ok(
+    guide.decisionNavLabel,
+    "the decision chapter falls back to a label this section contradicts",
+  )
+  assert.notEqual(guide.decisionNavLabel, "Choose a model")
+  assert.doesNotMatch(guide.decisionNavLabel, dashPattern)
+  assert.ok(
+    guides.some((entry) => entry.decisionNavLabel === undefined),
+    "the fallback label is no longer exercised by any guide",
+  )
+})
