@@ -128,6 +128,18 @@ type NonTeamEventPropertiesMap = {
   }
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
+  /**
+   * The auth.md first-link ceremony, decided. `provider` is the agent provider
+   * that vouched for the user (an issuer host, never the user's identity at
+   * it), which is the one thing worth knowing when a link is refused: whether
+   * one provider's users decline more often than another's.
+   */
+  agent_delegation_approved: {
+    provider: string
+  }
+  agent_delegation_denied: {
+    provider: string
+  }
   mcp_tool_used: {
     succeeded: boolean
     tool_name:

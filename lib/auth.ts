@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth"
 import { emailOTP, jwt, organization } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
 
+import { authMdAgentVerified } from "@/lib/agent-auth/plugin"
 import {
   getAuthBaseUrl as resolveAuthBaseUrl,
   getDeploymentEnvironment,
@@ -140,6 +141,11 @@ export const auth = betterAuth({
       // resource, so implicit access is equivalent to linking every client.
       enforcePerClientResources: false,
     }),
+    // Registers the RFC 7523 `jwt-bearer` grant on the provider `mcp()` just
+    // configured, so an auth.md identity assertion is exchanged for an
+    // ordinary Better Auth access token. It has to come after `mcp()`:
+    // `extendOAuthProvider` looks the provider plugin up at init time.
+    authMdAgentVerified(),
     nextCookies(),
   ],
   ...(isDevelopment

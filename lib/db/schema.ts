@@ -567,3 +567,100 @@ export const collectionDistribution = pgTable("collectionDistribution", {
     name: "collectionDistribution_activeReleaseId_fkey",
   }).onDelete("restrict"),
 ])
+
+/**
+ * auth.md Agent Verified: the persistent link between an agent-provider
+ * identity and a Skills Board user.
+ *
+ * The stable key is `(issuer, subject, audience)` — never the email. An agent
+ * provider's `sub` is the only identifier it guarantees will not change; an
+ * email can be reassigned, and treating it as the key would let a provider
+ * take over an account by re-asserting a familiar address. Once a row exists,
+ * an ID-JAG carrying that triple resolves straight to `userId` with no
+ * interaction; until it exists, the first-link ceremony in `agentRegistration`
+ * has to run.
+ *
+ * `revokedAt` is a tombstone rather than a delete: a provider that revokes a
+ * delegation must not be able to reinstate it by sending a fresh ID-JAG, so
+ * the row stays and is matched against.
+ */
+export const agentDelegation = pgTable("agentDelegation", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("userId").notNull(),
+  issuer: text("issuer").notNull(),
+  subject: text("subject").notNull(),
+  audience: text("audience").notNull(),
+  providerName: text("providerName"),
+  lastUsedAt: timestamp("lastUsedAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("agentDelegation_issuer_subject_audience_uidx").on(
+    table.issuer,
+    table.subject,
+    table.audience,
+  ),
+  index("agentDelegation_userId_idx").on(table.userId),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "agentDelegation_userId_fkey",
+  }).onDelete("cascade"),
+])
+
+/**
+ * One in-flight `/agent/identity` exchange.
+ *
+ * A row is written for every accepted ID-JAG, whether or not it resolved
+ * straight to a user: `status` records which of the three outcomes the request
+ * took, so the claim endpoint has something to poll and an operator can see
+ * why a link was refused. Rows for a pending claim carry `claimTokenHash` (the
+ * agent's poll credential) and `userCode` (what the human types), and every
+ * row expires — this table is a queue, not a ledger.
+ */
+export const agentRegistration = pgTable("agentRegistration", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  type: text("type").notNull(),
+  issuer: text("issuer").notNull(),
+  subject: text("subject").notNull(),
+  audience: text("audience").notNull(),
+  clientId: text("clientId").notNull(),
+  email: text("email"),
+  providerName: text("providerName"),
+  userId: text("userId"),
+  requestedScopes: text("requestedScopes").array().notNull().default(sql`ARRAY[]::text[]`),
+  status: text("status").notNull(),
+  claimTokenHash: text("claimTokenHash"),
+  userCode: text("userCode"),
+  attempts: integer("attempts").notNull().default(0),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  completedAt: timestamp("completedAt", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("agentRegistration_userCode_uidx").on(table.userCode),
+  index("agentRegistration_expiresAt_idx").on(table.expiresAt),
+  index("agentRegistration_lookup_idx").on(table.issuer, table.subject, table.audience),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "agentRegistration_userId_fkey",
+  }).onDelete("cascade"),
+])
+
+/**
+ * Single-use `jti` tombstones for every assertion this deployment consumes —
+ * both the provider's ID-JAG and our own identity assertion, told apart by
+ * `issuer`. Rows live only until `expiresAt`, which is the assertion's own
+ * `exp`: past that the signature check rejects a replay on its own, so keeping
+ * the tombstone buys nothing.
+ */
+export const agentConsumedAssertion = pgTable("agentConsumedAssertion", {
+  issuer: text("issuer").notNull(),
+  jti: text("jti").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  consumedAt: timestamp("consumedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  primaryKey({ name: "agentConsumedAssertion_pkey", columns: [table.issuer, table.jti] }),
+  index("agentConsumedAssertion_expiresAt_idx").on(table.expiresAt),
+])

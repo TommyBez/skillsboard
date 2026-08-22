@@ -71,6 +71,13 @@
       "when": 1787085941666,
       "tag": "0009_better_auth_1_7_drop_legacy_client_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1787439399469,
+      "tag": "0010_auth_md_agent_verified",
+      "breakpoints": true
     }
   ]
 }

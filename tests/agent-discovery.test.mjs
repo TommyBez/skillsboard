@@ -66,13 +66,16 @@ test("agent_auth is omitted rather than invented when registration is unavailabl
 })
 
 test("agent_auth declares no flow this server cannot run", () => {
+  // No agent provider is on the trust list in this environment, so the ID-JAG
+  // flow would answer invalid_grant for every issuer alive. `agent_auth` says
+  // so by omitting it rather than advertising a flow that always fails; the
+  // configured case is asserted in tests/agent-auth.test.mjs.
   const block = buildAgentAuthBlock({
     registration_endpoint: `${origin}/api/auth/oauth2/register`,
   })
   const serialized = JSON.stringify(block)
 
-  // No ID-JAG exchange, no anonymous identity, and no claim ceremony exist
-  // here; advertising one would send an agent down a flow that answers 400.
+  assert.deepEqual(block.identity_types_supported, ["service_auth"])
   assert.doesNotMatch(serialized, /id-jag/i)
   assert.doesNotMatch(serialized, /anonymous/i)
   assert.doesNotMatch(serialized, /claim_uri|claim_endpoint/)

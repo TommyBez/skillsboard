@@ -15,6 +15,11 @@ export const disallowedPaths = [
   "/invite/",
   // Installable collections use bearer-like unlisted share identifiers.
   "/p/",
+  // The auth.md agent surface: the identity and claim endpoints are for
+  // agents holding a credential, and the ceremony pages carry bearer-like
+  // registration ids. Both already emit noindex; this keeps them out of crawl
+  // paths as well.
+  "/agent/",
 ] as const
 
 /**
