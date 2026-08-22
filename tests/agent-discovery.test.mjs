@@ -8,6 +8,7 @@ import "./helpers/register-app-aliases.mjs"
 const { buildProtectedResourceMetadata, discoveryUrl, getDiscoveryOrigin } =
   await import("../lib/agent-discovery.ts")
 const { buildAgentAuthBlock } = await import("../lib/agent-auth-metadata.ts")
+const { resetTrustedProviderCache } = await import("../lib/agent-auth/trust.ts")
 const { buildAgentSkillsIndex, TEAM_SKILL_LIBRARY_DESCRIPTION, TEAM_SKILL_LIBRARY_DIGEST, TEAM_SKILL_LIBRARY_SKILL_PATH } =
   await import("../lib/published-agent-skills.ts")
 const { mcpServerInfo, mcpToolSummaries } = await import("../lib/mcp-server-card.ts")
@@ -48,7 +49,9 @@ test("agent_auth points at the endpoints the auth server actually published", ()
 
   assert.equal(block.skill, `${origin}/auth.md`)
   assert.equal(block.register_uri, `${origin}/api/auth/oauth2/register`)
-  assert.equal(block.revocation_uri, `${origin}/api/auth/oauth2/revoke`)
+  // One revocation URL for both credential kinds: it revokes the self-contained
+  // JWTs the agent profile issues and forwards everything else to Better Auth.
+  assert.equal(block.revocation_uri, `${origin}/oauth2/revoke`)
 
   const [method] = block.registration_methods_supported
   assert.equal(method.type, "dynamic_client_registration")
@@ -66,17 +69,60 @@ test("agent_auth is omitted rather than invented when registration is unavailabl
 })
 
 test("agent_auth declares no flow this server cannot run", () => {
+  // No trusted Agent Provider is configured in this environment, so every
+  // ID-JAG would be refused. The block must not mention the flow.
+  assert.equal(process.env.AGENT_AUTH_TRUSTED_PROVIDERS, undefined)
+
   const block = buildAgentAuthBlock({
     registration_endpoint: `${origin}/api/auth/oauth2/register`,
   })
   const serialized = JSON.stringify(block)
 
-  // No ID-JAG exchange, no anonymous identity, and no claim ceremony exist
-  // here; advertising one would send an agent down a flow that answers 400.
   assert.doesNotMatch(serialized, /id-jag/i)
-  assert.doesNotMatch(serialized, /anonymous/i)
+  assert.doesNotMatch(serialized, /identity_endpoint/)
   assert.doesNotMatch(serialized, /claim_uri|claim_endpoint/)
+  // Anonymous and email-only registration are not implemented at all.
+  assert.doesNotMatch(serialized, /anonymous/i)
+  assert.doesNotMatch(serialized, /service_auth/)
   assert.doesNotMatch(serialized, /client_credentials/)
+})
+
+test("agent_auth declares Agent Verified once a provider is trusted", () => {
+  process.env.AGENT_AUTH_TRUSTED_PROVIDERS = JSON.stringify([
+    { iss: "https://provider.example.com", name: "Example Provider" },
+  ])
+  resetTrustedProviderCache()
+
+  try {
+    const block = buildAgentAuthBlock({
+      registration_endpoint: `${origin}/api/auth/oauth2/register`,
+      token_endpoint: `${origin}/api/auth/oauth2/token`,
+    })
+
+    assert.equal(block.identity_endpoint, `${origin}/agent/identity`)
+    assert.equal(block.claim_endpoint, `${origin}/agent/identity/claim`)
+    assert.equal(block.events_endpoint, `${origin}/agent/event/notify`)
+    assert.deepEqual(block.identity_types_supported, ["identity_assertion"])
+    assert.deepEqual(block.identity_assertion.assertion_types_supported, [
+      "urn:ietf:params:oauth:token-type:id-jag",
+    ])
+    // The audience an ID-JAG must be minted for is the RFC 8707 resource, which
+    // is also what the issued access token is bound to.
+    assert.equal(block.identity_assertion.audience, `${origin}/api/mcp`)
+    assert.deepEqual(block.identity_assertion.trusted_issuers, [
+      { iss: "https://provider.example.com", name: "Example Provider" },
+    ])
+    assert.deepEqual(block.identity_assertion.scopes_supported, ["skills:read", "skills:write"])
+    // The trust list is published without its key sources: a JWKS URL is ours
+    // to hold, never something an agent supplies or reads back.
+    assert.doesNotMatch(JSON.stringify(block), /jwks/i)
+    // Still no flow that answers *_not_enabled.
+    assert.doesNotMatch(JSON.stringify(block), /anonymous/i)
+    assert.doesNotMatch(JSON.stringify(block.identity_types_supported), /service_auth/)
+  } finally {
+    delete process.env.AGENT_AUTH_TRUSTED_PROVIDERS
+    resetTrustedProviderCache()
+  }
 })
 
 test("the published skill copy matches the plugin skill it was taken from", async () => {
@@ -188,16 +234,26 @@ test("robots.txt keeps the crawl rules it had before the signals were added", ()
   assert.ok(robots.endsWith("\n"))
 })
 
-test("auth.md opens with an h1 naming itself and covers the whole flow", async () => {
+test("auth.md opens with an h1 naming itself and covers both flows end to end", async () => {
   const authMd = await readRepoFile("../public/auth.md")
 
   assert.match(authMd, /^# auth\.md\n/)
 
-  for (const heading of ["Discover", "Register", "Claim", "Exchange", "Use", "Handle revoke"]) {
-    assert.ok(
-      new RegExp(`^## \\d\\. ${heading}$`, "m").test(authMd),
-      `auth.md is missing the "${heading}" step`,
-    )
+  for (const heading of [
+    "## 1. Discover",
+    "## Agent Verified (ID-JAG)",
+    "### 2a. Mint the ID-JAG",
+    "### 3a. Register the identity",
+    "### 3b. Hand off to the user",
+    "### 4a. Exchange the assertion",
+    "## OAuth client registration",
+    "### 2b. Register",
+    "### 3c. Authorize",
+    "### 4b. Exchange",
+    "## Use the token",
+    "## Handle revoke",
+  ]) {
+    assert.ok(authMd.includes(`\n${heading}\n`), `auth.md is missing the "${heading}" section`)
   }
 
   for (const scope of oauthScopes) {
@@ -208,6 +264,35 @@ test("auth.md opens with an h1 naming itself and covers the whole flow", async (
   assert.ok(
     authMd.includes(`${siteConfig.url}/.well-known/oauth-protected-resource`),
     "auth.md must point at the protected resource metadata",
+  )
+  for (const endpoint of ["/agent/identity", "/agent/identity/claim", "/agent/event/notify", "/oauth2/revoke"]) {
+    assert.ok(
+      authMd.includes(`${siteConfig.url}${endpoint}`),
+      `auth.md must name the ${endpoint} endpoint`,
+    )
+  }
+  assert.ok(
+    authMd.includes("urn:ietf:params:oauth:grant-type:jwt-bearer"),
+    "auth.md must document the RFC 7523 exchange",
+  )
+})
+
+test("auth.md keeps login_required and interaction_required apart", async () => {
+  const authMd = await readRepoFile("../public/auth.md")
+
+  // The two 401s mean opposite things, and an agent that conflates them either
+  // sends a user to sign in over a stale provider session that signing in
+  // cannot fix, or silently skips the confirmation a first link requires.
+  const loginRequired = authMd.indexOf("`login_required`")
+  const interactionRequired = authMd.indexOf("`interaction_required`")
+  assert.ok(loginRequired > 0 && interactionRequired > 0)
+  assert.ok(
+    /Nothing the user does at Skills Board fixes this/.test(authMd),
+    "auth.md must say that login_required cannot be resolved here",
+  )
+  assert.ok(
+    /will not link the two\s+silently/.test(authMd),
+    "auth.md must say that a matching email alone never links an account",
   )
 })
 

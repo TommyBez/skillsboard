@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getDeploymentEnvironment } from "@/lib/auth-environment"
 import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
-import { safeReturnTo } from "@/lib/safe-return-to"
+import { isAgentClaimReturnTo, safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
 
 interface AuthEntryProps {
@@ -25,7 +25,9 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
     if (returnTo === "/library") redirect("/library")
     const destinationLabel = returnTo === "/settings/email"
       ? "Continue to Email preferences"
-      : "Continue to invitation"
+      : isAgentClaimReturnTo(returnTo)
+        ? "Continue to agent authorization"
+        : "Continue to invitation"
     return (
       <div className="grid gap-5 border-t border-border pt-6">
         <p className="text-sm leading-relaxed text-muted-foreground">

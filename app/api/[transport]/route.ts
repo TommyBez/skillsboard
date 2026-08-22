@@ -5,6 +5,8 @@ import { revalidateTag } from "next/cache"
 import { z } from "zod"
 
 import { auth } from "@/lib/auth"
+import { refuseAgentCredential, type AgentTokenClaims } from "@/lib/agent-auth/resource"
+import { agentAuthStore } from "@/lib/agent-auth/store-db"
 import { claimApiRequest, MCP_RATE_LIMIT, rateLimitHeaders } from "@/lib/api-rate-limit"
 import {
   API_VERSION_HEADER,
@@ -36,6 +38,7 @@ import {
   buildInstallableCollectionUrl,
 } from "@/lib/installable-collection-protocol"
 import { capturePostHogEvent, captureTeamEvent } from "@/lib/posthog-server"
+import { tokenHasScope } from "@/lib/oauth-scopes"
 import { saveSkillToLibrary } from "@/lib/save-skill"
 import { siteConfig } from "@/lib/site"
 import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
@@ -80,10 +83,6 @@ async function trackMcpToolCall<Result>(
 
 function textResult(text: string, isError = false) {
   return { content: [{ type: "text" as const, text }], isError }
-}
-
-function tokenHasScope(claims: Record<string, unknown>, scope: string) {
-  return typeof claims.scope === "string" && claims.scope.split(" ").includes(scope)
 }
 
 async function resolveWriteOrganization(userId: string, organizationId?: string) {
@@ -145,6 +144,24 @@ const route = requireMcpAuth(
   auth,
   async (req, jwt) => {
     if (!jwt.sub) return new Response("Token subject is required", { status: 401 })
+
+    // A credential minted through the auth.md Agent Verified flow carries the
+    // delegation it speaks for. The signature says the token was ours; only this
+    // check says the delegation behind it is still live, which is what makes a
+    // revocation reach a self-contained JWT. Human tokens carry no such claim
+    // and fall straight through.
+    const refusal = await refuseAgentCredential(jwt as AgentTokenClaims, agentAuthStore)
+    if (refusal) {
+      return jsonRpcRefusal(401, {
+        code: -32001,
+        message: refusal.message,
+        data: { code: refusal.code },
+        headers: {
+          "WWW-Authenticate": `Bearer error="invalid_token", error_description="${refusal.message.replace(/[\\"]/g, "\\$&")}", resource_metadata="${getAuthBaseUrl() ?? ""}/.well-known/oauth-protected-resource"`,
+        },
+      })
+    }
+
     return createMcpHandler((server) => {
       server.registerTool("list_skills", {
         title: "List team skills",

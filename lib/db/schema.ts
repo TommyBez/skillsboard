@@ -567,3 +567,153 @@ export const collectionDistribution = pgTable("collectionDistribution", {
     name: "collectionDistribution_activeReleaseId_fkey",
   }).onDelete("restrict"),
 ])
+
+/**
+ * auth.md Agent Verified state.
+ *
+ * The tables below hold the protocol state the WorkOS auth.md reference
+ * implementation keeps in memory (`agent-services/src/store.ts`), mapped onto
+ * this deployment's Postgres. Better Auth keeps owning `user`, `session` and the
+ * whole `oauth*` surface — nothing here duplicates a user, and every row that
+ * names a human names a Better Auth `user.id`.
+ */
+
+/**
+ * The durable link between an Agent Provider identity and a Better Auth user.
+ *
+ * `(issuer, subject, audience)` is the identity relationship, not the email: an
+ * ID-JAG whose verified email happens to match an account is never enough to
+ * resolve a user, so a provider that re-mints assertions for a different person
+ * behind the same address cannot inherit the delegation.
+ */
+export const agentDelegation = pgTable("agentDelegation", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: text("userId").notNull(),
+  issuer: text("issuer").notNull(),
+  subject: text("subject").notNull(),
+  audience: text("audience").notNull(),
+  providerName: text("providerName").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  lastSeenAt: timestamp("lastSeenAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("agentDelegation_identity_unique").on(table.issuer, table.subject, table.audience),
+  index("agentDelegation_user_idx").on(table.userId),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "agentDelegation_userId_fkey",
+  }).onDelete("cascade"),
+])
+
+/**
+ * One row per `(issuer, subject, audience)` triple the identity endpoint has
+ * seen. The registration is what a service-signed `identity_assertion` names in
+ * its `sub`, so the token endpoint can resolve an exchange back to the state
+ * that authorized it — including a revocation that landed in between.
+ *
+ * `claimTokenHash` is the agent-facing polling handle; the user-facing leg of
+ * the ceremony lives in `agentClaim`.
+ */
+export const agentRegistration = pgTable("agentRegistration", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  issuer: text("issuer").notNull(),
+  subject: text("subject").notNull(),
+  audience: text("audience").notNull(),
+  userId: text("userId"),
+  delegationId: uuid("delegationId"),
+  requestedScopes: text("requestedScopes").array().notNull().default(sql`ARRAY[]::text[]`),
+  status: text("status").notNull(),
+  loginHintEmail: text("loginHintEmail"),
+  claimTokenHash: text("claimTokenHash"),
+  claimTokenExpiresAt: timestamp("claimTokenExpiresAt", { withTimezone: true }),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }),
+  completedAt: timestamp("completedAt", { withTimezone: true }),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }),
+}, (table) => [
+  uniqueIndex("agentRegistration_identity_unique").on(table.issuer, table.subject, table.audience),
+  uniqueIndex("agentRegistration_claimTokenHash_unique").on(table.claimTokenHash),
+  index("agentRegistration_user_idx").on(table.userId),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "agentRegistration_userId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.delegationId],
+    foreignColumns: [agentDelegation.id],
+    name: "agentRegistration_delegationId_fkey",
+  }).onDelete("set null"),
+])
+
+/**
+ * One claim attempt: the device-authorization-shaped ceremony a first link goes
+ * through. `viewTokenHash` binds the verification URL to this attempt without
+ * putting the user-typed code in a URL, and `userCodeHash` is what the signed-in
+ * human has to reproduce. Re-minting an attempt supersedes the previous one, so
+ * only the newest row is ever `pending`.
+ */
+export const agentClaim = pgTable("agentClaim", {
+  id: text("id").primaryKey(),
+  registrationId: text("registrationId").notNull(),
+  viewTokenHash: text("viewTokenHash").notNull(),
+  viewExpiresAt: timestamp("viewExpiresAt", { withTimezone: true }).notNull(),
+  userCodeHash: text("userCodeHash").notNull(),
+  userCodeExpiresAt: timestamp("userCodeExpiresAt", { withTimezone: true }).notNull(),
+  loginHintEmail: text("loginHintEmail"),
+  attempts: integer("attempts").notNull().default(0),
+  status: text("status").notNull().default("pending"),
+  createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  completedAt: timestamp("completedAt", { withTimezone: true }),
+  completedByUserId: text("completedByUserId"),
+}, (table) => [
+  uniqueIndex("agentClaim_viewTokenHash_unique").on(table.viewTokenHash),
+  index("agentClaim_registration_idx").on(table.registrationId, table.createdAt),
+  foreignKey({
+    columns: [table.registrationId],
+    foreignColumns: [agentRegistration.id],
+    name: "agentClaim_registrationId_fkey",
+  }).onDelete("cascade"),
+])
+
+/**
+ * Single-use `jti` tombstones for every assertion this deployment consumes:
+ * incoming ID-JAGs, provider Security Event Tokens, and the service-signed
+ * identity assertions handed back to agents. Rows live only until `expiresAt`;
+ * a sweep on write keeps the table from growing without a cron.
+ *
+ * In Postgres rather than in process memory on purpose — the app runs as several
+ * serverless instances, and a per-instance set would let a replayed assertion
+ * land on a cold instance and be accepted.
+ */
+export const agentAssertionReplay = pgTable("agentAssertionReplay", {
+  jti: text("jti").notNull(),
+  purpose: text("purpose").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  seenAt: timestamp("seenAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  primaryKey({ name: "agentAssertionReplay_pkey", columns: [table.purpose, table.jti] }),
+  index("agentAssertionReplay_expiry_idx").on(table.expiresAt),
+])
+
+/**
+ * Revocation tombstones for credentials this deployment issued to agents.
+ *
+ * Access tokens here are JWTs (that is what `/api/mcp` verifies), so they carry
+ * no server-side row to flip. RFC 7009 revocation and provider-pushed SET
+ * revocation therefore record the credential's `jti`, and the resource server
+ * checks the tombstone alongside the signature. Rows expire with the credential.
+ */
+export const agentCredentialRevocation = pgTable("agentCredentialRevocation", {
+  jti: text("jti").primaryKey(),
+  registrationId: text("registrationId"),
+  reason: text("reason").notNull(),
+  expiresAt: timestamp("expiresAt", { withTimezone: true }).notNull(),
+  revokedAt: timestamp("revokedAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [
+  index("agentCredentialRevocation_expiry_idx").on(table.expiresAt),
+])

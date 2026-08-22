@@ -3,6 +3,7 @@ import { betterAuth } from "better-auth"
 import { emailOTP, jwt, organization } from "better-auth/plugins"
 import { nextCookies } from "better-auth/next-js"
 
+import { agentAuth } from "@/lib/agent-auth/plugin"
 import {
   getAuthBaseUrl as resolveAuthBaseUrl,
   getDeploymentEnvironment,
@@ -140,6 +141,10 @@ export const auth = betterAuth({
       // resource, so implicit access is equivalent to linking every client.
       enforcePerClientResources: false,
     }),
+    // auth.md Agent Verified. Registered after `mcp()` because it extends that
+    // plugin's OAuth provider with the RFC 7523 and claim grants rather than
+    // standing up a token endpoint of its own.
+    agentAuth(),
     nextCookies(),
   ],
   ...(isDevelopment

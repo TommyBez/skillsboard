@@ -15,6 +15,9 @@ export const disallowedPaths = [
   "/invite/",
   // Installable collections use bearer-like unlisted share identifiers.
   "/p/",
+  // The auth.md agent surface: two machine endpoints with no page behind them,
+  // and a confirmation page whose URL carries a bearer-like ceremony token.
+  "/agent/",
 ] as const
 
 /**
