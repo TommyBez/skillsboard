@@ -175,7 +175,7 @@ export const copilotSkills: CopilotSkillsDefinition = {
         label: "Visual Studio Code",
         cells: [
           "Supported",
-          "The most detailed skills documentation in the whole Copilot family lives on the VS Code side, not on docs.github.com. It is the only place that publishes the frontmatter constraints, the extra fields, the extension contribution point, and the setting for additional skill directories.",
+          "The most detailed skills documentation in the whole Copilot family lives on the VS Code side, not on docs.github.com. It is the only Copilot-side page that publishes the character limits on name and description, four extra frontmatter fields, an extension contribution point, and a setting for additional skill directories.",
         ],
       },
       {
@@ -217,7 +217,7 @@ export const copilotSkills: CopilotSkillsDefinition = {
         label: "Copilot CLI",
         cells: [
           "Supported",
-          "The only surface with an interactive management interface for skills: /skills list, /skills info, /skills add, /skills remove, and /skills reload inside a session, plus a copilot skill subcommand from the terminal for scripting.",
+          "The surface with the most granular skill management: /skills list, /skills info, /skills add, /skills remove, and /skills reload inside a session, plus a copilot skill subcommand from the terminal for scripting. VS Code has an interactive editor too, but no scriptable equivalent is documented.",
         ],
       },
       {
