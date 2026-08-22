@@ -219,56 +219,56 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         label: "brand-guidelines",
         cells: [
-          "74 lines, 2,235 bytes, and no bundled files at all beyond a license. The body is hex codes, two typeface names with fallbacks, and the rules for applying them to headings, body text, and shapes.",
+          "73 lines, 2,235 bytes, and no bundled files at all beyond a license. The body is hex codes, two typeface names with fallbacks, and the rules for applying them to headings, body text, and shapes.",
           "A skill can be pure reference data. When the agent already knows how to do the task and only lacks your facts, the facts are the whole skill. No scripts, no reference folder, no workflow.",
         ],
       },
       {
         label: "internal-comms",
         cells: [
-          "33 lines and 1,511 bytes, the shortest SKILL.md in the repository. It lists seven kinds of internal communication, then routes to one of four files in its examples folder, then closes with a keyword list.",
+          "32 lines and 1,511 bytes, the shortest SKILL.md in the repository. It lists seven kinds of internal communication, then routes to one of four files in its examples folder, then closes with a keyword list.",
           "The router. The body carries the branch table and nothing else, and the actual instructions sit one file down. This is the clearest working demonstration of progressive disclosure in the repository.",
         ],
       },
       {
         label: "webapp-testing",
         cells: [
-          "96 lines with a scripts folder and an examples folder. It names one helper script, tells the agent to run it with the help flag before reading it, then gives a decision tree and one worked Playwright snippet.",
+          "95 lines with a scripts folder and an examples folder. It names one helper script, tells the agent to run it with the help flag before reading it, then gives a decision tree and one worked Playwright snippet.",
           "Scripts as black boxes. The file spends its words on when to reach for the script and what to do with the result, and explicitly tells the agent not to load the source into context.",
         ],
       },
       {
         label: "pdf",
         cells: [
-          "315 lines, eight scripts, and two long reference files, forms and reference, kept beside SKILL.md instead of inside a references folder. The body covers the common operations and defers form filling and troubleshooting.",
+          "314 lines, eight scripts, and two long reference files, forms and reference, kept beside SKILL.md instead of inside a references folder. The body covers the common operations and defers form filling and troubleshooting.",
           "Split by frequency rather than by topic. The operations that run on every invocation stay inline; the ones that run occasionally move out and are named in a quick reference table at the end.",
         ],
       },
       {
         label: "xlsx",
         cells: [
-          "100 lines, twelve scripts, and a 948-character description whose last sentence exists only to stop the skill from firing on a Word document, an HTML report, or a Google Sheets integration.",
+          "99 lines, twelve scripts, and a 948-character description whose last sentence exists only to stop the skill from firing on a Word document, an HTML report, or a Google Sheets integration.",
           "The description is the interface. A long description is not padding when every clause rules a case in or out, and the closing negative list is the single most copyable move in the repository.",
         ],
       },
       {
         label: "claude-api",
         cells: [
-          "557 lines and 68 files across ten folders named after languages rather than roles. The description is 1,068 characters and is organised into a reference line, a trigger block, and a skip block that overrides it.",
+          "556 lines and 68 files across ten folders named after languages rather than roles. The description is 1,068 characters and is organised into a reference line, a trigger block, and a skip block that overrides it.",
           "What outgrowing the format looks like. Genuinely useful to read, and also the one example that breaks three separate pieces of guidance published by the same repository and the same specification.",
         ],
       },
       {
         label: "skill-creator",
         cells: [
-          "486 lines and the only folder in the repository using both directory names the specification recommends, references and assets, alongside scripts, an agents folder for subagent instructions, and an eval viewer.",
+          "485 lines and the only folder in the repository using both directory names the specification recommends, references and assets, alongside scripts, an agents folder for subagent instructions, and an eval viewer.",
           "The skill that writes skills. It states the three-level loading model, the 500-line rule, and the domain-organisation layout, so it doubles as the repository's own opinion on how the other eighteen should be built.",
         ],
       },
     ],
     notes: [
       "These eight are a selection, not the repository. The other twelve folders are academy-guide, algorithmic-art, canvas-design, discernment-nudge, doc-coauthoring, docx, frontend-design, mcp-builder, pptx, slack-gif-creator, theme-factory and web-artifacts-builder. Several of them repeat a pattern already covered here: pptx and docx share the shape of xlsx, and canvas-design bundles fonts the way theme-factory bundles themes.",
-      "There is no ranking implied by the order. A 74-line skill with no bundled files is not a worse skill than a 557-line one, and in the repository the smallest files are the ones whose intent is easiest to read in a single pass.",
+      "There is no ranking implied by the order. A 73-line skill with no bundled files is not a worse skill than a 556-line one, and in the repository the smallest files are the ones whose intent is easiest to read in a single pass.",
       "One honest caveat about copying: license terms differ per folder in this repository, and two folders declare nothing at all. Check the license file next to the SKILL.md you are borrowing from before the pattern turns into a paste.",
     ],
     link: {
@@ -574,7 +574,7 @@ export const skillExamples: SkillExamplesDefinition = {
         label: "Keep SKILL.md under 500 lines",
         cells: [
           "Stated three times over: in the Agent Skills specification, in the Claude Code documentation, and inside skill-creator, the repository's own skill for writing skills.",
-          "Seventeen of the nineteen are under 500 lines. claude-api is 557. skill-creator itself is 486, which is close enough to its own limit to be worth noticing.",
+          "Seventeen of the nineteen are under 500 lines. claude-api is 556. skill-creator itself is 485, which is close enough to its own limit to be worth noticing.",
         ],
       },
       {
@@ -657,7 +657,7 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         title: "Write the body for the path you actually take",
         body:
-          "brand-guidelines is 74 lines because the task is a lookup. internal-comms is 33 lines because the task is a routing decision. Neither pads the file to look thorough, and both are easier to keep true than a long one.",
+          "brand-guidelines is 73 lines because the task is a lookup. internal-comms is 32 lines because the task is a routing decision. Neither pads the file to look thorough, and both are easier to keep true than a long one.",
       },
       {
         title: "Move anything long one level down and say when to read it",
@@ -795,7 +795,7 @@ export const skillExamples: SkillExamplesDefinition = {
     {
       question: "What does a minimal SKILL.md example look like?",
       answer:
-        "Two frontmatter fields and a heading. The official template declares a name and a description between two marker lines, then opens the body. The smallest of the nineteen real skills, internal-comms, is 33 lines: a list of the cases it covers and a rule for which bundled file to read.",
+        "Two frontmatter fields and a heading. The official template declares a name and a description between two marker lines, then opens the body. The smallest of the nineteen real skills, internal-comms, is 32 lines: a list of the cases it covers and a rule for which bundled file to read.",
     },
     {
       question: "Do the example skills use the scripts, references and assets folders?",
@@ -810,7 +810,7 @@ export const skillExamples: SkillExamplesDefinition = {
     {
       question: "Which example should I read first?",
       answer:
-        "internal-comms, because it is 33 lines and shows progressive disclosure working. Then webapp-testing for how to bundle a script without loading it into context, then xlsx for a description that names what must not trigger it. Skip claude-api until those three make sense.",
+        "internal-comms, because it is 32 lines and shows progressive disclosure working. Then webapp-testing for how to bundle a script without loading it into context, then xlsx for a description that names what must not trigger it. Skip claude-api until those three make sense.",
     },
     {
       question: "Do these examples work outside Claude?",
@@ -852,7 +852,7 @@ export const skillExamples: SkillExamplesDefinition = {
       id: "internal-comms-skill",
       label: "skills/internal-comms/SKILL.md",
       href: `${skillsRepoBlob}/skills/internal-comms/SKILL.md`,
-      note: "The shortest SKILL.md in the repository at 1,511 bytes and 33 lines, and the routing body quoted on this page. Its four guideline files live in an examples folder.",
+      note: "The shortest SKILL.md in the repository at 1,511 bytes and 32 lines, and the routing body quoted on this page. Its four guideline files live in an examples folder.",
     },
     {
       id: "webapp-testing-skill",
@@ -864,7 +864,7 @@ export const skillExamples: SkillExamplesDefinition = {
       id: "pdf-skill",
       label: "skills/pdf/SKILL.md",
       href: `${skillsRepoBlob}/skills/pdf/SKILL.md`,
-      note: "The 315-line body, the eight bundled scripts, and the four references each to REFERENCE.md and FORMS.md against the reference.md and forms.md that are actually in the folder.",
+      note: "The 314-line body, the eight bundled scripts, and the four references each to REFERENCE.md and FORMS.md against the reference.md and forms.md that are actually in the folder.",
     },
     {
       id: "xlsx-skill",
@@ -876,7 +876,7 @@ export const skillExamples: SkillExamplesDefinition = {
       id: "claude-api-skill",
       label: "skills/claude-api/SKILL.md",
       href: `${skillsRepoBlob}/skills/claude-api/SKILL.md`,
-      note: "The 557-line body, the 1,068-character description with its trigger and skip blocks, and the ten language and shared folders it references, including a path two levels deep.",
+      note: "The 556-line body, the 1,068-character description with its trigger and skip blocks, and the ten language and shared folders it references, including a path two levels deep.",
     },
     {
       id: "skill-creator-skill",
@@ -888,7 +888,7 @@ export const skillExamples: SkillExamplesDefinition = {
       id: "brand-guidelines-skill",
       label: "skills/brand-guidelines/SKILL.md",
       href: `${skillsRepoBlob}/skills/brand-guidelines/SKILL.md`,
-      note: "A 74-line skill with no bundled files beyond a license, and the three-line frontmatter quoted on this page. Its description is 236 characters.",
+      note: "A 73-line skill with no bundled files beyond a license, and the three-line frontmatter quoted on this page. Its description is 236 characters.",
     },
     {
       id: "agentskills-spec",
