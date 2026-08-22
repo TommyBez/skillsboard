@@ -185,15 +185,15 @@ export const skillExamples: SkillExamplesDefinition = {
     "Eight real Agent Skills from anthropics/skills, read file by file: what each SKILL.md does, the pattern worth copying, verbatim excerpts with their source, what all nineteen example skills actually declare in frontmatter, and the six places the examples disagree with the specification they are written to.",
   intro: [
     "When developers search for skill examples they are almost never asking for a definition. They want to open a real SKILL.md, see how long it is, see what the frontmatter carries, and work out how much of the format they actually have to use. This page is built for that: eight real files, quoted where quoting helps, grouped by the pattern each one demonstrates rather than listed alphabetically.",
-    "The examples come from anthropics/skills, the public repository Anthropic publishes for this purpose. It holds nineteen skill folders, a five-line starter template, and a spec folder that is now a single line pointing at agentskills.io. Its own README calls the contents demonstration and educational material and warns that what Claude actually does may differ from what the files show, which is a useful frame: read them as evidence of what people ship, not as a conformance suite.",
+    "The examples come from anthropics/skills, the public repository Anthropic publishes for this purpose. It holds nineteen skill folders, a six-line starter template, and a spec folder that is now a single line pointing at agentskills.io. Its own README calls the contents demonstration and educational material and warns that what Claude actually does may differ from what the files show, which is a useful frame: read them as evidence of what people ship, not as a conformance suite.",
     "Two things this page deliberately does not do. It does not re-list the catalog, because the full inventory of what Anthropic publishes and where each set loads already lives on its own page. And it does not teach the format from scratch, because the authoring rules, the field constraints, and the validation step live in the companion guide. This page sits between them: the files themselves, and what a reader should take from each one.",
     "Everything below was read on August 22, 2026, from the GitHub API, the raw files in the repository, the Agent Skills specification, and the Claude Code documentation. Line counts, character counts, and folder counts are from that reading. Repositories move, so check the linked source before you rely on a number.",
   ],
   answer:
-    "The skill examples most developers are looking for are the nineteen folders in anthropics/skills, plus the five-line template the same repository ships at template/SKILL.md. Each folder is a directory holding a SKILL.md: YAML frontmatter carrying a name and a description, then Markdown instructions. Eight of the nineteen bundle a scripts folder, five bundle nothing beyond the file itself, and none of them uses more than three frontmatter fields.",
+    "The skill examples most developers are looking for are the nineteen folders in anthropics/skills, plus the six-line template the same repository ships at template/SKILL.md. Each folder is a directory holding a SKILL.md: YAML frontmatter carrying a name and a description, then Markdown instructions. Eight of the nineteen bundle a scripts folder, five bundle nothing beyond the file itself, and none of them uses more than three frontmatter fields.",
   answerNotes: [
     "The count of nineteen is the folder count under skills/ in the repository. The packaging agrees: .claude-plugin/marketplace.json groups exactly those nineteen into five installable plugins, four document skills, twelve example skills, and three that stand alone as claude-api, academy-guide and discernment-nudge.",
-    "The smallest complete example in the repository is not one of the nineteen. It is template/SKILL.md, at 140 bytes and five lines: three lines of frontmatter, a blank line, and a heading that says where the instructions go. Everything else on this page is an elaboration of that file.",
+    "The smallest complete example in the repository is not one of the nineteen. It is template/SKILL.md, at 140 bytes and six lines: a four-line frontmatter block with two fields between the delimiters, a blank line, and a heading that says where the instructions go. Everything else on this page is an elaboration of that file.",
     "The repository states its own status plainly. Its README says the skills are provided for demonstration and educational purposes only, and that the implementations and behaviors you receive from Claude may differ from what is shown. It also says the document skills are source-available rather than open source, and that many of the others are Apache 2.0.",
     "Reading real files is the fastest way to calibrate how much format you need, and it is also the fastest way to inherit somebody else's shortcuts. Six places where these examples and the published guidance disagree are tabled further down, including one that can break at runtime.",
   ],
@@ -212,7 +212,7 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         label: "template/SKILL.md",
         cells: [
-          "Five lines and 140 bytes. A name, a description that says to replace it, and a single heading reading Insert instructions below. It is not one of the nineteen skills, it sits in its own folder at the repository root.",
+          "Six lines and 140 bytes. A four-line frontmatter block carrying a name and a description that says to replace it, a blank line, and a single heading reading Insert instructions below. It is not one of the nineteen skills, it sits in its own folder at the repository root.",
           "The floor. A skill is a directory, a name, a description, and prose. Every other row on this page is optional structure layered on top of this file, which is worth knowing before you copy a 500-line example.",
         ],
       },
@@ -515,7 +515,7 @@ export const skillExamples: SkillExamplesDefinition = {
     entries: [
       {
         title: "The whole official template, unedited",
-        file: "template/SKILL.md in anthropics/skills, 140 bytes and five lines",
+        file: "template/SKILL.md in anthropics/skills, 140 bytes and six lines",
         permalink: `${skillsRepoBlob}/template/SKILL.md`,
         template: "---\nname: template-skill\ndescription: Replace with description of the skill and when Claude should use it.\n---\n\n# Insert instructions below",
         takeaway: "Two frontmatter fields and a heading. The repository README describes the same shape in prose and states that the frontmatter requires only two fields, name and description. If a skill you are reading is longer than this, everything past this point was a choice somebody made.",
@@ -642,7 +642,7 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         title: "Start from the template, not from a blank file",
         body:
-          "Copy the five lines in template/SKILL.md into a new folder and fill them in. Every additional structure on this page is something you add when the file asks for it, not something you begin with.",
+          "Copy the six lines in template/SKILL.md into a new folder and fill them in. Every additional structure on this page is something you add when the file asks for it, not something you begin with.",
       },
       {
         title: "Name the folder first, then match the frontmatter to it",
@@ -790,7 +790,7 @@ export const skillExamples: SkillExamplesDefinition = {
     {
       question: "Where are the official Claude skill examples?",
       answer:
-        "In anthropics/skills on GitHub, the public repository Anthropic publishes for that purpose. It holds nineteen skill folders under skills, a five-line starter at template/SKILL.md, and a spec folder that is now one line pointing at agentskills.io. Its README calls the contents demonstration and educational material.",
+        "In anthropics/skills on GitHub, the public repository Anthropic publishes for that purpose. It holds nineteen skill folders under skills, a six-line starter at template/SKILL.md, and a spec folder that is now one line pointing at agentskills.io. Its README calls the contents demonstration and educational material.",
     },
     {
       question: "What does a minimal SKILL.md example look like?",
@@ -840,7 +840,7 @@ export const skillExamples: SkillExamplesDefinition = {
       id: "anthropic-template",
       label: "The official skill template",
       href: `${skillsRepoBlob}/template/SKILL.md`,
-      note: "The five-line starter file quoted in full on this page, at 140 bytes. The smallest complete example the repository publishes.",
+      note: "The six-line starter file quoted in full on this page, at 140 bytes. The smallest complete example the repository publishes.",
     },
     {
       id: "anthropic-marketplace",
