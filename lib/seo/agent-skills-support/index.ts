@@ -5,6 +5,7 @@ import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
+import { copilotSkillsPath } from "@/lib/seo/copilot-skills/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
@@ -699,6 +700,12 @@ export const agentSkillsSupport: AgentSkillsSupportDefinition = {
       href: codexSkillsPath,
       description:
         "The neutral .agents/skills path in detail, and what a Claude skill keeps when Codex reads it.",
+    },
+    {
+      label: "GitHub Copilot skills: what Copilot supports",
+      href: copilotSkillsPath,
+      description:
+        "The two rows in this matrix that disagree with each other, and the surfaces where skills are preview or unsupported.",
     },
     {
       label: "OpenCode skills: what they are and how to use them",

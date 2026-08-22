@@ -162,6 +162,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/copilot-skills/",
+        destination: "/copilot-skills",
+        permanent: true,
+      },
+      {
         source: "/cursor-skills/",
         destination: "/cursor-skills",
         permanent: true,
