@@ -398,7 +398,7 @@ export function AnthropicSkillsPage({
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills your team actually recommends, and keep the source and
+            the skills your team actually uses, and keep the source and
             the license one click away from every entry.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">

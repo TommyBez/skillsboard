@@ -384,8 +384,7 @@ export function AgentSkillsSupportPage({
 
         <section className="mt-16 border-t border-border py-14 text-center md:py-16">
           <p className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight md:text-4xl">
-            Your teammates run different clients. Keep one recommendation
-            anyway.
+            Your teammates run different clients. Keep one team library anyway.
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Save the skill once,

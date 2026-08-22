@@ -2,17 +2,17 @@ export const landingFaqs = [
   {
     question: "What is Skills Board?",
     answer:
-      "Skills Board is a web app where a team collects the AI skills it recommends. Teammates search that library, see where each skill comes from, and choose the source, install command, or ZIP that fits their agent setup.",
+      "Skills Board is a web app where a team collects and shares its AI skills. Teammates search that library, see where each skill comes from, and choose the source, install command, or ZIP that fits their agent setup.",
   },
   {
     question: "How is Skills Board different from a public skill catalog?",
     answer:
-      "Public catalogs help you discover what exists. Skills Board captures the smaller set your own team recommends, keeps each entry tied to its original source, and offers more than one way to use a skill across different agents.",
+      "Public catalogs help you discover what exists. Skills Board captures the smaller set your own team settled on, keeps each entry tied to its original source, and offers more than one way to use a skill across different agents.",
   },
   {
     question: "Do teammates need to use the same AI agent?",
     answer:
-      "No. Skills Board is built for mixed setups. Everyone starts from the same team recommendation, then connects an MCP-compatible agent or opens the source, copies a compatible install command, or downloads the latest files as a ZIP.",
+      "No. Skills Board is built for mixed setups. Everyone starts from the same team entry, then connects an MCP-compatible agent or opens the source, copies a compatible install command, or downloads the latest files as a ZIP.",
   },
   {
     question: "What can my agent do through MCP?",
@@ -32,7 +32,7 @@ export const landingFaqs = [
   {
     question: "Is a saved skill a formal approval or security review?",
     answer:
-      "No. A saved skill is a team recommendation, not a formal security review, approval, or compatibility certification. Teams should inspect the source and apply their own standards.",
+      "No. A saved skill is a team's own choice, not a formal security review, approval, or compatibility certification. Teams should inspect the source and apply their own standards.",
   },
   {
     question: "Will I get the exact version someone on my team used?",

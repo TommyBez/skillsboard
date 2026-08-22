@@ -123,7 +123,7 @@ const githubRepo: AlternativeDefinition = {
       { text: "shared team library.", accent: true },
     ],
     description:
-      "How a shared GitHub repository and Skills Board compare for the AI skills a team recommends.",
+      "How a shared GitHub repository and Skills Board compare for a team's AI skills.",
     contextLabel: "skillsboard.sh/alternatives",
     chips: ["GitHub repo", "Team library", "MCP"],
   },
@@ -131,19 +131,19 @@ const githubRepo: AlternativeDefinition = {
   modifiedAt: "2026-08-09",
   summary: [
     "A shared repository is the honest default. It costs nothing, every change goes through review and history, and every engineer already knows how it works. When the skills belong to the codebase your team works in every day, committing them is the right call.",
-    "Skills Board is for the other case: the skills your team recommends live in other people's repositories, teammates run different agents, and nobody wants to grep a file tree to find the thing someone recommended in chat last month.",
-    "The two are compatible. Keep the repo for skills that belong to your code, and use the library for the recommendations that come from everywhere else.",
+    "Skills Board is for the other case: your team's skills live in other people's repositories, teammates run different agents, and nobody wants to grep a file tree to find the thing someone shared in chat last month.",
+    "The two are compatible. Keep the repo for skills that belong to your code, and use the library for everything that comes from somewhere else.",
   ],
   reasons: {
     title: "Why teams start looking past the shared repo",
     intro:
-      "The repo pattern holds up until the recommendations stop coming from inside your own codebase.",
+      "The repo pattern holds up until the skills stop coming from inside your own codebase.",
     points: [
-      "Most recommended skills live in someone else's repository, so the shared repo turns into a list of links or a folder of copies.",
+      "Most of the skills a team keeps live in someone else's repository, so the shared repo turns into a list of links or a folder of copies.",
       "A copy stops matching upstream the moment upstream changes, and nobody notices until a teammate hits a difference.",
-      "In Claude Code, project skills load from the .claude/skills directory of the repository the agent starts in, so a recommendation does not follow a teammate into a different project.",
+      "In Claude Code, project skills load from the .claude/skills directory of the repository the agent starts in, so a skill does not follow a teammate into a different project.",
       "Finding a skill means repository search or a hand-maintained README index, rather than searching by task or by a tag your team invented.",
-      "Teammates who are not in that repository every day, including designers, writers, and product folks, never see the recommendation at all.",
+      "Teammates who are not in that repository every day, including designers, writers, and product folks, never see the skill at all.",
     ],
   },
   comparison: {
@@ -194,7 +194,7 @@ const githubRepo: AlternativeDefinition = {
       {
         dimension: "Review and history",
         skillsBoard:
-          "A saved skill is a team recommendation, not a formal review, approval, or compatibility certification.",
+          "A saved skill is a team's own choice, not a formal review, approval, or compatibility certification.",
         alternative:
           "Pull requests, required reviewers, and code owners, on the plans that include them.",
         sourceIds: ["gh-pricing"],
@@ -232,11 +232,11 @@ const githubRepo: AlternativeDefinition = {
     title: "When a shared library fits better",
     intro: "The signals that the repo has stopped being the right container.",
     points: [
-      "The skills your team recommends come from many repositories rather than one.",
+      "Your team's skills come from many repositories rather than one.",
       "Teammates use different agents, so one install path does not cover everyone.",
       "People search by task or by a team tag, not by file path.",
       "You want a compatible agent to search the same team list over MCP instead of asking a person.",
-      "You want teammates who never open a pull request to still find the recommendation.",
+      "You want teammates who never open a pull request to still find the skill.",
     ],
   },
   moveOver: {
@@ -244,7 +244,7 @@ const githubRepo: AlternativeDefinition = {
     intro:
       "Nothing needs to be deleted. This is the shortest path to a searchable list.",
     steps: [
-      "List what the shared repo currently recommends, and note the original repository and path for anything that came from outside.",
+      "List what the shared repo currently holds, and note the original repository and path for anything that came from outside.",
       "Create a team library and save those skills from their original sources.",
       "Add the tags your team actually searches by, such as the workflow or the surface the skill belongs to.",
       "Invite your teammates. Each one picks the source link, the install command, or the ZIP that fits their agent.",
@@ -256,7 +256,7 @@ const githubRepo: AlternativeDefinition = {
       question:
         "Do I have to stop keeping AI skills in a GitHub repository?",
       answer:
-        "No. Skills that describe your own codebase belong in that codebase. Skills Board is for the recommendations that come from other repositories, where a copy would drift and a link would get lost.",
+        "No. Skills that describe your own codebase belong in that codebase. Skills Board is for the skills that come from other repositories, where a copy would drift and a link would get lost.",
     },
     {
       question: "Does Skills Board store a copy of the skill files?",
@@ -323,7 +323,7 @@ const skillsSh: AlternativeDefinition = {
   seoTitle: "skills.sh Alternative for Team Skill Libraries | Skills Board",
   socialTitle: "Skills Board vs skills.sh",
   description:
-    "skills.sh is a public directory of agent skills with a leaderboard, packs, and a CLI. Compare it with Skills Board, the organization-scoped library for the smaller set of skills your own team recommends.",
+    "skills.sh is a public directory of agent skills with a leaderboard, packs, and a CLI. Compare it with Skills Board, the organization-scoped library for the smaller set your own team settled on.",
   cardSummary:
     "A public directory with a leaderboard and packs, next to a private team library. Where each one belongs.",
   ogAlt: "Comparison of skills.sh and Skills Board for team AI skills.",
@@ -334,7 +334,7 @@ const skillsSh: AlternativeDefinition = {
       { text: "and your team's list.", accent: true },
     ],
     description:
-      "How skills.sh and Skills Board compare for discovering skills and recording what your team recommends.",
+      "How skills.sh and Skills Board compare for discovering skills and recording what your team settled on.",
     contextLabel: "skillsboard.sh/alternatives",
     chips: ["Directory", "Team library", "MCP"],
   },
@@ -342,13 +342,13 @@ const skillsSh: AlternativeDefinition = {
   modifiedAt: "2026-08-09",
   summary: [
     "skills.sh is a public directory. It ranks skills by install count, installs any of them with npx skills add, and offers packs that bundle public skills, private files, and repository skills behind a single install command.",
-    "Skills Board is the organization-scoped list of skills your own team decided to recommend, with search, team tags, the original source for every entry, and an authenticated MCP endpoint a compatible agent can query.",
-    "These are different jobs, and they compose. Skills Board reads the public skills.sh catalog in Discover, so you can browse there and save what your team recommends here.",
+    "Skills Board is the organization-scoped list of skills your own team settled on, with search, team tags, the original source for every entry, and an authenticated MCP endpoint a compatible agent can query.",
+    "These are different jobs, and they compose. Skills Board reads the public skills.sh catalog in Discover, so you can browse there and save what your team keeps here.",
   ],
   reasons: {
     title: "What sends people looking for something else",
     intro:
-      "A directory answers what exists. It does not answer what your team recommends.",
+      "A directory answers what exists. It does not answer what your team uses.",
     points: [
       "Leaderboard position is aggregate install count, not a judgement about whether a skill suits your team.",
       "A pack is unlisted rather than access-controlled, so anyone holding the URL can view and install it.",
@@ -365,7 +365,7 @@ const skillsSh: AlternativeDefinition = {
       {
         dimension: "What it is",
         skillsBoard:
-          "An organization-scoped library of the skills your team recommends.",
+          "An organization-scoped library of your team's AI skills.",
         alternative:
           "A public directory of agent skills, described on its own site as the Agent Skills Directory, with topics, an official set, and security audits.",
         sourceIds: ["skills-home"],
@@ -418,7 +418,7 @@ const skillsSh: AlternativeDefinition = {
       {
         dimension: "Safety posture",
         skillsBoard:
-          "A saved skill is a team recommendation, not a formal security review, approval, or compatibility certification.",
+          "A saved skill is a team's own choice, not a formal security review, approval, or compatibility certification.",
         alternative:
           "Routine security audits with partner results per skill, alongside its own note that it cannot guarantee the quality or security of every listed skill.",
         sourceIds: ["skills-docs", "skills-api"],
@@ -448,7 +448,7 @@ const skillsSh: AlternativeDefinition = {
     intro:
       "Skills Board starts from your team's judgement rather than the ecosystem's.",
     points: [
-      "Your list is much smaller than the directory because it is only what your team recommends.",
+      "Your list is much smaller than the directory because it is only what your team uses.",
       "You want the set scoped to invited teammates rather than reachable by anyone with a URL.",
       "You want to search by task and by tags your team invented, not by install count.",
       "You want a compatible agent to query the same team list over an authenticated MCP endpoint.",
@@ -461,7 +461,7 @@ const skillsSh: AlternativeDefinition = {
       "Skills Board reads the public skills.sh catalog in Discover, so this is additive.",
     steps: [
       "Keep browsing skills.sh for discovery, audits, and popularity signal.",
-      "Create a team library and save the skills your team actually recommends, each one from its original source.",
+      "Create a team library and save the skills your team actually uses, each one from its original source.",
       "Search the public catalog from inside Skills Board's Discover and save straight from there.",
       "Add team tags and a short note explaining why the skill made the list.",
       "Invite teammates, or connect a compatible agent over MCP so it can search the same list.",
@@ -471,7 +471,7 @@ const skillsSh: AlternativeDefinition = {
     {
       question: "Is Skills Board a replacement for skills.sh?",
       answer:
-        "No. skills.sh is a public directory for discovering what exists across the ecosystem. Skills Board records the smaller set your own team recommends. Skills Board reads the public skills.sh catalog in Discover, so teams commonly use both.",
+        "No. skills.sh is a public directory for discovering what exists across the ecosystem. Skills Board records the smaller set your own team settled on. Skills Board reads the public skills.sh catalog in Discover, so teams commonly use both.",
     },
     {
       question: "Is a Skills Board team library public?",
@@ -536,7 +536,7 @@ const skillsSh: AlternativeDefinition = {
     {
       label: "Choose your team's first AI agent skill",
       href: guidePaths.chooseFirstTeamSkill,
-      description: "Turning a directory find into a team recommendation.",
+      description: "Turning a directory find into an entry the whole team can use.",
     },
     {
       label: "Pricing",
@@ -556,7 +556,7 @@ const smithery: AlternativeDefinition = {
   seoTitle: "Smithery Alternative for Team AI Skill Libraries | Skills Board",
   socialTitle: "Skills Board vs Smithery",
   description:
-    "Smithery is a public registry for MCP servers and skills with managed connections and auth. Compare it with Skills Board, a free, MIT-licensed library for the AI skills your own team recommends.",
+    "Smithery is a public registry for MCP servers and skills with managed connections and auth. Compare it with Skills Board, a free, MIT-licensed library for your own team's AI skills.",
   cardSummary:
     "A public registry with managed connections, next to a team-curated library. Two different problems.",
   ogAlt: "Comparison of Smithery and Skills Board for team AI skills.",
@@ -567,7 +567,7 @@ const smithery: AlternativeDefinition = {
       { text: "and a team library.", accent: true },
     ],
     description:
-      "How Smithery and Skills Board compare for connecting agents and for recording what your team recommends.",
+      "How Smithery and Skills Board compare for connecting agents and for recording what your team settled on.",
     contextLabel: "skillsboard.sh/alternatives",
     chips: ["Registry", "Team library", "MCP"],
   },
@@ -575,8 +575,8 @@ const smithery: AlternativeDefinition = {
   modifiedAt: "2026-08-09",
   summary: [
     "Smithery is a public registry. It lists MCP servers and a browsable skills catalog, and it takes over the connection plumbing so an agent can reach a service without you wiring up OAuth and credentials.",
-    "Skills Board does one narrower thing: it holds the skills your own team decided to recommend, scoped to the people you invite, with the original source visible on every entry.",
-    "If your problem is connecting agents to third-party services, Smithery covers ground Skills Board does not. If your problem is that teammates cannot find what your team already recommends, that is the library.",
+    "Skills Board does one narrower thing: it holds the skills your own team settled on, scoped to the people you invite, with the original source visible on every entry.",
+    "If your problem is connecting agents to third-party services, Smithery covers ground Skills Board does not. If your problem is that teammates cannot find what your team already uses, that is the library.",
   ],
   reasons: {
     title: "Where the registry model stops answering the question",
@@ -586,7 +586,7 @@ const smithery: AlternativeDefinition = {
       "A large public listing tells you what exists, not which of those entries your colleagues actually use.",
       "Install counts rank the ecosystem's behaviour, not your team's.",
       "Publishing and distribution are the registry's centre of gravity, so there is nowhere to record the small set your team standardised on.",
-      "Teammates using different agents still need a way to reach the same recommendation without adopting the same runtime.",
+      "Teammates using different agents still need a way to reach the same skill without adopting the same runtime.",
       "Nothing captures the note explaining why your team picked one skill and not the near-identical one next to it.",
     ],
   },
@@ -597,7 +597,7 @@ const smithery: AlternativeDefinition = {
       {
         dimension: "Primary object",
         skillsBoard:
-          "The skills your team recommends, saved from their original repository and path.",
+          "Your team's AI skills, saved from their original repository and path.",
         alternative:
           "MCP servers and skills published to a public registry, browsable at smithery.ai/servers and smithery.ai/skills.",
         sourceIds: ["smithery-home", "smithery-skills"],
@@ -611,7 +611,7 @@ const smithery: AlternativeDefinition = {
       },
       {
         dimension: "Who curates",
-        skillsBoard: "Your teammates, by saving what they recommend.",
+        skillsBoard: "Your teammates, by saving what they use.",
         alternative:
           "Publishers, with skill pages showing publisher namespaces, badges, and install counts.",
         sourceIds: ["smithery-skills"],
@@ -664,14 +664,14 @@ const smithery: AlternativeDefinition = {
       "You want the same connected accounts reused across chats, workflows, and different harnesses.",
       "You are publishing an MCP server and want distribution plus usage observability.",
       "You want to browse a large public registry of MCP servers rather than a short curated list.",
-      "The bottleneck is authentication plumbing, not knowing which skill your colleagues recommend.",
+      "The bottleneck is authentication plumbing, not knowing which skill your colleagues use.",
     ],
   },
   skillsBoardWins: {
     title: "When a team library fits better",
     intro: "The library exists for a smaller, more human problem.",
     points: [
-      "Teammates keep asking which skill to use and where the one you recommended lives.",
+      "Teammates keep asking which skill to use and where the one you shared lives.",
       "Your team runs a mix of agents, so one runtime or one install path does not cover everyone.",
       "You want the list scoped to invited teammates rather than published publicly.",
       "You want the original source visible on every entry, so people can read a skill before using it.",
@@ -684,9 +684,9 @@ const smithery: AlternativeDefinition = {
       "These sit at different layers, so most teams that need both simply keep both.",
     steps: [
       "Keep Smithery for the service connections your agents depend on.",
-      "Create a Skills Board team library and save the skills your team recommends, each from its original source.",
+      "Create a Skills Board team library and save the skills your team uses, each from its original source.",
       "Tag them the way your team searches, and add the note explaining why the skill made the list.",
-      "Invite teammates so everyone starts from the same recommendation.",
+      "Invite teammates so everyone starts from the same entry.",
       "Connect a compatible agent to Skills Board over MCP so it can search the team list without leaving the agent.",
     ],
   },
@@ -694,7 +694,7 @@ const smithery: AlternativeDefinition = {
     {
       question: "Can I use Skills Board and Smithery together?",
       answer:
-        "Yes. They solve different problems. Smithery focuses on connecting agents to services and on publishing to a public registry. Skills Board records the skills your own team recommends and makes them searchable for teammates and for a connected agent.",
+        "Yes. They solve different problems. Smithery focuses on connecting agents to services and on publishing to a public registry. Skills Board records the skills your own team settled on and makes them searchable for teammates and for a connected agent.",
     },
     {
       question: "Is Skills Board an MCP server?",
@@ -741,7 +741,7 @@ const smithery: AlternativeDefinition = {
     {
       label: "Manage skills across Claude, Codex, and Cursor",
       href: guidePaths.manageCrossAgentSkills,
-      description: "Keeping one recommendation across mixed agent setups.",
+      description: "Keeping one agreed skill per job across mixed agent setups.",
     },
     {
       label: "Pricing",

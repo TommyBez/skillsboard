@@ -436,7 +436,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills your team actually recommends, and invite the people who
+            the skills your team actually uses, and invite the people who
             keep asking which one to use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">

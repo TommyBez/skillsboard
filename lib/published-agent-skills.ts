@@ -15,11 +15,11 @@ export const TEAM_SKILL_LIBRARY_SKILL_PATH = "/skills/team-skill-library/SKILL.m
  * longer matches what the URL serves.
  */
 export const TEAM_SKILL_LIBRARY_DIGEST: Sha256Digest =
-  "sha256:a716079df32364777dec7bd4a1abfcb4e6ee7fb3053ea50df14a0e131e1303ba"
+  "sha256:dc380e3cea094e21abc9e5ea2559061aa44be547b8f2dce4970fec9af6ac1632"
 
 /** Verbatim from the skill's own frontmatter; the same test asserts the match. */
 export const TEAM_SKILL_LIBRARY_DESCRIPTION =
-  "Work with a team's shared Agent Skills library on Skills Board through the Skills Board MCP server at https://www.skillsboard.sh/api/mcp. Use when the user asks which skills their team recommends, wants to search or list the team library or its collections, needs the install command for a saved skill or for a published collection, wants to check a GitHub repository for installable skills, or wants to save a skill to the team library. Do not use it to write or edit SKILL.md files, to install unrelated npm packages or MCP servers, to edit or delete skills already saved on Skills Board, or when the Skills Board MCP server is not connected to this client."
+  "Work with a team's shared Agent Skills library on Skills Board through the Skills Board MCP server at https://www.skillsboard.sh/api/mcp. Use when the user asks which AI skills their team uses, wants to search or list the team library or its collections, needs the install command for a saved skill or for a published collection, wants to check a GitHub repository for installable skills, or wants to save a skill to the team library. Do not use it to write or edit SKILL.md files, to install unrelated npm packages or MCP servers, to edit or delete skills already saved on Skills Board, or when the Skills Board MCP server is not connected to this client."
 
 /**
  * The Agent Skills Discovery index for this site (RFC v0.2.0).

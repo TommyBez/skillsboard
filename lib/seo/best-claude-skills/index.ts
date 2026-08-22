@@ -648,7 +648,7 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     body: [
       "The pattern that fails is familiar and has nothing to do with the skills. Somebody reads a register, installs six, keeps two, and the two live in a personal ~/.claude/skills/ folder nobody else can see. A teammate asks which skill to use for a task, gets a link in chat, and the link is to whichever repository was top of a list that month. Six weeks later two people are running different versions of the same idea and neither knows.",
       "The fix is small and unglamorous. Pick a job your team does every week, choose one skill from this register that does it, and record the decision somewhere searchable with the source repository, the folder path, and the license visible. That is enough for the next teammate to open the SKILL.md and judge it themselves, which is the only part of this that does not transfer.",
-      "Skills Board is where we keep that: a web app holding the skills a team recommends, with the original source one click from every entry, a compatible install command where one exists, and a ZIP of the latest source files. A saved skill is a team recommendation rather than an approval or a security review, which is exactly what a register like this one produces. It is free, MIT licensed, and open source.",
+      "Skills Board is where we keep that: a web app holding a team's AI skills, with the original source one click from every entry, a compatible install command where one exists, and a ZIP of the latest source files. A saved skill is a team's own choice rather than an approval or a security review, which is exactly what a register like this one produces. It is free, MIT licensed, and open source.",
     ],
     paths: [
       {
@@ -671,10 +671,10 @@ export const bestClaudeSkills: BestClaudeSkillsDefinition = {
     limits: [
       "This page is a reading, not an audit. We opened every SKILL.md in the register and every license we cite. We did not run the skills, measure their output, or review their scripts line by line, and no entry here should be read as a security assessment.",
       "Twenty-seven entries against a bar drawn on one date is a selection with a shelf life. The maintained test in particular is a snapshot: three of the repositories here were pushed the same day we read them, and a repository can go quiet the week after a page like this is published.",
-      "Nothing on this page is sponsored, and no publisher in the register was contacted. Skills Board is not a party to any of these projects, and the one product recommendation on this page is our own, stated as such.",
+      "Nothing on this page is sponsored, and no publisher in the register was contacted. Skills Board is not a party to any of these projects, and the one product we put forward on this page is our own, stated as such.",
     ],
     link: {
-      lead: "For turning a shortlist into a recommendation a second teammate can act on, including who owns each entry, see",
+      lead: "For turning a shortlist into an entry a second teammate can act on, including who owns each entry, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",

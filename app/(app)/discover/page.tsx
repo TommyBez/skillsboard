@@ -88,7 +88,7 @@ export default function DiscoverPage({ searchParams }: DiscoverPageProps) {
         <div className="mt-6">
           <p className="font-mono text-sm text-primary">Find skills</p>
           <h1 data-testid="discover-shell" className="mt-3 max-w-[15ch] text-balance text-4xl font-semibold leading-[1.02] tracking-display md:text-6xl">
-            Find a skill to recommend.
+            Find a skill for the team.
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted-foreground">
             Browse the public catalog, inspect the source, then add the useful skills to your team library.

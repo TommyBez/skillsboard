@@ -38,7 +38,7 @@ export function CreateOrganizationDialog() {
           </span>
           <DialogTitle className="text-2xl font-semibold tracking-[-0.035em]">Create team library</DialogTitle>
           <DialogDescription className="max-w-md leading-relaxed">
-            Name the shared place where your team will collect the skills it recommends.
+            Name the shared place where your team will collect its AI skills.
           </DialogDescription>
         </DialogHeader>
         <div className="p-6">

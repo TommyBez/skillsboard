@@ -20,7 +20,7 @@ export const aboutSocialImageContent: OgTemplateContent = {
     { text: "One place to keep them.", accent: true },
   ],
   description:
-    "A free, open-source library for the AI skills your team recommends.",
+    "A free, open-source library for your team's AI skills.",
   contextLabel: "skillsboard.sh/about",
   chips: ["Team library", "MCP", "Open source"],
 }

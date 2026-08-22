@@ -30,7 +30,7 @@ export const developers = {
   publishedAt: "2026-08-21",
   modifiedAt: "2026-08-21",
   intro: [
-    "Skills Board is a web app for the AI skills a team recommends, and its programmatic surface is a Model Context Protocol server. An agent that authenticates against it can search the team's saved skills and collections, fetch install commands, inspect a GitHub repository for skills, and, with write access, save skills and organize collections.",
+    "Skills Board is a web app where a team keeps and shares its AI skills, and its programmatic surface is a Model Context Protocol server. An agent that authenticates against it can search the team's saved skills and collections, fetch install commands, inspect a GitHub repository for skills, and, with write access, save skills and organize collections.",
     "This page is the whole contract: what is public, how to authenticate, what the tools do, and how the surface behaves when something goes wrong. Everything on it is also machine readable: append `.md` to this URL, or send `Accept: text/markdown`, for the same document as Markdown.",
   ],
   publicSurface: {

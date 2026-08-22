@@ -71,9 +71,9 @@ export default function PricingPage() {
             Free forever. No trial, no credit card, no paid tier.
           </h1>
           <p className="mt-5 text-pretty text-base leading-7 text-muted-foreground">
-            Skills Board keeps the AI skills your team recommends in one
-            searchable library. The hosted product costs nothing, and the code
-            is MIT-licensed open source.
+            Skills Board keeps your team’s AI skills in one searchable library.
+            The hosted product costs nothing, and the code is MIT-licensed open
+            source.
           </p>
         </header>
 

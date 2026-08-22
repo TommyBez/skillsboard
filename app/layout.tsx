@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     "Cursor skills",
     "Codex skills",
     "agent skills",
-    "skill recommendations",
+    "team AI skills",
   ],
   openGraph: {
     type: "website",

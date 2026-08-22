@@ -61,7 +61,7 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
   stepsAreSequential: false,
   stepsTitle: "Eight practical team skill use cases",
   stepsIntro:
-    "Treat these as workflow patterns, not claims that a particular public skill is available or approved. For each one, define the team's own sources, constraints, fixture, and reviewer before recommending an implementation.",
+    "Treat these as workflow patterns, not claims that a particular public skill is available or approved. For each one, define the team's own sources, constraints, fixture, and reviewer before settling on an implementation.",
   steps: [
     {
       title: "Pull-request preflight",
@@ -129,7 +129,7 @@ export const aiSkillUseCasesGuide: GuideDefinition = {
       value: "The permission, uncertainty, sensitive data, or consequential decision that ends autonomous work.",
     },
     {
-      label: "Team recommendation",
+      label: "Team entry",
       value: "The reviewed source, tested environment, owner, limits, and event that triggers another review.",
     },
   ],
@@ -162,7 +162,7 @@ Review date: [date]
 - Stop when: [permission, requirement, sensitive data, or consequential decision is unclear]
 - Escalate to: [owner]
 
-## Recommendation record
+## Library record
 - Canonical source: [URL and reviewed source state]
 - Tested environment: [observed agent and setup]
 - Known limits: [unsupported or untested behavior]
@@ -192,7 +192,7 @@ Review date: [date]
     "The output has observable checks and a named human reviewer.",
     "The stop boundary preserves permissions and consequential decisions.",
     "Examples are presented as patterns, not as catalog availability or compatibility claims.",
-    "A saved team recommendation records the reviewed source, tested setup, limits, owner, and review trigger.",
+    "A saved team entry records the reviewed source, tested setup, limits, owner, and review trigger.",
   ],
   sources: [
     {

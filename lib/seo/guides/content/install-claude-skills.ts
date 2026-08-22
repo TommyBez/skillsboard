@@ -141,7 +141,7 @@ export const installClaudeSkillsGuide: GuideDefinition = {
   team: {
     title: "What a team still has to hand over",
     intro:
-      "None of the locations above records the part teammates keep asking about: which skill to use for this task, and why this one. A personal folder is invisible to everyone else, a repository only reaches the people working in it, and a plugin distributes files rather than a recommendation. Skills Board is a web app for that layer. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
+      "None of the locations above records the part teammates keep asking about: which skill to use for this task, and why this one. A personal folder is invisible to everyone else, a repository only reaches the people working in it, and a plugin distributes files rather than a decision. Skills Board is a web app for that layer. It is free and MIT licensed, and it gives a teammate four ways to act on a saved entry.",
     paths: [
       {
         label: "Open the original source",
@@ -161,14 +161,14 @@ export const installClaudeSkillsGuide: GuideDefinition = {
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "It does not create directories, place files, or run skills inside your agent. The steps above stay yours to run.",
     ],
   },
   templateTitle: "The install note worth keeping",
   templateIntro:
-    "Write this once per skill, beside the recommendation. It answers the questions the next person would otherwise ask in chat, and it records when the path was last checked, because product behavior changes.",
+    "Write this once per skill, beside the saved entry. It answers the questions the next person would otherwise ask in chat, and it records when the path was last checked, because product behavior changes.",
   templateFields: [
     {
       label: "Skill and source",

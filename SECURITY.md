@@ -19,4 +19,4 @@ You should receive an acknowledgement after a maintainer reviews the report. Ple
 
 ## Scope notes
 
-Skills Board retrieves skill metadata and files from third-party GitHub repositories. A skill saved by a team is a recommendation, not a security review. Users and self-hosters are responsible for reviewing third-party skill source before installing or executing it.
+Skills Board retrieves skill metadata and files from third-party GitHub repositories. A skill saved by a team is that team's own choice, not a security review. Users and self-hosters are responsible for reviewing third-party skill source before installing or executing it.

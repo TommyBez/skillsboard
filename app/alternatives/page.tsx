@@ -102,13 +102,13 @@ export default function AlternativesPage() {
             What Skills Board is, in one paragraph
           </h2>
           <p className="mt-5 max-w-3xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            Skills Board is a web app for the AI skills a team recommends. A teammate saves a skill from its original repository
+            Skills Board is a web app where a team keeps and shares its AI skills. A teammate saves a skill from its original repository
             and path, adds the tags the team searches by, and everyone else
             finds it later. Each person then picks how to use it: open the
             source, copy an install command, download a ZIP of the latest
             files, or connect a compatible agent to an authenticated MCP
             endpoint. The hosted product is free forever, the code is MIT
-            licensed, and a saved skill is a team recommendation rather than a
+            licensed, and a saved skill is the team’s own choice rather than a
             formal review.
           </p>
           <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm">

@@ -46,9 +46,9 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     },
   },
   corePrinciple:
-    "One canonical source. One visible recommendation. Explicit setup for every agent path.",
+    "One canonical source. One visible team entry. Explicit setup for every agent path.",
   problem:
-    "Mixed-agent teams usually fail in one of two ways: they maintain three unrelated skill collections, or they assume one folder will behave identically everywhere. The safer model is one canonical artifact, one team recommendation record, and a thin, tested adapter for each agent surface.",
+    "Mixed-agent teams usually fail in one of two ways: they maintain three unrelated skill collections, or they assume one folder will behave identically everywhere. The safer model is one canonical artifact, one team library record, and a thin, tested adapter for each agent surface.",
   decisionTitle: "Standardize the layers, not every implementation detail",
   decisionIntro:
     "The common layer is the skill’s purpose, source, owner, and SKILL.md workflow. Agent-specific installation, discovery, invocation, and administrative controls remain explicit adapters that your team verifies against current vendor documentation.",
@@ -64,7 +64,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     {
       label: "Discovery",
       cells: [
-        "One shared recommendation record explains when the skill should be used.",
+        "One shared library record explains when the skill should be used.",
         "Claude Code, Codex, and Cursor can expose skills differently by product, version, workspace, or project.",
       ],
     },
@@ -85,7 +85,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     {
       label: "Updates",
       cells: [
-        "Review changes at the canonical source and publish one new recommendation state.",
+        "Review changes at the canonical source and publish one new library state.",
         "Refresh or reinstall through each tested agent path; portability alone does not perform this step.",
       ],
     },
@@ -116,9 +116,9 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
       output: "A compatibility matrix based on observed results.",
     },
     {
-      title: "Publish the team recommendation",
-      body: "Point teammates to the canonical source, explain the recommended use case, and expose only the agent paths that passed. A shared library makes this discoverable without pretending to be a universal installer.",
-      output: "One searchable recommendation with tested use paths.",
+      title: "Publish the team entry",
+      body: "Point teammates to the canonical source, explain the use case it is for, and expose only the agent paths that passed. A team library makes this discoverable without pretending to be a universal installer.",
+      output: "One searchable entry with tested use paths.",
     },
     {
       title: "Update source first, adapters second",
@@ -134,7 +134,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   templateTitle: "The compatibility record",
   templateIntro:
-    "Keep this beside the recommendation. It records evidence, not a timeless promise: agent behavior and supported setup paths can change.",
+    "Keep this beside the saved entry. It records evidence, not a timeless promise: agent behavior and supported setup paths can change.",
   templateFields: [
     { label: "Canonical version", value: "Commit, tag, or reviewed source state used in the test." },
     { label: "Agent and environment", value: "Claude Code, Codex, or Cursor plus the relevant workspace, CLI, editor, or project context." },
@@ -217,7 +217,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     "Every compatibility claim names an observed environment and review date.",
     "The same fixture and pass/fail checks were used for each agent.",
     "A failed agent path can be paused without forking the canonical skill.",
-    "The team can discover the recommendation without knowing its install location in advance.",
+    "The team can discover the skill without knowing its install location in advance.",
   ],
   sources: [
     {

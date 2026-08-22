@@ -13,7 +13,7 @@ import { siteConfig } from "@/lib/site"
 export const PRODUCT_LAUNCH_EMAIL = {
   name: "Skills Board product launch 2026-08",
   subject: "A shared home for your team’s AI skills",
-  previewText: "Save a recommendation once, then let teammates find and use it in the way that fits.",
+  previewText: "Save a skill once, then let teammates find and use it in the way that fits.",
   from: "Tommaso from Skills Board <tommaso@skillsboard.sh>",
   ctaUrl: `${siteConfig.url}/?utm_source=product_email&utm_medium=email&utm_campaign=product_launch_2026_08&utm_content=launch_announcement`,
 } as const
@@ -52,14 +52,14 @@ export default function ProductLaunchEmail({
         Which skill should I use? Where can I find it?
       </Text>
       <Text className="m-0 mb-4 text-base leading-7 text-ink">
-        Those questions are easy to answer once and surprisingly easy to repeat. Skills Board gives your team one searchable library for the AI skills it recommends.
+        Those questions are easy to answer once and surprisingly easy to repeat. Skills Board gives your team one searchable library for its AI skills.
       </Text>
       <Text className="m-0 mb-6 text-base leading-7 text-ink">
         One teammate adds a useful skill. Another finds it by task or tag. Each person can open the original source, copy a compatible install command, download the latest skill files as a ZIP, or connect a compatible agent through authenticated MCP.
       </Text>
       <Section className="mb-6 rounded-[12px] border border-solid border-border bg-panel p-5">
         <Text className="m-0 text-sm leading-6 text-ink">
-          Skills Board does not decide whether a skill is approved or compatible with every setup. It keeps the recommendation and source visible so your team can make that choice.
+          Skills Board does not decide whether a skill is approved or compatible with every setup. It keeps the entry and its source visible so your team can make that choice.
         </Text>
       </Section>
       <Text className="m-0 mb-6 text-base leading-7 text-ink">

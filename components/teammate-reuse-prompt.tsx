@@ -51,7 +51,7 @@ export function TeammateReusePrompt({
 
   return (
     <section
-      aria-labelledby="teammate-recommendation-heading"
+      aria-labelledby="teammate-skill-heading"
       className="grid items-center gap-5 rounded-2xl border border-primary/25 bg-primary/[0.045] p-5 shadow-[0_14px_40px_hsl(var(--shadow-color)/0.05)] md:grid-cols-[auto_minmax(0,1fr)_auto] md:p-6"
     >
       <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-hidden="true">
@@ -59,8 +59,8 @@ export function TeammateReusePrompt({
       </span>
       <div className="min-w-0">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-primary">From your team</p>
-        <h2 id="teammate-recommendation-heading" className="mt-1 text-xl font-semibold tracking-[-0.025em]">
-          Put a teammate&apos;s recommendation to work.
+        <h2 id="teammate-skill-heading" className="mt-1 text-xl font-semibold tracking-[-0.025em]">
+          Put a teammate&apos;s skill to work.
         </h2>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
           {addedBy ? `${addedBy} added ${skillTitle}.` : `A teammate added ${skillTitle}.`} Choose the source, command, or ZIP that fits your setup.

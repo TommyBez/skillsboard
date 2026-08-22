@@ -129,7 +129,7 @@ export const codexSkills: CodexSkillsDefinition = {
   title: "Codex skills: what they are and how to use them",
   seoTitle: "Codex Skills: What They Are and How to Use Them | Skills Board",
   description:
-    "A Codex skill is a folder with a SKILL.md file that OpenAI's coding agent loads on demand. The directories Codex scans, what carries over from a Claude skill, how to add one, and how teams keep a single recommendation.",
+    "A Codex skill is a folder with a SKILL.md file that OpenAI's coding agent loads on demand. The directories Codex scans, what carries over from a Claude skill, how to add one, and how teams keep a single answer per job.",
   intro: [
     "Codex skills are folders of instructions that OpenAI's coding agent loads when a request matches what the folder is for. Each folder holds a SKILL.md file and, optionally, the scripts, reference documents, and templates the task needs. OpenAI's documentation calls skills the authoring format for reusable workflows, and plugins the way to distribute them.",
     "The format is not specific to Codex. It is the Agent Skills standard, originally developed by Anthropic and released as an open standard, and the client showcase at agentskills.io lists ChatGPT and Codex among the products that read the same SKILL.md file.",
@@ -329,13 +329,13 @@ A Markdown section titled with the version and date.`,
     sourceIds: ["codex-skills", "agentskills-spec", "openai-skills-repo"],
   },
   team: {
-    title: "How teams keep one recommendation across Codex and other agents",
+    title: "How teams keep one answer per job across Codex and other agents",
     intro:
-      "Two problems hide behind one word. Distribution is getting the files onto each teammate's machine. Recommendation is knowing which skill to use for a task and why that one. Codex has answers for the first. The second is not a Codex problem at all.",
+      "Two problems hide behind one word. Distribution is getting the files onto each teammate's machine. Selection is knowing which skill to use for a task and why that one. Codex has answers for the first. The second is not a Codex problem at all.",
     body: [
       "If every skill your team uses lives in a repository everyone works in, the answer is short: commit them to .agents/skills at the repository root, and Codex picks them up with no extra tooling. That is the best available setup for a single-repository team, and no shared library improves on it. Nothing on this page should talk you out of it.",
       "It stops being enough when the skills come from other people's repositories, when they are useful in more than one repository, or when teammates run different agents. Then distribution splits: OpenAI's answer is plugins, published to the plugin directory shared by ChatGPT and Codex, or a marketplace file checked into $REPO_ROOT/.agents/plugins/marketplace.json or kept personally at ~/.agents/plugins/marketplace.json and added with codex plugin marketplace add. Anthropic's answer is its own plugin system. Neither one carries the other's packaging.",
-      "The recommendation layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app for that layer: the smaller set of skills your team recommends, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
+      "The selection layer usually has no home at all. Which skill the team settled on, and why, ends up in a chat thread, a bookmark, or one person's memory. Skills Board is a web app for that layer: the smaller set of skills your team settled on, in one searchable place, with the original source visible on every entry, and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {
@@ -356,7 +356,7 @@ A Markdown section titled with the version and date.`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "It does not install or run skills inside Codex, and it does not claim a skill behaves the same in every agent your team uses.",
       "It is not a replacement for .agents/skills. The files still have to land in a location Codex scans, by whichever route each teammate prefers.",
@@ -527,7 +527,7 @@ A Markdown section titled with the version and date.`,
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Turning a skill that worked once into a recommendation the next teammate can find.",
+        "Turning a skill that worked once into an entry the next teammate can find.",
     },
     {
       label: "A shared MCP skill library for teams",
@@ -543,7 +543,7 @@ A Markdown section titled with the version and date.`,
       { text: "read from .agents/skills.", accent: true },
     ],
     description:
-      "What Codex skills are, the directories Codex scans, what transfers from a Claude skill, and how teams keep one recommendation.",
+      "What Codex skills are, the directories Codex scans, what transfers from a Claude skill, and how teams keep one answer per job.",
     contextLabel: "skillsboard.sh/codex-skills",
     chips: ["SKILL.md", "Codex CLI", ".agents/skills"],
   },

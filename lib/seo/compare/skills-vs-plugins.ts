@@ -211,7 +211,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
       lead: "Once more than one person depends on it, the format stops being the hard part:",
       label: "how to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
-      trail: " covers ownership, the distribution models, and keeping one recommendation instead of five forks.",
+      trail: " covers ownership, the distribution models, and keeping one agreed skill instead of five forks.",
     },
     sourceIds: [
       "claude-code-plugins",
@@ -319,7 +319,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
   editorialSubject: "skills and plugins",
   closing: {
     title: "Packaging is easy. Deciding what deserves packaging is not.",
-    body: "Skills Board is a web app for the skills a team recommends, loose or inside a plugin. Free forever, MIT licensed, and open source.",
+    body: "Skills Board is a web app for a team's AI skills, loose or inside a plugin. Free forever, MIT licensed, and open source.",
   },
   og: {
     eyebrow: "Claude Skills vs Plugins",

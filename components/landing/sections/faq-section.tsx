@@ -29,8 +29,8 @@ export function FaqSection() {
             <p className="lp-faq-intro">
               Straight answers about what Skills Board is, how it fits mixed
               agent setups, and{" "}
-              <span className="whitespace-nowrap">what “recommended”</span>{" "}
-              means.
+              <span className="whitespace-nowrap">what a saved skill</span>{" "}
+              does and does not mean.
             </p>
 
             {/* Counterweight: the title column's footer. Eight stations — one

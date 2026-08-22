@@ -488,9 +488,9 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
     intro:
       "Every channel above answers how a skill reaches a session. None of them answers which skill your team decided on, and that is the question people actually get stuck on.",
     body: [
-      "Enabling is a per-account act, provisioning is an owner act, and a plugin is a package. None of the three records who read the skill, what they used it for, or whether it held up on a real task. The recommendation ends up in a chat thread, and the next person starts over at a public directory.",
+      "Enabling is a per-account act, provisioning is an owner act, and a plugin is a package. None of the three records who read the skill, what they used it for, or whether it held up on a real task. The choice ends up in a chat thread, and the next person starts over at a public directory.",
       "The seams are visible in Anthropic's own documentation once you look for them. Custom skills you upload are private to your individual account. Organization-wide sharing publishes into a directory with no approval step. Scoping to a group runs through plugins rather than through the skills list. And the audit log captures that a skill was shared, not what was in it, with no admin view for browsing the contents.",
-      "Skills Board is a web app for that smaller layer: the set your team actually recommends, in one searchable place, with the source repository and path visible on every entry, and no assumption about whether a teammate is working in Cowork, in a terminal, or in a different agent altogether.",
+      "Skills Board is a web app for that smaller layer: the set your team actually settled on, in one searchable place, with the source repository and path visible on every entry, and no assumption about whether a teammate is working in Cowork, in a terminal, or in a different agent altogether.",
     ],
     paths: [
       {
@@ -511,14 +511,14 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board does not upload, enable, or provision anything inside Claude. Every channel on this page still runs through Anthropic's own settings.",
       "It follows the latest version available from the saved source, and does not pin or preserve historical versions.",
       "The MCP connection cannot install or run a skill inside an agent, and it cannot edit or delete saved team skills.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
     link: {
-      lead: "For the ownership side of the same problem, one recommendation and a named owner per skill, see",
+      lead: "For the ownership side of the same problem, one agreed skill per job and a named owner, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",
@@ -598,7 +598,7 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
     {
       question: "What is a Cowork skills library?",
       answer:
-        "Usually one of two things: a public directory indexing whatever anyone published, or a team library holding the smaller set your own colleagues recommend. Skills Board is the second kind, keeping the original repository and path visible on every saved entry so a teammate can read a skill before enabling it.",
+        "Usually one of two things: a public directory indexing whatever anyone published, or a team library holding the smaller set your own colleagues settled on. Skills Board is the second kind, keeping the original repository and path visible on every saved entry so a teammate can read a skill before enabling it.",
     },
   ],
   sources: [
@@ -722,13 +722,13 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       description:
-        "Ownership, distribution models, and one recommendation per skill that survives a new teammate.",
+        "Ownership, distribution models, and one agreed skill per job that survives a new teammate.",
     },
     {
       label: "Skills Board vs a GitHub repo",
       href: alternativePaths.githubRepo,
       description:
-        "Keeping recommendations in a repository next to keeping them in a library, and what each costs.",
+        "Keeping skills in a repository next to keeping them in a library, and what each costs.",
     },
   ],
   og: {
@@ -738,7 +738,7 @@ See REFERENCE.md for the heading order and two examples of the tone.`,
       { text: "your local skills folder.", accent: true },
     ],
     description:
-      "Which channels put a skill in a Cowork session, what changes between desktop, web, and mobile, and where a team keeps the set it recommends.",
+      "Which channels put a skill in a Cowork session, what changes between desktop, web, and mobile, and where a team keeps the set it uses.",
     contextLabel: "skillsboard.sh/cowork-skills",
     chips: ["Channels", "Surfaces", "Authoring"],
   },

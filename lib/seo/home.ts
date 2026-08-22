@@ -24,8 +24,8 @@ export const home = {
   publishedAt: "2026-01-15",
   modifiedAt: "2026-08-22",
   intro: [
-    "Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares the AI skills it recommends. Teammates search that library, see where each skill came from, and pick the way of using it that fits their agent.",
-    "A saved skill is a team recommendation. It is not a security review, an approval, or a compatibility certification, and Skills Board follows the latest version at the saved source rather than pinning the version a teammate used earlier.",
+    "Skills Board is the agent-native skills registry for teams, the web app where a team keeps and shares its AI skills. Teammates search that library, see where each skill came from, and pick the way of using it that fits their agent.",
+    "A saved skill is a team's own choice. It is not a security review, an approval, or a compatibility certification, and Skills Board follows the latest version at the saved source rather than pinning the version a teammate used earlier.",
   ],
   workflowTitle: "How it works",
   workflow: landingFlowSteps.map((step) => ({
@@ -63,7 +63,7 @@ export const home = {
     ],
     limits: [
       "No scope allows editing or deleting a skill already saved to a team library.",
-      "Skills Board records recommendations; it does not install a skill into an agent or run one.",
+      "Skills Board records what a team keeps; it does not install a skill into an agent or run one.",
     ],
   },
   mcpSetup: {

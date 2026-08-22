@@ -71,9 +71,8 @@ export default function AboutPage() {
               AI skills worth sharing. One place to keep them.
             </h1>
             <p className="mt-5 max-w-xl text-pretty text-base leading-7 text-muted-foreground">
-              Skills Board gives teams one shared library for the AI skills they
-              recommend, so useful workflows stay easy to find, understand, and
-              reuse.
+              Skills Board gives a team one place for its AI skills, so useful
+              workflows stay easy to find, understand, and reuse.
             </p>
           </header>
 
@@ -88,15 +87,15 @@ export default function AboutPage() {
               </p>
               <p>
                 Skills Board turns those discoveries into a searchable team
-                library. Save the original source, keep the recommendation
-                visible, and give everyone a clear place to start.
+                library. Save the original source, keep every entry visible,
+                and give everyone a clear place to start.
               </p>
             </section>
 
             <section>
               <h2>One library, even when your tools differ</h2>
               <p>
-                Teammates can use the same recommendation in the way that suits
+                Teammates can use the same saved skill in the way that suits
                 their setup:
               </p>
               <ul>
@@ -110,7 +109,7 @@ export default function AboutPage() {
                 </li>
                 <li>
                   Connect an MCP-compatible agent to search the library and,
-                  with permission, save or organize recommendations.
+                  with permission, save skills and organize collections.
                 </li>
               </ul>
               <p>

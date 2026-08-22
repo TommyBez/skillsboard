@@ -98,7 +98,7 @@ function GuideTeamCallout({ team }: { team: GuideTeamSection }) {
       className="mt-16 scroll-mt-24 rounded-[3px] bg-[var(--surface-ink)] px-6 py-8 text-[var(--surface-ink-foreground)] md:px-9 md:py-10"
     >
       <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-        Make the recommendation findable
+        Make the skill findable
       </p>
       <h2
         id="team-heading"
@@ -344,10 +344,10 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 className="mt-16 rounded-[3px] bg-[var(--surface-ink)] px-6 py-8 text-[var(--surface-ink-foreground)] md:px-9 md:py-10"
               >
                 <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-                  Make the recommendation findable
+                  Make the skill findable
                 </p>
                 <p className="mt-4 max-w-2xl text-pretty text-2xl font-semibold leading-tight md:text-3xl">
-                  Skills Board keeps the source, install path, notes, and team recommendation in one searchable library.
+                  Skills Board keeps the source, install path, notes, and team context in one searchable library.
                 </p>
                 <p className="mt-4 max-w-2xl leading-relaxed text-[color-mix(in_oklch,var(--surface-ink-foreground)_72%,transparent)]">
                   It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
@@ -533,7 +533,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 Give the next teammate one trusted place to start.
               </p>
               <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
-                Save the reviewed skill, document the path that works, and keep the recommendation visible to the whole team.
+                Save the reviewed skill, document the path that works, and keep it visible to the whole team.
               </p>
               <div className="mt-7 flex justify-center">
                 <ResourceCta location="guide_closing" />

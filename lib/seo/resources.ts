@@ -127,7 +127,7 @@ const resourceClusterDefinitions = [
     id: "cross-agent-sharing",
     title: "Cross-agent sharing",
     description:
-      "Keep one team recommendation visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
+      "Keep one team library visible while teammates use Claude Code, Codex, Cursor, MCP, or a direct source workflow.",
     paths: [
       agentSkillsPath,
       agentSkillsSupportPath,

@@ -2,10 +2,10 @@ export const siteConfig = {
   name: "Skills Board",
   url: "https://www.skillsboard.sh",
   description:
-    "Skills Board is the agent-native skills registry for teams. Keep the AI skills your team recommends in one place, and reach them from your agent through MCP.",
+    "Skills Board is the agent-native skills registry for teams. Keep your team's AI skills in one place, and reach them from your agent through MCP.",
   tagline: "Your team’s skills. All in one place.",
   ogDescription:
-    "The agent-native skills registry for teams. Keep the AI skills your team recommends in one place, and reach them from your agent through MCP.",
+    "The agent-native skills registry for teams. Keep your team's AI skills in one place, and reach them from your agent through MCP.",
   githubUrl: "https://github.com/TommyBez/skillsboard",
   contactEmail: "tommaso@skillsboard.sh",
   postalAddress: "15 Giuseppe Verdi Avenue, Suite 150, Capraia Innovation Park, CA 50050",

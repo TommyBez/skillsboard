@@ -39,7 +39,7 @@ export default function SignUpPage({ searchParams }: SignUpPageProps) {
       title="Create your shared AI skill library"
       description="Enter your email for a one-time code, then start the free library your team can use across agent setups."
       editorialTitle="Stop answering the same “which skill?” question."
-      editorialBody="Collect the skills your team recommends so colleagues can find them and choose the source, compatible command, or ZIP that fits their setup."
+      editorialBody="Collect your team’s AI skills so colleagues can find them and choose the source, compatible command, or ZIP that fits their setup."
     >
       <Suspense fallback={<AuthEntryFallback mode="sign-up" />}>
         <AuthEntry mode="sign-up" searchParams={searchParams} />

@@ -153,7 +153,7 @@ export const vercelSkills: VercelSkillsDefinition = {
   seoTitle:
     "Vercel Skills: The Official Collection, Explained | Skills Board",
   description:
-    "Vercel skills means at least four different things. The nine Agent Skills in vercel-labs/agent-skills, a vercel skills CLI command, the npx skills tool Vercel builds, and Vercel's own docs directory. Every skill in the collection with its license and install count, the four whose folder name is not their skill name, what the README gets wrong about its own contents, and how a team keeps one recommendation.",
+    "Vercel skills means at least four different things. The nine Agent Skills in vercel-labs/agent-skills, a vercel skills CLI command, the npx skills tool Vercel builds, and Vercel's own docs directory. Every skill in the collection with its license and install count, the four whose folder name is not their skill name, what the README gets wrong about its own contents, and how a team keeps one answer per job.",
   intro: [
     "Start with the disambiguation, because this phrase carries at least four meanings and only one of them is a collection of skills you can install. There is vercel-labs/agent-skills, Vercel's official set of Agent Skills, which is what almost everybody means. There is vercel skills, an actual command in the Vercel CLI that recommends skills for the project you are standing in. There is npx skills, a separate Vercel project that installs skills from anybody's repository into any of dozens of agents. And there is the directory Vercel publishes in its own documentation, which reaches well past that one repository.",
     "If you came here for the skills a job at Vercel asks for, or for what you need to learn in order to use the Vercel platform, none of the below is about that. This page is about SKILL.md files: folders of instructions that a coding agent loads when a task matches, in the format defined at agentskills.io and read by Claude Code, Codex, Cursor, OpenCode, and a long list of others.",
@@ -509,7 +509,7 @@ export const vercelSkills: VercelSkillsDefinition = {
       "skills.sh publishes third-party security audits per skill and reported a pass from all three providers it lists for vercel-react-best-practices on the day we read it. An audit is a useful signal and it is not a read. For a skill that uploads your working tree or scans your .env, the fifteen minutes it takes to open the file is the actual control.",
     ],
     link: {
-      lead: "For the scorecard we use to decide whether a skill like these belongs in a team recommendation at all, see",
+      lead: "For the scorecard we use to decide whether a skill like these belongs in a team library at all, see",
       label: "Choose the first AI agent skill for your team",
       href: guidePaths.chooseFirstTeamSkill,
       trail: ".",
@@ -652,14 +652,14 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
     sourceIds: ["skills-cli", "vercel-agent-skills", "agentskills-spec"],
   },
   team: {
-    title: "How a team keeps one recommendation once the collection is installed",
+    title: "How a team keeps one answer per job once the collection is installed",
     intro:
       "Installing is solved. One command puts nine folders on one machine. What is not solved is the next teammate knowing that your team uses four of the nine, ignores three, and has an opinion about the fifth, because none of that fits anywhere in the repository or the CLI.",
     body: [
       "The distribution half is genuinely good here, and better than most vendors manage. One command, sixty-nine rows of agent targets, a lock file, an update command, a remove command, and a directory with install counts and third-party audits attached. If your only problem is getting files onto machines, stop reading and run the command.",
-      "The recommendation half has no home. Which four of the nine your team decided to keep, why deploy-to-vercel is not one of them, that the two review skills fetch their rules live and somebody should re-check them quarterly, that the five unlicensed folders were cleared by your own counsel or were not: all of that is knowledge that currently lives in a thread. The lock file records what got installed, not what was chosen or why.",
+      "The selection half has no home. Which four of the nine your team decided to keep, why deploy-to-vercel is not one of them, that the two review skills fetch their rules live and somebody should re-check them quarterly, that the five unlicensed folders were cleared by your own counsel or were not: all of that is knowledge that currently lives in a thread. The lock file records what got installed, not what was chosen or why.",
       "This gets worse rather than better once a second collection arrives. The moment a team is running Vercel's nine alongside a first-party set and whatever a teammate found last week, the question stops being how to install and becomes which one to reach for. That question has no vendor answer, because every vendor mechanism assumes its own collection is the only one in the room.",
-      "Skills Board is a web application where a team keeps, searches, and shares the AI skills it recommends. Each saved entry keeps the original source repository and path visible, so the folder-and-name mismatch above is right there rather than discovered later. Teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run.",
+      "Skills Board is a web application where a team keeps, searches, and shares its AI skills. Each saved entry keeps the original source repository and path visible, so the folder-and-name mismatch above is right there rather than discovered later. Teammates search it by task or by a tag the team invented, and each of them picks the way of using the skill that suits the agent they actually run.",
     ],
     paths: [
       {
@@ -680,7 +680,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a license opinion. The five Vercel folders with no license field are still five folders with no license field after you save one.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a license opinion. The five Vercel folders with no license field are still five folders with no license field after you save one.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions, which matters more than usual for the two skills that fetch their rules from a third repository at review time.",
       "Saving a skill does not install it. The files still have to land in a directory the agent scans, by the CLI or by hand.",
       "An MCP connection cannot install or run a skill, and it cannot edit or delete saved team skills.",
@@ -771,7 +771,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
     {
       question: "How does a team share Vercel skills?",
       answer:
-        "Installing is one command, so the difficulty is the recommendation rather than the distribution. Which of the nine your team keeps, which it refuses, and why, has no home in the repository or in the CLI lock file. That is the layer Skills Board holds beside the source, the command, and the ZIP.",
+        "Installing is one command, so the difficulty is the selection rather than the distribution. Which of the nine your team keeps, which it refuses, and why, has no home in the repository or in the CLI lock file. That is the layer Skills Board holds beside the source, the command, and the ZIP.",
     },
   ],
   sources: [
@@ -899,7 +899,7 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
       { text: "and a README that counts eight.", accent: true },
     ],
     description:
-      "What Vercel skills means, every skill in vercel-labs/agent-skills with its license, what the packaging gets wrong, and how a team keeps one recommendation.",
+      "What Vercel skills means, every skill in vercel-labs/agent-skills with its license, what the packaging gets wrong, and how a team keeps one answer per job.",
     contextLabel: "skillsboard.sh/vercel-skills",
     chips: ["SKILL.md", "npx skills add", "vercel-labs/agent-skills"],
   },

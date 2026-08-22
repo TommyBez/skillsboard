@@ -415,7 +415,7 @@ including it.
     body: [
       "AGENTS.md scales without help. It is committed to the repository it describes, it arrives with a clone, and the closest file wins, so a monorepo can carry one per package with no coordination at all. There is no distribution problem to solve, which is a large part of why the format spread.",
       "Skills do have one. A skill useful in one repository is usually useful in several, and the folder has to land in a directory each teammate's agent scans. The products answer that with packaging: plugins in Claude Code and Cursor, plugins and marketplace files for Codex. If everyone works in the same repository, committing the folder is the whole answer, and no shared library improves on it.",
-      "What none of them answer is which skill your team recommends and why. That decision usually lives in a chat thread or one person's memory. Skills Board is a web app for that layer: the smaller set of skills a team recommends, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
+      "What none of them answer is which skill your team settled on and why. That decision usually lives in a chat thread or one person's memory. Skills Board is a web app for that layer: the smaller set of skills a team settled on, in one searchable place, with the original source visible on every entry and no assumption about which agent a teammate runs.",
     ],
     paths: [
       {
@@ -436,14 +436,14 @@ including it.
       },
     ],
     limits: [
-      "A saved skill is a team recommendation, not a security review, an approval, or a compatibility certification.",
+      "A saved skill is a team's own choice, not a security review, an approval, or a compatibility certification.",
       "Skills Board follows the latest version available from the saved source. It does not pin or preserve historical versions.",
       "It holds skills. AGENTS.md belongs in the repository it describes, and nothing here changes that.",
       "The MCP connection cannot install or run a skill inside an agent, and it cannot edit or delete saved team skills.",
       "The hosted product is free forever, the code is MIT licensed, and you can read or self-host all of it.",
     ],
     link: {
-      lead: "For the ownership and review side of the same problem, one recommendation and a named owner per skill, see",
+      lead: "For the ownership and review side of the same problem, one agreed skill per job and a named owner, see",
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
       trail: ".",

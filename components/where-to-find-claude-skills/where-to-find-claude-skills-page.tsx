@@ -412,7 +412,7 @@ export function WhereToFindClaudeSkillsPage({
           </p>
           <p className="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-muted-foreground">
             Free forever, MIT licensed, and open source. Create a library, save
-            the skills you actually recommend, and invite the people who keep
+            the skills you actually use, and invite the people who keep
             asking.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">

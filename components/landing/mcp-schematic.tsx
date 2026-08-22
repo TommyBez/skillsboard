@@ -71,7 +71,7 @@ export function McpSchematic() {
                   panel is wide enough to hold it — otherwise it is one line at
                   1440 and two at 1920. */}
               <p className="text-[clamp(0.95rem,1.09vw,1.02rem)] font-[650] leading-[1.22] tracking-[-0.022em] text-balance">
-                Skills your team recommends
+                Your team’s AI skills
               </p>
             </div>
             <ul aria-hidden="true">

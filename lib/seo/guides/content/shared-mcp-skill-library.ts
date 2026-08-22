@@ -13,11 +13,11 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
   title: "How to use a shared AI skill library through MCP",
   seoTitle: "Shared MCP Skill Library for Teams | Skills Board",
   description:
-    "Connect an MCP-compatible agent to a shared team skill library, authorize access in the browser, search recommendations, and verify a useful handoff.",
+    "Connect an MCP-compatible agent to a shared team skill library, authorize access in the browser, search the team library, and verify a useful handoff.",
   intro:
-    "A shared skill library should remain useful when a teammate works inside an agent. MCP gives a compatible client an authenticated path to the same team recommendations, so the teammate can search the library, retrieve a command, and, with the required scope, contribute skills or organize collections without copying an API key.",
+    "A shared skill library should remain useful when a teammate works inside an agent. MCP gives a compatible client an authenticated path to the same team skills, so the teammate can search the library, retrieve a command, and, with the required scope, contribute skills or organize collections without copying an API key.",
   answer:
-    "Use MCP as an authenticated path to a shared skill library, not as a universal installer. Connect the intended account, verify its permissions, and retrieve a real recommendation. Keep the original source and non-MCP setup paths available.",
+    "Use MCP as an authenticated path to a shared skill library, not as a universal installer. Connect the intended account, verify its permissions, and retrieve a real entry. Keep the original source and non-MCP setup paths available.",
   citations: {
     answer: ["skills-board-repository", "mcp-authorization", "mcp-transports"],
     problem: ["skills-board-repository"],
@@ -28,16 +28,16 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
     },
   },
   corePrinciple:
-    "Keep the team recommendation central. Use MCP as one authenticated access path.",
+    "Keep the team library central. Use MCP as one authenticated access path.",
   problem:
-    "Connecting an MCP server is not the same as sharing a useful skill. The connection still needs the correct team account, a current recommendation, an understood permission set, and a real retrieval test. It also needs an honest boundary: Skills Board exposes library tools, but it does not install or execute a skill, certify compatibility, or preserve a historical source version.",
+    "Connecting an MCP server is not the same as sharing a useful skill. The connection still needs the correct team account, a current entry, an understood permission set, and a real retrieval test. It also needs an honest boundary: Skills Board exposes library tools, but it does not install or execute a skill, certify compatibility, or preserve a historical source version.",
   decisionTitle: "Use MCP for agent access, not as a universal installer",
   decisionIntro:
     "Choose MCP when the teammate's client supports Streamable HTTP and browser-based OAuth. Keep the web library, original source, compatible command, and ZIP available for teammates whose setup does not support that connection.",
   comparisonColumns: ["MCP task", "What the connection provides", "Boundary to keep visible"],
   comparisonRows: [
     {
-      label: "Find team recommendations",
+      label: "Find team skills",
       cells: [
         "List or search the saved skills and collections visible to the account that authorized the connection.",
         "The result reflects that account's team memberships. It is not a public approval catalog or a security review.",
@@ -54,19 +54,19 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
       label: "Contribute and organize",
       cells: [
         "With the skills:write scope, save a skill from GitHub, create collections, and add or remove saved skills from collections.",
-        "The connection cannot edit or delete saved team skills. A recommendation still needs team-owned review and context.",
+        "The connection cannot edit or delete saved team skills. An entry still needs team-owned review and context.",
       ],
     },
   ],
   stepsAreSequential: true,
   stepsTitle: "A six-step MCP team-library test",
   stepsIntro:
-    "Start with one existing team recommendation and one teammate. The goal is to prove that the teammate can reach the right library, understand the granted access, and retrieve a useful path without private setup guidance.",
+    "Start with one existing team entry and one teammate. The goal is to prove that the teammate can reach the right library, understand the granted access, and retrieve a useful path without private setup guidance.",
   steps: [
     {
-      title: "Prepare one real recommendation",
+      title: "Prepare one real entry",
       body: "Confirm that the team library contains one skill for a repeated task. Check its title, tags, note, original source, and known limits before testing a new access path. MCP can expose the record, but it cannot repair unclear team context.",
-      output: "One current recommendation with a clear task, source, owner, and expected result.",
+      output: "One current entry with a clear task, source, owner, and expected result.",
     },
     {
       title: "Confirm the client can make the connection",
@@ -80,8 +80,8 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
     },
     {
       title: "Verify the library before the task",
-      body: "Ask the connected agent to list or search team skills using the task language or a known team tag. Check that the expected recommendation appears and that the source, note, and team context match the web library. An empty result can mean the wrong account or team membership, not an empty global catalog.",
-      output: "One expected recommendation found through the connected agent and matched to the web library.",
+      body: "Ask the connected agent to list or search team skills using the task language or a known team tag. Check that the expected entry appears and that the source, note, and team context match the web library. An empty result can mean the wrong account or team membership, not an empty global catalog.",
+      output: "One expected entry found through the connected agent and matched to the web library.",
     },
     {
       title: "Retrieve, inspect, and test one path",
@@ -112,7 +112,7 @@ export const sharedMcpSkillLibraryGuide: GuideDefinition = {
     },
     {
       label: "Library proof",
-      value: "The task query or tag used and the expected recommendation found in both MCP and the web library.",
+      value: "The task query or tag used and the expected entry found in both MCP and the web library.",
     },
     {
       label: "Use-path proof",
@@ -147,7 +147,7 @@ Test date: [date]
 
 ## 4. Library proof
 - Search task or tag: [query]
-- Expected recommendation: [skill]
+- Expected entry: [skill]
 - MCP and web records match: [yes/no plus gap]
 
 ## 5. Use-path proof
@@ -164,7 +164,7 @@ Test date: [date]
   pitfalls: [
     {
       title: "Treating connection as adoption",
-      body: "A green connection proves transport and authorization. It does not prove that a teammate found the right recommendation or completed useful work.",
+      body: "A green connection proves transport and authorization. It does not prove that a teammate found the right entry or completed useful work.",
     },
     {
       title: "Using the wrong account",
@@ -176,14 +176,14 @@ Test date: [date]
     },
     {
       title: "Overstating write access",
-      body: "The skills:write scope permits specific save and collection operations. It does not permit editing or deleting saved team skills, and it does not turn a recommendation into an approval.",
+      body: "The skills:write scope permits specific save and collection operations. It does not permit editing or deleting saved team skills, and it does not turn a saved entry into an approval.",
     },
   ],
   checklist: [
-    "The test starts from one current team recommendation and a real task.",
+    "The test starts from one current team entry and a real task.",
     "The client supports Streamable HTTP and browser-based OAuth for this connection.",
     "The intended account, team membership, and requested scopes were reviewed.",
-    "The teammate found the expected recommendation through MCP and matched it to the web library.",
+    "The teammate found the expected entry through MCP and matched it to the web library.",
     "The original source was inspected before a compatible use path was tested.",
     "The record names unsupported behavior, a non-MCP fallback, an owner, and a review trigger.",
   ],
@@ -221,7 +221,7 @@ Test date: [date]
       { text: "inside your agent.", accent: true },
     ],
     description:
-      "Connect through browser-based OAuth, search team recommendations, retrieve a command, and keep MCP’s limits visible.",
+      "Connect through browser-based OAuth, search the team library, retrieve a command, and keep MCP’s limits visible.",
     contextLabel: "skillsboard.sh/guides",
     titleSize: 76,
     chips: ["MCP access test", "Scope-aware workflow"],
