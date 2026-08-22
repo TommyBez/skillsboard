@@ -705,6 +705,12 @@ export const agentSkills: AgentSkillsDefinition = {
   ],
   related: [
     {
+      label: "Skill examples: real SKILL.md files, explained",
+      href: "/skill-examples",
+      description:
+        "Eight skills written to this format, quoted, and the six places they diverge from the specification.",
+    },
+    {
       label: "Agent Skills support: which AI clients read SKILL.md",
       href: agentSkillsSupportPath,
       description:

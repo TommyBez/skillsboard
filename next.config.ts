@@ -182,6 +182,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/skill-examples/",
+        destination: "/skill-examples",
+        permanent: true,
+      },
+      {
         source: "/where-to-find-claude-skills/",
         destination: "/where-to-find-claude-skills",
         permanent: true,
@@ -268,6 +273,13 @@ const nextConfig = {
           source: "/agents-md-vs-skill-md",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/agents-md-vs-skill-md",
+        },
+        // `/skill-examples` does not end in `-skills`, so the shared rule
+        // above does not reach it and it needs a rule of its own.
+        {
+          source: "/skill-examples",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/skill-examples",
         },
         {
           source: "/guides/:slug",

@@ -35,6 +35,11 @@ import {
   manageAiSkillsPath,
   type ManageAiSkillsPath,
 } from "@/lib/seo/manage-ai-skills/types"
+import { skillExamples } from "@/lib/seo/skill-examples"
+import {
+  skillExamplesPath,
+  type SkillExamplesPath,
+} from "@/lib/seo/skill-examples/types"
 import { opencodeSkills } from "@/lib/seo/opencode-skills"
 import {
   opencodeSkillsPath,
@@ -72,6 +77,7 @@ export type ResourcePath =
   | CursorSkillsPath
   | ManageAiSkillsPath
   | OpencodeSkillsPath
+  | SkillExamplesPath
   | VercelSkillsPath
   | WhereToFindClaudeSkillsPath
 
@@ -98,6 +104,7 @@ export const resourceEntries = [
   coworkSkills,
   cursorSkills,
   opencodeSkills,
+  skillExamples,
   vercelSkills,
   agentsMdVsSkillMd,
   manageAiSkills,
@@ -127,6 +134,7 @@ const resourceClusterDefinitions = [
       anthropicSkillsPath,
       claudeSkillsPath,
       guidePaths.writeSkillMd,
+      skillExamplesPath,
       guidePaths.installClaudeSkills,
       codexSkillsPath,
       cursorSkillsPath,
