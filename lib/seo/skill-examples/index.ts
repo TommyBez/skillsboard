@@ -153,6 +153,16 @@ export interface SkillExamplesDefinition {
   modifiedAt: string
 }
 
+/**
+ * The anthropics/skills commit every excerpt, line count and byte count on
+ * this page was read from. Pinned rather than tracking main so a quote stays
+ * checkable against the exact bytes it was taken from after the branch moves.
+ */
+const skillsRepoCommit = "3b3fad96af16a10759d930941b4520ba0c40edae"
+
+/** Blob URL prefix for files in anthropics/skills at {@link skillsRepoCommit}. */
+const skillsRepoBlob = `https://github.com/anthropics/skills/blob/${skillsRepoCommit}`
+
 export const skillExamples: SkillExamplesDefinition = {
   path: skillExamplesPath,
   contentType: "article",
@@ -257,7 +267,7 @@ export const skillExamples: SkillExamplesDefinition = {
       },
     ],
     notes: [
-      "These eight are a selection, not the repository. The other eleven folders are academy-guide, algorithmic-art, canvas-design, discernment-nudge, doc-coauthoring, docx, frontend-design, mcp-builder, pptx, slack-gif-creator, theme-factory and web-artifacts-builder. Several of them repeat a pattern already covered here: pptx and docx share the shape of xlsx, and canvas-design bundles fonts the way theme-factory bundles themes.",
+      "These eight are a selection, not the repository. The other twelve folders are academy-guide, algorithmic-art, canvas-design, discernment-nudge, doc-coauthoring, docx, frontend-design, mcp-builder, pptx, slack-gif-creator, theme-factory and web-artifacts-builder. Several of them repeat a pattern already covered here: pptx and docx share the shape of xlsx, and canvas-design bundles fonts the way theme-factory bundles themes.",
       "There is no ranking implied by the order. A 74-line skill with no bundled files is not a worse skill than a 557-line one, and in the repository the smallest files are the ones whose intent is easiest to read in a single pass.",
       "One honest caveat about copying: license terms differ per folder in this repository, and two folders declare nothing at all. Check the license file next to the SKILL.md you are borrowing from before the pattern turns into a paste.",
     ],
@@ -506,35 +516,35 @@ export const skillExamples: SkillExamplesDefinition = {
       {
         title: "The whole official template, unedited",
         file: "template/SKILL.md in anthropics/skills, 140 bytes and five lines",
-        permalink: "https://github.com/anthropics/skills/blob/main/template/SKILL.md",
+        permalink: `${skillsRepoBlob}/template/SKILL.md`,
         template: "---\nname: template-skill\ndescription: Replace with description of the skill and when Claude should use it.\n---\n\n# Insert instructions below",
         takeaway: "Two frontmatter fields and a heading. The repository README describes the same shape in prose and states that the frontmatter requires only two fields, name and description. If a skill you are reading is longer than this, everything past this point was a choice somebody made.",
       },
       {
         title: "internal-comms: a body that is a routing table",
         file: "skills/internal-comms/SKILL.md, the shortest of the nineteen at 1,511 bytes",
-        permalink: "https://github.com/anthropics/skills/blob/main/skills/internal-comms/SKILL.md",
+        permalink: `${skillsRepoBlob}/skills/internal-comms/SKILL.md`,
         template: "## How to use this skill\n\nTo write any internal communication:\n\n1. **Identify the communication type** from the request\n2. **Load the appropriate guideline file** from the `examples/` directory:\n    - `examples/3p-updates.md` - For Progress/Plans/Problems team updates\n    - `examples/company-newsletter.md` - For company-wide newsletters\n    - `examples/faq-answers.md` - For answering frequently asked questions\n    - `examples/general-comms.md` - For anything else that doesn't explicitly match one of the above\n3. **Follow the specific instructions** in that file for formatting, tone, and content gathering",
         takeaway: "This is the whole procedure. The skill never states the house format for a status report; it states which file holds it and when to open that file. The four files in the examples folder carry the content, so a session that writes a newsletter never loads the incident report guidance.",
       },
       {
         title: "webapp-testing: the instruction that keeps a script out of context",
         file: "skills/webapp-testing/SKILL.md, in the opening section",
-        permalink: "https://github.com/anthropics/skills/blob/main/skills/webapp-testing/SKILL.md",
+        permalink: `${skillsRepoBlob}/skills/webapp-testing/SKILL.md`,
         template: "**Helper Scripts Available**:\n- `scripts/with_server.py` - Manages server lifecycle (supports multiple servers)\n\n**Always run scripts with `--help` first** to see usage. DO NOT read the source until you try running the script first and find that a customized solution is abslutely necessary. These scripts can be very large and thus pollute your context window. They exist to be called directly as black-box scripts rather than ingested into your context window.",
         takeaway: "The rule is that a bundled script is an interface, not reading material, and the help flag is how the agent learns the interface. The typo in the fourth sentence is in the published file and is left here as read, which is a fair reminder that these are demonstration files rather than polished artifacts.",
       },
       {
         title: "xlsx: the sentence that stops the wrong trigger",
         file: "skills/xlsx/SKILL.md, the closing clause of a 948-character description",
-        permalink: "https://github.com/anthropics/skills/blob/main/skills/xlsx/SKILL.md",
+        permalink: `${skillsRepoBlob}/skills/xlsx/SKILL.md`,
         template: "The deliverable must be a spreadsheet file. Do NOT trigger when the primary deliverable is a Word document, HTML report, standalone Python script, database pipeline, or Google Sheets API integration, even if tabular data is involved.",
         takeaway: "Everything before this clause tells the agent when to load the skill. This clause tells it when not to, by naming five adjacent deliverables a spreadsheet request is most often confused with. The agentskills.io guidance recommends exactly this move when a description fires too often.",
       },
       {
         title: "brand-guidelines: frontmatter with nothing optional in it",
         file: "skills/brand-guidelines/SKILL.md, the first seven lines",
-        permalink: "https://github.com/anthropics/skills/blob/main/skills/brand-guidelines/SKILL.md",
+        permalink: `${skillsRepoBlob}/skills/brand-guidelines/SKILL.md`,
         template: "---\nname: brand-guidelines\ndescription: Applies Anthropic's official brand colors and typography to any sort of artifact that may benefit from having Anthropic's look-and-feel. Use it when brand colors or style guidelines, visual formatting, or company design standards apply.\nlicense: Complete terms in LICENSE.txt\n---\n\n# Anthropic Brand Styling",
         takeaway: "Three fields, and the license field is a sentence pointing at a bundled file rather than an SPDX identifier. The description is 236 characters: one sentence of capability, one sentence of trigger. Seventeen of the nineteen files in this repository open with a version of these three lines.",
       },
@@ -823,61 +833,61 @@ export const skillExamples: SkillExamplesDefinition = {
     {
       id: "anthropic-skills-readme",
       label: "anthropics/skills README",
-      href: "https://github.com/anthropics/skills/blob/main/README.md",
+      href: `${skillsRepoBlob}/README.md`,
       note: "The disclaimer that the skills are for demonstration and educational purposes only, the two-field frontmatter description, the note that the document skills are source-available rather than open source, and the plugin install commands.",
     },
     {
       id: "anthropic-template",
       label: "The official skill template",
-      href: "https://github.com/anthropics/skills/blob/main/template/SKILL.md",
+      href: `${skillsRepoBlob}/template/SKILL.md`,
       note: "The five-line starter file quoted in full on this page, at 140 bytes. The smallest complete example the repository publishes.",
     },
     {
       id: "anthropic-marketplace",
       label: "anthropics/skills marketplace.json",
-      href: "https://github.com/anthropics/skills/blob/main/.claude-plugin/marketplace.json",
+      href: `${skillsRepoBlob}/.claude-plugin/marketplace.json`,
       note: "The packaging that groups the nineteen folders into five plugins: four document skills, twelve example skills, and claude-api, academy-guide and discernment-nudge on their own.",
     },
     {
       id: "internal-comms-skill",
       label: "skills/internal-comms/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/internal-comms/SKILL.md",
+      href: `${skillsRepoBlob}/skills/internal-comms/SKILL.md`,
       note: "The shortest SKILL.md in the repository at 1,511 bytes and 33 lines, and the routing body quoted on this page. Its four guideline files live in an examples folder.",
     },
     {
       id: "webapp-testing-skill",
       label: "skills/webapp-testing/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/webapp-testing/SKILL.md",
+      href: `${skillsRepoBlob}/skills/webapp-testing/SKILL.md`,
       note: "The black-box script instruction quoted on this page, the decision tree, and the split between a scripts folder and an examples folder holding sample automation.",
     },
     {
       id: "pdf-skill",
       label: "skills/pdf/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/pdf/SKILL.md",
+      href: `${skillsRepoBlob}/skills/pdf/SKILL.md`,
       note: "The 315-line body, the eight bundled scripts, and the four references each to REFERENCE.md and FORMS.md against the reference.md and forms.md that are actually in the folder.",
     },
     {
       id: "xlsx-skill",
       label: "skills/xlsx/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/xlsx/SKILL.md",
+      href: `${skillsRepoBlob}/skills/xlsx/SKILL.md`,
       note: "The 948-character description quoted in part on this page, including the closing clause that names the deliverables which must not trigger it.",
     },
     {
       id: "claude-api-skill",
       label: "skills/claude-api/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/claude-api/SKILL.md",
+      href: `${skillsRepoBlob}/skills/claude-api/SKILL.md`,
       note: "The 557-line body, the 1,068-character description with its trigger and skip blocks, and the ten language and shared folders it references, including a path two levels deep.",
     },
     {
       id: "skill-creator-skill",
       label: "skills/skill-creator/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md",
+      href: `${skillsRepoBlob}/skills/skill-creator/SKILL.md`,
       note: "The repository's own skill for writing skills. The three-level progressive disclosure model, the 500-line rule, the domain-organised layout, and the only folder using both references and assets.",
     },
     {
       id: "brand-guidelines-skill",
       label: "skills/brand-guidelines/SKILL.md",
-      href: "https://github.com/anthropics/skills/blob/main/skills/brand-guidelines/SKILL.md",
+      href: `${skillsRepoBlob}/skills/brand-guidelines/SKILL.md`,
       note: "A 74-line skill with no bundled files beyond a license, and the three-line frontmatter quoted on this page. Its description is 236 characters.",
     },
     {

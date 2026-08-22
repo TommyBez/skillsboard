@@ -238,10 +238,12 @@ test("every quoted excerpt names its file and links to it", () => {
   assert.equal(entry.excerpts.entries.length, 5)
 
   for (const excerpt of entry.excerpts.entries) {
+    // Pinned to a commit, not to main: a permalink onto a moving branch stops
+    // matching the quote as soon as the file upstream changes.
     assert.match(
       excerpt.permalink,
-      /^https:\/\/github\.com\/anthropics\/skills\/blob\/main\//,
-      `${excerpt.title} does not link to the source file`,
+      /^https:\/\/github\.com\/anthropics\/skills\/blob\/[0-9a-f]{40}\//,
+      `${excerpt.title} does not link to a pinned source file`,
     )
     assert.ok(excerpt.file.length > 0, `${excerpt.title} names no file`)
     assert.ok(
@@ -464,7 +466,7 @@ test("every section cites a source that the page actually lists", () => {
   // other people's summaries: the repository, the files, the spec, the client.
   for (const href of [
     "https://github.com/anthropics/skills",
-    "https://github.com/anthropics/skills/blob/main/template/SKILL.md",
+    "https://github.com/anthropics/skills/blob/3b3fad96af16a10759d930941b4520ba0c40edae/template/SKILL.md",
     "https://agentskills.io/specification",
     "https://code.claude.com/docs/en/skills",
   ]) {
