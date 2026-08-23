@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { access, readFile } from "node:fs/promises"
+import { access, readdir, readFile } from "node:fs/promises"
 import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
@@ -30,6 +30,9 @@ const startPage = await readText("../app/(app)/start/page.tsx")
 const nextSteps = await readText("../components/onboarding-next-steps.tsx")
 const inviteStep = await readText("../components/onboarding-invite-step.tsx")
 const organizationActions = await readText("../app/actions/organizations.ts")
+const inviteForm = await readText("../components/invite-member-form.tsx")
+const firstSkillInviteStep = await readText("../components/first-skill-invite-step.tsx")
+const organizationSettings = await readText("../app/(app)/settings/organization/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
 const llms = await readText("../public/llms.txt")
 
@@ -76,9 +79,36 @@ test("/connect is a public page, discoverable in the sitemap and llms.txt", () =
   )
   const listed = llms.match(/^- \[Connect your agent\]\(https:\/\/www\.skillsboard\.sh\/connect\):.+$/gm)
   assert.equal(listed?.length, 1)
-  // A page in the sitemap cannot sit behind the session: the layout picks the
-  // frame, it never requires one.
-  assert.doesNotMatch(connectLayout, /requireSession|getAppContext/)
+  // One frame, the public one. A signed-in reader gets the same page as
+  // everyone else, which is what the founder asked for and what keeps a stale
+  // session cookie from turning an acquisition page into a redirect to sign in.
+  assert.match(connectLayout, /<ResourceShell location="connect_header">/)
+  assert.doesNotMatch(connectLayout, /ProtectedAppShell/)
+})
+
+/**
+ * The build failure this page shipped with was a runtime read during
+ * prerendering: the layout chose its frame from the session cookie. A public
+ * page cannot read per-request state at all, so the rule is asserted over every
+ * file under `app/connect`, not just the two that had the problem.
+ */
+test("nothing under /connect reads a session, a cookie, or a header", async () => {
+  const directory = new URL("../app/connect/", import.meta.url)
+  const files = await readdir(directory)
+  assert.ok(files.length > 0)
+
+  for (const file of files) {
+    const source = await readFile(new URL(file, directory), "utf8")
+    assert.doesNotMatch(
+      source,
+      /getSessionCookie|getSession|requireSession|getAppContext|\bauth\(|cookies\(\)|headers\(\)/,
+      `${file} reads per-request state on a page that has to prerender`,
+    )
+  }
+  // The helper that resolved the viewer's team for this page is gone with it.
+  assert.equal(await exists("../lib/connect-viewer.ts"), false)
+  // The endpoint is the same string for every visitor, not the request host.
+  assert.match(connectPage, /const mcpUrl = absoluteUrl\("\/api\/mcp"\)/)
 })
 
 test("the first run offers the agent first, with the invitation beside it", () => {
@@ -115,6 +145,29 @@ test("the first-run steps reuse the existing event names", () => {
   // The two steps that had no event of their own, and only those two.
   assert.match(events, /onboarding_steps_viewed: Record<never, never>/)
   assert.match(events, /step: "first_skill" \| "invite_team"/)
+})
+
+/**
+ * The invitation is created on the server, so the surface has to travel with
+ * the request: a client-side event on the form can describe the copied link,
+ * but not the invitation that was actually sent.
+ */
+test("an invitation carries the surface it was sent from", () => {
+  assert.match(events, /team_member_invited: \{\n\s+email_sent: boolean\n\s+role: "admin" \| "member"\n\s+surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"\n\s+\}/)
+
+  // The form posts it, the action reads it, the event carries it.
+  assert.match(inviteForm, /<input type="hidden" name="surface" value=\{surface\} \/>/)
+  assert.match(organizationActions, /const surface = inviteSurfaceSchema\.parse\(formData\.get\("surface"\)\)/)
+  assert.match(
+    organizationActions,
+    /event: "team_member_invited",\n\s+properties: \{\n\s+role: parsed\.data\.role,\n\s+email_sent: !emailError,\n\s+surface,\n\s+\},/,
+  )
+
+  // Every copy of the form names its own surface, and the first run names the
+  // one the onboarding metric is counted on.
+  assert.match(inviteStep, /surface="onboarding"/)
+  assert.match(firstSkillInviteStep, /surface="first_skill_invite_step"/)
+  assert.match(organizationSettings, /surface="organization_settings"/)
 })
 
 test("no dash rule violations in the copy this change owns", () => {

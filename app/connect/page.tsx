@@ -1,17 +1,9 @@
-import { cache, Suspense } from "react"
 import type { Metadata } from "next"
-import Link from "next/link"
-import { headers } from "next/headers"
-import { getSessionCookie } from "better-auth/cookies"
-import { ArrowLeftIcon } from "lucide-react"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getConnectViewerTeamId } from "@/lib/connect-viewer"
-import { siteConfig } from "@/lib/site"
+import { absoluteUrl, siteConfig } from "@/lib/site"
 
 const connectPath = "/connect"
 const connectDescription =
@@ -52,56 +44,27 @@ const availableTools = [
   { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },
 ]
 
-const getMcpDetails = cache(async () => {
-  const requestHeaders = await headers()
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "your-app.vercel.app"
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https"
-  const mcpUrl = `${protocol}://${host}/api/mcp`
-  const config = JSON.stringify(
-    { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
-    null,
-    2,
-  )
+/**
+ * The endpoint every visitor is given, spelled the same way for all of them.
+ *
+ * It used to be derived from the request host so a signed-in reader saw the
+ * deployment they were on. That read made the page dynamic, and the page is now
+ * public and prerendered, so the canonical production endpoint is what it hands
+ * out: the address a reader is meant to paste into their own client.
+ */
+const mcpUrl = absoluteUrl("/api/mcp")
+const mcpConfig = JSON.stringify(
+  { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
+  null,
+  2,
+)
 
-  return { config, host, mcpUrl }
-})
-
-async function McpSetupAnalyticsScope() {
-  const teamId = await getConnectViewerTeamId()
-  if (!teamId) return null
-
-  return <McpSetupAnalytics teamId={teamId} />
-}
-
-async function McpGuide() {
-  const [{ config, mcpUrl }, teamId] = await Promise.all([
-    getMcpDetails(),
-    getConnectViewerTeamId(),
-  ])
-
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={teamId ?? undefined} />
-}
-
-export default async function ConnectPage() {
-  // Cookie presence only, matching the layout: it decides whether the page
-  // adds the main landmark (the marketing frame already carries one) and
-  // whether the way back into the product is worth showing.
-  const isSignedIn = Boolean(getSessionCookie(await headers()))
-  const Container = isSignedIn ? "main" : "div"
-
+export default function ConnectPage() {
   return (
-    <Container className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <Suspense fallback={null}>
-        <McpSetupAnalyticsScope />
-      </Suspense>
-      {isSignedIn ? (
-        <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
-          <ArrowLeftIcon data-icon="inline-start" />
-          Back to library
-        </Button>
-      ) : null}
+    <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
+      <McpSetupAnalytics />
 
-      <header className="mt-8 border-b pb-10">
+      <header className="border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
         <h1 data-testid="mcp-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
           Connect your agent
@@ -126,11 +89,7 @@ export default async function ConnectPage() {
       </div>
 
       <div className="mt-8">
-        <Suspense
-          fallback={<Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}
-        >
-          <McpGuide />
-        </Suspense>
+        <McpSetupGuide config={mcpConfig} mcpUrl={mcpUrl} />
       </div>
 
       <section className="mt-8 overflow-hidden rounded-[16px] border bg-card">
@@ -159,6 +118,6 @@ export default async function ConnectPage() {
       <div className="mt-8">
         <McpTroubleshooting />
       </div>
-    </Container>
+    </div>
   )
 }

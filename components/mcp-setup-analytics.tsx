@@ -5,14 +5,17 @@ import { useEffect } from "react"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
 /**
- * Team-scoped so it can act as the denominator of the MCP funnel:
- * `mcp_setup_viewed` → `mcp_config_copied` grouped by `team_id`. Without
- * the team on both ends every view lands in the null-team bucket.
+ * The view of `/connect`, the public page where an agent gets connected.
+ *
+ * Not team scoped: the page is readable before an account exists, so most of
+ * these views have no team behind them, and asking for one would have meant
+ * reading the session on a page that has to stay prerendered. The team scoped
+ * half of the funnel lives on `/start`, where the team is already known.
  */
-export function McpSetupAnalytics({ teamId }: { teamId: string }) {
+export function McpSetupAnalytics() {
   useEffect(() => {
-    captureAnalyticsEvent("mcp_setup_viewed", { team_id: teamId })
-  }, [teamId])
+    captureAnalyticsEvent("mcp_setup_viewed")
+  }, [])
 
   return null
 }

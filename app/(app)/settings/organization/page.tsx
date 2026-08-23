@@ -120,6 +120,7 @@ async function InvitationPanel() {
               team_id: activeId,
             },
           }}
+          surface="organization_settings"
         />
       ) : (
         <p className="mt-6 border-t pt-5 text-sm text-muted-foreground">Only team owners and admins can send invitations.</p>

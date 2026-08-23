@@ -135,6 +135,19 @@ type NonTeamEventPropertiesMap = {
   plugin_install_copied: {
     location: "landing" | "mcp_settings" | "onboarding"
   }
+  /**
+   * The MCP setup funnel, `mcp_setup_viewed` then `mcp_config_copied`, both non
+   * team scoped since the setup moved from `/settings/mcp` to the public
+   * `/connect`. Most of these views happen before an account exists, and a team
+   * scoped view would have meant reading the session on a page that has to stay
+   * prerendered. `client` keeps the surfaces apart: `generic` is the endpoint
+   * copied from the first run on `/start`, the rest come from the guide. The
+   * team scoped half of the first run is `onboarding_steps_viewed`.
+   */
+  mcp_setup_viewed: Record<never, never>
+  mcp_config_copied: {
+    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+  }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
@@ -184,9 +197,16 @@ type TeamEventPropertiesMap = {
     surface: "mcp" | "web"
     tag_count: number
   }
+  /**
+   * `surface` is threaded from the form that sent the invitation, through the
+   * server action, so an invitation sent from the first run can be counted on
+   * its own. Same values as `team_invite_link_copied`, so the emailed
+   * invitation and the copied link read against each other per surface.
+   */
   team_member_invited: {
     email_sent: boolean
     role: "admin" | "member"
+    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
   }
   invitation_accepted: Record<never, never>
   skill_usage_path_selected: {
@@ -223,10 +243,6 @@ type TeamEventPropertiesMap = {
    */
   onboarding_step_clicked: {
     step: "first_skill" | "invite_team"
-  }
-  mcp_setup_viewed: Record<never, never>
-  mcp_config_copied: {
-    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean

@@ -28,6 +28,7 @@ export function OnboardingInviteStep({ teamId }: { teamId: string }) {
           team_id: teamId,
         })
       }}
+      surface="onboarding"
     />
   )
 }

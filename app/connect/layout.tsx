@@ -1,26 +1,19 @@
-import type { ReactNode } from "react"
-import { headers } from "next/headers"
-import { getSessionCookie } from "better-auth/cookies"
-
-import { ProtectedAppShell } from "@/components/protected-app-shell"
 import { ResourceShell } from "@/components/resources/resource-chrome"
 
 /**
- * One URL, two frames.
+ * One frame, the public one.
  *
- * Connecting an agent is the first thing a new account does and the first
- * thing a reader wants to check before opening one, so the page is public and
- * indexable. A signed-in reader still gets the product chrome, because this is
- * a nav destination for them, not a marketing page.
+ * Connecting an agent is the first thing a reader checks before opening an
+ * account, so `/connect` is a public, indexable page and nothing else. It reads
+ * no session, no cookie, and no header, which is what lets it be prerendered
+ * and what stops a stale session cookie from turning an acquisition page into a
+ * redirect to sign in.
  *
- * The choice is made from cookie presence alone, the same optimistic read the
- * proxy makes: a session lookup here would put a database round trip in front
- * of the first byte of a public page.
+ * The personalized, team scoped version of this setup lives behind the session,
+ * on `/start`.
  */
-export default async function ConnectLayout({ children }: { children: ReactNode }) {
-  const hasSessionCookie = Boolean(getSessionCookie(await headers()))
-
-  if (hasSessionCookie) return <ProtectedAppShell>{children}</ProtectedAppShell>
-
+export default function ConnectLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return <ResourceShell location="connect_header">{children}</ResourceShell>
 }

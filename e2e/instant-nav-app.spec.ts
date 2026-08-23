@@ -32,10 +32,6 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/discover", "discover-shell", "discover-content")
   })
 
-  test("/connect", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/connect", "mcp-shell", "mcp-content")
-  })
-
   test("/settings/organization", async ({ page }) => {
     await expectInstantInitialLoad(page, "/settings/organization", "org-settings-shell", "org-settings-content")
   })
@@ -83,12 +79,13 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
+  // /connect is a public page with nothing deferred behind it, so there is no
+  // content marker to gate: the whole page is the shell.
   test("/library -> /connect", async ({ page }) => {
     await expectInstantSoftNav(page, {
       from: "/library",
       trigger: productNav("Connect agent"),
       shellTestId: "mcp-shell",
-      contentTestId: "mcp-content",
     })
   })
 
@@ -112,10 +109,11 @@ test.describe("instant soft navigation: app routes", () => {
   })
 
   // The account menu items are anchors rendered with the menuitem role
-  // (Base UI DropdownMenuItem with nativeButton={false}).
-  test("/connect -> /settings/organization (account menu)", async ({ page }) => {
+  // (Base UI DropdownMenuItem with nativeButton={false}). The menu lives in the
+  // product chrome, which /connect no longer carries: it is a public page.
+  test("/library -> /settings/organization (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/connect",
+      from: "/library",
       trigger: (p) => p.getByRole("menuitem", { name: "Team access" }),
       shellTestId: "org-settings-shell",
       contentTestId: "org-settings-content",
@@ -125,9 +123,9 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  test("/connect -> /settings/email (account menu)", async ({ page }) => {
+  test("/collections -> /settings/email (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/connect",
+      from: "/collections",
       trigger: (p) => p.getByRole("menuitem", { name: "Email preferences" }),
       shellTestId: "email-settings-shell",
       contentTestId: "email-settings-content",

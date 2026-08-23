@@ -32,33 +32,30 @@ function InlineCode({ children }: { children: ReactNode }) {
 }
 
 /**
- * `mcp_config_copied` is team scoped on purpose, so it can be counted against
- * `mcp_setup_viewed` for the same team. A reader who has not signed in yet has
- * no team to attribute the copy to, so the copy control still works and simply
- * reports nothing rather than landing in a null-team bucket. Their interest in
- * connecting is still visible through `plugin_install_copied`, which is not
- * team scoped.
+ * `mcp_config_copied` is not team scoped here: this guide is rendered on the
+ * public `/connect`, where most readers have no team yet, and a team scoped
+ * copy would have meant reading the session on a page that has to stay
+ * prerendered. `client` is what separates the surfaces, and it counts directly
+ * against `mcp_setup_viewed`, which is now non team scoped for the same reason.
  */
-function configCopiedAnalytics(client: McpClientAnalyticsId, teamId?: string) {
-  return teamId
-    ? ({ event: "mcp_config_copied", properties: { client, team_id: teamId } } as const)
-    : undefined
+function configCopiedAnalytics(client: McpClientAnalyticsId) {
+  return { event: "mcp_config_copied", properties: { client } } as const
 }
 
-function Snippet({ code, client, teamId }: { code: string; client: McpClientAnalyticsId; teamId?: string }) {
+function Snippet({ code, client }: { code: string; client: McpClientAnalyticsId }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[12px] border">
       <pre className="overflow-x-auto bg-foreground p-4 font-mono text-xs leading-5 text-background">
         <code>{code}</code>
       </pre>
       <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton value={code} label="Copy" compact analytics={configCopiedAnalytics(client, teamId)} />
+        <CopyButton value={code} label="Copy" compact analytics={configCopiedAnalytics(client)} />
       </div>
     </div>
   )
 }
 
-function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientAnalyticsId; teamId?: string }) {
+function StepList({ steps, client }: { steps: Step[]; client: McpClientAnalyticsId }) {
   return (
     <ol className="space-y-6">
       {steps.map((step, index) => (
@@ -68,7 +65,7 @@ function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientA
           </span>
           <div className="min-w-0 flex-1 pt-1">
             <p className="text-sm leading-relaxed text-muted-foreground">{step.text}</p>
-            {step.snippet ? <Snippet code={step.snippet} client={client} teamId={teamId} /> : null}
+            {step.snippet ? <Snippet code={step.snippet} client={client} /> : null}
           </div>
         </li>
       ))}
@@ -99,7 +96,7 @@ const troubleshooting = [
   },
 ]
 
-export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; config: string; teamId?: string }) {
+export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: string }) {
   const vscodeConfig = JSON.stringify(
     { servers: { "skills-board": { type: "http", url: mcpUrl } } },
     null,
@@ -250,7 +247,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
         <CopyButton
           value={headerCopyValue}
           label={headerCopyLabel}
-          analytics={configCopiedAnalytics(activeGuide.analyticsId, teamId)}
+          analytics={configCopiedAnalytics(activeGuide.analyticsId)}
         />
       </div>
 
@@ -275,7 +272,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
 
         {clients.map((client) => (
           <TabsContent key={client.id} value={client.id} className="px-5 py-5 sm:px-6 sm:py-6">
-            <StepList steps={client.steps} client={client.analyticsId} teamId={teamId} />
+            <StepList steps={client.steps} client={client.analyticsId} />
           </TabsContent>
         ))}
       </Tabs>

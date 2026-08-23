@@ -100,7 +100,7 @@ export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNex
           copyAriaLabel="Copy the plugin install commands"
         />
         <Snippet
-          analytics={{ event: "mcp_config_copied", properties: { client: "generic", team_id: teamId } }}
+          analytics={{ event: "mcp_config_copied", properties: { client: "generic" } }}
           ariaLabel="MCP endpoint"
           code={mcpUrl}
           copyAriaLabel="Copy the MCP endpoint"
