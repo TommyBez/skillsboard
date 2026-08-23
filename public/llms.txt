@@ -74,6 +74,7 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 - [Claude skills vs MCP](https://www.skillsboard.sh/compare/claude-skills-vs-mcp): What a skill is for and what the Model Context Protocol is for, why they are not alternatives, and what a repository that commits both looks like
 - [Claude skills vs plugins](https://www.skillsboard.sh/compare/claude-skills-vs-plugins): A skill as content and a Claude Code plugin as packaging, what each can carry, how each is distributed and versioned, and how a plugin ships a skill
 - [Claude skills vs slash commands](https://www.skillsboard.sh/compare/claude-skills-vs-slash-commands): Why Claude Code documents custom commands as merged into skills, what still differs between a command file and a SKILL.md, and which file wins the same command name
+- [Skills Board vs Superpowers](https://www.skillsboard.sh/alternatives/superpowers): What the MIT-licensed Superpowers plugin installs, the fourteen skill folders and per-harness install steps, and where a team registry sits next to it
 
 ## Team skill workflows
 - [Manage AI skills across an organization](https://www.skillsboard.sh/manage-ai-skills): What each vendor's organization-level distribution mechanism covers and where it stops, across Claude Code managed settings and plugins, claude.ai owner provisioning and sharing, the Claude API, Codex admin locations and plugins, and Cursor, plus the selection layer none of them records

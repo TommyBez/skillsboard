@@ -1,4 +1,5 @@
 import type { OgTemplateContent } from "@/lib/og/template"
+import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { guidePaths } from "@/lib/seo/guides/types"
 import { pricingPath } from "@/lib/seo/pricing-schema"
 import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
@@ -9,6 +10,7 @@ export const alternativePaths = {
   githubRepo: "/alternatives/github-repo",
   skillsSh: "/alternatives/skills-sh",
   smithery: "/alternatives/smithery",
+  superpowers: "/alternatives/superpowers",
 } as const
 
 export type AlternativePath =
@@ -22,6 +24,7 @@ export type AlternativeCtaLocation =
   | "alternatives_github_repo"
   | "alternatives_skills_sh"
   | "alternatives_smithery"
+  | "alternatives_superpowers"
 
 /**
  * The two CTA placements on an alternative page, kept in sync with the
@@ -751,8 +754,257 @@ const smithery: AlternativeDefinition = {
   ],
 }
 
+const superpowers: AlternativeDefinition = {
+  path: alternativePaths.superpowers,
+  ctaLocation: "alternatives_superpowers",
+  subject: "Superpowers",
+  subjectHref: "https://github.com/obra/superpowers",
+  eyebrow: "Skills Board vs Superpowers",
+  title: "Skills Board vs Superpowers",
+  seoTitle: "Superpowers Alternative for Team AI Skills | Skills Board",
+  socialTitle: "Skills Board vs Superpowers",
+  description:
+    "Superpowers is an MIT-licensed plugin that installs one development methodology into a coding agent. Compare it with Skills Board, the agent-native skills registry for teams, and see where the two fit together.",
+  cardSummary:
+    "An installed methodology plugin next to a team registry. What each one is for, and why most teams end up with both.",
+  ogAlt: "Comparison of Superpowers and Skills Board for team AI skills.",
+  og: {
+    eyebrow: "Alternatives",
+    title: [
+      { text: "An installed method," },
+      { text: "and your team's set.", accent: true },
+    ],
+    description:
+      "How Superpowers and Skills Board compare for giving a coding agent a method and for keeping your team's AI skills.",
+    contextLabel: "skillsboard.sh/alternatives",
+    chips: ["Superpowers", "Team registry", "MCP"],
+  },
+  publishedAt: "2026-08-23",
+  modifiedAt: "2026-08-23",
+  summary: [
+    "Superpowers is a plugin from Jesse Vincent, described in its README as a complete software development methodology for coding agents, built on composable skills plus the instructions that make an agent reach for them. Fourteen skill folders cover brainstorming, planning, red and green TDD, subagent-driven development, systematic debugging, and code review.",
+    "Skills Board is the agent-native skills registry for teams: the web app where a team keeps and shares its AI skills, scoped to the people you invite, with the original repository and path on every entry and an authenticated MCP endpoint a compatible agent can query.",
+    "They answer different questions, and they compose. Superpowers decides how your agent works. Skills Board holds the set your team settled on, including the Superpowers folders you keep, saved straight from github.com/obra/superpowers.",
+  ],
+  reasons: {
+    title: "Where an installed methodology stops being the whole answer",
+    intro:
+      "Superpowers is opinionated on purpose, and that is most of its value. The gap shows up around it rather than inside it.",
+    points: [
+      "It ships one curated methodology. The contributing section says the project does not generally accept contributions of new skills, so it is not the place your own skills go.",
+      "It installs once per harness. The README carries fourteen separate install sections, from Claude Code to Codex, Cursor, Gemini CLI, and OpenCode, and says to install separately for each one you use.",
+      "In Claude Code, plugin skills load where the plugin is enabled and answer to a plugin-name:skill-name command, so what a teammate has depends on which plugins that teammate turned on.",
+      "The skills that describe your product, your deploy path, and your review conventions will never ship inside somebody else's plugin.",
+      "Nothing in a plugin records which of its fourteen folders your team actually settled on, or why.",
+    ],
+  },
+  comparison: {
+    title: "Side by side",
+    caption:
+      "One is a method you install. The other is where your team's AI skills live.",
+    rows: [
+      {
+        dimension: "What it is",
+        skillsBoard:
+          "The agent-native skills registry for teams: the web app where a team keeps and shares its AI skills.",
+        alternative:
+          "A plugin its README calls a complete software development methodology for coding agents, built on composable skills plus instructions that make the agent use them.",
+        sourceIds: ["sp-readme"],
+      },
+      {
+        dimension: "Who writes the contents",
+        skillsBoard:
+          "Your teammates, saving skills from wherever they come from, Superpowers included.",
+        alternative:
+          "Jesse Vincent and the rest of the folks at Prime Radiant. The contributing section states the project does not generally accept contributions of new skills.",
+        sourceIds: ["sp-readme", "sp-manifest"],
+      },
+      {
+        dimension: "What is inside",
+        skillsBoard:
+          "Whatever your team saves. Each entry records the original repository and path.",
+        alternative:
+          "Fourteen folders under skills/, each one a SKILL.md with name and description frontmatter, covering TDD, debugging, brainstorming, plan writing and execution, worktrees, code review, and skill authoring.",
+        sourceIds: ["sp-repo", "sp-readme"],
+      },
+      {
+        dimension: "How you get it",
+        skillsBoard:
+          "Sign in to the web app. Per entry: the original source, a copy-ready install command, a ZIP of the latest files, or an authenticated MCP endpoint.",
+        alternative:
+          "A plugin install per harness. In Claude Code, /plugin install superpowers@claude-plugins-official from the official marketplace, or the same plugin from obra/superpowers-marketplace.",
+        sourceIds: ["sp-readme", "sp-official-marketplace"],
+      },
+      {
+        dimension: "Where it lands for a teammate",
+        skillsBoard:
+          "One organization-scoped library, the same for every invited teammate whatever agent that teammate runs.",
+        alternative:
+          "Claude Code documents plugin skills at <plugin>/skills/<skill-name>/SKILL.md, available wherever the plugin is enabled and namespaced plugin-name:skill-name.",
+        sourceIds: ["claude-skills"],
+      },
+      {
+        dimension: "Mixed agent teams",
+        skillsBoard:
+          "One entry, and each teammate takes the source link, the install command, or the ZIP that suits the agent in front of them.",
+        alternative:
+          "Separate documented install steps for Claude Code, Antigravity, the Codex app and CLI, Cursor, Devin CLI, Factory Droid, Gemini CLI, GitHub Copilot CLI, Grok Build CLI, Kimi Code, OpenCode, Pi, and Hermes Agent.",
+        sourceIds: ["sp-readme"],
+      },
+      {
+        dimension: "What an agent can query",
+        skillsBoard:
+          "An authenticated MCP endpoint, listed on the Official MCP Registry as io.github.TommyBez/skillsboard, with browser sign-in and no API key to copy.",
+        alternative:
+          "The plugin loads its skills into the agent directly, and the source is a public git repository you can clone or read on GitHub.",
+        sourceIds: ["sp-repo"],
+      },
+      {
+        dimension: "Versions",
+        skillsBoard:
+          "The latest version available from the saved source. Skills Board does not pin or preserve historical versions.",
+        alternative:
+          "A versioned plugin: the manifest read 6.3.0 on the day we checked, and the README says updates are somewhat agent dependent and often automatic.",
+        sourceIds: ["sp-manifest", "sp-readme"],
+      },
+      {
+        dimension: "License and cost",
+        skillsBoard:
+          "Free forever for the hosted product. MIT licensed, code public at github.com/TommyBez/skillsboard.",
+        alternative:
+          "MIT licensed, copyright Jesse Vincent. The README points enterprises that want commercial support, extra tooling, or managed spending at Prime Radiant.",
+        sourceIds: ["sp-repo", "sp-readme"],
+      },
+    ],
+  },
+  alternativeWins: {
+    title: "When Superpowers is the thing to install",
+    intro:
+      "This is a real product solving a real problem, and for a lot of people it is the right answer on its own.",
+    points: [
+      "You want an opinionated process rather than a menu: design first, plan, then implement, with the skills triggering on their own.",
+      "You want red and green TDD run as a cycle, write the failing test, watch it fail, write the minimal code, watch it pass, rather than as a suggestion.",
+      "You want subagent-driven development with a two-stage review, spec compliance first and code quality second, without building it yourself.",
+      "You work alone or on one harness, so a single plugin install already covers everyone who needs it.",
+      "You would rather the method arrive as a versioned plugin that updates itself than as a list a person keeps current.",
+    ],
+  },
+  skillsBoardWins: {
+    title: "When a team registry fits better",
+    intro:
+      "Skills Board starts from a smaller problem: your teammates cannot find your team's AI skills.",
+    points: [
+      "The skills you need most are about your product, your deploy path, and your review conventions, so no third-party plugin will ever ship them.",
+      "Teammates run different agents, and you would rather keep one entry than one install command per harness.",
+      "You want people to search by the task they are doing and see the original source before they use anything.",
+      "You want a compatible agent to search the same team list over an authenticated MCP endpoint instead of asking a person.",
+      "You want teammates who never install a plugin, including designers, writers, and product folks, to reach the same set.",
+    ],
+  },
+  moveOver: {
+    title: "Running Superpowers and a team registry together",
+    intro:
+      "Nothing here replaces the plugin. This is the short path from an installed method to a list your team can search.",
+    steps: [
+      "Keep Superpowers installed in the agents where you want its methodology.",
+      "Create a team library and save the Superpowers folders your team settled on, from github.com/obra/superpowers, so each entry points at the SKILL.md a teammate can read.",
+      "Save the skills your team wrote itself next to them, each from its own repository and path.",
+      "Tag both sets the way your team searches, by workflow or by the surface the skill belongs to.",
+      "Invite your teammates, or connect a compatible agent over MCP so it can search the same list without leaving the agent.",
+    ],
+  },
+  faq: [
+    {
+      question: "Is Skills Board a replacement for Superpowers?",
+      answer:
+        "No. Superpowers is an installed plugin that gives a coding agent one development methodology. Skills Board is the web app where a team keeps and shares its AI skills, whatever those skills came from. Teams commonly install Superpowers and save the folders they settled on to their team library.",
+    },
+    {
+      question: "Can I save Superpowers skills to Skills Board?",
+      answer:
+        "Yes. Superpowers is a public MIT-licensed repository and each of its fourteen skill folders holds a SKILL.md, so saving one records the original repository and path and a teammate opens the same folder you did.",
+    },
+    {
+      question: "Does Skills Board install or run skills?",
+      answer:
+        "No. It records the original repository and path, and offers the source link, an install command, or a ZIP of the latest files available at download time. Installing Superpowers is still a plugin install inside your agent.",
+    },
+    {
+      question: "Is Superpowers only for Claude Code?",
+      answer:
+        "No. The README documents install steps for fourteen harnesses, Claude Code, Antigravity, Codex, Cursor, Devin CLI, Factory Droid, Gemini CLI, GitHub Copilot CLI, Grok Build CLI, Kimi Code, OpenCode, Pi, and Hermes Agent among them, and asks you to install it separately for each one you use.",
+    },
+    {
+      question: "What does Skills Board cost?",
+      answer:
+        "The hosted product is free forever, with no trial, credit card, or paid tier. The code is MIT licensed and open source.",
+    },
+  ],
+  sources: [
+    {
+      id: "sp-repo",
+      label: "obra/superpowers on GitHub",
+      href: "https://github.com/obra/superpowers",
+      note: "The public repository, the fourteen folders under skills/, and the MIT license file with its copyright line.",
+    },
+    {
+      id: "sp-readme",
+      label: "Superpowers README",
+      href: "https://github.com/obra/superpowers/blob/main/README.md",
+      note: "The methodology description, the per-harness install sections, the workflow and skills library listings, the note on contributing new skills, updating, and commercial support.",
+    },
+    {
+      id: "sp-manifest",
+      label: "Superpowers plugin manifest",
+      href: "https://github.com/obra/superpowers/blob/main/.claude-plugin/plugin.json",
+      note: "The plugin name, description, version, author, and MIT license as declared to Claude Code.",
+    },
+    {
+      id: "sp-official-marketplace",
+      label: "anthropics/claude-plugins-official",
+      href: "https://github.com/anthropics/claude-plugins-official",
+      note: "The official marketplace manifest that lists superpowers in the development category and points at github.com/obra/superpowers.",
+    },
+    {
+      id: "claude-skills",
+      label: "Claude Code documentation, Skills",
+      href: "https://code.claude.com/docs/en/skills",
+      note: "Where plugin skills live on disk, that they are available where the plugin is enabled, and the plugin-name:skill-name namespace.",
+    },
+  ],
+  related: [
+    {
+      label: "Best Claude skills",
+      href: bestClaudeSkillsPath,
+      description:
+        "The register that reads each SKILL.md, Superpowers folders included.",
+    },
+    {
+      label: "Where to find Claude skills",
+      href: whereToFindClaudeSkillsPath,
+      description:
+        "Every marketplace, directory, and repository skills come from, and what each screens.",
+    },
+    {
+      label: "Manage skills across Claude, Codex, and Cursor",
+      href: guidePaths.manageCrossAgentSkills,
+      description: "What changes when teammates run different agents.",
+    },
+    {
+      label: "Pricing",
+      href: pricingPath,
+      description: "Free forever, with the open-source code on GitHub.",
+    },
+  ],
+}
+
 /** Single registration point: pages, the index, JSON-LD, and the sitemap read this. */
-export const alternatives = [githubRepo, skillsSh, smithery] as const
+export const alternatives = [
+  githubRepo,
+  skillsSh,
+  smithery,
+  superpowers,
+] as const
 
 export const alternativesIndexModifiedAt = alternatives.reduce(
   (latest, entry) => (entry.modifiedAt > latest ? entry.modifiedAt : latest),
@@ -760,7 +1012,7 @@ export const alternativesIndexModifiedAt = alternatives.reduce(
 )
 
 export const alternativesIndexDescription =
-  "Honest comparisons between Skills Board and the other ways teams share AI skills: a shared GitHub repository, the skills.sh directory, and the Smithery registry."
+  "Honest comparisons between Skills Board and the other ways teams share AI skills: a shared GitHub repository, the skills.sh directory, the Smithery registry, and the Superpowers plugin."
 
 export const alternativesIndexOg: OgTemplateContent = {
   eyebrow: "Alternatives",
@@ -769,13 +1021,13 @@ export const alternativesIndexOg: OgTemplateContent = {
     { text: "teams share skills.", accent: true },
   ],
   description:
-    "Skills Board next to a shared GitHub repository, skills.sh, and Smithery, including when each one is the better choice.",
+    "Skills Board next to a shared GitHub repository, skills.sh, Smithery, and Superpowers, including when each one is the better choice.",
   contextLabel: "skillsboard.sh/alternatives",
-  chips: ["GitHub repo", "skills.sh", "Smithery"],
+  chips: ["GitHub repo", "skills.sh", "Smithery", "Superpowers"],
 }
 
 export const alternativesIndexOgAlt =
-  "Skills Board alternatives, compared with a shared GitHub repository, skills.sh, and Smithery."
+  "Skills Board alternatives, compared with a shared GitHub repository, skills.sh, Smithery, and Superpowers."
 
 const alternativesByPath = new Map(
   alternatives.map((entry) => [entry.path, entry]),
