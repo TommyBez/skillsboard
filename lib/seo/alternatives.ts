@@ -1021,13 +1021,13 @@ export const alternativesIndexOg: OgTemplateContent = {
     { text: "teams share skills.", accent: true },
   ],
   description:
-    "Skills Board next to a shared GitHub repository, skills.sh, and Smithery, including when each one is the better choice.",
+    "Skills Board next to a shared GitHub repository, skills.sh, Smithery, and Superpowers, including when each one is the better choice.",
   contextLabel: "skillsboard.sh/alternatives",
-  chips: ["GitHub repo", "skills.sh", "Smithery"],
+  chips: ["GitHub repo", "skills.sh", "Smithery", "Superpowers"],
 }
 
 export const alternativesIndexOgAlt =
-  "Skills Board alternatives, compared with a shared GitHub repository, skills.sh, and Smithery."
+  "Skills Board alternatives, compared with a shared GitHub repository, skills.sh, Smithery, and Superpowers."
 
 const alternativesByPath = new Map(
   alternatives.map((entry) => [entry.path, entry]),
