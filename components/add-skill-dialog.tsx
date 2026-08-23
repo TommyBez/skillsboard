@@ -69,7 +69,12 @@ export function AddSkillDialog({
      repository inspection on the spot, so the network round trip overlaps the
      second or two the user spends reading the dialog instead of waiting for a
      click that only ever meant "yes, that URL". Auto-inspection stays silent
-     on failure — the explicit button below still reports what went wrong. */
+     on failure — the explicit button below still reports what went wrong.
+
+     Paste is the only trigger. Blur looked like a second one, but the submit
+     button is the next focusable element here, so blurring to inspect would
+     mostly fire as the user reaches for it: the pending state would disable
+     the button mid-click and swallow the very error they asked for. */
   const pastedIntoUrlField = useRef(false)
   const autoInspectedUrls = useRef<Set<string>>(new Set())
   /* Asked for only when the save just took this team from an empty library to
@@ -289,13 +294,6 @@ export function AddSkillDialog({
                     pastedIntoUrlField.current = false
                     autoInspect(next)
                   }
-                }}
-                onBlur={(event) => {
-                  // Tabbing on is the other moment a typed URL is finished.
-                  // Closing the dialog blurs the field too, so a dialog that
-                  // is already on its way out never starts a request.
-                  if (!isOpen || isLocked || inspectedUrl) return
-                  autoInspect(event.target.value)
                 }}
                 readOnly={isLocked}
                 disabled={pendingMode !== null}

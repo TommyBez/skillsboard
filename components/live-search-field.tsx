@@ -145,6 +145,10 @@ export function LiveSearchField({ id, label, placeholder, minLength = 1 }: LiveS
         value={value}
         onValueChange={setValue}
         onKeyDown={(event) => {
+          // Mid-composition, Enter confirms the IME candidate and Escape
+          // cancels it. Neither belongs to the search field until the text
+          // being composed is actually text.
+          if (event.nativeEvent.isComposing) return
           if (event.key === "Enter") {
             event.preventDefault()
             flush()
