@@ -143,10 +143,18 @@ type NonTeamEventPropertiesMap = {
    * prerendered. `client` keeps the surfaces apart: `generic` is the endpoint
    * copied from the first run on `/start`, the rest come from the guide. The
    * team scoped half of the first run is `onboarding_steps_viewed`.
+   *
+   * `team_id` is optional for the same reason, and only optional: the public
+   * page has no team to name and sends none, while the first run on `/start`
+   * is authenticated and sends the real one, so the team level read of this
+   * funnel keeps working on the surface where a team exists.
    */
-  mcp_setup_viewed: Record<never, never>
+  mcp_setup_viewed: {
+    team_id?: string
+  }
   mcp_config_copied: {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+    team_id?: string
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -335,19 +343,34 @@ export type AnalyticsCapturedEventProperties<EventName extends AnalyticsEventNam
   AnalyticsEventProperties<EventName> &
     (EventName extends TeamScopedAnalyticsEventName ? { team_id: string } : object)
 
+/**
+ * The keys a caller has to fill in. An event whose properties are all optional,
+ * like the MCP setup funnel where the team is known on one surface and unknown
+ * on the other, is called the same way as an event with no properties at all.
+ */
+export type RequiredAnalyticsPropertyKeys<Properties> = {
+  [Key in keyof Properties]-?: object extends Pick<Properties, Key> ? never : Key
+}[keyof Properties]
+
 export type AnalyticsCapturedEventPropertiesArgs<EventName extends AnalyticsEventName> =
-  keyof AnalyticsCapturedEventProperties<EventName> extends never
-    ? []
+  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
+    ? keyof AnalyticsCapturedEventProperties<EventName> extends never
+      ? []
+      : [properties?: AnalyticsCapturedEventProperties<EventName>]
     : [properties: AnalyticsCapturedEventProperties<EventName>]
 
 type AnalyticsEventPropertiesField<EventName extends AnalyticsEventName> =
-  keyof AnalyticsEventProperties<EventName> extends never
-    ? { properties?: never }
+  RequiredAnalyticsPropertyKeys<AnalyticsEventProperties<EventName>> extends never
+    ? keyof AnalyticsEventProperties<EventName> extends never
+      ? { properties?: never }
+      : { properties?: AnalyticsEventProperties<EventName> }
     : { properties: AnalyticsEventProperties<EventName> }
 
 type AnalyticsCapturedEventPropertiesField<EventName extends AnalyticsEventName> =
-  keyof AnalyticsCapturedEventProperties<EventName> extends never
-    ? { properties?: never }
+  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
+    ? keyof AnalyticsCapturedEventProperties<EventName> extends never
+      ? { properties?: never }
+      : { properties?: AnalyticsCapturedEventProperties<EventName> }
     : { properties: AnalyticsCapturedEventProperties<EventName> }
 
 export type AnalyticsEventCapture<

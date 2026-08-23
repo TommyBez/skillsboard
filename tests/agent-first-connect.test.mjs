@@ -141,6 +141,13 @@ test("the first-run steps reuse the existing event names", () => {
     assert.match(events, new RegExp(`${event}: \\{`))
   }
   assert.match(inviteStep, /event: "team_invite_link_copied"/)
+  // The public page cannot name a team, so the property is optional rather
+  // than gone, and the authenticated first run still sends the real one.
+  assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+team_id\?: string\n\s+\}/)
+  assert.match(
+    nextSteps,
+    /event: "mcp_config_copied",\n\s+properties: \{ client: "generic", team_id: teamId \},/,
+  )
   assert.match(events, /surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"/)
   // The two steps that had no event of their own, and only those two.
   assert.match(events, /onboarding_steps_viewed: Record<never, never>/)

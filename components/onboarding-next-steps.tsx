@@ -83,6 +83,11 @@ function Snippet({
  * it was reachable only from a settings page before. Inviting a teammate sits
  * beside it rather than behind a first saved skill: a library one person can
  * reach is not a team library, and the ask reads the same on day zero.
+ *
+ * Every event here carries the team. `mcp_config_copied` is not team scoped in
+ * general, because the same copy runs on the public `/connect` where there is
+ * no team to name, but this screen is authenticated and the team is already in
+ * hand, so the first run stays readable per team.
  */
 export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNextStepsProps) {
   return (
@@ -100,7 +105,10 @@ export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNex
           copyAriaLabel="Copy the plugin install commands"
         />
         <Snippet
-          analytics={{ event: "mcp_config_copied", properties: { client: "generic" } }}
+          analytics={{
+            event: "mcp_config_copied",
+            properties: { client: "generic", team_id: teamId },
+          }}
           ariaLabel="MCP endpoint"
           code={mcpUrl}
           copyAriaLabel="Copy the MCP endpoint"

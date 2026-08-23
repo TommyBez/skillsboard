@@ -32,11 +32,13 @@ function InlineCode({ children }: { children: ReactNode }) {
 }
 
 /**
- * `mcp_config_copied` is not team scoped here: this guide is rendered on the
- * public `/connect`, where most readers have no team yet, and a team scoped
- * copy would have meant reading the session on a page that has to stay
- * prerendered. `client` is what separates the surfaces, and it counts directly
- * against `mcp_setup_viewed`, which is now non team scoped for the same reason.
+ * `mcp_config_copied` carries no team here: this guide is rendered on the
+ * public `/connect`, where most readers have no team yet, and naming one would
+ * have meant reading the session on a page that has to stay prerendered. The
+ * property is optional rather than absent, so the first run on `/start`, which
+ * is authenticated, still sends the team it already knows. `client` is what
+ * separates the surfaces, and it counts directly against `mcp_setup_viewed`,
+ * which is non team scoped for the same reason.
  */
 function configCopiedAnalytics(client: McpClientAnalyticsId) {
   return { event: "mcp_config_copied", properties: { client } } as const
