@@ -31,25 +31,34 @@ function InlineCode({ children }: { children: ReactNode }) {
   return <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
 }
 
-function Snippet({ code, client, teamId }: { code: string; client: McpClientAnalyticsId; teamId: string }) {
+/**
+ * `mcp_config_copied` is team scoped on purpose, so it can be counted against
+ * `mcp_setup_viewed` for the same team. A reader who has not signed in yet has
+ * no team to attribute the copy to, so the copy control still works and simply
+ * reports nothing rather than landing in a null-team bucket. Their interest in
+ * connecting is still visible through `plugin_install_copied`, which is not
+ * team scoped.
+ */
+function configCopiedAnalytics(client: McpClientAnalyticsId, teamId?: string) {
+  return teamId
+    ? ({ event: "mcp_config_copied", properties: { client, team_id: teamId } } as const)
+    : undefined
+}
+
+function Snippet({ code, client, teamId }: { code: string; client: McpClientAnalyticsId; teamId?: string }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[12px] border">
       <pre className="overflow-x-auto bg-foreground p-4 font-mono text-xs leading-5 text-background">
         <code>{code}</code>
       </pre>
       <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton
-          value={code}
-          label="Copy"
-          compact
-          analytics={{ event: "mcp_config_copied", properties: { client, team_id: teamId } }}
-        />
+        <CopyButton value={code} label="Copy" compact analytics={configCopiedAnalytics(client, teamId)} />
       </div>
     </div>
   )
 }
 
-function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientAnalyticsId; teamId: string }) {
+function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientAnalyticsId; teamId?: string }) {
   return (
     <ol className="space-y-6">
       {steps.map((step, index) => (
@@ -90,7 +99,7 @@ const troubleshooting = [
   },
 ]
 
-export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; config: string; teamId: string }) {
+export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; config: string; teamId?: string }) {
   const vscodeConfig = JSON.stringify(
     { servers: { "skills-board": { type: "http", url: mcpUrl } } },
     null,
@@ -241,10 +250,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
         <CopyButton
           value={headerCopyValue}
           label={headerCopyLabel}
-          analytics={{
-            event: "mcp_config_copied",
-            properties: { client: activeGuide.analyticsId, team_id: teamId },
-          }}
+          analytics={configCopiedAnalytics(activeGuide.analyticsId, teamId)}
         />
       </div>
 

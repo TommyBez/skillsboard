@@ -32,8 +32,8 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/discover", "discover-shell", "discover-content")
   })
 
-  test("/settings/mcp", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/settings/mcp", "mcp-shell", "mcp-content")
+  test("/connect", async ({ page }) => {
+    await expectInstantInitialLoad(page, "/connect", "mcp-shell", "mcp-content")
   })
 
   test("/settings/organization", async ({ page }) => {
@@ -83,7 +83,7 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  test("/library -> /settings/mcp", async ({ page }) => {
+  test("/library -> /connect", async ({ page }) => {
     await expectInstantSoftNav(page, {
       from: "/library",
       trigger: productNav("Connect agent"),
@@ -113,9 +113,9 @@ test.describe("instant soft navigation: app routes", () => {
 
   // The account menu items are anchors rendered with the menuitem role
   // (Base UI DropdownMenuItem with nativeButton={false}).
-  test("/settings/mcp -> /settings/organization (account menu)", async ({ page }) => {
+  test("/connect -> /settings/organization (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/settings/mcp",
+      from: "/connect",
       trigger: (p) => p.getByRole("menuitem", { name: "Team access" }),
       shellTestId: "org-settings-shell",
       contentTestId: "org-settings-content",
@@ -125,9 +125,9 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  test("/settings/mcp -> /settings/email (account menu)", async ({ page }) => {
+  test("/connect -> /settings/email (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/settings/mcp",
+      from: "/connect",
       trigger: (p) => p.getByRole("menuitem", { name: "Email preferences" }),
       shellTestId: "email-settings-shell",
       contentTestId: "email-settings-content",

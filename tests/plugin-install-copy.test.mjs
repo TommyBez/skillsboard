@@ -15,7 +15,7 @@ const dashPattern = /[\u2013\u2014]/
 const landingSection = await readText("../components/landing/sections/plugin-section.tsx")
 const settingsBlock = await readText("../components/mcp-plugin-install.tsx")
 const landingPage = await readText("../app/(landing)/page.tsx")
-const settingsPage = await readText("../app/(app)/settings/mcp/page.tsx")
+const connectPage = await readText("../app/connect/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
 const setupGuide = await readText("../components/mcp-setup-guide.tsx")
 const skill = await readText("../plugin/skills/team-skill-library/SKILL.md")
@@ -53,12 +53,12 @@ test("both surfaces quote the shared commands instead of their own copies", () =
 test("the landing page and the connection page render the plugin blocks", () => {
   assert.match(landingPage, /<PluginSection \/>/)
   assert.match(landingPage, /from "@\/components\/landing\/sections\/plugin-section"/)
-  assert.match(settingsPage, /<McpPluginInstall \/>/)
-  assert.match(settingsPage, /from "@\/components\/mcp-plugin-install"/)
+  assert.match(connectPage, /<McpPluginInstall \/>/)
+  assert.match(connectPage, /from "@\/components\/mcp-plugin-install"/)
 })
 
 test("each copy control reports the surface it was copied from", () => {
-  assert.match(events, /plugin_install_copied: \{\n\s+location: "landing" \| "mcp_settings"\n\s+\}/)
+  assert.match(events, /plugin_install_copied: \{\n\s+location: "landing" \| "mcp_settings" \| "onboarding"\n\s+\}/)
   assert.match(landingSection, /location: "landing"/)
   assert.match(settingsBlock, /location: "mcp_settings"/)
 })
@@ -82,8 +82,8 @@ test("the connection page offers the plugin as an alternative to the manual setu
   assert.match(settingsBlock, /Do one or the other, not both\./)
   assert.match(setupGuide, /Option 2: manual MCP setup/)
   assert.match(setupGuide, /Skip this if you installed the plugin above/)
-  assert.match(settingsPage, /data-testid="mcp-setup-or-divider"/)
-  assert.match(settingsPage, /There are two ways to set this up/)
+  assert.match(connectPage, /data-testid="mcp-setup-or-divider"/)
+  assert.match(connectPage, /There are two ways to set this up/)
 })
 
 test("Skills Board is described as a web app, never as a shared library", () => {
@@ -104,7 +104,7 @@ test("Skills Board is described as a web app, never as a shared library", () => 
 })
 
 test("no dash rule violations in the copy this page owns", () => {
-  for (const source of [landingSection, settingsBlock, settingsPage]) {
+  for (const source of [landingSection, settingsBlock, connectPage]) {
     assert.doesNotMatch(source, dashPattern)
   }
 })

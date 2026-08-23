@@ -1,14 +1,40 @@
 import { cache, Suspense } from "react"
+import type { Metadata } from "next"
 import Link from "next/link"
 import { headers } from "next/headers"
+import { getSessionCookie } from "better-auth/cookies"
 import { ArrowLeftIcon } from "lucide-react"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
-import { getAppContext } from "@/lib/app-context"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getConnectViewerTeamId } from "@/lib/connect-viewer"
+import { siteConfig } from "@/lib/site"
+
+const connectPath = "/connect"
+const connectDescription =
+  "Connect Claude Code, Claude Desktop, Cursor, VS Code, or any MCP client to your team's AI skills on Skills Board. Install the plugin or add the MCP endpoint by hand, then sign in through the browser."
+
+export const metadata: Metadata = {
+  title: { absolute: "Connect your agent | Skills Board MCP setup" },
+  description: connectDescription,
+  alternates: { canonical: connectPath },
+  openGraph: {
+    type: "website",
+    url: connectPath,
+    title: "Connect your agent to Skills Board",
+    description: connectDescription,
+    siteName: siteConfig.name,
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Connect your agent to Skills Board",
+    description: connectDescription,
+  },
+}
 
 const availableTools = [
   { name: "list_skills", description: "List saved skills across your team libraries" },
@@ -41,30 +67,39 @@ const getMcpDetails = cache(async () => {
 })
 
 async function McpSetupAnalyticsScope() {
-  const { activeId } = await getAppContext()
+  const teamId = await getConnectViewerTeamId()
+  if (!teamId) return null
 
-  return <McpSetupAnalytics teamId={activeId} />
+  return <McpSetupAnalytics teamId={teamId} />
 }
 
 async function McpGuide() {
-  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
+  const [{ config, mcpUrl }, teamId] = await Promise.all([
     getMcpDetails(),
-    getAppContext(),
+    getConnectViewerTeamId(),
   ])
 
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
+  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={teamId ?? undefined} />
 }
 
-export default function McpSettingsPage() {
+export default async function ConnectPage() {
+  // Cookie presence only, matching the layout: it decides whether the page
+  // adds the main landmark (the marketing frame already carries one) and
+  // whether the way back into the product is worth showing.
+  const isSignedIn = Boolean(getSessionCookie(await headers()))
+  const Container = isSignedIn ? "main" : "div"
+
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
+    <Container className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
       <Suspense fallback={null}>
         <McpSetupAnalyticsScope />
       </Suspense>
-      <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
-        <ArrowLeftIcon data-icon="inline-start" />
-        Back to library
-      </Button>
+      {isSignedIn ? (
+        <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
+          <ArrowLeftIcon data-icon="inline-start" />
+          Back to library
+        </Button>
+      ) : null}
 
       <header className="mt-8 border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
@@ -124,6 +159,6 @@ export default function McpSettingsPage() {
       <div className="mt-8">
         <McpTroubleshooting />
       </div>
-    </main>
+    </Container>
   )
 }

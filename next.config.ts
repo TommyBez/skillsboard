@@ -97,6 +97,20 @@ const nextConfig = {
         destination: "/api/mcp",
         permanent: true,
       },
+      // Connecting an agent moved out of settings to /connect: it is the first
+      // thing a new team does, not a preference to adjust later. Bookmarks, an
+      // open tab whose account menu still points at the old path, and any link
+      // shared in a chat keep working.
+      {
+        source: "/settings/mcp",
+        destination: "/connect",
+        permanent: true,
+      },
+      {
+        source: "/settings/mcp/",
+        destination: "/connect",
+        permanent: true,
+      },
       {
         source: "/about/",
         destination: "/about",

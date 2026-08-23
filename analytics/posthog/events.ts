@@ -17,6 +17,7 @@ type NonTeamEventPropertiesMap = {
       | "hero"
       | "closing"
       | "about_header"
+      | "connect_header"
       | "developers_header"
       | "agent_skills_header"
       | "agent_skills_hero"
@@ -111,9 +112,20 @@ type NonTeamEventPropertiesMap = {
       | "where_skills_inline"
       | "where_skills_closing"
   }
+  /**
+   * `/settings/mcp` stays in the destination union: the setup page now lives at
+   * `/connect`, and the old value is what every event captured before the move
+   * carries, so dropping it would rewrite history rather than record it.
+   */
   mcp_entry_clicked: {
-    destination: "#mcp" | "/settings/mcp" | "/sign-up"
-    location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
+    destination: "#mcp" | "/connect" | "/settings/mcp" | "/sign-up"
+    location:
+      | "account_menu"
+      | "app_navigation"
+      | "landing_hero"
+      | "landing_section"
+      | "library_header"
+      | "onboarding"
   }
   /**
    * Copying the plugin install commands. Non team scoped on purpose: the same
@@ -121,7 +133,7 @@ type NonTeamEventPropertiesMap = {
    * keeps the two surfaces apart.
    */
   plugin_install_copied: {
-    location: "landing" | "mcp_settings"
+    location: "landing" | "mcp_settings" | "onboarding"
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -199,6 +211,19 @@ type TeamEventPropertiesMap = {
   library_empty_state_cta_clicked: {
     cta: "add_skill" | "find_skills"
   }
+  /**
+   * The first-run screen a new team lands on, where connecting an agent and
+   * inviting a teammate are offered beside each other rather than in sequence.
+   */
+  onboarding_steps_viewed: Record<never, never>
+  /**
+   * Only the two steps that have no event of their own. Connecting an agent is
+   * already measured by `mcp_entry_clicked`, `plugin_install_copied`, and
+   * `mcp_config_copied`, and counting it twice would inflate that step.
+   */
+  onboarding_step_clicked: {
+    step: "first_skill" | "invite_team"
+  }
   mcp_setup_viewed: Record<never, never>
   mcp_config_copied: {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
@@ -215,7 +240,7 @@ type TeamEventPropertiesMap = {
   }
   team_invite_link_copied: {
     actor_is_skill_creator: boolean
-    surface: "first_skill_invite_step" | "organization_settings"
+    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
   }
   skill_note_updated: {
     has_note: boolean

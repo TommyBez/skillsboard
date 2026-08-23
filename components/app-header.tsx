@@ -28,10 +28,10 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
             <AppNavLink href="/collections">Collections</AppNavLink>
             <AppNavLink href="/discover">Find skills</AppNavLink>
             <AppNavLink
-              href="/settings/mcp"
+              href="/connect"
               analytics={{
                 event: "mcp_entry_clicked",
-                properties: mcpEntryEventProperties("app_navigation", "/settings/mcp"),
+                properties: mcpEntryEventProperties("app_navigation", "/connect"),
               }}
             >
               Connect agent
@@ -55,11 +55,11 @@ export function AppHeader({ user, organizations, activeId }: AppHeaderProps) {
         <AppNavLink href="/collections" mobile><FolderOpenIcon className="mr-1.5 size-4" aria-hidden="true" />Collections</AppNavLink>
         <AppNavLink href="/discover" mobile><SearchIcon className="mr-1.5 size-4" aria-hidden="true" />Find</AppNavLink>
         <AppNavLink
-          href="/settings/mcp"
+          href="/connect"
           mobile
           analytics={{
             event: "mcp_entry_clicked",
-            properties: mcpEntryEventProperties("app_navigation", "/settings/mcp"),
+            properties: mcpEntryEventProperties("app_navigation", "/connect"),
           }}
         >
           <CableIcon className="mr-1.5 size-4" aria-hidden="true" />Connect

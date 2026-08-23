@@ -69,7 +69,11 @@ export async function createOrganization(
     return { error: "We couldn’t create your team library. Please try again." }
   }
 
-  redirect("/library")
+  // A team created during onboarding goes to the first-run screen, where
+  // connecting an agent and inviting a teammate are offered together. A team
+  // created from inside the app is a switch of context, not a first run, so it
+  // still lands in the library.
+  redirect(creationSurface === "onboarding" ? "/start" : "/library")
 }
 
 export async function setActiveOrganization(organizationId: string) {
