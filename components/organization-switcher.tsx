@@ -22,7 +22,9 @@ export function OrganizationSwitcher({ organizations, activeId }: OrganizationSw
   }
 
   return (
-    <div className="relative w-32 sm:w-44">
+    // min-w-0 lets the switcher give up width on very narrow phones (the
+    // select truncates) instead of forcing the header row past the viewport.
+    <div className="relative w-32 min-w-0 sm:w-44">
       <select
         aria-label="Switch team library"
         className="h-10 w-full appearance-none truncate rounded-xl border border-border bg-card/65 pl-3 pr-9 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-60"
