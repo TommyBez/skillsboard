@@ -8,8 +8,21 @@ import {
 } from "@/lib/agent-auth/config"
 import { AgentAuthError } from "@/lib/agent-auth/errors"
 import { getProviderKeySource } from "@/lib/agent-auth/jwks"
-import { revokeDelegation } from "@/lib/agent-auth/delegations"
-import { consumeAssertionId } from "@/lib/agent-auth/replay"
+import { revokeDelegation, revokeDelegationTokens } from "@/lib/agent-auth/delegations"
+import { db } from "@/lib/db"
+import { agentConsumedAssertion } from "@/lib/db/schema"
+
+/**
+ * How old a SET may be, and equally how long its `jti` tombstone is kept.
+ *
+ * The two bounds are one number on purpose. A SET carries no `exp`, so the
+ * tombstone alone decides how long a replay is remembered — and a token that
+ * stayed *acceptable* after its tombstone was pruned could be replayed to
+ * revoke a delegation the user has since re-approved. Refusing any event
+ * older than the horizon closes that: by the time a tombstone is pruned, the
+ * token it guarded is no longer accepted at all.
+ */
+const SET_MAX_AGE_SECONDS = 24 * 60 * 60
 
 /**
  * Event URIs that mean "this delegation is over".
@@ -78,6 +91,8 @@ export async function applySecurityEventToken(token: unknown): Promise<SecurityE
       audience: acceptedAgentAudiences(),
       algorithms: provider.allowedAlgorithms,
       clockTolerance: AGENT_AUTH_CLOCK_TOLERANCE_SECONDS,
+      // Bounds `iat`: see SET_MAX_AGE_SECONDS.
+      maxTokenAge: SET_MAX_AGE_SECONDS,
       requiredClaims: ["iss", "aud", "iat", "jti"],
       // RFC 8417 §2.3: a SET is marked as one so it can never be mistaken for,
       // or replayed as, an access or identity token.
@@ -91,45 +106,61 @@ export async function applySecurityEventToken(token: unknown): Promise<SecurityE
   const jti = typeof payload.jti === "string" ? payload.jti : ""
   if (!jti) throw new AgentAuthError("invalid_request", "The event carries no jti.")
 
-  // A SET has no `exp`, so the tombstone gets a fixed horizon: long enough
-  // that a transmitter's retries all land on the same already-handled answer,
-  // short enough that the table does not accumulate.
-  const seen = await consumeAssertionId({
-    issuer: `${provider.issuer}#events`,
-    jti,
-    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-  })
-  // Delivered twice is the normal case for an at-least-once transmitter, and
-  // the correct answer is the same success it got the first time.
-  if (!seen) return { revoked: 0, handled: 0, ignored: 0 }
-
   const events = payload.events
   if (!events || typeof events !== "object" || Array.isArray(events)) {
     throw new AgentAuthError("invalid_request", "The event carries no events claim.")
   }
 
-  const outcome: SecurityEventOutcome = { revoked: 0, handled: 0, ignored: 0 }
-  const audience = getAgentAudience()
-
+  // Everything checkable is checked before the jti is spent, and the spend
+  // shares one transaction with the revocations it authorizes. Split apart,
+  // either half fails alone: a tombstone written before a failed revocation
+  // turns the transmitter's retry into a 202 that revoked nothing, and a
+  // revocation before the tombstone lets a replay re-run it.
+  const subjects: string[] = []
+  let ignored = 0
   for (const [eventUri, eventBody] of Object.entries(events as Record<string, unknown>)) {
     if (!REVOCATION_EVENTS.has(eventUri)) {
-      outcome.ignored += 1
+      ignored += 1
       continue
     }
-
     const subject = readSubject(eventBody, payload, provider.issuer)
     if (!subject) {
-      outcome.ignored += 1
+      ignored += 1
       continue
     }
-
-    outcome.handled += 1
-
-    const revoked = await revokeDelegation({ issuer: provider.issuer, subject, audience })
-    if (revoked) outcome.revoked += 1
+    subjects.push(subject)
   }
 
-  return outcome
+  const audience = getAgentAudience()
+
+  const outcome = await db.transaction(async (tx) => {
+    const inserted = await tx
+      .insert(agentConsumedAssertion)
+      .values({
+        issuer: `${provider.issuer}#events`,
+        jti,
+        expiresAt: new Date(Date.now() + SET_MAX_AGE_SECONDS * 1000),
+      })
+      .onConflictDoNothing()
+      .returning({ jti: agentConsumedAssertion.jti })
+
+    // Delivered twice is the normal case for an at-least-once transmitter,
+    // and the correct answer is the same success it got the first time.
+    if (inserted.length === 0) return undefined
+
+    const applied: SecurityEventOutcome = { revoked: 0, handled: 0, ignored }
+    for (const subject of subjects) {
+      applied.handled += 1
+      const revoked = await revokeDelegation({ issuer: provider.issuer, subject, audience }, tx)
+      if (revoked) {
+        await revokeDelegationTokens(revoked.id, tx)
+        applied.revoked += 1
+      }
+    }
+    return applied
+  })
+
+  return outcome ?? { revoked: 0, handled: 0, ignored: 0 }
 }
 
 /**

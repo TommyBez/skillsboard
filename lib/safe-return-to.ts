@@ -1,5 +1,5 @@
 export function safeReturnTo(value: unknown, fallback = "/library") {
-  if (value === "/library" || value === "/settings/email") return value
+  if (value === "/library" || value === "/settings/email" || value === "/agent/claim") return value
   if (typeof value === "string" && /^\/invite\/[A-Za-z0-9_-]{1,200}$/.test(value)) return value
   // The auth.md first-link ceremony. A UUID only, so the path cannot be bent
   // into a query string or an origin-relative redirect.

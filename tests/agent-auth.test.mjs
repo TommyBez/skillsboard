@@ -539,15 +539,16 @@ test("agent_auth is still omitted entirely when registration is unavailable", ()
   assert.equal(buildAgentAuthBlock({ issuer: `${origin}/api/auth` }), undefined)
 })
 
-test("the claim ceremony is the only new sign-in destination, and only by id", () => {
+test("the claim ceremony pages are the only new sign-in destinations", () => {
   const id = "0f9d5a2e-1c3b-4d5e-8a7b-9c0d1e2f3a4b"
 
+  // The code-entry page and one specific ceremony, addressed by UUID only, so
+  // the parameter cannot be bent into another destination.
+  assert.equal(safeReturnTo("/agent/claim"), "/agent/claim")
   assert.equal(safeReturnTo(`/agent/claim/${id}`), `/agent/claim/${id}`)
-  // Anything that is not exactly one UUID under that path falls back, so the
-  // parameter cannot be bent into another destination.
-  assert.equal(safeReturnTo("/agent/claim"), "/library")
   assert.equal(safeReturnTo(`/agent/claim/${id}/../../library`), "/library")
   assert.equal(safeReturnTo(`/agent/claim/${id}?next=https://example.com`), "/library")
+  assert.equal(safeReturnTo("/agent/claim?error=unknown"), "/library")
   assert.equal(safeReturnTo("/agent/identity"), "/library")
 })
 

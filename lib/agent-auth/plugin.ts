@@ -8,7 +8,10 @@ import {
 } from "@/lib/agent-auth/config"
 import { findActiveDelegationById, touchDelegation } from "@/lib/agent-auth/delegations"
 import { AgentAuthError } from "@/lib/agent-auth/errors"
-import { consumeIdentityAssertion } from "@/lib/agent-auth/identity-assertion"
+import {
+  spendIdentityAssertion,
+  verifyIdentityAssertion,
+} from "@/lib/agent-auth/identity-assertion"
 
 /**
  * auth.md Agent Verified, expressed as one extra grant on the existing OAuth
@@ -31,9 +34,15 @@ export function authMdAgentVerified() {
           [JWT_BEARER_GRANT_TYPE]: async ({ ctx: endpointContext, provider }) => {
             const body = (endpointContext.body ?? {}) as Record<string, unknown>
 
+            // Verified here, spent only at the end: everything between is a
+            // recoverable failure (a wrong secret, a transient auth error, a
+            // revocation landing mid-window), and a `jti` burned up front
+            // would cost the agent a fresh provider round trip for a request
+            // it could simply have corrected. The ID-JAG path holds the same
+            // invariant.
             let verified
             try {
-              verified = await consumeIdentityAssertion(body.assertion)
+              verified = await verifyIdentityAssertion(body.assertion)
             } catch (error) {
               throw toApiError(error)
             }
@@ -81,6 +90,14 @@ export function authMdAgentVerified() {
               })
             }
 
+            // Every check has passed; the assertion is spent now, immediately
+            // before minting, so it buys exactly one token set.
+            try {
+              await spendIdentityAssertion(verified)
+            } catch (error) {
+              throw toApiError(error)
+            }
+
             await touchDelegation(delegation.id)
 
             const resource = getAgentAudience()
@@ -91,6 +108,10 @@ export function authMdAgentVerified() {
               scopes: verified.scopes,
               resources: [resource],
               originalResources: [resource],
+              // Stored on the token rows (never stamped into the JWT), which
+              // is what lets a delegation revocation find and revoke every
+              // credential minted through it.
+              referenceId: delegation.id,
               // The provider's word on when the human last authenticated. It
               // came from the ID-JAG's `auth_time`, so a resource that cares
               // about freshness reads the provider's answer, not ours.

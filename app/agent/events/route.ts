@@ -19,7 +19,8 @@ export async function POST(request: Request) {
 
   try {
     const contentType = request.headers.get("content-type") ?? ""
-    if (!contentType.includes("application/secevent+jwt") && !contentType.includes("text/plain")) {
+    const mediaType = contentType.split(";", 1)[0].trim().toLowerCase()
+    if (mediaType !== "application/secevent+jwt" && mediaType !== "text/plain") {
       throw new AgentAuthError(
         "invalid_request",
         "Send the Security Event Token as application/secevent+jwt.",

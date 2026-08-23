@@ -28,7 +28,7 @@ interface ClaimEntryPageProps {
 async function openClaim(formData: FormData) {
   "use server"
 
-  await requireSession("/library")
+  await requireSession("/agent/claim")
 
   const registration = await findOpenRegistrationByUserCode(String(formData.get("userCode") ?? ""))
   if (!registration || registration.status !== "pending_claim") {
@@ -46,7 +46,7 @@ async function openClaim(formData: FormData) {
  * and for the user who typed the short URL out of a terminal.
  */
 async function ClaimEntryContent({ searchParams }: ClaimEntryPageProps) {
-  await requireSession("/library")
+  await requireSession("/agent/claim")
   const { error } = await searchParams
 
   return (

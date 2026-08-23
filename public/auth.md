@@ -103,8 +103,11 @@ Content-Type: application/json
 ```
 
 The ID-JAG has to carry `iss`, `sub`, `aud`, `exp`, `iat`, `jti`, `auth_time`,
-and a verified identifier — `email` with `email_verified: true`. An `email`
-claim on its own is not enough. Each `jti` is single-use.
+and one verified identifier — either `email` with `email_verified: true` or
+`phone_number` with `phone_number_verified: true`. An identifier claim on its
+own, without the matching `_verified` claim, is not enough. Account matching
+and provisioning run on the verified email, so a phone-only assertion verifies
+but cannot resolve a Skills Board account today. Each `jti` is single-use.
 
 On success:
 
@@ -276,10 +279,12 @@ re-register.
 **The whole delegation.** A trusted agent provider can transmit a Security Event
 Token to `agent_auth.events_endpoint`
 (`https://www.skillsboard.sh/agent/events`, `application/secevent+jwt`, RFC
-8935). A recognized revocation event ends the link between that
-`(issuer, subject)` and the Skills Board account. After that, a fresh ID-JAG
-does **not** reinstate it — `/agent/identity` answers `403 access_denied` until
-the account holder approves the link again through the ceremony in step 3.
+8935; events older than 24 hours are refused). A recognized revocation event
+ends the link between that `(issuer, subject)` and the Skills Board account and
+revokes the access tokens minted through it at the authorization server. After
+that, a fresh ID-JAG does **not** silently reinstate the link: the next
+identity request runs the claim ceremony again (`interaction_required`), so
+only the account holder, signing in with their email code, can re-approve it.
 
 Skills Board does not push revocation events to agents; there is no
 notification endpoint to subscribe to.

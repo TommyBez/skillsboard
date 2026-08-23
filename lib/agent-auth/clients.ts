@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 
 import { AgentAuthError } from "@/lib/agent-auth/errors"
 import { db } from "@/lib/db"
@@ -44,13 +44,20 @@ export async function requireAgentClient(clientId: unknown): Promise<AgentClient
   return { clientId: row.clientId, name: row.name }
 }
 
-/** The display name to show a human during a first-link ceremony. */
+/**
+ * The display name to show a human during a first-link ceremony.
+ *
+ * `disabled` is filtered after the read rather than in SQL because the column
+ * is nullable and `disabled = false` would drop the NULL rows —
+ * `requireAgentClient` treats NULL as enabled, and the two must agree.
+ */
 export async function findClientName(clientId: string): Promise<string | null> {
   const [row] = await db
-    .select({ name: oauthClient.name })
+    .select({ name: oauthClient.name, disabled: oauthClient.disabled })
     .from(oauthClient)
-    .where(and(eq(oauthClient.clientId, clientId), eq(oauthClient.disabled, false)))
+    .where(eq(oauthClient.clientId, clientId))
     .limit(1)
 
-  return row?.name ?? null
+  if (!row || row.disabled) return null
+  return row.name
 }

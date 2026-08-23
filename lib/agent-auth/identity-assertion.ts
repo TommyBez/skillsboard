@@ -112,19 +112,25 @@ export interface VerifiedIdentityAssertion {
   providerIssuer: string
   providerSubject: string
   authTime?: number
+  /** What `spendIdentityAssertion` needs to burn this assertion exactly once. */
+  issuer: string
+  jti: string
+  expiresAt: Date
   payload: JWTPayload
 }
 
 /**
- * Verifies and *spends* an identity assertion.
+ * Verifies an identity assertion without spending it.
  *
- * Single-use through the same `jti` tombstone table the ID-JAG uses, keyed by
- * our own issuer so the two namespaces cannot collide. Without it a captured
- * assertion could be exchanged repeatedly for the whole two minutes it lives.
+ * Verification and consumption are two steps on purpose: the token endpoint
+ * runs recoverable checks after this one — client authentication, the client
+ * binding, the delegation's liveness — and a failure there must leave the
+ * assertion usable for a corrected retry. Only the caller that has passed
+ * every check spends the `jti`, via `spendIdentityAssertion`, immediately
+ * before minting.
  */
-export async function consumeIdentityAssertion(
+export async function verifyIdentityAssertion(
   assertion: unknown,
-  { consume = consumeAssertionId }: { consume?: typeof consumeAssertionId } = {},
 ): Promise<VerifiedIdentityAssertion> {
   if (typeof assertion !== "string" || assertion.split(".").length !== 3) {
     throw new AgentAuthError("invalid_grant", "assertion must be a signed JWT.")
@@ -165,11 +171,6 @@ export async function consumeIdentityAssertion(
     throw new AgentAuthError("invalid_scope", "The identity assertion authorizes no usable scope.")
   }
 
-  const fresh = await consume({ issuer, jti, expiresAt })
-  if (!fresh) {
-    throw new AgentAuthError("invalid_grant", "This identity assertion has already been exchanged.")
-  }
-
   return {
     userId,
     delegationId,
@@ -178,8 +179,42 @@ export async function consumeIdentityAssertion(
     providerIssuer: typeof payload.provider_iss === "string" ? payload.provider_iss : "",
     providerSubject: typeof payload.provider_sub === "string" ? payload.provider_sub : "",
     authTime: typeof payload.auth_time === "number" ? payload.auth_time : undefined,
+    issuer,
+    jti,
+    expiresAt,
     payload,
   }
+}
+
+/**
+ * Burns a verified assertion's `jti`, failing if it was already spent.
+ *
+ * Single-use through the same tombstone table the ID-JAG uses, keyed by our
+ * own issuer so the two namespaces cannot collide. Without it a captured
+ * assertion could be exchanged repeatedly for the whole two minutes it lives.
+ */
+export async function spendIdentityAssertion(
+  verified: VerifiedIdentityAssertion,
+  { consume = consumeAssertionId }: { consume?: typeof consumeAssertionId } = {},
+): Promise<void> {
+  const fresh = await consume({
+    issuer: verified.issuer,
+    jti: verified.jti,
+    expiresAt: verified.expiresAt,
+  })
+  if (!fresh) {
+    throw new AgentAuthError("invalid_grant", "This identity assertion has already been exchanged.")
+  }
+}
+
+/** Verify and spend in one step, for callers with no checks in between. */
+export async function consumeIdentityAssertion(
+  assertion: unknown,
+  options: { consume?: typeof consumeAssertionId } = {},
+): Promise<VerifiedIdentityAssertion> {
+  const verified = await verifyIdentityAssertion(assertion)
+  await spendIdentityAssertion(verified, options)
+  return verified
 }
 
 /**

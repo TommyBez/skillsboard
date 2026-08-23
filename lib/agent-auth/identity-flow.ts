@@ -9,10 +9,10 @@ import {
   type AgentVerifiedScope,
 } from "@/lib/agent-auth/config"
 import {
+  createDelegationIfAbsent,
   findActiveDelegation,
-  findDelegation,
   touchDelegation,
-  upsertDelegation,
+  type AgentDelegationRow,
 } from "@/lib/agent-auth/delegations"
 import { AgentAuthError } from "@/lib/agent-auth/errors"
 import { verifyIdJag, type VerifiedIdJag } from "@/lib/agent-auth/id-jag"
@@ -66,15 +66,22 @@ export async function runIdentityFlow(
   // caller's problem and must never fail an otherwise valid exchange.
   void pruneExpiredState()
 
-  const userId = await resolveUserForIdJag(idJag, { clientId, requestedScopes, audience })
+  const resolution = await resolveUserForIdJag(idJag, { clientId, requestedScopes, audience })
+  const userId = resolution.userId
 
-  const delegation = await upsertDelegation({
-    userId,
-    issuer: idJag.issuer,
-    subject: idJag.subject,
-    audience,
-    providerName: idJag.provider.displayName,
-  })
+  // An already-active delegation is used as found, never rewritten: an update
+  // here could race a concurrent revocation event and clear a tombstone that
+  // was just written. Only a resolution with no row yet (JIT provisioning)
+  // creates one, and `createDelegationIfAbsent` refuses to touch a revoked one.
+  const delegation =
+    resolution.delegation ??
+    (await createDelegationIfAbsent({
+      userId,
+      issuer: idJag.issuer,
+      subject: idJag.subject,
+      audience,
+      providerName: idJag.provider.displayName,
+    }))
 
   // `lastUsedAt` on the delegation is the record that an exchange happened;
   // `agentRegistration` stays a queue of in-flight ceremonies rather than
@@ -107,9 +114,9 @@ export function toResult(minted: MintedIdentityAssertion): IdentityAssertionResu
 /**
  * The resolution ladder, in the one order that is safe.
  *
- * A: a delegation exists — use it, and never re-derive the user from the
- * email, because the delegation is the stronger statement and the email may
- * since have moved.
+ * A: an active delegation exists — use it, and never re-derive the user from
+ * the email, because the delegation is the stronger statement and the email
+ * may since have moved.
  *
  * B: no delegation, no account with that verified email — provision one only
  * if an operator turned that on.
@@ -118,6 +125,12 @@ export function toResult(minted: MintedIdentityAssertion): IdentityAssertionResu
  * This is the case the whole flow exists to get right: `email_verified: true`
  * means the provider checked the address, not that the provider is entitled to
  * the Skills Board account that happens to share it.
+ *
+ * A *revoked* delegation deliberately falls through to the same ladder rather
+ * than dead-ending: the assertion alone can never reactivate it (case A only
+ * matches active rows, and `createDelegationIfAbsent` refuses a tombstone),
+ * but the account holder can re-approve the link through the case C ceremony —
+ * which is exactly the recovery the revocation error tells the agent to seek.
  */
 async function resolveUserForIdJag(
   idJag: VerifiedIdJag,
@@ -126,21 +139,11 @@ async function resolveUserForIdJag(
     requestedScopes: AgentVerifiedScope[]
     audience: string
   },
-): Promise<string> {
+): Promise<{ userId: string; delegation?: AgentDelegationRow }> {
   const key = { issuer: idJag.issuer, subject: idJag.subject, audience: context.audience }
 
   const active = await findActiveDelegation(key)
-  if (active) return active.userId
-
-  // A delegation that exists but is revoked is a decision, not an absence. A
-  // fresh ID-JAG must not undo it; only a human re-running the ceremony can.
-  const revoked = await findDelegation(key)
-  if (revoked?.revokedAt) {
-    throw new AgentAuthError(
-      "access_denied",
-      "This delegation was revoked. The user has to link this agent again from Skills Board.",
-    )
-  }
+  if (active) return { userId: active.userId, delegation: active }
 
   const email = idJag.emailVerified ? idJag.email : undefined
   if (!email) {
@@ -166,7 +169,17 @@ async function resolveUserForIdJag(
     )
   }
 
-  return provisionUser({ email, providerName: idJag.provider.displayName })
+  const provisioned = await provisionUser({ email, providerName: idJag.provider.displayName })
+
+  // The account came into existence between the lookup above and the create —
+  // another request, or an ordinary signup. That address now belongs to an
+  // existing account, which is case C, not case B: the collision loser does
+  // not get to adopt an account it did not create.
+  if (provisioned.collidedWithExisting) {
+    throw await buildClaimChallenge(idJag, provisioned.userId, context)
+  }
+
+  return { userId: provisioned.userId }
 }
 
 /**
@@ -240,7 +253,7 @@ async function provisionUser({
 }: {
   email: string
   providerName: string
-}): Promise<string> {
+}): Promise<{ userId: string; collidedWithExisting: boolean }> {
   const context = await auth.$context
 
   try {
@@ -258,13 +271,13 @@ async function provisionUser({
       // can single this path out.
       { method: "agent-id-jag" },
     )
-    return created.id
+    return { userId: created.id, collidedWithExisting: false }
   } catch (error) {
-    // A concurrent request may have created the same account between the
-    // lookup and here; the unique index on email says so, and the account it
-    // created is the one we wanted.
+    // The unique index on email says someone else created this account after
+    // the lookup. Reported rather than adopted: the caller has to send this
+    // through the claim ceremony like any other existing account.
     const existing = await findUserByEmail(email)
-    if (existing) return existing.id
+    if (existing) return { userId: existing.id, collidedWithExisting: true }
 
     console.error("Unable to provision a Skills Board account from an agent assertion", {
       provider: providerName,

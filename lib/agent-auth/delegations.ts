@@ -1,7 +1,16 @@
 import { and, eq, isNull, sql } from "drizzle-orm"
 
+import { AgentAuthError } from "@/lib/agent-auth/errors"
 import { db } from "@/lib/db"
-import { agentDelegation } from "@/lib/db/schema"
+import { agentDelegation, oauthAccessToken, oauthRefreshToken } from "@/lib/db/schema"
+
+/**
+ * The queries here run standalone or inside a transaction — revocation has to
+ * be atomic with the replay tombstone that guards it (see
+ * `applySecurityEventToken`), so every writer takes the executor as a
+ * parameter and defaults to the shared client.
+ */
+type DbClient = typeof db | Parameters<Parameters<(typeof db)["transaction"]>[0]>[0]
 
 export interface AgentDelegationRow {
   id: string
@@ -118,6 +127,32 @@ export async function upsertDelegation(input: {
   return row
 }
 
+/**
+ * Revokes every access and refresh token minted through a delegation.
+ *
+ * The jwt-bearer grant stamps `referenceId = delegation.id` on the tokens it
+ * issues, which is what makes this query possible: revoking the delegation is
+ * a statement about the *relationship*, and the credentials derived from it
+ * must not outlive it. This is the same `revoked` mark `/oauth2/revoke`
+ * writes, so introspection and opaque validation reject the tokens
+ * immediately; a JWT access token already in flight validates statelessly
+ * until its own `exp`, which is the ceiling Better Auth's model has.
+ */
+export async function revokeDelegationTokens(
+  delegationId: string,
+  client: DbClient = db,
+): Promise<void> {
+  const revoked = sql`CURRENT_TIMESTAMP`
+  await client
+    .update(oauthAccessToken)
+    .set({ revoked })
+    .where(and(eq(oauthAccessToken.referenceId, delegationId), isNull(oauthAccessToken.revoked)))
+  await client
+    .update(oauthRefreshToken)
+    .set({ revoked })
+    .where(and(eq(oauthRefreshToken.referenceId, delegationId), isNull(oauthRefreshToken.revoked)))
+}
+
 /** Stamps a successful exchange, so an operator can see a delegation is live. */
 export async function touchDelegation(id: string): Promise<void> {
   await db
@@ -127,17 +162,70 @@ export async function touchDelegation(id: string): Promise<void> {
 }
 
 /**
+ * Writes the delegation the identity flow resolved, without ever resurrecting
+ * a revoked one.
+ *
+ * `onConflictDoNothing` instead of an upsert is the point: between the flow's
+ * revocation check and this write, a security event can land, and an update
+ * that cleared `revokedAt` here would let an already-in-flight ID-JAG undo it.
+ * On conflict the stored row is re-read and its `revokedAt` is honoured; only
+ * the claim ceremony's `upsertDelegation`, backed by a human approval, may
+ * clear a tombstone.
+ */
+export async function createDelegationIfAbsent(input: {
+  userId: string
+  issuer: string
+  subject: string
+  audience: string
+  providerName?: string | null
+}): Promise<AgentDelegationRow> {
+  const [inserted] = await db
+    .insert(agentDelegation)
+    .values({
+      userId: input.userId,
+      issuer: input.issuer,
+      subject: input.subject,
+      audience: input.audience,
+      providerName: input.providerName ?? null,
+    })
+    .onConflictDoNothing()
+    .returning()
+
+  if (inserted) return inserted
+
+  const existing = await findDelegation({
+    issuer: input.issuer,
+    subject: input.subject,
+    audience: input.audience,
+  })
+
+  // A concurrent writer beat this one. Revoked or re-pointed, the stored row
+  // wins and this exchange does not: resolving it takes the ceremony.
+  if (!existing || existing.revokedAt || existing.userId !== input.userId) {
+    throw new AgentAuthError(
+      "access_denied",
+      "This delegation was revoked. The account holder has to approve the link again.",
+    )
+  }
+
+  return existing
+}
+
+/**
  * Marks a delegation revoked, returning the row when one changed.
  *
  * Idempotent: an already-revoked delegation keeps its original `revokedAt`, so
  * a provider that retries a security event does not keep moving the timestamp.
  */
-export async function revokeDelegation(key: {
-  issuer: string
-  subject: string
-  audience: string
-}): Promise<AgentDelegationRow | undefined> {
-  const [row] = await db
+export async function revokeDelegation(
+  key: {
+    issuer: string
+    subject: string
+    audience: string
+  },
+  client: DbClient = db,
+): Promise<AgentDelegationRow | undefined> {
+  const [row] = await client
     .update(agentDelegation)
     .set({ revokedAt: sql`CURRENT_TIMESTAMP`, updatedAt: sql`CURRENT_TIMESTAMP` })
     .where(

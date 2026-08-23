@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 
 import { decideAgentClaim } from "@/app/actions/agent-claim"
 import { ButtonPendingContent } from "@/components/button-pending-content"
@@ -14,7 +13,6 @@ const MESSAGES: Record<string, string> = {
 }
 
 export function AgentClaimForm({ registrationId }: { registrationId: string }) {
-  const router = useRouter()
   const [pending, setPending] = useState<"approve" | "deny" | null>(null)
   const [outcome, setOutcome] = useState<"approved" | "denied" | null>(null)
   const [error, setError] = useState("")
@@ -24,9 +22,11 @@ export function AgentClaimForm({ registrationId }: { registrationId: string }) {
     setError("")
     try {
       const result = await decideAgentClaim(registrationId, decision)
+      // No router.refresh(): the server page treats anything but
+      // pending_claim as "isn't open", so a refresh would replace this
+      // confirmation with that message.
       if (result.status === "approved" || result.status === "denied") {
         setOutcome(result.status)
-        router.refresh()
         return
       }
       setError(MESSAGES[result.status] ?? "We couldn’t complete this request.")
