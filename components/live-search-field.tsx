@@ -105,7 +105,10 @@ export function LiveSearchField({ id, label, placeholder, minLength = 1 }: LiveS
 
   useEffect(() => {
     const query = toQuery(value, minLength)
-    if (query === toQuery(qFromUrl, minLength)) return
+    // Compared against the raw URL value, not a normalized one: a `q` the URL
+    // should not be carrying — one the field is too short to justify, or an
+    // untrimmed one — has to be rewritten, not read as already agreeing.
+    if (query === qFromUrl) return
 
     // An emptied field has no "still typing" to wait out, so it reverts the
     // results on the spot; a live query waits for the typing to settle.
