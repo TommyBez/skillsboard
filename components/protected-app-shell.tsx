@@ -28,9 +28,9 @@ function AppHeaderFallback() {
   return (
     <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-xl">
       <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center gap-3 px-4 md:px-6 lg:px-8">
-        <Brand />
+        <Brand compactOnMobile="sm" />
         <Skeleton className="ml-3 hidden h-11 w-[22rem] rounded-xl md:block" />
-        <Skeleton className="ml-auto h-10 w-32 rounded-xl sm:w-44" />
+        <Skeleton className="ml-auto h-10 w-32 min-w-0 rounded-xl sm:w-44" />
         <ThemeToggle />
         <Skeleton className="size-10 rounded-xl" />
       </div>
