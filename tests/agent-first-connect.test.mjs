@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { access, readFile } from "node:fs/promises"
+import { access, readFile, readdir } from "node:fs/promises"
 import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
@@ -21,6 +21,33 @@ async function exists(relative) {
   }
 }
 
+async function readSourceTree(relative) {
+  const directory = new URL(relative, import.meta.url)
+  const entries = await readdir(directory, { withFileTypes: true })
+  const sources = []
+
+  for (const entry of entries) {
+    const child = new URL(entry.name, `${directory.href}/`)
+    if (entry.isDirectory()) {
+      sources.push(...(await readSourceTree(child.href)))
+    } else if (/\.[cm]?[jt]sx?$/.test(entry.name)) {
+      sources.push(await readFile(child, "utf8"))
+    }
+  }
+
+  return sources
+}
+
+function assertPatternsInOrder(source, patterns, message) {
+  let cursor = 0
+
+  for (const pattern of patterns) {
+    const match = source.slice(cursor).match(pattern)
+    assert.ok(match, `${message}: missing ${pattern}`)
+    cursor += match.index + match[0].length
+  }
+}
+
 const connectPage = await readText("../app/(app)/connect/page.tsx")
 const appHeader = await readText("../components/app-header.tsx")
 const accountMenu = await readText("../components/account-menu.tsx")
@@ -35,12 +62,21 @@ const organizationSettings = await readText("../app/(app)/settings/organization/
 const events = await readText("../analytics/posthog/events.ts")
 const mcpSetupGuide = await readText("../components/mcp-setup-guide.tsx")
 const appLayout = await readText("../app/(app)/layout.tsx")
+const rootLayout = await readText("../app/layout.tsx")
 const protectedAppShell = await readText("../components/protected-app-shell.tsx")
-const posthogAnalytics = await readText("../components/posthog-analytics.tsx")
+const posthogIdentity = await readText("../components/posthog-identity.tsx")
 const posthogClient = await readText("../lib/posthog-client.ts")
 const analyticsClient = await readText("../lib/analytics-client.ts")
+const createOrganizationForm = await readText("../components/create-organization-form.tsx")
+const acceptInvitationForm = await readText("../components/accept-invitation-form.tsx")
+const organizationSwitcher = await readText("../components/organization-switcher.tsx")
 const consentPage = await readText("../app/consent/page.tsx")
 const llms = await readText("../public/llms.txt")
+const applicationSources = (
+  await Promise.all(
+    ["../analytics/", "../app/", "../components/", "../lib/"].map(readSourceTree),
+  )
+).flat()
 
 /** Em dash and en dash are not allowed anywhere in published copy. */
 const dashPattern = /[–—]/
@@ -174,20 +210,40 @@ test("only the first-run content that needs app context waits for it", () => {
   assert.doesNotMatch(connectPage, /headers\(\)/)
 })
 
-test("OTP success names the destination from the form mode", async () => {
+test("OTP success identifies first, flushes the auth event, then reloads the destination", async () => {
   const authForm = await readText("../components/auth-form.tsx")
-  assert.match(authForm, /router\.push\(destinationAfterOtp\(returnTo, mode\)\)/)
+  assertPatternsInOrder(
+    authForm,
+    [
+      /await syncPostHogIdentity\(\{ userId \}\)/,
+      /captureAnalyticsEvent\(/,
+      /window\.location\.assign\(destinationAfterOtp\(returnTo, mode\)\)/,
+    ],
+    "OTP success",
+  )
+  assert.equal((authForm.match(/send_instantly:\s*true/g) ?? []).length, 2)
+  assert.match(authForm, /window\.location\.assign\(continueHref\)/)
+  assert.doesNotMatch(authForm, /activeOrganizationId|authClient\.getSession\(/)
+  assert.doesNotMatch(authForm, /router\.(?:push|refresh|replace)\(/)
 })
 
 test("a team created in onboarding lands on the first-run screen", async () => {
   const onboardingPage = await readText("../app/onboarding/page.tsx")
-  assert.match(organizationActions, /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/)
-  // After the action redirects, this page revalidates. Sending an empty team
-  // to /library here would steal the first run.
+  assert.match(
+    organizationActions,
+    /const destination = creationSurface === "onboarding" \? "\/start" : "\/library"/,
+  )
+  assert.doesNotMatch(
+    organizationActions,
+    /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/,
+  )
+  // After a reload, this page still sends an existing empty team to the
+  // first-run screen. The create form owns the normal client navigation so it
+  // can register the new team with PostHog first.
   assert.match(onboardingPage, /redirect\(skillCount === 0 \? "\/start" : "\/library"\)/)
 })
 
-test("route views use one scoped pageview while real actions stay custom", async () => {
+test("route views stay native while real actions stay custom", async () => {
   for (const event of [
     "plugin_install_copied",
     "mcp_config_copied",
@@ -212,29 +268,82 @@ test("route views use one scoped pageview while real actions stay custom", async
   assert.equal(await exists("../components/mcp-setup-analytics.tsx"), false)
   assert.equal(await exists("../components/onboarding-steps-analytics.tsx"), false)
 
-  // The route tracker extends the existing PostHog identity pattern with one
-  // team super property, then emits the canonical `$pageview` directly.
-  assert.match(posthogClient, /capture_pageview: false/)
+  // PostHog owns initial and history-change pageviews. The app only applies
+  // identity and the active team before those transitions; it never captures
+  // `$pageview` itself.
+  assert.match(posthogClient, /capture_pageview: "history_change"/)
+  assert.doesNotMatch(posthogClient, /capture_pageview: false/)
   assert.doesNotMatch(appLayout, /getAppContext|PostHogRoute|Suspense/)
   assert.match(protectedAppShell, /const \{ session, organizations, activeId \} = await getAppContext\(\)/)
-  assert.match(protectedAppShell, /<PostHogRoute userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
+  assert.match(protectedAppShell, /<PostHogIdentity userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
   assert.match(posthogClient, /posthog\.identify\(userId\)/)
   assert.match(posthogClient, /posthog\.register\(\{ team_id: teamId \}\)/)
   assert.match(posthogClient, /posthog\.unregister\("team_id"\)/)
   assert.match(
-    posthogAnalytics,
-    /applyPostHogIdentity\(posthog, \{ teamId, userId \}\)[\s\S]*posthog\.capture\(\s*"\$pageview"/,
+    posthogIdentity,
+    /syncPostHogIdentity\(\{\s*teamId,\s*userId,?\s*\}\)/,
   )
-  assert.match(posthogAnalytics, /useSelectedLayoutSegment\(\)/)
+  assert.match(posthogIdentity, /userId:\s*string \| null/)
+  assert.match(posthogIdentity, /useSelectedLayoutSegment\(\)/)
+  for (const segment of ["(account)", "(app)", "consent", "onboarding"]) {
+    assert.match(posthogIdentity, new RegExp(`"${segment.replace(/[()]/g, "\\$&")}"`))
+  }
+  assert.match(posthogIdentity, /if \(!isIdentityScoped\) void posthogReady\(\)/)
+  assert.match(rootLayout, /import \{ PostHogBootstrap \} from "@\/components\/posthog-identity"/)
+  assert.match(rootLayout, /<Suspense fallback=\{null\}>\s*<PostHogBootstrap \/>\s*<\/Suspense>/)
+  assert.equal(await exists("../instrumentation-client.ts"), false)
+  for (const source of applicationSources) {
+    assert.doesNotMatch(source, /\.capture\(\s*["'`]\$pageview["'`]/)
+  }
   assert.match(analyticsClient, /posthogReady\(\)\.then\(\(posthog\) =>/)
   assert.doesNotMatch(analyticsClient, /queue|scope|team_id/)
+  assert.equal(await exists("../components/posthog-analytics.tsx"), false)
   assert.equal(await exists("../lib/posthog-scope.ts"), false)
   assert.equal(await exists("../lib/posthog-scope-state.ts"), false)
   assert.equal(await exists("../lib/posthog-route-scope.ts"), false)
 
-  // Invalid OAuth requests deliberately resolve the route without a user
-  // lookup and still emit their anonymous canonical pageview.
-  assert.equal((consentPage.match(/<PostHogRoute userId=\{null\} \/>/g) ?? []).length, 2)
+  // Consent is bootstrap-excluded, so even invalid anonymous requests start
+  // native tracking through their identity-scoped component.
+  assert.equal((consentPage.match(/<PostHogIdentity userId=\{null\} \/>/g) ?? []).length, 2)
+  assert.equal(
+    (consentPage.match(/<PostHogIdentity userId=\{session\.user\.id\} \/>/g) ?? []).length,
+    1,
+  )
+})
+
+test("team-changing transitions synchronize PostHog before navigation", () => {
+  assert.match(organizationActions, /teamId:\s*created\.id/)
+  assert.match(
+    organizationActions,
+    /teamId:\s*accepted\.invitation\.organizationId/,
+  )
+  assert.doesNotMatch(organizationActions, /redirect\("\/library"\)/)
+
+  assertPatternsInOrder(
+    createOrganizationForm,
+    [
+      /await createOrganization\(/,
+      /await authClient\.organization\.setActive\(/,
+      /await syncPostHogTeam\(/,
+      /router\.push\(/,
+    ],
+    "team creation",
+  )
+  assertPatternsInOrder(
+    acceptInvitationForm,
+    [/await acceptInvitation\(/, /await syncPostHogTeam\(/, /router\.push\(/],
+    "invitation acceptance",
+  )
+  assertPatternsInOrder(
+    organizationSwitcher,
+    [
+      /await (?:setActiveOrganization|authClient\.organization\.setActive)\(/,
+      /await syncPostHogTeam\(/,
+      /router\.refresh\(/,
+    ],
+    "team switch",
+  )
+  assert.doesNotMatch(organizationSwitcher, /router\.(?:push|replace)\(/)
 })
 
 /**

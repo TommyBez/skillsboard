@@ -7,7 +7,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { ConsentForm } from "@/components/consent-form"
-import { PostHogRoute } from "@/components/posthog-analytics"
+import { PostHogIdentity } from "@/components/posthog-identity"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
@@ -54,7 +54,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
   if (!clientId) {
     return (
       <>
-        <PostHogRoute userId={null} />
+        <PostHogIdentity userId={null} />
         <InvalidAuthorizationRequest />
       </>
     )
@@ -70,7 +70,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
     console.error("Unable to verify OAuth authorization request", error)
     return (
       <>
-        <PostHogRoute userId={null} />
+        <PostHogIdentity userId={null} />
         <InvalidAuthorizationRequest />
       </>
     )
@@ -84,7 +84,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <PostHogRoute userId={session.user.id} />
+      <PostHogIdentity userId={session.user.id} />
       <div className="flex items-center gap-3 border-b border-border pb-5">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
           <ShieldCheckIcon className="size-5" aria-hidden="true" />

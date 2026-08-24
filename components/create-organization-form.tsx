@@ -1,17 +1,28 @@
 "use client"
 
 import { useActionState } from "react"
+import { useRouter } from "next/navigation"
 
-import { createOrganization } from "@/app/actions/organizations"
+import {
+  createOrganization,
+  type CreateOrganizationState,
+} from "@/app/actions/organizations"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
+import { syncPostHogTeam } from "@/lib/posthog-client"
 
-const initialState = { error: "" }
+const initialState: CreateOrganizationState = {
+  destination: "",
+  error: "",
+  teamId: "",
+}
 
 interface CreateOrganizationFormProps {
   creationSurface?: "onboarding" | "in_app"
   idPrefix?: string
+  onSuccess?: () => void
   submitLabel?: string
   pendingLabel?: string
 }
@@ -19,10 +30,40 @@ interface CreateOrganizationFormProps {
 export function CreateOrganizationForm({
   creationSurface = "onboarding",
   idPrefix = "create-org",
+  onSuccess,
   submitLabel = "Create team library",
   pendingLabel = "Creating library…",
 }: CreateOrganizationFormProps) {
-  const [state, action] = useActionState(createOrganization, initialState)
+  const router = useRouter()
+  const [state, action] = useActionState(
+    async (previousState: CreateOrganizationState, formData: FormData) => {
+      // If activation failed after creation, retry that transition instead of
+      // creating a second team from the same form submission.
+      const result = previousState.teamId
+        ? previousState
+        : await createOrganization(previousState, formData)
+      if (!result.teamId || !result.destination) return result
+
+      try {
+        const activation = await authClient.organization.setActive({
+          organizationId: result.teamId,
+        })
+        if (activation.error) throw new Error(activation.error.message)
+
+        await syncPostHogTeam(result.teamId)
+        onSuccess?.()
+        router.push(result.destination)
+        router.refresh()
+        return { ...result, error: "" }
+      } catch {
+        return {
+          ...result,
+          error: "Your team library was created, but we couldn’t open it. Try again.",
+        }
+      }
+    },
+    initialState,
+  )
 
   return (
     <form action={action} className="flex flex-col gap-7">

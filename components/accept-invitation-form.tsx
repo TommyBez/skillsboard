@@ -2,15 +2,32 @@
 
 import { useActionState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
-import { acceptInvitation } from "@/app/actions/organizations"
+import {
+  acceptInvitation,
+  type AcceptInvitationState,
+} from "@/app/actions/organizations"
 import { FormSubmitButton } from "@/components/form-submit-button"
 import { Button } from "@/components/ui/button"
+import { syncPostHogTeam } from "@/lib/posthog-client"
 
-const initialState = { error: "" }
+const initialState: AcceptInvitationState = { error: "", teamId: "" }
 
 export function AcceptInvitationForm({ invitationId }: { invitationId: string }) {
-  const [state, action] = useActionState(acceptInvitation, initialState)
+  const router = useRouter()
+  const [state, action] = useActionState(
+    async (previousState: AcceptInvitationState, formData: FormData) => {
+      const result = await acceptInvitation(previousState, formData)
+      if (!result.teamId) return result
+
+      await syncPostHogTeam(result.teamId)
+      router.push("/library")
+      router.refresh()
+      return result
+    },
+    initialState,
+  )
 
   return (
     <form action={action} className="border-t border-border pt-6">

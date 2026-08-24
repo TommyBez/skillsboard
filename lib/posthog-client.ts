@@ -19,7 +19,7 @@ let ready: Promise<PostHogClient | null> | null = null
 /** Applies the app identity and active team using native PostHog state. */
 export function applyPostHogIdentity(
   posthog: PostHogClient,
-  { teamId = null, userId }: PostHogIdentity,
+  { teamId, userId }: PostHogIdentity,
 ) {
   if (userId) {
     const identifiedUser = posthog.get_property("$user_id")
@@ -33,28 +33,40 @@ export function applyPostHogIdentity(
     if (posthog.get_property("$user_id") !== userId) posthog.identify(userId)
   }
 
-  const registeredTeam = posthog.get_property("team_id")
-  if (teamId && registeredTeam !== teamId) {
-    posthog.register({ team_id: teamId })
-  } else if (!teamId && registeredTeam != null) {
-    posthog.unregister("team_id")
+  if (teamId !== undefined) {
+    const registeredTeam = posthog.get_property("team_id")
+    if (teamId && registeredTeam !== teamId) {
+      posthog.register({ team_id: teamId })
+    } else if (teamId === null && registeredTeam != null) {
+      posthog.unregister("team_id")
+    }
   }
+}
+
+/** Waits until PostHog is ready, then updates its native identity context. */
+export async function syncPostHogIdentity(identity: PostHogIdentity) {
+  const posthog = await posthogReady()
+  if (posthog) applyPostHogIdentity(posthog, identity)
+}
+
+/** Updates the active team before an action can trigger the next pageview. */
+export function syncPostHogTeam(teamId: string | null) {
+  return syncPostHogIdentity({ teamId, userId: null })
 }
 
 /**
  * Loads and initializes the PostHog singleton on demand.
  *
  * posthog-js is ~70 kB gzipped. Imported statically from
- * `instrumentation-client.ts` it sat in every page's entry bundle — including
+ * a static instrumentation entry it sat in every page's bundle — including
  * the landing page's, where it was the largest unused chunk on the critical
- * path. The dynamic import keeps it out of the initial bundle; the route
- * tracker starts it after hydration, or the first custom capture starts it on
- * demand.
+ * path. The dynamic import keeps it out of the initial bundle. Public routes
+ * start it from the lightweight bootstrap; identity-scoped routes start it
+ * only when their user/team context is available.
  *
- * Route tracking and custom events share this singleton. Routes apply identity
- * before their pageview; later browser events inherit PostHog's registered
- * properties. Without a project token (local dev, previews) it resolves to
- * null and all calls no-op.
+ * Identity, native pageviews, and custom events share this singleton. Without
+ * a project token (local dev, previews) it resolves to null and all calls
+ * no-op.
  */
 export function posthogReady(): Promise<PostHogClient | null> {
   if (!ready) {
@@ -75,13 +87,7 @@ export function posthogReady(): Promise<PostHogClient | null> {
                   $set_once: sanitizePostHogUrlProperties(capture.$set_once),
                 }
               },
-              // A single route tracker captures `$pageview` only after the
-              // current user/team scope has been applied. SDK-owned pageviews
-              // would race the streamed authenticated shell and duplicate it.
-              capture_pageview: false,
-              // Manual `$pageview` events still need SDK-owned duration and
-              // leave tracking; the default disables it with auto views off.
-              capture_pageleave: true,
+              capture_pageview: "history_change",
               defaults: "2026-01-30",
               capture_exceptions: true,
               debug: process.env.NODE_ENV === "development",

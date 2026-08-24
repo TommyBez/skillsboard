@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { OnboardingForm } from "@/components/onboarding-form"
-import { PostHogRoute } from "@/components/posthog-analytics"
+import { PostHogIdentity } from "@/components/posthog-identity"
 import { Skeleton } from "@/components/ui/skeleton"
 import { countOrganizationSkills, listUserOrganizations } from "@/lib/db/queries"
 import { requireSession } from "@/lib/session"
@@ -29,7 +29,7 @@ async function OnboardingGate() {
 
   return (
     <>
-      <PostHogRoute userId={session.user.id} />
+      <PostHogIdentity userId={session.user.id} teamId={null} />
       <OnboardingForm />
     </>
   )

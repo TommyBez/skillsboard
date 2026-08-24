@@ -68,13 +68,24 @@ test("switches team without resetting the stable user", () => {
   assert.deepEqual(operations, [["register", { team_id: "team-2" }]])
 })
 
-test("removes team context outside authenticated team routes", () => {
+test("preserves team context when a route only refreshes user identity", () => {
   const { operations, posthog } = createPostHog({
     $user_id: "user-1",
     team_id: "team-1",
   })
 
   applyPostHogIdentity(posthog, { userId: "user-1" })
+
+  assert.deepEqual(operations, [])
+})
+
+test("removes team context when it is explicitly cleared", () => {
+  const { operations, posthog } = createPostHog({
+    $user_id: "user-1",
+    team_id: "team-1",
+  })
+
+  applyPostHogIdentity(posthog, { userId: "user-1", teamId: null })
 
   assert.deepEqual(operations, [["unregister", "team_id"]])
 })

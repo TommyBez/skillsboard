@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { PlusIcon, UsersIcon } from "lucide-react"
 
 import { CreateOrganizationForm } from "@/components/create-organization-form"
@@ -15,10 +16,15 @@ import {
 } from "@/components/ui/dialog"
 
 export function CreateOrganizationDialog() {
-  const [isOpen, setIsOpen] = useState(false)
+  const pathname = usePathname()
+  const [openPath, setOpenPath] = useState<string | null>(null)
+  const isOpen = openPath === pathname
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => setOpenPath(open ? pathname : null)}
+    >
       <DialogTrigger
         render={
           <Button
@@ -42,7 +48,11 @@ export function CreateOrganizationDialog() {
           </DialogDescription>
         </DialogHeader>
         <div className="p-6">
-          <CreateOrganizationForm creationSurface="in_app" idPrefix="dialog-create-org" />
+          <CreateOrganizationForm
+            creationSurface="in_app"
+            idPrefix="dialog-create-org"
+            onSuccess={() => setOpenPath(null)}
+          />
         </div>
       </DialogContent>
     </Dialog>
