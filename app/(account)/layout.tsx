@@ -3,8 +3,7 @@ import { Suspense, type ReactNode } from "react"
 
 import { AccountMenu } from "@/components/account-menu"
 import { Brand } from "@/components/brand"
-import { PostHogScopeBoundary } from "@/components/posthog-analytics"
-import { PostHogIdentity } from "@/components/posthog-identity"
+import { PostHogRoute } from "@/components/posthog-analytics"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import { requireSession } from "@/lib/session"
@@ -25,7 +24,7 @@ async function AuthenticatedAccountHeader() {
 
   return (
     <>
-      <PostHogIdentity userId={session.user.id} />
+      <PostHogRoute userId={session.user.id} />
       <header className="sticky top-0 z-30 border-b border-border/80 bg-background/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[4.5rem] max-w-[1440px] items-center gap-3 px-4 md:px-6 lg:px-8">
           <Brand />
@@ -53,13 +52,11 @@ function AccountHeaderFallback() {
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <PostHogScopeBoundary scope="user">
-      <div className="app-canvas min-h-[100dvh] bg-background">
-        <Suspense fallback={<AccountHeaderFallback />}>
-          <AuthenticatedAccountHeader />
-        </Suspense>
-        {children}
-      </div>
-    </PostHogScopeBoundary>
+    <div className="app-canvas min-h-[100dvh] bg-background">
+      <Suspense fallback={<AccountHeaderFallback />}>
+        <AuthenticatedAccountHeader />
+      </Suspense>
+      {children}
+    </div>
   )
 }

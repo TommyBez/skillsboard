@@ -9,11 +9,37 @@ import {
 
 type PostHogClient = typeof posthogJs
 
+export interface PostHogIdentity {
+  teamId?: string | null
+  userId: string | null
+}
+
 let ready: Promise<PostHogClient | null> | null = null
-let resolveStarted: (posthog: PostHogClient | null) => void
-const started = new Promise<PostHogClient | null>((resolve) => {
-  resolveStarted = resolve
-})
+
+/** Applies the app identity and active team using native PostHog state. */
+export function applyPostHogIdentity(
+  posthog: PostHogClient,
+  { teamId = null, userId }: PostHogIdentity,
+) {
+  if (userId) {
+    const identifiedUser = posthog.get_property("$user_id")
+    if (
+      typeof identifiedUser === "string" &&
+      identifiedUser.length > 0 &&
+      identifiedUser !== userId
+    ) {
+      posthog.reset()
+    }
+    if (posthog.get_property("$user_id") !== userId) posthog.identify(userId)
+  }
+
+  const registeredTeam = posthog.get_property("team_id")
+  if (teamId && registeredTeam !== teamId) {
+    posthog.register({ team_id: teamId })
+  } else if (!teamId && registeredTeam != null) {
+    posthog.unregister("team_id")
+  }
+}
 
 /**
  * Loads and initializes the PostHog singleton on demand.
@@ -21,13 +47,14 @@ const started = new Promise<PostHogClient | null>((resolve) => {
  * posthog-js is ~70 kB gzipped. Imported statically from
  * `instrumentation-client.ts` it sat in every page's entry bundle — including
  * the landing page's, where it was the largest unused chunk on the critical
- * path. The dynamic import keeps it out of the initial bundle while still
- * starting during app startup, so pageview/session capture behave as before.
+ * path. The dynamic import keeps it out of the initial bundle; the route
+ * tracker starts it after hydration, or the first custom capture starts it on
+ * demand.
  *
- * Every call site chains on this one promise. Pageviews and browser events use
- * the scope coordinator in `lib/posthog-scope.ts`, which applies identity and
- * the active team before returning this singleton. Without a project token
- * (local dev, previews) it resolves to null and all calls no-op.
+ * Route tracking and custom events share this singleton. Routes apply identity
+ * before their pageview; later browser events inherit PostHog's registered
+ * properties. Without a project token (local dev, previews) it resolves to
+ * null and all calls no-op.
  */
 export function posthogReady(): Promise<PostHogClient | null> {
   if (!ready) {
@@ -74,17 +101,6 @@ export function posthogReady(): Promise<PostHogClient | null> {
           // `ready` rejected, or call sites like sign-out would hang forever.
           .catch(() => null)
       : Promise.resolve(null)
-
-    void ready.then(resolveStarted)
   }
   return ready
-}
-
-/** Resolves when some caller has deliberately started the lazy singleton. */
-export function posthogWhenStarted(): Promise<PostHogClient | null> {
-  return started
-}
-
-export function hasPostHogStarted() {
-  return ready !== null
 }

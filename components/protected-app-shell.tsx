@@ -6,7 +6,7 @@ import { CommandMenu } from "@/components/command-menu"
 import { CommandMenuIndex } from "@/components/command-menu-index"
 import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
 import { FirstSkillInviteProvider } from "@/components/first-skill-invite-provider"
-import { PostHogIdentity } from "@/components/posthog-identity"
+import { PostHogRoute } from "@/components/posthog-analytics"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
@@ -15,7 +15,7 @@ async function AuthenticatedHeader() {
   const { session, organizations, activeId } = await getAppContext()
   return (
     <>
-      <PostHogIdentity userId={session.user.id} teamId={activeId} />
+      <PostHogRoute userId={session.user.id} teamId={activeId} />
       <AppHeader user={session.user} organizations={organizations} activeId={activeId} />
     </>
   )

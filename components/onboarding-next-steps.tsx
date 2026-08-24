@@ -83,9 +83,9 @@ function Snippet({
  * beside it rather than behind a first saved skill: a library one person can
  * reach is not a team library, and the ask reads the same on day zero.
  *
- * The protected analytics boundary gives every event the active team, as it
- * does on `/connect`. `client` tells the two copy surfaces apart: `generic` is
- * the endpoint copied straight from this first run.
+ * The protected shell registers the active team for every event, as it does
+ * on `/connect`. `client` tells the two copy surfaces apart: `generic` is the
+ * endpoint copied straight from this first run.
  */
 export function OnboardingNextSteps({ canInvite, mcpUrl }: OnboardingNextStepsProps) {
   return (

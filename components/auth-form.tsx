@@ -8,7 +8,7 @@ import { ArrowRightIcon, Loader2Icon } from "lucide-react"
 import { saveSignupProductCommunicationsConsent } from "@/app/actions/email-preferences"
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
-import { identifyPostHogUser } from "@/lib/posthog-scope"
+import { applyPostHogIdentity, posthogReady } from "@/lib/posthog-client"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -159,9 +159,11 @@ export function AuthForm({
           : null
       const userId = user && "id" in user ? String(user.id) : null
       if (userId) {
-        // Registration is synchronous, so the capture below waits for this
-        // identity even though optional analytics never blocks the redirect.
-        void identifyPostHogUser(userId)
+        // Chained ahead of the captures below on the same promise, so the
+        // identify always lands before them.
+        void posthogReady().then((posthog) => {
+          if (posthog) applyPostHogIdentity(posthog, { userId })
+        })
       }
       // Both pages share signIn.emailOtp; emit based on whether the account was just created.
       if (isNewlyCreatedUser(user)) {

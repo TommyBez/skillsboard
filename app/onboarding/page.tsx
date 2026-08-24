@@ -4,8 +4,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { OnboardingForm } from "@/components/onboarding-form"
-import { PostHogScopeBoundary } from "@/components/posthog-analytics"
-import { PostHogIdentity } from "@/components/posthog-identity"
+import { PostHogRoute } from "@/components/posthog-analytics"
 import { Skeleton } from "@/components/ui/skeleton"
 import { countOrganizationSkills, listUserOrganizations } from "@/lib/db/queries"
 import { requireSession } from "@/lib/session"
@@ -30,7 +29,7 @@ async function OnboardingGate() {
 
   return (
     <>
-      <PostHogIdentity userId={session.user.id} />
+      <PostHogRoute userId={session.user.id} />
       <OnboardingForm />
     </>
   )
@@ -47,18 +46,16 @@ function OnboardingFormFallback() {
 
 export default function OnboardingPage() {
   return (
-    <PostHogScopeBoundary scope="user">
-      <AccessShell
-        marker="Set up library"
-        title="Create your team library"
-        description="Name the shared place where your team will collect its AI skills."
-        editorialTitle="Share what works. Let everyone choose how to use it."
-        editorialBody="Your team can find every saved skill in one place and choose the source, command, or ZIP that best fits each setup."
-      >
-        <Suspense fallback={<OnboardingFormFallback />}>
-          <OnboardingGate />
-        </Suspense>
-      </AccessShell>
-    </PostHogScopeBoundary>
+    <AccessShell
+      marker="Set up library"
+      title="Create your team library"
+      description="Name the shared place where your team will collect its AI skills."
+      editorialTitle="Share what works. Let everyone choose how to use it."
+      editorialBody="Your team can find every saved skill in one place and choose the source, command, or ZIP that best fits each setup."
+    >
+      <Suspense fallback={<OnboardingFormFallback />}>
+        <OnboardingGate />
+      </Suspense>
+    </AccessShell>
   )
 }

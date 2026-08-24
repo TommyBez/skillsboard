@@ -1,34 +1,79 @@
 "use client"
 
-import { useLayoutEffect, type ReactNode } from "react"
-import { usePathname } from "next/navigation"
-
+import { useLayoutEffect, useRef } from "react"
 import {
-  registerPostHogScopeRequirement,
-  schedulePostHogPageView,
-  type PostHogScopeRequirement,
-} from "@/lib/posthog-scope"
+  usePathname,
+  useSelectedLayoutSegment,
+} from "next/navigation"
 
-export function PostHogScopeBoundary({
-  children,
-  scope,
+import { sanitizeAnalyticsUrl } from "@/lib/analytics-url-privacy"
+import { applyPostHogIdentity, posthogReady } from "@/lib/posthog-client"
+
+const scopedRootSegments = new Set([
+  "(account)",
+  "(app)",
+  "consent",
+  "onboarding",
+])
+
+function usePostHogPageView({
+  enabled = true,
+  teamId = null,
+  userId,
 }: {
-  children: ReactNode
-  scope: PostHogScopeRequirement
+  enabled?: boolean
+  teamId?: string | null
+  userId: string | null
 }) {
-  useLayoutEffect(() => registerPostHogScopeRequirement(scope), [scope])
-  return children
+  const pathname = usePathname()
+  const previousPathname = useRef<string | null>(null)
+
+  useLayoutEffect(() => {
+    const capturePageView = previousPathname.current !== pathname
+    previousPathname.current = pathname
+    if (!enabled) return
+
+    const timestamp = new Date()
+    const url = sanitizeAnalyticsUrl(window.location.href)
+    void posthogReady().then((posthog) => {
+      if (!posthog) return
+
+      // `team_id` is managed beside `identify`, as PostHog context for every
+      // subsequent event. The pageview is the only event that must wait for it.
+      applyPostHogIdentity(posthog, { teamId, userId })
+      if (!capturePageView) return
+
+      posthog.capture(
+        "$pageview",
+        {
+          $current_url: url,
+          $pathname: pathname,
+          team_id: teamId,
+        },
+        { timestamp },
+      )
+    })
+  }, [enabled, pathname, teamId, userId])
 }
 
-/** The only browser route-view producer. Query-only library state is separate. */
-export function PostHogPageView() {
-  const pathname = usePathname()
+/** Tracks public routes; scoped routes supply identity from their own layout. */
+export function PostHogNavigation() {
+  const rootSegment = useSelectedLayoutSegment()
+  usePostHogPageView({
+    enabled: !rootSegment || !scopedRootSegments.has(rootSegment),
+    userId: null,
+  })
+  return null
+}
 
-  // Scope and identity layout effects in the preceding route subtree settle
-  // first; this still runs before any descendant passive analytics effect.
-  useLayoutEffect(() => {
-    schedulePostHogPageView(pathname)
-  }, [pathname])
-
+/** Identifies the person/team and emits the route's one canonical pageview. */
+export function PostHogRoute({
+  teamId,
+  userId,
+}: {
+  teamId?: string
+  userId: string | null
+}) {
+  usePostHogPageView({ teamId, userId })
   return null
 }

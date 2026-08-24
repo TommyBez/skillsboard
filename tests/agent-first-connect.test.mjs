@@ -38,7 +38,6 @@ const appLayout = await readText("../app/(app)/layout.tsx")
 const protectedAppShell = await readText("../components/protected-app-shell.tsx")
 const posthogAnalytics = await readText("../components/posthog-analytics.tsx")
 const posthogClient = await readText("../lib/posthog-client.ts")
-const posthogScope = await readText("../lib/posthog-scope.ts")
 const analyticsClient = await readText("../lib/analytics-client.ts")
 const consentPage = await readText("../app/consent/page.tsx")
 const llms = await readText("../public/llms.txt")
@@ -213,32 +212,29 @@ test("route views use one scoped pageview while real actions stay custom", async
   assert.equal(await exists("../components/mcp-setup-analytics.tsx"), false)
   assert.equal(await exists("../components/onboarding-steps-analytics.tsx"), false)
 
-  // The route-level coordinator owns ordering: disable SDK pageviews, declare
-  // team scope synchronously in the app layout, register identity + team from
-  // the shared shell, and only then emit the canonical `$pageview`.
+  // The route tracker extends the existing PostHog identity pattern with one
+  // team super property, then emits the canonical `$pageview` directly.
   assert.match(posthogClient, /capture_pageview: false/)
-  assert.match(appLayout, /<PostHogScopeBoundary scope="team">/)
-  assert.match(protectedAppShell, /<PostHogIdentity userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
-  assert.match(posthogAnalytics, /useLayoutEffect\(\(\) => \{\n\s+schedulePostHogPageView\(pathname\)/)
-  assert.match(posthogAnalytics, /schedulePostHogPageView\(pathname\)/)
-  assert.match(posthogScope, /posthog\.capture\(\s*"\$pageview"/)
+  assert.doesNotMatch(appLayout, /getAppContext|PostHogRoute|Suspense/)
+  assert.match(protectedAppShell, /const \{ session, organizations, activeId \} = await getAppContext\(\)/)
+  assert.match(protectedAppShell, /<PostHogRoute userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
+  assert.match(posthogClient, /posthog\.identify\(userId\)/)
+  assert.match(posthogClient, /posthog\.register\(\{ team_id: teamId \}\)/)
+  assert.match(posthogClient, /posthog\.unregister\("team_id"\)/)
   assert.match(
-    posthogScope,
-    /export async function posthogReadyForAnalyticsCapture\(\) \{[\s\S]*schedulePostHogPageView\(window\.location\.pathname\)[\s\S]*await capturePendingPageView\(\)/,
+    posthogAnalytics,
+    /applyPostHogIdentity\(posthog, \{ teamId, userId \}\)[\s\S]*posthog\.capture\(\s*"\$pageview"/,
   )
-  assert.match(
-    posthogScope,
-    /scopeRequirement: postHogPageViewRequirement\(pathname\)/,
-  )
-  assert.match(posthogScope, /await waitForPendingPageViewScope\(requested\)/)
-  assert.match(posthogScope, /if \(pendingPageView\?\.pathname === pathname\) return/)
-  assert.match(analyticsClient, /withPostHogEventScope\([\s\S]*ready\.eventScope/)
-  assert.match(posthogScope, /posthogReadyForAnalyticsScope/)
+  assert.match(posthogAnalytics, /useSelectedLayoutSegment\(\)/)
+  assert.match(analyticsClient, /posthogReady\(\)\.then\(\(posthog\) =>/)
+  assert.doesNotMatch(analyticsClient, /queue|scope|team_id/)
+  assert.equal(await exists("../lib/posthog-scope.ts"), false)
+  assert.equal(await exists("../lib/posthog-scope-state.ts"), false)
+  assert.equal(await exists("../lib/posthog-route-scope.ts"), false)
 
   // Invalid OAuth requests deliberately resolve the route without a user
-  // lookup, so the central pageview cannot wait forever.
-  assert.match(consentPage, /<PostHogScopeBoundary scope="optional-user">/)
-  assert.equal((consentPage.match(/<PostHogIdentity userId=\{null\} \/>/g) ?? []).length, 2)
+  // lookup and still emit their anonymous canonical pageview.
+  assert.equal((consentPage.match(/<PostHogRoute userId=\{null\} \/>/g) ?? []).length, 2)
 })
 
 /**

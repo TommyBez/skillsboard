@@ -32,8 +32,8 @@ function InlineCode({ children }: { children: ReactNode }) {
 }
 
 /**
- * `client` keeps the copy surfaces apart. The protected analytics boundary
- * attaches the active team, and the denominator is `$pageview` on `/connect`.
+ * `client` keeps the copy surfaces apart. The protected shell registers the
+ * active team, and the denominator is `$pageview` on `/connect`.
  */
 function configCopiedAnalytics(client: McpClientAnalyticsId) {
   return { event: "mcp_config_copied", properties: { client } } as const

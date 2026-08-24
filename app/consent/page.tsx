@@ -7,8 +7,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { ConsentForm } from "@/components/consent-form"
-import { PostHogScopeBoundary } from "@/components/posthog-analytics"
-import { PostHogIdentity } from "@/components/posthog-identity"
+import { PostHogRoute } from "@/components/posthog-analytics"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { auth } from "@/lib/auth"
@@ -55,7 +54,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
   if (!clientId) {
     return (
       <>
-        <PostHogIdentity userId={null} />
+        <PostHogRoute userId={null} />
         <InvalidAuthorizationRequest />
       </>
     )
@@ -71,7 +70,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
     console.error("Unable to verify OAuth authorization request", error)
     return (
       <>
-        <PostHogIdentity userId={null} />
+        <PostHogRoute userId={null} />
         <InvalidAuthorizationRequest />
       </>
     )
@@ -85,7 +84,7 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
 
   return (
     <div className="flex flex-col gap-6">
-      <PostHogIdentity userId={session.user.id} />
+      <PostHogRoute userId={session.user.id} />
       <div className="flex items-center gap-3 border-b border-border pb-5">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-[16px] bg-primary/10 text-primary">
           <ShieldCheckIcon className="size-5" aria-hidden="true" />
@@ -135,18 +134,16 @@ function ConsentContentFallback() {
 
 export default function ConsentPage({ searchParams }: ConsentPageProps) {
   return (
-    <PostHogScopeBoundary scope="optional-user">
-      <AccessShell
-        marker="MCP authorization"
-        title="Allow access?"
-        description="Review the client and permissions before connecting it to Skills Board."
-        editorialTitle="Your libraries stay yours."
-        editorialBody="This client can find saved skills, retrieve install commands, and save new skills to your team libraries. It cannot edit or delete anything."
-      >
-        <Suspense fallback={<ConsentContentFallback />}>
-          <ConsentContent searchParams={searchParams} />
-        </Suspense>
-      </AccessShell>
-    </PostHogScopeBoundary>
+    <AccessShell
+      marker="MCP authorization"
+      title="Allow access?"
+      description="Review the client and permissions before connecting it to Skills Board."
+      editorialTitle="Your libraries stay yours."
+      editorialBody="This client can find saved skills, retrieve install commands, and save new skills to your team libraries. It cannot edit or delete anything."
+    >
+      <Suspense fallback={<ConsentContentFallback />}>
+        <ConsentContent searchParams={searchParams} />
+      </Suspense>
+    </AccessShell>
   )
 }
