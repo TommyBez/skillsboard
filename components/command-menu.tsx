@@ -77,10 +77,10 @@ const navigationItems: CommandItem[] = [
     icon: <FolderOpenIcon className="size-4" />,
   },
   {
-    id: "go:settings/mcp",
-    label: "MCP setup",
-    group: "Settings",
-    keywords: "connect agent claude codex cursor client",
+    id: "go:connect",
+    label: "Connect your agent",
+    group: "Go to",
+    keywords: "mcp setup connect agent claude codex cursor client plugin",
     icon: <CableIcon className="size-4" />,
   },
   {

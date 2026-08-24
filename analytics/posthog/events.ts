@@ -17,6 +17,7 @@ type NonTeamEventPropertiesMap = {
       | "hero"
       | "closing"
       | "about_header"
+      | "connect_header"
       | "developers_header"
       | "agent_skills_header"
       | "agent_skills_hero"
@@ -46,6 +47,8 @@ type NonTeamEventPropertiesMap = {
       | "alternatives_skills_sh_closing"
       | "alternatives_smithery_header"
       | "alternatives_smithery_closing"
+      | "alternatives_superpowers_header"
+      | "alternatives_superpowers_closing"
       | "claude_skills_header"
       | "claude_skills_hero"
       | "claude_skills_inline"
@@ -94,6 +97,10 @@ type NonTeamEventPropertiesMap = {
       | "opencode_skills_hero"
       | "opencode_skills_inline"
       | "opencode_skills_closing"
+      | "claude_code_for_teams_header"
+      | "claude_code_for_teams_hero"
+      | "claude_code_for_teams_inline"
+      | "claude_code_for_teams_closing"
       | "copilot_skills_header"
       | "copilot_skills_hero"
       | "copilot_skills_inline"
@@ -111,9 +118,20 @@ type NonTeamEventPropertiesMap = {
       | "where_skills_inline"
       | "where_skills_closing"
   }
+  /**
+   * `/settings/mcp` stays in the destination union: the setup page now lives at
+   * `/connect`, and the old value is what every event captured before the move
+   * carries, so dropping it would rewrite history rather than record it.
+   */
   mcp_entry_clicked: {
-    destination: "#mcp" | "/settings/mcp" | "/sign-up"
-    location: "account_menu" | "app_navigation" | "landing_hero" | "landing_section" | "library_header"
+    destination: "#mcp" | "/connect" | "/settings/mcp" | "/sign-up"
+    location:
+      | "account_menu"
+      | "app_navigation"
+      | "landing_hero"
+      | "landing_section"
+      | "library_header"
+      | "onboarding"
   }
   /**
    * Copying the plugin install commands. Non team scoped on purpose: the same
@@ -121,7 +139,16 @@ type NonTeamEventPropertiesMap = {
    * keeps the two surfaces apart.
    */
   plugin_install_copied: {
-    location: "landing" | "mcp_settings"
+    location: "landing" | "mcp_settings" | "onboarding"
+  }
+  /**
+   * A real copy action, not a route view. `$pageview` on `/connect` and
+   * `/start` owns the denominator; `client` separates their copy surfaces.
+   * Browser team context comes from PostHog's registered `team_id` super
+   * property, without making leaf components fetch or receive the team.
+   */
+  mcp_config_copied: {
+    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -172,9 +199,16 @@ type TeamEventPropertiesMap = {
     surface: "mcp" | "web"
     tag_count: number
   }
+  /**
+   * `surface` is threaded from the form that sent the invitation, through the
+   * server action, so an invitation sent from the first run can be counted on
+   * its own. Same values as `team_invite_link_copied`, so the emailed
+   * invitation and the copied link read against each other per surface.
+   */
   team_member_invited: {
     email_sent: boolean
     role: "admin" | "member"
+    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
   }
   invitation_accepted: Record<never, never>
   skill_usage_path_selected: {
@@ -199,9 +233,13 @@ type TeamEventPropertiesMap = {
   library_empty_state_cta_clicked: {
     cta: "add_skill" | "find_skills"
   }
-  mcp_setup_viewed: Record<never, never>
-  mcp_config_copied: {
-    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+  /**
+   * Only the two steps that have no event of their own. Connecting an agent is
+   * already measured by `mcp_entry_clicked`, `plugin_install_copied`, and
+   * `mcp_config_copied`, and counting it twice would inflate that step.
+   */
+  onboarding_step_clicked: {
+    step: "first_skill" | "invite_team"
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean
@@ -215,7 +253,7 @@ type TeamEventPropertiesMap = {
   }
   team_invite_link_copied: {
     actor_is_skill_creator: boolean
-    surface: "first_skill_invite_step" | "organization_settings"
+    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
   }
   skill_note_updated: {
     has_note: boolean
@@ -294,19 +332,34 @@ export type AnalyticsCapturedEventProperties<EventName extends AnalyticsEventNam
   AnalyticsEventProperties<EventName> &
     (EventName extends TeamScopedAnalyticsEventName ? { team_id: string } : object)
 
+/**
+ * The keys a caller has to fill in. An event whose properties are all optional,
+ * like the MCP setup funnel where the team is known on one surface and unknown
+ * on the other, is called the same way as an event with no properties at all.
+ */
+export type RequiredAnalyticsPropertyKeys<Properties> = {
+  [Key in keyof Properties]-?: object extends Pick<Properties, Key> ? never : Key
+}[keyof Properties]
+
 export type AnalyticsCapturedEventPropertiesArgs<EventName extends AnalyticsEventName> =
-  keyof AnalyticsCapturedEventProperties<EventName> extends never
-    ? []
+  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
+    ? keyof AnalyticsCapturedEventProperties<EventName> extends never
+      ? []
+      : [properties?: AnalyticsCapturedEventProperties<EventName>]
     : [properties: AnalyticsCapturedEventProperties<EventName>]
 
 type AnalyticsEventPropertiesField<EventName extends AnalyticsEventName> =
-  keyof AnalyticsEventProperties<EventName> extends never
-    ? { properties?: never }
+  RequiredAnalyticsPropertyKeys<AnalyticsEventProperties<EventName>> extends never
+    ? keyof AnalyticsEventProperties<EventName> extends never
+      ? { properties?: never }
+      : { properties?: AnalyticsEventProperties<EventName> }
     : { properties: AnalyticsEventProperties<EventName> }
 
 type AnalyticsCapturedEventPropertiesField<EventName extends AnalyticsEventName> =
-  keyof AnalyticsCapturedEventProperties<EventName> extends never
-    ? { properties?: never }
+  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
+    ? keyof AnalyticsCapturedEventProperties<EventName> extends never
+      ? { properties?: never }
+      : { properties?: AnalyticsCapturedEventProperties<EventName> }
     : { properties: AnalyticsCapturedEventProperties<EventName> }
 
 export type AnalyticsEventCapture<

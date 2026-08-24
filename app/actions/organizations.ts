@@ -11,7 +11,9 @@ import { captureTeamEvent } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
+  destination: "/library" | "/start" | ""
   error: string
+  teamId: string
 }
 
 export interface CreateInvitationLinkState {
@@ -25,56 +27,72 @@ export interface CreateInvitationLinkState {
 
 export interface AcceptInvitationState {
   error: string
+  teamId: string
 }
 
 const organizationNameSchema = z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less.")
 const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
+/**
+ * Where the invitation form was rendered. Posted as a hidden field because the
+ * invitation is created here, on the server, so `team_member_invited` can only
+ * carry the surface if the surface travels with the request. An older form that
+ * posts nothing reads as the settings panel, which is where the form lived
+ * alone before the other two surfaces existed.
+ */
+const inviteSurfaceSchema = z
+  .enum(["first_skill_invite_step", "onboarding", "organization_settings"])
+  .catch("organization_settings")
 
 export async function createOrganization(
   _state: CreateOrganizationState,
   formData: FormData,
 ): Promise<CreateOrganizationState> {
-  await requireSession()
+  const session = await requireSession()
   const parsed = organizationNameSchema.safeParse(formData.get("name"))
   const creationSurface = creationSurfaceSchema.parse(formData.get("creationSurface"))
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Enter a valid team name." }
+    return {
+      destination: "",
+      error: parsed.error.issues[0]?.message ?? "Enter a valid team name.",
+      teamId: "",
+    }
   }
 
   const slug = await resolveUniqueOrganizationSlug(parsed.data)
+  const destination = creationSurface === "onboarding" ? "/start" : "/library"
 
   try {
     const created = await auth.api.createOrganization({
       headers: await headers(),
-      body: { name: parsed.data, slug },
+      // The browser activates the new team after this action returns. Keeping
+      // the current team here lets it update PostHog before navigation.
+      body: { keepCurrentActiveOrganization: true, name: parsed.data, slug },
     })
-    if (!created?.id) return { error: "We couldn’t create your team library. Please try again." }
-
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: { organizationId: created.id },
-    })
-    const session = await getSession()
-    if (session?.user) {
-      captureTeamEvent({
-        distinctId: session.user.id,
-        event: "team_created",
-        properties: { creation_surface: creationSurface },
-        teamId: created.id,
-      })
+    if (!created?.id) {
+      return {
+        destination: "",
+        error: "We couldn’t create your team library. Please try again.",
+        teamId: "",
+      }
     }
+
+    captureTeamEvent({
+      distinctId: session.user.id,
+      event: "team_created",
+      properties: { creation_surface: creationSurface },
+      teamId: created.id,
+    })
+
+    return { destination, error: "", teamId: created.id }
   } catch (error) {
     console.error("Unable to create team library", error)
-    return { error: "We couldn’t create your team library. Please try again." }
+    return {
+      destination: "",
+      error: "We couldn’t create your team library. Please try again.",
+      teamId: "",
+    }
   }
-
-  redirect("/library")
-}
-
-export async function setActiveOrganization(organizationId: string) {
-  await requireSession()
-  await auth.api.setActiveOrganization({ headers: await headers(), body: { organizationId } })
 }
 
 export async function createInvitationLink(
@@ -82,6 +100,7 @@ export async function createInvitationLink(
   formData: FormData,
 ): Promise<CreateInvitationLinkState> {
   await requireSession()
+  const surface = inviteSurfaceSchema.parse(formData.get("surface"))
   const parsed = z.object({
     email: z.email(),
     role: z.enum(["admin", "member"]),
@@ -141,6 +160,7 @@ export async function createInvitationLink(
         properties: {
           role: parsed.data.role,
           email_sent: !emailError,
+          surface,
         },
         teamId: invitation.organizationId,
       })
@@ -171,7 +191,7 @@ export async function acceptInvitation(
   formData: FormData,
 ): Promise<AcceptInvitationState> {
   const invitationId = z.string().regex(/^[A-Za-z0-9_-]{1,200}$/).safeParse(formData.get("invitationId"))
-  if (!invitationId.success) return { error: "This invitation link is invalid." }
+  if (!invitationId.success) return { error: "This invitation link is invalid.", teamId: "" }
   const session = await getSession()
   if (!session?.user) redirect(`/sign-up?returnTo=${encodeURIComponent(`/invite/${invitationId.data}`)}`)
 
@@ -187,10 +207,12 @@ export async function acceptInvitation(
         teamId: accepted.invitation.organizationId,
       })
     }
+    return { error: "", teamId: accepted.invitation.organizationId }
   } catch (error) {
     console.error("Unable to accept invitation", error)
-    return { error: "This invitation may have expired or can no longer be accepted. Ask a team admin for a new link." }
+    return {
+      error: "This invitation may have expired or can no longer be accepted. Ask a team admin for a new link.",
+      teamId: "",
+    }
   }
-
-  redirect("/library")
 }

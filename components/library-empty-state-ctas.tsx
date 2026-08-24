@@ -6,10 +6,6 @@ import { AddSkillDialog } from "@/components/add-skill-dialog"
 import { Button } from "@/components/ui/button"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
 
-interface LibraryEmptyStateCtasProps {
-  teamId: string
-}
-
 /**
  * CTAs for the true-empty library state ("Add your first skill").
  *
@@ -18,7 +14,7 @@ interface LibraryEmptyStateCtasProps {
  * itself is already derivable from `team_library_viewed` with
  * `has_skills=false` and `filter_state="none"` — no separate viewed event.
  */
-export function LibraryEmptyStateCtas({ teamId }: LibraryEmptyStateCtasProps) {
+export function LibraryEmptyStateCtas() {
   return (
     <>
       <AddSkillDialog
@@ -26,7 +22,6 @@ export function LibraryEmptyStateCtas({ teamId }: LibraryEmptyStateCtasProps) {
         onTriggerClick={() => {
           captureAnalyticsEvent("library_empty_state_cta_clicked", {
             cta: "add_skill",
-            team_id: teamId,
           })
         }}
       />
@@ -39,7 +34,6 @@ export function LibraryEmptyStateCtas({ teamId }: LibraryEmptyStateCtasProps) {
             onClick={() => {
               captureAnalyticsEvent("library_empty_state_cta_clicked", {
                 cta: "find_skills",
-                team_id: teamId,
               })
             }}
           />

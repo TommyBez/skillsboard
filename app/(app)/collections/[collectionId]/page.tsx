@@ -183,7 +183,6 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
         disabledDistribution={disabledDistribution}
         skillCount={collectionSkills.length}
         sourceVerificationCount={sourceVerificationCount}
-        teamId={activeId}
         distribution={activeDistribution}
       />
 
@@ -211,7 +210,6 @@ async function CollectionDetail({ params }: CollectionDetailPageProps) {
                   skillId: item.id,
                   skillName: item.skillName,
                   surface: "collection",
-                  teamId: activeId,
                 }}
                 actions={(
                   <>

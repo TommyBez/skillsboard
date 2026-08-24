@@ -67,10 +67,10 @@ export function AccountMenu({ user }: AccountMenuProps) {
             nativeButton={false}
             render={(
               <TrackedLink
-                href="/settings/mcp"
+                href="/connect"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: mcpEntryEventProperties("account_menu", "/settings/mcp"),
+                  properties: mcpEntryEventProperties("account_menu", "/connect"),
                 }}
               />
             )}

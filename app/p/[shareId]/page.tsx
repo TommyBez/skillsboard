@@ -74,7 +74,10 @@ async function SharedCollection({ params }: SharedCollectionProps) {
         <Badge variant="outline">Unlisted release</Badge>
       </header>
 
-      <section className="grid flex-1 content-start gap-10 py-12 md:py-16">
+      {/* minmax(0,1fr): grid items default to min-width:auto, so the nowrap
+          install command would otherwise set the page's minimum width and drag
+          the mobile layout viewport past the screen. */}
+      <section className="grid flex-1 grid-cols-[minmax(0,1fr)] content-start gap-10 py-12 md:py-16">
         <div className="grid gap-5">
           <span className="flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary" aria-hidden="true">
             <PackageOpenIcon className="size-6" />

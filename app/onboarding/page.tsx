@@ -4,8 +4,9 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { OnboardingForm } from "@/components/onboarding-form"
+import { PostHogIdentity } from "@/components/posthog-identity"
 import { Skeleton } from "@/components/ui/skeleton"
-import { listUserOrganizations } from "@/lib/db/queries"
+import { countOrganizationSkills, listUserOrganizations } from "@/lib/db/queries"
 import { requireSession } from "@/lib/session"
 
 export const metadata: Metadata = {
@@ -16,9 +17,22 @@ export const metadata: Metadata = {
 async function OnboardingGate() {
   const session = await requireSession()
   const organizations = await listUserOrganizations(session.user.id)
-  if (organizations.length) redirect("/library")
+  if (organizations.length) {
+    const active =
+      organizations.find((organization) => organization.id === session.session.activeOrganizationId) ??
+      organizations[0]
+    const skillCount = await countOrganizationSkills(active.id)
+    // An empty team just created here is owed the first-run screen, not the
+    // library. A team that already holds skills is done with that screen.
+    redirect(skillCount === 0 ? "/start" : "/library")
+  }
 
-  return <OnboardingForm />
+  return (
+    <>
+      <PostHogIdentity userId={session.user.id} teamId={null} />
+      <OnboardingForm />
+    </>
+  )
 }
 
 function OnboardingFormFallback() {

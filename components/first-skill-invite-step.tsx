@@ -45,7 +45,6 @@ export function FirstSkillInviteStep({ onOpenChange, open, teamId }: FirstSkillI
       // Reaching this step means the actor just saved the team's first skill.
       actor_is_skill_creator: true,
       surface: "first_skill_invite_step",
-      team_id: teamId,
       trigger: "first_skill_saved",
     })
   }, [open, teamId])
@@ -86,17 +85,16 @@ export function FirstSkillInviteStep({ onOpenChange, open, teamId }: FirstSkillI
             properties: {
               actor_is_skill_creator: true,
               surface: "first_skill_invite_step",
-              team_id: teamId,
             },
           }}
           onSubmitIntent={() => {
             captureAnalyticsEvent("team_invite_prompt_clicked", {
               actor_is_skill_creator: true,
               surface: "first_skill_invite_step",
-              team_id: teamId,
               trigger: "first_skill_saved",
             })
           }}
+          surface="first_skill_invite_step"
         />
 
         <DialogFooter>

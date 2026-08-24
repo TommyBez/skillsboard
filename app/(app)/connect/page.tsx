@@ -1,14 +1,12 @@
-import { cache, Suspense } from "react"
-import Link from "next/link"
-import { headers } from "next/headers"
-import { ArrowLeftIcon } from "lucide-react"
+import type { Metadata } from "next"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
-import { getAppContext } from "@/lib/app-context"
-import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
+import { getMcpResource } from "@/lib/auth-environment"
+
+export const metadata: Metadata = {
+  title: "Connect your agent",
+}
 
 const availableTools = [
   { name: "list_skills", description: "List saved skills across your team libraries" },
@@ -26,47 +24,35 @@ const availableTools = [
   { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },
 ]
 
-const getMcpDetails = cache(async () => {
-  const requestHeaders = await headers()
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "your-app.vercel.app"
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https"
-  const mcpUrl = `${protocol}://${host}/api/mcp`
+/**
+ * Connecting an agent, on its own page, behind the session.
+ *
+ * The founder asked for `/connect` as a private page: MCP setup used to be
+ * buried in settings, which is the fix this page keeps, but it was never meant
+ * to be a public acquisition surface. It lives in the authenticated `(app)`
+ * route group, the same as `/start`, `/library`, and `/settings`, so it reads
+ * the session, redirects a signed-out visitor to sign in, and stays out of the
+ * sitemap, `llms.txt`, and search indexing the same way those pages do.
+ *
+ * The MCP endpoint comes from the same Vercel system vars Better Auth uses,
+ * so a preview names its own server and production names the stable domain.
+ * The shared analytics shell attaches the active team to the canonical
+ * `$pageview` and to copy actions, so this page does not fetch the team or
+ * block its setup guide for analytics. The plugin install commands stay
+ * canonical (the same command for every team) since the plugin itself is not
+ * team scoped.
+ */
+export default function ConnectPage() {
+  const mcpUrl = getMcpResource()
   const config = JSON.stringify(
     { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
     null,
     2,
   )
 
-  return { config, host, mcpUrl }
-})
-
-async function McpSetupAnalyticsScope() {
-  const { activeId } = await getAppContext()
-
-  return <McpSetupAnalytics teamId={activeId} />
-}
-
-async function McpGuide() {
-  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
-    getMcpDetails(),
-    getAppContext(),
-  ])
-
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
-}
-
-export default function McpSettingsPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <Suspense fallback={null}>
-        <McpSetupAnalyticsScope />
-      </Suspense>
-      <Button variant="ghost" className="-ml-2 w-fit" nativeButton={false} render={<Link href="/library" />}>
-        <ArrowLeftIcon data-icon="inline-start" />
-        Back to library
-      </Button>
-
-      <header className="mt-8 border-b pb-10">
+      <header className="border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
         <h1 data-testid="mcp-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
           Connect your agent
@@ -91,11 +77,7 @@ export default function McpSettingsPage() {
       </div>
 
       <div className="mt-8">
-        <Suspense
-          fallback={<Skeleton className="h-[28rem] rounded-[16px]" role="status" aria-label="Loading setup guide" />}
-        >
-          <McpGuide />
-        </Suspense>
+        <McpSetupGuide config={config} mcpUrl={mcpUrl} />
       </div>
 
       <section className="mt-8 overflow-hidden rounded-[16px] border bg-card">

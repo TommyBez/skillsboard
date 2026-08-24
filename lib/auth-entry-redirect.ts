@@ -1,5 +1,5 @@
 import { getOAuthAuthorizeContinuePath } from "@/lib/oauth-continue"
-import { safeReturnTo } from "@/lib/safe-return-to"
+import { isImmediateSignedInDestination, safeReturnTo } from "@/lib/safe-return-to"
 
 /**
  * Marks a `/sign-in` URL that a *validated* session check just produced.
@@ -45,11 +45,12 @@ function toParamRecord(searchParams: URLSearchParams) {
  * Where the edge should send a `/sign-in` or `/sign-up` request that carries a
  * session cookie, or `null` to let the page decide.
  *
- * Only the bare shape is claimed — no `sessionChecked` marker, no OAuth
- * authorize params, and a `returnTo` that is absent or already `/library`.
- * That is the marketing chrome: the CTA and the "Sign in" beside it both link
- * to a plain route, and a signed-in visitor following either only ever wanted
- * their library.
+ * Only the immediate destinations are claimed — no `sessionChecked` marker, no
+ * OAuth authorize params, and a `returnTo` that is absent or already `/library`,
+ * `/connect`, or `/start`. The marketing CTA and the "Sign in" beside it both
+ * link to a plain route, and a signed-in visitor following either only ever
+ * wanted their library. `/connect` and `/start` are the same kind of page:
+ * authenticated, and the place the visitor asked for.
  *
  * Everything else deliberately falls through to `AuthEntry`, because a
  * redirect would destroy it:
@@ -66,7 +67,7 @@ function toParamRecord(searchParams: URLSearchParams) {
  */
 export function resolveSignedInAuthRedirect(
   searchParams: URLSearchParams,
-): "/library" | null {
+): "/library" | "/connect" | "/start" | null {
   if (searchParams.has(SESSION_CHECKED_PARAM)) return null
 
   const params = toParamRecord(searchParams)
@@ -75,5 +76,5 @@ export function resolveSignedInAuthRedirect(
   const returnTo = safeReturnTo(
     typeof params.returnTo === "string" ? params.returnTo : undefined,
   )
-  return returnTo === "/library" ? "/library" : null
+  return isImmediateSignedInDestination(returnTo) ? returnTo : null
 }

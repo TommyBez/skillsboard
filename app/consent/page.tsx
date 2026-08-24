@@ -51,7 +51,14 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
   const oauthQuery = buildOAuthQuery(params)
   const query = new URLSearchParams(oauthQuery)
   const clientId = query.get("client_id")
-  if (!clientId) return <InvalidAuthorizationRequest />
+  if (!clientId) {
+    return (
+      <>
+        <PostHogIdentity userId={null} />
+        <InvalidAuthorizationRequest />
+      </>
+    )
+  }
 
   let client
   try {
@@ -61,7 +68,12 @@ async function ConsentContent({ searchParams }: ConsentPageProps) {
     })
   } catch (error) {
     console.error("Unable to verify OAuth authorization request", error)
-    return <InvalidAuthorizationRequest />
+    return (
+      <>
+        <PostHogIdentity userId={null} />
+        <InvalidAuthorizationRequest />
+      </>
+    )
   }
 
   const session = await getSession()

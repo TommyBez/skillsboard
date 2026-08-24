@@ -2,16 +2,18 @@
 
 import { useEffect } from "react"
 
-import { posthogReady } from "@/lib/posthog-client"
+import { syncPostHogIdentity } from "@/lib/posthog-client"
 
 interface PostHogIdentityProps {
-  userId: string
+  teamId?: string | null
+  userId: string | null
 }
 
-export function PostHogIdentity({ userId }: PostHogIdentityProps) {
+/** Keeps PostHog's native person and event context aligned with the app. */
+export function PostHogIdentity({ teamId, userId }: PostHogIdentityProps) {
   useEffect(() => {
-    void posthogReady().then((posthog) => posthog?.identify(userId))
-  }, [userId])
+    void syncPostHogIdentity({ teamId, userId })
+  }, [teamId, userId])
 
   return null
 }

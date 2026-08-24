@@ -3,8 +3,10 @@
 import { useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronDownIcon } from "lucide-react"
+import { toast } from "sonner"
 
-import { setActiveOrganization } from "@/app/actions/organizations"
+import { authClient } from "@/lib/auth-client"
+import { syncPostHogTeam } from "@/lib/posthog-client"
 
 interface OrganizationOption { id: string; name: string }
 interface OrganizationSwitcherProps { organizations: OrganizationOption[]; activeId: string }
@@ -16,13 +18,25 @@ export function OrganizationSwitcher({ organizations, activeId }: OrganizationSw
   function handleValueChange(value: string) {
     if (!value || value === activeId) return
     startTransition(async () => {
-      await setActiveOrganization(value)
-      router.refresh()
+      try {
+        const result = await authClient.organization.setActive({ organizationId: value })
+        if (result.error) throw new Error(result.error.message)
+
+        // Better Auth has already changed the product's active team. Refresh
+        // immediately so optional analytics can never leave the old team's UI
+        // actionable against the new session.
+        router.refresh()
+        void syncPostHogTeam(value).catch(() => {})
+      } catch {
+        toast.error("We couldn’t switch team libraries. Try again.")
+      }
     })
   }
 
   return (
-    <div className="relative w-32 sm:w-44">
+    // min-w-0 lets the switcher give up width on very narrow phones (the
+    // select truncates) instead of forcing the header row past the viewport.
+    <div className="relative w-32 min-w-0 sm:w-44">
       <select
         aria-label="Switch team library"
         className="h-10 w-full appearance-none truncate rounded-xl border border-border bg-card/65 pl-3 pr-9 text-sm font-medium text-foreground outline-none transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-wait disabled:opacity-60"

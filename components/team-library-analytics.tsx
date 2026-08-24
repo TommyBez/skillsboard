@@ -29,7 +29,6 @@ export function TeamLibraryAnalytics({
       filter_state: filterState,
       has_skills: skillCount > 0,
       skill_count: skillCount,
-      team_id: teamId,
     })
   }, [filterState, navigationKey, skillCount, teamId])
 

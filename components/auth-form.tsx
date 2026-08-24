@@ -2,19 +2,19 @@
 
 import { useEffect, useState, type FormEvent } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { REGEXP_ONLY_DIGITS } from "input-otp"
 import { ArrowRightIcon, Loader2Icon } from "lucide-react"
 import { saveSignupProductCommunicationsConsent } from "@/app/actions/email-preferences"
 import { authClient } from "@/lib/auth-client"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
-import { posthogReady } from "@/lib/posthog-client"
+import { syncPostHogIdentity } from "@/lib/posthog-client"
 import { ButtonPendingContent } from "@/components/button-pending-content"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { destinationAfterOtp } from "@/lib/destination-after-otp"
 import { PRODUCT_COMMUNICATIONS_DISCLOSURE } from "@/lib/email/product-communications"
 
 interface AuthFormProps {
@@ -30,16 +30,18 @@ interface AuthFormProps {
 
 const RESEND_COOLDOWN_SECONDS = 60
 const OTP_LENGTH = 6
-const NEW_USER_WINDOW_MS = 2 * 60 * 1000
 
 const otpSlotClassName =
   "size-11 rounded-[14px] border border-border bg-background text-base first:rounded-[14px] first:border-l last:rounded-[14px] data-[active=true]:border-primary data-[active=true]:ring-primary/30 sm:size-12"
+
+const NEW_USER_WINDOW_MS = 2 * 60 * 1000
 
 function emailLocalPart(value: string): string {
   const local = value.split("@")[0]?.trim()
   return local || value
 }
 
+/** Sign-in and sign-up share `signIn.emailOtp`; this is only for which event to emit. */
 function isNewlyCreatedUser(user: { createdAt?: unknown } | null | undefined): boolean {
   if (!user?.createdAt) return false
   const createdAtMs = new Date(user.createdAt as string | Date).getTime()
@@ -54,7 +56,6 @@ export function AuthForm({
   preserveQuery = null,
   acceptAnyOtp = false,
 }: AuthFormProps) {
-  const router = useRouter()
   const [step, setStep] = useState<"email" | "otp">("email")
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
@@ -156,18 +157,24 @@ export function AuthForm({
           : null
       const userId = user && "id" in user ? String(user.id) : null
       if (userId) {
-        // Chained ahead of the captures below on the same promise, so the
-        // identify always lands before them.
-        void posthogReady().then((posthog) => posthog?.identify(userId))
+        await syncPostHogIdentity({ userId })
       }
       // Both pages share signIn.emailOtp; emit based on whether the account was just created.
       if (isNewlyCreatedUser(user)) {
-        captureAnalyticsEvent("user_signed_up", {
-          method: "email_otp",
-          signup_context: returnTo.startsWith("/invite/") ? "team_invitation" : "new_team",
-        })
+        captureAnalyticsEvent(
+          "user_signed_up",
+          {
+            method: "email_otp",
+            signup_context: returnTo.startsWith("/invite/") ? "team_invitation" : "new_team",
+          },
+          { send_instantly: true },
+        )
       } else {
-        captureAnalyticsEvent("user_signed_in", { method: "email_otp" })
+        captureAnalyticsEvent(
+          "user_signed_in",
+          { method: "email_otp" },
+          { send_instantly: true },
+        )
       }
 
       if (isSignUp && productCommunications) {
@@ -185,8 +192,7 @@ export function AuthForm({
         window.location.assign(continueHref)
         return
       }
-      router.push(returnTo)
-      router.refresh()
+      window.location.assign(destinationAfterOtp(returnTo, mode))
     } catch {
       setError("That code didn’t work. Request a new one and try again.")
     } finally {

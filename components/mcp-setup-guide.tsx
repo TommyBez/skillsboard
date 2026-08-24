@@ -31,25 +31,28 @@ function InlineCode({ children }: { children: ReactNode }) {
   return <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
 }
 
-function Snippet({ code, client, teamId }: { code: string; client: McpClientAnalyticsId; teamId: string }) {
+/**
+ * `client` keeps the copy surfaces apart. The protected shell registers the
+ * active team, and the denominator is `$pageview` on `/connect`.
+ */
+function configCopiedAnalytics(client: McpClientAnalyticsId) {
+  return { event: "mcp_config_copied", properties: { client } } as const
+}
+
+function Snippet({ code, client }: { code: string; client: McpClientAnalyticsId }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[12px] border">
       <pre className="overflow-x-auto bg-foreground p-4 font-mono text-xs leading-5 text-background">
         <code>{code}</code>
       </pre>
       <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton
-          value={code}
-          label="Copy"
-          compact
-          analytics={{ event: "mcp_config_copied", properties: { client, team_id: teamId } }}
-        />
+        <CopyButton value={code} label="Copy" compact analytics={configCopiedAnalytics(client)} />
       </div>
     </div>
   )
 }
 
-function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientAnalyticsId; teamId: string }) {
+function StepList({ steps, client }: { steps: Step[]; client: McpClientAnalyticsId }) {
   return (
     <ol className="space-y-6">
       {steps.map((step, index) => (
@@ -59,7 +62,7 @@ function StepList({ steps, client, teamId }: { steps: Step[]; client: McpClientA
           </span>
           <div className="min-w-0 flex-1 pt-1">
             <p className="text-sm leading-relaxed text-muted-foreground">{step.text}</p>
-            {step.snippet ? <Snippet code={step.snippet} client={client} teamId={teamId} /> : null}
+            {step.snippet ? <Snippet code={step.snippet} client={client} /> : null}
           </div>
         </li>
       ))}
@@ -90,7 +93,7 @@ const troubleshooting = [
   },
 ]
 
-export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; config: string; teamId: string }) {
+export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: string }) {
   const vscodeConfig = JSON.stringify(
     { servers: { "skills-board": { type: "http", url: mcpUrl } } },
     null,
@@ -241,10 +244,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
         <CopyButton
           value={headerCopyValue}
           label={headerCopyLabel}
-          analytics={{
-            event: "mcp_config_copied",
-            properties: { client: activeGuide.analyticsId, team_id: teamId },
-          }}
+          analytics={configCopiedAnalytics(activeGuide.analyticsId)}
         />
       </div>
 
@@ -269,7 +269,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
 
         {clients.map((client) => (
           <TabsContent key={client.id} value={client.id} className="px-5 py-5 sm:px-6 sm:py-6">
-            <StepList steps={client.steps} client={client.analyticsId} teamId={teamId} />
+            <StepList steps={client.steps} client={client.analyticsId} />
           </TabsContent>
         ))}
       </Tabs>

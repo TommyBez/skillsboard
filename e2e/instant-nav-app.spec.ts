@@ -32,10 +32,6 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/discover", "discover-shell", "discover-content")
   })
 
-  test("/settings/mcp", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/settings/mcp", "mcp-shell", "mcp-content")
-  })
-
   test("/settings/organization", async ({ page }) => {
     await expectInstantInitialLoad(page, "/settings/organization", "org-settings-shell", "org-settings-content")
   })
@@ -44,9 +40,16 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/settings/email", "email-settings-shell", "email-settings-content")
   })
 
+  // Authenticated now: the guide streams the team-scoped config behind the
+  // shell, the same shape as every other app route.
+  test("/connect", async ({ page }) => {
+    await expectInstantInitialLoad(page, "/connect", "mcp-shell", "mcp-content")
+  })
+
   test("/onboarding", async ({ page }) => {
-    // The gate redirects users who already have a team to /library, but only
-    // when it streams in — the shell itself must still commit instantly.
+    // The gate redirects users who already have a team (empty ones to /start,
+    // the rest to /library), but only when it streams in — the shell itself
+    // must still commit instantly.
     await expectInstantInitialLoad(page, "/onboarding", "access-shell")
   })
 
@@ -83,7 +86,7 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  test("/library -> /settings/mcp", async ({ page }) => {
+  test("/library -> /connect", async ({ page }) => {
     await expectInstantSoftNav(page, {
       from: "/library",
       trigger: productNav("Connect agent"),
@@ -113,9 +116,9 @@ test.describe("instant soft navigation: app routes", () => {
 
   // The account menu items are anchors rendered with the menuitem role
   // (Base UI DropdownMenuItem with nativeButton={false}).
-  test("/settings/mcp -> /settings/organization (account menu)", async ({ page }) => {
+  test("/library -> /settings/organization (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/settings/mcp",
+      from: "/library",
       trigger: (p) => p.getByRole("menuitem", { name: "Team access" }),
       shellTestId: "org-settings-shell",
       contentTestId: "org-settings-content",
@@ -125,9 +128,9 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  test("/settings/mcp -> /settings/email (account menu)", async ({ page }) => {
+  test("/collections -> /settings/email (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
-      from: "/settings/mcp",
+      from: "/collections",
       trigger: (p) => p.getByRole("menuitem", { name: "Email preferences" }),
       shellTestId: "email-settings-shell",
       contentTestId: "email-settings-content",
