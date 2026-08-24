@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { access, readdir, readFile } from "node:fs/promises"
+import { access, readFile } from "node:fs/promises"
 import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
@@ -21,8 +21,7 @@ async function exists(relative) {
   }
 }
 
-const connectPage = await readText("../app/connect/page.tsx")
-const connectLayout = await readText("../app/connect/layout.tsx")
+const connectPage = await readText("../app/(app)/connect/page.tsx")
 const appHeader = await readText("../components/app-header.tsx")
 const accountMenu = await readText("../components/account-menu.tsx")
 const libraryPage = await readText("../app/(app)/library/page.tsx")
@@ -34,13 +33,15 @@ const inviteForm = await readText("../components/invite-member-form.tsx")
 const firstSkillInviteStep = await readText("../components/first-skill-invite-step.tsx")
 const organizationSettings = await readText("../app/(app)/settings/organization/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
+const mcpSetupGuide = await readText("../components/mcp-setup-guide.tsx")
+const mcpSetupAnalytics = await readText("../components/mcp-setup-analytics.tsx")
 const llms = await readText("../public/llms.txt")
 
 /** Em dash and en dash are not allowed anywhere in published copy. */
 const dashPattern = /[–—]/
 
 test("connecting an agent is a page of its own, not a setting", async () => {
-  assert.equal(await exists("../app/connect/page.tsx"), true)
+  assert.equal(await exists("../app/(app)/connect/page.tsx"), true)
   assert.equal(await exists("../app/(app)/settings/mcp/page.tsx"), false)
   assert.match(connectPage, /<McpPluginInstall \/>/)
   assert.match(connectPage, /<McpSetupGuide/)
@@ -72,43 +73,49 @@ test("every entry point into the setup page names the new destination", () => {
   assert.match(events, /destination: "#mcp" \| "\/connect" \| "\/settings\/mcp" \| "\/sign-up"/)
 })
 
-test("/connect is a public page, discoverable in the sitemap and llms.txt", () => {
+/**
+ * The founder asked for `/connect` as a private page: MCP setup moving out of
+ * settings was the point, not making it a public acquisition surface. It now
+ * lives in the same authenticated route group as every other signed-in page,
+ * and it has to stay out of the surfaces that only list public URLs.
+ */
+test("/connect is private: out of the sitemap and out of llms.txt", () => {
   assert.ok(
-    sitemap().some((entry) => entry.url === `${siteConfig.url}/connect`),
-    "missing from the sitemap",
+    !sitemap().some((entry) => entry.url === `${siteConfig.url}/connect`),
+    "an authenticated page must not be listed in the sitemap",
   )
-  const listed = llms.match(/^- \[Connect your agent\]\(https:\/\/www\.skillsboard\.sh\/connect\):.+$/gm)
-  assert.equal(listed?.length, 1)
-  // One frame, the public one. A signed-in reader gets the same page as
-  // everyone else, which is what the founder asked for and what keeps a stale
-  // session cookie from turning an acquisition page into a redirect to sign in.
-  assert.match(connectLayout, /<ResourceShell location="connect_header">/)
-  assert.doesNotMatch(connectLayout, /ProtectedAppShell/)
+  assert.doesNotMatch(llms, /\(https:\/\/www\.skillsboard\.sh\/connect\)/)
 })
 
 /**
- * The build failure this page shipped with was a runtime read during
- * prerendering: the layout chose its frame from the session cookie. A public
- * page cannot read per-request state at all, so the rule is asserted over every
- * file under `app/connect`, not just the two that had the problem.
+ * `/connect` moved into the `(app)` route group instead of keeping its own
+ * public layout: that group's layout is what redirects a signed-out visitor
+ * to sign in and marks every route under it `noindex`, the same mechanism
+ * `/start`, `/library`, and `/settings` already rely on.
  */
-test("nothing under /connect reads a session, a cookie, or a header", async () => {
-  const directory = new URL("../app/connect/", import.meta.url)
-  const files = await readdir(directory)
-  assert.ok(files.length > 0)
+test("/connect is authenticated the same way as every other app page", async () => {
+  assert.equal(await exists("../app/(app)/connect/page.tsx"), true)
+  // No layout of its own: the shared `(app)` layout supplies the session
+  // check, the protected shell, and the noindex metadata.
+  assert.equal(await exists("../app/(app)/connect/layout.tsx"), false)
+  assert.doesNotMatch(connectPage, /ResourceShell/)
+})
 
-  for (const file of files) {
-    const source = await readFile(new URL(file, directory), "utf8")
-    assert.doesNotMatch(
-      source,
-      /getSessionCookie|getSession|requireSession|getAppContext|\bauth\(|cookies\(\)|headers\(\)/,
-      `${file} reads per-request state on a page that has to prerender`,
-    )
-  }
-  // The helper that resolved the viewer's team for this page is gone with it.
-  assert.equal(await exists("../lib/connect-viewer.ts"), false)
-  // The endpoint is the same string for every visitor, not the request host.
-  assert.match(connectPage, /const mcpUrl = absoluteUrl\("\/api\/mcp"\)/)
+/**
+ * The build failure the public draft of this page shipped with was a runtime
+ * session read during prerendering. That risk is gone now that the page is
+ * authenticated on purpose: it has to read the session, the same as `/start`,
+ * to know which team's setup it is showing.
+ */
+test("the connect page reads the session and personalizes the setup", () => {
+  assert.match(connectPage, /getAppContext/)
+  // The endpoint reflects the deployment the reader is signed into, not a
+  // hardcoded production URL.
+  assert.match(connectPage, /headers\(\)/)
+  assert.doesNotMatch(connectPage, /const mcpUrl = absoluteUrl\("\/api\/mcp"\)/)
+  // The plugin install commands stay canonical: the same command for every
+  // team, since the plugin is not team scoped.
+  assert.match(connectPage, /<McpPluginInstall \/>/)
 })
 
 test("the first run offers the agent first, with the invitation beside it", () => {
@@ -141,13 +148,19 @@ test("the first-run steps reuse the existing event names", () => {
     assert.match(events, new RegExp(`${event}: \\{`))
   }
   assert.match(inviteStep, /event: "team_invite_link_copied"/)
-  // The public page cannot name a team, so the property is optional rather
-  // than gone, and the authenticated first run still sends the real one.
+  // `team_id` stays optional on the type: not every future caller of this
+  // funnel is guaranteed to have resolved a team yet. Both current callers,
+  // `/connect` and the first run on `/start`, are authenticated and send it.
   assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+team_id\?: string\n\s+\}/)
   assert.match(
     nextSteps,
     /event: "mcp_config_copied",\n\s+properties: \{ client: "generic", team_id: teamId \},/,
   )
+  // The guide rendered on `/connect` sends the team on every copy, the same
+  // as the first run.
+  assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId, teamId: string\)/)
+  assert.match(mcpSetupGuide, /properties: \{ client, team_id: teamId \}/)
+  assert.match(mcpSetupAnalytics, /captureAnalyticsEvent\("mcp_setup_viewed", \{ team_id: teamId \}\)/)
   assert.match(events, /surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"/)
   // The two steps that had no event of their own, and only those two.
   assert.match(events, /onboarding_steps_viewed: Record<never, never>/)
@@ -178,11 +191,9 @@ test("an invitation carries the surface it was sent from", () => {
 })
 
 test("no dash rule violations in the copy this change owns", () => {
-  for (const source of [connectPage, connectLayout, startPage, nextSteps, inviteStep]) {
+  for (const source of [connectPage, startPage, nextSteps, inviteStep]) {
     assert.doesNotMatch(source, dashPattern)
   }
-  const connectLine = llms.split("\n").find((line) => line.includes("/connect)"))
-  assert.doesNotMatch(connectLine, dashPattern)
 })
 
 test("the new copy keeps the product's own words", () => {

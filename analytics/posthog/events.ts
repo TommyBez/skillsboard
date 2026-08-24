@@ -138,18 +138,18 @@ type NonTeamEventPropertiesMap = {
     location: "landing" | "mcp_settings" | "onboarding"
   }
   /**
-   * The MCP setup funnel, `mcp_setup_viewed` then `mcp_config_copied`, both non
-   * team scoped since the setup moved from `/settings/mcp` to the public
-   * `/connect`. Most of these views happen before an account exists, and a team
-   * scoped view would have meant reading the session on a page that has to stay
-   * prerendered. `client` keeps the surfaces apart: `generic` is the endpoint
-   * copied from the first run on `/start`, the rest come from the guide. The
-   * team scoped half of the first run is `onboarding_steps_viewed`.
+   * The MCP setup funnel, `mcp_setup_viewed` then `mcp_config_copied`. Both
+   * surfaces that fire these are authenticated now: `/connect` moved behind
+   * the session, alongside the first run on `/start`, so both send the real
+   * team on every capture. `client` keeps the surfaces apart: `generic` is the
+   * endpoint copied from the first run on `/start`, the rest come from the
+   * guide on `/connect`. The team scoped half of the first run is
+   * `onboarding_steps_viewed`.
    *
-   * `team_id` is optional for the same reason, and only optional: the public
-   * page has no team to name and sends none, while the first run on `/start`
-   * is authenticated and sends the real one, so the team level read of this
-   * funnel keeps working on the surface where a team exists.
+   * `team_id` stays optional on the type rather than moving into
+   * `TeamEventPropertiesMap`: these events are not exclusively team scoped by
+   * construction, only by the surfaces that currently call them, so a future
+   * caller that has not resolved a team yet is still free to omit it.
    */
   mcp_setup_viewed: {
     team_id?: string

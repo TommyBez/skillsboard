@@ -22,12 +22,6 @@ test.describe("instant initial load: public routes", () => {
     await expectInstantInitialLoad(page, "/about", "about-shell")
   })
 
-  // Public, and static all the way down: connecting an agent is the same page
-  // for a reader without an account and for one who already has a team.
-  test("/connect", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/connect", "mcp-shell")
-  })
-
   test("/resources", async ({ page }) => {
     await expectInstantInitialLoad(page, "/resources", "resources-shell")
   })

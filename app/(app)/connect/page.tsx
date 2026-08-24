@@ -1,31 +1,15 @@
+import { cache, Suspense } from "react"
 import type { Metadata } from "next"
+import { headers } from "next/headers"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
-import { absoluteUrl, siteConfig } from "@/lib/site"
-
-const connectPath = "/connect"
-const connectDescription =
-  "Connect Claude Code, Claude Desktop, Cursor, VS Code, or any MCP client to your team's AI skills on Skills Board. Install the plugin or add the MCP endpoint by hand, then sign in through the browser."
+import { Skeleton } from "@/components/ui/skeleton"
+import { getAppContext } from "@/lib/app-context"
 
 export const metadata: Metadata = {
-  title: { absolute: "Connect your agent | Skills Board MCP setup" },
-  description: connectDescription,
-  alternates: { canonical: connectPath },
-  openGraph: {
-    type: "website",
-    url: connectPath,
-    title: "Connect your agent to Skills Board",
-    description: connectDescription,
-    siteName: siteConfig.name,
-    locale: siteConfig.locale,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Connect your agent to Skills Board",
-    description: connectDescription,
-  },
+  title: "Connect your agent",
 }
 
 const availableTools = [
@@ -45,24 +29,73 @@ const availableTools = [
 ]
 
 /**
- * The endpoint every visitor is given, spelled the same way for all of them.
+ * The endpoint for the deployment the reader is actually signed into.
  *
- * It used to be derived from the request host so a signed-in reader saw the
- * deployment they were on. That read made the page dynamic, and the page is now
- * public and prerendered, so the canonical production endpoint is what it hands
- * out: the address a reader is meant to paste into their own client.
+ * Derived from the request host rather than a hardcoded production URL: this
+ * page is behind the session now, so a preview deployment and production each
+ * hand back the address that will actually work for the account that is
+ * looking at it, the same as the rest of the authenticated app.
  */
-const mcpUrl = absoluteUrl("/api/mcp")
-const mcpConfig = JSON.stringify(
-  { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
-  null,
-  2,
-)
+const getMcpDetails = cache(async () => {
+  const requestHeaders = await headers()
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "your-app.vercel.app"
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https"
+  const mcpUrl = `${protocol}://${host}/api/mcp`
+  const config = JSON.stringify(
+    { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
+    null,
+    2,
+  )
 
+  return { config, mcpUrl }
+})
+
+async function ConnectAnalytics() {
+  const { activeId } = await getAppContext()
+  return <McpSetupAnalytics teamId={activeId} />
+}
+
+async function ConnectGuide() {
+  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
+    getMcpDetails(),
+    getAppContext(),
+  ])
+
+  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
+}
+
+function ConnectGuideFallback() {
+  return (
+    <Skeleton
+      className="h-[28rem] rounded-[16px]"
+      role="status"
+      aria-label="Loading setup guide"
+    />
+  )
+}
+
+/**
+ * Connecting an agent, on its own page, behind the session.
+ *
+ * The founder asked for `/connect` as a private page: MCP setup used to be
+ * buried in settings, which is the fix this page keeps, but it was never meant
+ * to be a public acquisition surface. It lives in the authenticated `(app)`
+ * route group, the same as `/start`, `/library`, and `/settings`, so it reads
+ * the session, redirects a signed-out visitor to sign in, and stays out of the
+ * sitemap, `llms.txt`, and search indexing the same way those pages do.
+ *
+ * Reading the session back also restores the personalization the public draft
+ * of this page had to give up: the MCP endpoint reflects the deployment the
+ * reader is actually on, and `mcp_setup_viewed` / `mcp_config_copied` carry the
+ * team. The plugin install commands stay canonical (the same command for every
+ * team) since the plugin itself is not team scoped.
+ */
 export default function ConnectPage() {
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <McpSetupAnalytics />
+    <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
+      <Suspense fallback={null}>
+        <ConnectAnalytics />
+      </Suspense>
 
       <header className="border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
@@ -89,7 +122,9 @@ export default function ConnectPage() {
       </div>
 
       <div className="mt-8">
-        <McpSetupGuide config={mcpConfig} mcpUrl={mcpUrl} />
+        <Suspense fallback={<ConnectGuideFallback />}>
+          <ConnectGuide />
+        </Suspense>
       </div>
 
       <section className="mt-8 overflow-hidden rounded-[16px] border bg-card">
@@ -118,6 +153,6 @@ export default function ConnectPage() {
       <div className="mt-8">
         <McpTroubleshooting />
       </div>
-    </div>
+    </main>
   )
 }

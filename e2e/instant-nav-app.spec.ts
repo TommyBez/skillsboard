@@ -40,6 +40,12 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/settings/email", "email-settings-shell", "email-settings-content")
   })
 
+  // Authenticated now: the guide streams the team-scoped config behind the
+  // shell, the same shape as every other app route.
+  test("/connect", async ({ page }) => {
+    await expectInstantInitialLoad(page, "/connect", "mcp-shell", "mcp-content")
+  })
+
   test("/onboarding", async ({ page }) => {
     // The gate redirects users who already have a team to /library, but only
     // when it streams in — the shell itself must still commit instantly.
@@ -79,13 +85,12 @@ test.describe("instant soft navigation: app routes", () => {
     })
   })
 
-  // /connect is a public page with nothing deferred behind it, so there is no
-  // content marker to gate: the whole page is the shell.
   test("/library -> /connect", async ({ page }) => {
     await expectInstantSoftNav(page, {
       from: "/library",
       trigger: productNav("Connect agent"),
       shellTestId: "mcp-shell",
+      contentTestId: "mcp-content",
     })
   })
 
@@ -109,8 +114,7 @@ test.describe("instant soft navigation: app routes", () => {
   })
 
   // The account menu items are anchors rendered with the menuitem role
-  // (Base UI DropdownMenuItem with nativeButton={false}). The menu lives in the
-  // product chrome, which /connect no longer carries: it is a public page.
+  // (Base UI DropdownMenuItem with nativeButton={false}).
   test("/library -> /settings/organization (account menu)", async ({ page }) => {
     await expectInstantSoftNav(page, {
       from: "/library",
