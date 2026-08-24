@@ -754,8 +754,8 @@ export const claudeCodeForTeams: ClaudeCodeForTeamsDefinition = {
     ],
     paths: [
       {
-        label: "Install the plugin once per team",
-        body: "Run /plugin marketplace add TommyBez/skillsboard and then /plugin install skills-board@skills-board, and Claude Code has the team library in session. A team that wants it on every clone can put the same marketplace in extraKnownMarketplaces and the plugin in enabledPlugins in the committed .claude/settings.json, which is exactly the mechanism the plugins section above describes.",
+        label: "Install the plugin",
+        body: "Run /plugin marketplace add TommyBez/skillsboard and then /plugin install skills-board@skills-board, and Claude Code has the team library in session. The install is per user, not per team: committing the marketplace in extraKnownMarketplaces and the plugin in enabledPlugins makes every fresh clone prompt each teammate with that exact install command on the first run, and the seed directory provisions it without a prompt in containers and CI, exactly as the plugins section above describes.",
       },
       {
         label: "Or point one MCP endpoint at it",
