@@ -142,25 +142,13 @@ type NonTeamEventPropertiesMap = {
     location: "landing" | "mcp_settings" | "onboarding"
   }
   /**
-   * The MCP setup funnel, `mcp_setup_viewed` then `mcp_config_copied`. Both
-   * surfaces that fire these are authenticated now: `/connect` moved behind
-   * the session, alongside the first run on `/start`, so both send the real
-   * team on every capture. `client` keeps the surfaces apart: `generic` is the
-   * endpoint copied from the first run on `/start`, the rest come from the
-   * guide on `/connect`. The team scoped half of the first run is
-   * `onboarding_steps_viewed`.
-   *
-   * `team_id` stays optional on the type rather than moving into
-   * `TeamEventPropertiesMap`: these events are not exclusively team scoped by
-   * construction, only by the surfaces that currently call them, so a future
-   * caller that has not resolved a team yet is still free to omit it.
+   * A real copy action, not a route view. `$pageview` on `/connect` and
+   * `/start` owns the denominator; `client` separates their copy surfaces.
+   * Browser team context comes from PostHog's registered `team_id` super
+   * property, without making leaf components fetch or receive the team.
    */
-  mcp_setup_viewed: {
-    team_id?: string
-  }
   mcp_config_copied: {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
-    team_id?: string
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -245,11 +233,6 @@ type TeamEventPropertiesMap = {
   library_empty_state_cta_clicked: {
     cta: "add_skill" | "find_skills"
   }
-  /**
-   * The first-run screen a new team lands on, where connecting an agent and
-   * inviting a teammate are offered beside each other rather than in sequence.
-   */
-  onboarding_steps_viewed: Record<never, never>
   /**
    * Only the two steps that have no event of their own. Connecting an agent is
    * already measured by `mcp_entry_clicked`, `plugin_install_copied`, and

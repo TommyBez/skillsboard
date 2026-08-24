@@ -1,5 +1,5 @@
 import assert from "node:assert/strict"
-import { access, readFile } from "node:fs/promises"
+import { access, readFile, readdir } from "node:fs/promises"
 import { test } from "node:test"
 
 import "./helpers/register-app-aliases.mjs"
@@ -21,6 +21,33 @@ async function exists(relative) {
   }
 }
 
+async function readSourceTree(relative) {
+  const directory = new URL(relative, import.meta.url)
+  const entries = await readdir(directory, { withFileTypes: true })
+  const sources = []
+
+  for (const entry of entries) {
+    const child = new URL(entry.name, `${directory.href}/`)
+    if (entry.isDirectory()) {
+      sources.push(...(await readSourceTree(child.href)))
+    } else if (/\.[cm]?[jt]sx?$/.test(entry.name)) {
+      sources.push(await readFile(child, "utf8"))
+    }
+  }
+
+  return sources
+}
+
+function assertPatternsInOrder(source, patterns, message) {
+  let cursor = 0
+
+  for (const pattern of patterns) {
+    const match = source.slice(cursor).match(pattern)
+    assert.ok(match, `${message}: missing ${pattern}`)
+    cursor += match.index + match[0].length
+  }
+}
+
 const connectPage = await readText("../app/(app)/connect/page.tsx")
 const appHeader = await readText("../components/app-header.tsx")
 const accountMenu = await readText("../components/account-menu.tsx")
@@ -34,8 +61,23 @@ const firstSkillInviteStep = await readText("../components/first-skill-invite-st
 const organizationSettings = await readText("../app/(app)/settings/organization/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
 const mcpSetupGuide = await readText("../components/mcp-setup-guide.tsx")
-const mcpSetupAnalytics = await readText("../components/mcp-setup-analytics.tsx")
+const appLayout = await readText("../app/(app)/layout.tsx")
+const rootLayout = await readText("../app/layout.tsx")
+const protectedAppShell = await readText("../components/protected-app-shell.tsx")
+const posthogIdentity = await readText("../components/posthog-identity.tsx")
+const posthogClient = await readText("../lib/posthog-client.ts")
+const instrumentationClient = await readText("../instrumentation-client.ts")
+const analyticsClient = await readText("../lib/analytics-client.ts")
+const createOrganizationForm = await readText("../components/create-organization-form.tsx")
+const acceptInvitationForm = await readText("../components/accept-invitation-form.tsx")
+const organizationSwitcher = await readText("../components/organization-switcher.tsx")
+const consentPage = await readText("../app/consent/page.tsx")
 const llms = await readText("../public/llms.txt")
+const applicationSources = (
+  await Promise.all(
+    ["../analytics/", "../app/", "../components/", "../lib/"].map(readSourceTree),
+  )
+).flat()
 
 /** Em dash and en dash are not allowed anywhere in published copy. */
 const dashPattern = /[–—]/
@@ -119,13 +161,14 @@ test("/connect is gated at the edge the same way as /library", async () => {
 })
 
 /**
- * The build failure the public draft of this page shipped with was a runtime
- * session read during prerendering. That risk is gone now that the page is
- * authenticated on purpose: it has to read the session, the same as `/start`,
- * to know which team's setup it is showing.
+ * The route group owns authentication and analytics identity. The setup page
+ * itself contains no team-specific UI, so it must not wait on app context just
+ * to label browser analytics.
  */
-test("the connect page reads the session and personalizes the setup", () => {
-  assert.match(connectPage, /getAppContext/)
+test("the connect guide renders without a page-local team fetch", () => {
+  assert.doesNotMatch(connectPage, /getAppContext/)
+  assert.doesNotMatch(connectPage, /async function ConnectGuide/)
+  assert.doesNotMatch(connectPage, /ConnectGuideFallback/)
   // The endpoint is this deployment's MCP resource, from the same Vercel
   // system vars Better Auth uses, not a hardcoded production URL.
   assert.match(connectPage, /getMcpResource\(\)/)
@@ -152,37 +195,56 @@ test("the first run offers the agent first, with the invitation beside it", () =
   assert.match(startPage, /<OnboardingNextSteps/)
 })
 
-test("the first-run and connect screens resolve the team before claiming it is ready", () => {
+test("only the first-run content that needs app context waits for it", () => {
   // The start heading used to live outside a Suspense child that called
   // getAppContext, so a new account saw "Your team library is ready"
   // before the redirect to team creation. That heading still waits on the
-  // team. /connect's heading is generic, so it stays in the shell and only
-  // the team-scoped guide waits. The MCP URL comes from env on both.
+  // team. /connect's heading and guide are generic, so neither waits on a
+  // page-local analytics fetch. The MCP URL comes from env on both.
   assert.match(startPage, /async function StartHeading/)
   assert.match(startPage, /await getAppContext\(\)/)
   assert.match(startPage, /getMcpResource\(\)/)
   assert.doesNotMatch(startPage, /headers\(\)/)
   assert.match(connectPage, /export default function ConnectPage/)
-  assert.match(connectPage, /async function ConnectGuide/)
-  assert.match(connectPage, /await getAppContext\(\)/)
+  assert.doesNotMatch(connectPage, /getAppContext/)
   assert.match(connectPage, /getMcpResource\(\)/)
   assert.doesNotMatch(connectPage, /headers\(\)/)
 })
 
-test("OTP success names the destination from the form mode", async () => {
+test("OTP success identifies first, flushes the auth event, then reloads the destination", async () => {
   const authForm = await readText("../components/auth-form.tsx")
-  assert.match(authForm, /router\.push\(destinationAfterOtp\(returnTo, mode\)\)/)
+  assertPatternsInOrder(
+    authForm,
+    [
+      /await syncPostHogIdentity\(\{ userId \}\)/,
+      /captureAnalyticsEvent\(/,
+      /window\.location\.assign\(destinationAfterOtp\(returnTo, mode\)\)/,
+    ],
+    "OTP success",
+  )
+  assert.equal((authForm.match(/send_instantly:\s*true/g) ?? []).length, 2)
+  assert.match(authForm, /window\.location\.assign\(continueHref\)/)
+  assert.doesNotMatch(authForm, /activeOrganizationId|authClient\.getSession\(/)
+  assert.doesNotMatch(authForm, /router\.(?:push|refresh|replace)\(/)
 })
 
 test("a team created in onboarding lands on the first-run screen", async () => {
   const onboardingPage = await readText("../app/onboarding/page.tsx")
-  assert.match(organizationActions, /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/)
-  // After the action redirects, this page revalidates. Sending an empty team
-  // to /library here would steal the first run.
+  assert.match(
+    organizationActions,
+    /const destination = creationSurface === "onboarding" \? "\/start" : "\/library"/,
+  )
+  assert.doesNotMatch(
+    organizationActions,
+    /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/,
+  )
+  // After a reload, this page still sends an existing empty team to the
+  // first-run screen. The create form owns the normal client navigation so it
+  // can register the new team with PostHog first.
   assert.match(onboardingPage, /redirect\(skillCount === 0 \? "\/start" : "\/library"\)/)
 })
 
-test("the first-run steps reuse the existing event names", () => {
+test("route views stay native while real actions stay custom", async () => {
   for (const event of [
     "plugin_install_copied",
     "mcp_config_copied",
@@ -192,23 +254,103 @@ test("the first-run steps reuse the existing event names", () => {
     assert.match(events, new RegExp(`${event}: \\{`))
   }
   assert.match(inviteStep, /event: "team_invite_link_copied"/)
-  // `team_id` stays optional on the type: not every future caller of this
-  // funnel is guaranteed to have resolved a team yet. Both current callers,
-  // `/connect` and the first run on `/start`, are authenticated and send it.
-  assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+team_id\?: string\n\s+\}/)
+  assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+\}/)
   assert.match(
     nextSteps,
-    /event: "mcp_config_copied",\n\s+properties: \{ client: "generic", team_id: teamId \},/,
+    /event: "mcp_config_copied",\n\s+properties: \{ client: "generic" \},/,
   )
-  // The guide rendered on `/connect` sends the team on every copy, the same
-  // as the first run.
-  assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId, teamId: string\)/)
-  assert.match(mcpSetupGuide, /properties: \{ client, team_id: teamId \}/)
-  assert.match(mcpSetupAnalytics, /captureAnalyticsEvent\("mcp_setup_viewed", \{ team_id: teamId \}\)/)
+  assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId\)/)
+  assert.match(mcpSetupGuide, /properties: \{ client \}/)
   assert.match(events, /surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"/)
-  // The two steps that had no event of their own, and only those two.
-  assert.match(events, /onboarding_steps_viewed: Record<never, never>/)
   assert.match(events, /step: "first_skill" \| "invite_team"/)
+
+  assert.doesNotMatch(events, /mcp_setup_viewed/)
+  assert.doesNotMatch(events, /onboarding_steps_viewed/)
+  assert.equal(await exists("../components/mcp-setup-analytics.tsx"), false)
+  assert.equal(await exists("../components/onboarding-steps-analytics.tsx"), false)
+
+  // Next.js starts PostHog once through its canonical client instrumentation
+  // entry. PostHog then owns initial and history-change pageviews; the app only
+  // keeps native user and team context current and never captures `$pageview`.
+  assert.match(posthogClient, /capture_pageview: "history_change"/)
+  assert.doesNotMatch(posthogClient, /capture_pageview: false/)
+  assert.equal(await exists("../instrumentation-client.ts"), true)
+  assert.match(
+    instrumentationClient,
+    /import \{ posthogReady \} from "@\/lib\/posthog-client"/,
+  )
+  assert.equal((instrumentationClient.match(/void posthogReady\(\)/g) ?? []).length, 2)
+  assert.match(instrumentationClient, /window\.requestIdleCallback/)
+  assert.match(instrumentationClient, /window\.setTimeout/)
+  assert.doesNotMatch(appLayout, /getAppContext|PostHogRoute|Suspense/)
+  assert.match(protectedAppShell, /const \{ session, organizations, activeId \} = await getAppContext\(\)/)
+  assert.match(protectedAppShell, /<PostHogIdentity userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
+  assert.match(posthogClient, /posthog\.identify\(userId\)/)
+  assert.match(posthogClient, /posthog\.register\(\{ team_id: teamId \}\)/)
+  assert.match(posthogClient, /posthog\.unregister\("team_id"\)/)
+  assert.match(
+    posthogIdentity,
+    /syncPostHogIdentity\(\{\s*teamId,\s*userId,?\s*\}\)/,
+  )
+  assert.match(posthogIdentity, /userId:\s*string \| null/)
+  assert.doesNotMatch(
+    posthogIdentity,
+    /PostHogBootstrap|posthogReady|useSelectedLayoutSegment|identityScoped/,
+  )
+  assert.doesNotMatch(rootLayout, /PostHogBootstrap/)
+  for (const source of applicationSources) {
+    assert.doesNotMatch(source, /\.capture\(\s*["'`]\$pageview["'`]/)
+  }
+  assert.match(analyticsClient, /posthogReady\(\)\.then\(\(posthog\) =>/)
+  assert.doesNotMatch(analyticsClient, /queue|scope|team_id/)
+  assert.equal(await exists("../components/posthog-analytics.tsx"), false)
+  assert.equal(await exists("../lib/posthog-scope.ts"), false)
+  assert.equal(await exists("../lib/posthog-scope-state.ts"), false)
+  assert.equal(await exists("../lib/posthog-route-scope.ts"), false)
+
+  // The global instrumentation entry starts native tracking for consent too;
+  // the route component only resolves whether a user identity can be applied.
+  assert.equal((consentPage.match(/<PostHogIdentity userId=\{null\} \/>/g) ?? []).length, 2)
+  assert.equal(
+    (consentPage.match(/<PostHogIdentity userId=\{session\.user\.id\} \/>/g) ?? []).length,
+    1,
+  )
+})
+
+test("team changes synchronize PostHog without delaying product updates", () => {
+  assert.match(organizationActions, /teamId:\s*created\.id/)
+  assert.match(
+    organizationActions,
+    /teamId:\s*accepted\.invitation\.organizationId/,
+  )
+  assert.doesNotMatch(organizationActions, /redirect\("\/library"\)/)
+
+  assertPatternsInOrder(
+    createOrganizationForm,
+    [
+      /await createOrganization\(/,
+      /await authClient\.organization\.setActive\(/,
+      /await syncPostHogTeam\(/,
+      /router\.push\(/,
+    ],
+    "team creation",
+  )
+  assertPatternsInOrder(
+    acceptInvitationForm,
+    [/await acceptInvitation\(/, /await syncPostHogTeam\(/, /router\.push\(/],
+    "invitation acceptance",
+  )
+  assertPatternsInOrder(
+    organizationSwitcher,
+    [
+      /await (?:setActiveOrganization|authClient\.organization\.setActive)\(/,
+      /router\.refresh\(/,
+      /void syncPostHogTeam\(value\)\.catch\(/,
+    ],
+    "team switch",
+  )
+  assert.doesNotMatch(organizationSwitcher, /await syncPostHogTeam\(value\)/)
+  assert.doesNotMatch(organizationSwitcher, /router\.(?:push|replace)\(/)
 })
 
 /**

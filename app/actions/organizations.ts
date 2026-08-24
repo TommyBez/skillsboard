@@ -11,7 +11,9 @@ import { captureTeamEvent } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
+  destination: "/library" | "/start" | ""
   error: string
+  teamId: string
 }
 
 export interface CreateInvitationLinkState {
@@ -25,6 +27,7 @@ export interface CreateInvitationLinkState {
 
 export interface AcceptInvitationState {
   error: string
+  teamId: string
 }
 
 const organizationNameSchema = z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less.")
@@ -44,51 +47,52 @@ export async function createOrganization(
   _state: CreateOrganizationState,
   formData: FormData,
 ): Promise<CreateOrganizationState> {
-  await requireSession()
+  const session = await requireSession()
   const parsed = organizationNameSchema.safeParse(formData.get("name"))
   const creationSurface = creationSurfaceSchema.parse(formData.get("creationSurface"))
 
   if (!parsed.success) {
-    return { error: parsed.error.issues[0]?.message ?? "Enter a valid team name." }
+    return {
+      destination: "",
+      error: parsed.error.issues[0]?.message ?? "Enter a valid team name.",
+      teamId: "",
+    }
   }
 
   const slug = await resolveUniqueOrganizationSlug(parsed.data)
+  const destination = creationSurface === "onboarding" ? "/start" : "/library"
 
   try {
     const created = await auth.api.createOrganization({
       headers: await headers(),
-      body: { name: parsed.data, slug },
+      // The browser activates the new team after this action returns. Keeping
+      // the current team here lets it update PostHog before navigation.
+      body: { keepCurrentActiveOrganization: true, name: parsed.data, slug },
     })
-    if (!created?.id) return { error: "We couldn’t create your team library. Please try again." }
-
-    await auth.api.setActiveOrganization({
-      headers: await headers(),
-      body: { organizationId: created.id },
-    })
-    const session = await getSession()
-    if (session?.user) {
-      captureTeamEvent({
-        distinctId: session.user.id,
-        event: "team_created",
-        properties: { creation_surface: creationSurface },
-        teamId: created.id,
-      })
+    if (!created?.id) {
+      return {
+        destination: "",
+        error: "We couldn’t create your team library. Please try again.",
+        teamId: "",
+      }
     }
+
+    captureTeamEvent({
+      distinctId: session.user.id,
+      event: "team_created",
+      properties: { creation_surface: creationSurface },
+      teamId: created.id,
+    })
+
+    return { destination, error: "", teamId: created.id }
   } catch (error) {
     console.error("Unable to create team library", error)
-    return { error: "We couldn’t create your team library. Please try again." }
+    return {
+      destination: "",
+      error: "We couldn’t create your team library. Please try again.",
+      teamId: "",
+    }
   }
-
-  // A team created during onboarding goes to the first-run screen, where
-  // connecting an agent and inviting a teammate are offered together. A team
-  // created from inside the app is a switch of context, not a first run, so it
-  // still lands in the library.
-  redirect(creationSurface === "onboarding" ? "/start" : "/library")
-}
-
-export async function setActiveOrganization(organizationId: string) {
-  await requireSession()
-  await auth.api.setActiveOrganization({ headers: await headers(), body: { organizationId } })
 }
 
 export async function createInvitationLink(
@@ -187,7 +191,7 @@ export async function acceptInvitation(
   formData: FormData,
 ): Promise<AcceptInvitationState> {
   const invitationId = z.string().regex(/^[A-Za-z0-9_-]{1,200}$/).safeParse(formData.get("invitationId"))
-  if (!invitationId.success) return { error: "This invitation link is invalid." }
+  if (!invitationId.success) return { error: "This invitation link is invalid.", teamId: "" }
   const session = await getSession()
   if (!session?.user) redirect(`/sign-up?returnTo=${encodeURIComponent(`/invite/${invitationId.data}`)}`)
 
@@ -203,10 +207,12 @@ export async function acceptInvitation(
         teamId: accepted.invitation.organizationId,
       })
     }
+    return { error: "", teamId: accepted.invitation.organizationId }
   } catch (error) {
     console.error("Unable to accept invitation", error)
-    return { error: "This invitation may have expired or can no longer be accepted. Ask a team admin for a new link." }
+    return {
+      error: "This invitation may have expired or can no longer be accepted. Ask a team admin for a new link.",
+      teamId: "",
+    }
   }
-
-  redirect("/library")
 }

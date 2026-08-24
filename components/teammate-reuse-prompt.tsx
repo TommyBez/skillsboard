@@ -14,7 +14,6 @@ interface TeammateReusePromptProps {
   skillId: string
   skillName: string
   skillTitle: string
-  teamId: string
 }
 
 export function TeammateReusePrompt({
@@ -24,7 +23,6 @@ export function TeammateReusePrompt({
   skillId,
   skillName,
   skillTitle,
-  teamId,
 }: TeammateReusePromptProps) {
   const commandAnalytics: ClientAnalyticsEvent = {
     event: "skill_usage_path_selected",
@@ -34,7 +32,6 @@ export function TeammateReusePrompt({
       skill_id: skillId,
       skill_name: skillName,
       surface: "library",
-      team_id: teamId,
     },
   }
   const sourceAnalytics: ClientAnalyticsEvent = {
@@ -45,7 +42,6 @@ export function TeammateReusePrompt({
       skill_id: skillId,
       skill_name: skillName,
       surface: "library",
-      team_id: teamId,
     },
   }
 

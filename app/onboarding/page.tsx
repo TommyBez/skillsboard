@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { OnboardingForm } from "@/components/onboarding-form"
+import { PostHogIdentity } from "@/components/posthog-identity"
 import { Skeleton } from "@/components/ui/skeleton"
 import { countOrganizationSkills, listUserOrganizations } from "@/lib/db/queries"
 import { requireSession } from "@/lib/session"
@@ -26,7 +27,12 @@ async function OnboardingGate() {
     redirect(skillCount === 0 ? "/start" : "/library")
   }
 
-  return <OnboardingForm />
+  return (
+    <>
+      <PostHogIdentity userId={session.user.id} teamId={null} />
+      <OnboardingForm />
+    </>
+  )
 }
 
 function OnboardingFormFallback() {

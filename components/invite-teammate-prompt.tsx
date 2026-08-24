@@ -40,7 +40,6 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
     captureAnalyticsEvent("team_invite_prompt_viewed", {
       actor_is_skill_creator: actorIsSkillCreator,
       surface: "library_after_first_skill",
-      team_id: teamId,
       trigger: "library_revisit",
     })
   }, [actorIsSkillCreator, teamId])
@@ -87,7 +86,6 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
                 captureAnalyticsEvent("team_invite_prompt_clicked", {
                   actor_is_skill_creator: actorIsSkillCreator,
                   surface: "library_after_first_skill",
-                  team_id: teamId,
                   trigger: "library_revisit",
                 })
               }}

@@ -1,11 +1,7 @@
-import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
-import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
-import { Skeleton } from "@/components/ui/skeleton"
-import { getAppContext } from "@/lib/app-context"
 import { getMcpResource } from "@/lib/auth-environment"
 
 export const metadata: Metadata = {
@@ -28,21 +24,6 @@ const availableTools = [
   { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },
 ]
 
-async function ConnectGuide({ config, mcpUrl }: { config: string; mcpUrl: string }) {
-  const { activeId } = await getAppContext()
-
-  return (
-    <>
-      <McpSetupAnalytics teamId={activeId} />
-      <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
-    </>
-  )
-}
-
-function ConnectGuideFallback() {
-  return <Skeleton className="h-[32rem] rounded-[16px]" aria-label="Loading setup guide" />
-}
-
 /**
  * Connecting an agent, on its own page, behind the session.
  *
@@ -55,9 +36,11 @@ function ConnectGuideFallback() {
  *
  * The MCP endpoint comes from the same Vercel system vars Better Auth uses,
  * so a preview names its own server and production names the stable domain.
- * `mcp_setup_viewed` / `mcp_config_copied` still carry the team from the
- * session. The plugin install commands stay canonical (the same command for
- * every team) since the plugin itself is not team scoped.
+ * The shared analytics shell attaches the active team to the canonical
+ * `$pageview` and to copy actions, so this page does not fetch the team or
+ * block its setup guide for analytics. The plugin install commands stay
+ * canonical (the same command for every team) since the plugin itself is not
+ * team scoped.
  */
 export default function ConnectPage() {
   const mcpUrl = getMcpResource()
@@ -94,9 +77,7 @@ export default function ConnectPage() {
       </div>
 
       <div className="mt-8">
-        <Suspense fallback={<ConnectGuideFallback />}>
-          <ConnectGuide config={config} mcpUrl={mcpUrl} />
-        </Suspense>
+        <McpSetupGuide config={config} mcpUrl={mcpUrl} />
       </div>
 
       <section className="mt-8 overflow-hidden rounded-[16px] border bg-card">

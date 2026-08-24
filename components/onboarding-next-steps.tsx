@@ -11,7 +11,6 @@ interface OnboardingNextStepsProps {
   /** Members cannot create invitations, so they are told who can instead. */
   canInvite: boolean
   mcpUrl: string
-  teamId: string
 }
 
 function StepCard({
@@ -84,12 +83,11 @@ function Snippet({
  * beside it rather than behind a first saved skill: a library one person can
  * reach is not a team library, and the ask reads the same on day zero.
  *
- * Every event here carries the team, and so does the equivalent copy on
- * `/connect`: both screens are authenticated, so `mcp_config_copied` stays
- * readable per team on either surface. `client` is what tells the two apart:
- * `generic` is the endpoint copied straight from this first run.
+ * The protected shell registers the active team for every event, as it does
+ * on `/connect`. `client` tells the two copy surfaces apart: `generic` is the
+ * endpoint copied straight from this first run.
  */
-export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNextStepsProps) {
+export function OnboardingNextSteps({ canInvite, mcpUrl }: OnboardingNextStepsProps) {
   return (
     <div data-testid="start-content" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <StepCard
@@ -107,7 +105,7 @@ export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNex
         <Snippet
           analytics={{
             event: "mcp_config_copied",
-            properties: { client: "generic", team_id: teamId },
+            properties: { client: "generic" },
           }}
           ariaLabel="MCP endpoint"
           code={mcpUrl}
@@ -146,7 +144,7 @@ export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNex
               href="/library"
               analytics={{
                 event: "onboarding_step_clicked",
-                properties: { step: "first_skill", team_id: teamId },
+                properties: { step: "first_skill" },
               }}
             />
           )}
@@ -166,7 +164,7 @@ export function OnboardingNextSteps({ canInvite, mcpUrl, teamId }: OnboardingNex
             : "This library is worth more with the rest of the team in it. A team admin can send the invitations."
         }
       >
-        {canInvite ? <OnboardingInviteStep teamId={teamId} /> : null}
+        {canInvite ? <OnboardingInviteStep /> : null}
       </StepCard>
     </div>
   )

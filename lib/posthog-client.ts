@@ -9,23 +9,63 @@ import {
 
 type PostHogClient = typeof posthogJs
 
+export interface PostHogIdentity {
+  teamId?: string | null
+  userId: string | null
+}
+
 let ready: Promise<PostHogClient | null> | null = null
+
+/** Applies the app identity and active team using native PostHog state. */
+export function applyPostHogIdentity(
+  posthog: PostHogClient,
+  { teamId, userId }: PostHogIdentity,
+) {
+  if (userId) {
+    const identifiedUser = posthog.get_property("$user_id")
+    if (
+      typeof identifiedUser === "string" &&
+      identifiedUser.length > 0 &&
+      identifiedUser !== userId
+    ) {
+      posthog.reset()
+    }
+    if (posthog.get_property("$user_id") !== userId) posthog.identify(userId)
+  }
+
+  if (teamId !== undefined) {
+    const registeredTeam = posthog.get_property("team_id")
+    if (teamId && registeredTeam !== teamId) {
+      posthog.register({ team_id: teamId })
+    } else if (teamId === null && registeredTeam != null) {
+      posthog.unregister("team_id")
+    }
+  }
+}
+
+/** Waits until PostHog is ready, then updates its native identity context. */
+export async function syncPostHogIdentity(identity: PostHogIdentity) {
+  const posthog = await posthogReady()
+  if (posthog) applyPostHogIdentity(posthog, identity)
+}
+
+/** Updates the active team before an action can trigger the next pageview. */
+export function syncPostHogTeam(teamId: string | null) {
+  return syncPostHogIdentity({ teamId, userId: null })
+}
 
 /**
  * Loads and initializes the PostHog singleton on demand.
  *
  * posthog-js is ~70 kB gzipped. Imported statically from
- * `instrumentation-client.ts` it sat in every page's entry bundle — including
+ * a static instrumentation entry it sat in every page's bundle — including
  * the landing page's, where it was the largest unused chunk on the critical
- * path. The dynamic import keeps it out of the initial bundle while still
- * starting during app startup, so pageview/session capture behave as before.
+ * path. The dynamic import keeps it out of the initial bundle while Next.js's
+ * `instrumentation-client.ts` remains the single global bootstrap.
  *
- * Every call site chains on this one promise: init runs in the first `.then`
- * ever registered (app startup, via `instrumentation-client.ts`), so captures
- * and identifies registered later are guaranteed to run after init — events
- * fired during the fetch are queued, not dropped. Without a project token
- * (local dev, previews) it resolves to null and all calls no-op, matching the
- * previous behaviour.
+ * Identity, native pageviews, and custom events share this singleton. Without
+ * a project token (local dev, previews) it resolves to null and all calls
+ * no-op.
  */
 export function posthogReady(): Promise<PostHogClient | null> {
   if (!ready) {
