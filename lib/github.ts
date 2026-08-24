@@ -3,6 +3,9 @@ import "server-only"
 import { cacheLife, cacheTag } from "next/cache"
 
 import { cacheTags } from "@/lib/cache-tags"
+import { parseGitHubUrl } from "@/lib/github-url"
+
+export { parseGitHubUrl }
 
 interface GitHubRepo {
   description: string | null
@@ -17,15 +20,6 @@ export interface GitHubMetadata {
   repoName: string
   repoStars: number
   repoUpdatedAt: Date
-}
-
-export function parseGitHubUrl(value: string) {
-  const url = new URL(value)
-  if (url.hostname !== "github.com") throw new Error("Use a github.com repository URL")
-  const [repoOwner, rawRepoName] = url.pathname.split("/").filter(Boolean)
-  if (!repoOwner || !rawRepoName) throw new Error("Invalid GitHub repository URL")
-  const repoName = rawRepoName.replace(/\.git$/, "")
-  return { githubUrl: `https://github.com/${repoOwner}/${repoName}`, repoOwner, repoName }
 }
 
 export async function getGitHubMetadata(value: string): Promise<GitHubMetadata> {

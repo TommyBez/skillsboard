@@ -23,6 +23,7 @@ import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { pickDiscoveredSkill } from "@/lib/discovered-skill-selection"
+import { readGitHubUrl } from "@/lib/github-url"
 import type { DiscoveredGitHubSkill } from "@/lib/github-skill-discovery"
 
 interface AddSkillDialogProps {
@@ -64,6 +65,18 @@ export function AddSkillDialog({
   const [selectedPaths, setSelectedPaths] = useState<string[]>([])
   const discoveryRequest = useRef(0)
   const lastSinglePath = useRef<string | null>(null)
+  /* A paste is a finished URL; typing is not. Pasting therefore starts the
+     repository inspection on the spot, so the network round trip overlaps the
+     second or two the user spends reading the dialog instead of waiting for a
+     click that only ever meant "yes, that URL". Auto-inspection stays silent
+     on failure — the explicit button below still reports what went wrong.
+
+     Paste is the only trigger. Blur looked like a second one, but the submit
+     button is the next focusable element here, so blurring to inspect would
+     mostly fire as the user reaches for it: the pending state would disable
+     the button mid-click and swallow the very error they asked for. */
+  const pastedIntoUrlField = useRef(false)
+  const autoInspectedUrls = useRef<Set<string>>(new Set())
   /* Asked for only when the save just took this team from an empty library to
      a stocked one and the server judged the invite ask eligible. The step is
      opened through the shell because this dialog, and the control that
@@ -99,7 +112,7 @@ export function AddSkillDialog({
     })
   }
 
-  async function inspectRepository(value = repositoryUrl) {
+  async function inspectRepository(value = repositoryUrl, { silent = false } = {}) {
     const requestId = discoveryRequest.current + 1
     discoveryRequest.current = requestId
     setPendingMode("discover")
@@ -108,7 +121,7 @@ export function AddSkillDialog({
       const result = await discoverRepositorySkills({ githubUrl: value })
       if (requestId !== discoveryRequest.current) return
       if (!result.ok) {
-        toast.error(result.error)
+        if (!silent) toast.error(result.error)
         return
       }
 
@@ -132,10 +145,21 @@ export function AddSkillDialog({
     } catch (error) {
       if (requestId !== discoveryRequest.current) return
       console.error("Unable to inspect repository", error)
-      toast.error("We couldn’t inspect this repository. Check the URL and try again.")
+      if (!silent) toast.error("We couldn’t inspect this repository. Check the URL and try again.")
     } finally {
       if (requestId === discoveryRequest.current) setPendingMode(null)
     }
+  }
+
+  /** Inspect a pasted URL once, quietly, without blocking the manual path. */
+  function autoInspect(value: string) {
+    const trimmed = value.trim()
+    // Keyed on what was entered, not on the repository it resolves to: two
+    // skill links in one repository each deserve their own attempt, while a
+    // quiet failure never retries itself into a loop.
+    if (!readGitHubUrl(trimmed) || autoInspectedUrls.current.has(trimmed)) return
+    autoInspectedUrls.current.add(trimmed)
+    void inspectRepository(trimmed, { silent: true })
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -143,6 +167,7 @@ export function AddSkillDialog({
 
     if (!nextOpen) {
       resetDiscovery()
+      autoInspectedUrls.current.clear()
       setRepositoryUrl(defaultUrl)
       return
     }
@@ -254,13 +279,21 @@ export function AddSkillDialog({
                 name="githubUrl"
                 type="url"
                 value={repositoryUrl}
+                onPaste={() => {
+                  if (!isLocked) pastedIntoUrlField.current = true
+                }}
                 onChange={(event) => {
                   // A locked dialog is bound to its catalog entry's source.
                   // Repointing it elsewhere would let a repository whose sole
                   // skill carries another name pass the selection fallbacks.
                   if (isLocked) return
-                  setRepositoryUrl(event.target.value)
+                  const next = event.target.value
+                  setRepositoryUrl(next)
                   resetDiscovery()
+                  if (pastedIntoUrlField.current) {
+                    pastedIntoUrlField.current = false
+                    autoInspect(next)
+                  }
                 }}
                 readOnly={isLocked}
                 disabled={pendingMode !== null}
