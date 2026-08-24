@@ -47,6 +47,8 @@ type NonTeamEventPropertiesMap = {
       | "alternatives_skills_sh_closing"
       | "alternatives_smithery_header"
       | "alternatives_smithery_closing"
+      | "alternatives_superpowers_header"
+      | "alternatives_superpowers_closing"
       | "claude_skills_header"
       | "claude_skills_hero"
       | "claude_skills_inline"
