@@ -28,7 +28,6 @@ interface SkillUsageTracking {
   skillId: string
   skillName: string
   surface?: "collection" | "library"
-  teamId: string
 }
 
 interface SkillDossierProps {
@@ -65,7 +64,6 @@ function getSkillUsageAnalytics(
       skill_id: tracking.skillId,
       skill_name: tracking.skillName,
       surface: tracking.surface ?? "library",
-      team_id: tracking.teamId,
     },
   }
 }

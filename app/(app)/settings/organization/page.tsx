@@ -117,7 +117,6 @@ async function InvitationPanel() {
             properties: {
               actor_is_skill_creator: actorIsSkillCreator,
               surface: "organization_settings",
-              team_id: activeId,
             },
           }}
           surface="organization_settings"

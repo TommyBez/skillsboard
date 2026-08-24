@@ -10,6 +10,10 @@ import {
 type PostHogClient = typeof posthogJs
 
 let ready: Promise<PostHogClient | null> | null = null
+let resolveStarted: (posthog: PostHogClient | null) => void
+const started = new Promise<PostHogClient | null>((resolve) => {
+  resolveStarted = resolve
+})
 
 /**
  * Loads and initializes the PostHog singleton on demand.
@@ -20,12 +24,10 @@ let ready: Promise<PostHogClient | null> | null = null
  * path. The dynamic import keeps it out of the initial bundle while still
  * starting during app startup, so pageview/session capture behave as before.
  *
- * Every call site chains on this one promise: init runs in the first `.then`
- * ever registered (app startup, via `instrumentation-client.ts`), so captures
- * and identifies registered later are guaranteed to run after init — events
- * fired during the fetch are queued, not dropped. Without a project token
- * (local dev, previews) it resolves to null and all calls no-op, matching the
- * previous behaviour.
+ * Every call site chains on this one promise. Pageviews and browser events use
+ * the scope coordinator in `lib/posthog-scope.ts`, which applies identity and
+ * the active team before returning this singleton. Without a project token
+ * (local dev, previews) it resolves to null and all calls no-op.
  */
 export function posthogReady(): Promise<PostHogClient | null> {
   if (!ready) {
@@ -46,7 +48,13 @@ export function posthogReady(): Promise<PostHogClient | null> {
                   $set_once: sanitizePostHogUrlProperties(capture.$set_once),
                 }
               },
-              capture_pageview: "history_change",
+              // A single route tracker captures `$pageview` only after the
+              // current user/team scope has been applied. SDK-owned pageviews
+              // would race the streamed authenticated shell and duplicate it.
+              capture_pageview: false,
+              // Manual `$pageview` events still need SDK-owned duration and
+              // leave tracking; the default disables it with auto views off.
+              capture_pageleave: true,
               defaults: "2026-01-30",
               capture_exceptions: true,
               debug: process.env.NODE_ENV === "development",
@@ -66,6 +74,17 @@ export function posthogReady(): Promise<PostHogClient | null> {
           // `ready` rejected, or call sites like sign-out would hang forever.
           .catch(() => null)
       : Promise.resolve(null)
+
+    void ready.then(resolveStarted)
   }
   return ready
+}
+
+/** Resolves when some caller has deliberately started the lazy singleton. */
+export function posthogWhenStarted(): Promise<PostHogClient | null> {
+  return started
+}
+
+export function hasPostHogStarted() {
+  return ready !== null
 }

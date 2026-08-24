@@ -1,7 +1,7 @@
 <wizard-report>
 # PostHog post-wizard report
 
-The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. PostHog is initialized on the client via `instrumentation-client.ts`, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. A shared lazy singleton in `lib/posthog-server.ts` queues server-side captures and gives their background flushes to Next.js `after`, so mutations and MCP responses do not wait for analytics. User identification is performed client-side after successful auth and for returning protected-app visitors, while sign-out resets the client identity. The canonical typed event and property contract lives in `analytics/posthog/events.ts` and drives browser and server capture types.
+The wizard has completed a PostHog integration for SkillsBoard — a Next.js 16 App Router application using `better-auth` for authentication and Drizzle ORM for data access. A single client route tracker starts the lazy PostHog singleton after hydration, and a reverse proxy is configured in `next.config.ts` to route requests through `/ingest`. Authenticated layouts declare whether a page needs user or team scope; the tracker waits for `identify(userId)` and `register({ team_id })` before emitting `$pageview`. A shared lazy singleton in `lib/posthog-server.ts` queues server-side captures and gives their background flushes to Next.js `after`, so mutations and MCP responses do not wait for analytics. Sign-out resets the client identity. The canonical typed event and property contract lives in `analytics/posthog/events.ts` and drives browser and server capture types.
 
 The full-funnel instrumentation pass adds a narrow URL sanitizer for PostHog, Session Replay, and Vercel Analytics. It removes hashes and non-UTM query parameters and replaces invitation capability paths with `/invite/[redacted]`, while retaining canonical pageviews for signup, sign-in, consent, and invitation journeys. PostHog autocapture, exception capture, and project-configured Session Replay remain available, while Do Not Track is honored; only replay network bodies and headers plus the rendered invitation-link result are excluded because they can contain live credentials. Analytics ingestion is disabled outside Vercel production.
 
@@ -15,7 +15,7 @@ The production baseline starts with the successful production deployment of this
 |---|---|---|
 | `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
-| `mcp_setup_viewed` | A visitor opened the public connection page. | `components/mcp-setup-analytics.tsx` |
+| `$pageview` | Canonical route view. Use `$pathname=/connect` for the MCP guide and `$pathname=/start` for first-run steps; authenticated views carry the active `team_id`. | `components/posthog-analytics.tsx`, `lib/posthog-scope.ts` |
 | `mcp_client_selected` | User selected one of the bounded client setup guides. | `components/mcp-setup-guide.tsx` |
 | `mcp_config_copied` | Visitor successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx`, `components/onboarding-next-steps.tsx` |
 | `mcp_authorization_approved` | User approved MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
@@ -39,7 +39,7 @@ The production baseline starts with the successful production deployment of this
 | `team_invite_link_copied` | User copied the invitation link to share it outside email, from the first-skill step or from team settings. | `components/invite-member-form.tsx` |
 | `team_library_viewed` | An identified user entered a mounted library route state, with team, skill-count, and filter-state context; search/tag navigation is tracked and same-route skill mutations are deduplicated while mounted. | `components/team-library-analytics.tsx` |
 
-All team-scoped events include a stable `team_id` property through the tested `withTeamAnalyticsScope` payload builder. This includes every `skill_saved` producer in `lib/save-skill.ts`; production observations must still be filtered to events ingested after the deployed producer change before classifying the property as missing. Skills Board assumes event capture is not duplicating until concrete contrary evidence exists. A duplicate investigation starts only from a reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event; it is not routine Tracking QA. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. The three invite events carry the same property, read there as "this actor has put at least one skill in the library they are inviting someone into"; in the first-skill step it is always true, because reaching the step means the actor just saved that skill. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
+All browser events inside the protected app receive `team_id` from the registered PostHog super property. The mutable `active_team_id` person property is inspection context only; historical attribution always uses the event-time `team_id`. Server and MCP events remain stateless and receive the same property through the tested `withTeamAnalyticsScope` payload builder. This includes every `skill_saved` producer in `lib/save-skill.ts`; production observations must still be filtered to events ingested after the deployed producer change before classifying the property as missing. Skills Board assumes event capture is not duplicating until concrete contrary evidence exists. A duplicate investigation starts only from a reproducible repeated capture, a provider integrity alert, or an observed incompatible repeated business event; it is not routine Tracking QA. Usage-path events also include `actor_is_skill_creator` so shared value can be distinguished from a creator reusing their own recommendation. The three invite events carry the same property, read there as "this actor has put at least one skill in the library they are inviting someone into"; in the first-skill step it is always true, because reaching the step means the actor just saved that skill. MCP setup events use bounded client and surface enums; MCP searches, OAuth client names, queries, invitation emails, invitation IDs, team names, and full repository URLs are not sent in custom event properties.
 
 ## Full-funnel query rules
 
@@ -47,6 +47,7 @@ All team-scoped events include a stable `team_id` property through the tested `w
 - Measure acquisition with PostHog-native unique visitors, sessions, pageviews, and pageview duration on the exact production host `www.skillsboard.sh`, then use the real conversion events `landing_cta_clicked`, `signup_form_submitted`, `user_signed_up`, and `team_created`.
 - There is no custom engaged or qualified visitor event and no application-defined attention threshold. Skills Board does not duplicate PostHog session, referrer, UTM, first-touch, or page-duration state in application events.
 - Use PostHog-native session and acquisition properties when analyzing journeys to real conversion events. This contract does not define a custom source-to-new-team classifier, attribution cookie, or frozen source-to-team rule.
+- For the MCP and first-run view denominators, use the legacy `mcp_setup_viewed` / `onboarding_steps_viewed` events only before this deployment's cutover and `$pageview` filtered to `/connect` / `/start` after it. Do not union the overlapping pre-cutover period without a date filter.
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.
@@ -66,12 +67,12 @@ We've built some insights and a dashboard to keep an eye on user behavior, based
 
 ## Verify before merging
 
-- [ ] Run a full production build (the wizard only verified the files it touched) and fix any lint or type errors introduced by the generated code.
-- [ ] Run the test suite — call sites that were rewritten or instrumented may need updated mocks or fixtures.
+- [x] Run a full production build and fix any lint or type errors introduced by the tracking cutover.
+- [x] Run the test suite, including identity, team-switch, pageview ordering, and duplicate-prevention coverage.
 - [x] Document `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` as Production-only Vercel configuration.
 - [ ] Wire source-map upload (`posthog-cli sourcemap` or your bundler's upload step) into CI so production stack traces de-minify in PostHog Error Tracking.
 - [x] Returning signed-in visitors call `posthog.identify()` from the protected app shell.
-- [x] Automatic analytics URLs are canonicalized before they are sent, while funnel pageviews and SDK-owned properties remain intact.
+- [x] Analytics URLs are canonicalized before the central manual `$pageview` is sent, while funnel paths and SDK-owned properties remain intact.
 - [x] Autocapture, exception capture, and project-configured Session Replay remain available alongside explicit semantic events.
 - [ ] Define analytics consent, opt-out, retention, deletion, and internal-user exclusion policy before treating each dependent production metric as decision-ready.
 - [x] Define team-level HogQL semantics for activation and retention state transitions; retention fails closed as `unavailable` until historical activation milestones are reconciled.

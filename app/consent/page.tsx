@@ -7,6 +7,7 @@ import { redirect } from "next/navigation"
 
 import { AccessShell } from "@/components/access-shell"
 import { ConsentForm } from "@/components/consent-form"
+import { PostHogScopeBoundary } from "@/components/posthog-analytics"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -122,16 +123,18 @@ function ConsentContentFallback() {
 
 export default function ConsentPage({ searchParams }: ConsentPageProps) {
   return (
-    <AccessShell
-      marker="MCP authorization"
-      title="Allow access?"
-      description="Review the client and permissions before connecting it to Skills Board."
-      editorialTitle="Your libraries stay yours."
-      editorialBody="This client can find saved skills, retrieve install commands, and save new skills to your team libraries. It cannot edit or delete anything."
-    >
-      <Suspense fallback={<ConsentContentFallback />}>
-        <ConsentContent searchParams={searchParams} />
-      </Suspense>
-    </AccessShell>
+    <PostHogScopeBoundary scope="user">
+      <AccessShell
+        marker="MCP authorization"
+        title="Allow access?"
+        description="Review the client and permissions before connecting it to Skills Board."
+        editorialTitle="Your libraries stay yours."
+        editorialBody="This client can find saved skills, retrieve install commands, and save new skills to your team libraries. It cannot edit or delete anything."
+      >
+        <Suspense fallback={<ConsentContentFallback />}>
+          <ConsentContent searchParams={searchParams} />
+        </Suspense>
+      </AccessShell>
+    </PostHogScopeBoundary>
   )
 }

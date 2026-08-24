@@ -4,29 +4,31 @@ import type { MouseEventHandler } from "react"
 import type { CaptureOptions } from "posthog-js"
 
 import type {
-  AnalyticsCapturedEventCapture,
-  AnalyticsCapturedEventProperties,
+  AnalyticsEventCapture,
+  AnalyticsEventProperties,
   CapturableAnalyticsEventName,
   RequiredAnalyticsPropertyKeys,
 } from "@/analytics/posthog/events"
-import { posthogReady } from "@/lib/posthog-client"
+import { posthogReadyForAnalyticsCapture } from "@/lib/posthog-scope"
 
-export type ClientAnalyticsEvent = AnalyticsCapturedEventCapture
+export type ClientAnalyticsEvent = AnalyticsEventCapture
 
 type ClientAnalyticsCaptureArgs<EventName extends CapturableAnalyticsEventName> =
-  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
-    ? [properties?: AnalyticsCapturedEventProperties<EventName>, options?: CaptureOptions]
-    : [properties: AnalyticsCapturedEventProperties<EventName>, options?: CaptureOptions]
+  RequiredAnalyticsPropertyKeys<AnalyticsEventProperties<EventName>> extends never
+    ? [properties?: AnalyticsEventProperties<EventName>, options?: CaptureOptions]
+    : [properties: AnalyticsEventProperties<EventName>, options?: CaptureOptions]
 
 export function captureAnalyticsEvent<EventName extends CapturableAnalyticsEventName>(
   event: EventName,
   ...args: ClientAnalyticsCaptureArgs<EventName>
 ) {
-  void posthogReady().then((posthog) => posthog?.capture(event, args[0], args[1]))
+  void posthogReadyForAnalyticsCapture().then((posthog) =>
+    posthog?.capture(event, args[0], args[1]),
+  )
 }
 
 export function captureClientAnalyticsEvent(analytics: ClientAnalyticsEvent) {
-  void posthogReady().then((posthog) =>
+  void posthogReadyForAnalyticsCapture().then((posthog) =>
     posthog?.capture(
       analytics.event,
       "properties" in analytics ? analytics.properties : undefined,

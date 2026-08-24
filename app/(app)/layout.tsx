@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 import type { Metadata } from "next"
 
+import { PostHogScopeBoundary } from "@/components/posthog-analytics"
 import { ProtectedAppShell } from "@/components/protected-app-shell"
 
 export const metadata: Metadata = {
@@ -15,5 +16,9 @@ export const metadata: Metadata = {
 }
 
 export default function AppLayout({ children }: { children: ReactNode }) {
-  return <ProtectedAppShell>{children}</ProtectedAppShell>
+  return (
+    <PostHogScopeBoundary scope="team">
+      <ProtectedAppShell>{children}</ProtectedAppShell>
+    </PostHogScopeBoundary>
+  )
 }

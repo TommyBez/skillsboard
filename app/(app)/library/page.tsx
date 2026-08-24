@@ -192,7 +192,6 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
           skillId={teammateRecommendation.id}
           skillName={teammateRecommendation.skillName}
           skillTitle={teammateRecommendation.title}
-          teamId={activeId}
         />
       ) : null}
 
@@ -231,7 +230,6 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                   actorIsSkillCreator: canEditNote,
                   skillId: item.id,
                   skillName: item.skillName,
-                  teamId: activeId,
                 }}
                 actions={(
                   <>
@@ -307,7 +305,7 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
                 <Button variant="outline" nativeButton={false} render={<Link href="/discover" />}>Find skills</Button>
               </>
             ) : (
-              <LibraryEmptyStateCtas teamId={activeId} />
+              <LibraryEmptyStateCtas />
             )}
           </div>
         </section>

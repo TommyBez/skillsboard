@@ -8,7 +8,7 @@ import { captureAnalyticsEvent } from "@/lib/analytics-client"
  * first skill to be saved. The team is one person old here, so the actor is
  * never someone reacting to a teammate's skill, hence the fixed false.
  */
-export function OnboardingInviteStep({ teamId }: { teamId: string }) {
+export function OnboardingInviteStep() {
   return (
     <InviteMemberForm
       className=""
@@ -19,13 +19,11 @@ export function OnboardingInviteStep({ teamId }: { teamId: string }) {
         properties: {
           actor_is_skill_creator: false,
           surface: "onboarding",
-          team_id: teamId,
         },
       }}
       onSubmitIntent={() => {
         captureAnalyticsEvent("onboarding_step_clicked", {
           step: "invite_team",
-          team_id: teamId,
         })
       }}
       surface="onboarding"

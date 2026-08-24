@@ -64,7 +64,6 @@ interface InstallableCollectionPanelProps {
   disabledDistribution: DisabledCollectionDistribution | null
   skillCount: number
   sourceVerificationCount: number
-  teamId: string
   distribution: CollectionDistribution | null
 }
 
@@ -84,7 +83,6 @@ export function InstallableCollectionPanel({
   disabledDistribution,
   skillCount,
   sourceVerificationCount,
-  teamId,
   distribution,
 }: InstallableCollectionPanelProps) {
   const router = useRouter()
@@ -266,7 +264,7 @@ export function InstallableCollectionPanel({
             <CopyButton
               analytics={{
                 event: "collection_install_command_copied",
-                properties: { collection_id: collectionId, team_id: teamId },
+                properties: { collection_id: collectionId },
               }}
               ariaLabel={`Copy install command for ${collectionTitle}`}
               copiedAriaLabel={`Copied install command for ${collectionTitle}`}

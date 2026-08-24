@@ -1,17 +1,19 @@
 "use client"
 
-import { useEffect } from "react"
+import { useLayoutEffect } from "react"
 
-import { posthogReady } from "@/lib/posthog-client"
+import { registerPostHogIdentity } from "@/lib/posthog-scope"
 
 interface PostHogIdentityProps {
+  teamId?: string
   userId: string
 }
 
-export function PostHogIdentity({ userId }: PostHogIdentityProps) {
-  useEffect(() => {
-    void posthogReady().then((posthog) => posthog?.identify(userId))
-  }, [userId])
+export function PostHogIdentity({ teamId, userId }: PostHogIdentityProps) {
+  useLayoutEffect(
+    () => registerPostHogIdentity({ teamId, userId }),
+    [teamId, userId],
+  )
 
   return null
 }

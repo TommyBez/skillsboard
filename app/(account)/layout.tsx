@@ -3,6 +3,7 @@ import { Suspense, type ReactNode } from "react"
 
 import { AccountMenu } from "@/components/account-menu"
 import { Brand } from "@/components/brand"
+import { PostHogScopeBoundary } from "@/components/posthog-analytics"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -52,11 +53,13 @@ function AccountHeaderFallback() {
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="app-canvas min-h-[100dvh] bg-background">
-      <Suspense fallback={<AccountHeaderFallback />}>
-        <AuthenticatedAccountHeader />
-      </Suspense>
-      {children}
-    </div>
+    <PostHogScopeBoundary scope="user">
+      <div className="app-canvas min-h-[100dvh] bg-background">
+        <Suspense fallback={<AccountHeaderFallback />}>
+          <AuthenticatedAccountHeader />
+        </Suspense>
+        {children}
+      </div>
+    </PostHogScopeBoundary>
   )
 }

@@ -15,7 +15,7 @@ async function AuthenticatedHeader() {
   const { session, organizations, activeId } = await getAppContext()
   return (
     <>
-      <PostHogIdentity userId={session.user.id} />
+      <PostHogIdentity userId={session.user.id} teamId={activeId} />
       <AppHeader user={session.user} organizations={organizations} activeId={activeId} />
     </>
   )

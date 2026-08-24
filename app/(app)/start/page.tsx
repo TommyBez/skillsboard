@@ -2,7 +2,6 @@ import { Suspense } from "react"
 import type { Metadata } from "next"
 
 import { OnboardingNextSteps } from "@/components/onboarding-next-steps"
-import { OnboardingStepsAnalytics } from "@/components/onboarding-steps-analytics"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
 import { getMcpResource } from "@/lib/auth-environment"
@@ -41,17 +40,13 @@ function StartHeadingFallback() {
 }
 
 async function StartSteps() {
-  const { activeId, role } = await getAppContext()
+  const { role } = await getAppContext()
 
   return (
-    <>
-      <OnboardingStepsAnalytics teamId={activeId} />
-      <OnboardingNextSteps
-        canInvite={isOrganizationAdmin(role)}
-        mcpUrl={getMcpResource()}
-        teamId={activeId}
-      />
-    </>
+    <OnboardingNextSteps
+      canInvite={isOrganizationAdmin(role)}
+      mcpUrl={getMcpResource()}
+    />
   )
 }
 
