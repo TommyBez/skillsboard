@@ -8,6 +8,7 @@ import { FormSubmitButton } from "@/components/form-submit-button"
 import { CopyButton } from "@/components/copy-button"
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import type { AnalyticsEventProperties } from "@/analytics/posthog/events"
 import type { ClientAnalyticsEvent } from "@/lib/analytics-client"
 import { cn } from "@/lib/utils"
 
@@ -35,6 +36,11 @@ interface InviteMemberFormProps {
   linkCopyAnalytics?: ClientAnalyticsEvent
   /** Fired when the user submits the form, before the invitation exists. */
   onSubmitIntent?: () => void
+  /** Where this copy of the form is rendered. Posted with the form so the
+      server action can attribute `team_member_invited` to it: the invitation
+      itself is created on the server, so the surface has to travel with the
+      request rather than only with the client-side events. */
+  surface: AnalyticsEventProperties<"team_member_invited">["surface"]
 }
 
 export function InviteMemberForm({
@@ -43,7 +49,8 @@ export function InviteMemberForm({
   layout = "row",
   linkCopyAnalytics,
   onSubmitIntent,
-}: InviteMemberFormProps = {}) {
+  surface,
+}: InviteMemberFormProps) {
   const [state, action] = useActionState(createInvitationLink, initialState)
   const emailFieldId = `${idPrefix}-email`
   const roleFieldId = `${idPrefix}-role`
@@ -58,6 +65,8 @@ export function InviteMemberForm({
           layout === "row" && "md:grid-cols-[minmax(0,1fr)_12rem_auto] md:items-end",
         )}
       >
+        <input type="hidden" name="surface" value={surface} />
+
         <Field>
           <FieldLabel htmlFor={emailFieldId}>Email</FieldLabel>
           <Input

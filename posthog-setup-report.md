@@ -15,9 +15,9 @@ The production baseline starts with the successful production deployment of this
 |---|---|---|
 | `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
-| `mcp_setup_viewed` | An identified user opened the MCP connection guide. | `components/mcp-setup-analytics.tsx` |
+| `mcp_setup_viewed` | A visitor opened the public connection page. | `components/mcp-setup-analytics.tsx` |
 | `mcp_client_selected` | User selected one of the bounded client setup guides. | `components/mcp-setup-guide.tsx` |
-| `mcp_config_copied` | User successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx`, `app/(app)/settings/mcp/page.tsx` |
+| `mcp_config_copied` | Visitor successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx`, `components/onboarding-next-steps.tsx` |
 | `mcp_authorization_approved` | User approved MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_authorization_denied` | User denied MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_tool_used` | An authenticated MCP client called a Skills Board tool, with the bounded tool name and success state. | `app/api/[transport]/route.ts` |
@@ -26,7 +26,7 @@ The production baseline starts with the successful production deployment of this
 | `user_signed_in` | User successfully signed in to an existing account via email OTP. | `components/auth-form.tsx` |
 | `user_signed_out` | User signed out of the app. | `app/actions/auth.ts` |
 | `team_created` | User created a new team library, distinguished by `creation_surface=onboarding\|in_app`. | `app/actions/organizations.ts` |
-| `team_member_invited` | Admin or owner generated a team invitation link and triggered an invitation email. | `app/actions/organizations.ts` |
+| `team_member_invited` | Admin or owner generated a team invitation link and triggered an invitation email, with the surface the form was rendered on. | `app/actions/organizations.ts` |
 | `invitation_accepted` | User accepted a team invitation and joined the organization. | `app/actions/organizations.ts` |
 | `skill_saved` | User saved a skill to their team library from a GitHub repository URL. | `app/actions/skills.ts` |
 | `skill_deleted` | User removed a skill from their team library. | `app/actions/skills.ts` |

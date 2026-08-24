@@ -352,10 +352,10 @@ export default function LibraryPage({ searchParams }: LibraryPageProps) {
             nativeButton={false}
             render={(
               <TrackedLink
-                href="/settings/mcp"
+                href="/connect"
                 analytics={{
                   event: "mcp_entry_clicked",
-                  properties: mcpEntryEventProperties("library_header", "/settings/mcp"),
+                  properties: mcpEntryEventProperties("library_header", "/connect"),
                 }}
               />
             )}

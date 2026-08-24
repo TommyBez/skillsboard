@@ -7,14 +7,15 @@ import type {
   AnalyticsCapturedEventCapture,
   AnalyticsCapturedEventProperties,
   CapturableAnalyticsEventName,
+  RequiredAnalyticsPropertyKeys,
 } from "@/analytics/posthog/events"
 import { posthogReady } from "@/lib/posthog-client"
 
 export type ClientAnalyticsEvent = AnalyticsCapturedEventCapture
 
 type ClientAnalyticsCaptureArgs<EventName extends CapturableAnalyticsEventName> =
-  keyof AnalyticsCapturedEventProperties<EventName> extends never
-    ? [properties?: undefined, options?: CaptureOptions]
+  RequiredAnalyticsPropertyKeys<AnalyticsCapturedEventProperties<EventName>> extends never
+    ? [properties?: AnalyticsCapturedEventProperties<EventName>, options?: CaptureOptions]
     : [properties: AnalyticsCapturedEventProperties<EventName>, options?: CaptureOptions]
 
 export function captureAnalyticsEvent<EventName extends CapturableAnalyticsEventName>(

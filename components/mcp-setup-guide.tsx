@@ -31,6 +31,16 @@ function InlineCode({ children }: { children: ReactNode }) {
   return <code className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-[13px] text-foreground">{children}</code>
 }
 
+/**
+ * `mcp_config_copied` always carries a team here: this guide only renders on
+ * `/connect`, which lives behind the session, so the team the reader is
+ * signed into is already known. `client` keeps the surfaces apart, and it
+ * counts directly against `mcp_setup_viewed`.
+ */
+function configCopiedAnalytics(client: McpClientAnalyticsId, teamId: string) {
+  return { event: "mcp_config_copied", properties: { client, team_id: teamId } } as const
+}
+
 function Snippet({ code, client, teamId }: { code: string; client: McpClientAnalyticsId; teamId: string }) {
   return (
     <div className="mt-3 overflow-hidden rounded-[12px] border">
@@ -38,12 +48,7 @@ function Snippet({ code, client, teamId }: { code: string; client: McpClientAnal
         <code>{code}</code>
       </pre>
       <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton
-          value={code}
-          label="Copy"
-          compact
-          analytics={{ event: "mcp_config_copied", properties: { client, team_id: teamId } }}
-        />
+        <CopyButton value={code} label="Copy" compact analytics={configCopiedAnalytics(client, teamId)} />
       </div>
     </div>
   )
@@ -241,10 +246,7 @@ export function McpSetupGuide({ mcpUrl, config, teamId }: { mcpUrl: string; conf
         <CopyButton
           value={headerCopyValue}
           label={headerCopyLabel}
-          analytics={{
-            event: "mcp_config_copied",
-            properties: { client: activeGuide.analyticsId, team_id: teamId },
-          }}
+          analytics={configCopiedAnalytics(activeGuide.analyticsId, teamId)}
         />
       </div>
 

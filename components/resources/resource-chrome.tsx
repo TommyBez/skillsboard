@@ -38,6 +38,7 @@ import { siteConfig } from "@/lib/site"
 
 type ResourceHeaderLocation =
   | "about_header"
+  | "connect_header"
   | "developers_header"
   | "agent_skills_header"
   | "agent_skills_support_header"

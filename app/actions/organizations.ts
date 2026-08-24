@@ -29,6 +29,16 @@ export interface AcceptInvitationState {
 
 const organizationNameSchema = z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less.")
 const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
+/**
+ * Where the invitation form was rendered. Posted as a hidden field because the
+ * invitation is created here, on the server, so `team_member_invited` can only
+ * carry the surface if the surface travels with the request. An older form that
+ * posts nothing reads as the settings panel, which is where the form lived
+ * alone before the other two surfaces existed.
+ */
+const inviteSurfaceSchema = z
+  .enum(["first_skill_invite_step", "onboarding", "organization_settings"])
+  .catch("organization_settings")
 
 export async function createOrganization(
   _state: CreateOrganizationState,
@@ -69,7 +79,11 @@ export async function createOrganization(
     return { error: "We couldn’t create your team library. Please try again." }
   }
 
-  redirect("/library")
+  // A team created during onboarding goes to the first-run screen, where
+  // connecting an agent and inviting a teammate are offered together. A team
+  // created from inside the app is a switch of context, not a first run, so it
+  // still lands in the library.
+  redirect(creationSurface === "onboarding" ? "/start" : "/library")
 }
 
 export async function setActiveOrganization(organizationId: string) {
@@ -82,6 +96,7 @@ export async function createInvitationLink(
   formData: FormData,
 ): Promise<CreateInvitationLinkState> {
   await requireSession()
+  const surface = inviteSurfaceSchema.parse(formData.get("surface"))
   const parsed = z.object({
     email: z.email(),
     role: z.enum(["admin", "member"]),
@@ -141,6 +156,7 @@ export async function createInvitationLink(
         properties: {
           role: parsed.data.role,
           email_sent: !emailError,
+          surface,
         },
         teamId: invitation.organizationId,
       })

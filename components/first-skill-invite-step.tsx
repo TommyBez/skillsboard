@@ -97,6 +97,7 @@ export function FirstSkillInviteStep({ onOpenChange, open, teamId }: FirstSkillI
               trigger: "first_skill_saved",
             })
           }}
+          surface="first_skill_invite_step"
         />
 
         <DialogFooter>

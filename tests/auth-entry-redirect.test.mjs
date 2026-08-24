@@ -42,6 +42,11 @@ test("claims the bare marketing CTA, which is what every landing button links to
   assert.equal(resolve("returnTo=/library"), "/library")
 })
 
+test("claims /connect and /start the same way as /library", () => {
+  assert.equal(resolve("returnTo=/connect"), "/connect")
+  assert.equal(resolve("returnTo=/start"), "/start")
+})
+
 test("claims a returnTo the sanitizer would have discarded anyway", () => {
   // safeReturnTo collapses these to "/library", so the page would redirect
   // there too — the edge just gets there first.
@@ -107,7 +112,7 @@ test("never bounces back a URL that requireSession itself produced", () => {
   // to end rather than by inspection: whatever requireSession redirects to,
   // the proxy stands down on. Every returnTo it is called with in the app,
   // plus the bare case that /onboarding and the server actions hit.
-  for (const returnTo of [undefined, "/library", "/settings/email", "/invite/invite_1"]) {
+  for (const returnTo of [undefined, "/library", "/connect", "/start", "/settings/email", "/invite/invite_1"]) {
     const path = buildSessionCheckedSignInPath(returnTo)
     const { searchParams } = new URL(path, "https://skillsboard.sh")
     assert.equal(resolveSignedInAuthRedirect(searchParams), null, `looped on ${path}`)
