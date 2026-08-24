@@ -4,6 +4,7 @@ import { agentsMdVsSkillMdPath } from "@/lib/seo/agents-md-vs-skill-md/types"
 import { alternativePaths } from "@/lib/seo/alternatives"
 import { anthropicSkillsPath } from "@/lib/seo/anthropic-skills/types"
 import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
+import { claudeCodeForTeamsPath } from "@/lib/seo/claude-code-for-teams/types"
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { comparePaths } from "@/lib/seo/compare/types"
@@ -571,6 +572,12 @@ A Markdown section ready to paste into the release description.`,
     },
   ],
   related: [
+    {
+      label: "Claude Code for teams: what a rollout configures",
+      href: claudeCodeForTeamsPath,
+      description:
+        "Where a team skill goes once more than one person runs Claude Code, beside the settings, plugin, and MCP decisions around it.",
+    },
     {
       label: "Best Claude skills: a register with the criteria behind it",
       href: bestClaudeSkillsPath,

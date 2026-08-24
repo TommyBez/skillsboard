@@ -20,6 +20,11 @@ import {
   bestClaudeSkillsPath,
   type BestClaudeSkillsPath,
 } from "@/lib/seo/best-claude-skills/types"
+import { claudeCodeForTeams } from "@/lib/seo/claude-code-for-teams"
+import {
+  claudeCodeForTeamsPath,
+  type ClaudeCodeForTeamsPath,
+} from "@/lib/seo/claude-code-for-teams/types"
 import { claudeSkills } from "@/lib/seo/claude-skills"
 import { claudeSkillsPath, type ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkills } from "@/lib/seo/codex-skills"
@@ -76,6 +81,7 @@ export type ResourcePath =
   | AgentsMdVsSkillMdPath
   | AnthropicSkillsPath
   | BestClaudeSkillsPath
+  | ClaudeCodeForTeamsPath
   | ClaudeSkillsPath
   | CodexSkillsPath
   | CoworkSkillsPath
@@ -114,6 +120,7 @@ export const resourceEntries = [
   vercelSkills,
   copilotSkills,
   agentsMdVsSkillMd,
+  claudeCodeForTeams,
   manageAiSkills,
   whereToFindClaudeSkills,
 ] satisfies readonly ResourceIndexEntry[]
@@ -161,6 +168,7 @@ const resourceClusterDefinitions = [
     description:
       "Choose useful skills, define accountable workflows, and help a second teammate reproduce the result without private context.",
     paths: [
+      claudeCodeForTeamsPath,
       manageAiSkillsPath,
       whereToFindClaudeSkillsPath,
       bestClaudeSkillsPath,

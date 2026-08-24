@@ -26,6 +26,7 @@ import type {
   ComparisonCtaPlacement,
   ComparisonHeaderLocation,
 } from "@/lib/seo/compare/types"
+import type { ClaudeCodeForTeamsCtaPlacement } from "@/lib/seo/claude-code-for-teams/types"
 import type { CopilotSkillsCtaPlacement } from "@/lib/seo/copilot-skills/types"
 import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
 import type { ManageAiSkillsCtaPlacement } from "@/lib/seo/manage-ai-skills/types"
@@ -51,6 +52,7 @@ type ResourceHeaderLocation =
   | "compare_header"
   | ComparisonHeaderLocation
   | "cowork_skills_header"
+  | "claude_code_for_teams_header"
   | "copilot_skills_header"
   | "cursor_skills_header"
   | "opencode_skills_header"
@@ -74,6 +76,7 @@ type ResourceCtaLocation =
   | "compare_index"
   | ComparisonCtaPlacement
   | CoworkSkillsCtaPlacement
+  | ClaudeCodeForTeamsCtaPlacement
   | CopilotSkillsCtaPlacement
   | CursorSkillsCtaPlacement
   | ManageAiSkillsCtaPlacement

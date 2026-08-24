@@ -176,6 +176,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/claude-code-for-teams/",
+        destination: "/claude-code-for-teams",
+        permanent: true,
+      },
+      {
         source: "/copilot-skills/",
         destination: "/copilot-skills",
         permanent: true,
@@ -299,6 +304,12 @@ const nextConfig = {
           source: "/skill-examples",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/skill-examples",
+        },
+        // `/claude-code-for-teams` does not end in `-skills` either.
+        {
+          source: "/claude-code-for-teams",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/claude-code-for-teams",
         },
         {
           source: "/guides/:slug",

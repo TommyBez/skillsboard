@@ -1,5 +1,6 @@
 import type { OgTemplateContent } from "@/lib/og/template"
 import { agentSkillsSupportPath } from "@/lib/seo/agent-skills-support/types"
+import { claudeCodeForTeamsPath } from "@/lib/seo/claude-code-for-teams/types"
 import { agentSkillsPath } from "@/lib/seo/agent-skills/types"
 import { bestClaudeSkillsPath } from "@/lib/seo/best-claude-skills/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
@@ -617,6 +618,12 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "Claude Code for teams: what a rollout configures",
+      href: claudeCodeForTeamsPath,
+      description:
+        "The Claude Code half of this page in detail: plans, the five settings layers, skills, plugins, MCP, and workspace trust.",
+    },
     {
       label: "How to share AI agent skills with your team",
       href: guidePaths.shareTeamSkills,
