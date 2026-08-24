@@ -317,7 +317,7 @@ test("route views stay native while real actions stay custom", async () => {
   )
 })
 
-test("team-changing transitions synchronize PostHog before navigation", () => {
+test("team changes synchronize PostHog without delaying product updates", () => {
   assert.match(organizationActions, /teamId:\s*created\.id/)
   assert.match(
     organizationActions,
@@ -344,11 +344,12 @@ test("team-changing transitions synchronize PostHog before navigation", () => {
     organizationSwitcher,
     [
       /await (?:setActiveOrganization|authClient\.organization\.setActive)\(/,
-      /await syncPostHogTeam\(/,
       /router\.refresh\(/,
+      /void syncPostHogTeam\(value\)\.catch\(/,
     ],
     "team switch",
   )
+  assert.doesNotMatch(organizationSwitcher, /await syncPostHogTeam\(value\)/)
   assert.doesNotMatch(organizationSwitcher, /router\.(?:push|replace)\(/)
 })
 
