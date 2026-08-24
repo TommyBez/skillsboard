@@ -11,18 +11,26 @@ import {
 import {
   applyPostHogScope,
   type DesiredPostHogScope,
+  withPostHogEventScope,
 } from "@/lib/posthog-scope-state"
+import {
+  postHogPageViewRequirement,
+  type PostHogPageViewRequirement,
+  type PostHogScopeRequirement,
+} from "@/lib/posthog-route-scope"
 
 type PostHogClient = typeof posthogJs
-export type PostHogScopeRequirement = "team" | "user"
+export type { PostHogScopeRequirement } from "@/lib/posthog-route-scope"
 
 interface PostHogIdentityScope {
   teamId?: string
-  userId: string
+  userId: string | null
 }
 
 interface PendingPageView {
   pathname: string
+  scopeRequirement: PostHogPageViewRequirement
+  timestamp: Date
   url: string
 }
 
@@ -36,11 +44,12 @@ let pendingPageView: PendingPageView | null = null
 let lastCapturedPathname: string | null = null
 let startupScheduled = false
 
-function currentRequirement(): PostHogScopeRequirement | "anonymous" {
-  let requirement: PostHogScopeRequirement | "anonymous" = "anonymous"
+function currentRequirement(): PostHogPageViewRequirement {
+  let requirement: PostHogPageViewRequirement = "anonymous"
   for (const candidate of scopeRequirements.values()) {
     if (candidate === "team") return "team"
-    requirement = "user"
+    if (candidate === "user") requirement = "user"
+    else if (requirement === "anonymous") requirement = "optional-user"
   }
   return requirement
 }
@@ -48,12 +57,15 @@ function currentRequirement(): PostHogScopeRequirement | "anonymous" {
 function latestIdentity(requirement: PostHogScopeRequirement) {
   const identities = [...identityScopes.values()].reverse()
   return requirement === "team"
-    ? identities.find((identity) => identity.teamId)
-    : identities[0]
+    ? identities.find((identity) => identity.userId && identity.teamId)
+    : requirement === "user"
+      ? identities.find((identity) => identity.userId)
+      : identities[0]
 }
 
-function desiredScope(): DesiredPostHogScope | null {
-  const requirement = currentRequirement()
+function desiredScope(
+  requirement: PostHogPageViewRequirement = currentRequirement(),
+): DesiredPostHogScope | null {
   if (requirement === "anonymous") {
     // A just-completed sign-in can register its user synchronously before the
     // destination layout streams in. Public routes otherwise keep the SDK's
@@ -71,13 +83,25 @@ function desiredScope(): DesiredPostHogScope | null {
   }
 }
 
+/** Captures the first scope available at invocation, before any lazy await. */
+export function snapshotPostHogEventScope(
+  requirement: PostHogPageViewRequirement = currentRequirement(),
+) {
+  return waitForDesiredScope(requirement)
+}
+
 function sameScope(left: DesiredPostHogScope | null, right: DesiredPostHogScope | null) {
   return left?.teamId === right?.teamId && left?.userId === right?.userId
 }
 
-function announceRegistryChange() {
-  for (const resolve of registryWaiters) resolve()
+function wakeCoordinatorWaiters() {
+  const waiters = [...registryWaiters]
   registryWaiters.clear()
+  for (const resolve of waiters) resolve()
+}
+
+function announceRegistryChange() {
+  wakeCoordinatorWaiters()
 
   // A team switch or a move back to a public/account route must update an
   // already-running SDK even when the pathname (and therefore pageview) stays
@@ -87,13 +111,16 @@ function announceRegistryChange() {
   }
 }
 
-function waitForDesiredScope(): Promise<DesiredPostHogScope> {
-  const desired = desiredScope()
+function waitForDesiredScope(
+  fixedRequirement?: PostHogPageViewRequirement,
+): Promise<DesiredPostHogScope> {
+  const readDesiredScope = () => desiredScope(fixedRequirement)
+  const desired = readDesiredScope()
   if (desired) return Promise.resolve(desired)
 
   return new Promise((resolve) => {
     const retry = () => {
-      const next = desiredScope()
+      const next = readDesiredScope()
       if (next) resolve(next)
       else registryWaiters.add(retry)
     }
@@ -143,7 +170,7 @@ export function registerPostHogScopeRequirement(requirement: PostHogScopeRequire
 }
 
 export function registerPostHogIdentity(identity: PostHogIdentityScope) {
-  const registration = Symbol(identity.userId)
+  const registration = Symbol(identity.userId ?? "optional-user")
   identityScopes.set(registration, identity)
   announceRegistryChange()
 
@@ -151,6 +178,34 @@ export function registerPostHogIdentity(identity: PostHogIdentityScope) {
     identityScopes.delete(registration)
     announceRegistryChange()
   }
+}
+
+function createPendingPageView(pathname: string): PendingPageView {
+  return {
+    pathname,
+    scopeRequirement: postHogPageViewRequirement(pathname),
+    timestamp: new Date(),
+    url: sanitizeAnalyticsUrl(window.location.href),
+  }
+}
+
+function waitForPendingPageViewScope(requested: PendingPageView) {
+  const desired = desiredScope(requested.scopeRequirement)
+  if (desired) return Promise.resolve(desired)
+
+  return new Promise<DesiredPostHogScope | null>((resolve) => {
+    const retry = () => {
+      if (pendingPageView !== requested) {
+        resolve(null)
+        return
+      }
+
+      const next = desiredScope(requested.scopeRequirement)
+      if (next) resolve(next)
+      else registryWaiters.add(retry)
+    }
+    registryWaiters.add(retry)
+  })
 }
 
 function scheduleStartup() {
@@ -171,23 +226,31 @@ function capturePendingPageView(): Promise<void> {
   pageViewCapturePromise = (async () => {
     while (pendingPageView) {
       const requested = pendingPageView
-      const posthog = await posthogReadyForAnalyticsScope({ start: false })
+      const eventScope = await waitForPendingPageViewScope(requested)
 
-      if (pendingPageView !== requested) continue
+      if (!eventScope || pendingPageView !== requested) continue
       if (window.location.pathname !== requested.pathname) {
-        pendingPageView = {
-          pathname: window.location.pathname,
-          url: sanitizeAnalyticsUrl(window.location.href),
-        }
+        pendingPageView = createPendingPageView(window.location.pathname)
+        wakeCoordinatorWaiters()
         continue
       }
+
+      const posthog = await posthogReadyForAnalyticsScope({ start: false })
+      if (pendingPageView !== requested) continue
       pendingPageView = null
       if (!posthog) continue
 
-      posthog.capture("$pageview", {
-        $current_url: requested.url,
-        $pathname: requested.pathname,
-      })
+      posthog.capture(
+        "$pageview",
+        withPostHogEventScope(
+          {
+            $current_url: requested.url,
+            $pathname: requested.pathname,
+          },
+          eventScope,
+        ),
+        { timestamp: requested.timestamp },
+      )
       lastCapturedPathname = requested.pathname
     }
   })().finally(() => {
@@ -200,29 +263,33 @@ function capturePendingPageView(): Promise<void> {
 
 /** Ensures the canonical route view is queued before a user's page action. */
 export async function posthogReadyForAnalyticsCapture() {
+  // This is intentionally inside the capture gate as well as the route
+  // tracker: Suspense boundaries can hydrate in separate commits, so custom
+  // event ordering must not depend on a sibling effect having mounted first.
+  schedulePostHogPageView(window.location.pathname)
+  const eventScope = snapshotPostHogEventScope()
   const posthog = await posthogReadyForAnalyticsScope()
   if (!posthog) return null
   await capturePendingPageView()
-  return posthog
+  return { eventScope: await eventScope, posthog }
 }
 
 /** Applies the user returned by OTP before its sign-in/up event is captured. */
 export async function identifyPostHogUser(userId: string) {
   const unregister = registerPostHogIdentity({ userId })
   try {
-    return await posthogReadyForAnalyticsCapture()
+    return (await posthogReadyForAnalyticsCapture())?.posthog ?? null
   } finally {
     unregister()
   }
 }
 
 export function schedulePostHogPageView(pathname: string) {
+  if (pendingPageView?.pathname === pathname) return
   if (lastCapturedPathname === pathname && !pendingPageView) return
 
-  pendingPageView = {
-    pathname,
-    url: sanitizeAnalyticsUrl(window.location.href),
-  }
+  pendingPageView = createPendingPageView(pathname)
+  wakeCoordinatorWaiters()
   scheduleStartup()
   void capturePendingPageView()
 }

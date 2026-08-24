@@ -140,7 +140,8 @@ type NonTeamEventPropertiesMap = {
   /**
    * A real copy action, not a route view. `$pageview` on `/connect` and
    * `/start` owns the denominator; `client` separates their copy surfaces.
-   * Browser team context is injected centrally as a PostHog super property.
+   * Browser team context is injected centrally from an event-time scope
+   * snapshot, without making leaf components fetch or receive the team.
    */
   mcp_config_copied: {
     client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"

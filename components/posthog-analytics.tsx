@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useLayoutEffect, type ReactNode } from "react"
+import { useLayoutEffect, type ReactNode } from "react"
 import { usePathname } from "next/navigation"
 
 import {
@@ -24,7 +24,9 @@ export function PostHogScopeBoundary({
 export function PostHogPageView() {
   const pathname = usePathname()
 
-  useEffect(() => {
+  // Scope and identity layout effects in the preceding route subtree settle
+  // first; this still runs before any descendant passive analytics effect.
+  useLayoutEffect(() => {
     schedulePostHogPageView(pathname)
   }, [pathname])
 

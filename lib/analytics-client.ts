@@ -10,6 +10,7 @@ import type {
   RequiredAnalyticsPropertyKeys,
 } from "@/analytics/posthog/events"
 import { posthogReadyForAnalyticsCapture } from "@/lib/posthog-scope"
+import { withPostHogEventScope } from "@/lib/posthog-scope-state"
 
 export type ClientAnalyticsEvent = AnalyticsEventCapture
 
@@ -22,17 +23,34 @@ export function captureAnalyticsEvent<EventName extends CapturableAnalyticsEvent
   event: EventName,
   ...args: ClientAnalyticsCaptureArgs<EventName>
 ) {
-  void posthogReadyForAnalyticsCapture().then((posthog) =>
-    posthog?.capture(event, args[0], args[1]),
+  const capture = posthogReadyForAnalyticsCapture()
+  const timestamp = new Date()
+  void capture.then((ready) =>
+    ready?.posthog.capture(
+      event,
+      withPostHogEventScope(
+        args[0] as Record<string, unknown> | undefined,
+        ready.eventScope,
+      ),
+      { ...args[1], timestamp: args[1]?.timestamp ?? timestamp },
+    ),
   )
 }
 
 export function captureClientAnalyticsEvent(analytics: ClientAnalyticsEvent) {
-  void posthogReadyForAnalyticsCapture().then((posthog) =>
-    posthog?.capture(
+  const capture = posthogReadyForAnalyticsCapture()
+  const timestamp = new Date()
+  void capture.then((ready) =>
+    ready?.posthog.capture(
       analytics.event,
-      "properties" in analytics ? analytics.properties : undefined,
-    )
+      withPostHogEventScope(
+        "properties" in analytics
+          ? (analytics.properties as Record<string, unknown>)
+          : undefined,
+        ready.eventScope,
+      ),
+      { timestamp },
+    ),
   )
 }
 

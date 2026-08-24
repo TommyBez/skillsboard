@@ -13,6 +13,21 @@ export interface DesiredPostHogScope {
 }
 
 /**
+ * Freezes event-time team attribution instead of relying on whichever super
+ * property happens to be active when a delayed PostHog import completes.
+ * `null` is deliberate: it overrides a team registered after a public event.
+ */
+export function withPostHogEventScope(
+  properties: Record<string, unknown> | undefined,
+  { teamId }: DesiredPostHogScope,
+) {
+  return {
+    ...(properties ?? {}),
+    team_id: teamId,
+  }
+}
+
+/**
  * Applies browser identity and event-time team context in a stable order.
  *
  * `$user_id` is set by PostHog after `identify`. An anonymous distinct ID is

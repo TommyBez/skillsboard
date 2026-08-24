@@ -39,6 +39,8 @@ const protectedAppShell = await readText("../components/protected-app-shell.tsx"
 const posthogAnalytics = await readText("../components/posthog-analytics.tsx")
 const posthogClient = await readText("../lib/posthog-client.ts")
 const posthogScope = await readText("../lib/posthog-scope.ts")
+const analyticsClient = await readText("../lib/analytics-client.ts")
+const consentPage = await readText("../app/consent/page.tsx")
 const llms = await readText("../public/llms.txt")
 
 /** Em dash and en dash are not allowed anywhere in published copy. */
@@ -217,9 +219,26 @@ test("route views use one scoped pageview while real actions stay custom", async
   assert.match(posthogClient, /capture_pageview: false/)
   assert.match(appLayout, /<PostHogScopeBoundary scope="team">/)
   assert.match(protectedAppShell, /<PostHogIdentity userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
+  assert.match(posthogAnalytics, /useLayoutEffect\(\(\) => \{\n\s+schedulePostHogPageView\(pathname\)/)
   assert.match(posthogAnalytics, /schedulePostHogPageView\(pathname\)/)
-  assert.match(posthogScope, /posthog\.capture\("\$pageview"/)
+  assert.match(posthogScope, /posthog\.capture\(\s*"\$pageview"/)
+  assert.match(
+    posthogScope,
+    /export async function posthogReadyForAnalyticsCapture\(\) \{[\s\S]*schedulePostHogPageView\(window\.location\.pathname\)[\s\S]*await capturePendingPageView\(\)/,
+  )
+  assert.match(
+    posthogScope,
+    /scopeRequirement: postHogPageViewRequirement\(pathname\)/,
+  )
+  assert.match(posthogScope, /await waitForPendingPageViewScope\(requested\)/)
+  assert.match(posthogScope, /if \(pendingPageView\?\.pathname === pathname\) return/)
+  assert.match(analyticsClient, /withPostHogEventScope\([\s\S]*ready\.eventScope/)
   assert.match(posthogScope, /posthogReadyForAnalyticsScope/)
+
+  // Invalid OAuth requests deliberately resolve the route without a user
+  // lookup, so the central pageview cannot wait forever.
+  assert.match(consentPage, /<PostHogScopeBoundary scope="optional-user">/)
+  assert.equal((consentPage.match(/<PostHogIdentity userId=\{null\} \/>/g) ?? []).length, 2)
 })
 
 /**
