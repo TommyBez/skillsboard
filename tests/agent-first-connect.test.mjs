@@ -66,6 +66,7 @@ const rootLayout = await readText("../app/layout.tsx")
 const protectedAppShell = await readText("../components/protected-app-shell.tsx")
 const posthogIdentity = await readText("../components/posthog-identity.tsx")
 const posthogClient = await readText("../lib/posthog-client.ts")
+const instrumentationClient = await readText("../instrumentation-client.ts")
 const analyticsClient = await readText("../lib/analytics-client.ts")
 const createOrganizationForm = await readText("../components/create-organization-form.tsx")
 const acceptInvitationForm = await readText("../components/accept-invitation-form.tsx")
@@ -268,11 +269,19 @@ test("route views stay native while real actions stay custom", async () => {
   assert.equal(await exists("../components/mcp-setup-analytics.tsx"), false)
   assert.equal(await exists("../components/onboarding-steps-analytics.tsx"), false)
 
-  // PostHog owns initial and history-change pageviews. The app only applies
-  // identity and the active team before those transitions; it never captures
-  // `$pageview` itself.
+  // Next.js starts PostHog once through its canonical client instrumentation
+  // entry. PostHog then owns initial and history-change pageviews; the app only
+  // keeps native user and team context current and never captures `$pageview`.
   assert.match(posthogClient, /capture_pageview: "history_change"/)
   assert.doesNotMatch(posthogClient, /capture_pageview: false/)
+  assert.equal(await exists("../instrumentation-client.ts"), true)
+  assert.match(
+    instrumentationClient,
+    /import \{ posthogReady \} from "@\/lib\/posthog-client"/,
+  )
+  assert.equal((instrumentationClient.match(/void posthogReady\(\)/g) ?? []).length, 2)
+  assert.match(instrumentationClient, /window\.requestIdleCallback/)
+  assert.match(instrumentationClient, /window\.setTimeout/)
   assert.doesNotMatch(appLayout, /getAppContext|PostHogRoute|Suspense/)
   assert.match(protectedAppShell, /const \{ session, organizations, activeId \} = await getAppContext\(\)/)
   assert.match(protectedAppShell, /<PostHogIdentity userId=\{session\.user\.id\} teamId=\{activeId\} \/>/)
@@ -284,14 +293,11 @@ test("route views stay native while real actions stay custom", async () => {
     /syncPostHogIdentity\(\{\s*teamId,\s*userId,?\s*\}\)/,
   )
   assert.match(posthogIdentity, /userId:\s*string \| null/)
-  assert.match(posthogIdentity, /useSelectedLayoutSegment\(\)/)
-  for (const segment of ["(account)", "(app)", "consent", "onboarding"]) {
-    assert.match(posthogIdentity, new RegExp(`"${segment.replace(/[()]/g, "\\$&")}"`))
-  }
-  assert.match(posthogIdentity, /if \(!isIdentityScoped\) void posthogReady\(\)/)
-  assert.match(rootLayout, /import \{ PostHogBootstrap \} from "@\/components\/posthog-identity"/)
-  assert.match(rootLayout, /<Suspense fallback=\{null\}>\s*<PostHogBootstrap \/>\s*<\/Suspense>/)
-  assert.equal(await exists("../instrumentation-client.ts"), false)
+  assert.doesNotMatch(
+    posthogIdentity,
+    /PostHogBootstrap|posthogReady|useSelectedLayoutSegment|identityScoped/,
+  )
+  assert.doesNotMatch(rootLayout, /PostHogBootstrap/)
   for (const source of applicationSources) {
     assert.doesNotMatch(source, /\.capture\(\s*["'`]\$pageview["'`]/)
   }
@@ -302,8 +308,8 @@ test("route views stay native while real actions stay custom", async () => {
   assert.equal(await exists("../lib/posthog-scope-state.ts"), false)
   assert.equal(await exists("../lib/posthog-route-scope.ts"), false)
 
-  // Consent is bootstrap-excluded, so even invalid anonymous requests start
-  // native tracking through their identity-scoped component.
+  // The global instrumentation entry starts native tracking for consent too;
+  // the route component only resolves whether a user identity can be applied.
   assert.equal((consentPage.match(/<PostHogIdentity userId=\{null\} \/>/g) ?? []).length, 2)
   assert.equal(
     (consentPage.match(/<PostHogIdentity userId=\{session\.user\.id\} \/>/g) ?? []).length,

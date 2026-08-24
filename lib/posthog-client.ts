@@ -60,9 +60,8 @@ export function syncPostHogTeam(teamId: string | null) {
  * posthog-js is ~70 kB gzipped. Imported statically from
  * a static instrumentation entry it sat in every page's bundle — including
  * the landing page's, where it was the largest unused chunk on the critical
- * path. The dynamic import keeps it out of the initial bundle. Public routes
- * start it from the lightweight bootstrap; identity-scoped routes start it
- * only when their user/team context is available.
+ * path. The dynamic import keeps it out of the initial bundle while Next.js's
+ * `instrumentation-client.ts` remains the single global bootstrap.
  *
  * Identity, native pageviews, and custom events share this singleton. Without
  * a project token (local dev, previews) it resolves to null and all calls

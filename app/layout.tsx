@@ -1,9 +1,7 @@
-import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist_Mono } from "next/font/google"
 
 import { DeferredToaster } from "@/components/deferred-toaster"
-import { PostHogBootstrap } from "@/components/posthog-identity"
 import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-analytics"
 import { ThemeProvider } from "@/components/theme-provider"
 import { WebMcpTools } from "@/components/web-mcp"
@@ -86,9 +84,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     >
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <Suspense fallback={null}>
-            <PostHogBootstrap />
-          </Suspense>
           {children}
           <WebMcpTools />
           <DeferredToaster />
