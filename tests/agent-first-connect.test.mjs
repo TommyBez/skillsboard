@@ -101,6 +101,23 @@ test("/connect is authenticated the same way as every other app page", async () 
   assert.doesNotMatch(connectPage, /ResourceShell/)
 })
 
+test("/connect is gated at the edge the same way as /library", async () => {
+  const proxy = await readText("../proxy.ts")
+  const sanitizer = await readText("../lib/safe-return-to.ts")
+
+  assert.match(proxy, /pathname === "\/connect"/)
+  assert.match(proxy, /pathname === "\/start"/)
+  assert.match(proxy, /"\/connect"/)
+  assert.match(proxy, /"\/start"/)
+  assert.match(
+    proxy,
+    /pathname === "\/library" \|\|\n\s+pathname === "\/connect" \|\|\n\s+pathname === "\/start" \|\|\n\s+pathname === "\/settings\/email"/,
+  )
+  assert.match(sanitizer, /"\/connect"/)
+  assert.match(sanitizer, /"\/start"/)
+  assert.match(sanitizer, /immediateSignedInDestinations = \["\/library", "\/connect", "\/start"\]/)
+})
+
 /**
  * The build failure the public draft of this page shipped with was a runtime
  * session read during prerendering. That risk is gone now that the page is
@@ -109,9 +126,10 @@ test("/connect is authenticated the same way as every other app page", async () 
  */
 test("the connect page reads the session and personalizes the setup", () => {
   assert.match(connectPage, /getAppContext/)
-  // The endpoint reflects the deployment the reader is signed into, not a
-  // hardcoded production URL.
-  assert.match(connectPage, /headers\(\)/)
+  // The endpoint is this deployment's MCP resource, from the same Vercel
+  // system vars Better Auth uses, not a hardcoded production URL.
+  assert.match(connectPage, /getMcpResource\(\)/)
+  assert.doesNotMatch(connectPage, /headers\(\)/)
   assert.doesNotMatch(connectPage, /const mcpUrl = absoluteUrl\("\/api\/mcp"\)/)
   // The plugin install commands stay canonical: the same command for every
   // team, since the plugin is not team scoped.
@@ -134,8 +152,34 @@ test("the first run offers the agent first, with the invitation beside it", () =
   assert.match(startPage, /<OnboardingNextSteps/)
 })
 
-test("a team created in onboarding lands on the first-run screen", () => {
+test("the first-run and connect screens resolve the team before claiming it is ready", () => {
+  // The start heading used to live outside a Suspense child that called
+  // getAppContext, so a new account saw "Your team library is ready"
+  // before the redirect to team creation. That heading still waits on the
+  // team. /connect's heading is generic, so it stays in the shell and only
+  // the team-scoped guide waits. The MCP URL comes from env on both.
+  assert.match(startPage, /async function StartHeading/)
+  assert.match(startPage, /await getAppContext\(\)/)
+  assert.match(startPage, /getMcpResource\(\)/)
+  assert.doesNotMatch(startPage, /headers\(\)/)
+  assert.match(connectPage, /export default function ConnectPage/)
+  assert.match(connectPage, /async function ConnectGuide/)
+  assert.match(connectPage, /await getAppContext\(\)/)
+  assert.match(connectPage, /getMcpResource\(\)/)
+  assert.doesNotMatch(connectPage, /headers\(\)/)
+})
+
+test("OTP success names the destination from the form mode", async () => {
+  const authForm = await readText("../components/auth-form.tsx")
+  assert.match(authForm, /router\.push\(destinationAfterOtp\(returnTo, mode\)\)/)
+})
+
+test("a team created in onboarding lands on the first-run screen", async () => {
+  const onboardingPage = await readText("../app/onboarding/page.tsx")
   assert.match(organizationActions, /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/)
+  // After the action redirects, this page revalidates. Sending an empty team
+  // to /library here would steal the first run.
+  assert.match(onboardingPage, /redirect\(skillCount === 0 \? "\/start" : "\/library"\)/)
 })
 
 test("the first-run steps reuse the existing event names", () => {

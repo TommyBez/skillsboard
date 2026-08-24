@@ -47,8 +47,9 @@ test.describe("instant initial load: app routes", () => {
   })
 
   test("/onboarding", async ({ page }) => {
-    // The gate redirects users who already have a team to /library, but only
-    // when it streams in — the shell itself must still commit instantly.
+    // The gate redirects users who already have a team (empty ones to /start,
+    // the rest to /library), but only when it streams in — the shell itself
+    // must still commit instantly.
     await expectInstantInitialLoad(page, "/onboarding", "access-shell")
   })
 

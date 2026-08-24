@@ -1,12 +1,12 @@
-import { cache, Suspense } from "react"
+import { Suspense } from "react"
 import type { Metadata } from "next"
-import { headers } from "next/headers"
 
 import { McpPluginInstall } from "@/components/mcp-plugin-install"
 import { McpSetupGuide, McpTroubleshooting } from "@/components/mcp-setup-guide"
 import { McpSetupAnalytics } from "@/components/mcp-setup-analytics"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
+import { getMcpResource } from "@/lib/auth-environment"
 
 export const metadata: Metadata = {
   title: "Connect your agent",
@@ -28,50 +28,19 @@ const availableTools = [
   { name: "remove_skill_from_collection", description: "Remove a skill from a collection" },
 ]
 
-/**
- * The endpoint for the deployment the reader is actually signed into.
- *
- * Derived from the request host rather than a hardcoded production URL: this
- * page is behind the session now, so a preview deployment and production each
- * hand back the address that will actually work for the account that is
- * looking at it, the same as the rest of the authenticated app.
- */
-const getMcpDetails = cache(async () => {
-  const requestHeaders = await headers()
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "your-app.vercel.app"
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https"
-  const mcpUrl = `${protocol}://${host}/api/mcp`
-  const config = JSON.stringify(
-    { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
-    null,
-    2,
-  )
-
-  return { config, mcpUrl }
-})
-
-async function ConnectAnalytics() {
+async function ConnectGuide({ config, mcpUrl }: { config: string; mcpUrl: string }) {
   const { activeId } = await getAppContext()
-  return <McpSetupAnalytics teamId={activeId} />
-}
 
-async function ConnectGuide() {
-  const [{ config, mcpUrl }, { activeId }] = await Promise.all([
-    getMcpDetails(),
-    getAppContext(),
-  ])
-
-  return <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
+  return (
+    <>
+      <McpSetupAnalytics teamId={activeId} />
+      <McpSetupGuide config={config} mcpUrl={mcpUrl} teamId={activeId} />
+    </>
+  )
 }
 
 function ConnectGuideFallback() {
-  return (
-    <Skeleton
-      className="h-[28rem] rounded-[16px]"
-      role="status"
-      aria-label="Loading setup guide"
-    />
-  )
+  return <Skeleton className="h-[32rem] rounded-[16px]" aria-label="Loading setup guide" />
 }
 
 /**
@@ -84,19 +53,22 @@ function ConnectGuideFallback() {
  * the session, redirects a signed-out visitor to sign in, and stays out of the
  * sitemap, `llms.txt`, and search indexing the same way those pages do.
  *
- * Reading the session back also restores the personalization the public draft
- * of this page had to give up: the MCP endpoint reflects the deployment the
- * reader is actually on, and `mcp_setup_viewed` / `mcp_config_copied` carry the
- * team. The plugin install commands stay canonical (the same command for every
- * team) since the plugin itself is not team scoped.
+ * The MCP endpoint comes from the same Vercel system vars Better Auth uses,
+ * so a preview names its own server and production names the stable domain.
+ * `mcp_setup_viewed` / `mcp_config_copied` still carry the team from the
+ * session. The plugin install commands stay canonical (the same command for
+ * every team) since the plugin itself is not team scoped.
  */
 export default function ConnectPage() {
+  const mcpUrl = getMcpResource()
+  const config = JSON.stringify(
+    { mcpServers: { "skills-board": { type: "http", url: mcpUrl } } },
+    null,
+    2,
+  )
+
   return (
     <main className="mx-auto w-full max-w-6xl px-4 pt-8 pb-28 md:px-6 md:py-12">
-      <Suspense fallback={null}>
-        <ConnectAnalytics />
-      </Suspense>
-
       <header className="border-b pb-10">
         <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">Agent access</p>
         <h1 data-testid="mcp-shell" className="mt-4 text-balance text-4xl font-semibold leading-[0.98] tracking-[-0.045em] sm:text-5xl lg:text-6xl">
@@ -123,7 +95,7 @@ export default function ConnectPage() {
 
       <div className="mt-8">
         <Suspense fallback={<ConnectGuideFallback />}>
-          <ConnectGuide />
+          <ConnectGuide config={config} mcpUrl={mcpUrl} />
         </Suspense>
       </div>
 

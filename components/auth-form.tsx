@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Field, FieldDescription, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { destinationAfterOtp } from "@/lib/destination-after-otp"
 import { PRODUCT_COMMUNICATIONS_DISCLOSURE } from "@/lib/email/product-communications"
 
 interface AuthFormProps {
@@ -30,16 +31,18 @@ interface AuthFormProps {
 
 const RESEND_COOLDOWN_SECONDS = 60
 const OTP_LENGTH = 6
-const NEW_USER_WINDOW_MS = 2 * 60 * 1000
 
 const otpSlotClassName =
   "size-11 rounded-[14px] border border-border bg-background text-base first:rounded-[14px] first:border-l last:rounded-[14px] data-[active=true]:border-primary data-[active=true]:ring-primary/30 sm:size-12"
+
+const NEW_USER_WINDOW_MS = 2 * 60 * 1000
 
 function emailLocalPart(value: string): string {
   const local = value.split("@")[0]?.trim()
   return local || value
 }
 
+/** Sign-in and sign-up share `signIn.emailOtp`; this is only for which event to emit. */
 function isNewlyCreatedUser(user: { createdAt?: unknown } | null | undefined): boolean {
   if (!user?.createdAt) return false
   const createdAtMs = new Date(user.createdAt as string | Date).getTime()
@@ -185,7 +188,7 @@ export function AuthForm({
         window.location.assign(continueHref)
         return
       }
-      router.push(returnTo)
+      router.push(destinationAfterOtp(returnTo, mode))
       router.refresh()
     } catch {
       setError("That code didn’t work. Request a new one and try again.")

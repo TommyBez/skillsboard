@@ -7,6 +7,8 @@ function isProtectedPath(pathname: string) {
   return (
     pathname === "/library" ||
     pathname.startsWith("/library/") ||
+    pathname === "/connect" ||
+    pathname === "/start" ||
     pathname === "/discover" ||
     pathname.startsWith("/discover/") ||
     pathname.startsWith("/settings/")
@@ -25,7 +27,12 @@ export async function proxy(request: NextRequest) {
       searchParams.forEach((value, key) => {
         signInUrl.searchParams.append(key, value)
       })
-    } else if (pathname === "/library" || pathname === "/settings/email") {
+    } else if (
+      pathname === "/library" ||
+      pathname === "/connect" ||
+      pathname === "/start" ||
+      pathname === "/settings/email"
+    ) {
       signInUrl.searchParams.set("returnTo", pathname)
     }
 
@@ -52,6 +59,8 @@ export const config = {
   matcher: [
     "/library",
     "/library/:path*",
+    "/connect",
+    "/start",
     "/discover",
     "/discover/:path*",
     "/settings/:path*",

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getDeploymentEnvironment } from "@/lib/auth-environment"
 import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
-import { safeReturnTo } from "@/lib/safe-return-to"
+import { isImmediateSignedInDestination, safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
 
 interface AuthEntryProps {
@@ -22,7 +22,7 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
 
   if (session?.user) {
     if (oauthContinue) redirect(oauthContinue)
-    if (returnTo === "/library") redirect("/library")
+    if (isImmediateSignedInDestination(returnTo)) redirect(returnTo)
     const destinationLabel = returnTo === "/settings/email"
       ? "Continue to Email preferences"
       : "Continue to invitation"
