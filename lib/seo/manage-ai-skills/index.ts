@@ -150,10 +150,10 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
     coworkSkillsPath,
   ],
   eyebrow: "Manage AI Skills",
-  title: "How to manage AI skills across an organization",
-  seoTitle: "How to Manage AI Skills Across an Organization | Skills Board",
+  title: "How to manage AI skills across your organization",
+  seoTitle: "How to Manage AI Skills Across Your Organization | Skills Board",
   description:
-    "Skills scatter across personal folders, repositories, and accounts, and every vendor mechanism for distributing them stops at that vendor's own products. What each one covers, what a team has to solve itself, and how to keep one answer everyone can find. Sources checked on August 21, 2026.",
+    "How to manage AI skills across your organization: what each vendor's distribution mechanism covers, where it stops, and the selection layer none of them records. Sources checked on August 21, 2026.",
   intro: [
     "The question sounds like a tooling question and is not one. A team lead notices that four people run four versions of the same code review skill, that the useful one somebody wrote in June sits in a personal folder nobody else can list, and that a new hire has no way to find out what the team actually uses. Nothing is broken. There is simply no place where the answer lives.",
     "Every agent vendor has shipped something for this, and each one is scoped to its own products. Anthropic documents organization provisioning for claude.ai and Cowork, managed settings for Claude Code, and workspace-wide uploads for the Claude API, while stating in the same documentation that custom skills do not sync between those three. OpenAI documents a shared machine location and plugins for anything wider. Cursor documents project and user directories and no organization mechanism at all.",

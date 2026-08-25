@@ -7,6 +7,7 @@ import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { type ComparePath, comparePaths } from "@/lib/seo/compare/types"
 import { coworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export {
@@ -49,6 +50,7 @@ export interface AnthropicSkillsInlineLink {
     | typeof bestClaudeSkillsPath
     | typeof claudeSkillsPath
     | typeof coworkSkillsPath
+    | typeof manageAiSkillsPath
     | typeof whereToFindClaudeSkillsPath
   trail: string
 }
@@ -531,9 +533,9 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       "The runtime differs as well, which matters when you copy a first-party skill that shells out. On the Claude API, skills run in a sandboxed container with no network access and no runtime package installation, so only pre-installed packages are available. In Claude Code they have the same network access as any other program on your computer. On claude.ai, network access varies with user and admin settings.",
     ],
     link: {
-      lead: "For the surface where none of the local directories apply and the set a session can load comes from an account instead, see",
-      label: "Claude Cowork skills",
-      href: coworkSkillsPath,
+      lead: "Sharing scope is the organization question underneath this table. For what each vendor mechanism distributes, where it stops, and the half none of them covers, see",
+      label: "how to manage AI skills across your organization",
+      href: manageAiSkillsPath,
       trail: ".",
     },
     sourceIds: [
@@ -793,6 +795,12 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     },
   ],
   related: [
+    {
+      label: "How to manage AI skills across your organization",
+      href: manageAiSkillsPath,
+      description:
+        "Every documented organization-level mechanism, Anthropic's included, what it covers and where it stops.",
+    },
     {
       label: "Skill examples: real SKILL.md files, explained",
       href: "/skill-examples",

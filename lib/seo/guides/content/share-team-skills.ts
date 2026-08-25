@@ -1,5 +1,6 @@
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { guidePaths, type GuideDefinition } from "@/lib/seo/guides/types"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 
 export const shareTeamSkillsGuide: GuideDefinition = {
   path: guidePaths.shareTeamSkills,
@@ -93,6 +94,12 @@ export const shareTeamSkillsGuide: GuideDefinition = {
       output: "An active, needs-review, or retired lifecycle state.",
     },
   ],
+  stepsLink: {
+    lead: "This workflow stays inside one team. For the level above it, meaning what each vendor mechanism distributes and where it stops, read",
+    label: "how to manage AI skills across your organization",
+    href: manageAiSkillsPath,
+    trail: ".",
+  },
   templateTitle: "The minimum useful skill record",
   templateIntro:
     "This record is deliberately small enough to maintain. Add fields only when they change a decision or reduce rollout risk.",

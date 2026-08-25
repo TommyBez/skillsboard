@@ -6,7 +6,7 @@ import { OG_SIZE, TWITTER_SIZE } from "@/lib/og/template"
 import { manageAiSkills } from "@/lib/seo/manage-ai-skills"
 import { siteConfig } from "@/lib/site"
 
-const socialTitle = "Manage AI skills across an organization"
+const socialTitle = "Manage AI skills across your organization"
 
 export const metadata: Metadata = {
   title: { absolute: manageAiSkills.seoTitle },
