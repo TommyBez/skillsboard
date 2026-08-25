@@ -172,5 +172,5 @@ export const shareTeamSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: how to share AI agent skills with your team.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-25",
 }

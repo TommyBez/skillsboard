@@ -30,7 +30,7 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   answer:
     "To share skills across Claude Code, Codex, and Cursor, keep one canonical SKILL.md source and document how each agent installs, discovers, and invokes it. Test every agent path with the same fixture, then share the compatibility record. Do not maintain separate canonical copies or assume updates sync automatically.",
   answerLink: {
-    lead: "Three agents is the common case rather than the whole problem. For every documented organization-level mechanism, what it covers and where it stops, see",
+    lead: "A three-agent team is the common case rather than the whole problem. For every documented organization-level mechanism, what it covers and where it stops, see",
     label: "how to manage AI skills across your organization",
     href: manageAiSkillsPath,
     trail: ".",
@@ -273,5 +273,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-16",
+  modifiedAt: "2026-08-25",
 }

@@ -687,5 +687,5 @@ export const manageAiSkills: ManageAiSkillsDefinition = {
   ogAlt:
     "Guide to managing AI skills across an organization: the vendor distribution mechanisms, where each one stops, and the selection layer none of them covers.",
   publishedAt: "2026-08-21",
-  modifiedAt: "2026-08-21",
+  modifiedAt: "2026-08-25",
 }

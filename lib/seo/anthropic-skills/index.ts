@@ -876,5 +876,5 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   ogAlt:
     "Catalog of Anthropic's first-party skills: the four pre-built document skills, the nineteen folders in the anthropics/skills repository, and the thirteen skills bundled with Claude Code.",
   publishedAt: "2026-08-18",
-  modifiedAt: "2026-08-19",
+  modifiedAt: "2026-08-25",
 }
