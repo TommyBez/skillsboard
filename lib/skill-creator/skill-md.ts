@@ -72,8 +72,13 @@ export interface SkillIssue {
 /** Indicators that change how a scalar parses when they open it. */
 const YAML_UNSAFE_FIRST_CHARACTER = /^[-?:,[\]{}#&*!|>'"%@`]/
 
-/** Words a YAML parser reads as a boolean or as null rather than as text. */
-const YAML_RESERVED_WORD = /^(?:y|n|yes|no|true|false|on|off|null|~)$/i
+/**
+ * Words a YAML parser reads as a boolean, as null, or as a special float
+ * rather than as text. `.inf` and `.nan` carry no digits, so the number
+ * pattern below never sees them.
+ */
+const YAML_RESERVED_WORD =
+  /^(?:y|n|yes|no|true|false|on|off|null|~|[-+]?\.inf|\.nan)$/i
 
 /** Anything a parser would hand back as a number instead of a string. */
 const YAML_NUMBER_LIKE =
@@ -151,11 +156,17 @@ function normalizeNewlines(value: string): string {
   return value.replace(/\r\n?/g, "\n")
 }
 
-/** The body as it will be written: normalized newlines, no trailing blank run. */
+/**
+ * The body as it will be written: normalized newlines, no trailing blank run.
+ *
+ * Only the terminal run of blank lines goes. Trailing spaces inside the body
+ * stay, because two of them at the end of a line are how Markdown spells a
+ * hard line break, and stripping them would silently rewrite the text.
+ */
 export function normalizeSkillBody(body: string): string {
-  return normalizeNewlines(body)
-    .replace(/[ \t]+$/gm, "")
-    .replace(/\n+$/, "")
+  const normalized = normalizeNewlines(body)
+  if (/^[ \t]*(?:\n[ \t]*)*$/.test(normalized)) return ""
+  return normalized.replace(/(?:\n[ \t]*)+$/, "")
 }
 
 export function countBodyLines(body: string): number {
@@ -440,12 +451,18 @@ function frontmatterLines(draft: SkillDraft): string[] {
     .filter((entry) => entry.key.length > 0 && entry.value.length > 0)
 
   if (metadata.length > 0) {
+    // The key runs through the same formatter as the value. A key such as
+    // `1.0`, `true`, or `null` is a legal metadata key here, but written raw
+    // it parses back as a number, a boolean, or null instead of the string
+    // that was typed, and `1.0` would collapse onto `1`.
     const seen = new Set<string>()
     const rendered: string[] = []
     for (const entry of metadata) {
       if (seen.has(entry.key)) continue
       seen.add(entry.key)
-      rendered.push(`  ${entry.key}: ${formatYamlScalar(entry.value)}`)
+      rendered.push(
+        `  ${formatYamlScalar(entry.key)}: ${formatYamlScalar(entry.value)}`,
+      )
     }
     lines.push("metadata:", ...rendered)
   }

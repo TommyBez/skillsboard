@@ -18,6 +18,8 @@ interface CopyButtonProps {
   copiedAriaLabel?: string
   analytics?: ClientAnalyticsEvent
   className?: string
+  /** Blocks the copy the same way a download control is blocked. */
+  disabled?: boolean
 }
 
 async function writeToClipboard(value: string) {
@@ -47,10 +49,12 @@ export function CopyButton({
   copiedAriaLabel,
   analytics,
   className,
+  disabled = false,
 }: CopyButtonProps) {
   const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle")
 
   async function copy() {
+    if (disabled) return
     try {
       await writeToClipboard(value)
       setStatus("copied")
@@ -75,6 +79,7 @@ export function CopyButton({
       variant="outline"
       size={iconOnly ? "icon-sm" : "sm"}
       className={cn(compact && "h-7 border-transparent bg-card px-2", className)}
+      disabled={disabled}
       onClick={copy}
     >
       {hasCopied ? (

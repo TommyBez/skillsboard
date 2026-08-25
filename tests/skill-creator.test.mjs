@@ -17,6 +17,7 @@ const {
   formatYamlScalar,
   hasBlockingIssue,
   isPlainYamlScalar,
+  normalizeSkillBody,
   SKILL_BODY_LINE_BUDGET,
   SKILL_COMPATIBILITY_MAX_LENGTH,
   SKILL_DESCRIPTION_MAX_LENGTH,
@@ -166,6 +167,32 @@ test("the one custom event records what a pageview cannot", async () => {
       `the builder never reports the ${output} output`,
     )
   }
+})
+
+test("validation errors gate the copy the same way they gate the downloads", async () => {
+  const builder = await readFile(
+    new URL("../components/skill-creator/skill-md-builder.tsx", import.meta.url),
+    "utf8",
+  )
+  const copyButton = await readFile(
+    new URL("../components/copy-button.tsx", import.meta.url),
+    "utf8",
+  )
+
+  assert.ok(
+    /<CopyButton[\s\S]*?disabled=\{blocked\}[\s\S]*?\/>/.test(builder),
+    "the copy control is not gated on the blocked state",
+  )
+  assert.equal(
+    (builder.match(/disabled=\{blocked\}/g) ?? []).length,
+    3,
+    "the copy control and the two download controls all read the blocked state",
+  )
+  assert.ok(copyButton.includes("disabled?: boolean"), "CopyButton takes no disabled prop")
+  assert.ok(
+    copyButton.includes("if (disabled) return"),
+    "a disabled CopyButton still runs its copy handler",
+  )
 })
 
 test("llms.txt points an agent at the tool", async () => {
@@ -372,6 +399,56 @@ test("newlines in a description collapse rather than break the document", async 
   assert.equal(frontmatter.description, "Reviews a diff. Use when a pull request opens.")
 })
 
+test("a metadata key YAML would read as a number, a boolean, or null stays a string", async () => {
+  const { parse } = await import("yaml")
+  const file = buildSkillMd(
+    draft({
+      metadata: [
+        { key: "1.0", value: "first" },
+        { key: "1", value: "second" },
+        { key: "true", value: "third" },
+        { key: "null", value: "fourth" },
+      ],
+    }),
+  )
+  const frontmatter = parse(file.split("---")[1])
+
+  // Written raw, `1.0` would parse as the number 1 and collide with `1`,
+  // `true` as a boolean, and `null` as the null key.
+  // An integer-like key sorts first in a JavaScript object, so compare sorted.
+  assert.deepEqual(Object.keys(frontmatter.metadata).sort(), ["1", "1.0", "null", "true"])
+  assert.deepEqual(frontmatter.metadata, {
+    "1.0": "first",
+    1: "second",
+    true: "third",
+    null: "fourth",
+  })
+})
+
+test("a special float value keeps its text rather than parsing as a number", async () => {
+  const { parse } = await import("yaml")
+
+  assert.equal(isPlainYamlScalar(".inf"), false)
+  assert.equal(isPlainYamlScalar(".Inf"), false)
+  assert.equal(isPlainYamlScalar(".INF"), false)
+  assert.equal(isPlainYamlScalar("+.inf"), false)
+  assert.equal(isPlainYamlScalar(".nan"), false)
+  assert.equal(isPlainYamlScalar(".NaN"), false)
+  assert.equal(formatYamlScalar(".inf"), '".inf"')
+
+  const file = buildSkillMd(
+    draft({
+      metadata: [
+        { key: "limit", value: ".inf" },
+        { key: "score", value: ".nan" },
+      ],
+    }),
+  )
+  const frontmatter = parse(file.split("---")[1])
+
+  assert.deepEqual(frontmatter.metadata, { limit: ".inf", score: ".nan" })
+})
+
 test("every generated file parses back into the fields it was built from", async () => {
   const { parse } = await import("yaml")
   const file = buildSkillMd(
@@ -524,6 +601,20 @@ test("the body budget is guidance, so going over it warns and still downloads", 
 test("the body line count ignores trailing blank lines", () => {
   assert.equal(countBodyLines("one\ntwo\n\n\n"), 2)
   assert.equal(countBodyLines("   \n"), 0)
+})
+
+test("a two space hard line break survives into the file", () => {
+  const body = "first line  \nsecond line"
+  const file = buildSkillMd(draft({ body }))
+
+  assert.ok(file.endsWith(`${body}\n`), "the hard line break was stripped")
+  assert.equal(normalizeSkillBody(body), body)
+  // Only the terminal blank run goes.
+  assert.equal(normalizeSkillBody("first line  \nsecond line\n  \n\n"), "first line  \nsecond line")
+  assert.equal(normalizeSkillBody("first line  \r\nsecond line"), body)
+  assert.equal(normalizeSkillBody("   \n  \n"), "")
+  assert.equal(normalizeSkillBody("   "), "")
+  assert.equal(normalizeSkillBody(""), "")
 })
 
 /* -------------------------------------------------------------------------- */

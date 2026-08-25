@@ -436,6 +436,7 @@ export function SkillMdBuilder({
               label="Copy the file"
               ariaLabel="Copy the generated SKILL.md"
               className="rounded-[3px]"
+              disabled={blocked}
               analytics={{
                 event: "skill_md_generated",
                 properties: { output: "clipboard" },
@@ -469,8 +470,8 @@ export function SkillMdBuilder({
           {blocked ? (
             <p className="mt-3 text-xs leading-5 text-muted-foreground">
               {errorCount === 1
-                ? "One error is blocking the download."
-                : `${errorCount} errors are blocking the download.`}{" "}
+                ? "One error is blocking the copy and the download."
+                : `${errorCount} errors are blocking the copy and the download.`}{" "}
               The preview stays live so you can see what changes as you fix them.
             </p>
           ) : (
