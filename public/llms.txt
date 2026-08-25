@@ -64,6 +64,7 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 
 ## Write and validate
 - [How to write a SKILL.md file](https://www.skillsboard.sh/guides/how-to-write-a-skill-md): The six specification frontmatter fields and the Claude Code additions, the description rules that decide whether a skill triggers, the body and reference-file budgets, and how to validate a skill before sharing it
+- [Skill creator: build a valid SKILL.md](https://www.skillsboard.sh/skill-creator): A free browser tool that writes SKILL.md from the six specification frontmatter fields, checks the name, description, and compatibility limits while you type, and downloads the skill folder as `<name>/SKILL.md`; it calls no model and has no Markdown twin
 
 ## Install and verify
 - [How to install Claude skills in Claude Code](https://www.skillsboard.sh/guides/install-claude-skills-in-claude-code): The documented skill locations on disk, the personal, project, plugin, managed, and claude.ai sync install paths, and how to confirm a skill loaded

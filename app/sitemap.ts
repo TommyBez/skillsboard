@@ -13,6 +13,7 @@ import {
 import { developers } from "@/lib/seo/developers"
 import { guideEvidencePaths } from "@/lib/seo/guides/types"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
+import { skillCreator } from "@/lib/seo/skill-creator"
 import { siteConfig } from "@/lib/site"
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -102,6 +103,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-08-06"),
       changeFrequency: "yearly",
       priority: 0.5,
+    },
+    {
+      /**
+       * Listed on its own rather than through the resource registry: the page
+       * is a browser tool, not an article, so it is not one of the entries
+       * that feed the /resources hub and the Markdown twins.
+       */
+      url: `${siteConfig.url}${skillCreator.path}`,
+      lastModified: new Date(skillCreator.modifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${siteConfig.url}${resourcePaths.index}`,

@@ -31,6 +31,10 @@ import type { CopilotSkillsCtaPlacement } from "@/lib/seo/copilot-skills/types"
 import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
 import type { ManageAiSkillsCtaPlacement } from "@/lib/seo/manage-ai-skills/types"
 import type { OpencodeSkillsCtaPlacement } from "@/lib/seo/opencode-skills/types"
+import {
+  skillCreatorPath,
+  type SkillCreatorCtaPlacement,
+} from "@/lib/seo/skill-creator/types"
 import type { SkillExamplesCtaPlacement } from "@/lib/seo/skill-examples/types"
 import type { VercelSkillsCtaPlacement } from "@/lib/seo/vercel-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
@@ -56,6 +60,7 @@ type ResourceHeaderLocation =
   | "copilot_skills_header"
   | "cursor_skills_header"
   | "opencode_skills_header"
+  | "skill_creator_header"
   | "skill_examples_header"
   | "vercel_skills_header"
   | "guide_header"
@@ -81,6 +86,7 @@ type ResourceCtaLocation =
   | CursorSkillsCtaPlacement
   | ManageAiSkillsCtaPlacement
   | OpencodeSkillsCtaPlacement
+  | SkillCreatorCtaPlacement
   | SkillExamplesCtaPlacement
   | VercelSkillsCtaPlacement
   | "guide_inline"
@@ -246,6 +252,12 @@ export function ResourceFooter() {
               className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
             >
               Alternatives
+            </Link>
+            <Link
+              href={skillCreatorPath}
+              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
+            >
+              Skill creator
             </Link>
             <Link
               href="/developers"
