@@ -6,6 +6,7 @@ import {
   guidePaths,
   type GuideDefinition,
 } from "@/lib/seo/guides/types"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import { absoluteUrl } from "@/lib/site"
 
 export const manageCrossAgentSkillsGuide: GuideDefinition = {
@@ -28,6 +29,12 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     "Claude Code, Codex, and Cursor can all work with reusable skills, but “supported” does not mean “kept in sync.” A durable team setup separates the shared skill source from each agent’s installation and discovery rules.",
   answer:
     "To share skills across Claude Code, Codex, and Cursor, keep one canonical SKILL.md source and document how each agent installs, discovers, and invokes it. Test every agent path with the same fixture, then share the compatibility record. Do not maintain separate canonical copies or assume updates sync automatically.",
+  answerLink: {
+    lead: "A three-agent team is the common case rather than the whole problem. For every documented organization-level mechanism, what it covers and where it stops, see",
+    label: "how to manage AI skills across your organization",
+    href: manageAiSkillsPath,
+    trail: ".",
+  },
   citations: {
     answer: [
       "openai-skills",
@@ -266,5 +273,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-16",
+  modifiedAt: "2026-08-25",
 }

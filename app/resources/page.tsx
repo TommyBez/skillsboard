@@ -4,6 +4,7 @@ import { ArrowUpRightIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
+import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import { buildResourceIndexSchema } from "@/lib/seo/resource-schema"
 import {
   resourceClusters,
@@ -67,6 +68,30 @@ export default function ResourcesPage() {
             </Link>
             .
           </p>
+
+          <div className="mt-10 max-w-3xl">
+            <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+              Start here
+            </p>
+            <Link
+              href={manageAiSkillsPath}
+              className="group mt-3 flex items-start justify-between gap-5 rounded-[3px] border border-border bg-card p-6 transition-colors hover:border-primary/70 md:gap-8 md:p-7"
+            >
+              <div>
+                <h2 className="text-balance text-2xl font-semibold leading-tight transition-colors group-hover:text-primary md:text-3xl">
+                  How to manage AI skills across your organization
+                </h2>
+                <p className="mt-3 text-pretty leading-relaxed text-muted-foreground">
+                  What each vendor mechanism for distributing skills covers, where it
+                  stops, and the selection layer none of them records.
+                </p>
+              </div>
+              <ArrowUpRightIcon
+                className="mt-1 size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
+                aria-hidden="true"
+              />
+            </Link>
+          </div>
         </div>
       </header>
 

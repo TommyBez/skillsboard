@@ -7,6 +7,7 @@ import type { ClaudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsPath } from "@/lib/seo/codex-skills/types"
 import type { CoworkSkillsPath } from "@/lib/seo/cowork-skills/types"
 import type { CursorSkillsPath } from "@/lib/seo/cursor-skills/types"
+import type { ManageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import type { WhereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skills/types"
 
 export const guidePaths = {
@@ -60,6 +61,7 @@ export interface GuideInlineLink {
     | CodexSkillsPath
     | CoworkSkillsPath
     | CursorSkillsPath
+    | ManageAiSkillsPath
     | WhereToFindClaudeSkillsPath
   trail: string
 }
