@@ -206,6 +206,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: "/skill-creator/",
+        destination: "/skill-creator",
+        permanent: true,
+      },
+      {
         source: "/skill-examples/",
         destination: "/skill-examples",
         permanent: true,

@@ -105,6 +105,9 @@ type NonTeamEventPropertiesMap = {
       | "copilot_skills_hero"
       | "copilot_skills_inline"
       | "copilot_skills_closing"
+      | "skill_creator_header"
+      | "skill_creator_inline"
+      | "skill_creator_closing"
       | "skill_examples_header"
       | "skill_examples_hero"
       | "skill_examples_inline"
@@ -152,6 +155,16 @@ type NonTeamEventPropertiesMap = {
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
+  }
+  /**
+   * A generated SKILL.md left the page: copied, saved as a file, or saved as
+   * the skill folder. `$pageview` on `/skill-creator` already counts the
+   * visit, and the URL never changes while the tool is used, so the one thing
+   * a pageview cannot tell us is whether anyone carried a file away. Non team
+   * scoped: the tool needs no account, so most callers have no team.
+   */
+  skill_md_generated: {
+    output: "clipboard" | "folder_zip" | "skill_md"
   }
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
