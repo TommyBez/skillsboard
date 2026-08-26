@@ -146,10 +146,18 @@ const route = requireMcpAuth(
   async (req, jwt) => {
     if (!jwt.sub) return new Response("Token subject is required", { status: 401 })
     return createMcpHandler((server) => {
+      // Tool annotations are hints a client reads before it calls: a read-only
+      // tool can run without asking, a destructive one is worth a confirmation.
+      // Nine of these tools only read, so they carry `readOnlyHint: true` and
+      // leave out the hints the spec defines only when it is false. The four
+      // write tools spell all four out, because every hint has a default and a
+      // missing one reads as `destructiveHint: true`. `openWorldHint` is true
+      // only where the tool leaves this database: the public catalog and GitHub.
       server.registerTool("list_skills", {
         title: "List team skills",
         description: "List every skill saved across the authenticated user's team libraries",
         inputSchema: {},
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async () => trackMcpToolCall(jwt.sub!, "list_skills", async () => ({
         content: [{ type: "text" as const, text: JSON.stringify(await listUserSkills(jwt.sub!), null, 2) }],
       })))
@@ -158,6 +166,7 @@ const route = requireMcpAuth(
         title: "Search team skills",
         description: "Search saved team skills by name, description, note, example prompt, repository, or tag",
         inputSchema: { query: z.string().min(1) },
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async ({ query }) => trackMcpToolCall(jwt.sub!, "search_skills", async () => {
         const skills = await listUserSkills(jwt.sub!)
         const normalized = query.toLowerCase()
@@ -173,7 +182,12 @@ const route = requireMcpAuth(
         }
       }))
 
-      server.registerTool("get_skill_command", { title: "Get install command", description: "Return the skills.sh CLI command for a saved skill", inputSchema: { skillId: z.uuid() } }, async ({ skillId }) => {
+      server.registerTool("get_skill_command", {
+        title: "Get install command",
+        description: "Return the skills.sh CLI command for a saved skill",
+        inputSchema: { skillId: z.uuid() },
+        annotations: { readOnlyHint: true, openWorldHint: false },
+      }, async ({ skillId }) => {
         const found = await getUserSkill(jwt.sub!, skillId)
         const payload = {
           content: [{
@@ -211,6 +225,7 @@ const route = requireMcpAuth(
           view: z.enum(["trending", "hot", "all-time"]).optional(),
           page: z.number().int().min(0).optional(),
         },
+        annotations: { readOnlyHint: true, openWorldHint: true },
       }, async ({ query, view, page }) => {
         try {
           return await trackMcpToolCall(jwt.sub!, "discover_skills", async () => ({
@@ -233,6 +248,7 @@ const route = requireMcpAuth(
         title: "Inspect a repository for skills",
         description: "List the installable skills (SKILL.md definitions) found in a GitHub repository, with the skillPath to use when saving one",
         inputSchema: { githubUrl: z.url().describe("GitHub repository URL or direct skill link") },
+        annotations: { readOnlyHint: true, openWorldHint: true },
       }, async ({ githubUrl }) => {
         try {
           const repository = await discoverGitHubSkills(githubUrl)
@@ -270,6 +286,7 @@ const route = requireMcpAuth(
           examplePrompts: z.array(z.string().trim().min(1).max(800)).max(8).optional().describe("Up to 8 example prompts for teammates"),
           organizationId: z.string().optional().describe("Team library to save into. Optional when you belong to a single team."),
         },
+        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: true },
       }, async ({ githubUrl, skillPath, tags, note, examplePrompts, organizationId }) => {
         if (!tokenHasScope(jwt, "skills:write")) {
           captureMcpToolUsed(jwt.sub!, "add_skill", false)
@@ -335,6 +352,7 @@ const route = requireMcpAuth(
         title: "List team collections",
         description: "List every skill collection across the authenticated user's team libraries, with skill counts",
         inputSchema: {},
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async () => trackMcpToolCall(jwt.sub!, "list_collections", async () => ({
         content: [{ type: "text" as const, text: JSON.stringify(await listUserCollections(jwt.sub!), null, 2) }],
       })))
@@ -343,6 +361,7 @@ const route = requireMcpAuth(
         title: "Search team collections",
         description: "Search team skill collections by title, description, or tag",
         inputSchema: { query: z.string().min(1) },
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async ({ query }) => trackMcpToolCall(jwt.sub!, "search_collections", async () => {
         const collections = await listUserCollections(jwt.sub!)
         const normalized = query.toLowerCase()
@@ -362,6 +381,7 @@ const route = requireMcpAuth(
         title: "Get collection skills",
         description: "List the skills grouped in a collection, with their install commands",
         inputSchema: { collectionId: z.uuid() },
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async ({ collectionId }) => {
         const found = await getUserCollection(jwt.sub!, collectionId)
         captureMcpToolUsed(jwt.sub!, "get_collection_skills", Boolean(found))
@@ -396,6 +416,7 @@ const route = requireMcpAuth(
         title: "Get collection install command",
         description: "Get the one-command installer for a published installable collection",
         inputSchema: { collectionId: z.uuid() },
+        annotations: { readOnlyHint: true, openWorldHint: false },
       }, async ({ collectionId }) => {
         const found = await getUserCollection(jwt.sub!, collectionId)
         if (!found) {
@@ -443,6 +464,7 @@ const route = requireMcpAuth(
           tags: z.array(z.string().trim().min(1).max(30)).max(10).optional().describe("Up to 10 team tags"),
           organizationId: z.string().optional().describe("Team library to create the collection in. Optional when you belong to a single team."),
         },
+        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: false, openWorldHint: false },
       }, async ({ title, description, tags, organizationId }) => {
         if (!tokenHasScope(jwt, "skills:write")) {
           captureMcpToolUsed(jwt.sub!, "create_collection", false)
@@ -505,6 +527,7 @@ const route = requireMcpAuth(
         title: "Add a skill to a collection",
         description: "Add a saved team skill to a collection. Use list_skills and list_collections to find the IDs.",
         inputSchema: { collectionId: z.uuid(), skillId: z.uuid() },
+        annotations: { readOnlyHint: false, destructiveHint: false, idempotentHint: true, openWorldHint: false },
       }, async ({ collectionId, skillId }) => {
         if (!tokenHasScope(jwt, "skills:write")) {
           captureMcpToolUsed(jwt.sub!, "add_skill_to_collection", false)
@@ -551,10 +574,14 @@ const route = requireMcpAuth(
         }, null, 2))
       })
 
+      // The only tool that takes something away. It unfiles rather than
+      // deletes, and the skill stays in the team library, but the collection a
+      // team published is the thing an agent should not edit unprompted.
       server.registerTool("remove_skill_from_collection", {
         title: "Remove a skill from a collection",
         description: "Remove a skill from a collection. The skill stays in the team library.",
         inputSchema: { collectionId: z.uuid(), skillId: z.uuid() },
+        annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: false },
       }, async ({ collectionId, skillId }) => {
         if (!tokenHasScope(jwt, "skills:write")) {
           captureMcpToolUsed(jwt.sub!, "remove_skill_from_collection", false)
