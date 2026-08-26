@@ -20,7 +20,7 @@ export const mcpServerInfo = {
   title: "Skills Board",
   version: "1.0.0",
   description:
-    "Search your team's shared AI-skill library, get install commands, and save skills from your agent.",
+    "The agent-native skills registry for teams. Search team skills, get install commands, save skills.",
   websiteUrl: "https://www.skillsboard.sh",
   repository: {
     url: "https://github.com/TommyBez/skillsboard",
