@@ -43,7 +43,7 @@ async function InvitationDetails({ params }: InvitationPageProps) {
         title={`Join ${invitation.organizationName}`}
         description={`${invitation.inviterEmail} invited ${session.user.email} to join as ${invitation.role}.`}
         editorialTitle="Find the skills your new teammates already use."
-        editorialBody="Join their shared library, then open the source, copy a compatible install command, or download the latest skill files as a ZIP."
+        editorialBody="Join their team library, then open the source, copy a compatible install command, or download the latest skill files as a ZIP."
       >
         <AcceptInvitationForm invitationId={invitationId} />
       </AccessShell>

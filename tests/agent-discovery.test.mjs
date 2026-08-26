@@ -158,6 +158,63 @@ test("the server card marks a tool as write-scoped when the route checks for it"
   }
 })
 
+test("every MCP tool annotates what it does to the library", async () => {
+  const route = await readRepoFile("../app/api/[transport]/route.ts")
+  const destructive = []
+
+  for (const tool of mcpToolSummaries) {
+    const start = route.indexOf(`server.registerTool("${tool.name}"`)
+    const next = route.indexOf("server.registerTool(", start + 1)
+    const body = route.slice(start, next === -1 ? undefined : next)
+    const declared = body.match(/annotations: \{([^}]*)\}/)
+
+    assert.ok(declared, `${tool.name} declares no annotations`)
+    const hints = Object.fromEntries(
+      declared[1]
+        .split(",")
+        .map((hint) => hint.trim())
+        .filter(Boolean)
+        .map((hint) => {
+          const [name, value] = hint.split(":").map((part) => part.trim())
+          return [name, value === "true"]
+        }),
+    )
+
+    const writes = tool.requiredScopes.includes("skills:write")
+    assert.equal(
+      hints.readOnlyHint,
+      !writes,
+      `${tool.name}: readOnlyHint disagrees with the scope the tool asks for`,
+    )
+    assert.equal(
+      typeof hints.openWorldHint,
+      "boolean",
+      `${tool.name}: openWorldHint is the one hint every tool has to answer`,
+    )
+
+    if (writes) {
+      // Each hint has a default, and the default for a missing destructiveHint
+      // is `true`: a write tool that leaves one out is claiming the worst case.
+      for (const hint of ["destructiveHint", "idempotentHint"]) {
+        assert.equal(typeof hints[hint], "boolean", `${tool.name} leaves ${hint} to its default`)
+      }
+      if (hints.destructiveHint) destructive.push(tool.name)
+    } else {
+      // The spec defines these two only when readOnlyHint is false. Stating
+      // them on a read tool would be noise a client has to decide to ignore.
+      for (const hint of ["destructiveHint", "idempotentHint"]) {
+        assert.equal(hints[hint], undefined, `${tool.name} is read-only but declares ${hint}`)
+      }
+    }
+  }
+
+  assert.deepEqual(
+    destructive,
+    ["remove_skill_from_collection"],
+    "only removing a skill from a collection takes something away",
+  )
+})
+
 test("robots.txt declares all three content signals under the user agent block", () => {
   const robots = buildRobotsTxt()
 
