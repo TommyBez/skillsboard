@@ -613,7 +613,7 @@ function ProductScene() {
           }}
         >
           <span style={{ color: "#6bd58f", fontWeight: 700 }}>✓</span>
-          Install command copied — ready for your agent
+          Install command copied, ready for your agent
         </div>
       </div>
 

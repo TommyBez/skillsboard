@@ -26,7 +26,7 @@ export const brand = {
   wordmark: "Skills Board",
   tagline: "Your team's skills. All in one place.",
   domain: "skillsboard.sh",
-  closing: "One place for the skills your team recommends.",
+  closing: "One place for the skills your team chooses.",
 } as const;
 
 export const saveDialog = {
@@ -42,7 +42,7 @@ export const saveDialog = {
     { name: "xlsx", description: "Build and edit spreadsheets, formulas included." },
   ],
   noteLabel: "Note for your team",
-  note: "Use it for the board deck — it keeps table formatting intact.",
+  note: "Use it for the board deck. It keeps table formatting intact.",
   promptLabel: "Example prompt",
   prompt: "Extract the tables from this quarterly report into a summary.",
   tagsLabel: "Tags",
@@ -122,7 +122,7 @@ export const find = {
 
 export const handoff = {
   paths: ["Open source", "Copy install command", "Download ZIP"],
-  line: "Same recommendation, any agent.",
+  line: "Same skill, any agent.",
   agents: ["Claude", "Codex", "Cursor"],
 } as const;
 
