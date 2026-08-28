@@ -5,23 +5,19 @@ import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react"
 
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
-import { LegalLinks } from "@/components/legal-links"
+import { FooterNavColumns } from "@/components/footer-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import type { AgentSkillsSupportCtaPlacement } from "@/lib/seo/agent-skills-support/types"
 import type { AgentSkillsCtaPlacement } from "@/lib/seo/agent-skills/types"
 import type { AgentsMdVsSkillMdCtaPlacement } from "@/lib/seo/agents-md-vs-skill-md/types"
-import {
-  alternativesIndexPath,
-  type AlternativeCtaPlacement,
-} from "@/lib/seo/alternatives"
+import type { AlternativeCtaPlacement } from "@/lib/seo/alternatives"
 import type { AnthropicSkillsCtaPlacement } from "@/lib/seo/anthropic-skills/types"
 import type { BestClaudeSkillsCtaPlacement } from "@/lib/seo/best-claude-skills/types"
 import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
 import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
 import type { CoworkSkillsCtaPlacement } from "@/lib/seo/cowork-skills/types"
-import { compareIndexPath } from "@/lib/seo/compare/types"
 import type {
   ComparisonCtaPlacement,
   ComparisonHeaderLocation,
@@ -31,10 +27,7 @@ import type { CopilotSkillsCtaPlacement } from "@/lib/seo/copilot-skills/types"
 import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
 import type { ManageAiSkillsCtaPlacement } from "@/lib/seo/manage-ai-skills/types"
 import type { OpencodeSkillsCtaPlacement } from "@/lib/seo/opencode-skills/types"
-import {
-  skillCreatorPath,
-  type SkillCreatorCtaPlacement,
-} from "@/lib/seo/skill-creator/types"
+import type { SkillCreatorCtaPlacement } from "@/lib/seo/skill-creator/types"
 import type { SkillExamplesCtaPlacement } from "@/lib/seo/skill-examples/types"
 import type { VercelSkillsCtaPlacement } from "@/lib/seo/vercel-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
@@ -225,66 +218,30 @@ export function ResourceShell({
   )
 }
 
+/**
+ * The resource colophon.
+ *
+ * Same three groups as the landing footer, from `components/footer-nav`, in
+ * this surface's own type. It used to be one wrapping row of seven links plus
+ * a second row of legal ones, which on a phone was a paragraph of tracked caps
+ * with no order in it. The FAQ entry is absent because `#faq` is a section of
+ * the home page and there is nothing here for it to scroll to.
+ */
 export function ResourceFooter() {
   return (
     <footer className="border-t border-border/70">
-      <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-5 px-5 py-9 md:flex-row md:items-center md:justify-between md:px-10">
-        <Brand />
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-          <nav
-            aria-label="Resource footer"
-            className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
+      <div className="mx-auto flex w-full max-w-[1320px] flex-col gap-10 px-5 py-10 md:px-10 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+        <div className="flex min-w-0 flex-col items-start gap-4">
+          <Brand />
+          <a
+            href={siteConfig.githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center gap-1.5 font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground transition-colors hover:text-foreground"
           >
-            <Link
-              href={resourcePaths.index}
-              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
-            >
-              Resources
-            </Link>
-            <Link
-              href={compareIndexPath}
-              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
-            >
-              Compare
-            </Link>
-            <Link
-              href={alternativesIndexPath}
-              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
-            >
-              Alternatives
-            </Link>
-            <Link
-              href={skillCreatorPath}
-              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
-            >
-              Skill creator
-            </Link>
-            <Link
-              href="/developers"
-              className="inline-flex min-h-11 items-center transition-colors hover:text-foreground"
-            >
-              Developers
-            </Link>
-            <Link
-              href={resourcePaths.about}
-              className="inline-flex min-h-11 min-w-11 items-center justify-center transition-colors hover:text-foreground"
-            >
-              About
-            </Link>
-            <a
-              href={siteConfig.githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-1.5 transition-colors hover:text-foreground"
-            >
-              GitHub
-              <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
-            </a>
-          </nav>
-          <LegalLinks
-            ariaLabel="Legal pages"
-            className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground"
-          />
+            GitHub
+            <ExternalLinkIcon className="size-3.5" aria-hidden="true" />
+          </a>
           <p className="text-sm text-muted-foreground">
             ©{" "}
             <Suspense
@@ -295,6 +252,12 @@ export function ResourceFooter() {
             {siteConfig.name}. Free and open source.
           </p>
         </div>
+        <FooterNavColumns
+          ariaLabel="Resource footer"
+          className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground lg:w-auto lg:gap-x-14"
+          titleClassName="text-[0.675rem] tracking-[0.2em] text-foreground"
+          linkClassName="inline-flex min-h-11 min-w-11 items-center transition-colors hover:text-foreground"
+        />
       </div>
     </footer>
   )
