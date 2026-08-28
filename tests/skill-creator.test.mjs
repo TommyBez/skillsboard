@@ -201,11 +201,11 @@ test("llms.txt points an agent at the tool", async () => {
 })
 
 test("every marketing page links to the tool from the shared footer", async () => {
-  const chrome = await readFile(
-    new URL("../components/resources/resource-chrome.tsx", import.meta.url),
+  const nav = await readFile(
+    new URL("../components/footer-nav.tsx", import.meta.url),
     "utf8",
   )
-  assert.ok(chrome.includes("skillCreatorPath"), "no footer link to the tool")
+  assert.ok(nav.includes("skillCreatorPath"), "no footer link to the tool")
 })
 
 /* -------------------------------------------------------------------------- */

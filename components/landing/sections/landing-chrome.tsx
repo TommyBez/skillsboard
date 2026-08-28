@@ -1,7 +1,5 @@
-import Link from "next/link"
-
 import { Brand } from "@/components/brand"
-import { LegalLinks } from "@/components/legal-links"
+import { FooterNavColumns } from "@/components/footer-nav"
 import { PageFrame } from "@/components/landing/chrome/page-frame"
 import { HomeHeaderActions } from "@/components/landing/landing-ctas"
 
@@ -76,15 +74,24 @@ export function LandingHeader() {
 const brandLockup = "lp-brand-lockup inline-flex ms-[calc(-1*var(--lp-mark-bearing))]"
 
 /**
- * A colophon link. The negative inline-end margin takes back the trailing
- * letter-space of the tracked caps, so the optical gap to the next cell matches
- * the gap between the links themselves.
+ * A colophon link, and the caps that title the group it sits in.
+ *
+ * The link used to carry a negative inline-end margin, to take back the
+ * trailing letter-space of the tracked caps so the optical gap to the next
+ * cell matched the gap between the links. The links are in columns now, one
+ * per row, so there is no next cell on the row to match, and the box is left
+ * aligned rather than centred so the hover underline lands under the word
+ * instead of under the 44px hit target.
  *
  * The class carries the underline it grows on hover and the two states that
- * drive it.
+ * drive it. The group title is the same mono, one step smaller and one step
+ * wider, at full contrast so it reads as the label of the column rather than
+ * as its first entry.
  */
 const footerNavLink =
-  "lp-footer-nav-link relative me-[-0.18em] inline-flex min-h-11 min-w-11 items-center justify-center py-[0.15rem] text-muted-foreground no-underline"
+  "lp-footer-nav-link relative inline-flex min-h-11 min-w-11 items-center py-[0.15rem] text-muted-foreground no-underline"
+
+const footerGroupTitle = "text-[0.675rem] tracking-[0.22em] text-foreground"
 
 function GitHubMark() {
   return (
@@ -116,6 +123,19 @@ function GitHubMark() {
  * The inner measure carries the same content clear as the closing chapter
  * above it, page gutter plus the extra air off the frame rails, so the
  * colophon doesn't snap back out to the rails after "06 · Start".
+ *
+ * The nav lists pages, in the three groups defined once in
+ * `components/footer-nav`, so this colophon and the resource one cannot name
+ * different sets. It used to list two in-page anchors and three pages, which
+ * left `/compare`, `/alternatives` and `/skill-creator` with no link from the
+ * site's most linked page and put `/pricing` behind the anchor to its own
+ * section. Naming every page then made the row a wrapping line of eight
+ * tracked caps, which is what the columns are for. One anchor is left:
+ * `#faq` has no page of its own to point at, and it is offered here only,
+ * because here is the only page that has the section.
+ *
+ * The mark hangs under the wordmark rather than at the far end of a control
+ * row, so the left cell is the brand and the right cell is the whole nav.
  */
 export function LandingFooter() {
   return (
@@ -125,45 +145,11 @@ export function LandingFooter() {
         className="pointer-events-none absolute inset-x-0 -top-20 bottom-0 z-0 bg-[linear-gradient(to_bottom,transparent_0,var(--lp-footer-field)_5rem)] lg:left-[var(--lp-frame-inset)] lg:right-[var(--lp-frame-inset)]"
       />
       <span className="lp-footer-rule" aria-hidden="true" />
-      <div className="relative mx-auto flex w-full max-w-[var(--lp-measure)] flex-col gap-8 px-[calc(var(--lp-gutter)+1.5rem)] py-12 md:flex-row md:items-center md:justify-between md:py-14 lg:px-[calc(var(--lp-gutter)+1.75rem)] min-[84rem]:px-[calc(var(--lp-gutter)+2rem)]">
-        <span className={brandLockup}>
-          <Brand />
-        </span>
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-4 md:justify-end">
-          <nav
-            aria-label="Footer"
-            className="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
-          >
-            <a href="#pricing" className={footerNavLink}>
-              Pricing
-            </a>
-            <a href="#faq" className={footerNavLink}>
-              FAQ
-            </a>
-            <Link href="/resources" className={footerNavLink}>
-              Resources
-            </Link>
-            <Link href="/developers" className={footerNavLink}>
-              Developers
-            </Link>
-            <Link href="/about" className={footerNavLink}>
-              About
-            </Link>
-          </nav>
-          <LegalLinks
-            ariaLabel="Legal pages"
-            className="font-mono text-xs font-semibold uppercase tracking-[0.18em]"
-            linkClassName={footerNavLink}
-          />
-          {/* A short vertical divider between two cells of a control row. It
-              centres on the row's optical centre — the same centre the caps and
-              the icon cell sit on — so it must not ask for `self-stretch`,
-              which a definite height cancels, dropping it back to flex-start
-              and leaving it 10px high in a 36px row. */}
-          <span
-            aria-hidden="true"
-            className="hidden h-4 w-px flex-none self-center bg-[var(--lp-hairline)] sm:block"
-          />
+      <div className="relative mx-auto flex w-full max-w-[var(--lp-measure)] flex-col gap-10 px-[calc(var(--lp-gutter)+1.5rem)] py-12 md:py-14 lg:flex-row lg:items-start lg:justify-between lg:gap-16 lg:px-[calc(var(--lp-gutter)+1.75rem)] min-[84rem]:px-[calc(var(--lp-gutter)+2rem)]">
+        <div className="flex min-w-0 flex-col items-start gap-6">
+          <span className={brandLockup}>
+            <Brand />
+          </span>
           <a
             href="https://github.com/TommyBez/skillsboard"
             target="_blank"
@@ -174,6 +160,13 @@ export function LandingFooter() {
             <GitHubMark />
           </a>
         </div>
+        <FooterNavColumns
+          ariaLabel="Footer"
+          faqAnchor
+          className="font-mono text-xs font-semibold uppercase tracking-[0.18em] lg:w-auto lg:gap-x-14"
+          titleClassName={footerGroupTitle}
+          linkClassName={footerNavLink}
+        />
       </div>
     </footer>
   )
