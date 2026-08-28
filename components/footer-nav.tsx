@@ -47,7 +47,7 @@ export function footerNavGroups(
       ],
     },
     {
-      title: "Resources",
+      title: "Explore",
       links: [
         { href: resourcePaths.index, label: "Resources" },
         { href: compareIndexPath, label: "Compare" },
