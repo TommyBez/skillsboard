@@ -12,11 +12,19 @@ import {
 } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
+/**
+ * The hub describes itself as an index, not as an answer.
+ *
+ * The previous description repeated the head phrase of the pages it lists,
+ * which is one reason Google was routing their queries here instead of to
+ * them. What this page is for is browsing: say that, and let each page below
+ * own its own question.
+ */
 const description =
-  "Explore practical resources for sharing, reviewing, and managing reusable AI skills across your team and agent workflows."
+  "Browse the full index of Skills Board guides, comparisons, and reference pages, then open the one that answers your question."
 
 export const metadata: Metadata = {
-  title: { absolute: "AI Skill Resources for Teams | Skills Board" },
+  title: { absolute: "AI Skill Resources: Guides and Comparisons | Skills Board" },
   description,
   alternates: { canonical: resourcePaths.index },
   openGraph: {
