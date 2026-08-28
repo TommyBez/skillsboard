@@ -4,6 +4,11 @@ import { Brand } from "@/components/brand"
 import { LegalLinks } from "@/components/legal-links"
 import { PageFrame } from "@/components/landing/chrome/page-frame"
 import { HomeHeaderActions } from "@/components/landing/landing-ctas"
+import { alternativesIndexPath } from "@/lib/seo/alternatives"
+import { compareIndexPath } from "@/lib/seo/compare/types"
+import { pricingPath } from "@/lib/seo/pricing-schema"
+import { resourcePaths } from "@/lib/seo/resources"
+import { skillCreatorPath } from "@/lib/seo/skill-creator/types"
 
 /**
  * Retired chapter index.
@@ -116,6 +121,13 @@ function GitHubMark() {
  * The inner measure carries the same content clear as the closing chapter
  * above it, page gutter plus the extra air off the frame rails, so the
  * colophon doesn't snap back out to the rails after "06 · Start".
+ *
+ * The nav lists pages, and reads from the same path constants the resource
+ * footer reads, so the two colophons cannot name different sets. It used to
+ * list two in-page anchors and three pages, which left `/compare`,
+ * `/alternatives` and `/skill-creator` with no link from the site's most
+ * linked page and put `/pricing` behind the anchor to its own section. One
+ * anchor is left: `#faq` has no page of its own to point at.
  */
 export function LandingFooter() {
   return (
@@ -134,19 +146,28 @@ export function LandingFooter() {
             aria-label="Footer"
             className="flex flex-wrap items-center gap-x-7 gap-y-3 font-mono text-xs font-semibold uppercase tracking-[0.18em]"
           >
-            <a href="#pricing" className={footerNavLink}>
+            <Link href={pricingPath} className={footerNavLink}>
               Pricing
-            </a>
+            </Link>
             <a href="#faq" className={footerNavLink}>
               FAQ
             </a>
-            <Link href="/resources" className={footerNavLink}>
+            <Link href={resourcePaths.index} className={footerNavLink}>
               Resources
+            </Link>
+            <Link href={compareIndexPath} className={footerNavLink}>
+              Compare
+            </Link>
+            <Link href={alternativesIndexPath} className={footerNavLink}>
+              Alternatives
+            </Link>
+            <Link href={skillCreatorPath} className={footerNavLink}>
+              Skill creator
             </Link>
             <Link href="/developers" className={footerNavLink}>
               Developers
             </Link>
-            <Link href="/about" className={footerNavLink}>
+            <Link href={resourcePaths.about} className={footerNavLink}>
               About
             </Link>
           </nav>

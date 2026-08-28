@@ -9,6 +9,7 @@ import { HeroSection } from "@/components/landing/sections/hero-section"
 import { McpSection } from "@/components/landing/sections/mcp-section"
 import { PluginSection } from "@/components/landing/sections/plugin-section"
 import { PricingSection } from "@/components/landing/sections/pricing-section"
+import { RelatedResourcesSection } from "@/components/landing/sections/related-resources-section"
 import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import { homePath } from "@/lib/seo/home"
 import { buildLandingSchema } from "@/lib/seo/landing-schema"
@@ -44,6 +45,7 @@ export default function HomePage() {
       <FaqSection />
       <EmailCaptureSection />
       <ClosingSection />
+      <RelatedResourcesSection />
     </>
   )
 }
