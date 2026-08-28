@@ -11,6 +11,7 @@ import {
   SectionTable,
   StepList,
 } from "@/components/resources/article-parts"
+import { ResourceBreadcrumb } from "@/components/resources/resource-breadcrumb"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import type {
@@ -41,16 +42,7 @@ export function ClaudeSkillsPage({ entry }: { entry: ClaudeSkillsDefinition }) {
       <JsonLd data={buildResourceArticleSchema(entry)} />
 
       <div className="mx-auto w-full max-w-[1000px] px-5 py-12 md:px-10 md:py-16">
-        <nav
-          aria-label="Breadcrumb"
-          className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
-        >
-          <Link href="/" className="transition-colors hover:text-foreground">
-            Home
-          </Link>
-          <span aria-hidden="true">/</span>
-          <span aria-current="page">{entry.eyebrow}</span>
-        </nav>
+        <ResourceBreadcrumb page={entry.eyebrow} />
 
         <header className="mt-8">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">

@@ -4,6 +4,7 @@ import {
   organizationLogoNode,
   organizationNode,
 } from "@/lib/seo/organization"
+import { resourcePaths } from "@/lib/seo/resources"
 import { absoluteUrl, siteConfig } from "@/lib/site"
 
 /**
@@ -93,7 +94,13 @@ export function buildResourceArticleSchema(entry: ResourceArticleSchemaEntry) {
           {
             "@type": "ListItem",
             position: 2,
-            name: entry.eyebrow,
+            name: "Resources",
+            item: absoluteUrl(resourcePaths.index),
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: entry.title,
             item: pageUrl,
           },
         ],

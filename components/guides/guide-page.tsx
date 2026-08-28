@@ -6,6 +6,7 @@ import { EmailCaptureCard } from "@/components/email-capture-card"
 import { GuideChapterNav } from "@/components/guides/guide-chapter-nav"
 import { GuideEvidenceAssetSection } from "@/components/guides/guide-evidence-asset"
 import { JsonLd } from "@/components/json-ld"
+import { ResourceBreadcrumb } from "@/components/resources/resource-breadcrumb"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import { buildGuideSchema, stepAnchorId } from "@/lib/seo/guide-schema"
 import { estimateGuideWordCount, slugFromPath, type GuideDefinition } from "@/lib/seo/guides"
@@ -162,13 +163,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
           />
           <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 gap-10 px-5 py-16 md:px-10 md:py-24 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-end">
             <div>
-              <nav aria-label="Breadcrumb" className="mb-7 flex items-center gap-2 text-sm text-muted-foreground">
-                <Link href={resourcePaths.index} className="transition-colors hover:text-foreground">
-                  Resources
-                </Link>
-                <span aria-hidden="true">/</span>
-                <span aria-current="page">Guide</span>
-              </nav>
+              <ResourceBreadcrumb page={guide.title} className="mb-7" />
               <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-primary">
                 {guide.eyebrow}
               </p>
