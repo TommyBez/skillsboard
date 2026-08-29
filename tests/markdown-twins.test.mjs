@@ -108,6 +108,56 @@ test("a trailing slash resolves, an unknown path does not", () => {
   assert.equal(renderMarkdownTwin("/pricing"), undefined)
 })
 
+test("the twin route answers whether or not the rewrite kept the extension", async () => {
+  // `/compare/:slug` and the other negotiation rewrites match a slug pattern
+  // that also accepts an extension, so `/compare/<slug>.md` asked for with
+  // `Accept: text/markdown` reaches the handler as `?path=/compare/<slug>.md`
+  // wherever the destination query survives, which is what Vercel does and
+  // `next start` does not. `components/web-mcp.tsx` makes exactly that request
+  // for every twin it reads, so the handler has to resolve both spellings.
+  const { GET } = await import("../app/api/markdown/route.ts")
+
+  const answers = async (url) => {
+    const response = await GET(
+      new Request(url, { headers: { Accept: "text/markdown" } }),
+    )
+    return { status: response.status, body: await response.text() }
+  }
+
+  const expected = renderMarkdownTwin("/compare/claude-skills-vs-plugins")
+
+  for (const url of [
+    // The rewrite destination, with and without the extension the slug ate.
+    "https://www.skillsboard.sh/api/markdown?path=/compare/claude-skills-vs-plugins.md",
+    "https://www.skillsboard.sh/api/markdown?path=/compare/claude-skills-vs-plugins",
+    // The same request where the destination query was dropped.
+    "https://www.skillsboard.sh/compare/claude-skills-vs-plugins.md",
+    "https://www.skillsboard.sh/compare/claude-skills-vs-plugins",
+  ]) {
+    const { status, body } = await answers(url)
+    assert.equal(status, 200, `${url} did not answer with the twin`)
+    assert.equal(body, expected, `${url} answered with another document`)
+  }
+
+  // The home twin is the one URL that is not its page path plus `.md`.
+  for (const url of [
+    "https://www.skillsboard.sh/api/markdown?path=/",
+    "https://www.skillsboard.sh/index.md",
+  ]) {
+    const { status, body } = await answers(url)
+    assert.equal(status, 200, `${url} did not answer with the home twin`)
+    assert.equal(body, renderMarkdownTwin("/"))
+  }
+
+  // A path with no twin is still a 404, whichever way it arrives.
+  for (const url of [
+    "https://www.skillsboard.sh/api/markdown?path=/pricing",
+    "https://www.skillsboard.sh/api/markdown?path=/compare/not-a-pair.md",
+  ]) {
+    assert.equal((await answers(url)).status, 404, `${url} should not resolve`)
+  }
+})
+
 test("only a page with a twin advertises the Markdown alternate", () => {
   assert.deepEqual(markdownTwinAlternates("/codex-skills"), {
     canonical: "/codex-skills",
