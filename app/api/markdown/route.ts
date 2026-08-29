@@ -12,16 +12,21 @@ import { absoluteUrl } from "@/lib/site"
  * the rewrites in next.config.ts: `<path>.md`, or `<path>` requested with
  * `Accept: text/markdown`. The public URL is always the `.md` one.
  *
- * The page being asked for comes from the request URL rather than from the
- * `?path=` the rewrite destination carries. A rewrite hands the handler the URL
- * the client asked for, and whether the destination's query survives depends on
- * where this runs: `next start` drops it. The path is in the URL either way,
- * and the query is still read first for a direct call to this route.
+ * Both inputs are URLs, so both are resolved the same way. A rewrite hands the
+ * handler the URL the client asked for, and whether the destination's `?path=`
+ * survives depends on where this runs: `next start` drops it, Vercel keeps it.
+ * The query is not a content path either: the negotiation rules match a slug
+ * pattern that also accepts an extension, so `/compare/<slug>.md` asked for
+ * with `Accept: text/markdown` arrives as `?path=/compare/<slug>.md`. That is
+ * exactly the request `components/web-mcp.tsx` makes for every twin it reads.
+ * Resolving the query through the same URL to content path step keeps the
+ * answer identical in both environments; `renderMarkdownTwin` stays strict.
  */
 export async function GET(request: Request) {
   const url = new URL(request.url)
-  const requestedPath =
-    url.searchParams.get("path") ?? contentPathForMarkdownRequest(url.pathname)
+  const requestedPath = contentPathForMarkdownRequest(
+    url.searchParams.get("path") ?? url.pathname,
+  )
   const markdown = renderMarkdownTwin(requestedPath)
 
   // A 404 with a body a client can act on. The status is the one that matters

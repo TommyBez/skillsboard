@@ -2,6 +2,7 @@ import assert from "node:assert/strict"
 import { access, readFile } from "node:fs/promises"
 import { test } from "node:test"
 
+import "./helpers/register-app-aliases.mjs"
 import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
 const { compareIndexPath, comparePaths, comparisons } = await loadTsModule(
@@ -74,6 +75,29 @@ test("every comparison reports its own CTA locations", async () => {
     assert.ok(
       layout.includes(`${entry.ctaLocation}_header`),
       `app${entry.path}/layout.tsx does not mount the shell with ${entry.ctaLocation}_header, so the sticky CTA reports another page's location`,
+    )
+  }
+})
+
+test("every comparison publishes a Markdown twin", async () => {
+  // The alias hook rather than `loadTsModule`: the twin registry reaches every
+  // content collection, and inlining that graph as data URLs would load a
+  // second copy of each one.
+  const { hasMarkdownTwin, renderMarkdownTwin } = await import(
+    "../lib/markdown/twins.ts"
+  )
+
+  for (const entry of comparisons) {
+    assert.ok(
+      hasMarkdownTwin(entry.path),
+      `${entry.path} has no Markdown twin, so ${entry.path}.md answers 404 while every other content page answers`,
+    )
+
+    const markdown = renderMarkdownTwin(entry.path) ?? ""
+    assert.ok(markdown.startsWith(`# ${entry.title}\n`))
+    assert.ok(
+      markdown.includes(`## ${entry.sideBySide.title}`),
+      `${entry.path} twin is missing the side-by-side section`,
     )
   }
 })

@@ -43,6 +43,12 @@ const skippedKeys = new Set([
   "ogAlt",
   "publishedAt",
   "modifiedAt",
+  // Chrome rather than copy: an eyebrow label above a column, the button and
+  // screen-reader strings for a copy control, and the noun the page prints in
+  // its own sourcing note. A reader of the Markdown sees none of that UI.
+  "eyebrowLabel",
+  "templateCopy",
+  "editorialSubject",
 ])
 
 /** Verbatim blocks: templates and directory trees are read as code, not prose. */
@@ -207,7 +213,12 @@ function inlineLinkSentence(value: Record<string, unknown>): string {
   const href = typeof value.href === "string" ? value.href : ""
   const trail = typeof value.trail === "string" ? value.trail : ""
 
-  return collapse(`${prose(lead)} ${link(label, href)}${prose(trail)}`)
+  // `prose` trims, so a trail written as " covers ownership" would weld itself
+  // to the closing bracket of the link. Keep the separator the author wrote.
+  const trailText = prose(trail)
+  const spacer = trailText && /^\s/.test(trail) ? " " : ""
+
+  return collapse(`${prose(lead)} ${link(label, href)}${spacer}${trailText}`)
 }
 
 function linkLabelOf(item: Record<string, unknown>): string | undefined {

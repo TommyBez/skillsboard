@@ -6,6 +6,7 @@ import { PrivacySafeVercelAnalytics } from "@/components/privacy-safe-vercel-ana
 import { ThemeProvider } from "@/components/theme-provider"
 import { WebMcpTools } from "@/components/web-mcp"
 import { siteConfig } from "@/lib/site"
+import { webMcpPages } from "@/lib/web-mcp-pages"
 
 import "./globals.css"
 
@@ -85,7 +86,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           {children}
-          <WebMcpTools />
+          <WebMcpTools pages={webMcpPages} />
           <DeferredToaster />
           {process.env.VERCEL_ENV === "production" ? <PrivacySafeVercelAnalytics /> : null}
         </ThemeProvider>

@@ -2,7 +2,11 @@
 
 import { useEffect } from "react"
 
-import { mcpEndpointFor, sameOriginDestination, webMcpPages } from "@/lib/web-mcp-tools"
+import {
+  mcpEndpointFor,
+  sameOriginDestination,
+  type WebMcpPage,
+} from "@/lib/web-mcp-tools"
 
 /**
  * WebMCP: the tools an agent driving this page in a browser can call.
@@ -35,7 +39,7 @@ function json(value: unknown) {
   return text(JSON.stringify(value, null, 2))
 }
 
-function buildTools(): WebMcpTool[] {
+function buildTools(pages: readonly WebMcpPage[]): WebMcpTool[] {
   return [
     {
       name: "list_pages",
@@ -44,7 +48,7 @@ function buildTools(): WebMcpTool[] {
       inputSchema: { type: "object", properties: {}, additionalProperties: false },
       async execute() {
         return json(
-          webMcpPages.map((page) => ({
+          pages.map((page) => ({
             path: page.path,
             title: page.title,
             description: page.description,
@@ -70,7 +74,7 @@ function buildTools(): WebMcpTool[] {
       async execute(args) {
         const requested = typeof args.path === "string" ? args.path : ""
         const normalized = requested.replace(/\/+$/, "") || "/"
-        const page = webMcpPages.find((candidate) => candidate.path === normalized)
+        const page = pages.find((candidate) => candidate.path === normalized)
 
         if (!page) {
           return text(
@@ -144,13 +148,20 @@ function buildTools(): WebMcpTool[] {
   ]
 }
 
-export function WebMcpTools() {
+/**
+ * `pages` is the catalogue, passed in from the server rather than imported.
+ * The list is three strings per page; the registries it is derived from carry
+ * the full body of every page in them, and importing them here would ship all
+ * of that prose to the browser on every route. The root layout reads
+ * `lib/web-mcp-pages` and hands over the result.
+ */
+export function WebMcpTools({ pages }: { pages: readonly WebMcpPage[] }) {
   useEffect(() => {
     const modelContext = (navigator as Navigator & { modelContext?: ModelContext }).modelContext
     if (!modelContext) return
 
     const controller = new AbortController()
-    const tools = buildTools()
+    const tools = buildTools(pages)
 
     // Two shapes are in the wild: `provideContext` replaces the page's whole
     // tool set in one call and is what the WebMCP explainer specifies;
@@ -191,7 +202,7 @@ export function WebMcpTools() {
         }
       }
     }
-  }, [])
+  }, [pages])
 
   return null
 }

@@ -6,17 +6,19 @@ import {
   type MarkdownContentEntry,
 } from "@/lib/markdown/content-markdown"
 import { alternatives } from "@/lib/seo/alternatives"
+import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { resourceEntries } from "@/lib/seo/resources"
 
 /**
  * Every page with a Markdown twin, taken from the existing collections rather
- * than a list of its own. A page added to the resource registry, or a new
- * alternative, gets a twin at `<path>.md` with no change here.
+ * than a list of its own. A page added to the resource registry, a new
+ * alternative, or a new comparison gets a twin at `<path>.md` with no change
+ * here.
  *
  * The home page and the developer docs are listed on their own because
- * neither is in either collection: the home page is built from section
+ * neither is in any collection: the home page is built from section
  * components, with `lib/seo/home` as the content definition written for the
  * twin, and the developer docs describe an interface rather than being a
  * resource article, so they carry their own definition too.
@@ -25,6 +27,7 @@ const twinEntries: readonly MarkdownContentEntry[] = [
   home,
   ...resourceEntries,
   ...alternatives,
+  ...comparisons,
   developers,
 ]
 

@@ -318,7 +318,8 @@ test("the OpenAPI description names the deployment serving it, never production"
 const { buildArdCatalog } = await import("../lib/ard-catalog.ts")
 const { API_CATALOG_MEDIA_TYPE, buildApiCatalog } = await import("../lib/api-catalog.ts")
 const { estimateMarkdownTokens } = await import("../lib/markdown/tokens.ts")
-const { mcpEndpointFor, webMcpPages } = await import("../lib/web-mcp-tools.ts")
+const { mcpEndpointFor } = await import("../lib/web-mcp-tools.ts")
+const { webMcpPages } = await import("../lib/web-mcp-pages.ts")
 const { markdownTwinPaths } = await import("../lib/markdown/twins.ts")
 
 test("every ARD entry carries an identifier, a type, and one location", () => {
@@ -434,6 +435,38 @@ test("WebMCP can reach every page that has a Markdown twin", () => {
 
   // The home page is the one whose twin path is not its own path plus `.md`.
   assert.equal(webMcpPages.find((page) => page.path === "/")?.markdownPath, "/index.md")
+})
+
+test("the WebMCP client module reaches no content registry", async () => {
+  // The catalogue keeps a path, a title, and a description per page. The
+  // registries it is derived from carry the body of every page in them, over
+  // 100 KB of prose for the comparisons alone. Anything the client component
+  // imports is in the module graph of every route, so the catalogue is built
+  // on the server and handed over as a prop; this test is what keeps a later
+  // import from quietly putting the prose back in the browser bundle.
+  const component = await readFile(new URL("../components/web-mcp.tsx", import.meta.url), "utf8")
+  const clientModule = await readFile(new URL("../lib/web-mcp-tools.ts", import.meta.url), "utf8")
+
+  for (const [name, source] of [
+    ["components/web-mcp.tsx", component],
+    ["lib/web-mcp-tools.ts", clientModule],
+  ]) {
+    assert.doesNotMatch(
+      source,
+      /^import[^\n]*from "@\/lib\/(seo\/|markdown\/)/m,
+      `${name} runs in the browser and must not import a content registry`,
+    )
+  }
+
+  assert.match(
+    component,
+    /WebMcpTools\(\{ pages\b/,
+    "the client component has to take the catalogue as a prop",
+  )
+
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8")
+  assert.match(layout, /from "@\/lib\/web-mcp-pages"/)
+  assert.match(layout, /<WebMcpTools pages=\{webMcpPages\} \/>/)
 })
 
 const { withAgentAuthMetadata } = await import("../lib/agent-auth-metadata.ts")

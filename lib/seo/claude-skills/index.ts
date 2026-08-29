@@ -627,6 +627,12 @@ A Markdown section ready to paste into the release description.`,
         "Instructions the agent loads next to a protocol for reaching systems it does not own, and why teams end up with both.",
     },
     {
+      label: "Claude skills vs plugins: content and packaging",
+      href: comparePaths.skillsVsPlugins,
+      description:
+        "The skill is the SKILL.md file; the plugin is the directory that ships it alongside agents, hooks, and MCP servers.",
+    },
+    {
       label: "Codex skills: what they are and how to use them",
       href: codexSkillsPath,
       description:
