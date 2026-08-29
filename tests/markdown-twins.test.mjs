@@ -8,20 +8,25 @@ const { markdownTwinAlternates, markdownTwinPath, markdownTwinPaths, renderMarkd
 const { codexSkills } = await import("../lib/seo/codex-skills/index.ts")
 const { home } = await import("../lib/seo/home.ts")
 const { alternatives } = await import("../lib/seo/alternatives.ts")
+const { comparisons } = await import("../lib/seo/compare/index.ts")
 const { developers } = await import("../lib/seo/developers.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
 
-test("every registered resource and alternative has a Markdown twin", () => {
-  // The home page and the developer docs are in neither registry: the home
-  // page is built from section components, with `lib/seo/home` as the content
+test("every registered resource, alternative, and comparison has a Markdown twin", () => {
+  // The home page and the developer docs are in no registry: the home page is
+  // built from section components, with `lib/seo/home` as the content
   // definition written for it, and the developer docs describe an interface
   // rather than being a resource article, so they carry their own definition.
-  const registered = [home, ...resourceEntries, ...alternatives, developers].map(
-    (entry) => entry.path,
-  )
+  const registered = [
+    home,
+    ...resourceEntries,
+    ...alternatives,
+    ...comparisons,
+    developers,
+  ].map((entry) => entry.path)
 
   assert.deepEqual([...markdownTwinPaths], registered)
 

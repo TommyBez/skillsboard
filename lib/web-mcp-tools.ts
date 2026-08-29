@@ -1,5 +1,6 @@
 import { markdownTwinPath } from "@/lib/markdown/twins"
 import { alternatives } from "@/lib/seo/alternatives"
+import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { resourceEntries } from "@/lib/seo/resources"
@@ -15,13 +16,15 @@ export interface WebMcpPage {
  * The pages a WebMCP tool can read or navigate to: every page with a Markdown
  * twin, which is exactly the set that can be handed back as text.
  *
- * Built from the same registries the twins are built from, so a page added to
- * the resource registry becomes reachable from an agent with no change here.
+ * Built from the same registries the twins are built from, and in the same
+ * order, so a page added to the resource registry becomes reachable from an
+ * agent with no change here.
  */
 export const webMcpPages: readonly WebMcpPage[] = [
   home,
   ...resourceEntries,
   ...alternatives,
+  ...comparisons,
   developers,
 ].map(
   (entry) => ({
