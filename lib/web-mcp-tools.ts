@@ -1,39 +1,16 @@
-import { markdownTwinPath } from "@/lib/markdown/twins"
-import { alternatives } from "@/lib/seo/alternatives"
-import { comparisons } from "@/lib/seo/compare"
-import { developers } from "@/lib/seo/developers"
-import { home } from "@/lib/seo/home"
-import { resourceEntries } from "@/lib/seo/resources"
-
+/**
+ * One page in the WebMCP catalogue, as the in-page tools hand it to an agent.
+ *
+ * The catalogue itself is built in `lib/web-mcp-pages`, which reads the content
+ * registries and therefore stays on the server. Everything in this module is
+ * safe to pull into a client component: types and pure functions, no content.
+ */
 export interface WebMcpPage {
   path: string
   markdownPath: string
   title: string
   description: string
 }
-
-/**
- * The pages a WebMCP tool can read or navigate to: every page with a Markdown
- * twin, which is exactly the set that can be handed back as text.
- *
- * Built from the same registries the twins are built from, and in the same
- * order, so a page added to the resource registry becomes reachable from an
- * agent with no change here.
- */
-export const webMcpPages: readonly WebMcpPage[] = [
-  home,
-  ...resourceEntries,
-  ...alternatives,
-  ...comparisons,
-  developers,
-].map(
-  (entry) => ({
-    path: entry.path,
-    markdownPath: markdownTwinPath(entry.path),
-    title: entry.title,
-    description: entry.description,
-  }),
-)
 
 /**
  * The MCP endpoint of the deployment a page is being served from.
