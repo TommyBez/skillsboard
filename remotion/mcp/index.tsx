@@ -6,25 +6,24 @@ import { pushThrough } from "@/components/remocn/push-through";
 import { zoomBlur } from "@/components/remocn/zoom-blur";
 import "../product-demo/fonts";
 import { light } from "../product-demo/theme";
-import { ApplyScene } from "./scenes/apply";
-import { AskScene } from "./scenes/ask";
 import { ConfigScene } from "./scenes/config";
 import { ConsentScene } from "./scenes/consent";
 import { EndCardScene } from "./scenes/end-card";
 import { HookScene } from "./scenes/hook";
 import { ReachScene } from "./scenes/reach";
+import { SessionScene } from "./scenes/session";
 import { ToolsScene } from "./scenes/tools";
 
 export const MCP_FPS = 30;
 
 /** 1110 frames of scene, 88 of overlap. */
 export const MCP_SETUP_DURATION = 1022;
-/** 1130 frames of scene, 64 of overlap. */
-export const MCP_AGENT_DURATION = 1066;
+/** 1180 frames of scene, 44 of overlap. */
+export const MCP_AGENT_DURATION = 1136;
 
-/** Frames the two posters are cut from: the endpoint, and the skill it returns. */
+/** Frames the two posters are cut from: the endpoint, and the finished session. */
 export const MCP_SETUP_POSTER_FRAME = 306;
-export const MCP_AGENT_POSTER_FRAME = 250;
+export const MCP_AGENT_POSTER_FRAME = 700;
 
 function timing(durationInFrames: number) {
   return linearTiming({ durationInFrames });
@@ -69,20 +68,16 @@ export function SkillsboardMcpSetup() {
 
 /**
  * The connection at work: one task, one search against the team library, and
- * the teammate's own note carried into the answer. The dark scenes lift to the
- * page background on the last beat so the shared end card cuts in clean.
+ * the teammate's own note carried into the answer. It runs as a single session
+ * in a single window, on the same light stage as the setup video, so the search
+ * and the answer read as one job rather than as two examples.
  */
 export function SkillsboardMcpAgent() {
   return (
     <AbsoluteFill style={{ background: light.background }}>
       <TransitionSeries>
-        <TransitionSeries.Sequence durationInFrames={360}>
-          <AskScene durationInFrames={360} />
-        </TransitionSeries.Sequence>
-        <TransitionSeries.Transition presentation={fade()} timing={timing(20)} />
-
-        <TransitionSeries.Sequence durationInFrames={360}>
-          <ApplyScene durationInFrames={360} />
+        <TransitionSeries.Sequence durationInFrames={770}>
+          <SessionScene durationInFrames={770} />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition presentation={pushThrough()} timing={timing(22)} />
 

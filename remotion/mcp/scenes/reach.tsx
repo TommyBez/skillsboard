@@ -1,6 +1,6 @@
-import { interpolate, interpolateColors } from "remotion";
+import { interpolate } from "remotion";
 import { clamp, outEasing, Scene, useSceneFrame } from "../../product-demo/stage";
-import { displayTracking, ink, light, radius } from "../../product-demo/theme";
+import { displayTracking, light, radius } from "../../product-demo/theme";
 import { agentRun } from "../content";
 
 const REF = 250;
@@ -11,22 +11,16 @@ export function ReachScene({ durationInFrames }: { durationInFrames: number }) {
   const frame = useSceneFrame(REF, durationInFrames);
 
   return (
-    <Scene background={interpolateColors(frame, [214, 240], [ink.background, light.background])}>
+    <Scene>
       <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 52,
-          opacity: interpolate(frame, [218, 238], [1, 0], clamp),
-        }}
+        style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 52 }}
       >
         <div
           style={{
             fontSize: 64,
             fontWeight: 600,
             letterSpacing: displayTracking,
-            color: ink.foreground,
+            color: light.foreground,
             opacity: interpolate(frame, [0, 20], [0, 1], clamp),
             translate: `0 ${interpolate(frame, [0, 26], [18, 0], outEasing)}px`,
           }}
@@ -49,8 +43,9 @@ export function ReachScene({ durationInFrames }: { durationInFrames: number }) {
                 style={{
                   padding: "16px 32px",
                   borderRadius: radius["2xl"],
-                  border: `1px solid ${ink.border}`,
-                  color: ink.foreground,
+                  border: `1px solid ${light.border}`,
+                  background: light.card,
+                  color: light.foreground,
                   fontSize: 30,
                   opacity: reveal,
                   scale: String(0.94 + 0.06 * reveal),
