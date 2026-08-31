@@ -11,7 +11,6 @@ import {
   comparisons,
 } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
-import { guideEvidencePaths } from "@/lib/seo/guides/types"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
 import { skillCreator } from "@/lib/seo/skill-creator"
 import { siteConfig } from "@/lib/site"
@@ -97,12 +96,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date("2026-08-06"),
       changeFrequency: "monthly",
       priority: 0.6,
-    },
-    {
-      url: `${siteConfig.url}${guideEvidencePaths.crossAgentCompatibilityFixture}`,
-      lastModified: new Date("2026-08-06"),
-      changeFrequency: "yearly",
-      priority: 0.5,
     },
     {
       /**

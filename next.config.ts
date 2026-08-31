@@ -346,9 +346,9 @@ const nextConfig = {
           destination: "https://eu.i.posthog.com/:path*",
         },
         // The Markdown twin of every data driven content page. `afterFiles`
-        // leaves the hand written Markdown in `public` (`/pricing.md`, the
-        // compatibility fixture) serving itself as a static file. Paths with no
-        // twin fall through to a 404 from the route handler.
+        // leaves the hand written Markdown in `public` (`/pricing.md`,
+        // `/auth.md`) serving itself as a static file. Paths with no twin
+        // fall through to a 404 from the route handler.
         {
           source: "/:path(.*)\\.md",
           destination: "/api/markdown?path=/:path",

@@ -1,13 +1,8 @@
 import { claudeSkillsPath } from "@/lib/seo/claude-skills/types"
 import { codexSkillsPath } from "@/lib/seo/codex-skills/types"
 import { cursorSkillsPath } from "@/lib/seo/cursor-skills/types"
-import {
-  guideEvidencePaths,
-  guidePaths,
-  type GuideDefinition,
-} from "@/lib/seo/guides/types"
+import { guidePaths, type GuideDefinition } from "@/lib/seo/guides/types"
 import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
-import { absoluteUrl } from "@/lib/site"
 
 export const manageCrossAgentSkillsGuide: GuideDefinition = {
   path: guidePaths.manageCrossAgentSkills,
@@ -48,9 +43,6 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
       "cursor-agent-skills",
       "github-agent-skills",
     ],
-    steps: {
-      3: ["skills-board-compatibility-fixture"],
-    },
   },
   corePrinciple:
     "One canonical source. One visible team entry. Explicit setup for every agent path.",
@@ -150,55 +142,6 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
     { label: "Fixture result", value: "Pass, partial, or fail against the same expected output and checks." },
     { label: "Reviewed at", value: "Date, owner, and reason to retest after a source or agent change." },
   ],
-  evidenceAsset: {
-    eyebrow: "Skills Board field protocol",
-    title: "Cross-agent skill discovery and instruction-transport fixture",
-    summary:
-      "Use this public fixture to test whether one documented agent path can discover a named SKILL.md and transport a nonce-bearing instruction into a fresh session. The protocol publishes the method and blank record only; Skills Board is not claiming a result for Claude Code, Codex, Cursor, or any other agent.",
-    version: "1.0",
-    publishedAt: "2026-08-06",
-    status: "Protocol only — no results claimed",
-    scope: [
-      "Pins the product version, environment, setup documentation, fixture hash, and test date for one path.",
-      "Uses two fresh sessions and two private run nonces to check named-skill discovery and literal instruction transport.",
-      "Publishes fixed pass, partial, fail, and not-run criteria plus a blank evidence record.",
-    ],
-    methodology: [
-      {
-        title: "Pin the path",
-        body: "Record the exact product version, interface, operating system, workspace scope, vendor setup URL, and access date.",
-      },
-      {
-        title: "Prepare the fixture",
-        body: "Copy the published SKILL.md, replace its placeholder with a new 128-bit-or-longer nonce, and hash the installed file.",
-      },
-      {
-        title: "Keep the nonce out of context",
-        body: "Expose the fixture only through the documented setup path. Do not paste the receipt or nonce into the conversation.",
-      },
-      {
-        title: "Run a fresh session",
-        body: "Send the protocol's exact invocation prompt and retain the full response plus any observable discovery or invocation signal.",
-      },
-      {
-        title: "Repeat independently",
-        body: "Start another fresh session with a different nonce, the same setup path, and a new fixture hash.",
-      },
-      {
-        title: "Apply fixed criteria",
-        body: "Mark pass only when both runs return their exact one-line receipts. Preserve partial, fail, and not-run outcomes.",
-      },
-    ],
-    limitations: [
-      "It does not test automatic selection, scripts, tools, commands, file access, network access, or side effects.",
-      "It does not evaluate permissions, sandboxing, secret handling, open-ended output quality, or bundled resources.",
-      "If the product does not expose provenance, the nonce proves that the payload reached the session—not which internal discovery mechanism loaded it.",
-      "A result applies only to the recorded product version, environment, and setup path—not every client or future release.",
-      "A pass for this fixture cannot certify another skill as safe, correct, portable, or team-approved.",
-    ],
-    href: guideEvidencePaths.crossAgentCompatibilityFixture,
-    linkLabel: "Open the complete fixture",
-  },
   pitfallsTitle: "Cross-agent shortcuts to avoid",
   pitfalls: [
     {
@@ -251,12 +194,6 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
       href: "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
       note: "Confirms Agent Skills as an open standard used across multiple AI systems and documents shared repository locations.",
     },
-    {
-      id: "skills-board-compatibility-fixture",
-      label: "Skills Board: Cross-agent skill compatibility fixture",
-      href: absoluteUrl(guideEvidencePaths.crossAgentCompatibilityFixture),
-      note: "Version 1.0 of the dated, reproducible discovery and instruction-transport protocol. It publishes fixed criteria and a blank record, with no agent results claimed.",
-    },
   ],
   og: {
     variant: "ink",
@@ -273,5 +210,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-25",
+  modifiedAt: "2026-08-31",
 }

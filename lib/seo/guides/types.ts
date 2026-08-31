@@ -23,10 +23,6 @@ export const guidePaths = {
   aiCodingGuidelinesTemplate: "/guides/ai-coding-guidelines-template",
 } as const
 
-export const guideEvidencePaths = {
-  crossAgentCompatibilityFixture: "/cross-agent-skill-compatibility-fixture.md",
-} as const
-
 export type GuidePath = (typeof guidePaths)[keyof typeof guidePaths]
 
 export type GuideSlug = GuidePath extends `/guides/${infer S}` ? S : never
