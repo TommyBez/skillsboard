@@ -266,8 +266,9 @@ const nextConfig = {
       //
       // Scoped to the URL shapes that have a Markdown twin instead of the whole
       // site: `/<something>-skills`, a top-level article that does not end in
-      // `-skills`, a guide, an alternative, or a comparison. A request for a
-      // page outside those shapes keeps returning HTML rather than a 404.
+      // `-skills`, one of the three hubs, a guide, an alternative, or a
+      // comparison. A request for a page outside those shapes keeps returning
+      // HTML rather than a 404.
       beforeFiles: [
         // The home page. It is the URL an agent scanning the site reaches
         // first, so it is the one that most needs to answer in Markdown.
@@ -315,6 +316,23 @@ const nextConfig = {
           source: "/claude-code-for-teams",
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/claude-code-for-teams",
+        },
+        // The three hubs. Each one is a page in its own right, so the rules
+        // below it, which all carry a slug, never match it.
+        {
+          source: "/resources",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/resources",
+        },
+        {
+          source: "/alternatives",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/alternatives",
+        },
+        {
+          source: "/compare",
+          has: [MARKDOWN_ACCEPT],
+          destination: "/api/markdown?path=/compare",
         },
         {
           source: "/guides/:slug",

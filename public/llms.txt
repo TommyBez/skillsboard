@@ -14,7 +14,7 @@ Key facts:
 - MCP limits: cannot edit or delete saved team skills, install skills in an agent, or execute skills
 - Hosted product: free forever, no trial, credit card, or paid tier
 
-Markdown versions: the home page and every guide, skill format explainer, and alternatives page listed below is also served as Markdown at the same URL with a `.md` suffix (for example https://www.skillsboard.sh/codex-skills.md; the home page is https://www.skillsboard.sh/index.md), and the page URL returns the same Markdown when the request sends `Accept: text/markdown`. Those responses carry `Content-Type: text/markdown` and an `x-markdown-tokens` estimate.
+Markdown versions: the home page, the resources, comparisons, and alternatives hubs, and every guide, skill format explainer, comparison, and alternatives page listed below is also served as Markdown at the same URL with a `.md` suffix (for example https://www.skillsboard.sh/codex-skills.md; the home page is https://www.skillsboard.sh/index.md), and the page URL returns the same Markdown when the request sends `Accept: text/markdown`. Those responses carry `Content-Type: text/markdown` and an `x-markdown-tokens` estimate.
 
 ## Core pages
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
@@ -74,6 +74,7 @@ Markdown versions: the home page and every guide, skill format explainer, and al
 - [Claude skills vs MCP](https://www.skillsboard.sh/compare/claude-skills-vs-mcp): What a skill is for and what the Model Context Protocol is for, why they are not alternatives, and what a repository that commits both looks like
 - [Claude skills vs plugins](https://www.skillsboard.sh/compare/claude-skills-vs-plugins): A skill as content and a Claude Code plugin as packaging, what each can carry, how each is distributed and versioned, and how a plugin ships a skill
 - [Claude skills vs slash commands](https://www.skillsboard.sh/compare/claude-skills-vs-slash-commands): Why Claude Code documents custom commands as merged into skills, what still differs between a command file and a SKILL.md, and which file wins the same command name
+- [Alternatives](https://www.skillsboard.sh/alternatives): Skills Board next to a shared GitHub repository, skills.sh, Smithery, and Superpowers, with the case for each one
 - [Skills Board vs Superpowers](https://www.skillsboard.sh/alternatives/superpowers): What the MIT-licensed Superpowers plugin installs, the fourteen skill folders and per-harness install steps, and where a team registry sits next to it
 
 ## Team skill workflows

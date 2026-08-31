@@ -3,6 +3,7 @@ import { alternatives } from "@/lib/seo/alternatives"
 import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
+import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
 import { resourceEntries } from "@/lib/seo/resources"
 import type { WebMcpPage } from "@/lib/web-mcp-tools"
 
@@ -23,8 +24,11 @@ import type { WebMcpPage } from "@/lib/web-mcp-tools"
  */
 export const webMcpPages: readonly WebMcpPage[] = [
   home,
+  resourcesHub,
   ...resourceEntries,
+  alternativesHub,
   ...alternatives,
+  compareHub,
   ...comparisons,
   developers,
 ].map(

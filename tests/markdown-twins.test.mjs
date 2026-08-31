@@ -10,6 +10,7 @@ const { home } = await import("../lib/seo/home.ts")
 const { alternatives } = await import("../lib/seo/alternatives.ts")
 const { comparisons } = await import("../lib/seo/compare/index.ts")
 const { developers } = await import("../lib/seo/developers.ts")
+const { alternativesHub, compareHub, resourcesHub } = await import("../lib/seo/hubs.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 
@@ -20,10 +21,14 @@ test("every registered resource, alternative, and comparison has a Markdown twin
   // built from section components, with `lib/seo/home` as the content
   // definition written for it, and the developer docs describe an interface
   // rather than being a resource article, so they carry their own definition.
+  // Each hub sits immediately above the collection it lists.
   const registered = [
     home,
+    resourcesHub,
     ...resourceEntries,
+    alternativesHub,
     ...alternatives,
+    compareHub,
     ...comparisons,
     developers,
   ].map((entry) => entry.path)
