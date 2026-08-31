@@ -46,6 +46,20 @@ async function markdownResponse(url) {
   return { response, body: await response.text() }
 }
 
+test("every page a hub lists as a topic or collection entry carries a Markdown twin", () => {
+  // The resources hub intro promises a `.md` suffix for the pages under its
+  // topics. This test is that promise: a page added to a hub list without a
+  // twin breaks the build here, not in an agent's 404.
+  for (const { hub, children } of hubs) {
+    for (const child of children) {
+      assert.ok(
+        hasMarkdownTwin(child.path),
+        `${hub.path} lists ${child.path}, which has no Markdown twin`,
+      )
+    }
+  }
+})
+
 test("each hub publishes a twin at its own path plus .md", () => {
   for (const { hub } of hubs) {
     assert.ok(hasMarkdownTwin(hub.path), `${hub.path} has no Markdown twin`)

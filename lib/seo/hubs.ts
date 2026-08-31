@@ -98,7 +98,7 @@ export const resourcesHub = {
   modifiedAt: lastModified(resourceEntries),
   intro: [
     "This page is the index of the Skills Board resource pages: guides, skill format explainers, and reference pages for teams that share and operate AI skills. It answers nothing itself, and each entry below is the page that answers its own question.",
-    "Every page listed here names its publisher, its first-party sources, and the date its claims were last checked. Every one of them is also published as Markdown at the same URL with a `.md` suffix.",
+    "Every page in the topics below names its publisher, its first-party sources, and the date its claims were last checked. Every one of them is also published as Markdown at the same URL with a `.md` suffix.",
   ],
   clustersTitle: "Topics",
   clusters: resourceClusters.map((cluster) => ({
@@ -121,7 +121,7 @@ export const resourcesHub = {
     {
       label: "About Skills Board",
       href: resourcePaths.about,
-      note: "Why the shared team library exists",
+      note: "Why Skills Board exists",
     },
     machineReadableIndex,
   ],
