@@ -14,6 +14,13 @@ import { ReachScene } from "./scenes/reach";
 import { SessionScene } from "./scenes/session";
 import { ToolsScene } from "./scenes/tools";
 
+/** The thirty second cut of the agent video, built as a spot. */
+export {
+  MCP_AGENT_SPOT_DURATION,
+  MCP_AGENT_SPOT_POSTER_FRAME,
+  SkillsboardMcpAgentSpot,
+} from "./spot";
+
 export const MCP_FPS = 30;
 
 /** 1110 frames of scene, 88 of overlap. */
