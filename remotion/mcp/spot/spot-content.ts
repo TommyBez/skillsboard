@@ -89,10 +89,36 @@ export const toolArgs = agentRun.call.slice(callOpens + 1, -1).replace(/(\w+):/,
 /** The task, as the person at the keyboard types it, over two rows. */
 export const promptLines = splitLine(agentRun.prompt, 32);
 
-/** The teammate's note, one sentence per row. */
-export const noteLines = agentRun.note
+/** One instruction inside the skill file. `key` is one of the two the run used. */
+export interface NoteLine {
+  text: string;
+  key?: boolean;
+}
+
+/** The teammate's note, one sentence per row, as `../content` keeps it. */
+const savedNote = agentRun.note
   .split(". ")
   .map((part, index, all) => (index < all.length - 1 ? `${part}.` : part));
+
+/**
+ * The instructions inside the skill file.
+ *
+ * `../content` keeps the note at the two sentences the long videos print, and it
+ * stays that way: those two are the ones the run visibly obeys, so a longer
+ * string there would put words in the output the output never uses. A file with
+ * two lines in it is not a file anybody wrote, though, so the spot shows the
+ * rest of the page around them (maintainer feedback, 31/08). The two saved
+ * sentences come straight out of the note and keep their full size; the other
+ * three are set smaller and quieter, which is how a real page reads: you see the
+ * shape of a list and you read the lines that matter.
+ */
+export const noteLines: NoteLine[] = [
+  { text: "Start from the merged pull requests since the last tag." },
+  { key: true, text: savedNote[0] },
+  { key: true, text: savedNote[1] },
+  { text: "Keep every entry under twelve words." },
+  { text: "Skip internal refactors unless they change behavior." },
+];
 
 /**
  * The thesis beat. The film says what the product is with the canonical
@@ -105,8 +131,13 @@ export const applyLines = [
   "keeps and shares its AI skills.",
 ] as const;
 
-/** The skill file heading shown over the instruction lines. */
-export const skillFileName = `# ${agentRun.hit.title}`;
+/**
+ * The skill file heading, kept in two pieces. The name is the one object the
+ * fused beat moves: it starts as the title of the card and ends as the heading
+ * of the file, so it cannot be a single baked string with the hash already in
+ * it. The hash arrives on its own, while the name is still travelling.
+ */
+export const skillFileHeading = { hash: "# ", name: agentRun.hit.title } as const;
 
 /** `agentRun.reach.line`, broken after the comma. */
 export const reachLines = splitLine(agentRun.reach.line, 22);

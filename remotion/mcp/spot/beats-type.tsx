@@ -1,20 +1,18 @@
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { displayTracking, light, MONO, radius, SANS } from "../../product-demo/theme";
 import { BrandMark } from "../../product-demo/ui/atoms";
-import { Beat, display, Kicker, Land, RAIL, snap, SPOT } from "./kit";
+import { Beat, display, Land, RAIL, snap, SPOT } from "./kit";
 import {
   agentRun,
   applyLines,
   brand,
   endpointHeading,
   hookLines,
-  noteLines,
   reachLines,
-  skillFileName,
 } from "./spot-content";
 
 /**
- * The six beats that are pure type.
+ * The five beats that are pure type.
  *
  * These are the posters between the fragments: one sentence, set as large as
  * the frame allows, on the same paper and the same rail as everything else.
@@ -44,61 +42,6 @@ export function HookBeat() {
           </div>
         </Land>
       ))}
-    </Beat>
-  );
-}
-
-/** The instructions inside the skill file, at the size of what they decide. */
-export function NoteBeat() {
-  const frame = useCurrentFrame();
-  const rule = interpolate(frame, [0, 9], [0, 1], snap);
-
-  return (
-    <Beat gap={34}>
-      <Kicker at={0}>SKILL.md</Kicker>
-      <div style={{ display: "flex", gap: 40 }}>
-        <div
-          style={{
-            width: 10,
-            borderRadius: 5,
-            background: light.primary,
-            transformOrigin: "top center",
-            scale: `1 ${rule}`,
-          }}
-        />
-        <div>
-          <Land at={3} over={9}>
-            <div
-              style={{
-                fontFamily: MONO,
-                fontSize: 44,
-                fontWeight: 700,
-                color: light.primary,
-                marginBottom: 22,
-              }}
-            >
-              {skillFileName}
-            </div>
-          </Land>
-          {noteLines.map((line, index) => (
-            <Land at={5 + index * 6} key={line} over={11}>
-              <div style={{ ...display, fontSize: 80, fontWeight: 500 }}>{line}</div>
-            </Land>
-          ))}
-          <Land at={26} from={12} over={9}>
-            <div
-              style={{
-                marginTop: 26,
-                fontFamily: MONO,
-                fontSize: 30,
-                color: light.mutedForeground,
-              }}
-            >
-              written by {agentRun.hit.savedBy}
-            </div>
-          </Land>
-        </div>
-      </div>
     </Beat>
   );
 }
