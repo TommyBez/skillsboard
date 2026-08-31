@@ -1,5 +1,12 @@
 import { Composition } from "remotion";
 import {
+  MCP_AGENT_DURATION,
+  MCP_FPS,
+  MCP_SETUP_DURATION,
+  SkillsboardMcpAgent,
+  SkillsboardMcpSetup,
+} from "./mcp";
+import {
   FPS,
   PRODUCT_HUNT_DURATION,
   SOCIAL_DURATION,
@@ -44,6 +51,22 @@ export function RemotionRoot() {
         height={900}
         id="skillsboard-launch-social"
         width={1440}
+      />
+      <Composition
+        component={SkillsboardMcpSetup}
+        durationInFrames={MCP_SETUP_DURATION}
+        fps={MCP_FPS}
+        height={1080}
+        id="skillsboard-mcp-setup"
+        width={1920}
+      />
+      <Composition
+        component={SkillsboardMcpAgent}
+        durationInFrames={MCP_AGENT_DURATION}
+        fps={MCP_FPS}
+        height={1080}
+        id="skillsboard-mcp-agent"
+        width={1920}
       />
     </>
   );
