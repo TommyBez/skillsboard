@@ -65,7 +65,6 @@ export const setup = {
   tools: {
     step: "Done",
     heading: "13 tools in your client",
-    caption: "Nine read. Four write, once skills:write is granted.",
     writeBadge: "write",
   },
 } as const;
