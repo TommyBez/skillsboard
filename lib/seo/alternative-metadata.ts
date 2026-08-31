@@ -71,7 +71,7 @@ export function buildAlternativesIndexMetadata(): Metadata {
         "Skills Board Alternatives: Honest Comparisons for Team AI Skills",
     },
     description: alternativesIndexDescription,
-    alternates: { canonical: alternativesIndexPath },
+    alternates: markdownTwinAlternates(alternativesIndexPath),
     openGraph: {
       type: "website",
       url: alternativesIndexPath,

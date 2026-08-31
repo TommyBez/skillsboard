@@ -69,7 +69,7 @@ export function buildCompareIndexMetadata(): Metadata {
   return {
     title: { absolute: compareIndexSeoTitle },
     description: compareIndexDescription,
-    alternates: { canonical: compareIndexPath },
+    alternates: markdownTwinAlternates(compareIndexPath),
     openGraph: {
       type: "website",
       url: compareIndexPath,

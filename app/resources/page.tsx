@@ -4,6 +4,8 @@ import { ArrowUpRightIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
 import { ResourceCta } from "@/components/resources/resource-chrome"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
+import { resourcesIndexDescription } from "@/lib/seo/hubs"
 import { manageAiSkillsPath } from "@/lib/seo/manage-ai-skills/types"
 import { buildResourceIndexSchema } from "@/lib/seo/resource-schema"
 import {
@@ -13,20 +15,16 @@ import {
 import { siteConfig } from "@/lib/site"
 
 /**
- * The hub describes itself as an index, not as an answer.
- *
- * The previous description repeated the head phrase of the pages it lists,
- * which is one reason Google was routing their queries here instead of to
- * them. What this page is for is browsing: say that, and let each page below
- * own its own question.
+ * The hub describes itself as an index, not as an answer, and says so in one
+ * place: `lib/seo/hubs` holds the sentence, because the Markdown twin of this
+ * URL opens with it too.
  */
-const description =
-  "Browse the full index of Skills Board guides, comparisons, and reference pages, then open the one that answers your question."
+const description = resourcesIndexDescription
 
 export const metadata: Metadata = {
   title: { absolute: "AI Skill Resources: Guides and Comparisons | Skills Board" },
   description,
-  alternates: { canonical: resourcePaths.index },
+  alternates: markdownTwinAlternates(resourcePaths.index),
   openGraph: {
     type: "website",
     url: resourcePaths.index,

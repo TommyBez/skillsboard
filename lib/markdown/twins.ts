@@ -9,6 +9,7 @@ import { alternatives } from "@/lib/seo/alternatives"
 import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
+import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
 import { resourceEntries } from "@/lib/seo/resources"
 
 /**
@@ -16,6 +17,11 @@ import { resourceEntries } from "@/lib/seo/resources"
  * than a list of its own. A page added to the resource registry, a new
  * alternative, or a new comparison gets a twin at `<path>.md` with no change
  * here.
+ *
+ * Each hub sits immediately above the collection it lists, which is the order
+ * an agent reads them in: the hub twin names the pages below it, and each of
+ * those names the hub above it. `lib/seo/hubs` holds the three definitions,
+ * built from the same registries the HTML hubs render.
  *
  * The home page and the developer docs are listed on their own because
  * neither is in any collection: the home page is built from section
@@ -25,8 +31,11 @@ import { resourceEntries } from "@/lib/seo/resources"
  */
 const twinEntries: readonly MarkdownContentEntry[] = [
   home,
+  resourcesHub,
   ...resourceEntries,
+  alternativesHub,
   ...alternatives,
+  compareHub,
   ...comparisons,
   developers,
 ]
