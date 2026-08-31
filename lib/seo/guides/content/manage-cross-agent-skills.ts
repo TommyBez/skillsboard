@@ -210,5 +210,5 @@ export const manageCrossAgentSkillsGuide: GuideDefinition = {
   },
   ogAlt: "Skills Board guide: manage skills across Claude Code, Codex, and Cursor.",
   publishedAt: "2026-07-22",
-  modifiedAt: "2026-08-25",
+  modifiedAt: "2026-08-31",
 }
