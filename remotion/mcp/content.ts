@@ -37,10 +37,10 @@ export const CONFIG_URL_LINE = 5;
 export const setup = {
   hook: {
     lines: [
-      ["Your", "team's", "AI", "skills"],
-      ["are", "not", "in", "your", "agent."],
+      ["Give", "your", "agent"],
+      ["your", "team's", "AI", "skills."],
     ],
-    accentWord: "not",
+    accentWord: "teams",
     sub: "Paste the config. Approve access.",
   },
   config: {
