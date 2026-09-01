@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/collection-release-retention",
       "schedule": "17 3 * * *"
+    },
+    {
+      "path": "/api/cron/activation-emails",
+      "schedule": "0 13 * * *"
     }
   ]
 }

@@ -259,6 +259,36 @@ export const invitation = pgTable("invitation", {
   }).onDelete("cascade"),
 ])
 
+/**
+ * One row per proactive automation email, written in the same operation as the
+ * send. The composite primary key is what makes a second send impossible when
+ * the cron overlaps itself or a deployment reruns it, and the row carries a
+ * hashed address rather than the address itself, like every other email table.
+ * Defined here rather than beside the other email tables because it references
+ * `organization`.
+ */
+export const emailAutomationSend = pgTable("emailAutomationSend", {
+  userId: text("userId").notNull(),
+  automationKey: text("automationKey").notNull(),
+  organizationId: text("organizationId").notNull(),
+  emailHash: text("emailHash").notNull(),
+  providerEmailId: text("providerEmailId"),
+  sentAt: timestamp("sentAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({ name: "emailAutomationSend_pkey", columns: [table.userId, table.automationKey] }),
+  index("emailAutomationSend_org_sent_idx").on(table.organizationId, table.sentAt),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "emailAutomationSend_userId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.organizationId],
+    foreignColumns: [organization.id],
+    name: "emailAutomationSend_organizationId_fkey",
+  }).onDelete("cascade"),
+])
+
 export const jwks = pgTable("jwks", {
   id: text("id").primaryKey(),
   publicKey: text("publicKey").notNull(),

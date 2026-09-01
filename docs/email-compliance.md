@@ -33,7 +33,7 @@ Activation service email is a third category, separate from `product_communicati
 - Suppression wins. An `emailSuppression` row of either scope blocks an activation send before it reaches Resend, exactly as it blocks a marketing send, and no activation rule may relax it.
 - Unsubscribe: the sequence reuses the existing public, encrypted, idempotent one-click unsubscribe and its RFC 8058 headers. It adds no second mechanism and no separate token.
 - The `emailSubscriber` list is out of scope. Those rows are visitor captures with no account and no team, so they never receive an activation email.
-- No retroactive send. Users and teams created before the sequence ships are not backfilled into it, and doing so would need its own recorded decision.
+- One time backfill, decided on 2026-09-01. This is the recorded decision the rule above asked for: teams created before the sequence was switched on enter it once, with their 14 day window anchored to the enabling date held in `ACTIVATION_BACKFILL_STARTED_AT` rather than to team creation. Everything else in this section applies unchanged, including the caps, the skip conditions evaluated at send time, and the precedence of suppression. The welcome carries its backfill wording, because a first day tone would be false for a team created weeks earlier. When that anchored window closes the pass is over and only newly created teams qualify.
 
 Two preconditions gate the first send of the sequence. The footer must carry a real public postal identity: the value in `lib/site.ts`, quoted above, is a placeholder and has to be replaced with the operator's real address before any activation email leaves. And the founder has to authorize that first send explicitly, as with every other proactive category.
 
