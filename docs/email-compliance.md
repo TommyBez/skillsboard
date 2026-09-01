@@ -21,6 +21,22 @@ Proactive sender identity:
 
 `Tommaso from Skills Board <tommaso@skillsboard.sh>`
 
+## Activation service email
+
+Activation service email is a third category, separate from `product_communications` marketing and from sign-in codes and team invitations. It covers exactly two messages, `activation_welcome` and `activation_first_skill`, sent only to the person who created a team. Nothing else ever enters the category.
+
+- Perimeter: those two message types and no others. Inviting a teammate and connecting an agent are later activation messages that stay under the `product_communications` opt-in topic, without exception.
+- Window: a person is eligible only within 14 days of team creation. On day 14 the sequence ends for that person, whatever has been sent.
+- Legal basis: in the EU the basis is legitimate interest toward a registered user, limited to completing the setup of the account that user just created, and it is never marketing consent. In the United States the messages carry the CAN SPAM footer with a working opt out. Both bases are limited to the perimeter above.
+- Frequency: at most one activation email per user per day, at least 24 hours between two emails of the sequence, and no more than 3 activation emails to any person, ever. The count is per person and never resets. The sequence defines two messages; 3 is the ceiling that no later change may exceed without its own review.
+- Permanent exit: withdrawn consent, a suppression of any kind, the completed action the message asks for, the end of the 14-day window, or 3 activation emails already sent. Any one of these ends the sequence for that person for good.
+- Suppression wins. An `emailSuppression` row of either scope blocks an activation send before it reaches Resend, exactly as it blocks a marketing send, and no activation rule may relax it.
+- Unsubscribe: the sequence reuses the existing public, encrypted, idempotent one-click unsubscribe and its RFC 8058 headers. It adds no second mechanism and no separate token.
+- The `emailSubscriber` list is out of scope. Those rows are visitor captures with no account and no team, so they never receive an activation email.
+- No retroactive send. Users and teams created before the sequence ships are not backfilled into it, and doing so would need its own recorded decision.
+
+Two preconditions gate the first send of the sequence. The footer must carry a real public postal identity: the value in `lib/site.ts`, quoted above, is a placeholder and has to be replaced with the operator's real address before any activation email leaves. And the founder has to authorize that first send explicitly, as with every other proactive category.
+
 ## Data model
 
 - `emailPreference` holds the current topic choice, notice version and text, email hash, stable encrypted unsubscribe token, and timestamps.
