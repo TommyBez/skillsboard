@@ -218,10 +218,10 @@ test("the developer docs schema describes the page as technical documentation", 
   assert.equal(article.encoding.contentUrl, `${siteConfig.url}${developersPath}.md`)
 
   const organization = graph.find((node) => node["@type"] === "Organization")
-  assert.equal(organization.address["@type"], "PostalAddress")
+  assert.ok(organization, "no Organization node")
 })
 
-test("the organization node states both a contact point and an address", async () => {
+test("the organization node states a contact point, and an address only when there is one", async () => {
   const { buildLandingSchema } = await import("../lib/seo/landing-schema.ts")
   const { organizationNode } = await import("../lib/seo/organization.ts")
 
@@ -232,6 +232,18 @@ test("the organization node states both a contact point and an address", async (
     const organization = graph.find((node) => node["@type"] === "Organization")
 
     assert.ok(organization.contactPoint?.email, "the organization has no contact point")
+
+    // The postal identity is optional and is null today: CAN SPAM asks for a
+    // postal address on commercial messages, and there is no real one to
+    // publish yet. A placeholder would answer "where is this company" with a
+    // lie, so the node carries no address until both spellings are set.
+    if (!siteConfig.address || !siteConfig.postalAddress) {
+      assert.equal(siteConfig.address, null, "one spelling of the mailing address is set without the other")
+      assert.equal(siteConfig.postalAddress, null, "one spelling of the mailing address is set without the other")
+      assert.equal(organization.address, undefined, "the organization publishes an address it does not have")
+      continue
+    }
+
     assert.equal(organization.address["@type"], "PostalAddress")
     assert.equal(organization.address.addressCountry, siteConfig.address.addressCountry)
     // The one-line spelling used in the footer and in email has to be the same

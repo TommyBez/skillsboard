@@ -72,9 +72,11 @@ export function LegalPageShell({
                 {siteConfig.contactEmail}
               </a>
             </p>
-            <address className="max-w-2xl text-sm not-italic text-muted-foreground">
-              {siteConfig.postalAddress}
-            </address>
+            {siteConfig.postalAddress ? (
+              <address className="max-w-2xl text-sm not-italic text-muted-foreground">
+                {siteConfig.postalAddress}
+              </address>
+            ) : null}
           </div>
         </div>
       </footer>
