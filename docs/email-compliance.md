@@ -9,13 +9,13 @@ Skills Board keeps product communications separate from sign-in codes and team i
 - For a newly created account, leaving the signup choice unchecked records a non-consent default after verification. It never grants consent or changes an existing account's preference.
 - Existing accounts with no recorded choice see one inline, non-blocking choice in the authenticated product until they answer.
 - Authenticated users can grant or withdraw consent at `/settings/email`.
-- Every product email includes a visible unsubscribe link, a preferences link, the sender identity, and the exact postal address below.
+- Every product email includes a visible unsubscribe link, a preferences link, and the sender identity. A marketing broadcast also carries the public postal address, because the CAN SPAM postal requirement applies to commercial messages. Account setup service email and transactional email are relationship messages and carry no address.
 - One-click unsubscribe is public, encrypted, idempotent, and does not expose the raw email address or a stable user identifier.
 - Product campaigns use the verified consent and suppression contract without adding an account-age, weekly, or other arbitrary attention gate.
 
 Public postal identity:
 
-`15 Giuseppe Verdi Avenue, Suite 150, Capraia Innovation Park, CA 50050`
+There is none yet. `postalAddress` and `address` in `lib/site.ts` are `null`, and every surface that would print an address omits it while they are. Set both, with the operator's real address, before the first marketing broadcast. Never fill them with a placeholder: a made up address is worse than no address, in an email and on a legal page alike.
 
 Proactive sender identity:
 
@@ -35,7 +35,9 @@ Activation service email is a third category, separate from `product_communicati
 - The `emailSubscriber` list is out of scope. Those rows are visitor captures with no account and no team, so they never receive an activation email.
 - One time backfill, decided on 2026-09-01. This is the recorded decision the rule above asked for: teams created before the sequence was switched on enter it once, with their 14 day window anchored to the enabling date held in `ACTIVATION_BACKFILL_STARTED_AT` rather than to team creation. Everything else in this section applies unchanged, including the caps, the skip conditions evaluated at send time, and the precedence of suppression. The welcome carries its backfill wording, because a first day tone would be false for a team created weeks earlier. When that anchored window closes the pass is over and only newly created teams qualify.
 
-Two preconditions gate the first send of the sequence. The footer must carry a real public postal identity: the value in `lib/site.ts`, quoted above, is a placeholder and has to be replaced with the operator's real address before any activation email leaves. And the founder has to authorize that first send explicitly, as with every other proactive category.
+A public postal address is not a precondition for this category. The CAN SPAM postal requirement covers commercial messages, and account setup service email is relationship email, so its footer carries the sender identity and a working unsubscribe and no address. A real postal address stays required before any future marketing broadcast to the opt-in list, such as a newsletter or a product update. Approved by the maintainer on 2026-09-01.
+
+Two preconditions gate the first send of the sequence. The public privacy notice has to describe this category and the basis it relies on before the category is switched on: the notice published today says product communications go out only after opt-in, so enabling the sequence without that update would use the provider for a purpose users have not been told about. And the founder has to authorize that first send explicitly, as with every other proactive category.
 
 ## Data model
 
@@ -69,7 +71,7 @@ Provider resources must be created and read back through the official authentica
 5. Render the local Skills Board unsubscribe link from that contact property and retain Resend's native `{{{RESEND_UNSUBSCRIBE_URL}}}`. The local link updates the canonical database; the native link keeps Resend more restrictive even if topic-level state is not present in `contact.updated` webhooks.
 6. Keep the draft unsent until sender, segment, topic, suppression, unsubscribe, postal identity, quota, duplicate effect, and audience readbacks all match.
 
-The React Email source for the approved launch body is `emails/product-launch.tsx`. Its footer uses the exact public postal identity from `lib/site.ts`.
+The React Email source for the approved launch body is `emails/product-launch.tsx`. Its footer prints the public postal identity from `lib/site.ts` when one is set, so that address has to exist before the broadcast goes out.
 
 ## Transactional delivery
 

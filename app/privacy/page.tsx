@@ -44,8 +44,8 @@ export default function PrivacyPage() {
         <h2>Controller and contact</h2>
         <p>
           The hosted service is operated under the Skills Board name. Skills Board is the controller for the personal
-          data described in this policy. Contact {siteConfig.contactEmail} or write to {siteConfig.name},{" "}
-          {siteConfig.postalAddress}.
+          data described in this policy. Contact {siteConfig.contactEmail}
+          {siteConfig.postalAddress ? ` or write to ${siteConfig.name}, ${siteConfig.postalAddress}` : ""}.
         </p>
       </section>
 
@@ -172,7 +172,7 @@ export default function PrivacyPage() {
         <h2>Contact</h2>
         <p>
           For privacy questions or requests, email <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
-          {" "}or write to {siteConfig.name}, {siteConfig.postalAddress}.
+          {siteConfig.postalAddress ? ` or write to ${siteConfig.name}, ${siteConfig.postalAddress}` : ""}.
         </p>
       </section>
     </LegalPageShell>

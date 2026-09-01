@@ -14,12 +14,13 @@ const organizationLogoUrl = absoluteUrl("/apple-icon.png")
  * assistant answering "who runs Skills Board, and how do I reach them" reads
  * whichever page it happened to fetch, so the answer depended on the page.
  *
- * `contactPoint` and `address` are both here because schema.org treats them as
- * the two halves of a reachable organization, and a consumer checking whether a
- * business is real looks for both.
+ * `contactPoint` and `address` are the two halves schema.org uses for a
+ * reachable organization, and a consumer checking whether a business is real
+ * looks for both. The address is emitted only when `lib/site.ts` holds a real
+ * one: a fabricated address would answer the same question with a lie.
  */
 export function organizationNode() {
-  return {
+  const node = {
     "@type": "Organization",
     "@id": organizationId,
     name: siteConfig.name,
@@ -34,11 +35,11 @@ export function organizationNode() {
       url: absoluteUrl("/contact"),
       availableLanguage: "English",
     },
-    address: {
-      "@type": "PostalAddress",
-      ...siteConfig.address,
-    },
   }
+
+  if (!siteConfig.address) return node
+
+  return { ...node, address: { "@type": "PostalAddress", ...siteConfig.address } }
 }
 
 /** The logo the organization node references, as its own addressable node. */
