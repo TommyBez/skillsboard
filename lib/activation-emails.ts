@@ -19,8 +19,15 @@ export const ACTIVATION_AUTOMATION_KEYS = [
 
 export type ActivationAutomationKey = (typeof ACTIVATION_AUTOMATION_KEYS)[number]
 
-/** The welcome speaks of a library that was just created. Past this age that would not be true. */
-export type ActivationWelcomeVariant = "backfill" | "new"
+/**
+ * Which welcome is true for this team right now.
+ *
+ * `new` is the first days of an empty library, `backfill` is an older team
+ * whose library is still empty, and `saved` is a team that already has skills
+ * in it: the empty library wording would be a demonstrably false claim there,
+ * so that team gets copy about what is left to do instead.
+ */
+export type ActivationWelcomeVariant = "backfill" | "new" | "saved"
 
 export const ACTIVATION_WINDOW_DAYS = 14
 export const ACTIVATION_MAX_PROACTIVE_EMAILS_PER_PERSON = 3
@@ -100,9 +107,16 @@ export function resolveActivationAnchor(input: {
   return organizationCreatedAt
 }
 
+/**
+ * The library state decides the wording before the team age does. Both empty
+ * library variants would be false for a team that already saved a skill, which
+ * a backfilled team very well may have done before the sequence was enabled.
+ */
 export function resolveActivationWelcomeVariant(input: {
   daysSinceTeamCreated: number
+  skillCount: number
 }): ActivationWelcomeVariant {
+  if (input.skillCount > 0) return "saved"
   return input.daysSinceTeamCreated > ACTIVATION_DAY_ONE_MAXIMUM_DAYS ? "backfill" : "new"
 }
 
@@ -159,7 +173,10 @@ export function decideActivationEmail(input: {
   }
 
   const daysSinceTeamCreated = Math.max(0, differenceInDays(now, candidate.organizationCreatedAt))
-  const variant = resolveActivationWelcomeVariant({ daysSinceTeamCreated })
+  const variant = resolveActivationWelcomeVariant({
+    daysSinceTeamCreated,
+    skillCount: candidate.skillCount,
+  })
 
   if (!hasSent(candidate.sends, ACTIVATION_WELCOME)) {
     return {
@@ -216,6 +233,11 @@ export function parseActivationBackfillStartedAt(value: string | undefined): Dat
   return Number.isNaN(parsed.getTime()) ? null : parsed
 }
 
+/**
+ * The kill switch fails closed: only the exact string `true` enables delivery.
+ * A padded or differently cased value is a mistake in the environment, and a
+ * mistake there must not be the thing that starts sending email.
+ */
 export function isActivationEmailsEnabled(value: string | undefined): boolean {
-  return value?.trim() === "true"
+  return value === "true"
 }

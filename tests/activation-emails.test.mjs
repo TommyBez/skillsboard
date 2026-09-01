@@ -12,6 +12,7 @@ const {
   isActivationEmailsEnabled,
   parseActivationBackfillStartedAt,
   resolveActivationAnchor,
+  resolveActivationWelcomeVariant,
 } = await loadTsModule(new URL("../lib/activation-emails.ts", import.meta.url))
 
 const DAY = 24 * 60 * 60 * 1000
@@ -82,6 +83,26 @@ test("does not remind a team that already saved a skill", () => {
     skillCount: 1,
   })
   assert.deepEqual(decision, { reason: "skill_already_saved", send: false })
+})
+
+test("never tells a team with skills in it that its library is empty", () => {
+  // Selection time and send time are different moments, and the library can
+  // fill in between, so the wording follows the count rather than the age.
+  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 0 }), "new")
+  assert.equal(
+    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 9, skillCount: 0 }),
+    "backfill",
+  )
+  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 1 }), "saved")
+  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 9, skillCount: 4 }), "saved")
+
+  const decision = decide({ now: at(4 * HOUR), skillCount: 2 })
+  assert.deepEqual(decision, {
+    automationKey: ACTIVATION_WELCOME,
+    daysSinceTeamCreated: 0,
+    send: true,
+    variant: "saved",
+  })
 })
 
 test("ends the sequence once both messages have been sent", () => {
@@ -206,7 +227,7 @@ test("the selection reads every team while the backfill window is open", () => {
 
 test("reads the enabling flag and the backfill date strictly", () => {
   assert.equal(isActivationEmailsEnabled("true"), true)
-  assert.equal(isActivationEmailsEnabled(" true "), true)
+  assert.equal(isActivationEmailsEnabled(" true "), false)
   assert.equal(isActivationEmailsEnabled("TRUE"), false)
   assert.equal(isActivationEmailsEnabled("1"), false)
   assert.equal(isActivationEmailsEnabled(undefined), false)
@@ -259,4 +280,67 @@ test("the activation copy keeps the rules the templates are written under", asyn
     assert.ok(!/recommend/i.test(source), `${file} must not recommend skills`)
     assert.ok(!/opted in/i.test(source), `${file} must not claim an opt-in that is not there`)
   }
+})
+
+test("the candidate selection walks every page instead of a fixed first page", async () => {
+  const source = await readFile(
+    new URL("../lib/db/activation-candidates.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(
+    source.includes("asc(organization.createdAt), asc(organization.id)"),
+    "the walk is ordered oldest team first, with the id as a tiebreak",
+  )
+  assert.ok(!source.includes("desc(organization.createdAt)"), "no newest-first fixed page")
+  assert.ok(source.includes("cursor"), "pages advance through a keyset cursor")
+  assert.ok(
+    source.includes("ACTIVATION_CANDIDATE_PAGE_SIZE"),
+    "the page size is a batch size, not the horizon of the selection",
+  )
+})
+
+test("the welcome wording is resolved from the library at send time", async () => {
+  const source = await readFile(
+    new URL("../lib/email/send-activation-email.tsx", import.meta.url),
+    "utf8",
+  )
+  const countIndex = source.indexOf("countOrganizationSkills(input.organizationId)")
+  const claimIndex = source.indexOf(".insert(emailAutomationSend)")
+  assert.ok(countIndex > 0, "the send reads the current library size")
+  assert.ok(claimIndex > countIndex, "and reads it before the row is claimed")
+})
+
+test("the claimed send register row is released only on an answered refusal", async () => {
+  const source = await readFile(
+    new URL("../lib/email/send-activation-email.tsx", import.meta.url),
+    "utf8",
+  )
+  const clientIndex = source.indexOf("const client = getResendClient()")
+  const claimIndex = source.indexOf(".insert(emailAutomationSend)")
+  assert.ok(clientIndex > 0 && clientIndex < claimIndex, "a missing key consumes no claim")
+
+  const catchIndex = source.indexOf("} catch (thrown) {")
+  const answeredIndex = source.indexOf("const { data, error } = sent")
+  assert.ok(catchIndex > 0 && answeredIndex > catchIndex)
+  const ambiguousBranch = source.slice(catchIndex, answeredIndex)
+  assert.ok(
+    !ambiguousBranch.includes("delete("),
+    "a request that throws is ambiguous, so at most once wins and the claim stays",
+  )
+  assert.ok(
+    source.slice(answeredIndex).includes(".delete(emailAutomationSend)"),
+    "an answered refusal releases the claim for a later run",
+  )
+})
+
+test("the send register outlives the team it was sent about", async () => {
+  const schema = await readFile(new URL("../lib/db/schema.ts", import.meta.url), "utf8")
+  const table = schema.slice(
+    schema.indexOf('export const emailAutomationSend = pgTable'),
+    schema.indexOf("export const jwks"),
+  )
+  assert.ok(
+    table.includes('name: "emailAutomationSend_organizationId_fkey",\n  }).onDelete("set null")'),
+    "deleting a team must not erase the lifetime cap of the person who created it",
+  )
 })

@@ -1,6 +1,6 @@
 import "server-only"
 
-import { and, asc, count, desc, eq, gte, inArray } from "drizzle-orm"
+import { and, asc, count, eq, gt, gte, inArray, or } from "drizzle-orm"
 
 import type { ActivationCandidate } from "@/lib/activation-emails"
 import { db } from "@/lib/db"
@@ -15,16 +15,34 @@ import {
 import { hashEmailAddressCandidates } from "@/lib/email/email-privacy"
 
 /**
+ * How many organizations one database round trip reads. The selection walks
+ * every page, so this is a batch size and not a horizon: it never decides which
+ * teams are considered, only how many are read at a time.
+ */
+export const ACTIVATION_CANDIDATE_PAGE_SIZE = 200
+
+/**
  * A bound on one cron run. At the current rate of team creation this is orders
  * of magnitude above the real number, and it keeps a single invocation finite
  * if the backfill anchor is ever set to a date that opens the whole table.
+ *
+ * Pages are walked oldest team first, so if this ceiling were ever reached the
+ * teams left out would be the newest ones, whose window has just opened and
+ * which the rolling 14 day cutoff keeps selecting on later runs. No team is
+ * ever excluded by its position in a fixed first page.
  */
-export const ACTIVATION_CANDIDATE_LIMIT = 200
+export const ACTIVATION_CANDIDATE_LIMIT = 5000
 
 export interface ActivationCandidateRow extends ActivationCandidate {
   email: string
   firstName: string | null
   teamName: string
+}
+
+interface OrganizationRow {
+  createdAt: Date
+  id: string
+  name: string
 }
 
 function firstName(name: string): string | null {
@@ -33,26 +51,40 @@ function firstName(name: string): string | null {
 }
 
 /**
- * The teams whose activation window may still be open, each paired with the
- * person who created it: the earliest owner of the team. Every value the
- * decision needs is read here, and the decision itself stays in
- * `lib/activation-emails.ts` so it can be tested without a database.
+ * One page of organizations, ordered oldest first and read through a keyset
+ * cursor on `(createdAt, id)`. A cursor rather than an offset because rows are
+ * inserted while the walk runs, and because it lets every page after the first
+ * start exactly where the previous one ended.
  */
-export async function selectActivationCandidates(input: {
+function selectOrganizationPage(input: {
+  cursor: { createdAt: Date; id: string } | null
   cutoff: Date | null
-}): Promise<ActivationCandidateRow[]> {
-  const organizations = await db
+}): Promise<OrganizationRow[]> {
+  const { cursor, cutoff } = input
+  return db
     .select({
       createdAt: organization.createdAt,
       id: organization.id,
       name: organization.name,
     })
     .from(organization)
-    .where(input.cutoff ? gte(organization.createdAt, input.cutoff) : undefined)
-    .orderBy(desc(organization.createdAt))
-    .limit(ACTIVATION_CANDIDATE_LIMIT)
-  if (organizations.length === 0) return []
+    .where(and(
+      cutoff ? gte(organization.createdAt, cutoff) : undefined,
+      cursor
+        ? or(
+          gt(organization.createdAt, cursor.createdAt),
+          and(eq(organization.createdAt, cursor.createdAt), gt(organization.id, cursor.id)),
+        )
+        : undefined,
+    ))
+    .orderBy(asc(organization.createdAt), asc(organization.id))
+    .limit(ACTIVATION_CANDIDATE_PAGE_SIZE)
+}
 
+/** Everything the decision needs about one page of teams, read in one pass. */
+async function hydrateOrganizations(
+  organizations: OrganizationRow[],
+): Promise<ActivationCandidateRow[]> {
   const organizationIds = organizations.map((row) => row.id)
   const owners = await db
     .select({
@@ -155,4 +187,53 @@ export async function selectActivationCandidates(input: {
   }
 
   return candidates
+}
+
+/**
+ * The teams whose activation window may still be open, each paired with the
+ * person who created it: the earliest owner of the team. Every value the
+ * decision needs is read here, and the decision itself stays in
+ * `lib/activation-emails.ts` so it can be tested without a database.
+ *
+ * The walk covers the whole eligible set rather than one page of it. A single
+ * page would be filled by the same teams on every run, because a team that was
+ * already emailed or skipped keeps matching the query, and during the backfill
+ * every older team behind that page would never be reached before its window
+ * closed.
+ */
+export async function selectActivationCandidates(input: {
+  cutoff: Date | null
+}): Promise<ActivationCandidateRow[]> {
+  const candidates: ActivationCandidateRow[] = []
+  let cursor: { createdAt: Date; id: string } | null = null
+
+  while (candidates.length < ACTIVATION_CANDIDATE_LIMIT) {
+    const organizations: OrganizationRow[] = await selectOrganizationPage({
+      cursor,
+      cutoff: input.cutoff,
+    })
+    if (organizations.length === 0) break
+
+    candidates.push(...(await hydrateOrganizations(organizations)))
+
+    if (organizations.length < ACTIVATION_CANDIDATE_PAGE_SIZE) break
+    const last = organizations.at(-1)
+    if (!last) break
+    cursor = { createdAt: last.createdAt, id: last.id }
+  }
+
+  return candidates.slice(0, ACTIVATION_CANDIDATE_LIMIT)
+}
+
+/**
+ * The current number of skills in a team's library, read immediately before a
+ * send so the copy cannot claim an empty library for a team that filled one
+ * between the nightly selection and the message going out.
+ */
+export async function countOrganizationSkills(organizationId: string): Promise<number> {
+  const [row] = await db
+    .select({ total: count() })
+    .from(skill)
+    .where(eq(skill.organizationId, organizationId))
+  return Number(row?.total ?? 0)
 }

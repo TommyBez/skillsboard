@@ -78,6 +78,13 @@
       "when": 1788261874329,
       "tag": "0010_activation_email_log",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1788291456092,
+      "tag": "0011_activation_send_keeps_person_history",
+      "breakpoints": true
     }
   ]
 }

@@ -80,13 +80,13 @@ export async function GET(request: Request) {
       try {
         const result = await sendActivationEmail({
           automationKey: decision.automationKey,
+          daysSinceTeamCreated: decision.daysSinceTeamCreated,
           email: candidate.email,
           firstName: candidate.firstName,
           organizationId: candidate.organizationId,
           sentAt: new Date(),
           teamName: candidate.teamName,
           userId: candidate.userId,
-          variant: decision.variant,
         })
         if (!result.sent) {
           skipped += 1

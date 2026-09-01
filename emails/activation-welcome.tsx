@@ -14,6 +14,8 @@ export interface ActivationWelcomeProps {
   /**
    * `new` speaks to a team created in the last couple of days. `backfill` is
    * for the one time retroactive pass, where a first day tone would be false.
+   * `saved` is for a team whose library already has skills in it, where the
+   * empty library wording of the other two would be false.
    */
   variant: ActivationWelcomeVariant
 }
@@ -50,23 +52,38 @@ export default function ActivationWelcome({
         {firstName ? `Hi ${firstName},` : "Hi,"}
       </Text>
 
-      {variant === "backfill" ? (
+      {variant === "saved" && (
+        <Text className="m-0 mb-4 text-base leading-7 text-ink">
+          You created {teamName} on Skills Board and the library already has skills in it, so I will
+          skip the introduction and go to the part that is easy to miss.
+        </Text>
+      )}
+      {variant === "backfill" && (
         <Text className="m-0 mb-4 text-base leading-7 text-ink">
           You created {teamName} on Skills Board a while ago and the library is still empty, so I
           wanted to make sure you know what it can do.
         </Text>
-      ) : (
+      )}
+      {variant === "new" && (
         <Text className="m-0 mb-4 text-base leading-7 text-ink">
           Thanks for creating {teamName} on Skills Board. The library is empty right now, which is
           what day one looks like.
         </Text>
       )}
 
-      <Text className="m-0 mb-4 text-base leading-7 text-ink">
-        Your start page lists three things to do, in any order: connect your agent so it can search
-        the library from inside the client you already use, save a skill your team keeps coming back
-        to, and invite a teammate so the library has more than one person in it.
-      </Text>
+      {variant === "saved" ? (
+        <Text className="m-0 mb-4 text-base leading-7 text-ink">
+          Two things are worth doing from here, in any order: connect your agent so it can search
+          the library from inside the client you already use, and invite a teammate so the library
+          has more than one person in it.
+        </Text>
+      ) : (
+        <Text className="m-0 mb-4 text-base leading-7 text-ink">
+          Your start page lists three things to do, in any order: connect your agent so it can
+          search the library from inside the client you already use, save a skill your team keeps
+          coming back to, and invite a teammate so the library has more than one person in it.
+        </Text>
+      )}
       <Text className="m-0 mb-6 text-base leading-7 text-ink">
         I would start with the agent, because that is where the skills actually get used.
       </Text>

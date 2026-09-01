@@ -270,7 +270,13 @@ export const invitation = pgTable("invitation", {
 export const emailAutomationSend = pgTable("emailAutomationSend", {
   userId: text("userId").notNull(),
   automationKey: text("automationKey").notNull(),
-  organizationId: text("organizationId").notNull(),
+  /**
+   * Nullable, and cleared rather than cascaded when the team is deleted. The
+   * lifetime cap of 3 proactive emails is per person and never resets, so the
+   * row has to outlive the team it was sent about; only the attribution is
+   * dropped.
+   */
+  organizationId: text("organizationId"),
   emailHash: text("emailHash").notNull(),
   providerEmailId: text("providerEmailId"),
   sentAt: timestamp("sentAt", { withTimezone: true }).notNull().defaultNow(),
@@ -286,7 +292,7 @@ export const emailAutomationSend = pgTable("emailAutomationSend", {
     columns: [table.organizationId],
     foreignColumns: [organization.id],
     name: "emailAutomationSend_organizationId_fkey",
-  }).onDelete("cascade"),
+  }).onDelete("set null"),
 ])
 
 export const jwks = pgTable("jwks", {
