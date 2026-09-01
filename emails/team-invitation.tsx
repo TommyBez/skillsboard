@@ -46,7 +46,7 @@ export default function TeamInvitation({
       </Section>
 
       <Text className="m-0 mb-6 text-base leading-7 text-ink">
-        Accept the invitation to access the shared skill library.
+        Accept the invitation to see the skills your team keeps in {teamName}.
       </Text>
 
       <Button
