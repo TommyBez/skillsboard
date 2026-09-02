@@ -67,11 +67,20 @@ export const ecosystemDatapoints: readonly AdoptionDatapoint[] = [
     sourceId: "anthropic-skills-repo",
   },
   {
+    id: "skills-sh-skills",
+    label: "Skills on the skills.sh all-time leaderboard",
+    value: "9,704",
+    detail:
+      "The skill count the all-time view of the public directory run by Vercel reports in its own page data, read on September 2, 2026. A skill enters it once somebody installs it through the npx skills add command, forks and copies are flagged rather than merged, and the trending view of the same site reported 9,922 the same day, so the figure moves with the view.",
+    measuredOn: "2026-09-02",
+    sourceId: "skills-sh",
+  },
+  {
     id: "skills-sh-total",
-    label: "Skills listed on the skills.sh leaderboard",
+    label: "Unlabelled total printed beside that leaderboard tab",
     value: "1,297,018",
     detail:
-      "The all-time view of the public directory run by Vercel. It counts skills that have been installed at least once through the npx skills add command, and its own API flags forks and copies separately, so the figure is neither a census of skills that exist nor a count of distinct ones.",
+      "The number skills.sh prints as All Time (1,297,018) beside its own tab, with no unit given on the page or in its API reference. It is not a count of skills, because the same page data reports 9,704 of those, and it is not a sum of install counts, because the leaderboard's top skill alone reported 3,220,754 installs the same day. It is published here only so that nobody quotes it as a number of skills.",
     measuredOn: "2026-09-02",
     sourceId: "skills-sh",
   },

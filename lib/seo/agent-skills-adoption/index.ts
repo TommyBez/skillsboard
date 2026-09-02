@@ -156,15 +156,15 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
   title: "Agent skills adoption: the numbers",
   seoTitle: "Agent Skills Adoption: The Numbers | Skills Board",
   description:
-    "Dated figures on agent skills adoption, each with the source beside it: 46 clients on the official showcase, 1,297,018 skills on the skills.sh leaderboard, and server logs where AI crawlers read one site 5.9 times more often than Googlebot and bingbot.",
+    "Dated figures on agent skills adoption, each with the source beside it: 46 clients on the official showcase, 9,704 skills on the skills.sh all-time leaderboard, and server logs where AI crawlers read one site 5.9 times more often than Googlebot and bingbot.",
   intro: [
     "Nobody publishes a census of agent skills. There is no registry every skill has to enter, no vendor reporting installs, and no survey of how many teams have written one. What exists instead is a set of partial counts, each measuring something narrow, each reproducible if you say plainly what it measures.",
     "This page collects those counts and adds three we can measure ourselves: what AI crawlers do to a small site's server logs, what the Google Search Console beta report says about impressions inside AI answers, and how one site's organic impressions moved between July and August 2026. Every figure carries the source and the day it was read.",
   ],
   answer:
-    "As of September 2, 2026, the Agent Skills client showcase lists 46 agent products, the reference repository anthropics/skills holds 19 skills and has not changed since August 18, and the public skills.sh directory lists 1,297,018 skills that have been installed at least once. On skillsboard.sh over the seven days to September 2, named AI crawlers made 690 requests for page content against 117 from Googlebot and bingbot combined, a ratio of 5.9 to 1.",
+    "As of September 2, 2026, the Agent Skills client showcase lists 46 agent products, the reference repository anthropics/skills holds 19 skills and has not changed since August 18, and the all-time leaderboard on the public skills.sh directory lists 9,704 skills, each of them installed at least once through that directory's own command line tool. On skillsboard.sh over the seven days to September 2, named AI crawlers made 690 requests for page content against 117 from Googlebot and bingbot combined, a ratio of 5.9 to 1.",
   answerNotes: [
-    "Two of those four figures come from public pages anyone can open. The third is a leaderboard whose count depends on install telemetry, and the fourth is one site's server log. None of them is a measure of how many agent skills exist, and this page does not claim one.",
+    "Two of those four figures come from public pages anyone can open. The third is a leaderboard that only sees a skill once its own command line tool installs it, and the fourth is one site's server log. None of them is a measure of how many agent skills exist, and this page does not claim one.",
     "Skills Board is the agent-native skills registry for teams: a web application where a team keeps, searches, and shares its AI skills. The figures below come from running that site, so the search and crawler numbers describe a small site with a few dozen pages, not the market.",
   ],
   answerSourceIds: [
@@ -183,7 +183,7 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
     ],
     steps: [
       "Showcase and repository counts: fetch the published page or clone the repository, count, and record the commit or the fetch date. The anthropics/skills count is folders containing a SKILL.md under skills/, read at commit 5304866.",
-      "Directory count: read the total the skills.sh all-time leaderboard prints beside its own tab label. The number is theirs, the reading is ours, and its limits are stated in the section below.",
+      "Directory count: open the skills.sh all-time leaderboard and read the skill count its own page data reports for that view. The larger number printed beside the tab label is a different figure, and skills.sh does not say what it counts, so it is quoted below as the unlabelled total it is rather than as a number of skills.",
       "Crawler counts: server-side request logs from skillsboard.sh, delivered from Vercel to PostHog as one event per page-route invocation, classified by user agent string. Requests to /api/mcp and to /.well-known paths are excluded because they are protocol handshakes. Known monitoring agents and a Codex client stuck in an authentication retry loop are excluded by name.",
       "Search counts: the Search Console Search Analytics API for the property, queried per calendar month with dataState set to all so provisional days are included. The AI-feature impressions come from the separate Generative AI performance report, which has no API and was read in the interface on August 31, 2026.",
     ],
@@ -198,13 +198,13 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
   ecosystem: {
     title: "What the public sources count",
     intro:
-      "Four figures from three public sources, and none of them answers how many agent skills exist.",
+      "Five figures from three public sources, and none of them answers how many agent skills exist.",
     columns: [...datapointColumns],
     rows: datapointRows(ecosystemDatapoints),
     notes: [
       "The showcase count is the most stable of the three sources and the least informative about usage: a vendor appears once its own documentation says it reads SKILL.md, and it stays there whether one user or a million use the feature. It is a supply-side number about clients, not a demand-side number about skills.",
-      "The leaderboard count is the opposite. It moves with real installs, which makes it the closest public proxy for how many skills are in circulation, and it is also the figure most likely to be misread. It counts a skill from the first time anyone installs it through the command line tool, so a skill that a team keeps private or shares by copying a folder never appears at all, and a fork of a popular skill appears as its own entry.",
-      "The reference repository is worth watching precisely because it barely moves. Anthropic publishes 19 skills there and published the same 19 two weeks earlier. Growth in this format is happening in other people's repositories, which is why a directory built on install telemetry finds more than a million entries while the first-party catalog finds nineteen.",
+      "The leaderboard count is the opposite. It moves with real installs, which makes it the closest public proxy for how many skills are in circulation, and it is also the figure most likely to be misread. A skill enters it the first time anyone installs it through the command line tool, so a skill that a team keeps private or shares by copying a folder never appears at all, and a fork of a popular skill appears as its own entry. The much larger total the site prints beside the tab label is not that count and is not defined anywhere it publishes, which is exactly how a directory of a few thousand skills gets quoted as a million.",
+      "The reference repository is worth watching precisely because it barely moves. Anthropic publishes 19 skills there and published the same 19 two weeks earlier. Growth in this format is happening in other people's repositories, which is why a directory built on install telemetry lists thousands of skills while the first-party catalog holds nineteen.",
     ],
     link: {
       lead: "The showcase entries are unpacked client by client in",
@@ -265,7 +265,7 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
     entries: [
       {
         title: "How many agent skills exist",
-        body: "No source counts them. The skills.sh leaderboard counts skills installed at least once through its own command line tool, which excludes every skill kept inside a company, every skill shared as a copied folder, and every skill installed by pointing an agent at a repository directly. It also counts forks as separate entries. Treat 1,297,018 as a floor on installed-and-public skills and as no kind of answer to how many have been written.",
+        body: "No source counts them, and the nearest thing to one is smaller than it looks. The skills.sh all-time leaderboard listed 9,704 skills on September 2, 2026, and it sees a skill only once its own command line tool installs it, so every skill kept inside a company, every skill passed around as a copied folder, and every skill installed by pointing an agent straight at a repository is missing, while forks appear as entries of their own. The site also prints 1,297,018 beside that tab without saying what it counts, and that number has been read elsewhere as a count of skills. It is not one.",
       },
       {
         title: "How many people use agent skills",
@@ -313,7 +313,7 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
     {
       question: "How many agent skills are there?",
       answer:
-        "No source counts them. The nearest public figure is the skills.sh leaderboard, which listed 1,297,018 skills on September 2, 2026, but it counts only skills installed at least once through its own command line tool and counts forks separately. Private and hand-copied skills are invisible to it.",
+        "No source counts them. The nearest public figure is the skills.sh all-time leaderboard, which listed 9,704 skills on September 2, 2026, counting only skills installed at least once through its own command line tool and counting forks separately. Private and hand-copied skills are invisible to it. The larger 1,297,018 that page prints is not a skill count.",
     },
     {
       question: "How many products support agent skills?",
@@ -364,13 +364,13 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
       id: "skills-sh",
       label: "skills.sh leaderboard",
       href: "https://www.skills.sh/",
-      note: "The public directory run by Vercel. The all-time total printed beside its own tab label, read on September 2, 2026.",
+      note: "The public directory run by Vercel. Its all-time leaderboard, and the skill count and the unlabelled total that view reports, read on September 2, 2026.",
     },
     {
       id: "skills-sh-api",
       label: "skills.sh API reference",
       href: "https://www.skills.sh/docs/api",
-      note: "States that the leaderboard counts installs and flags forks and copies with an isDuplicate field, which is why the total is a floor rather than a census.",
+      note: "States that the leaderboard ranks skills by install count and flags forks and copies with an isDuplicate field, and defines no field matching the total the site prints beside its tab.",
     },
     {
       id: "posthog-log-drain",
@@ -448,7 +448,7 @@ export const agentSkillsAdoption: AgentSkillsAdoptionDefinition = {
       { text: "the numbers", accent: true },
     ],
     description:
-      "46 clients on the official showcase, 1,297,018 skills on the public leaderboard, and AI crawlers reading one site 5.9x more than Google and Bing.",
+      "46 clients on the official showcase, 9,704 skills on the public skills.sh leaderboard, and AI crawlers reading one site 5.9x more than Google and Bing.",
     contextLabel: "skillsboard.sh",
     chips: ["Sourced", "Dated", "Refreshed monthly"],
     footnote: "Data as of September 2, 2026",
