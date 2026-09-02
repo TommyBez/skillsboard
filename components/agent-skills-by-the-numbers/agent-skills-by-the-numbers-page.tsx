@@ -12,15 +12,15 @@ import {
 import { ResourceBreadcrumb } from "@/components/resources/resource-breadcrumb"
 import { ResourceCta } from "@/components/resources/resource-chrome"
 import type {
-  AgentSkillsAdoptionDefinition,
-  AgentSkillsAdoptionInlineLink,
-  AgentSkillsAdoptionSource,
-} from "@/lib/seo/agent-skills-adoption"
+  AgentSkillsByTheNumbersDefinition,
+  AgentSkillsByTheNumbersInlineLink,
+  AgentSkillsByTheNumbersSource,
+} from "@/lib/seo/agent-skills-by-the-numbers"
 import { buildResourceArticleSchema } from "@/lib/seo/resource-article-schema"
 import { resourcePaths } from "@/lib/seo/resources"
 import { siteConfig } from "@/lib/site"
 
-function InlineLink({ link }: { link: AgentSkillsAdoptionInlineLink }) {
+function InlineLink({ link }: { link: AgentSkillsByTheNumbersInlineLink }) {
   return (
     <p className="mt-7 max-w-3xl text-[0.95rem] leading-7 text-muted-foreground">
       {link.lead}{" "}
@@ -35,12 +35,22 @@ function InlineLink({ link }: { link: AgentSkillsAdoptionInlineLink }) {
   )
 }
 
-export function AgentSkillsAdoptionPage({
+export function AgentSkillsByTheNumbersPage({
   entry,
 }: {
-  entry: AgentSkillsAdoptionDefinition
+  entry: AgentSkillsByTheNumbersDefinition
 }) {
-  const sources: readonly AgentSkillsAdoptionSource[] = entry.sources
+  const sources: readonly AgentSkillsByTheNumbersSource[] = entry.sources
+
+  const sections = [
+    { key: "clients", eyebrow: "01 / Clients", section: entry.clients },
+    { key: "installs", eyebrow: "02 / Installs", section: entry.installs },
+    {
+      key: "repositories",
+      eyebrow: "03 / Repositories",
+      section: entry.repositories,
+    },
+  ] as const
 
   return (
     <>
@@ -57,10 +67,7 @@ export function AgentSkillsAdoptionPage({
             {entry.title}
           </h1>
           <p className="mt-5 font-mono text-sm font-semibold text-muted-foreground">
-            Data as of{" "}
-            <time dateTime={entry.modifiedAt}>
-              {formatArticleDate(entry.modifiedAt)}
-            </time>
+            <time dateTime={entry.modifiedAt}>{entry.dataNote}</time>
           </p>
           <div className="mt-6 max-w-3xl space-y-4 text-[1.05rem] leading-8 text-muted-foreground">
             {entry.intro.map((paragraph) => (
@@ -70,7 +77,7 @@ export function AgentSkillsAdoptionPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_adoption_hero" />
+            <ResourceCta location="agent_skills_by_the_numbers_hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -132,104 +139,44 @@ export function AgentSkillsAdoptionPage({
           />
         </section>
 
-        <section aria-labelledby="method-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="01 / Method"
-            id="method"
-            title={entry.method.title}
-            intro={entry.method.intro}
-          />
-          <NoteList notes={entry.method.body} />
-          <ol className="mt-9 border-t border-border">
-            {entry.method.steps.map((step, index) => (
-              <li
-                key={step}
-                className="grid grid-cols-1 gap-3 border-b border-border py-6 md:grid-cols-[3rem_minmax(0,1fr)] md:gap-5"
-              >
-                <span className="font-mono text-sm font-semibold text-primary">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <p className="text-pretty text-[0.95rem] leading-7 text-muted-foreground">
-                  {step}
-                </p>
-              </li>
+        {sections.map(({ key, eyebrow, section }) => (
+          <section
+            key={key}
+            aria-labelledby={`${key}-heading`}
+            className="pt-16"
+          >
+            <SectionHeading
+              eyebrow={eyebrow}
+              id={key}
+              title={section.title}
+              intro={section.intro}
+            />
+            {section.tables.map((table) => (
+              <SectionTable
+                key={table.caption}
+                caption={table.caption}
+                columns={table.columns}
+                rows={table.rows}
+                labelWidth="w-[22%]"
+              />
             ))}
-          </ol>
-          <SectionSources
-            sourceIds={entry.method.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="ecosystem-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="02 / Ecosystem"
-            id="ecosystem"
-            title={entry.ecosystem.title}
-            intro={entry.ecosystem.intro}
-          />
-          <SectionTable
-            caption="The four public figures on agent skills adoption, what each one counts, and the day it was read."
-            columns={entry.ecosystem.columns}
-            rows={entry.ecosystem.rows}
-            labelWidth="w-[22%]"
-          />
-          <NoteList notes={entry.ecosystem.notes} />
-          <InlineLink link={entry.ecosystem.link} />
-          <SectionSources
-            sourceIds={entry.ecosystem.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="crawlers-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="03 / Crawlers"
-            id="crawlers"
-            title={entry.crawlers.title}
-            intro={entry.crawlers.intro}
-          />
-          <SectionTable
-            caption="Server-side request counts for skillsboard.sh over seven days, split between AI crawlers, classic search crawlers, and excluded noise."
-            columns={entry.crawlers.columns}
-            rows={entry.crawlers.rows}
-            labelWidth="w-[22%]"
-          />
-          <NoteList notes={entry.crawlers.notes} />
-          <InlineLink link={entry.crawlers.link} />
-          <div className="mt-8">
-            <ResourceCta location="agent_skills_adoption_inline" />
-          </div>
-          <SectionSources
-            sourceIds={entry.crawlers.sourceIds}
-            sources={sources}
-          />
-        </section>
-
-        <section aria-labelledby="search-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="04 / Search"
-            id="search"
-            title={entry.search.title}
-            intro={entry.search.intro}
-          />
-          <SectionTable
-            caption="Google Search Console figures for one small site, including the beta report on impressions inside AI answers."
-            columns={entry.search.columns}
-            rows={entry.search.rows}
-            labelWidth="w-[22%]"
-          />
-          <NoteList notes={entry.search.notes} />
-          <InlineLink link={entry.search.link} />
-          <SectionSources
-            sourceIds={entry.search.sourceIds}
-            sources={sources}
-          />
-        </section>
+            <NoteList notes={section.notes} />
+            <InlineLink link={section.link} />
+            {key === "installs" ? (
+              <div className="mt-8">
+                <ResourceCta location="agent_skills_by_the_numbers_inline" />
+              </div>
+            ) : null}
+            <SectionSources
+              sourceIds={section.sourceIds}
+              sources={sources}
+            />
+          </section>
+        ))}
 
         <section aria-labelledby="not-documented-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Limits"
+            eyebrow="04 / Limits"
             id="not-documented"
             title={entry.notDocumented.title}
             intro={entry.notDocumented.intro}
@@ -255,24 +202,9 @@ export function AgentSkillsAdoptionPage({
           />
         </section>
 
-        <section aria-labelledby="reuse-heading" className="pt-16">
-          <SectionHeading
-            eyebrow="06 / Reuse"
-            id="reuse"
-            title={entry.reuse.title}
-            intro={entry.reuse.intro}
-          />
-          <NoteList notes={entry.reuse.body} />
-          <InlineLink link={entry.reuse.link} />
-          <SectionSources
-            sourceIds={entry.reuse.sourceIds}
-            sources={sources}
-          />
-        </section>
-
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            07 / Questions
+            05 / Questions
           </p>
           <h2
             id="faq-heading"
@@ -305,12 +237,11 @@ export function AgentSkillsAdoptionPage({
             <span className="font-semibold text-foreground">
               Editorial method:
             </span>{" "}
-            every figure on this page names the source it came from and the day
-            it was read. Public counts come from the first-party page or
-            repository below. Traffic and search figures come from
-            instrumentation on this site, described in the method section. Where
-            a figure cannot be reproduced, the limits section says so instead of
-            filling the gap.
+            every figure on this page comes from a source you can open, and
+            carries the day it was read. Nothing here is estimated, modelled, or
+            taken from private telemetry. Where a question cannot be answered
+            from a public source, the limits section says so instead of filling
+            the gap.
           </p>
           <ul className="mt-6 space-y-4">
             {sources.map((source) => (
@@ -373,7 +304,7 @@ export function AgentSkillsAdoptionPage({
             teammate should open.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_adoption_closing" />
+            <ResourceCta location="agent_skills_by_the_numbers_closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

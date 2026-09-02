@@ -706,10 +706,10 @@ export const agentSkills: AgentSkillsDefinition = {
   ],
   related: [
     {
-      label: "Agent skills adoption: the numbers",
-      href: "/agent-skills-adoption",
+      label: "Agent skills by the numbers",
+      href: "/agent-skills-by-the-numbers",
       description:
-        "Dated counts of clients, published skills, and crawler traffic, with the source beside every figure.",
+        "Dated public counts of clients, published skills, installs, and repositories, with the source beside every figure.",
     },
     {
       label: "Skill examples: real SKILL.md files, explained",

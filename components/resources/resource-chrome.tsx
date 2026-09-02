@@ -9,7 +9,7 @@ import { FooterNavColumns } from "@/components/footer-nav"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
-import type { AgentSkillsAdoptionCtaPlacement } from "@/lib/seo/agent-skills-adoption/types"
+import type { AgentSkillsByTheNumbersCtaPlacement } from "@/lib/seo/agent-skills-by-the-numbers/types"
 import type { AgentSkillsSupportCtaPlacement } from "@/lib/seo/agent-skills-support/types"
 import type { AgentSkillsCtaPlacement } from "@/lib/seo/agent-skills/types"
 import type { AgentsMdVsSkillMdCtaPlacement } from "@/lib/seo/agents-md-vs-skill-md/types"
@@ -39,7 +39,7 @@ type ResourceHeaderLocation =
   | "about_header"
   | "connect_header"
   | "developers_header"
-  | "agent_skills_adoption_header"
+  | "agent_skills_by_the_numbers_header"
   | "agent_skills_header"
   | "agent_skills_support_header"
   | "agents_md_header"
@@ -64,7 +64,7 @@ type ResourceHeaderLocation =
   | "resources_header"
   | "where_skills_header"
 type ResourceCtaLocation =
-  | AgentSkillsAdoptionCtaPlacement
+  | AgentSkillsByTheNumbersCtaPlacement
   | AgentSkillsCtaPlacement
   | AgentSkillsSupportCtaPlacement
   | AgentsMdVsSkillMdCtaPlacement

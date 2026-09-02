@@ -76,6 +76,7 @@ const unlabeledKeys = new Set([
   "steps",
   "entries",
   "rows",
+  "tables",
   "link",
   "template",
   "tree",

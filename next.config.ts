@@ -161,8 +161,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/agent-skills-adoption/",
-        destination: "/agent-skills-adoption",
+        source: "/agent-skills-by-the-numbers/",
+        destination: "/agent-skills-by-the-numbers",
         permanent: true,
       },
       {
@@ -299,12 +299,12 @@ const nextConfig = {
           has: [MARKDOWN_ACCEPT],
           destination: "/api/markdown?path=/agent-skills-support",
         },
-        // `/agent-skills-adoption` does not end in `-skills` either, so the
+        // `/agent-skills-by-the-numbers` does not end in `-skills` either, so the
         // shared rule above never reaches it.
         {
-          source: "/agent-skills-adoption",
+          source: "/agent-skills-by-the-numbers",
           has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/agent-skills-adoption",
+          destination: "/api/markdown?path=/agent-skills-by-the-numbers",
         },
         {
           source: "/developers",

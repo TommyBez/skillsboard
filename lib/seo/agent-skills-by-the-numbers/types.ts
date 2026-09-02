@@ -5,15 +5,16 @@
  * does not end in `-skills`, so it carries its own Markdown negotiation
  * rewrite in `next.config.ts` the way /skill-examples does.
  */
-export const agentSkillsAdoptionPath = "/agent-skills-adoption" as const
+export const agentSkillsByTheNumbersPath =
+  "/agent-skills-by-the-numbers" as const
 
-export type AgentSkillsAdoptionPath = typeof agentSkillsAdoptionPath
+export type AgentSkillsByTheNumbersPath = typeof agentSkillsByTheNumbersPath
 
 /**
  * CTA placements on the statistics page, kept in sync with the
  * landing_cta_clicked union. The sticky shell CTA is
- * agent_skills_adoption_header, following the naming every other marketing
- * chrome uses for its nav slot.
+ * agent_skills_by_the_numbers_header, following the naming every other
+ * marketing chrome uses for its nav slot.
  */
-export type AgentSkillsAdoptionCtaPlacement =
-  `agent_skills_adoption_${"hero" | "inline" | "closing"}`
+export type AgentSkillsByTheNumbersCtaPlacement =
+  `agent_skills_by_the_numbers_${"hero" | "inline" | "closing"}`
