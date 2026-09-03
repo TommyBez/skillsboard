@@ -733,7 +733,7 @@ export const agentSkills: AgentSkillsDefinition = {
       label: "Anthropic skills: every first-party skill and where it loads",
       href: anthropicSkillsPath,
       description:
-        "The first-party catalog: four pre-built document skills, nineteen repository folders, thirteen bundled with Claude Code.",
+        "The first-party catalog: four pre-built document skills, nineteen repository folders, fifteen bundled with Claude Code.",
     },
     {
       label: "Claude Cowork skills",
