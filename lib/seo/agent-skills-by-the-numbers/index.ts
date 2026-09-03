@@ -5,8 +5,10 @@ import {
   formatCount,
   formatDay,
   formatMonth,
+  ecosystemSnapshots,
   latestSnapshot,
   monthlyChange,
+  snapshotCadenceNote,
   snapshotDay,
   snapshotTime,
   topicChange,
@@ -135,7 +137,7 @@ function topicCount(topic: string): string {
 
 const readmeMatches = formatCount(usage.readmeMatches)
 const downloadsLastMonth = formatCount(usage.npmDownloadsLastMonth)
-const perProject = formatCount(usage.downloadsPerDeclaringProject)
+const perReadme = formatCount(usage.downloadsPerMatchingReadme)
 const npmWindow = `${formatDay(usage.npmWindowStart)} to ${formatDay(usage.npmWindowEnd)}`
 
 const firstMonth = months[0]
@@ -182,19 +184,19 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   description: `Three figures for the agent skills ecosystem, read on ${readOnLabel}: ${topicCount("agent-skills")} public repositories tagged agent-skills, about ${readmeMatches} public READMEs printing npx skills, and ${downloadsLastMonth} npm downloads of the same CLI in a month. Collected by a script in our repository and refreshed once a month.`,
   dataNote: `Snapshot read on ${readOnLabel}`,
   intro: [
-    `Is the agent skills ecosystem growing, or are the download counts growing? On ${readOnLabel} the npm registry reported ${downloadsLastMonth} downloads of the \`${usage.npmPackage}\` CLI over the previous month, and GitHub code search returned about ${readmeMatches} public READMEs that print \`npx ${usage.npmPackage}\` as an install step. That is roughly ${perProject} downloads a month for each project that declares the CLI in public.`,
-    `Three figures follow, each with the endpoint it came from and the day it was read: how many projects declare the CLI, how many public repositories file themselves under a skills topic, and what the download curve looks like month by month across 2026. A script in our repository writes one JSON file a month, and this page renders whichever months are committed.`,
-    `This is the first monthly snapshot, so the tables report levels. From the next one on, each figure sits beside its movement since the month before.`,
+    `Is the agent skills ecosystem growing, or are the download counts growing? On ${readOnLabel} the npm registry reported ${downloadsLastMonth} downloads of the \`${usage.npmPackage}\` CLI over the previous month, and GitHub code search returned about ${readmeMatches} public READMEs that print \`npx ${usage.npmPackage}\` as an install step. That is roughly ${perReadme} downloads a month for every README that prints it.`,
+    `Three figures follow, each with the endpoint it came from and the day it was read: how many public READMEs print the CLI, how many public repositories file themselves under a skills topic, and what the download curve looks like month by month across 2026. A script in our repository writes one JSON file a month, and this page renders whichever months are committed.`,
+    snapshotCadenceNote(ecosystemSnapshots.length),
   ],
-  answer: `On ${readOnLabel}, GitHub carried ${topicCount("agent-skills")} public repositories tagged \`agent-skills\`, ${topicCount("claude-skills")} tagged \`claude-skills\`, and ${topicCount("claude-code-skills")} tagged \`claude-code-skills\`. About ${readmeMatches} public READMEs print \`npx ${usage.npmPackage}\`, while npm served ${downloadsLastMonth} downloads of that package in the month ending ${formatDay(usage.npmWindowEnd)}, a ratio of roughly ${perProject} downloads for every project that declares it.`,
+  answer: `On ${readOnLabel}, GitHub carried ${topicCount("agent-skills")} public repositories tagged \`agent-skills\`, ${topicCount("claude-skills")} tagged \`claude-skills\`, and ${topicCount("claude-code-skills")} tagged \`claude-code-skills\`. About ${readmeMatches} public READMEs print \`npx ${usage.npmPackage}\`, while npm served ${downloadsLastMonth} downloads of that package in the month ending ${formatDay(usage.npmWindowEnd)}, a ratio of roughly ${perReadme} downloads for every matching README.`,
   answerNotes: [
     `The 2026 download curve runs from ${formatCount(firstMonth.downloads)} in ${formatMonth(firstMonth.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)}, then holds between ${formatCount(settledFloor.downloads)} and ${formatCount(settledPeak.downloads)} through the summer. The step from ${formatMonth(beforeStep.month)} to ${formatMonth(stepMonth.month)} is about ${stepFactor} times in a single month, which is the shape automated traffic tends to make. That reading is a hypothesis worth stating, and public data does not settle it either way.`,
     `The two GitHub endpoints report at different precisions, and the tables label which is which. Repository search returns an exact \`total_count\`. Code search rounds \`total_count\` into buckets of roughly four significant figures, so ${readmeMatches} marks a range rather than an exact register.`,
   ],
   answerSourceIds: ["github-repo-search", "github-code-search", "npm-point"],
   declarations: {
-    title: "How many projects declare it",
-    intro: `The install command for the \`${usage.npmPackage}\` CLI, published on npm by Vercel Labs from the vercel-labs/skills repository, is \`npx ${usage.npmPackage}\`. A public repository that prints that command in its README belongs to an author who expects a human to run it, which makes README matches the closest public proxy for stated use.`,
+    title: "How many READMEs print the command",
+    intro: `The install command for the \`${usage.npmPackage}\` CLI, published on npm by Vercel Labs from the vercel-labs/skills repository, is \`npx ${usage.npmPackage}\`. A public README that prints that command was written by an author who expects a human to run it, which makes README matches the closest public proxy for stated use. GitHub code search counts files rather than repositories, so a repository holding several matching READMEs is counted once for each of them, and the number of distinct projects is lower than or equal to the figure below.`,
     columns: ["Measure", "Value", "Precision", "Read on"],
     rows: [
       {
@@ -214,18 +216,19 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
         ],
       },
       {
-        label: "Downloads per declaring project",
+        label: "Downloads per matching README",
         cells: [
-          `About ${perProject}`,
+          `About ${perReadme}`,
           "Derived from the two rows above",
           readOnLabel,
         ],
       },
     ],
     notes: [
-      `The ratio is where the two sides pull apart. One project that writes the command into its README corresponds to roughly a thousand package downloads a month, which is more traffic than a team of people running an installer would produce. A registry counts machines and a README records an intention, so the numerator and the denominator are drawn from different populations by construction.`,
+      `The ratio is where the two sides pull apart. One README that prints the command corresponds to roughly a thousand package downloads a month, which is more traffic than a team of people running an installer would produce. A registry counts machines and a README records an intention, so the numerator and the denominator are drawn from different populations by construction.`,
       `Both figures carry a shape worth knowing. GitHub code search rounds its total into buckets, so about ${readmeMatches} marks a range rather than an exact register. The npm figure covers the window npm chose, ${npmWindow}, which is why it differs slightly from any calendar month in the series further down.`,
       `Code search reads public repositories that GitHub has indexed. Private repositories, packages documented on a website instead of a README, and monorepo subdirectories without a README of their own all sit outside the count.`,
+      `Folding the files back into repositories is not something the endpoint allows: code search stops paginating at a thousand results, so the matches behind a total of about ${readmeMatches} cannot be listed and deduplicated. The page reports the file count it can verify and leaves the project count as the smaller unknown behind it.`,
     ],
     link: {
       lead: "If the command itself is new to you,",
@@ -288,7 +291,8 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
       "Everything above comes from three public endpoints, read in one pass by `scripts/ecosystem-stats/collect.mjs` in our repository.",
     steps: [
       "Repository counts: `GET /search/repositories?q=topic:<topic>&per_page=1` on the GitHub API, once per topic. The `total_count` field on repository search is exact.",
-      'README counts: `GET /search/code?q="npx skills" filename:README.md` on the same API. Code search quantizes `total_count` into buckets of roughly four significant figures, so that number is approximate and the table says so beside it.',
+      'README counts: `GET /search/code?q="npx skills" filename:README.md` on the same API. Code search counts matching files rather than repositories, and it quantizes `total_count` into buckets of roughly four significant figures, so that number is approximate and the table says so beside it.',
+      "Refusal: if either GitHub search answers with `incomplete_results: true`, its `total_count` is partial, and the collector exits with an error instead of writing a snapshot.",
       "Downloads: `api.npmjs.org/downloads/point/last-month/skills` for the ratio, and `api.npmjs.org/downloads/range/2026-01-01:<today>/skills` aggregated by calendar month for the series.",
       `Snapshot: the run behind this page finished on ${readOnLabel} at ${snapshotTime(snapshot)} and was written to \`lib/seo/agent-skills-by-the-numbers/data/${snapshot.snapshot}.json\`.`,
       "Schedule: one snapshot a month, committed as its own JSON file. The page renders whichever months are in the folder, so the change column fills itself in from the second month onward.",
@@ -304,7 +308,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   faq: [
     {
       question: `Do ${downloadsLastMonth} downloads a month mean that many people use agent skills?`,
-      answer: `They do not. npm counts every fetch of the package, so one continuous integration pipeline installing it on each run can produce thousands of downloads by itself. The figure tracks machines rather than people. The count of about ${readmeMatches} public READMEs printing the command is the closer public proxy for how many projects a person chose it for.`,
+      answer: `They do not. npm counts every fetch of the package, so one continuous integration pipeline can produce thousands of downloads on its own. The figure tracks machines rather than people. The closer public proxy is the count of about ${readmeMatches} public README files that print the command, and because code search counts files, fewer projects sit behind it.`,
     },
     {
       question: "How many public repositories are tagged as agent skills?",
@@ -337,7 +341,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     {
       id: "npm-range",
       label: "npm downloads, daily range, package skills",
-      href: "https://api.npmjs.org/downloads/range/2026-01-01:2026-09-03/skills",
+      href: `https://api.npmjs.org/downloads/range/${snapshot.monthlyDownloads.rangeStart}:${snapshot.monthlyDownloads.rangeEnd}/${snapshot.monthlyDownloads.package}`,
       note: "Daily counts, aggregated here by calendar month for the 2026 series.",
     },
     {

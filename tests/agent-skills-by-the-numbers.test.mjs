@@ -13,6 +13,7 @@ const {
   noComparisonYet,
   formatCount,
   monthlyChange,
+  snapshotCadenceNote,
   topicChange,
 } = await import("../lib/seo/agent-skills-by-the-numbers/snapshots.ts")
 const { agentSkills } = await import("../lib/seo/agent-skills/index.ts")
@@ -147,9 +148,14 @@ test("every committed snapshot matches the schema the page reads", async () => {
         usage.npmDownloadsLastMonth > 0,
     )
     assert.equal(
-      usage.downloadsPerDeclaringProject,
+      usage.downloadsPerMatchingReadme,
       Math.round(usage.npmDownloadsLastMonth / usage.readmeMatches),
       `${file} ratio is not derived from its own two figures`,
+    )
+    assert.equal(
+      usage.downloadsPerDeclaringProject,
+      undefined,
+      `${file} still carries the old per project field name`,
     )
     for (const day of [usage.npmWindowStart, usage.npmWindowEnd]) {
       assert.match(day, /^\d{4}-\d{2}-\d{2}$/, `${file} npm window`)
@@ -202,7 +208,7 @@ test("the page renders every figure in the most recent snapshot", () => {
   for (const value of [
     usage.readmeMatches,
     usage.npmDownloadsLastMonth,
-    usage.downloadsPerDeclaringProject,
+    usage.downloadsPerMatchingReadme,
   ]) {
     assert.ok(
       rendered.includes(formatCount(value)),
@@ -420,4 +426,112 @@ test("the collector reads its token from the environment only", async () => {
     packageJson.scripts["stats:collect"],
     "node scripts/ecosystem-stats/collect.mjs",
   )
+})
+
+test("the page counts README files and never claims to count projects", () => {
+  const copy = [
+    entry.description,
+    ...entry.intro,
+    entry.answer,
+    ...entry.answerNotes,
+    ...[entry.declarations, entry.repositories, entry.downloads].flatMap(
+      (section) => [
+        section.title,
+        section.intro,
+        ...section.rows.flatMap((row) => [row.label, ...row.cells]),
+        ...section.notes,
+      ],
+    ),
+    ...entry.method.steps,
+    ...entry.faq.flatMap((item) => [item.question, item.answer]),
+    markdown,
+  ]
+
+  for (const line of copy) {
+    assert.ok(
+      !/declaring project|per project|per declaring/i.test(line),
+      `the page reads the code search total as projects in: ${line}`,
+    )
+  }
+
+  assert.match(entry.declarations.title, /README/)
+  assert.ok(
+    entry.declarations.rows.some(
+      (row) => row.label === "Downloads per matching README",
+    ),
+    "the ratio row does not name the README as its denominator",
+  )
+
+  const caveat = [entry.declarations.intro, ...entry.declarations.notes].join(" ")
+  assert.match(
+    caveat,
+    /counted once for each|counts files rather than repositories/,
+    "the page never says a repository with several READMEs is counted twice",
+  )
+  assert.match(
+    caveat,
+    /lower than or equal/,
+    "the page never says the project count sits below the file count",
+  )
+})
+
+test("the snapshot cadence line follows the number of committed snapshots", () => {
+  assert.ok(
+    entry.intro.includes(snapshotCadenceNote(ecosystemSnapshots.length)),
+    "the intro does not carry the cadence line for the committed snapshots",
+  )
+
+  assert.match(snapshotCadenceNote(1), /first monthly snapshot/)
+  assert.match(snapshotCadenceNote(1), /From the next one on/)
+
+  for (const count of [2, 7]) {
+    const line = snapshotCadenceNote(count)
+    assert.ok(!/first monthly snapshot/.test(line), `count ${count} still reads as the first`)
+    assert.ok(line.includes(formatCount(count)), `count ${count} is not in the line`)
+    assert.match(line, /movement since the month before/)
+    assert.ok(!dashPattern.test(line), `dash in: ${line}`)
+  }
+})
+
+test("the npm range source link is built from the snapshot it describes", () => {
+  const source = entry.sources.find((candidate) => candidate.id === "npm-range")
+  assert.ok(source, "the npm range source is missing")
+
+  const { package: name, rangeStart, rangeEnd } = latestSnapshot.monthlyDownloads
+  assert.equal(
+    source.href,
+    `https://api.npmjs.org/downloads/range/${rangeStart}:${rangeEnd}/${name}`,
+  )
+})
+
+test("the collector refuses a GitHub search that came back incomplete", async () => {
+  const { assertCompleteSearch } = await import(
+    "../scripts/ecosystem-stats/collect.mjs"
+  )
+
+  assert.deepEqual(
+    assertCompleteSearch({ incomplete_results: false, total_count: 12 }, "topic search"),
+    { incomplete_results: false, total_count: 12 },
+  )
+
+  assert.throws(
+    () => assertCompleteSearch({ incomplete_results: true, total_count: 3 }, "code search"),
+    /incomplete_results for code search/,
+  )
+  assert.throws(
+    () => assertCompleteSearch({ incomplete_results: true }, "code search"),
+    /No snapshot was written/,
+  )
+
+  const script = await readFile(
+    new URL("../scripts/ecosystem-stats/collect.mjs", import.meta.url),
+    "utf8",
+  )
+  const guards = script.match(/assertCompleteSearch\(/g) ?? []
+  assert.ok(
+    guards.length >= 3,
+    "the guard is not applied to both the repository search and the code search",
+  )
+  assert.match(script, /repository search`\)/)
+  assert.match(script, /code search for/)
 })

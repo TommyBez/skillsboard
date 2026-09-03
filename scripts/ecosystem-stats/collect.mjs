@@ -7,8 +7,9 @@
  * 1. GitHub repository search, one call per topic. `total_count` on the
  *    repository search endpoint is exact.
  * 2. GitHub code search for the install command in public READMEs, next to the
- *    npm download count of the same CLI. Code search quantizes `total_count`
- *    into buckets, so that figure is approximate and the snapshot records it.
+ *    npm download count of the same CLI. Code search counts matching files
+ *    rather than repositories, and it quantizes `total_count` into buckets, so
+ *    that figure is approximate and the snapshot records it.
  * 3. The npm downloads range endpoint for the `skills` package, aggregated by
  *    calendar month.
  *
@@ -16,10 +17,14 @@
  *
  * The token is read from the environment only. Code search is rate limited to
  * ten requests a minute, so the script spaces its GitHub calls out.
+ *
+ * Either GitHub search can come back with `incomplete_results: true`, which
+ * means the query timed out and the total is a partial one. The script refuses
+ * to write a snapshot in that case rather than publishing a low number.
  */
 
 import { mkdir, writeFile } from "node:fs/promises"
-import { dirname, join } from "node:path"
+import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..", "..")
@@ -68,6 +73,21 @@ async function githubSearch(path, token) {
   })
 }
 
+/**
+ * GitHub sets `incomplete_results` when the search timed out, and the
+ * `total_count` beside it is then a partial figure that would understate the
+ * ecosystem. A snapshot built on one of those is worse than no snapshot, so
+ * this throws and the run ends before anything is written.
+ */
+export function assertCompleteSearch(result, label) {
+  if (result.incomplete_results) {
+    throw new Error(
+      `GitHub returned incomplete_results for ${label}, so total_count is partial. No snapshot was written. Run the script again.`,
+    )
+  }
+  return result
+}
+
 async function collectRepositoryTopics(token) {
   const topics = []
   for (const topic of TOPICS) {
@@ -75,6 +95,7 @@ async function collectRepositoryTopics(token) {
       `/search/repositories?q=topic:${encodeURIComponent(topic)}&per_page=1`,
       token,
     )
+    assertCompleteSearch(result, `topic:${topic} repository search`)
     topics.push({ topic, repositories: result.total_count })
     await sleep(GITHUB_CALL_SPACING_MS)
   }
@@ -86,6 +107,8 @@ async function collectDeclaredUsage(token) {
     `/search/code?q=${encodeURIComponent(CODE_SEARCH_QUERY)}&per_page=1`,
     token,
   )
+  assertCompleteSearch(code, `code search for ${CODE_SEARCH_QUERY}`)
+
   const point = await getJson(
     `https://api.npmjs.org/downloads/point/last-month/${NPM_PACKAGE}`,
   )
@@ -98,9 +121,7 @@ async function collectDeclaredUsage(token) {
     npmDownloadsLastMonth: point.downloads,
     npmWindowStart: point.start,
     npmWindowEnd: point.end,
-    downloadsPerDeclaringProject: Math.round(
-      point.downloads / code.total_count,
-    ),
+    downloadsPerMatchingReadme: Math.round(point.downloads / code.total_count),
   }
 }
 
@@ -129,7 +150,7 @@ async function collectMonthlyDownloads(today) {
   }
 }
 
-async function main() {
+export async function main() {
   const token = requireToken()
   const collectedAt = new Date().toISOString().replace(/\.\d{3}Z$/, "Z")
   const today = collectedAt.slice(0, 10)
@@ -148,7 +169,8 @@ async function main() {
     notes: [
       "GitHub repository search reports an exact total_count, so the topic figures are counts rather than estimates.",
       "GitHub code search quantizes total_count into buckets of roughly four significant figures, so the README figure is approximate and the page says so.",
-      "A README match is a public repository that prints the install command. It is not a running installation, and a repository can print the command without anyone running it.",
+      "A README match is one public README file that prints the install command. Code search counts files, so a repository holding several matching READMEs is counted once for each of them, and the number of distinct projects is lower than or equal to the total.",
+      "A README match is not a running installation, and a repository can print the command without anyone running it.",
       "npm counts every download of the package, including continuous integration jobs, mirrors, and bots, so a download is not a person.",
     ],
   }
@@ -166,4 +188,10 @@ async function main() {
   )
 }
 
-await main()
+const invokedDirectly =
+  process.argv[1] !== undefined &&
+  resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (invokedDirectly) {
+  await main()
+}

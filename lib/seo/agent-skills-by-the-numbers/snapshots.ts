@@ -19,14 +19,19 @@ export interface EcosystemTopicCount {
 
 export interface EcosystemDeclaredUsage {
   query: string
-  /** Bucketed by GitHub code search rather than exact. */
+  /**
+   * Matching README files, not repositories: GitHub code search counts files,
+   * so a repository with several matching READMEs is counted once for each.
+   * Bucketed by code search rather than exact.
+   */
   readmeMatches: number
   readmeMatchPrecision: "bucketed" | "exact"
   npmPackage: string
   npmDownloadsLastMonth: number
   npmWindowStart: string
   npmWindowEnd: string
-  downloadsPerDeclaringProject: number
+  /** Downloads divided by matching README files, not by distinct projects. */
+  downloadsPerMatchingReadme: number
 }
 
 export interface EcosystemMonth {
@@ -137,6 +142,19 @@ export function topicChange(topic: string): string {
   const since = formatMonth(previousSnapshot.snapshot)
 
   return `${sign}${formatCount(Math.abs(difference))} since ${since}`
+}
+
+/**
+ * The line that tells a reader what a page built on `count` snapshots can and
+ * cannot show. One snapshot only carries levels; from the second one on every
+ * figure sits beside its movement.
+ */
+export function snapshotCadenceNote(count: number): string {
+  if (count <= 1) {
+    return "This is the first monthly snapshot, so the tables report levels. From the next one on, each figure sits beside its movement since the month before."
+  }
+
+  return `This page holds ${formatCount(count)} monthly snapshots, so each figure sits beside its movement since the month before.`
 }
 
 /** Each month beside the multiple it represents on the month before it. */

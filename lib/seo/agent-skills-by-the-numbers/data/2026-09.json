@@ -23,7 +23,7 @@
     "npmDownloadsLastMonth": 38365913,
     "npmWindowStart": "2026-07-31",
     "npmWindowEnd": "2026-08-29",
-    "downloadsPerDeclaringProject": 1030
+    "downloadsPerMatchingReadme": 1030
   },
   "monthlyDownloads": {
     "package": "skills",
@@ -80,7 +80,8 @@
   "notes": [
     "GitHub repository search reports an exact total_count, so the topic figures are counts rather than estimates.",
     "GitHub code search quantizes total_count into buckets of roughly four significant figures, so the README figure is approximate and the page says so.",
-    "A README match is a public repository that prints the install command. It is not a running installation, and a repository can print the command without anyone running it.",
+    "A README match is one public README file that prints the install command. Code search counts files, so a repository holding several matching READMEs is counted once for each of them, and the number of distinct projects is lower than or equal to the total.",
+    "A README match is not a running installation, and a repository can print the command without anyone running it.",
     "npm counts every download of the package, including continuous integration jobs, mirrors, and bots, so a download is not a person."
   ]
 }
