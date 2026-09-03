@@ -149,13 +149,6 @@ export function topicChange(topic: string): string {
  * cannot show. One snapshot only carries levels; from the second one on every
  * figure sits beside its movement.
  */
-export function snapshotCadenceNote(count: number): string {
-  if (count <= 1) {
-    return "This is the first monthly snapshot, so the tables report levels. From the next one on, each figure sits beside its movement since the month before."
-  }
-
-  return `This page holds ${formatCount(count)} monthly snapshots, so each figure sits beside its movement since the month before.`
-}
 
 /** Each month beside the multiple it represents on the month before it. */
 export function monthlyChange(

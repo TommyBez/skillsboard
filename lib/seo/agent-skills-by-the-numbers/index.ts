@@ -5,10 +5,8 @@ import {
   formatCount,
   formatDay,
   formatMonth,
-  ecosystemSnapshots,
   latestSnapshot,
   monthlyChange,
-  snapshotCadenceNote,
   snapshotDay,
   snapshotTime,
   topicChange,
@@ -181,16 +179,15 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   title: "Agent skills by the numbers",
   seoTitle:
     "Agent Skills by the Numbers: Repositories, Declarations, and Downloads | Skills Board",
-  description: `Three figures for the agent skills ecosystem, read on ${readOnLabel}: ${topicCount("agent-skills")} public repositories tagged agent-skills, about ${readmeMatches} public READMEs printing npx skills, and ${downloadsLastMonth} npm downloads of the same CLI in a month. Collected by a script in our repository and refreshed once a month.`,
+  description: `Three figures for the agent skills ecosystem, read on ${readOnLabel}: ${topicCount("agent-skills")} public repositories tagged agent-skills, about ${readmeMatches} public READMEs printing npx skills, and ${downloadsLastMonth} npm downloads of the same CLI in a month. Refreshed monthly.`,
   dataNote: `Snapshot read on ${readOnLabel}`,
   intro: [
     `Is the agent skills ecosystem growing, or are the download counts growing? On ${readOnLabel} the npm registry reported ${downloadsLastMonth} downloads of the \`${usage.npmPackage}\` CLI over the previous month, and GitHub code search returned about ${readmeMatches} public READMEs that print \`npx ${usage.npmPackage}\` as an install step. That is roughly ${perReadme} downloads a month for every README that prints it.`,
-    `Three figures follow, each with the endpoint it came from and the day it was read: how many public READMEs print the CLI, how many public repositories file themselves under a skills topic, and what the download curve looks like month by month across 2026. A script in our repository writes one JSON file a month, and this page renders whichever months are committed.`,
-    snapshotCadenceNote(ecosystemSnapshots.length),
+    `Three figures follow: how many public READMEs print the CLI, how many public repositories file themselves under a skills topic, and what the download curve looks like month by month across 2026.`,
   ],
   answer: `On ${readOnLabel}, GitHub carried ${topicCount("agent-skills")} public repositories tagged \`agent-skills\`, ${topicCount("claude-skills")} tagged \`claude-skills\`, and ${topicCount("claude-code-skills")} tagged \`claude-code-skills\`. About ${readmeMatches} public READMEs print \`npx ${usage.npmPackage}\`, while npm served ${downloadsLastMonth} downloads of that package in the month ending ${formatDay(usage.npmWindowEnd)}, a ratio of roughly ${perReadme} downloads for every matching README.`,
   answerNotes: [
-    `The 2026 download curve runs from ${formatCount(firstMonth.downloads)} in ${formatMonth(firstMonth.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)}, then holds between ${formatCount(settledFloor.downloads)} and ${formatCount(settledPeak.downloads)} through the summer. The step from ${formatMonth(beforeStep.month)} to ${formatMonth(stepMonth.month)} is about ${stepFactor} times in a single month, which is the shape automated traffic tends to make. That reading is a hypothesis worth stating, and public data does not settle it either way.`,
+    `The 2026 download curve runs from ${formatCount(firstMonth.downloads)} in ${formatMonth(firstMonth.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)}, then holds between ${formatCount(settledFloor.downloads)} and ${formatCount(settledPeak.downloads)} through the summer. The step from ${formatMonth(beforeStep.month)} to ${formatMonth(stepMonth.month)} is about ${stepFactor} times in a single month, which is the shape automated traffic tends to make. Public download data does not say which.`,
     `The two GitHub endpoints report at different precisions, and the tables label which is which. Repository search returns an exact \`total_count\`. Code search rounds \`total_count\` into buckets of roughly four significant figures, so ${readmeMatches} marks a range rather than an exact register.`,
   ],
   answerSourceIds: ["github-repo-search", "github-code-search", "npm-point"],
@@ -226,9 +223,9 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     ],
     notes: [
       `The ratio is where the two sides pull apart. One README that prints the command corresponds to roughly a thousand package downloads a month, which is more traffic than a team of people running an installer would produce. A registry counts machines and a README records an intention, so the numerator and the denominator are drawn from different populations by construction.`,
-      `Both figures carry a shape worth knowing. GitHub code search rounds its total into buckets, so about ${readmeMatches} marks a range rather than an exact register. The npm figure covers the window npm chose, ${npmWindow}, which is why it differs slightly from any calendar month in the series further down.`,
+      `GitHub code search rounds its total into buckets, so about ${readmeMatches} marks a range rather than an exact register. The npm figure covers the window npm chose, ${npmWindow}, which is why it differs slightly from any calendar month in the series further down.`,
       `Code search reads public repositories that GitHub has indexed. Private repositories, packages documented on a website instead of a README, and monorepo subdirectories without a README of their own all sit outside the count.`,
-      `Folding the files back into repositories is not something the endpoint allows: code search stops paginating at a thousand results, so the matches behind a total of about ${readmeMatches} cannot be listed and deduplicated. The page reports the file count it can verify and leaves the project count as the smaller unknown behind it.`,
+      `Folding the files back into repositories is not something the endpoint allows: code search stops paginating at a thousand results, so the matches behind a total of about ${readmeMatches} cannot be listed and deduplicated.`,
     ],
     link: {
       lead: "If the command itself is new to you,",
@@ -254,7 +251,6 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     notes: [
       "The three topics overlap. A repository can carry `agent-skills` and `claude-skills` at the same time, so the totals describe three labels rather than three populations, and adding them together produces a number that means nothing.",
       "What sits under a topic is mixed: individual skills, collections of skills, tooling that reads a SKILL.md, and repositories that added the topic to be found. The count measures how many people file work under the category, and it moves at the speed a person edits a repository.",
-      "A single snapshot only gives a level. The curve appears from the second month on, which is why the script runs monthly and every month stays in the repository as its own file.",
     ],
     link: {
       lead: "For the repositories worth opening rather than counting,",
@@ -294,8 +290,8 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
       'README counts: `GET /search/code?q="npx skills" filename:README.md` on the same API. Code search counts matching files rather than repositories, and it quantizes `total_count` into buckets of roughly four significant figures, so that number is approximate and the table says so beside it.',
       "Refusal: if either GitHub search answers with `incomplete_results: true`, its `total_count` is partial, and the collector exits with an error instead of writing a snapshot.",
       "Downloads: `api.npmjs.org/downloads/point/last-month/skills` for the ratio, and `api.npmjs.org/downloads/range/2026-01-01:<today>/skills` aggregated by calendar month for the series.",
-      `Snapshot: the run behind this page finished on ${readOnLabel} at ${snapshotTime(snapshot)} and was written to \`lib/seo/agent-skills-by-the-numbers/data/${snapshot.snapshot}.json\`.`,
-      "Schedule: one snapshot a month, committed as its own JSON file. The page renders whichever months are in the folder, so the change column fills itself in from the second month onward.",
+      `Snapshot: read on ${readOnLabel} at ${snapshotTime(snapshot)}.`,
+      "Schedule: one snapshot a month. The change column compares each month with the one before.",
     ],
     sourceIds: [
       "github-repo-search",

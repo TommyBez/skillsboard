@@ -13,7 +13,6 @@ const {
   noComparisonYet,
   formatCount,
   monthlyChange,
-  snapshotCadenceNote,
   topicChange,
 } = await import("../lib/seo/agent-skills-by-the-numbers/snapshots.ts")
 const { agentSkills } = await import("../lib/seo/agent-skills/index.ts")
@@ -475,23 +474,6 @@ test("the page counts README files and never claims to count projects", () => {
   )
 })
 
-test("the snapshot cadence line follows the number of committed snapshots", () => {
-  assert.ok(
-    entry.intro.includes(snapshotCadenceNote(ecosystemSnapshots.length)),
-    "the intro does not carry the cadence line for the committed snapshots",
-  )
-
-  assert.match(snapshotCadenceNote(1), /first monthly snapshot/)
-  assert.match(snapshotCadenceNote(1), /From the next one on/)
-
-  for (const count of [2, 7]) {
-    const line = snapshotCadenceNote(count)
-    assert.ok(!/first monthly snapshot/.test(line), `count ${count} still reads as the first`)
-    assert.ok(line.includes(formatCount(count)), `count ${count} is not in the line`)
-    assert.match(line, /movement since the month before/)
-    assert.ok(!dashPattern.test(line), `dash in: ${line}`)
-  }
-})
 
 test("the npm range source link is built from the snapshot it describes", () => {
   const source = entry.sources.find((candidate) => candidate.id === "npm-range")
