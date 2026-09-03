@@ -146,16 +146,16 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   seoTitle:
     "Anthropic Skills: Every First-Party Skill and Where It Loads | Skills Board",
   description:
-    "A catalog of the skills Anthropic itself publishes: four pre-built document skills, nineteen folders in the anthropics/skills repository, and thirteen bundled with Claude Code. What each one does, which surface loads it, and how it is licensed, checked against first-party sources on August 18, 2026.",
+    "A catalog of the skills Anthropic itself publishes: four pre-built document skills, nineteen folders in the anthropics/skills repository, and fifteen bundled with Claude Code. What each one does, which surface loads it, and how it is licensed, checked against first-party sources on August 18, 2026, with the bundled Claude Code list re-read on September 3, 2026.",
   intro: [
     "This page is a catalog, not a definition. It lists the skills Anthropic publishes itself, one row each, with what the skill says it does, which surface loads it, and what its license file actually says. If you are still working out what a skill is, the SKILL.md format and the frontmatter fields are covered on our Claude skills page instead, and nothing here repeats it.",
-    "The reason a catalog is worth writing is that Anthropic's first-party skills are not one list. They are three lists that share a vocabulary and almost nothing else. Four pre-built document skills load on claude.ai and through the Claude API and are referenced by a skill_id. Nineteen skill folders live in the public anthropics/skills repository and install like any other skill. Thirteen more ship inside Claude Code, invoked by typing a slash, and are documented in the commands reference rather than in the skills repository.",
+    "The reason a catalog is worth writing is that Anthropic's first-party skills are not one list. They are three lists that share a vocabulary and almost nothing else. Four pre-built document skills load on claude.ai and through the Claude API and are referenced by a skill_id. Nineteen skill folders live in the public anthropics/skills repository and install like any other skill. Fifteen more ship inside Claude Code, invoked by typing a slash, and are documented in the commands reference rather than in the skills repository.",
     "Two of those three lists collide on the same names. There is a pdf skill in the repository and a pdf skill_id on the API, and they are not the same artifact under the same license. Every row below says which set it belongs to. Counts and file contents were read on August 18, 2026 from the GitHub API and from raw.githubusercontent.com, and the repository gains skills often enough that the count is a snapshot rather than a fact.",
   ],
   answer:
-    "Anthropic publishes first-party skills in three separate sets. Four pre-built document skills, pptx, xlsx, docx, and pdf, are available on claude.ai and the Claude API, where you reference them by skill_id alongside the code execution tool. Nineteen skill folders sit in the public anthropics/skills repository, grouped into five plugin bundles. Thirteen more ship bundled inside Claude Code and are invoked with a slash.",
+    "Anthropic publishes first-party skills in three separate sets. Four pre-built document skills, pptx, xlsx, docx, and pdf, are available on claude.ai and the Claude API, where you reference them by skill_id alongside the code execution tool. Nineteen skill folders sit in the public anthropics/skills repository, grouped into five plugin bundles. Fifteen more ship bundled inside Claude Code and are invoked with a slash.",
   answerNotes: [
-    "The three sets do not sync with each other, and Anthropic says so directly. The overview page states that custom skills do not sync across surfaces, that a skill uploaded to claude.ai must be uploaded separately to the API, and that Claude Code skills are filesystem-based and separate from both. The same separation applies to the first-party skills: the pre-built document skills are documented as not available in Claude Code, and twelve of the thirteen Claude Code bundled skills are not in the repository. The exception is claude-api. The overview page says the open-source Claude API skill comes bundled with Claude Code, and the same skill is published in the repository as its own plugin, so that one artifact is the only place two of the three sets overlap.",
+    "The three sets do not sync with each other, and Anthropic says so directly. The overview page states that custom skills do not sync across surfaces, that a skill uploaded to claude.ai must be uploaded separately to the API, and that Claude Code skills are filesystem-based and separate from both. The same separation applies to the first-party skills: the pre-built document skills are documented as not available in Claude Code, and fourteen of the fifteen Claude Code bundled skills are not in the repository. The exception is claude-api. The overview page says the open-source Claude API skill comes bundled with Claude Code, and the same skill is published in the repository as its own plugin, so that one artifact is the only place two of the three sets overlap.",
     "The repository is not a product surface either. It is a GitHub repository at 170,257 stars when we read the API today, carrying a skills folder, a one-file spec folder, and a template folder holding a single SKILL.md. Anthropic's own framing is that these skills demonstrate what is possible, with a disclaimer that the implementations and behaviors you receive from Claude may differ from what is shown, and that you should test before relying on them.",
     "One naming rule is worth knowing before you copy a first-party skill and rename it. The platform documentation states that a skill name may contain only lowercase letters, numbers, and hyphens, is capped at 64 characters, and cannot contain the reserved words anthropic or claude. The bundled Claude Code skill is spelled claude-api and the repository folder is spelled claude-api, so the reserved-word rule and Anthropic's own published names disagree on the surfaces where the rule is stated.",
   ],
@@ -188,8 +188,8 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       {
         label: "Claude Code bundled skills",
         cells: [
-          "Thirteen entries marked Skill in the commands reference, from /batch to /verify. Anthropic describes them as prompt-based: a prompt handed to Claude, which Claude can also invoke automatically when relevant, rather than fixed logic.",
-          "Every Claude Code session, with no install step. The disableBundledSkills setting turns off every one of them except /doctor, and a skillOverrides entry hides an individual skill.",
+          "Fifteen entries marked Skill in the commands reference, from /batch to /workflow-authoring. Anthropic describes them as prompt-based: a prompt handed to Claude, which Claude can also invoke automatically when relevant, rather than fixed logic.",
+          "Every Claude Code session, with no install step, for thirteen of them. /design needs a session where artifacts are available and v2.1.234 or later, and /workflow-authoring needs dynamic workflows enabled and v2.1.248 or later. The disableBundledSkills setting turns off every one of them except /doctor, and a skillOverrides entry hides an individual skill.",
         ],
       },
     ],
@@ -375,7 +375,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     ],
   },
   bundled: {
-    title: "The thirteen skills bundled with Claude Code",
+    title: "The fifteen skills bundled with Claude Code",
     intro:
       "These are first-party skills too, and almost nobody counts them as such because they are documented in the commands reference rather than in the skills repository. Every entry below is marked Skill in that table, which is Anthropic's own distinction between a prompt handed to Claude and a command that runs fixed logic.",
     columns: ["Command", "What it does", "What to know"],
@@ -413,6 +413,13 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
         cells: [
           "Turns on debug logging for the current session and troubleshoots by reading the session debug log.",
           "Debug logging is off by default unless you started with claude --debug, so running this mid-session captures from that point forward.",
+        ],
+      },
+      {
+        label: "/design",
+        cells: [
+          "Drafts UI mockups, screen flows, landing pages, or posters as artboards on a single canvas, published as an artifact that runs a research preview of the Claude Design editor.",
+          "Where saving is enabled for the account you edit the artboards and publish a new version; otherwise you view the draft and export it as PNG or PDF. Needs a session where artifacts are available and Claude Code v2.1.234 or later.",
         ],
       },
       {
@@ -471,6 +478,13 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
           "One of the skills documented as running only when you invoke it, which keeps you in control of when a longer check spends time and tokens. Can record its own recipe into .claude/skills/verify/SKILL.md.",
         ],
       },
+      {
+        label: "/workflow-authoring",
+        cells: [
+          "Loads the reference for writing dynamic workflow scripts: the script API, resume behavior, quality patterns, and worked examples.",
+          "Claude normally loads it on its own before writing a script, so you run it yourself mainly before editing a saved script by hand. Available when dynamic workflows are enabled, and requires Claude Code v2.1.248 or later.",
+        ],
+      },
     ],
     notes: [
       "Two of these write skills rather than only running as skills. /run-skill-generator records a per-project recipe at .claude/skills/run-<name>/, and /verify writes what worked to .claude/skills/verify/SKILL.md when it had to figure out a build without a recorded recipe. Both land in the repository, which means the output of a first-party skill becomes a team skill that any agent reading that directory will pick up, whether or not the person who ran the command intended that.",
@@ -494,7 +508,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       {
         label: "Claude Code",
         cells: [
-          "The thirteen bundled skills, in every session, with no install. The pre-built document skills are documented as not available here.",
+          "The fifteen bundled skills, with no install; thirteen load in every session, while /design and /workflow-authoring are gated on artifacts, dynamic workflows, and a recent enough version. The pre-built document skills are documented as not available here.",
           "Everything else. Personal skills in ~/.claude/skills/, project skills in .claude/skills/, or plugins. Add the repository with /plugin marketplace add anthropics/skills, then install document-skills or example-skills.",
         ],
       },
@@ -607,9 +621,9 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   team: {
     title: "The catalog does not tell your team which of these to use",
     intro:
-      "Nineteen folders, thirteen commands, and four skill_ids is a supply problem solved. The question a team gets stuck on is which three of them are worth standardizing on, and none of the three sets above answers it.",
+      "Nineteen folders, fifteen commands, and four skill_ids is a supply problem solved. The question a team gets stuck on is which three of them are worth standardizing on, and none of the three sets above answers it.",
     body: [
-      "The scope you install at is different on every surface, which is exactly why a team ends up with three answers. On claude.ai a skill is enabled per person, and the platform documentation says custom skills there are individual to each user with no org-wide distribution and no central admin management. In Claude Code the thirteen bundled skills are present in every session with no install, while anything from the repository is added per user, per project, or through a plugin the project checks in. On the Claude API nothing is installed per person at all: the four pre-built skills are referenced by skill_id, and a custom skill uploaded through /v1/skills is workspace-wide for every member. Someone enables theme-factory on claude.ai, someone else installs example-skills in Claude Code, and a third person is on the API where neither is reachable, and Anthropic states that custom skills do not sync across surfaces, so the drift is designed in rather than accidental.",
+      "The scope you install at is different on every surface, which is exactly why a team ends up with three answers. On claude.ai a skill is enabled per person, and the platform documentation says custom skills there are individual to each user with no org-wide distribution and no central admin management. In Claude Code the fifteen bundled skills are present in every session with no install, while anything from the repository is added per user, per project, or through a plugin the project checks in. On the Claude API nothing is installed per person at all: the four pre-built skills are referenced by skill_id, and a custom skill uploaded through /v1/skills is workspace-wide for every member. Someone enables theme-factory on claude.ai, someone else installs example-skills in Claude Code, and a third person is on the API where neither is reachable, and Anthropic states that custom skills do not sync across surfaces, so the drift is designed in rather than accidental.",
       "The decision itself lives nowhere. The repository tells you a skill exists. It does not record that your team tried webapp-testing, found it worked, and agreed it is the one to reach for, or that someone read the docx license and decided the source-available terms rule it out for your fork. That gets said once in a chat thread and then it is gone.",
       "Skills Board is a web app for that smaller layer: the set your team actually settled on, in one searchable place, with the source repository and path visible on every entry, so a teammate can open the original SKILL.md before installing anything anywhere.",
     ],
@@ -665,7 +679,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       },
       {
         title: "No documented context cost for the bundled Claude Code skills",
-        body: "Thirteen bundled skills occupy metadata in every session, and /doctor exists partly to report skills against their context cost. No figure is published for what the bundled set itself costs, or where it sits against the listing budget Claude Code documents as one percent of the model's context window.",
+        body: "Up to fifteen bundled skills occupy metadata in a session, and /doctor exists partly to report skills against their context cost. No figure is published for what the bundled set itself costs, or where it sits against the listing budget Claude Code documents as one percent of the model's context window.",
       },
       {
         title: "No license on the repository as a whole",
@@ -688,7 +702,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     {
       question: "What are Anthropic skills?",
       answer:
-        "They are the Agent Skills that Anthropic publishes itself, in three sets: four pre-built document skills referenced by skill_id on claude.ai and the Claude API, nineteen skill folders in the public anthropics/skills repository, and thirteen more bundled inside Claude Code and invoked with a slash.",
+        "They are the Agent Skills that Anthropic publishes itself, in three sets: four pre-built document skills referenced by skill_id on claude.ai and the Claude API, nineteen skill folders in the public anthropics/skills repository, and fifteen more bundled inside Claude Code and invoked with a slash.",
     },
     {
       question: "How many skills does Anthropic publish in its skills repository?",
@@ -718,7 +732,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     {
       question: "Which skills come bundled with Claude Code from Anthropic?",
       answer:
-        "Thirteen entries marked Skill in the commands reference: /batch, /claude-api, /code-review, /dataviz, /debug, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, and /verify. They are available in every session with no install step, and the disableBundledSkills setting turns off all of them except for /doctor.",
+        "Fifteen entries marked Skill in the commands reference: /batch, /claude-api, /code-review, /dataviz, /debug, /design, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, /verify, and /workflow-authoring. Thirteen load in every session with no install step; /design and /workflow-authoring are gated on artifacts, dynamic workflows, and a recent version. The disableBundledSkills setting turns off all of them except /doctor.",
     },
     {
       question: "How does a team standardize on a set of Anthropic skills?",
@@ -767,7 +781,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       id: "claude-code-commands",
       label: "Claude Code: commands reference",
       href: "https://code.claude.com/docs/en/commands",
-      note: "The thirteen entries marked Skill and what each one does, the aliases, the subcommands and flags, and the version requirements for the newer ones.",
+      note: "The fifteen entries marked Skill and what each one does, the aliases, the subcommands and flags, and the version requirements for the newer ones.",
     },
     {
       id: "claude-code-skills",
@@ -869,12 +883,12 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       { text: "separate sets of skills.", accent: true },
     ],
     description:
-      "Four pre-built document skills, nineteen folders in anthropics/skills, and thirteen bundled with Claude Code. What each does, where it loads, and how it is licensed.",
+      "Four pre-built document skills, nineteen folders in anthropics/skills, and fifteen bundled with Claude Code. What each does, where it loads, and how it is licensed.",
     contextLabel: "skillsboard.sh/anthropic-skills",
     chips: ["Catalog", "Surfaces", "Licenses"],
   },
   ogAlt:
-    "Catalog of Anthropic's first-party skills: the four pre-built document skills, the nineteen folders in the anthropics/skills repository, and the thirteen skills bundled with Claude Code.",
+    "Catalog of Anthropic's first-party skills: the four pre-built document skills, the nineteen folders in the anthropics/skills repository, and the fifteen skills bundled with Claude Code.",
   publishedAt: "2026-08-18",
-  modifiedAt: "2026-08-19",
+  modifiedAt: "2026-09-03",
 }
