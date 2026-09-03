@@ -146,7 +146,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
   seoTitle:
     "Anthropic Skills: Every First-Party Skill and Where It Loads | Skills Board",
   description:
-    "A catalog of the skills Anthropic itself publishes: four pre-built document skills, nineteen folders in the anthropics/skills repository, and fifteen bundled with Claude Code. What each one does, which surface loads it, and how it is licensed, checked against first-party sources on September 3, 2026.",
+    "A catalog of the skills Anthropic itself publishes: four pre-built document skills, nineteen folders in the anthropics/skills repository, and fifteen bundled with Claude Code. What each one does, which surface loads it, and how it is licensed, checked against first-party sources on August 18, 2026, with the bundled Claude Code list re-read on September 3, 2026.",
   intro: [
     "This page is a catalog, not a definition. It lists the skills Anthropic publishes itself, one row each, with what the skill says it does, which surface loads it, and what its license file actually says. If you are still working out what a skill is, the SKILL.md format and the frontmatter fields are covered on our Claude skills page instead, and nothing here repeats it.",
     "The reason a catalog is worth writing is that Anthropic's first-party skills are not one list. They are three lists that share a vocabulary and almost nothing else. Four pre-built document skills load on claude.ai and through the Claude API and are referenced by a skill_id. Nineteen skill folders live in the public anthropics/skills repository and install like any other skill. Fifteen more ship inside Claude Code, invoked by typing a slash, and are documented in the commands reference rather than in the skills repository.",
@@ -189,7 +189,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
         label: "Claude Code bundled skills",
         cells: [
           "Fifteen entries marked Skill in the commands reference, from /batch to /workflow-authoring. Anthropic describes them as prompt-based: a prompt handed to Claude, which Claude can also invoke automatically when relevant, rather than fixed logic.",
-          "Every Claude Code session, with no install step. The disableBundledSkills setting turns off every one of them except /doctor, and a skillOverrides entry hides an individual skill.",
+          "Every Claude Code session, with no install step, for thirteen of them. /design needs a session where artifacts are available and v2.1.234 or later, and /workflow-authoring needs dynamic workflows enabled and v2.1.248 or later. The disableBundledSkills setting turns off every one of them except /doctor, and a skillOverrides entry hides an individual skill.",
         ],
       },
     ],
@@ -508,7 +508,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       {
         label: "Claude Code",
         cells: [
-          "The fifteen bundled skills, in every session, with no install. The pre-built document skills are documented as not available here.",
+          "The fifteen bundled skills, with no install; thirteen load in every session, while /design and /workflow-authoring are gated on artifacts, dynamic workflows, and a recent enough version. The pre-built document skills are documented as not available here.",
           "Everything else. Personal skills in ~/.claude/skills/, project skills in .claude/skills/, or plugins. Add the repository with /plugin marketplace add anthropics/skills, then install document-skills or example-skills.",
         ],
       },
@@ -679,7 +679,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
       },
       {
         title: "No documented context cost for the bundled Claude Code skills",
-        body: "Fifteen bundled skills occupy metadata in every session, and /doctor exists partly to report skills against their context cost. No figure is published for what the bundled set itself costs, or where it sits against the listing budget Claude Code documents as one percent of the model's context window.",
+        body: "Up to fifteen bundled skills occupy metadata in a session, and /doctor exists partly to report skills against their context cost. No figure is published for what the bundled set itself costs, or where it sits against the listing budget Claude Code documents as one percent of the model's context window.",
       },
       {
         title: "No license on the repository as a whole",
@@ -732,7 +732,7 @@ export const anthropicSkills: AnthropicSkillsDefinition = {
     {
       question: "Which skills come bundled with Claude Code from Anthropic?",
       answer:
-        "Fifteen entries marked Skill in the commands reference: /batch, /claude-api, /code-review, /dataviz, /debug, /design, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, /verify, and /workflow-authoring. They are available in every session with no install step, and the disableBundledSkills setting turns off all of them except for /doctor.",
+        "Fifteen entries marked Skill in the commands reference: /batch, /claude-api, /code-review, /dataviz, /debug, /design, /design-sync, /doctor, /fewer-permission-prompts, /loop, /run, /run-skill-generator, /simplify, /verify, and /workflow-authoring. Thirteen load in every session with no install step; /design and /workflow-authoring are gated on artifacts, dynamic workflows, and a recent version. The disableBundledSkills setting turns off all of them except /doctor.",
     },
     {
       question: "How does a team standardize on a set of Anthropic skills?",
