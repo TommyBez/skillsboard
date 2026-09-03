@@ -194,7 +194,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   answerSourceIds: ["github-repo-search", "github-code-search", "npm-point"],
   declarations: {
     title: "How many projects declare it",
-    intro: `The install command for the \`${usage.npmPackage}\` CLI is \`npx ${usage.npmPackage}\`. A public repository that prints that command in its README belongs to an author who expects a human to run it, which makes README matches the closest public proxy for stated use.`,
+    intro: `The install command for the \`${usage.npmPackage}\` CLI, published on npm by Vercel Labs from the vercel-labs/skills repository, is \`npx ${usage.npmPackage}\`. A public repository that prints that command in its README belongs to an author who expects a human to run it, which makes README matches the closest public proxy for stated use.`,
     columns: ["Measure", "Value", "Precision", "Read on"],
     rows: [
       {
@@ -251,7 +251,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     notes: [
       "The three topics overlap. A repository can carry `agent-skills` and `claude-skills` at the same time, so the totals describe three labels rather than three populations, and adding them together produces a number that means nothing.",
       "What sits under a topic is mixed: individual skills, collections of skills, tooling that reads a SKILL.md, and repositories that added the topic to be found. The count measures how many people file work under the category, and it moves at the speed a person edits a repository.",
-      "One snapshot gives a level. Twelve give a curve, which is why the script runs monthly and every month stays in the repository as its own file.",
+      "A single snapshot only gives a level. The curve appears from the second month on, which is why the script runs monthly and every month stays in the repository as its own file.",
     ],
     link: {
       lead: "For the repositories worth opening rather than counting,",
