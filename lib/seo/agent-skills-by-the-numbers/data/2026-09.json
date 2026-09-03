@@ -1,0 +1,86 @@
+{
+  "snapshot": "2026-09",
+  "collectedAt": "2026-09-03T19:26:17Z",
+  "repositoryTopics": [
+    {
+      "topic": "agent-skills",
+      "repositories": 20783
+    },
+    {
+      "topic": "claude-skills",
+      "repositories": 7817
+    },
+    {
+      "topic": "claude-code-skills",
+      "repositories": 1661
+    }
+  ],
+  "declaredUsage": {
+    "query": "\"npx skills\" filename:README.md",
+    "readmeMatches": 37248,
+    "readmeMatchPrecision": "bucketed",
+    "npmPackage": "skills",
+    "npmDownloadsLastMonth": 38365913,
+    "npmWindowStart": "2026-07-31",
+    "npmWindowEnd": "2026-08-29",
+    "downloadsPerDeclaringProject": 1030
+  },
+  "monthlyDownloads": {
+    "package": "skills",
+    "rangeStart": "2026-01-01",
+    "rangeEnd": "2026-09-03",
+    "months": [
+      {
+        "month": "2026-01",
+        "downloads": 240953,
+        "partial": false
+      },
+      {
+        "month": "2026-02",
+        "downloads": 988785,
+        "partial": false
+      },
+      {
+        "month": "2026-03",
+        "downloads": 2635935,
+        "partial": false
+      },
+      {
+        "month": "2026-04",
+        "downloads": 3026631,
+        "partial": false
+      },
+      {
+        "month": "2026-05",
+        "downloads": 4760931,
+        "partial": false
+      },
+      {
+        "month": "2026-06",
+        "downloads": 38867068,
+        "partial": false
+      },
+      {
+        "month": "2026-07",
+        "downloads": 44425540,
+        "partial": false
+      },
+      {
+        "month": "2026-08",
+        "downloads": 39859796,
+        "partial": false
+      },
+      {
+        "month": "2026-09",
+        "downloads": 3596150,
+        "partial": true
+      }
+    ]
+  },
+  "notes": [
+    "GitHub repository search reports an exact total_count, so the topic figures are counts rather than estimates.",
+    "GitHub code search quantizes total_count into buckets of roughly four significant figures, so the README figure is approximate and the page says so.",
+    "A README match is a public repository that prints the install command. It is not a running installation, and a repository can print the command without anyone running it.",
+    "npm counts every download of the package, including continuous integration jobs, mirrors, and bots, so a download is not a person."
+  ]
+}
