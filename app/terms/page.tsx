@@ -43,7 +43,8 @@ export default function TermsPage() {
         <h2>Service operator</h2>
         <p>
           The hosted service is operated under the Skills Board name. The operator can be reached at{" "}
-          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a> or at {siteConfig.postalAddress}.
+          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
+          {siteConfig.postalAddress ? ` or at ${siteConfig.postalAddress}` : ""}.
         </p>
       </section>
 
@@ -163,7 +164,7 @@ export default function TermsPage() {
         <h2>Contact</h2>
         <p>
           Questions about these terms can be sent to <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
-          {" "}or mailed to {siteConfig.name}, {siteConfig.postalAddress}.
+          {siteConfig.postalAddress ? ` or mailed to ${siteConfig.name}, ${siteConfig.postalAddress}` : ""}.
         </p>
       </section>
     </LegalPageShell>

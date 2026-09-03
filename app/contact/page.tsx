@@ -51,17 +51,19 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="rounded-[16px] border border-border bg-card p-5 sm:p-6">
-        <div className="flex items-start gap-3">
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-foreground text-background">
-            <MapPinIcon className="size-4" aria-hidden="true" />
-          </span>
-          <div>
-            <h2>Postal address</h2>
-            <address className="not-italic text-foreground">{siteConfig.postalAddress}</address>
+      {siteConfig.postalAddress ? (
+        <section className="rounded-[16px] border border-border bg-card p-5 sm:p-6">
+          <div className="flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-foreground text-background">
+              <MapPinIcon className="size-4" aria-hidden="true" />
+            </span>
+            <div>
+              <h2>Postal address</h2>
+              <address className="not-italic text-foreground">{siteConfig.postalAddress}</address>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       <section>
         <h2>Public bug reports and feature requests</h2>

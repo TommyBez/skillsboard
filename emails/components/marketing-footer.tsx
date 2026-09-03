@@ -28,8 +28,13 @@ export function MarketingFooter({
         <Link href={`${siteConfig.url}/contact`} className="text-ink underline">Contact Skills Board</Link>
       </Text>
       <Text className="mb-0 mt-2 text-xs leading-5 text-muted">
-        {siteConfig.name}<br />
-        {siteConfig.postalAddress}
+        {siteConfig.name}
+        {siteConfig.postalAddress ? (
+          <>
+            <br />
+            {siteConfig.postalAddress}
+          </>
+        ) : null}
       </Text>
     </>
   )
