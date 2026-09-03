@@ -36,7 +36,7 @@ export const developers = {
   publicSurface: {
     title: "The public surface",
     intro:
-      "Everything below is public and needs no credential to fetch, except the MCP endpoint itself. Anything under /api that is not listed here backs the web UI on a session cookie and is not an integration point: it can change without notice.",
+      "Everything below is public and needs no credential to fetch, except the MCP endpoint itself. Every document in this table is linked from its own row, so a client can follow it rather than guess the path. Anything under /api that is not listed here backs the web UI on a session cookie and is not an integration point: it can change without notice.",
     columns: ["Endpoint", "What it is", "Authentication"],
     rows: [
       {
@@ -55,14 +55,17 @@ export const developers = {
       },
       {
         label: "/openapi.json",
+        href: "/openapi.json",
         cells: ["OpenAPI 3.1 description of everything in this table.", "None"],
       },
       {
         label: "/server.json",
+        href: "/server.json",
         cells: ["MCP registry manifest: identity, version, and the remote endpoint.", "None"],
       },
       {
         label: "/.well-known/mcp/server-card.json",
+        href: "/.well-known/mcp/server-card.json",
         cells: [
           "MCP Server Card (SEP-1649): transport, capabilities, tools, and scopes. The same card answers at /.well-known/mcp.",
           "None",
@@ -70,18 +73,22 @@ export const developers = {
       },
       {
         label: "/.well-known/oauth-protected-resource",
+        href: "/.well-known/oauth-protected-resource",
         cells: ["RFC 9728 metadata: the audience a token must be bound to.", "None"],
       },
       {
         label: "/.well-known/api-catalog",
+        href: "/.well-known/api-catalog",
         cells: ["RFC 9727 linkset naming this API and its documents.", "None"],
       },
       {
         label: "/.well-known/ai-catalog.json",
+        href: "/.well-known/ai-catalog.json",
         cells: ["Agentic Resource Discovery manifest for this origin.", "None"],
       },
       {
         label: "/.well-known/agent-skills/index.json",
+        href: "/.well-known/agent-skills/index.json",
         cells: ["The Agent Skills this site publishes, each with a sha256 digest.", "None"],
       },
     ],
@@ -96,6 +103,7 @@ export const developers = {
       "The client registers itself dynamically, then runs authorization code + PKCE. A person approves the scopes in a browser; nothing is issued without that approval.",
       "Call `tools/list` on the live session for the tool schemas, then `tools/call`.",
     ],
+    templateLanguage: "json",
     template: `{
   "mcpServers": {
     "skills-board": {
@@ -161,6 +169,7 @@ export const developers = {
         cells: [String(problem.status), problem.title, problem.detail],
       })),
     },
+    templateLanguage: "http",
     template: `HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Retry-After: 37
@@ -212,8 +221,13 @@ RateLimit: "${PUBLIC_API_RATE_LIMIT.name}";r=0;t=37
     title: "Markdown, for reading rather than parsing",
     body: [
       "Every public page on this site has a Markdown twin at the same URL with a `.md` suffix, and the page URL itself returns Markdown when the request sends `Accept: text/markdown`. Those responses carry an `x-markdown-tokens` header estimating the document's size, so a client can budget a read before it makes it.",
-      `Start at ${siteConfig.url}/llms.txt, which indexes every page, document, and endpoint this site publishes.`,
     ],
+    link: {
+      lead: "The index of every page, document, and endpoint this site publishes, and the place to start:",
+      label: "llms.txt",
+      href: "/llms.txt",
+      trail: ".",
+    },
   },
   supportAndSource: {
     title: "Status, support, and source",

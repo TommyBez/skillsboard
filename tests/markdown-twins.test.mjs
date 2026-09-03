@@ -168,7 +168,14 @@ test("only a page with a twin advertises the Markdown alternate", () => {
     canonical: "/codex-skills",
     types: { "text/markdown": "/codex-skills.md" },
   })
-  assert.deepEqual(markdownTwinAlternates("/pricing"), { canonical: "/pricing" })
+  // `/pricing.md` is written by hand and lives in `public` rather than being
+  // generated, so the page head is where it is announced: without this the
+  // document existed and only a reader coming from llms.txt would find it.
+  assert.deepEqual(markdownTwinAlternates("/pricing"), {
+    canonical: "/pricing",
+    types: { "text/markdown": "/pricing.md" },
+  })
+  assert.deepEqual(markdownTwinAlternates("/about"), { canonical: "/about" })
 })
 
 /** Everything outside a fenced block, where Markdown syntax is live. */
@@ -177,7 +184,8 @@ function prose(markdown) {
   return markdown
     .split("\n")
     .filter((line) => {
-      if (/^`{3,}$/.test(line.trim())) {
+      // The opening fence carries a language tag and the closing one does not.
+      if (/^`{3,}[a-z]*$/.test(line.trim())) {
         inFence = !inFence
         return false
       }

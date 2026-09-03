@@ -15,6 +15,61 @@ const MARKDOWN_ACCEPT = {
   value: String.raw`.*text/markdown(?![^,]*;\s*q\s*=\s*0(?:\.0*)?(?![.\d])).*`,
 } as const
 
+/**
+ * The URLs that answer in two representations.
+ *
+ * One list, read twice: it names the rewrite that serves Markdown when the
+ * request asks for it, and it names the URLs whose HTML response has to carry
+ * `Vary: Accept`. Keeping them in one place is what stops a page from
+ * negotiating without announcing it, which is the state `/pricing` was in.
+ *
+ * `source` is matched by the router, so it carries the slug patterns; the
+ * scope is deliberately narrow rather than site wide: `/<something>-skills`, a
+ * top-level article that does not end in `-skills`, one of the three hubs, a
+ * guide, an alternative, or a comparison. A request for a page outside those
+ * shapes keeps returning HTML rather than a 404.
+ */
+const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] = [
+  // The home page. It is the URL an agent scanning the site reaches first, so
+  // it is the one that most needs to answer in Markdown.
+  { source: "/", markdown: "/api/markdown?path=/" },
+  { source: "/:slug([^/]*-skills)", markdown: "/api/markdown?path=/:slug" },
+  {
+    source: "/agent-skills-support",
+    markdown: "/api/markdown?path=/agent-skills-support",
+  },
+  { source: "/developers", markdown: "/api/markdown?path=/developers" },
+  {
+    source: "/agents-md-vs-skill-md",
+    markdown: "/api/markdown?path=/agents-md-vs-skill-md",
+  },
+  // `/skill-examples` does not end in `-skills`, so the shared rule above does
+  // not reach it and it needs a rule of its own.
+  { source: "/skill-examples", markdown: "/api/markdown?path=/skill-examples" },
+  // `/claude-code-for-teams` does not end in `-skills` either.
+  {
+    source: "/claude-code-for-teams",
+    markdown: "/api/markdown?path=/claude-code-for-teams",
+  },
+  // `/pricing.md` is written by hand and lives in `public`, so the negotiated
+  // request is sent to the file itself rather than to the twin generator,
+  // which only knows the pages built from a content definition. A rewrite in
+  // `beforeFiles` is resolved against the filesystem afterwards, so the static
+  // file answers with its own `text/markdown` content type.
+  { source: "/pricing", markdown: "/pricing.md" },
+  // The three hubs. Each one is a page in its own right, so the rules below
+  // it, which all carry a slug, never match it.
+  { source: "/resources", markdown: "/api/markdown?path=/resources" },
+  { source: "/alternatives", markdown: "/api/markdown?path=/alternatives" },
+  { source: "/compare", markdown: "/api/markdown?path=/compare" },
+  { source: "/guides/:slug", markdown: "/api/markdown?path=/guides/:slug" },
+  {
+    source: "/alternatives/:slug",
+    markdown: "/api/markdown?path=/alternatives/:slug",
+  },
+  { source: "/compare/:slug", markdown: "/api/markdown?path=/compare/:slug" },
+]
+
 const nextConfig = {
   cacheComponents: true,
   experimental: {
@@ -49,6 +104,22 @@ const nextConfig = {
           },
         ],
       },
+      // `Vary: Accept` on the HTML half of every URL that negotiates. The
+      // Markdown half already sends it from the route handler; without it here
+      // any cache between the site and the client is free to hand the HTML it
+      // stored to a request that asked for Markdown, and the other way round.
+      //
+      // Declared here because this is where the site says what its responses
+      // depend on. Under `next start` the App Router sets its own `Vary` on
+      // the rendered response after these headers are applied, so the served
+      // header shows the router tokens only; the same is true of a `Vary`
+      // appended from `proxy.ts`, which was measured. Whether the value
+      // survives on Vercel is a `curl -I` against a preview deployment, and if
+      // it does not, this entry is inert rather than wrong.
+      ...NEGOTIATED_PAGES.map(({ source }) => ({
+        source,
+        headers: [{ key: "Vary", value: "Accept" }],
+      })),
       {
         source: "/p/:path*",
         headers: [
@@ -262,21 +333,9 @@ const nextConfig = {
       // Content negotiation. `beforeFiles` is what makes these win over the
       // HTML page that owns the same URL. The header value is matched as an
       // anchored regular expression, and no browser or RSC request asks for
-      // `text/markdown`, so ordinary page traffic never reaches these.
-      //
-      // Scoped to the URL shapes that have a Markdown twin instead of the whole
-      // site: `/<something>-skills`, a top-level article that does not end in
-      // `-skills`, one of the three hubs, a guide, an alternative, or a
-      // comparison. A request for a page outside those shapes keeps returning
-      // HTML rather than a 404.
+      // `text/markdown`, so ordinary page traffic never reaches these. The
+      // URLs are `NEGOTIATED_PAGES`, which is also what `headers()` reads.
       beforeFiles: [
-        // The home page. It is the URL an agent scanning the site reaches
-        // first, so it is the one that most needs to answer in Markdown.
-        {
-          source: "/",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/",
-        },
         // `/` + `.md` is not a path, so the home twin is published at
         // `/index.md`. Stated here because the generic `<path>.md` rule below
         // would resolve it to the page `/index`, which does not exist.
@@ -284,71 +343,11 @@ const nextConfig = {
           source: "/index.md",
           destination: "/api/markdown?path=/",
         },
-        {
-          source: "/:slug([^/]*-skills)",
+        ...NEGOTIATED_PAGES.map(({ source, markdown }) => ({
+          source,
           has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/:slug",
-        },
-        {
-          source: "/agent-skills-support",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/agent-skills-support",
-        },
-        {
-          source: "/developers",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/developers",
-        },
-        {
-          source: "/agents-md-vs-skill-md",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/agents-md-vs-skill-md",
-        },
-        // `/skill-examples` does not end in `-skills`, so the shared rule
-        // above does not reach it and it needs a rule of its own.
-        {
-          source: "/skill-examples",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/skill-examples",
-        },
-        // `/claude-code-for-teams` does not end in `-skills` either.
-        {
-          source: "/claude-code-for-teams",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/claude-code-for-teams",
-        },
-        // The three hubs. Each one is a page in its own right, so the rules
-        // below it, which all carry a slug, never match it.
-        {
-          source: "/resources",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/resources",
-        },
-        {
-          source: "/alternatives",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/alternatives",
-        },
-        {
-          source: "/compare",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/compare",
-        },
-        {
-          source: "/guides/:slug",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/guides/:slug",
-        },
-        {
-          source: "/alternatives/:slug",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/alternatives/:slug",
-        },
-        {
-          source: "/compare/:slug",
-          has: [MARKDOWN_ACCEPT],
-          destination: "/api/markdown?path=/compare/:slug",
-        },
+          destination: markdown,
+        })),
       ],
       afterFiles: [
         {

@@ -125,6 +125,7 @@ export interface ComparisonTogether {
   }
   notes: readonly string[]
   template: string
+  templateLanguage: string
   templateLabel: string
   templateCopy: ComparisonTemplateCopy
   link: ComparisonInlineLink

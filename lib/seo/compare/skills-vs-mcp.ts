@@ -259,6 +259,7 @@ export const skillsVsMcp: ComparisonDefinition = {
       "The convention that survives contact with a real team is boring. One repository, two committed files, and one line in the README that says which skills the team settled on and why. Everything past that is a distribution problem rather than a format problem.",
     ],
     template: bothLayersTemplate,
+    templateLanguage: "text",
     templateLabel: "A repository that commits both layers",
     templateCopy: {
       buttonLabel: "Copy example",

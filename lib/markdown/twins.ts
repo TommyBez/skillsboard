@@ -99,12 +99,30 @@ export function renderMarkdownTwin(path: string): string | undefined {
 }
 
 /**
+ * Twins written by hand rather than generated from a content definition: a
+ * Markdown document in `public` that mirrors a page built from components.
+ *
+ * Only the head of the page reads this. `renderMarkdownTwin` stays strict, so
+ * a static document is served by the file itself, which is where the rewrite
+ * in `next.config.ts` sends a negotiated request for one.
+ */
+const staticMarkdownTwins: Record<string, string> = {
+  "/pricing": "/pricing.md",
+}
+
+/**
  * `<link rel="alternate" type="text/markdown" href="...">` for the page head,
  * merged into the page metadata alongside its canonical URL.
  */
 export function markdownTwinAlternates(
   path: string,
 ): NonNullable<Metadata["alternates"]> {
+  const normalized = normalizeContentPath(path)
+  const staticTwin = staticMarkdownTwins[normalized]
+  if (staticTwin) {
+    return { canonical: path, types: { "text/markdown": staticTwin } }
+  }
+
   if (!hasMarkdownTwin(path)) return { canonical: path }
 
   return {

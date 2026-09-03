@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ExternalLinkIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
 import {
   buildPricingSchema,
   pricingDescription,
@@ -16,7 +17,7 @@ const socialTitle = "Skills Board Pricing: Free Forever"
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Skills Board: Free Forever" },
   description: pricingDescription,
-  alternates: { canonical: pricingPath },
+  alternates: markdownTwinAlternates(pricingPath),
   openGraph: {
     type: "website",
     url: pricingPath,
