@@ -114,9 +114,15 @@ test("the article is listed in the static llms.txt", async () => {
     "utf8",
   )
   assert.ok(llms.includes(`${canonical})`), "missing from public/llms.txt")
+
+  // The sibling articles pin the single `Last reviewed` line to their own
+  // modifiedAt, so moving it forward asserts that every one of them was
+  // re-reviewed on the new date. This page re-read the Claude Code commands
+  // reference on 2026-09-03 and nothing else, so the shared line stays at the
+  // date of that full review and this page carries its own date instead.
   assert.ok(
-    llms.includes(`Last reviewed: ${entry.modifiedAt}`),
-    "llms.txt was not re-reviewed alongside the new entry",
+    llms.includes("Last reviewed: 2026-08-19"),
+    "the shared review date moved without a full re-review",
   )
 })
 
@@ -225,7 +231,7 @@ test("the page is a registry rather than a second definition page", () => {
 
   // The bundled Claude Code skills are first-party too, and are the half of
   // the answer the repository does not carry.
-  assert.equal(entry.bundled.rows.length, 13)
+  assert.equal(entry.bundled.rows.length, 15)
   for (const row of entry.bundled.rows) {
     assert.match(row.label, /^\/[a-z-]+$/, `${row.label} is not a command`)
   }
