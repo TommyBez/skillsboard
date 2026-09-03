@@ -18,10 +18,8 @@ const MARKDOWN_ACCEPT = {
 /**
  * The URLs that answer in two representations.
  *
- * One list, read twice: it names the rewrite that serves Markdown when the
- * request asks for it, and it names the URLs whose HTML response has to carry
- * `Vary: Accept`. Keeping them in one place is what stops a page from
- * negotiating without announcing it, which is the state `/pricing` was in.
+ * One list, so the rewrite that serves Markdown when the request asks for it
+ * is declared in a single place rather than once per URL.
  *
  * `source` is matched by the router, so it carries the slug patterns; the
  * scope is deliberately narrow rather than site wide: `/<something>-skills`, a
@@ -104,22 +102,6 @@ const nextConfig = {
           },
         ],
       },
-      // `Vary: Accept` on the HTML half of every URL that negotiates. The
-      // Markdown half already sends it from the route handler; without it here
-      // any cache between the site and the client is free to hand the HTML it
-      // stored to a request that asked for Markdown, and the other way round.
-      //
-      // Declared here because this is where the site says what its responses
-      // depend on. Under `next start` the App Router sets its own `Vary` on
-      // the rendered response after these headers are applied, so the served
-      // header shows the router tokens only; the same is true of a `Vary`
-      // appended from `proxy.ts`, which was measured. Whether the value
-      // survives on Vercel is a `curl -I` against a preview deployment, and if
-      // it does not, this entry is inert rather than wrong.
-      ...NEGOTIATED_PAGES.map(({ source }) => ({
-        source,
-        headers: [{ key: "Vary", value: "Accept" }],
-      })),
       {
         source: "/p/:path*",
         headers: [
@@ -391,4 +373,5 @@ const nextConfig = {
   },
 } satisfies NextConfig
 
+export { NEGOTIATED_PAGES }
 export default nextConfig

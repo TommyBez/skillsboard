@@ -7,7 +7,9 @@ import "./helpers/register-app-aliases.mjs"
 const { markdownTwinPaths, markdownTwinPath, renderMarkdownTwin } = await import(
   "../lib/markdown/twins.ts"
 )
-const { default: nextConfig } = await import("../next.config.ts")
+const { default: nextConfig, NEGOTIATED_PAGES } = await import(
+  "../next.config.ts"
+)
 
 const repoRoot = new URL("../", import.meta.url)
 const source = (path) => readFileSync(new URL(path, repoRoot), "utf8")
@@ -105,32 +107,34 @@ test("the install command and the developer templates carry the right tag", () =
 })
 
 /**
- * The Markdown half of a negotiated URL already sends `Vary: Accept` from the
- * route handler. Without it on the HTML half, a cache between the site and the
- * client may hand the representation it stored to a request that asked for the
- * other one.
+ * `Vary: Accept` on the HTML half was measured to be inert on Vercel: the App
+ * Router overwrites `Vary` on the rendered response with its own RSC tokens,
+ * so the header this config declared never reached a client (see the removal
+ * noted on PR #178). Negotiation itself stays safe without it, because the
+ * `has` rule on a negotiated source sends the request to a different
+ * destination (a static `.md` file or `/api/markdown`) rather than to the
+ * same URL with a different body, so the HTML and Markdown responses never
+ * share a cache key. What still has to hold is that every rewrite rule that
+ * negotiates on Accept is declared from the same `NEGOTIATED_PAGES` list, so
+ * there is one place that names the negotiated URLs.
  */
-test("every URL that negotiates on Accept varies on it", async () => {
+test("every rewrite rule that negotiates on Accept comes from NEGOTIATED_PAGES", async () => {
   const headers = await nextConfig.headers()
   const { beforeFiles } = await nextConfig.rewrites()
 
-  const varies = new Set(
-    headers
-      .filter((entry) =>
-        entry.headers.some(
-          (header) =>
-            header.key === "Vary" && header.value.includes("Accept"),
-        ),
-      )
-      .map((entry) => entry.source),
-  )
+  // `/index.md` is the home twin's own rewrite, declared by hand rather than
+  // through the shared list, and it does not negotiate on Accept (it always
+  // serves Markdown), so it is not among the `has` rules below.
+  const negotiatedSources = beforeFiles
+    .filter((entry) => entry.has)
+    .map((entry) => entry.source)
+    .sort()
 
-  for (const rule of beforeFiles.filter((entry) => entry.has)) {
-    assert.ok(
-      varies.has(rule.source),
-      `${rule.source} negotiates on Accept without varying on it`,
-    )
-  }
+  assert.deepEqual(
+    negotiatedSources,
+    NEGOTIATED_PAGES.map((entry) => entry.source).sort(),
+    "the beforeFiles rules that negotiate on Accept have drifted from NEGOTIATED_PAGES",
+  )
 
   // The site wide pointer to llms.txt is still the first thing every response
   // carries.
