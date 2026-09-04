@@ -22,7 +22,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   agentSkillsByTheNumbersPath,
-  type AgentSkillsByTheNumbersCtaPlacement,
   type AgentSkillsByTheNumbersPath,
 } from "@/lib/seo/agent-skills-by-the-numbers/types"
 

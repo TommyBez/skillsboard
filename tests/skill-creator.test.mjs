@@ -116,21 +116,21 @@ test("the trailing slash redirects to the canonical path", async () => {
   assert.equal(rule.permanent, true)
 })
 
-test("the page declares its own CTA locations and no hero one", async () => {
+test("the page declares its own CTA placements and no hero one", async () => {
   const layout = await readFile(
     new URL(`../app${entry.path}/layout.tsx`, import.meta.url),
     "utf8",
   )
-  assert.ok(layout.includes("skill_creator_header"))
+  assert.ok(layout.includes("ResourceShell"))
 
   const page = await readFile(
     new URL("../components/skill-creator/skill-creator-page.tsx", import.meta.url),
     "utf8",
   )
-  assert.ok(page.includes("skill_creator_inline"))
-  assert.ok(page.includes("skill_creator_closing"))
+  assert.ok(page.includes('location="inline"'))
+  assert.ok(page.includes('location="closing"'))
   assert.ok(
-    !page.includes("skill_creator_hero"),
+    !page.includes('location="hero"'),
     "the generator owns the space above the fold",
   )
 
@@ -138,11 +138,7 @@ test("the page declares its own CTA locations and no hero one", async () => {
     new URL("../analytics/posthog/events.ts", import.meta.url),
     "utf8",
   )
-  for (const location of [
-    "skill_creator_header",
-    "skill_creator_inline",
-    "skill_creator_closing",
-  ]) {
+  for (const location of ["header", "inline", "closing"]) {
     assert.ok(
       events.includes(`"${location}"`),
       `${location} is missing from the landing_cta_clicked union`,

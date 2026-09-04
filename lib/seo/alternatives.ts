@@ -19,20 +19,18 @@ export type AlternativePath =
 export type AlternativeSlug =
   AlternativePath extends `/alternatives/${infer Slug}` ? Slug : never
 
-/** One value per alternative page, used as the analytics location prefix. */
-export type AlternativeCtaLocation =
+/**
+ * One value per alternative page, recorded as the `source` of an
+ * email_capture_submitted event so a signup can be traced back to the page
+ * that earned it. The CTA location no longer carries the page, which is read
+ * from `$pathname`, but the capture source is a stored column and stays
+ * spelled out.
+ */
+export type AlternativeEmailCaptureSource =
   | "alternatives_github_repo"
   | "alternatives_skills_sh"
   | "alternatives_smithery"
   | "alternatives_superpowers"
-
-/**
- * The two CTA placements on an alternative page, kept in sync with the
- * landing_cta_clicked union. Guides split guide_inline from guide_closing for
- * the same reason, so the placement stays readable in PostHog.
- */
-export type AlternativeCtaPlacement =
-  `${AlternativeCtaLocation}_${"header" | "closing"}`
 
 export interface AlternativeSource {
   /** Stable key referenced by comparison rows. */
@@ -69,7 +67,7 @@ export interface AlternativeRelatedLink {
 
 export interface AlternativeDefinition {
   path: AlternativePath
-  ctaLocation: AlternativeCtaLocation
+  emailCaptureSource: AlternativeEmailCaptureSource
   /** What the reader is comparing against, used in cards and breadcrumbs. */
   subject: string
   subjectHref: string
@@ -105,7 +103,7 @@ export interface AlternativeDefinition {
 
 const githubRepo: AlternativeDefinition = {
   path: alternativePaths.githubRepo,
-  ctaLocation: "alternatives_github_repo",
+  emailCaptureSource: "alternatives_github_repo",
   subject: "A shared GitHub repository",
   subjectHref: "https://github.com",
   eyebrow: "Alternative to the shared repo",
@@ -318,7 +316,7 @@ const githubRepo: AlternativeDefinition = {
 
 const skillsSh: AlternativeDefinition = {
   path: alternativePaths.skillsSh,
-  ctaLocation: "alternatives_skills_sh",
+  emailCaptureSource: "alternatives_skills_sh",
   subject: "skills.sh",
   subjectHref: "https://www.skills.sh",
   eyebrow: "Skills Board vs skills.sh",
@@ -551,7 +549,7 @@ const skillsSh: AlternativeDefinition = {
 
 const smithery: AlternativeDefinition = {
   path: alternativePaths.smithery,
-  ctaLocation: "alternatives_smithery",
+  emailCaptureSource: "alternatives_smithery",
   subject: "Smithery",
   subjectHref: "https://smithery.ai",
   eyebrow: "Skills Board vs Smithery",
@@ -756,7 +754,7 @@ const smithery: AlternativeDefinition = {
 
 const superpowers: AlternativeDefinition = {
   path: alternativePaths.superpowers,
-  ctaLocation: "alternatives_superpowers",
+  emailCaptureSource: "alternatives_superpowers",
   subject: "Superpowers",
   subjectHref: "https://github.com/obra/superpowers",
   eyebrow: "Skills Board vs Superpowers",

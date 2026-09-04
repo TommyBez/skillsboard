@@ -12,7 +12,6 @@ import { skillExamplesPath } from "@/lib/seo/skill-examples/types"
 
 export {
   claudeCodeForTeamsPath,
-  type ClaudeCodeForTeamsCtaPlacement,
   type ClaudeCodeForTeamsPath,
 } from "@/lib/seo/claude-code-for-teams/types"
 

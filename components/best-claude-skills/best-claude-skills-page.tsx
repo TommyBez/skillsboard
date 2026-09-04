@@ -64,7 +64,7 @@ export function BestClaudeSkillsPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="best_claude_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -169,7 +169,7 @@ export function BestClaudeSkillsPage({
           <NoteList notes={entry.engineering.notes} />
           <InlineLink link={entry.engineering.link} />
           <div className="mt-8">
-            <ResourceCta location="best_claude_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.engineering.sourceIds}
@@ -432,7 +432,7 @@ export function BestClaudeSkillsPage({
             the path, and the license one click away from every entry.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="best_claude_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

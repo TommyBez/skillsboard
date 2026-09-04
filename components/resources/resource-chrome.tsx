@@ -6,89 +6,12 @@ import { ArrowRightIcon, ExternalLinkIcon } from "lucide-react"
 import type { AnalyticsCapturedEventProperties } from "@/analytics/posthog/events"
 import { Brand } from "@/components/brand"
 import { FooterNavColumns } from "@/components/footer-nav"
+import type { CtaLocation } from "@/components/landing/landing-ctas"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
-import type { AgentSkillsByTheNumbersCtaPlacement } from "@/lib/seo/agent-skills-by-the-numbers/types"
-import type { AgentSkillsSupportCtaPlacement } from "@/lib/seo/agent-skills-support/types"
-import type { AgentSkillsCtaPlacement } from "@/lib/seo/agent-skills/types"
-import type { AgentsMdVsSkillMdCtaPlacement } from "@/lib/seo/agents-md-vs-skill-md/types"
-import type { AlternativeCtaPlacement } from "@/lib/seo/alternatives"
-import type { AnthropicSkillsCtaPlacement } from "@/lib/seo/anthropic-skills/types"
-import type { BestClaudeSkillsCtaPlacement } from "@/lib/seo/best-claude-skills/types"
-import type { ClaudeSkillsCtaPlacement } from "@/lib/seo/claude-skills/types"
-import type { CodexSkillsCtaPlacement } from "@/lib/seo/codex-skills/types"
-import type { CoworkSkillsCtaPlacement } from "@/lib/seo/cowork-skills/types"
-import type {
-  ComparisonCtaPlacement,
-  ComparisonHeaderLocation,
-} from "@/lib/seo/compare/types"
-import type { ClaudeCodeForTeamsCtaPlacement } from "@/lib/seo/claude-code-for-teams/types"
-import type { CopilotSkillsCtaPlacement } from "@/lib/seo/copilot-skills/types"
-import type { CursorSkillsCtaPlacement } from "@/lib/seo/cursor-skills/types"
-import type { ManageAiSkillsCtaPlacement } from "@/lib/seo/manage-ai-skills/types"
-import type { OpencodeSkillsCtaPlacement } from "@/lib/seo/opencode-skills/types"
-import type { SkillCreatorCtaPlacement } from "@/lib/seo/skill-creator/types"
-import type { SkillExamplesCtaPlacement } from "@/lib/seo/skill-examples/types"
-import type { VercelSkillsCtaPlacement } from "@/lib/seo/vercel-skills/types"
 import { resourcePaths } from "@/lib/seo/resources"
-import type { WhereToFindClaudeSkillsCtaPlacement } from "@/lib/seo/where-to-find-claude-skills/types"
 import { siteConfig } from "@/lib/site"
-
-type ResourceHeaderLocation =
-  | "about_header"
-  | "connect_header"
-  | "developers_header"
-  | "agent_skills_by_the_numbers_header"
-  | "agent_skills_header"
-  | "agent_skills_support_header"
-  | "agents_md_header"
-  | "anthropic_skills_header"
-  | "best_claude_skills_header"
-  | "alternatives_header"
-  | "claude_skills_header"
-  | "codex_skills_header"
-  | "compare_header"
-  | ComparisonHeaderLocation
-  | "cowork_skills_header"
-  | "claude_code_for_teams_header"
-  | "copilot_skills_header"
-  | "cursor_skills_header"
-  | "opencode_skills_header"
-  | "skill_creator_header"
-  | "skill_examples_header"
-  | "vercel_skills_header"
-  | "guide_header"
-  | "manage_ai_skills_header"
-  | "pricing_header"
-  | "resources_header"
-  | "where_skills_header"
-type ResourceCtaLocation =
-  | AgentSkillsByTheNumbersCtaPlacement
-  | AgentSkillsCtaPlacement
-  | AgentSkillsSupportCtaPlacement
-  | AgentsMdVsSkillMdCtaPlacement
-  | AnthropicSkillsCtaPlacement
-  | BestClaudeSkillsCtaPlacement
-  | "alternatives_index"
-  | AlternativeCtaPlacement
-  | ClaudeSkillsCtaPlacement
-  | CodexSkillsCtaPlacement
-  | "compare_index"
-  | ComparisonCtaPlacement
-  | CoworkSkillsCtaPlacement
-  | ClaudeCodeForTeamsCtaPlacement
-  | CopilotSkillsCtaPlacement
-  | CursorSkillsCtaPlacement
-  | ManageAiSkillsCtaPlacement
-  | OpencodeSkillsCtaPlacement
-  | SkillCreatorCtaPlacement
-  | SkillExamplesCtaPlacement
-  | VercelSkillsCtaPlacement
-  | "guide_inline"
-  | "guide_closing"
-  | "resources_closing"
-  | WhereToFindClaudeSkillsCtaPlacement
 
 /**
  * The one action these pages offer.
@@ -109,7 +32,7 @@ async function CurrentYear() {
 }
 
 function ctaProperties(
-  location: ResourceHeaderLocation | ResourceCtaLocation,
+  location: CtaLocation,
 ): AnalyticsCapturedEventProperties<"landing_cta_clicked"> {
   return {
     destination: ctaHref,
@@ -117,7 +40,7 @@ function ctaProperties(
   }
 }
 
-export function ResourceCta({ location }: { location: ResourceCtaLocation }) {
+export function ResourceCta({ location }: { location: CtaLocation }) {
   return (
     <Button
       size="lg"
@@ -139,12 +62,12 @@ export function ResourceCta({ location }: { location: ResourceCtaLocation }) {
   )
 }
 
-function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation }) {
+function ResourceHeaderActions({ atResourceIndex }: { atResourceIndex: boolean }) {
   return (
     <div className="flex min-w-0 items-center gap-1.5">
       <Link
         href={resourcePaths.index}
-        aria-current={location === "resources_header" ? "page" : undefined}
+        aria-current={atResourceIndex ? "page" : undefined}
         className="inline-flex min-h-11 items-center rounded-[3px] px-2 py-1.5 font-mono text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:px-3 sm:text-xs sm:tracking-[0.16em]"
       >
         Resources
@@ -170,7 +93,7 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
             href={ctaHref}
             analytics={{
               event: "landing_cta_clicked",
-              properties: ctaProperties(location),
+              properties: ctaProperties("header"),
             }}
           />
         )}
@@ -182,12 +105,16 @@ function ResourceHeaderActions({ location }: { location: ResourceHeaderLocation 
   )
 }
 
-export function ResourceHeader({ location }: { location: ResourceHeaderLocation }) {
+export function ResourceHeader({
+  atResourceIndex = false,
+}: {
+  atResourceIndex?: boolean
+}) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/92 backdrop-blur-xl">
       <div className="mx-auto flex h-14 w-full max-w-[1320px] items-center justify-between gap-2 px-4 sm:gap-4 sm:px-5 md:px-10">
         <Brand compactOnMobile />
-        <ResourceHeaderActions location={location} />
+        <ResourceHeaderActions atResourceIndex={atResourceIndex} />
       </div>
     </header>
   )
@@ -198,10 +125,11 @@ export function ResourceHeader({ location }: { location: ResourceHeaderLocation 
  * three lines they should be and no page renders its own header or footer.
  */
 export function ResourceShell({
-  location,
+  atResourceIndex = false,
   children,
 }: {
-  location: ResourceHeaderLocation
+  /** The resource index marks its own nav link, and only it does. */
+  atResourceIndex?: boolean
   children: React.ReactNode
 }) {
   return (
@@ -209,7 +137,7 @@ export function ResourceShell({
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <ResourceHeader location={location} />
+      <ResourceHeader atResourceIndex={atResourceIndex} />
       <main
         id="main-content"
         className="[&_nav[aria-label=Breadcrumb]_a]:-mx-2 [&_nav[aria-label=Breadcrumb]_a]:-my-2 [&_nav[aria-label=Breadcrumb]_a]:inline-flex [&_nav[aria-label=Breadcrumb]_a]:min-h-11 [&_nav[aria-label=Breadcrumb]_a]:items-center [&_nav[aria-label=Breadcrumb]_a]:px-2"

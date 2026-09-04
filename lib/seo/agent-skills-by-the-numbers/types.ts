@@ -8,12 +8,3 @@
 export const agentSkillsByTheNumbersPath = "/agent-skills-by-the-numbers" as const
 
 export type AgentSkillsByTheNumbersPath = typeof agentSkillsByTheNumbersPath
-
-/**
- * CTA placements on the statistics page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is
- * agent_skills_by_the_numbers_header, following the naming every other
- * marketing chrome uses for its nav slot.
- */
-export type AgentSkillsByTheNumbersCtaPlacement =
-  `agent_skills_by_the_numbers_${"hero" | "inline" | "closing"}`

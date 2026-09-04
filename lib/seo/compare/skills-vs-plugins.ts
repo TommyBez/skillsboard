@@ -31,7 +31,6 @@ and leave anything internal out of the published note.
 
 export const skillsVsPlugins: ComparisonDefinition = {
   path: comparePaths.skillsVsPlugins,
-  ctaLocation: "compare_skills_plugins",
   subject: "Skills vs plugins",
   eyebrow: "Claude Skills vs Plugins",
   title: "Claude skills vs plugins",

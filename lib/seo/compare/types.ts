@@ -19,28 +19,6 @@ export type CompareIndexPath = typeof compareIndexPath
 
 export type ComparePath = (typeof comparePaths)[keyof typeof comparePaths]
 
-/** One value per comparison page, used as the analytics location prefix. */
-export type ComparisonCtaLocation =
-  | "compare_skills_subagents"
-  | "compare_skills_mcp"
-  | "compare_skills_plugins"
-  | "compare_skills_slash_commands"
-
-/**
- * The sticky shell CTA for a comparison page. It is per page rather than per
- * hub, which is why every comparison route mounts its own ResourceShell inside
- * a route group instead of sharing one /compare layout.
- */
-export type ComparisonHeaderLocation = `${ComparisonCtaLocation}_header`
-
-/**
- * The three in-page CTA placements, kept in sync with the landing_cta_clicked
- * union. Together with the header location that is four per comparison page,
- * matching what every resource article already reports.
- */
-export type ComparisonCtaPlacement =
-  `${ComparisonCtaLocation}_${"hero" | "inline" | "closing"}`
-
 export interface ComparisonSource {
   /** Stable key referenced by the sections the source supports. */
   id: string
@@ -150,7 +128,6 @@ export interface ComparisonTeamSection {
 
 export interface ComparisonDefinition {
   path: ComparePath
-  ctaLocation: ComparisonCtaLocation
   /** Short label used on the hub card and in the breadcrumb. */
   subject: string
   eyebrow: string

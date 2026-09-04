@@ -20,7 +20,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   agentSkillsPath,
-  type AgentSkillsCtaPlacement,
   type AgentSkillsPath,
 } from "@/lib/seo/agent-skills/types"
 

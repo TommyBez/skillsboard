@@ -93,14 +93,14 @@ test("the route renders the page and its social images", async () => {
   }
 })
 
-test("the page mounts its own four CTA locations", async () => {
+test("the page mounts the four CTA placements", async () => {
   const layout = await readFile(
     new URL(`../app${entry.path}/layout.tsx`, import.meta.url),
     "utf8",
   )
   assert.ok(
-    layout.includes("claude_code_for_teams_header"),
-    "the shell reports another page's location",
+    layout.includes("ResourceShell"),
+    "the page does not mount the shared chrome, so it has no header CTA",
   )
 
   const page = await readFile(
@@ -112,8 +112,8 @@ test("the page mounts its own four CTA locations", async () => {
   )
   for (const suffix of ["hero", "inline", "closing"]) {
     assert.ok(
-      page.includes(`claude_code_for_teams_${suffix}`),
-      `the page never renders the claude_code_for_teams_${suffix} CTA`,
+      page.includes(`location="${suffix}"`),
+      `the page never renders the ${suffix} CTA`,
     )
   }
 
@@ -123,8 +123,8 @@ test("the page mounts its own four CTA locations", async () => {
   )
   for (const suffix of ["header", "hero", "inline", "closing"]) {
     assert.ok(
-      events.includes(`"claude_code_for_teams_${suffix}"`),
-      `landing_cta_clicked cannot report claude_code_for_teams_${suffix}`,
+      events.includes(`"${suffix}"`),
+      `landing_cta_clicked cannot report ${suffix}`,
     )
   }
 })

@@ -57,15 +57,7 @@ test("every registered comparison has a route", async () => {
   }
 })
 
-test("every comparison reports its own CTA locations", async () => {
-  const locations = comparisons.map((entry) => entry.ctaLocation)
-
-  assert.equal(
-    new Set(locations).size,
-    locations.length,
-    "two comparisons share a ctaLocation, so landing_cta_clicked cannot tell their CTAs apart",
-  )
-
+test("every comparison mounts the shell that carries the header CTA", async () => {
   for (const entry of comparisons) {
     const layout = await readFile(
       new URL(`../app${entry.path}/layout.tsx`, import.meta.url),
@@ -73,8 +65,8 @@ test("every comparison reports its own CTA locations", async () => {
     )
 
     assert.ok(
-      layout.includes(`${entry.ctaLocation}_header`),
-      `app${entry.path}/layout.tsx does not mount the shell with ${entry.ctaLocation}_header, so the sticky CTA reports another page's location`,
+      layout.includes("ResourceShell"),
+      `app${entry.path}/layout.tsx does not mount the shell, so the page has no header CTA`,
     )
   }
 })

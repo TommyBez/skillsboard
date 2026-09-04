@@ -10,7 +10,6 @@ import type { SkillDraft } from "@/lib/skill-creator/skill-md"
 
 export {
   skillCreatorPath,
-  type SkillCreatorCtaPlacement,
   type SkillCreatorPath,
 } from "@/lib/seo/skill-creator/types"
 

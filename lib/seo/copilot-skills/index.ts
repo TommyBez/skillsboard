@@ -13,7 +13,6 @@ import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 
 export {
   copilotSkillsPath,
-  type CopilotSkillsCtaPlacement,
   type CopilotSkillsPath,
 } from "@/lib/seo/copilot-skills/types"
 

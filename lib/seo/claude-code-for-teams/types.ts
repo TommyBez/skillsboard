@@ -8,12 +8,3 @@
 export const claudeCodeForTeamsPath = "/claude-code-for-teams" as const
 
 export type ClaudeCodeForTeamsPath = typeof claudeCodeForTeamsPath
-
-/**
- * CTA placements on the Claude Code for teams page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is
- * claude_code_for_teams_header, following the naming every other marketing
- * chrome uses for its nav slot.
- */
-export type ClaudeCodeForTeamsCtaPlacement =
-  `claude_code_for_teams_${"hero" | "inline" | "closing"}`

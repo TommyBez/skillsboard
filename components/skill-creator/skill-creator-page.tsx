@@ -147,7 +147,7 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
           <NoteList notes={entry.fields.notes} />
           <InlineLink link={entry.fields.link} />
           <div className="mt-8">
-            <ResourceCta location="skill_creator_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.fields.sourceIds}
@@ -285,7 +285,7 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
             ZIP. Free forever, MIT licensed, and open source.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="skill_creator_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

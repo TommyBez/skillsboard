@@ -9,11 +9,3 @@
 export const skillExamplesPath = "/skill-examples" as const
 
 export type SkillExamplesPath = typeof skillExamplesPath
-
-/**
- * CTA placements on the skill examples page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is skill_examples_header,
- * following the naming every other marketing chrome uses for its nav slot.
- */
-export type SkillExamplesCtaPlacement =
-  `skill_examples_${"hero" | "inline" | "closing"}`
