@@ -56,6 +56,12 @@ const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] = [
     source: "/agent-skills-support",
     markdown: "/api/markdown?path=/agent-skills-support",
   },
+  // `/agent-skills-by-the-numbers` does not end in `-skills` either, so the
+  // shared rule above never reaches it.
+  {
+    source: "/agent-skills-by-the-numbers",
+    markdown: "/api/markdown?path=/agent-skills-by-the-numbers",
+  },
   { source: "/developers", markdown: "/api/markdown?path=/developers" },
   {
     source: "/agents-md-vs-skill-md",
@@ -233,6 +239,11 @@ const nextConfig = {
       {
         source: "/agent-skills-support/",
         destination: "/agent-skills-support",
+        permanent: true,
+      },
+      {
+        source: "/agent-skills-by-the-numbers/",
+        destination: "/agent-skills-by-the-numbers",
         permanent: true,
       },
       {
