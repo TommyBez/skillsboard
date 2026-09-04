@@ -349,7 +349,7 @@ const nextConfig = {
       // HTML page that owns the same URL. The header value is matched as an
       // anchored regular expression, and no browser or RSC request asks for
       // `text/markdown`, so ordinary page traffic never reaches these. The
-      // URLs are `NEGOTIATED_PAGES`, which is also what `headers()` reads.
+      // URLs are `NEGOTIATED_PAGES`, the single list the tests read too.
       beforeFiles: [
         // `/` + `.md` is not a path, so the home twin is published at
         // `/index.md`. Stated here because the generic `<path>.md` rule below
