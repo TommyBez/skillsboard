@@ -706,6 +706,12 @@ export const agentSkills: AgentSkillsDefinition = {
   ],
   related: [
     {
+      label: "Agent skills by the numbers",
+      href: "/agent-skills-by-the-numbers",
+      description:
+        "A monthly snapshot of tagged repositories, READMEs that print the install command, and npm downloads, with the endpoint beside each figure.",
+    },
+    {
       label: "Skill examples: real SKILL.md files, explained",
       href: "/skill-examples",
       description:
