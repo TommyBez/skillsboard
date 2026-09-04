@@ -124,7 +124,7 @@ function buildTools(pages: readonly WebMcpPage[]): WebMcpTool[] {
     {
       name: "navigate",
       description:
-        "Open a Skills Board page in this browser tab. Takes a path from list_pages, or one of /pricing, /resources, /about, /sign-up.",
+        "Open a Skills Board page in this browser tab. Takes a path from list_pages, or one of /resources, /about, /sign-up.",
       inputSchema: {
         type: "object",
         properties: {

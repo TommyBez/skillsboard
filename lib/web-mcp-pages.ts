@@ -4,6 +4,7 @@ import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
+import { pricing } from "@/lib/seo/pricing"
 import { resourceEntries } from "@/lib/seo/resources"
 import type { WebMcpPage } from "@/lib/web-mcp-tools"
 
@@ -31,6 +32,7 @@ export const webMcpPages: readonly WebMcpPage[] = [
   compareHub,
   ...comparisons,
   developers,
+  pricing,
 ].map(
   (entry) => ({
     path: entry.path,

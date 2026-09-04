@@ -11,17 +11,19 @@ const { alternatives } = await import("../lib/seo/alternatives.ts")
 const { comparisons } = await import("../lib/seo/compare/index.ts")
 const { developers } = await import("../lib/seo/developers.ts")
 const { alternativesHub, compareHub, resourcesHub } = await import("../lib/seo/hubs.ts")
+const { pricing } = await import("../lib/seo/pricing.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
 
 test("every registered resource, alternative, and comparison has a Markdown twin", () => {
-  // The home page and the developer docs are in no registry: the home page is
-  // built from section components, with `lib/seo/home` as the content
-  // definition written for it, and the developer docs describe an interface
-  // rather than being a resource article, so they carry their own definition.
-  // Each hub sits immediately above the collection it lists.
+  // The home page, the developer docs, and the pricing page are in no
+  // registry: the first and the last are built from section components, with
+  // `lib/seo/home` and `lib/seo/pricing` as the content definitions written for
+  // them, and the developer docs describe an interface rather than being a
+  // resource article, so they carry their own definition too. Each hub sits
+  // immediately above the collection it lists.
   const registered = [
     home,
     resourcesHub,
@@ -31,6 +33,7 @@ test("every registered resource, alternative, and comparison has a Markdown twin
     compareHub,
     ...comparisons,
     developers,
+    pricing,
   ].map((entry) => entry.path)
 
   assert.deepEqual([...markdownTwinPaths], registered)
@@ -110,7 +113,7 @@ test("internal links in a twin are absolute", () => {
 test("a trailing slash resolves, an unknown path does not", () => {
   assert.equal(renderMarkdownTwin("/codex-skills/"), codexMarkdown)
   assert.equal(renderMarkdownTwin("/codex-skills.md"), undefined)
-  assert.equal(renderMarkdownTwin("/pricing"), undefined)
+  assert.equal(renderMarkdownTwin("/about"), undefined)
 })
 
 test("the twin route answers whether or not the rewrite kept the extension", async () => {
@@ -156,7 +159,7 @@ test("the twin route answers whether or not the rewrite kept the extension", asy
 
   // A path with no twin is still a 404, whichever way it arrives.
   for (const url of [
-    "https://www.skillsboard.sh/api/markdown?path=/pricing",
+    "https://www.skillsboard.sh/api/markdown?path=/about",
     "https://www.skillsboard.sh/api/markdown?path=/compare/not-a-pair.md",
   ]) {
     assert.equal((await answers(url)).status, 404, `${url} should not resolve`)
@@ -168,7 +171,14 @@ test("only a page with a twin advertises the Markdown alternate", () => {
     canonical: "/codex-skills",
     types: { "text/markdown": "/codex-skills.md" },
   })
-  assert.deepEqual(markdownTwinAlternates("/pricing"), { canonical: "/pricing" })
+  // `/pricing.md` is generated from `lib/seo/pricing` like every other twin,
+  // and the page head is where it is announced: without this the document
+  // existed and only a reader coming from llms.txt would find it.
+  assert.deepEqual(markdownTwinAlternates("/pricing"), {
+    canonical: "/pricing",
+    types: { "text/markdown": "/pricing.md" },
+  })
+  assert.deepEqual(markdownTwinAlternates("/about"), { canonical: "/about" })
 })
 
 /** Everything outside a fenced block, where Markdown syntax is live. */
@@ -177,7 +187,8 @@ function prose(markdown) {
   return markdown
     .split("\n")
     .filter((line) => {
-      if (/^`{3,}$/.test(line.trim())) {
+      // The opening fence carries a language tag and the closing one does not.
+      if (/^`{3,}[a-z]*$/.test(line.trim())) {
         inFence = !inFence
         return false
       }

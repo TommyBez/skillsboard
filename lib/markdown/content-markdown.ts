@@ -54,6 +54,39 @@ const skippedKeys = new Set([
 /** Verbatim blocks: templates and directory trees are read as code, not prose. */
 const codeKeys = new Set(["template", "copyTemplate", "tree"])
 
+/**
+ * The language a fenced block is tagged with when its owner does not name one.
+ *
+ * A fence with no tag tells a reader nothing about what it is holding, and the
+ * readers that matter here copy from it: agents lift lines out of code blocks
+ * verbatim. Templates are almost always a SKILL.md or another Markdown
+ * document, and a tree is a directory listing rather than a language, so those
+ * are the defaults. A block that is something else names it with a sibling
+ * `<key>Language` field, which is read here and never rendered as copy.
+ */
+const defaultCodeLanguages: Record<string, string> = {
+  template: "markdown",
+  copyTemplate: "markdown",
+  tree: "text",
+}
+
+/** `templateLanguage` names the tag on `template`; it is metadata, not copy. */
+function isCodeLanguageKey(key: string): boolean {
+  return (
+    key.endsWith("Language") && codeKeys.has(key.slice(0, -"Language".length))
+  )
+}
+
+/** The tag a fenced block carries, from its own field or from the default. */
+function codeLanguageFor(
+  key: string,
+  record: Record<string, unknown>,
+): string | undefined {
+  if (!codeKeys.has(key)) return undefined
+  const named = record[`${key}Language`]
+  return typeof named === "string" ? named : defaultCodeLanguages[key]
+}
+
 /** String arrays that are paragraphs rather than bullets. */
 const proseArrayKeys = new Set([
   "intro",
@@ -100,7 +133,12 @@ const labelOverrides: Record<string, string> = {
 
 /** Citation keys point at sources by id, and the sources render on their own. */
 function isSkippedKey(key: string): boolean {
-  return skippedKeys.has(key) || /SourceIds$/.test(key) || key === "sourceIds"
+  return (
+    skippedKeys.has(key) ||
+    /SourceIds$/.test(key) ||
+    key === "sourceIds" ||
+    isCodeLanguageKey(key)
+  )
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -174,9 +212,9 @@ function orderedList(items: readonly string[]): string {
   return items.map((item, index) => `${index + 1}. ${collapse(item)}`).join("\n")
 }
 
-function codeBlock(value: string): string {
+function codeBlock(value: string, language = ""): string {
   const fence = value.includes("```") ? "````" : "```"
-  return [fence, value, fence].join("\n")
+  return [`${fence}${language}`, value, fence].join("\n")
 }
 
 function cell(value: unknown): string {
@@ -382,7 +420,14 @@ function renderRecordFields(
       !(isRecord(value) && isInlineLink(value))
 
     if (labelled) blocks.push(heading(level, humanize(key)))
-    blocks.push(...renderValue(key, value, labelled ? level + 1 : level))
+    blocks.push(
+      ...renderValue(
+        key,
+        value,
+        labelled ? level + 1 : level,
+        codeLanguageFor(key, record),
+      ),
+    )
   }
 
   if (href) {
@@ -401,7 +446,13 @@ function renderRows(
     return table(
       columns,
       rows.map((row) => [
-        row.label,
+        // A row that names where it lives is a link rather than a path in
+        // monospace. The documents an agent fetches are found by following a
+        // link far more often than by guessing the path, so a table of
+        // documents that renders them as text is a table it cannot use.
+        typeof row.href === "string" && typeof row.label === "string"
+          ? link(row.label, row.href)
+          : row.label,
         ...(Array.isArray(row.cells) ? row.cells : []),
       ]),
     )
@@ -417,10 +468,15 @@ function renderRows(
   )
 }
 
-function renderValue(key: string, value: unknown, level: number): string[] {
+function renderValue(
+  key: string,
+  value: unknown,
+  level: number,
+  language?: string,
+): string[] {
   if (typeof value === "string") {
     if (!value.trim()) return []
-    return codeKeys.has(key) ? [codeBlock(value)] : [paragraph(value)]
+    return codeKeys.has(key) ? [codeBlock(value, language)] : [paragraph(value)]
   }
 
   if (Array.isArray(value)) {
@@ -517,7 +573,7 @@ function renderBody(entry: Record<string, unknown>): string[] {
       continue
     }
 
-    blocks.push(...renderValue(key, value, 3))
+    blocks.push(...renderValue(key, value, 3, codeLanguageFor(key, entry)))
   }
 
   return blocks

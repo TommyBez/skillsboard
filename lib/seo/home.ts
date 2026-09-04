@@ -78,6 +78,7 @@ export const home = {
       "The same MCP server ships as a Claude Code plugin, so a teammate can add the marketplace and the plugin instead of configuring the server by hand.",
     template: `/plugin marketplace add TommyBez/skillsboard
 /plugin install skills-board@skills-board`,
+    templateLanguage: "bash",
   },
   pricingTitle: "Pricing",
   pricing: [

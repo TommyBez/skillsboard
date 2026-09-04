@@ -201,6 +201,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
       "The manifest is optional, which most summaries get wrong: without it Claude Code auto-discovers components in default locations and derives the name from the directory.",
     ],
     template: pluginWithSkillTemplate,
+    templateLanguage: "text",
     templateLabel: "A plugin whose only component is one skill",
     templateCopy: {
       buttonLabel: "Copy example",
