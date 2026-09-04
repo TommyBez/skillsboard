@@ -1,6 +1,22 @@
 import type { NextConfig } from 'next'
 
 /**
+ * A literal that matches in any case.
+ *
+ * A `has` rule's value is compiled with `new RegExp(\`^${value}$\`)` and no
+ * flags, so the match is case sensitive, and the flag cannot be passed from
+ * here. Media types and parameter names are case insensitive (RFC 9110), and a
+ * client that sends `Text/Markdown` or `Q=0` is within spec, so each letter is
+ * written as the pair it can arrive as.
+ */
+function anyCase(literal: string): string {
+  return literal.replace(
+    /[a-z]/gi,
+    (letter) => `[${letter.toLowerCase()}${letter.toUpperCase()}]`,
+  )
+}
+
+/**
  * Requests that ask for Markdown get the twin of the page they addressed.
  *
  * `q=0` on a media range means the client refuses it (RFC 9110), so the token
@@ -12,7 +28,11 @@ import type { NextConfig } from 'next'
 const MARKDOWN_ACCEPT = {
   type: "header",
   key: "accept",
-  value: String.raw`.*text/markdown(?![^,]*;\s*q\s*=\s*0(?:\.0*)?(?![.\d])).*`,
+  value: String.raw`.*` +
+    anyCase("text/markdown") +
+    String.raw`(?![^,]*;\s*` +
+    anyCase("q") +
+    String.raw`\s*=\s*0(?:\.0*)?(?![.\d])).*`,
 } as const
 
 /**
@@ -49,12 +69,14 @@ const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] = [
     source: "/claude-code-for-teams",
     markdown: "/api/markdown?path=/claude-code-for-teams",
   },
-  // `/pricing.md` is written by hand and lives in `public`, so the negotiated
-  // request is sent to the file itself rather than to the twin generator,
-  // which only knows the pages built from a content definition. A rewrite in
-  // `beforeFiles` is resolved against the filesystem afterwards, so the static
-  // file answers with its own `text/markdown` content type.
-  { source: "/pricing", markdown: "/pricing.md" },
+  // The pricing page reaches the twin generator like every other negotiated
+  // page. It used to be sent to a hand written document in `public`, which a
+  // static file server answers without the token estimate, the canonical and
+  // alternate links, `X-Content-Type-Options`, or `Vary: Accept`: a Markdown
+  // body cached under the page URL with no `Vary` is a body a shared cache can
+  // hand to a browser. `lib/seo/pricing` is the content definition that
+  // replaced the document.
+  { source: "/pricing", markdown: "/api/markdown?path=/pricing" },
   // The three hubs. Each one is a page in its own right, so the rules below
   // it, which all carry a slug, never match it.
   { source: "/resources", markdown: "/api/markdown?path=/resources" },
@@ -345,9 +367,9 @@ const nextConfig = {
           destination: "https://eu.i.posthog.com/:path*",
         },
         // The Markdown twin of every data driven content page. `afterFiles`
-        // leaves the hand written Markdown in `public` (`/pricing.md`,
-        // `/auth.md`) serving itself as a static file. Paths with no twin
-        // fall through to a 404 from the route handler.
+        // leaves the hand written Markdown in `public` (`/auth.md`) serving
+        // itself as a static file. Paths with no twin fall through to a 404
+        // from the route handler.
         {
           source: "/:path(.*)\\.md",
           destination: "/api/markdown?path=/:path",
@@ -373,5 +395,5 @@ const nextConfig = {
   },
 } satisfies NextConfig
 
-export { NEGOTIATED_PAGES }
+export { MARKDOWN_ACCEPT, NEGOTIATED_PAGES }
 export default nextConfig

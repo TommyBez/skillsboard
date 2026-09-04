@@ -10,6 +10,7 @@ import { comparisons } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
+import { pricing } from "@/lib/seo/pricing"
 import { resourceEntries } from "@/lib/seo/resources"
 
 /**
@@ -23,8 +24,8 @@ import { resourceEntries } from "@/lib/seo/resources"
  * those names the hub above it. `lib/seo/hubs` holds the three definitions,
  * built from the same registries the HTML hubs render.
  *
- * The home page and the developer docs are listed on their own because
- * neither is in any collection: the home page is built from section
+ * The home page, the pricing page, and the developer docs are listed on their
+ * own because none of them is in any collection: the home page is built from section
  * components, with `lib/seo/home` as the content definition written for the
  * twin, and the developer docs describe an interface rather than being a
  * resource article, so they carry their own definition too.
@@ -38,6 +39,7 @@ const twinEntries: readonly MarkdownContentEntry[] = [
   compareHub,
   ...comparisons,
   developers,
+  pricing,
 ]
 
 const entriesByPath = new Map(twinEntries.map((entry) => [entry.path, entry]))
@@ -99,30 +101,12 @@ export function renderMarkdownTwin(path: string): string | undefined {
 }
 
 /**
- * Twins written by hand rather than generated from a content definition: a
- * Markdown document in `public` that mirrors a page built from components.
- *
- * Only the head of the page reads this. `renderMarkdownTwin` stays strict, so
- * a static document is served by the file itself, which is where the rewrite
- * in `next.config.ts` sends a negotiated request for one.
- */
-const staticMarkdownTwins: Record<string, string> = {
-  "/pricing": "/pricing.md",
-}
-
-/**
  * `<link rel="alternate" type="text/markdown" href="...">` for the page head,
  * merged into the page metadata alongside its canonical URL.
  */
 export function markdownTwinAlternates(
   path: string,
 ): NonNullable<Metadata["alternates"]> {
-  const normalized = normalizeContentPath(path)
-  const staticTwin = staticMarkdownTwins[normalized]
-  if (staticTwin) {
-    return { canonical: path, types: { "text/markdown": staticTwin } }
-  }
-
   if (!hasMarkdownTwin(path)) return { canonical: path }
 
   return {

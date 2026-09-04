@@ -7,9 +7,11 @@ import "./helpers/register-app-aliases.mjs"
 const { markdownTwinPaths, markdownTwinPath, renderMarkdownTwin } = await import(
   "../lib/markdown/twins.ts"
 )
-const { default: nextConfig, NEGOTIATED_PAGES } = await import(
-  "../next.config.ts"
-)
+const {
+  default: nextConfig,
+  MARKDOWN_ACCEPT,
+  NEGOTIATED_PAGES,
+} = await import("../next.config.ts")
 
 const repoRoot = new URL("../", import.meta.url)
 const source = (path) => readFileSync(new URL(path, repoRoot), "utf8")
@@ -108,32 +110,38 @@ test("the install command and the developer templates carry the right tag", () =
 
 /**
  * `Vary: Accept` on the HTML half was measured to be inert on Vercel: the App
- * Router overwrites `Vary` on the rendered response with its own RSC tokens,
- * so the header this config declared never reached a client (see the removal
- * noted on PR #178). Negotiation itself stays safe without it, because the
- * `has` rule on a negotiated source sends the request to a different
- * destination (a static `.md` file or `/api/markdown`) rather than to the
- * same URL with a different body, so the HTML and Markdown responses never
- * share a cache key. What still has to hold is that every rewrite rule that
- * negotiates on Accept is declared from the same `NEGOTIATED_PAGES` list, so
- * there is one place that names the negotiated URLs.
+ * Router overwrites `Vary` on the rendered response with its own RSC tokens, so
+ * the header this config declared never reached a client (see the removal noted
+ * on PR #178). The header that a shared cache needs is the one on the Markdown
+ * half, and that one is set by `app/api/markdown/route.ts`, which is a route
+ * handler rather than a page and keeps the headers it returns. So every rule
+ * that negotiates on Accept has to send the request there: a destination that a
+ * static file server answers would put a Markdown body under the page URL with
+ * no `Vary` on it, which is a body a shared cache can hand to a browser.
  */
-test("every rewrite rule that negotiates on Accept comes from NEGOTIATED_PAGES", async () => {
+test("every negotiated rule is declared once and answers from the route handler", async () => {
   const headers = await nextConfig.headers()
   const { beforeFiles } = await nextConfig.rewrites()
 
   // `/index.md` is the home twin's own rewrite, declared by hand rather than
   // through the shared list, and it does not negotiate on Accept (it always
   // serves Markdown), so it is not among the `has` rules below.
-  const negotiatedSources = beforeFiles
-    .filter((entry) => entry.has)
-    .map((entry) => entry.source)
-    .sort()
+  const negotiated = beforeFiles.filter((entry) => entry.has)
 
   assert.deepEqual(
-    negotiatedSources,
+    negotiated.map((entry) => entry.source).sort(),
     NEGOTIATED_PAGES.map((entry) => entry.source).sort(),
     "the beforeFiles rules that negotiate on Accept have drifted from NEGOTIATED_PAGES",
+  )
+
+  const notHandled = negotiated
+    .filter((entry) => !entry.destination.startsWith("/api/markdown?"))
+    .map((entry) => `${entry.source} -> ${entry.destination}`)
+
+  assert.deepEqual(
+    notHandled,
+    [],
+    "a negotiated request has to reach the route handler, which is what sets Vary: Accept and the Markdown metadata",
   )
 
   // The site wide pointer to llms.txt is still the first thing every response
@@ -150,21 +158,67 @@ test("every rewrite rule that negotiates on Accept comes from NEGOTIATED_PAGES",
 })
 
 /**
- * `/pricing.md` was written, published, and named in llms.txt, and the page it
- * mirrors said nothing about it: an agent that started from the page could not
- * find it and asking the page for Markdown returned HTML.
+ * The `has` rule is compiled by Next as `new RegExp(`^${value}$`)`, with no
+ * flags, so this is exactly what the router evaluates at runtime.
  */
-test("/pricing negotiates and announces its hand written twin", async () => {
+const acceptMatcher = new RegExp(`^${MARKDOWN_ACCEPT.value}$`)
+
+/**
+ * A media type and a parameter name are case insensitive (RFC 9110), and the
+ * matcher cannot be given the `i` flag, so the case is written into the pattern
+ * itself. A client that shouts its Accept header still gets Markdown, and one
+ * that refuses Markdown still gets HTML however it spells `q`.
+ */
+test("the Accept matcher reads the media type and its parameters in any case", () => {
+  for (const header of [
+    "text/markdown",
+    "Text/Markdown",
+    "TEXT/MARKDOWN",
+    "text/markdown, text/html;q=0.9",
+    "text/markdown;q=0.5",
+    "Text/Markdown;Q=1",
+    "text/html;q=0.9, Text/Markdown;Q=0.8",
+  ]) {
+    assert.ok(acceptMatcher.test(header), `${header} should negotiate Markdown`)
+  }
+
+  for (const header of [
+    "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "text/markdown;q=0",
+    "Text/Markdown;Q=0",
+    "TEXT/MARKDOWN;Q=0.0",
+    "text/markdown ; q = 0",
+    "text/html, text/markdown;q=0",
+  ]) {
+    assert.ok(
+      !acceptMatcher.test(header),
+      `${header} refuses Markdown and should get HTML`,
+    )
+  }
+})
+
+/**
+ * `/pricing` was the one negotiated page whose rewrite pointed at a hand
+ * written document in `public`. A static file carries none of what the route
+ * handler adds, and `/developers` promises the token estimate on every Markdown
+ * response, so the document became a content definition like the home page and
+ * the developer docs.
+ */
+test("/pricing negotiates through the twin generator and announces its twin", async () => {
   const { beforeFiles } = await nextConfig.rewrites()
   const rule = beforeFiles.find((entry) => entry.source === "/pricing")
 
   assert.ok(rule, "/pricing has no content negotiation rule")
   assert.equal(rule.has[0].key, "accept")
-  assert.equal(
-    rule.destination,
-    "/pricing.md",
-    "the negotiated request has to reach the document in public, not the twin generator",
-  )
+  assert.equal(rule.destination, "/api/markdown?path=/pricing")
+
+  const twin = renderMarkdownTwin("/pricing")
+  assert.ok(twin, "/pricing negotiates towards a twin that does not render")
+  assert.equal(markdownTwinPath("/pricing"), "/pricing.md")
+  // The URL named in llms.txt still answers, and the plans are still in it.
+  for (const line of ["# Skills Board pricing", "### Hosted", "### Self-hosted"]) {
+    assert.ok(twin.includes(line), `the pricing twin is missing ${line}`)
+  }
 
   assert.match(
     source("app/pricing/page.tsx"),
