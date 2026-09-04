@@ -92,7 +92,7 @@ export function WhereToFindClaudeSkillsPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="where_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -201,7 +201,7 @@ export function WhereToFindClaudeSkillsPage({
           <PlaceList entries={entry.catalogs.entries} />
           <NoteList notes={entry.catalogs.notes} />
           <div className="mt-8">
-            <ResourceCta location="where_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.catalogs.sourceIds}
@@ -408,7 +408,7 @@ export function WhereToFindClaudeSkillsPage({
             asking.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="where_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

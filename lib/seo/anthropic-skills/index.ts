@@ -12,7 +12,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   anthropicSkillsPath,
-  type AnthropicSkillsCtaPlacement,
   type AnthropicSkillsPath,
 } from "@/lib/seo/anthropic-skills/types"
 

@@ -9,7 +9,6 @@ import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
   cursorSkillsPath,
-  type CursorSkillsCtaPlacement,
   type CursorSkillsPath,
 } from "@/lib/seo/cursor-skills/types"
 

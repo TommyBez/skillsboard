@@ -81,7 +81,7 @@ export function AgentSkillsByTheNumbersPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_by_the_numbers_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -162,7 +162,7 @@ export function AgentSkillsByTheNumbersPage({
             <InlineLink link={section.link} />
             {key === "repositories" ? (
               <div className="mt-8">
-                <ResourceCta location="agent_skills_by_the_numbers_inline" />
+                <ResourceCta location="inline" />
               </div>
             ) : null}
             <SectionSources sourceIds={section.sourceIds} sources={sources} />
@@ -279,7 +279,7 @@ export function AgentSkillsByTheNumbersPage({
             {entry.closing.body}
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_by_the_numbers_closing" />
+            <ResourceCta location="closing" />
           </div>
         </section>
       </div>

@@ -37,7 +37,6 @@ date for each change.
 
 export const skillsVsMcp: ComparisonDefinition = {
   path: comparePaths.skillsVsMcp,
-  ctaLocation: "compare_skills_mcp",
   subject: "Skills vs MCP",
   eyebrow: "Claude Skills vs MCP",
   title: "Claude skills vs MCP (Model Context Protocol)",

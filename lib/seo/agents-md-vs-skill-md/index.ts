@@ -8,7 +8,6 @@ import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
   agentsMdVsSkillMdPath,
-  type AgentsMdVsSkillMdCtaPlacement,
   type AgentsMdVsSkillMdPath,
 } from "@/lib/seo/agents-md-vs-skill-md/types"
 

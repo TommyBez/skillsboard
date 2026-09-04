@@ -11,7 +11,6 @@ import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 
 export {
   opencodeSkillsPath,
-  type OpencodeSkillsCtaPlacement,
   type OpencodeSkillsPath,
 } from "@/lib/seo/opencode-skills/types"
 

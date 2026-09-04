@@ -13,7 +13,7 @@ The production baseline starts with the successful production deployment of this
 
 | Event name | Description | File |
 |---|---|---|
-| `landing_cta_clicked` | Anonymous or returning visitor selected the landing primary CTA, with semantic placement. | `app/page.tsx`, `components/tracked-link.tsx` |
+| `landing_cta_clicked` | Anonymous or returning visitor selected the primary CTA on a marketing page. `location` is the placement within the page (`header`, `hero`, `inline`, `closing`); which page it was is read from `$pathname`, so per-page analysis is a breakdown on `properties.$pathname`. Values captured before 2026-09-04 carry the page as a prefix (`where_skills_hero`). | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
 | `$pageview` | PostHog-native route view. Use `$pathname=/connect` for the MCP guide and `$pathname=/start` for first-run steps; after identity synchronization, authenticated views carry the active `team_id`. | `instrumentation-client.ts`, `lib/posthog-client.ts`, `components/posthog-identity.tsx` |
 | `mcp_client_selected` | User selected one of the bounded client setup guides. | `components/mcp-setup-guide.tsx` |

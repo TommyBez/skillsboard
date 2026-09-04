@@ -59,7 +59,7 @@ export function CursorSkillsPage({ entry }: { entry: CursorSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="cursor_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -236,7 +236,7 @@ export function CursorSkillsPage({ entry }: { entry: CursorSkillsDefinition }) {
           </ul>
           <InlineLink link={entry.team.link} />
           <div className="mt-8">
-            <ResourceCta location="cursor_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.team.sourceIds}
@@ -374,7 +374,7 @@ export function CursorSkillsPage({ entry }: { entry: CursorSkillsDefinition }) {
             use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="cursor_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

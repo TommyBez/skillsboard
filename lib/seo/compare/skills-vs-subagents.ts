@@ -38,7 +38,6 @@ preloaded skills and report only what breaks them, with file and line.
 
 export const skillsVsSubagents: ComparisonDefinition = {
   path: comparePaths.skillsVsSubagents,
-  ctaLocation: "compare_skills_subagents",
   subject: "Skills vs subagents",
   eyebrow: "Claude Skills vs Subagents",
   title: "Claude skills vs subagents",
