@@ -157,6 +157,8 @@ type TeamEventPropertiesMap = {
    */
   onboarding_step_clicked: {
     step: "first_skill" | "invite_team"
+    /** Only the first-skill step sets this; older events have none and meant `/library`. */
+    destination?: "discover" | "library"
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean

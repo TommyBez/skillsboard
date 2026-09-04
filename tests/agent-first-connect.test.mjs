@@ -193,6 +193,17 @@ test("the first run offers the agent first, with the invitation beside it", () =
   assert.match(nextSteps, /code=\{mcpUrl\}/)
   assert.match(inviteStep, /<InviteMemberForm/)
   assert.match(startPage, /<OnboardingNextSteps/)
+  // The first skill step opens the catalog, where saving is one click, and
+  // keeps the repository path beside it. Each destination is measured.
+  assert.match(
+    nextSteps,
+    /href="\/discover"\n\s+analytics=\{\{\n\s+event: "onboarding_step_clicked",\n\s+properties: \{ step: "first_skill", destination: "discover" \},/,
+  )
+  assert.match(
+    nextSteps,
+    /href="\/library"\n\s+analytics=\{\{\n\s+event: "onboarding_step_clicked",\n\s+properties: \{ step: "first_skill", destination: "library" \},/,
+  )
+  assert.match(events, /destination\?: "discover" \| "library"/)
 })
 
 test("only the first-run content that needs app context waits for it", () => {
