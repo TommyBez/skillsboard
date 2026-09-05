@@ -62,7 +62,7 @@ export function McpSection() {
                     aria-hidden="true"
                   />
                   <p>
-                    Sign in securely through your browser—there’s no API
+                    Sign in securely through your browser. There’s no API
                     key to copy.
                   </p>
                 </div>
