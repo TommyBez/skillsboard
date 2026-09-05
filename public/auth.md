@@ -1,3 +1,13 @@
+---
+title: "auth.md"
+description: "How an AI agent registers with Skills Board and gets a token for the Skills Board MCP server at https://www.skillsboard.sh/api/mcp."
+canonical: https://www.skillsboard.sh/auth.md
+markdown: https://www.skillsboard.sh/auth.md
+publisher: "Skills Board"
+published: 2026-08-20
+last_updated: 2026-08-20
+---
+
 # auth.md
 
 How an AI agent registers with Skills Board and gets a token for the Skills

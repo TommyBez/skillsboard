@@ -599,6 +599,43 @@ export function markdownPathOf(entry: MarkdownContentEntry): string {
   return entry.markdownPath ?? `${entry.path}.md`
 }
 
+/**
+ * A YAML double quoted scalar. Double quoted rather than plain so a title that
+ * opens with a colon, a bracket, or a quote still parses, and so the value
+ * never has to be read back through the Markdown escaping the body uses.
+ * Backslashes go first: escaping them after the quotes would escape the
+ * backslashes this function just added.
+ */
+function yamlString(value: string): string {
+  const escaped = collapse(value)
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+  return `"${escaped}"`
+}
+
+/**
+ * The document header as YAML frontmatter, from the same entry the prose
+ * header below it is built from.
+ *
+ * A client that parses frontmatter gets the title, the description, both URLs,
+ * and the dates without reading the document. The list under the title says
+ * the same thing in prose and stays, because a client that does not parse
+ * YAML reads that instead.
+ */
+function frontmatter(entry: MarkdownContentEntry): string {
+  return [
+    "---",
+    `title: ${yamlString(entry.title)}`,
+    `description: ${yamlString(entry.description)}`,
+    `canonical: ${absoluteUrl(entry.path)}`,
+    `markdown: ${absoluteUrl(markdownPathOf(entry))}`,
+    `publisher: ${yamlString(siteConfig.name)}`,
+    `published: ${entry.publishedAt}`,
+    `last_updated: ${entry.modifiedAt}`,
+    "---",
+  ].join("\n")
+}
+
 /** The full Markdown twin of a data driven page, header included. */
 export function buildContentMarkdown(entry: MarkdownContentEntry): string {
   const record = entry as unknown as Record<string, unknown>
@@ -616,6 +653,7 @@ export function buildContentMarkdown(entry: MarkdownContentEntry): string {
       : undefined
 
   const header = [
+    frontmatter(entry),
     heading(1, entry.title),
     `> ${paragraph(entry.description)}`,
     bulletList([

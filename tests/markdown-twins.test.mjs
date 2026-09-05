@@ -1,6 +1,8 @@
 import assert from "node:assert/strict"
 import { test } from "node:test"
 
+import { parse as parseYaml } from "yaml"
+
 import "./helpers/register-app-aliases.mjs"
 
 const { markdownTwinAlternates, markdownTwinPath, markdownTwinPaths, renderMarkdownTwin } =
@@ -13,6 +15,8 @@ const { developers } = await import("../lib/seo/developers.ts")
 const { alternativesHub, compareHub, resourcesHub } = await import("../lib/seo/hubs.ts")
 const { pricing } = await import("../lib/seo/pricing.ts")
 const { resourceEntries } = await import("../lib/seo/resources.ts")
+const { estimateMarkdownTokens } = await import("../lib/markdown/tokens.ts")
+const { siteConfig } = await import("../lib/site.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
@@ -41,12 +45,82 @@ test("every registered resource, alternative, and comparison has a Markdown twin
   for (const path of registered) {
     const markdown = renderMarkdownTwin(path)
     assert.ok(markdown, `missing Markdown twin for ${path}`)
-    assert.match(markdown, /^# .+/)
+    assert.ok(markdown.startsWith("---\n"), `${path} twin has no frontmatter`)
+    assert.match(markdown, /\n---\n\n# .+/)
   }
 })
 
+test("every twin opens with a frontmatter block that closes before the title", () => {
+  for (const path of markdownTwinPaths) {
+    const markdown = renderMarkdownTwin(path) ?? ""
+
+    assert.ok(markdown.startsWith("---\n"), `${path} twin has no frontmatter`)
+
+    const closing = markdown.indexOf("\n---\n", "---".length)
+    assert.notEqual(closing, -1, `${path} frontmatter never closes`)
+
+    const block = markdown.slice("---\n".length, closing + 1)
+    const heading = markdown.indexOf("\n# ")
+    assert.ok(
+      heading > closing,
+      `${path} opens its h1 inside the frontmatter block`,
+    )
+
+    // Parsed rather than pattern matched: a title carrying a colon or a quote
+    // has to survive the round trip, which is the whole point of quoting it.
+    const parsed = parseYaml(block)
+    assert.deepEqual(Object.keys(parsed), [
+      "title",
+      "description",
+      "canonical",
+      "markdown",
+      "publisher",
+      "published",
+      "last_updated",
+    ])
+    assert.equal(parsed.canonical, `${siteConfig.url}${path === "/" ? "" : path}`)
+    assert.equal(parsed.markdown, `${siteConfig.url}${markdownTwinPath(path)}`)
+    assert.equal(parsed.publisher, siteConfig.name)
+    assert.match(parsed.published, /^\d{4}-\d{2}-\d{2}$/)
+    assert.match(parsed.last_updated, /^\d{4}-\d{2}-\d{2}$/)
+  }
+})
+
+test("the frontmatter repeats what the list under the title already says", () => {
+  // The list stays: a client that does not parse YAML reads it instead, and
+  // the two have to agree or the document contradicts itself.
+  for (const path of markdownTwinPaths) {
+    const markdown = renderMarkdownTwin(path) ?? ""
+    const parsed = parseYaml(
+      markdown.slice("---\n".length, markdown.indexOf("\n---\n", "---".length) + 1),
+    )
+
+    assert.ok(markdown.includes(`\n\n# ${parsed.title}\n`), `${path} title`)
+    assert.ok(markdown.includes(`- Canonical URL: ${parsed.canonical}\n`), `${path} canonical`)
+    assert.ok(markdown.includes(`- Markdown URL: ${parsed.markdown}\n`), `${path} markdown URL`)
+    assert.ok(markdown.includes(`- Published: ${parsed.published}\n`), `${path} published`)
+    assert.ok(markdown.includes(`- Last updated: ${parsed.last_updated}\n`), `${path} last updated`)
+  }
+})
+
+test("the token header counts the frontmatter along with the rest", async () => {
+  const { GET } = await import("../app/api/markdown/route.ts")
+  const response = await GET(
+    new Request(`${siteConfig.url}/developers.md`, {
+      headers: { Accept: "text/markdown" },
+    }),
+  )
+  const body = await response.text()
+
+  assert.ok(body.startsWith("---\n"))
+  assert.equal(
+    response.headers.get("x-markdown-tokens"),
+    String(estimateMarkdownTokens(body)),
+  )
+})
+
 test("the /codex-skills twin carries the title, the sections, and the FAQ", () => {
-  assert.ok(codexMarkdown.startsWith(`# ${codexSkills.title}\n`))
+  assert.ok(codexMarkdown.includes(`\n\n# ${codexSkills.title}\n`))
   assert.ok(codexMarkdown.includes(codexSkills.description))
   assert.ok(codexMarkdown.includes("Canonical URL: https://www.skillsboard.sh/codex-skills"))
 
@@ -181,10 +255,20 @@ test("only a page with a twin advertises the Markdown alternate", () => {
   assert.deepEqual(markdownTwinAlternates("/about"), { canonical: "/about" })
 })
 
-/** Everything outside a fenced block, where Markdown syntax is live. */
+function withoutFrontmatter(markdown) {
+  if (!markdown.startsWith("---\n")) return markdown
+  const closing = markdown.indexOf("\n---\n", "---".length)
+  return closing === -1 ? markdown : markdown.slice(closing + "\n---\n".length)
+}
+
+/**
+ * Everything outside a fenced block, where Markdown syntax is live. The
+ * frontmatter goes too: it is a YAML block, and its escaping rules are not the
+ * ones Markdown uses.
+ */
 function prose(markdown) {
   let inFence = false
-  return markdown
+  return withoutFrontmatter(markdown)
     .split("\n")
     .filter((line) => {
       // The opening fence carries a language tag and the closing one does not.

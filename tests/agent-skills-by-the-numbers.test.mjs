@@ -363,7 +363,7 @@ test("the closing sentence uses the approved description of the product", () => 
 })
 
 test("the Markdown twin carries the tables, the method, and the FAQ", () => {
-  assert.ok(markdown.startsWith("# Agent skills by the numbers"))
+  assert.ok(markdown.includes("\n\n# Agent skills by the numbers"))
   assert.ok(markdown.includes(canonical))
 
   for (const section of [entry.declarations, entry.repositories, entry.downloads]) {

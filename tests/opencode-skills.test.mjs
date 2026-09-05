@@ -159,7 +159,7 @@ test("the canonical URL is reachable with and without a trailing slash", async (
 })
 
 test("the Markdown twin carries every section, the tables, and the FAQ", () => {
-  assert.ok(markdown.startsWith(`# ${entry.title}\n`))
+  assert.ok(markdown.includes(`\n\n# ${entry.title}\n`))
   assert.ok(markdown.includes(`Canonical URL: ${canonical}`))
   assert.deepEqual(markdownTwinAlternates(entry.path), {
     canonical: entry.path,
