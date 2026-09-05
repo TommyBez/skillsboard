@@ -202,7 +202,7 @@ export function McpSetupGuide({ mcpUrl, config }: { mcpUrl: string; config: stri
       label: "Other",
       steps: [
         {
-          text: "Any client that supports streamable HTTP with OAuth works. Add this config — most clients accept the standard mcpServers format.",
+          text: "Any client that supports streamable HTTP with OAuth works. Add this config; most clients accept the standard mcpServers format.",
           snippet: config,
         },
         {

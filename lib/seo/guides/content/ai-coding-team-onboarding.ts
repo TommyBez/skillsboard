@@ -17,7 +17,7 @@ export const aiCodingTeamOnboardingGuide: GuideDefinition = {
   intro:
     "Buying seats is not an onboarding strategy. Teams adopt AI coding tools when they can use them on a real task, with trusted context, clear review boundaries, and a visible definition of success. This guide turns an individual experiment into a repeatable team rollout.",
   answer:
-    "Onboard an engineering team to AI coding tools around one recurring, reviewable workflow—not a feature tour. Give the pilot trusted context, explicit review gates, a shared fixture, and a clear definition of success. Expand only after a second engineer can repeat the workflow.",
+    "Onboard an engineering team to AI coding tools around one recurring, reviewable workflow, not a feature tour. Give the pilot trusted context, explicit review gates, a shared fixture, and a clear definition of success. Expand only after a second engineer can repeat the workflow.",
   citations: {
     answer: ["ibm-ai-code-standardization", "linkedin-agent-playbooks"],
     decision: ["ibm-ai-code-standardization", "linkedin-agent-playbooks"],

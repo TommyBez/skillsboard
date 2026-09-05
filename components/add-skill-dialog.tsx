@@ -266,7 +266,7 @@ export function AddSkillDialog({
             </DialogTitle>
             <DialogDescription className="max-w-md leading-relaxed">
               {isLocked
-                ? "Skills Board reads this skill from its GitHub source and keeps the source, command, and ZIP together. Only this skill is added — not the rest of its repository."
+                ? "Skills Board reads this skill from its GitHub source and keeps the source, command, and ZIP together. Only this skill is added, not the rest of its repository."
                 : "Add its GitHub repository or direct skill link. Skills Board finds the installable skills and keeps the selected source, command, and ZIP together."}
             </DialogDescription>
           </DialogHeader>
