@@ -86,7 +86,7 @@ test("every comparison publishes a Markdown twin", async () => {
     )
 
     const markdown = renderMarkdownTwin(entry.path) ?? ""
-    assert.ok(markdown.startsWith(`# ${entry.title}\n`))
+    assert.ok(markdown.includes(`\n\n# ${entry.title}\n`))
     assert.ok(
       markdown.includes(`## ${entry.sideBySide.title}`),
       `${entry.path} twin is missing the side-by-side section`,
