@@ -83,6 +83,10 @@ function Snippet({
  * beside it rather than behind a first saved skill: a library one person can
  * reach is not a team library, and the ask reads the same on day zero.
  *
+ * The first skill step opens the public catalog, where saving is one click,
+ * and keeps the GitHub repository path beside it as the secondary button. It
+ * used to send people to their own library, which on day zero is empty.
+ *
  * The protected shell registers the active team for every event, as it does
  * on `/connect`. `client` tells the two copy surfaces apart: `generic` is the
  * endpoint copied straight from this first run.
@@ -134,24 +138,42 @@ export function OnboardingNextSteps({ canInvite, mcpUrl }: OnboardingNextStepsPr
         icon={<PlusIcon className="size-4" />}
         marker="Fill it"
         title="Add your first skill"
-        description="Save a skill from a GitHub repository so the library has something to hand back. Once your agent is connected, it can save skills for you too."
+        description="Pick a skill from the public catalog and save it, or add one from a GitHub repository. Once your agent is connected, it can save skills for you too."
       >
-        <Button
-          className="w-fit"
-          nativeButton={false}
-          render={(
-            <TrackedLink
-              href="/library"
-              analytics={{
-                event: "onboarding_step_clicked",
-                properties: { step: "first_skill" },
-              }}
-            />
-          )}
-        >
-          Go to your library
-          <ArrowRightIcon data-icon="inline-end" />
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            className="w-fit"
+            nativeButton={false}
+            render={(
+              <TrackedLink
+                href="/discover"
+                analytics={{
+                  event: "onboarding_step_clicked",
+                  properties: { step: "first_skill", destination: "discover" },
+                }}
+              />
+            )}
+          >
+            Browse the catalog
+            <ArrowRightIcon data-icon="inline-end" />
+          </Button>
+          <Button
+            variant="outline"
+            className="w-fit"
+            nativeButton={false}
+            render={(
+              <TrackedLink
+                href="/library"
+                analytics={{
+                  event: "onboarding_step_clicked",
+                  properties: { step: "first_skill", destination: "library" },
+                }}
+              />
+            )}
+          >
+            Add from a repository
+          </Button>
+        </div>
       </StepCard>
 
       <StepCard
