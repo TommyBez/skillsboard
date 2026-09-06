@@ -3,7 +3,7 @@ import { absoluteUrl, siteConfig } from "@/lib/site"
 export const pricingPath = "/pricing"
 
 export const pricingDescription =
-  "The hosted product is free forever — no trial, no credit card, no paid tier. The code is open source and can be self-hosted."
+  "The hosted product is free forever: no trial, no credit card, no paid tier. The code is open source and can be self-hosted."
 
 export const pricingFaq = [
   {
@@ -19,7 +19,7 @@ export const pricingFaq = [
   {
     question: "What is the difference between hosted and self-hosted?",
     answer:
-      "Both run the same open-source codebase. The hosted product at skillsboard.sh is operated for you and free forever. Self-hosting is also free, but limits and integrations — email, OAuth, and the public catalog — depend on your own infrastructure and provider configuration.",
+      "Both run the same open-source codebase. The hosted product at skillsboard.sh is operated for you and free forever. Self-hosting is also free, but limits and integrations (email, OAuth, and the public catalog) depend on your own infrastructure and provider configuration.",
   },
   {
     question: "What can a connected agent do through MCP?",

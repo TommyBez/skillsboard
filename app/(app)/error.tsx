@@ -19,7 +19,7 @@ export default function AppError({ reset }: { error: Error & { digest?: string }
         <div>
           <h1 className="text-3xl font-semibold tracking-display md:text-4xl">This page could not load.</h1>
           <p className="mt-3 max-w-lg text-lg leading-relaxed text-muted-foreground">
-            Something went wrong on our side. Try again — your library is safe.
+            Something went wrong on our side. Try again. Your library is safe.
           </p>
         </div>
         <div className="flex flex-wrap gap-3 md:justify-end">
