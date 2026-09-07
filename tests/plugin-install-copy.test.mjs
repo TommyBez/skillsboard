@@ -58,7 +58,7 @@ test("the landing page and the connection page render the plugin blocks", () => 
 })
 
 test("each copy control reports the surface it was copied from", () => {
-  assert.match(events, /plugin_install_copied: \{\n\s+location: "landing" \| "mcp_settings" \| "onboarding"\n\s+\}/)
+  assert.match(events, /plugin_install_copied: \{\n\s+location: "landing" \| "mcp_settings"\n\s+\}/)
   assert.match(landingSection, /location: "landing"/)
   assert.match(settingsBlock, /location: "mcp_settings"/)
 })

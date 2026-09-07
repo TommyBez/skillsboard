@@ -187,10 +187,12 @@ test("the first run offers the agent first, with the invitation beside it", () =
   assert.ok(connectStep > -1 && firstSkillStep > -1 && inviteTeamStep > -1)
   assert.ok(connectStep < firstSkillStep, "the agent connection is not the first step")
   assert.ok(firstSkillStep < inviteTeamStep)
-  // Not a placeholder: the step carries the real install commands, the real
-  // endpoint, and the real invitation form.
-  assert.match(nextSteps, /claudeCodeInstallSnippet/)
-  assert.match(nextSteps, /code=\{mcpUrl\}/)
+  // The connect step sends people to the per-client guide and copies nothing
+  // itself: the plugin commands only apply to Claude Code, and the card
+  // promises every MCP client. The invitation form is the real one.
+  assert.doesNotMatch(nextSteps, /claudeCodeInstallSnippet/)
+  assert.doesNotMatch(nextSteps, /mcpUrl/)
+  assert.match(nextSteps, /href="\/connect"/)
   assert.match(inviteStep, /<InviteMemberForm/)
   assert.match(startPage, /<OnboardingNextSteps/)
   // The first skill step opens the catalog, where saving is one click, and
@@ -211,10 +213,11 @@ test("only the first-run content that needs app context waits for it", () => {
   // getAppContext, so a new account saw "Your team library is ready"
   // before the redirect to team creation. That heading still waits on the
   // team. /connect's heading and guide are generic, so neither waits on a
-  // page-local analytics fetch. The MCP URL comes from env on both.
+  // page-local analytics fetch. The MCP URL comes from env on /connect;
+  // /start no longer shows it.
   assert.match(startPage, /async function StartHeading/)
   assert.match(startPage, /await getAppContext\(\)/)
-  assert.match(startPage, /getMcpResource\(\)/)
+  assert.doesNotMatch(startPage, /getMcpResource\(\)/)
   assert.doesNotMatch(startPage, /headers\(\)/)
   assert.match(connectPage, /export default function ConnectPage/)
   assert.doesNotMatch(connectPage, /getAppContext/)
@@ -256,20 +259,16 @@ test("a team created in onboarding lands on the first-run screen", async () => {
 })
 
 test("route views stay native while real actions stay custom", async () => {
-  for (const event of [
-    "plugin_install_copied",
-    "mcp_config_copied",
-    "mcp_entry_clicked",
-  ]) {
-    assert.match(nextSteps, new RegExp(`event: "${event}"|${event}`))
+  assert.match(nextSteps, /event: "mcp_entry_clicked"/)
+  for (const event of ["plugin_install_copied", "mcp_config_copied", "mcp_entry_clicked"]) {
     assert.match(events, new RegExp(`${event}: \\{`))
   }
+  // /start copies nothing since 2026-09-07: the copy events belong to
+  // /connect (per client) and the landing page.
+  assert.doesNotMatch(nextSteps, /plugin_install_copied|mcp_config_copied/)
   assert.match(inviteStep, /event: "team_invite_link_copied"/)
   assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+\}/)
-  assert.match(
-    nextSteps,
-    /event: "mcp_config_copied",\n\s+properties: \{ client: "generic" \},/,
-  )
+  assert.doesNotMatch(events, /\| "generic" \|/)
   assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId\)/)
   assert.match(mcpSetupGuide, /properties: \{ client \}/)
   assert.match(events, /surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"/)

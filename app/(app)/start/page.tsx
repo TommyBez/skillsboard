@@ -4,7 +4,6 @@ import type { Metadata } from "next"
 import { OnboardingNextSteps } from "@/components/onboarding-next-steps"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
-import { getMcpResource } from "@/lib/auth-environment"
 import { isOrganizationAdmin } from "@/lib/session"
 
 export const metadata: Metadata = {
@@ -42,10 +41,7 @@ async function StartSteps() {
   const { role } = await getAppContext()
 
   return (
-    <OnboardingNextSteps
-      canInvite={isOrganizationAdmin(role)}
-      mcpUrl={getMcpResource()}
-    />
+    <OnboardingNextSteps canInvite={isOrganizationAdmin(role)} />
   )
 }
 
