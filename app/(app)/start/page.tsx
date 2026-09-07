@@ -23,8 +23,7 @@ async function StartHeading() {
         Your team library is ready
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-        Three things to do now, in any order. Connecting your agent comes first because that is where your team&apos;s
-        AI skills get used, and inviting a teammate is open at the same time rather than later.
+        Connect your agent, add a first skill, invite a teammate. Any order works.
       </p>
     </>
   )
