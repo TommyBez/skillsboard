@@ -137,7 +137,7 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
   ],
   eyebrow: "OpenCode Skills",
   title: "OpenCode skills: what they are and how to use them",
-  seoTitle: "OpenCode Skills: Paths, Frontmatter, Permissions",
+  seoTitle: "OpenCode Skills: Paths, Frontmatter, Permissions | Skills Board",
   description:
     "An OpenCode skill is a folder with a SKILL.md file: the six directories OpenCode scans, the five frontmatter fields it reads, and the allow, ask, deny check.",
   intro: [
