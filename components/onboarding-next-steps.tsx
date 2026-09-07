@@ -1,16 +1,13 @@
 import { ArrowRightIcon, CableIcon, PlusIcon, UserPlusIcon } from "lucide-react"
 
-import { CopyButton } from "@/components/copy-button"
 import { OnboardingInviteStep } from "@/components/onboarding-invite-step"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
-import { claudeCodeInstallSnippet, pluginInstall } from "@/lib/plugin-install"
 
 interface OnboardingNextStepsProps {
   /** Members cannot create invitations, so they are told who can instead. */
   canInvite: boolean
-  mcpUrl: string
 }
 
 function StepCard({
@@ -48,33 +45,6 @@ function StepCard({
   )
 }
 
-function Snippet({
-  analytics,
-  ariaLabel,
-  code,
-  copyAriaLabel,
-}: {
-  analytics: React.ComponentProps<typeof CopyButton>["analytics"]
-  ariaLabel: string
-  code: string
-  copyAriaLabel: string
-}) {
-  return (
-    <div className="overflow-hidden rounded-[12px] border">
-      <pre
-        aria-label={ariaLabel}
-        className="overflow-x-auto bg-foreground p-4 font-mono text-xs leading-5 text-background"
-        tabIndex={0}
-      >
-        <code>{code}</code>
-      </pre>
-      <div className="flex justify-end bg-muted/30 px-3 py-2">
-        <CopyButton value={code} label="Copy" compact ariaLabel={copyAriaLabel} analytics={analytics} />
-      </div>
-    </div>
-  )
-}
-
 /**
  * The first screen of a team that exists but holds nothing yet.
  *
@@ -83,34 +53,24 @@ function Snippet({
  * beside it rather than behind a first saved skill: a library one person can
  * reach is not a team library, and the ask reads the same on day zero.
  *
+ * The first skill step opens the public catalog, where saving is one click,
+ * and keeps the GitHub repository path beside it as the secondary button. It
+ * used to send people to their own library, which on day zero is empty.
+ *
  * The protected shell registers the active team for every event, as it does
- * on `/connect`. `client` tells the two copy surfaces apart: `generic` is the
- * endpoint copied straight from this first run.
+ * on `/connect`. Nothing is copied from here: the install commands are one
+ * client's syntax, and the card promises every client, so the per-client
+ * steps live on `/connect`.
  */
-export function OnboardingNextSteps({ canInvite, mcpUrl }: OnboardingNextStepsProps) {
+export function OnboardingNextSteps({ canInvite }: OnboardingNextStepsProps) {
   return (
     <div data-testid="start-content" className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <StepCard
         icon={<CableIcon className="size-4" />}
         marker="Start here"
         title="Connect your agent"
-        description="Your library answers from inside Claude Code, Claude Desktop, Cursor, VS Code, and any other MCP client. Install the plugin, or paste the endpoint into the client you already use."
+        description="Your library answers from inside Claude Code, Claude Desktop, Cursor, VS Code, and any other MCP client. The setup guide has the steps for each one."
       >
-        <Snippet
-          analytics={{ event: "plugin_install_copied", properties: { location: "onboarding" } }}
-          ariaLabel={`Plugin install commands for ${pluginInstall.name}`}
-          code={claudeCodeInstallSnippet}
-          copyAriaLabel="Copy the plugin install commands"
-        />
-        <Snippet
-          analytics={{
-            event: "mcp_config_copied",
-            properties: { client: "generic" },
-          }}
-          ariaLabel="MCP endpoint"
-          code={mcpUrl}
-          copyAriaLabel="Copy the MCP endpoint"
-        />
         <Button
           variant="outline"
           className="w-fit"
@@ -134,24 +94,42 @@ export function OnboardingNextSteps({ canInvite, mcpUrl }: OnboardingNextStepsPr
         icon={<PlusIcon className="size-4" />}
         marker="Fill it"
         title="Add your first skill"
-        description="Save a skill from a GitHub repository so the library has something to hand back. Once your agent is connected, it can save skills for you too."
+        description="Pick a skill from the public catalog and save it, or add one from a GitHub repository. Once your agent is connected, it can save skills for you too."
       >
-        <Button
-          className="w-fit"
-          nativeButton={false}
-          render={(
-            <TrackedLink
-              href="/library"
-              analytics={{
-                event: "onboarding_step_clicked",
-                properties: { step: "first_skill" },
-              }}
-            />
-          )}
-        >
-          Go to your library
-          <ArrowRightIcon data-icon="inline-end" />
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            className="w-fit"
+            nativeButton={false}
+            render={(
+              <TrackedLink
+                href="/discover"
+                analytics={{
+                  event: "onboarding_step_clicked",
+                  properties: { step: "first_skill", destination: "discover" },
+                }}
+              />
+            )}
+          >
+            Browse the catalog
+            <ArrowRightIcon data-icon="inline-end" />
+          </Button>
+          <Button
+            variant="outline"
+            className="w-fit"
+            nativeButton={false}
+            render={(
+              <TrackedLink
+                href="/library"
+                analytics={{
+                  event: "onboarding_step_clicked",
+                  properties: { step: "first_skill", destination: "library" },
+                }}
+              />
+            )}
+          >
+            Add from a repository
+          </Button>
+        </div>
       </StepCard>
 
       <StepCard

@@ -43,19 +43,21 @@ type NonTeamEventPropertiesMap = {
   /**
    * Copying the plugin install commands. Non team scoped on purpose: the same
    * block runs on the landing page, where there is no team yet, and `location`
-   * keeps the two surfaces apart.
+   * keeps the two surfaces apart. `/start` carried this block until
+   * 2026-09-07; events with `location: "onboarding"` predate that.
    */
   plugin_install_copied: {
-    location: "landing" | "mcp_settings" | "onboarding"
+    location: "landing" | "mcp_settings"
   }
   /**
-   * A real copy action, not a route view. `$pageview` on `/connect` and
-   * `/start` owns the denominator; `client` separates their copy surfaces.
+   * A real copy action, not a route view. `$pageview` on `/connect` owns the
+   * denominator; `client` is the setup guide tab the config was copied from.
+   * `/start` copied the bare endpoint as `client: "generic"` until 2026-09-07.
    * Browser team context comes from PostHog's registered `team_id` super
    * property, without making leaf components fetch or receive the team.
    */
   mcp_config_copied: {
-    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+    client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -157,6 +159,8 @@ type TeamEventPropertiesMap = {
    */
   onboarding_step_clicked: {
     step: "first_skill" | "invite_team"
+    /** Only the first-skill step sets this; older events have none and meant `/library`. */
+    destination?: "discover" | "library"
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean

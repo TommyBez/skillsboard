@@ -4,7 +4,6 @@ import type { Metadata } from "next"
 import { OnboardingNextSteps } from "@/components/onboarding-next-steps"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getAppContext } from "@/lib/app-context"
-import { getMcpResource } from "@/lib/auth-environment"
 import { isOrganizationAdmin } from "@/lib/session"
 
 export const metadata: Metadata = {
@@ -23,8 +22,7 @@ async function StartHeading() {
         Your team library is ready
       </h1>
       <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-        Three things to do now, in any order. Connecting your agent comes first because that is where your team&apos;s
-        AI skills get used, and inviting a teammate is open at the same time rather than later.
+        Connect your agent, add a first skill, invite a teammate. Any order works.
       </p>
     </>
   )
@@ -43,10 +41,7 @@ async function StartSteps() {
   const { role } = await getAppContext()
 
   return (
-    <OnboardingNextSteps
-      canInvite={isOrganizationAdmin(role)}
-      mcpUrl={getMcpResource()}
-    />
+    <OnboardingNextSteps canInvite={isOrganizationAdmin(role)} />
   )
 }
 
