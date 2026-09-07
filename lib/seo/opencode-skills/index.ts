@@ -137,10 +137,9 @@ export const opencodeSkills: OpencodeSkillsDefinition = {
   ],
   eyebrow: "OpenCode Skills",
   title: "OpenCode skills: what they are and how to use them",
-  seoTitle:
-    "OpenCode Skills: What They Are and How to Use Them | Skills Board",
+  seoTitle: "OpenCode Skills: Paths, Frontmatter, Permissions",
   description:
-    "An OpenCode skill is a folder with a SKILL.md file that OpenCode loads on demand through a built-in skill tool. The six directories it scans, the five frontmatter fields it recognizes, the allow, ask, and deny model it puts in front of every skill, what the OpenCode 2 beta changes, and how a team distributes one.",
+    "An OpenCode skill is a folder with a SKILL.md file: the six directories OpenCode scans, the five frontmatter fields it reads, and the allow, ask, deny check.",
   intro: [
     "OpenCode reads the same SKILL.md file that Claude Code, Codex, and Cursor read, and then does two things none of them do. It exposes skills to the model as a tool call rather than as a list of instructions, and it puts a permission decision in front of every single one. Both are documented, and both change how you would design a skill for a team that runs OpenCode.",
     "The file itself is the ordinary one. A folder, a SKILL.md inside it, YAML frontmatter with a name and a description, then Markdown. The Agent Skills specification at agentskills.io defines that shape, and OpenCode appears on its client showcase alongside Claude Code, Codex, and Cursor. Nothing you write for one of them has to be rewritten for OpenCode.",

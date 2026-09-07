@@ -126,9 +126,9 @@ export const cursorSkills: CursorSkillsDefinition = {
   ],
   eyebrow: "Cursor Skills",
   title: "Cursor skills: what they are and how to use them",
-  seoTitle: "Cursor Skills: What They Are and How to Use Them | Skills Board",
+  seoTitle: "Cursor Skills: Paths, Frontmatter, Install | Skills Board",
   description:
-    "A Cursor skill is a folder with a SKILL.md file that Cursor discovers at startup and loads when it is relevant. The directories Cursor scans, the frontmatter fields it documents, how to add one, and what teams decide next.",
+    "A Cursor skill is a folder with a SKILL.md file: the eight directories Cursor scans, the frontmatter fields it documents, and how to add one in minutes.",
   intro: [
     "Cursor skills are folders of instructions that Cursor's agent loads when a task matches what the folder is for. Each holds a SKILL.md file and, optionally, the scripts, references, and assets the task needs. Cursor's own documentation opens by calling Agent Skills an open standard for extending AI agents, not a Cursor feature, which is the most useful thing to know before you write one.",
     "That matters because the file you write is the file the other agents read. The format was originally developed by Anthropic and released as an open standard, the specification lives at agentskills.io, and Cursor appears in the client showcase there alongside Claude Code, Codex, and a long list of others.",
