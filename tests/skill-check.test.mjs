@@ -643,8 +643,8 @@ test("the creator reads the from URL through the same endpoint, with no dash", a
   assert.ok(builder.includes('captureAnalyticsEvent("skill_creator_import_failed"'))
   assert.ok(!dashPattern.test(builder), "an em or en dash is in the builder copy")
 
-  // The page stays static: the searchParams promise is passed down and read
-  // with use() inside the tool's Suspense boundary, never awaited in the page.
+  // The page stays static: the searchParams promise is passed down and awaited
+  // by a server component inside the tool's Suspense boundary, never in the page.
   const tool = await readFile(
     new URL("../components/skill-creator/skill-creator-tool.tsx", import.meta.url),
     "utf8",
@@ -657,6 +657,7 @@ test("the creator reads the from URL through the same endpoint, with no dash", a
   assert.ok(page.includes("searchParams={searchParams}"))
   assert.ok(!builder.includes("useSearchParams"))
   assert.ok(!builder.includes("window.location"))
-  assert.ok(tool.includes("use(searchParams)"))
+  assert.ok(tool.includes("await searchParams"), "the tool resolves the promise")
+  assert.ok(!tool.includes("use client"), "the tool is a server component")
   assert.ok(pageComponent.includes("<Suspense"))
 })
