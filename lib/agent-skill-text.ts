@@ -17,7 +17,9 @@ const OSC_ESCAPE = /\x1b\][\s\S]*?(?:\x07|\x1b\\)/g
 const DCS_PM_APC_ESCAPE = /\x1b[P^_][\s\S]*?(?:\x1b\\)/g
 const SIMPLE_ESCAPE = /\x1b[\x20-\x7e]/g
 const C1_CONTROL = /[\x80-\x9f]/g
-const TERMINAL_CONTROL = /[\x00-\x06\x07\x08\x0b\x0c\x0d-\x1a\x1c-\x1f\x7f]/g
+// ESC itself is included: the patterns above need bytes after it, so a bare
+// or trailing ESC would otherwise survive them.
+const TERMINAL_CONTROL = /[\x00-\x06\x07\x08\x0b\x0c\x0d-\x1f\x7f]/g
 
 /** One line of plain text: no escapes, no control characters, no newlines. */
 export function sanitizeAgentSkillText(value: string) {

@@ -1197,9 +1197,12 @@ export async function collectGitHubSkillSources(
   const downloadsBySha = new Map<string, Promise<Uint8Array>>()
   let nextIndex = 0
   let totalBytes = 0
+  // Set by the first worker that fails, so the others stop claiming entries
+  // and a rejected batch does not keep spending GitHub API budget.
+  let aborted = false
 
   async function worker() {
-    while (nextIndex < selected.length) {
+    while (!aborted && nextIndex < selected.length) {
       const index = nextIndex
       nextIndex += 1
       const candidate = selected[index]
@@ -1215,9 +1218,16 @@ export async function collectGitHubSkillSources(
         downloadsBySha.set(candidate.entry.sha, download)
       }
 
-      const bytes = await download
+      let bytes: Uint8Array
+      try {
+        bytes = await download
+      } catch (error) {
+        aborted = true
+        throw error
+      }
       totalBytes += bytes.byteLength
       if (totalBytes > MAX_TOTAL_DESCRIPTOR_BYTES) {
+        aborted = true
         throw new GitHubSkillDiscoveryError(
           "The repository's skill definitions are too large to inspect safely.",
           413,

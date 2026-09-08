@@ -58,7 +58,11 @@ function respond(
       // the edge and never in the browser: long enough that a shared link does
       // not spend a GitHub request per reader, short enough that a fix pushed
       // to the repository shows up while the author is still looking.
-      "Cache-Control": "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
+      // A failed report is never cached: a momentary GitHub outage would
+      // otherwise pin the failure on a shared URL after GitHub recovered.
+      "Cache-Control": report.error
+        ? "no-store"
+        : "public, max-age=0, s-maxage=300, stale-while-revalidate=600",
       "X-Content-Type-Options": "nosniff",
       Vary: "Accept",
     },

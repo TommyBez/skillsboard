@@ -278,9 +278,9 @@ test("terminal escapes in a checked file never reach the report", () => {
   )
 
   for (const issue of [...result.errors, ...result.warnings]) {
-    assert.ok(!issue.message.includes(""), `${issue.code} carried an escape`)
+    assert.ok(!issue.message.includes("\u001b"), `${issue.code} carried an escape`)
   }
-  assert.ok(!result.name.includes(""))
+  assert.ok(!result.name.includes("\u001b"))
 })
 
 test("an unknown key holding regex syntax is a warning rather than a crash", () => {
@@ -485,4 +485,13 @@ test("the related links point at pages that exist in this repository", () => {
     skillCheck.related.map((link) => link.href),
     ["/skill-creator", "/guides/how-to-write-a-skill-md", "/agent-skills"],
   )
+})
+
+test("a bare or trailing ESC does not survive the sanitizer", async () => {
+  const { sanitizeAgentSkillText } = await import("../lib/agent-skill-text.ts")
+  // The escape patterns need bytes after ESC; these leave ESC with none.
+  assert.equal(sanitizeAgentSkillText("notes\u001b"), "notes")
+  assert.equal(sanitizeAgentSkillText("\u001b\u001b"), "")
+  assert.equal(sanitizeAgentSkillText("a\u001b\u007fb"), "ab")
+  assert.equal(sanitizeAgentSkillText("a\u001b\u001b"), "a")
 })
