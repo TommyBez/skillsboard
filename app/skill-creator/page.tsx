@@ -45,6 +45,21 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Page() {
-  return <SkillCreatorPage entry={skillCreator} />
+/**
+ * `?from=` is read on the server and handed down as a prop, so the client
+ * component never needs `useSearchParams` and the page needs no Suspense
+ * boundary around the tool. It does not touch the metadata above: the
+ * canonical stays the bare path, because a page opened with a skill loaded is
+ * the same page.
+ */
+export default async function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  const params = await searchParams
+  const from = params.from
+  const importUrl = typeof from === "string" && from.trim() ? from.trim() : undefined
+
+  return <SkillCreatorPage entry={skillCreator} importUrl={importUrl} />
 }

@@ -6,6 +6,7 @@
  * the report it just asked for without parsing JSON.
  */
 
+import type { SkillDraft } from "@/lib/skill-creator/skill-md"
 import type { SkillCheckIssue } from "@/lib/skill-check/skill-check"
 
 /**
@@ -48,6 +49,14 @@ export interface SkillCheckReportEntry {
   sizeBytes: number
   /** Permalink to the exact file that was read, pinned to the commit. */
   sourceUrl: string
+  /**
+   * The frontmatter and body as read, sanitized, in the shape the skill
+   * creator edits. It is what `/skill-creator?from=` loads into the form, so a
+   * reported file can be fixed where the rules are enforced as you type. The
+   * Markdown rendering leaves it out: a report is a list of findings, not a
+   * copy of the file.
+   */
+  draft: SkillDraft
   errors: SkillCheckIssue[]
   warnings: SkillCheckIssue[]
 }

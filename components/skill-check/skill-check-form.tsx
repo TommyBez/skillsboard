@@ -92,7 +92,22 @@ function IssueRow({ issue, level }: { issue: SkillCheckIssue; level: "error" | "
   )
 }
 
-function SkillReportCard({ skill }: { skill: SkillCheckReportEntry }) {
+/**
+ * The address that opens a checked skill in the creator with its fields
+ * already in the form. Built from the permalink when one skill is meant, so
+ * the file the creator loads is the exact one this report read.
+ */
+export function skillCreatorImportHref(url: string) {
+  return `/skill-creator?from=${encodeURIComponent(url)}`
+}
+
+function SkillReportCard({
+  skill,
+  showImport,
+}: {
+  skill: SkillCheckReportEntry
+  showImport: boolean
+}) {
   const passes = skill.errors.length === 0
 
   return (
@@ -163,6 +178,21 @@ function SkillReportCard({ skill }: { skill: SkillCheckReportEntry }) {
             <IssueRow key={`${issue.code}-${issue.message}`} issue={issue} level="warning" />
           ))}
         </ul>
+      ) : null}
+
+      {showImport ? (
+        <div className="mt-5 border-t border-border/70 pt-4">
+          <Link
+            href={skillCreatorImportHref(skill.sourceUrl)}
+            onClick={() =>
+              captureAnalyticsEvent("skill_check_open_in_creator", { entry: "skill" })
+            }
+            className="inline-flex items-center gap-1 text-xs font-semibold underline decoration-border underline-offset-4 hover:text-primary"
+          >
+            Open in the skill creator
+            <ArrowRightIcon className="size-3" aria-hidden="true" />
+          </Link>
+        </div>
       ) : null}
     </article>
   )
@@ -393,20 +423,35 @@ export function SkillCheckForm({ entry }: { entry: SkillCheckDefinition }) {
                   Save to your team&apos;s board
                   <ArrowRightIcon data-icon="inline-end" />
                 </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="rounded-[3px]"
-                  nativeButton={false}
-                  render={<Link href={entry.related[0].href} />}
-                >
-                  Fix it in the skill creator
-                </Button>
+                {report.skills.length === 1 ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-[3px]"
+                    nativeButton={false}
+                    render={
+                      <Link
+                        href={skillCreatorImportHref(report.url)}
+                        onClick={() =>
+                          captureAnalyticsEvent("skill_check_open_in_creator", {
+                            entry: "report",
+                          })
+                        }
+                      />
+                    }
+                  >
+                    Fix it in the skill creator
+                  </Button>
+                ) : null}
               </div>
             </div>
 
             {report.skills.map((skill) => (
-              <SkillReportCard key={skill.filePath} skill={skill} />
+              <SkillReportCard
+                key={skill.filePath}
+                skill={skill}
+                showImport={report.skills.length > 1}
+              />
             ))}
           </>
         ) : null}

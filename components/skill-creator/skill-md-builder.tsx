@@ -1,6 +1,6 @@
 "use client"
 
-import { useId, useMemo, useState } from "react"
+import { useEffect, useId, useMemo, useRef, useState } from "react"
 import {
   CircleAlertIcon,
   CircleCheckIcon,
@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import { pickSkillForUrl } from "@/lib/skill-check/pick-skill"
+import type { SkillCheckReport, SkillCheckReportEntry } from "@/lib/skill-check/report"
 import {
   buildSkillMd,
   countBodyLines,
@@ -123,12 +125,123 @@ function IssueList({ issues }: { issues: readonly SkillIssue[] }) {
   )
 }
 
+/* -------------------------------------------------------------------------- */
+/* Loading a skill from a GitHub URL                                           */
+/* -------------------------------------------------------------------------- */
+
+/** What the check endpoint sends when it refuses: an RFC 9457 document. */
+const PROBLEM_MEDIA_TYPE = "application/problem+json"
+
+type ImportState =
+  | { status: "loading" }
+  | {
+      status: "loaded"
+      skill: SkillCheckReportEntry
+      repository: SkillCheckReport["repository"]
+      otherCount: number
+      errorCount: number
+      warningCount: number
+    }
+  | { status: "failed"; message: string }
+
+function rateLimitMessage(retryAfter: string | null) {
+  const seconds = Number(retryAfter)
+  if (Number.isFinite(seconds) && seconds > 0) {
+    return `Too many reads from this network. Try again in ${Math.ceil(seconds)} seconds.`
+  }
+  return "Too many reads from this network. Try again in a minute."
+}
+
+/** A report, as opposed to a problem document or anything else that parsed. */
+function isSkillCheckReport(payload: unknown): payload is SkillCheckReport {
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    Array.isArray((payload as { skills?: unknown }).skills)
+  )
+}
+
+/**
+ * The line above the form while a `?from=` URL is read, and after.
+ *
+ * A row rather than a dialog: the form below it stays usable throughout, so a
+ * slow repository or a dead URL costs the reader nothing.
+ */
+function ImportRow({ url, state }: { url: string; state: ImportState }) {
+  if (state.status === "loading") {
+    return (
+      <p
+        className="rounded-[3px] border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
+        aria-live="polite"
+      >
+        Loading <span className="break-all font-mono text-xs">{url}</span>…
+      </p>
+    )
+  }
+
+  if (state.status === "failed") {
+    return (
+      <p
+        className="rounded-[3px] border border-destructive/40 bg-card px-4 py-3 text-sm text-destructive"
+        aria-live="polite"
+      >
+        {state.message} The example below is still loaded.
+      </p>
+    )
+  }
+
+  const { skill, repository, otherCount, errorCount, warningCount } = state
+  const shortSha = repository ? repository.commitSha.slice(0, 7) : ""
+
+  return (
+    <div
+      className="rounded-[3px] border border-border bg-card px-4 py-3 text-sm text-muted-foreground"
+      aria-live="polite"
+    >
+      <p>
+        Loaded{" "}
+        <a
+          href={skill.sourceUrl}
+          target="_blank"
+          rel="noreferrer noopener"
+          className="break-all font-mono text-xs font-semibold underline decoration-border underline-offset-4 hover:text-foreground"
+        >
+          {skill.filePath}
+        </a>
+        {repository ? (
+          <>
+            {" "}
+            from {repository.owner}/{repository.name} at {shortSha}
+          </>
+        ) : null}
+        {otherCount > 0 ? (
+          <>
+            {" "}
+            ({otherCount} other {otherCount === 1 ? "skill" : "skills"} in this repository{" "}
+            {otherCount === 1 ? "was" : "were"} not loaded)
+          </>
+        ) : null}
+      </p>
+      {errorCount + warningCount > 0 ? (
+        <p className="mt-1">
+          {errorCount} {errorCount === 1 ? "error" : "errors"} and {warningCount}{" "}
+          {warningCount === 1 ? "warning" : "warnings"} from the checker: the fields below
+          show them.
+        </p>
+      ) : null}
+    </div>
+  )
+}
+
 export function SkillMdBuilder({
   exampleDraft,
   privacyNote,
+  importUrl,
 }: {
   exampleDraft: SkillDraft
   privacyNote: string
+  /** A GitHub URL from `?from=`, read through `/api/check` on first render. */
+  importUrl?: string
 }) {
   const fieldId = useId()
   const [draft, setDraft] = useState<SkillDraft>(exampleDraft)
@@ -137,6 +250,122 @@ export function SkillMdBuilder({
   )
   const [nextRowId, setNextRowId] = useState(() => metadataRows.length)
   const [archiveError, setArchiveError] = useState<string | null>(null)
+  const [importState, setImportState] = useState<ImportState | null>(
+    importUrl ? { status: "loading" } : null,
+  )
+  /** The URL an import already ran for, so a rerender does not repeat it. */
+  const importedRef = useRef<string | null>(null)
+
+  /**
+   * A `?from=` URL is read once, through the same endpoint `/check` uses, and
+   * the skill it names is loaded into the fields. Nothing is cleared before
+   * the answer arrives: the example stays in the form, so the page does not
+   * blank out while a repository is being read, and a failure leaves the
+   * reader with a working tool rather than an empty one.
+   */
+  useEffect(() => {
+    if (!importUrl || importedRef.current === importUrl) return
+    importedRef.current = importUrl
+    let cancelled = false
+    setImportState({ status: "loading" })
+
+    async function run(target: string) {
+      try {
+        const response = await fetch(`/api/check?url=${encodeURIComponent(target)}`, {
+          headers: { Accept: "application/json" },
+        })
+
+        const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase()
+        const isProblem =
+          contentType.includes(PROBLEM_MEDIA_TYPE) || !contentType.includes("json")
+
+        if (response.status === 429 || isProblem) {
+          const rateLimited = response.status === 429
+          if (cancelled) return
+          setImportState({
+            status: "failed",
+            message: rateLimited
+              ? rateLimitMessage(response.headers.get("Retry-After"))
+              : "That URL could not be read right now.",
+          })
+          captureAnalyticsEvent("skill_creator_import_failed", {
+            error_code: rateLimited ? "rate_limited" : "unexpected_response",
+          })
+          return
+        }
+
+        const payload: unknown = await response.json()
+
+        if (!isSkillCheckReport(payload)) {
+          if (cancelled) return
+          setImportState({
+            status: "failed",
+            message: "That URL could not be read right now.",
+          })
+          captureAnalyticsEvent("skill_creator_import_failed", {
+            error_code: "unexpected_response",
+          })
+          return
+        }
+
+        if (payload.error) {
+          if (cancelled) return
+          setImportState({ status: "failed", message: payload.error.message })
+          captureAnalyticsEvent("skill_creator_import_failed", {
+            error_code: payload.error.code,
+          })
+          return
+        }
+
+        const skill = pickSkillForUrl(target, payload.skills)
+
+        if (!skill) {
+          if (cancelled) return
+          setImportState({
+            status: "failed",
+            message: "No SKILL.md file was found at that URL, so nothing was loaded.",
+          })
+          captureAnalyticsEvent("skill_creator_import_failed", {
+            error_code: "no_skills_found",
+          })
+          return
+        }
+
+        if (cancelled) return
+        setDraft(skill.draft)
+        setMetadataRows(toRows(skill.draft))
+        setNextRowId(skill.draft.metadata.length)
+        setArchiveError(null)
+        setImportState({
+          status: "loaded",
+          skill,
+          repository: payload.repository,
+          otherCount: payload.skills.length - 1,
+          errorCount: skill.errors.length,
+          warningCount: skill.warnings.length,
+        })
+        captureAnalyticsEvent("skill_creator_import_completed", {
+          skills_found: payload.skills.length,
+          error_count: skill.errors.length,
+          warning_count: skill.warnings.length,
+        })
+      } catch {
+        if (cancelled) return
+        setImportState({
+          status: "failed",
+          message:
+            "That URL could not be read from this browser. Check your connection and try again.",
+        })
+        captureAnalyticsEvent("skill_creator_import_failed", { error_code: "network" })
+      }
+    }
+
+    void run(importUrl)
+
+    return () => {
+      cancelled = true
+    }
+  }, [importUrl])
 
   const activeDraft = useMemo<SkillDraft>(
     () => ({
@@ -192,6 +421,11 @@ export function SkillMdBuilder({
 
   return (
     <div className="mt-9 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      {importUrl && importState ? (
+        <div className="lg:col-span-2">
+          <ImportRow url={importUrl} state={importState} />
+        </div>
+      ) : null}
       <div className="rounded-[3px] border border-border bg-card p-5 md:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-primary">

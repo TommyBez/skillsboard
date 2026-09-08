@@ -495,3 +495,157 @@ test("a bare or trailing ESC does not survive the sanitizer", async () => {
   assert.equal(sanitizeAgentSkillText("a\u001b\u007fb"), "ab")
   assert.equal(sanitizeAgentSkillText("a\u001b\u001b"), "a")
 })
+
+/* -------------------------------------------------------------------------- */
+/* Loading a checked skill into the skill creator                              */
+/* -------------------------------------------------------------------------- */
+
+test("the check recovers the draft the creator edits, and the report carries it", async () => {
+  const result = checkSkillMarkdown(valid(), context)
+
+  assert.equal(result.draft.name, "release-notes")
+  assert.ok(result.draft.description.startsWith("Writes release notes"))
+  assert.ok(result.draft.body.includes("Read the merged pull requests"))
+  assert.ok(!result.draft.body.startsWith("---"), "the frontmatter leaked into the body")
+
+  // The report builder is server-only, so the wiring is read as text: every
+  // entry carries a draft, and a file no fields could be recovered from
+  // carries the empty one rather than nothing.
+  const builder = await readFile(
+    new URL("../lib/skill-check/check-github-url.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(builder.includes("draft: result.draft ?? emptySkillDraft"))
+  assert.ok(builder.includes("draft: emptySkillDraft"), "the unreadable file has no draft")
+})
+
+test("the Markdown report states the findings and not the file", () => {
+  const markdown = renderSkillCheckMarkdown(
+    reportWith([
+      {
+        path: "skills/release-notes",
+        filePath: "skills/release-notes/SKILL.md",
+        name: "release-notes",
+        sizeBytes: 400,
+        sourceUrl: "https://github.com/owner/repo/blob/sha/skills/release-notes/SKILL.md",
+        draft: {
+          name: "release-notes",
+          description: "Writes release notes.",
+          license: "",
+          compatibility: "",
+          allowedTools: "",
+          metadata: [],
+          body: "# Release notes\n\nGROUP THE MERGED PULL REQUESTS.",
+        },
+        errors: [],
+        warnings: [],
+      },
+    ]),
+  )
+
+  assert.ok(markdown.includes("skills/release-notes/SKILL.md"))
+  assert.ok(
+    !markdown.includes("GROUP THE MERGED PULL REQUESTS"),
+    "the report printed the body of the file",
+  )
+})
+
+const pickable = [
+  {
+    path: "skills/release-notes",
+    filePath: "skills/release-notes/SKILL.md",
+    sourceUrl: "https://github.com/owner/repo/blob/aaa/skills/release-notes/SKILL.md",
+  },
+  {
+    path: "skills/triage",
+    filePath: "skills/triage/SKILL.md",
+    sourceUrl: "https://github.com/owner/repo/blob/aaa/skills/triage/SKILL.md",
+  },
+]
+
+test("a URL to a file, a folder, or a repository picks the skill it named", async () => {
+  const { pickSkillForUrl } = await import("../lib/skill-check/pick-skill.ts")
+
+  assert.equal(
+    pickSkillForUrl(
+      "https://github.com/owner/repo/blob/main/skills/triage/SKILL.md",
+      pickable,
+    ),
+    pickable[1],
+    "a file URL did not pick its own file",
+  )
+  assert.equal(
+    pickSkillForUrl("https://github.com/owner/repo/tree/main/skills/triage", pickable),
+    pickable[1],
+    "a folder URL did not pick the skill in it",
+  )
+  assert.equal(
+    pickSkillForUrl("https://github.com/owner/repo", pickable),
+    pickable[0],
+    "a repository URL did not pick the first skill",
+  )
+  assert.equal(
+    pickSkillForUrl("https://github.com/owner/repo/tree/main/docs", pickable),
+    pickable[0],
+    "an unmatched path did not fall back to the first skill",
+  )
+  assert.equal(pickSkillForUrl("https://github.com/owner/repo", []), null)
+})
+
+test("a permalink to the checked commit picks that exact file", async () => {
+  const { pickSkillForUrl } = await import("../lib/skill-check/pick-skill.ts")
+
+  assert.equal(pickSkillForUrl(pickable[1].sourceUrl, pickable), pickable[1])
+  // A branch name holding a slash is still resolved against what was read.
+  assert.equal(
+    pickSkillForUrl(
+      "https://github.com/owner/repo/tree/feature/two/skills/triage",
+      pickable,
+    ),
+    pickable[1],
+  )
+})
+
+test("the report links a checked skill into the creator", async () => {
+  const form = await readFile(
+    new URL("../components/skill-check/skill-check-form.tsx", import.meta.url),
+    "utf8",
+  )
+
+  assert.ok(form.includes("/skill-creator?from=${encodeURIComponent(url)}"))
+  assert.ok(
+    form.includes("skillCreatorImportHref(report.url)"),
+    "the header button does not carry the checked URL",
+  )
+  assert.ok(
+    form.includes("skillCreatorImportHref(skill.sourceUrl)"),
+    "a skill card does not link its own permalink",
+  )
+  assert.ok(form.includes("report.skills.length === 1"), "the header button is not scoped")
+  assert.ok(form.includes('captureAnalyticsEvent("skill_check_open_in_creator"'))
+})
+
+test("the creator reads the from URL through the same endpoint, with no dash", async () => {
+  const builder = await readFile(
+    new URL("../components/skill-creator/skill-md-builder.tsx", import.meta.url),
+    "utf8",
+  )
+  const page = await readFile(
+    new URL("../app/skill-creator/page.tsx", import.meta.url),
+    "utf8",
+  )
+
+  assert.ok(builder.includes("/api/check?url=${encodeURIComponent(target)}"))
+  assert.ok(builder.includes("application/problem+json"), "the media type is not checked")
+  assert.ok(builder.includes("response.status === 429"), "the refusal status is not checked")
+  assert.ok(builder.includes("pickSkillForUrl"), "the skill is not chosen")
+  assert.ok(builder.includes('captureAnalyticsEvent("skill_creator_import_completed"'))
+  assert.ok(builder.includes('captureAnalyticsEvent("skill_creator_import_failed"'))
+  assert.ok(!dashPattern.test(builder), "an em or en dash is in the builder copy")
+
+  // The query string is read on the server and handed down, so the client
+  // never needs useSearchParams and the page needs no Suspense boundary.
+  assert.ok(page.includes("await searchParams"))
+  assert.ok(page.includes("importUrl"))
+  assert.ok(!builder.includes("useSearchParams"))
+})

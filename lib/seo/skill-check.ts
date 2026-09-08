@@ -138,7 +138,7 @@ export const skillCheck: SkillCheckDefinition = {
       label: "Write a valid SKILL.md in the browser",
       href: skillCreatorPath,
       description:
-        "The same rules from the other side: fill in the fields, watch the checks, download the folder.",
+        "The same rules from the other side: fill in the fields, watch the checks, download the folder. A report opens a checked file straight into it.",
     },
     {
       label: "How to write a SKILL.md",

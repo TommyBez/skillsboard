@@ -12,6 +12,7 @@ import {
   type SkillCheckReportErrorCode,
 } from "@/lib/skill-check/report"
 import { checkSkillMarkdown } from "@/lib/skill-check/skill-check"
+import { emptySkillDraft } from "@/lib/skill-creator/skill-md"
 
 /** HTTP status for each way the check can refuse, used by the route. */
 export const SKILL_CHECK_ERROR_STATUS: Record<SkillCheckReportErrorCode, number> = {
@@ -102,6 +103,7 @@ export async function checkGitHubUrl(url: string): Promise<SkillCheckReport> {
           name: null,
           sizeBytes: source.sizeBytes,
           sourceUrl,
+          draft: emptySkillDraft,
           errors: [
             {
               code: "not_utf8",
@@ -125,6 +127,10 @@ export async function checkGitHubUrl(url: string): Promise<SkillCheckReport> {
         name: result.name,
         sizeBytes: source.sizeBytes,
         sourceUrl,
+        // A file the reader could not recover fields from carries an empty
+        // draft rather than nothing: the creator opens on the same form, and
+        // the errors beside it say why there was nothing to load.
+        draft: result.draft ?? emptySkillDraft,
         errors: result.errors,
         warnings: result.warnings,
       }

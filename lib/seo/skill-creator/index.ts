@@ -169,9 +169,9 @@ export const skillCreator: SkillCreatorDefinition = {
   tool: {
     title: "Write the file",
     intro:
-      "Fill in the two required fields and the body. The preview on the right is the file you will download, byte for byte, and the checks under it are the constraints the specification and Anthropic's authoring guidance state.",
+      "Fill in the two required fields and the body. The preview on the right is the file you will download, byte for byte, and the checks under it are the constraints the specification and Anthropic's authoring guidance state. To start from a skill that already exists, open this page as /skill-creator?from= followed by the GitHub URL of a repository, a skill folder, or a SKILL.md file, and the fields arrive filled in.",
     privacyNote:
-      "The generator is a script in this page. Your draft is not posted to a server, saved to an account, or read by anything else, and reloading the page clears it.",
+      "The generator is a script in this page. Your draft is not posted to a server, saved to an account, or read by anything else, and reloading the page clears it. The one thing that leaves the browser is a ?from= URL, which is sent to the format check endpoint so the public file it names can be read back into the fields.",
     exampleDraft,
     sourceIds: ["agentskills-spec", "anthropic-best-practices"],
   },
