@@ -10,7 +10,7 @@ import {
   SectionTable,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
-import { SkillMdBuilder } from "@/components/skill-creator/skill-md-builder"
+import { SkillCreatorTool } from "@/components/skill-creator/skill-creator-tool"
 import { buildSkillCreatorSchema } from "@/lib/seo/skill-creator/schema"
 import type {
   SkillCreatorDefinition,
@@ -121,7 +121,7 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
           <p className="mt-4 max-w-3xl text-pretty text-[1.05rem] leading-8 text-muted-foreground">
             {entry.tool.intro}
           </p>
-          <SkillMdBuilder
+          <SkillCreatorTool
             exampleDraft={entry.tool.exampleDraft}
             privacyNote={entry.tool.privacyNote}
           />

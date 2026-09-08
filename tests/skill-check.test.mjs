@@ -643,8 +643,15 @@ test("the creator reads the from URL through the same endpoint, with no dash", a
   assert.ok(builder.includes('captureAnalyticsEvent("skill_creator_import_failed"'))
   assert.ok(!dashPattern.test(builder), "an em or en dash is in the builder copy")
 
-  // The page stays static: the query string is read in the browser.
+  // The page stays static: the query string is read with useSearchParams
+  // inside a Suspense boundary, in the tool wrapper, never on the server.
+  const tool = await readFile(
+    new URL("../components/skill-creator/skill-creator-tool.tsx", import.meta.url),
+    "utf8",
+  )
   assert.ok(!page.includes("searchParams"))
   assert.ok(!builder.includes("useSearchParams"))
-  assert.ok(builder.includes("window.location.search"))
+  assert.ok(!builder.includes("window.location"))
+  assert.ok(tool.includes("useSearchParams"))
+  assert.ok(tool.includes("<Suspense"))
 })
