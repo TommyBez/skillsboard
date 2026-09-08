@@ -409,6 +409,15 @@ test("the API catalog is a linkset anchored on the MCP endpoint", () => {
   assert.equal(entry.status[0].href, `${origin}/api/health`)
 })
 
+test("the API catalog links the public format check", () => {
+  const [entry] = buildApiCatalog().linkset
+  const link = entry.related?.find((candidate) => candidate.href === `${origin}/api/check`)
+
+  assert.ok(link, "the catalog does not link /api/check")
+  assert.equal(link.type, "application/json")
+  assert.ok(link.title?.length > 0, "the format check link has no title")
+})
+
 test("the token estimate scales with the document and is never zero for text", () => {
   assert.equal(estimateMarkdownTokens(""), 0)
 

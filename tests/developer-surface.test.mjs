@@ -9,6 +9,7 @@ const { claimApiRequest, MCP_RATE_LIMIT, PUBLIC_API_RATE_LIMIT, rateLimitHeaders
 const { API_VERSION, API_VERSION_HEADER, isSupportedApiVersion, SUPPORTED_API_VERSIONS } =
   await import("../lib/api-version.ts")
 const { buildProblem, problemCodes } = await import("../lib/problem-json.ts")
+const { SKILL_CHECK_ERROR_STATUS } = await import("../lib/skill-check/report.ts")
 const { buildNotFoundMarkdown, recoveryLinks } = await import("../lib/agent-recovery.ts")
 const { buildOpenApiDocument } = await import("../lib/openapi.ts")
 const { buildArdCatalog } = await import("../lib/ard-catalog.ts")
@@ -305,6 +306,114 @@ test("every OpenAPI operation is typed well enough to become a tool definition",
   }
 
   assert.ok(operationIds.has("getMcpRegistryManifest"), "the registry manifest is undescribed")
+})
+
+/** A parameter as written, whether the operation inlined it or referenced it. */
+function resolveParameter(parameter) {
+  if (!parameter.$ref) return parameter
+  return spec.components.parameters[parameter.$ref.split("/").pop()]
+}
+
+test("the OpenAPI description registers the public format check", () => {
+  const check = spec.paths["/api/check"]?.get
+
+  assert.ok(check, "/api/check is not in the described surface")
+  assert.equal(check.operationId, "checkSkillRepository")
+  assert.deepEqual(check.security, [], "the format check needs no account")
+
+  const parameters = check.parameters.map(resolveParameter)
+
+  const url = parameters.find((parameter) => parameter.name === "url")
+  assert.ok(url, "the URL to check is not a described parameter")
+  assert.equal(url.in, "query")
+  assert.equal(url.required, true)
+  assert.equal(url.schema.format, "uri")
+
+  const format = parameters.find((parameter) => parameter.name === "format")
+  assert.ok(format, "the format parameter is undescribed")
+  assert.equal(format.required, false)
+  assert.deepEqual(format.schema.enum, ["json", "md"])
+
+  // The route reads no version header and sets none, so the description does
+  // not claim the parameter every other operation carries.
+  assert.equal(
+    parameters.some((parameter) => parameter.name === API_VERSION_HEADER),
+    false,
+    "/api/check is described as taking a version header its route never reads",
+  )
+
+  // Both representations the route can return are typed, JSON first, so a
+  // client generating a tool definition gets the report schema.
+  const success = check.responses["200"].content
+  assert.deepEqual(Object.keys(success), ["application/json", "text/markdown"])
+  assert.equal(success["application/json"].schema.$ref, "#/components/schemas/SkillCheckReport")
+  assert.equal(
+    spec.components.schemas[success["text/markdown"].schema.$ref.split("/").pop()].type,
+    "string",
+  )
+
+  // Every status the route can answer with is a status the document describes.
+  for (const status of new Set(Object.values(SKILL_CHECK_ERROR_STATUS))) {
+    assert.ok(
+      check.responses[String(status)],
+      `/api/check can answer ${status} and the description does not say so`,
+    )
+  }
+
+  // The refusal codes come from the report, not from the problem registry.
+  assert.deepEqual(
+    spec.components.schemas.SkillCheckReport.properties.error.properties.code.enum,
+    Object.keys(SKILL_CHECK_ERROR_STATUS),
+  )
+
+  // A spent budget there is still a problem document.
+  assert.equal(
+    check.responses["429"].content["application/problem+json"].schema.$ref,
+    "#/components/schemas/Problem",
+  )
+  assert.ok(check.responses["429"].headers["Retry-After"])
+  for (const header of ["RateLimit", "RateLimit-Policy", "RateLimit-Limit"]) {
+    assert.ok(check.responses["200"].headers[header], `/api/check does not publish ${header}`)
+  }
+})
+
+test("every schema reference in the OpenAPI document resolves", () => {
+  const references = new Set()
+
+  const walk = (node) => {
+    if (Array.isArray(node)) return node.forEach(walk)
+    if (!node || typeof node !== "object") return
+    for (const [key, value] of Object.entries(node)) {
+      if (key === "$ref" && typeof value === "string") references.add(value)
+      else walk(value)
+    }
+  }
+
+  walk(spec)
+
+  for (const reference of references) {
+    const [head, ...segments] = reference.split("/")
+    assert.equal(head, "#", `${reference} points outside this document`)
+
+    let resolved = spec
+    for (const segment of segments) resolved = resolved?.[segment]
+    assert.ok(resolved, `${reference} does not resolve`)
+  }
+
+  for (const schema of ["SkillCheckReport", "SkillCheckSkill", "SkillCheckProblem"]) {
+    assert.ok(references.has(`#/components/schemas/${schema}`), `${schema} is declared and unused`)
+  }
+})
+
+test("the developer docs list the endpoints the OpenAPI document describes", () => {
+  const listed = developers.publicSurface.rows.map((row) => row.label)
+
+  for (const path of ["/api/mcp", "/api/health", "/api/check"]) {
+    assert.ok(listed.includes(path), `${path} is described but not on the developers page`)
+  }
+
+  const twin = renderMarkdownTwin(developersPath)
+  assert.ok(twin.includes("/api/check"), "the Markdown twin does not carry the format check")
 })
 
 test("the OpenAPI description carries a typed error model", () => {

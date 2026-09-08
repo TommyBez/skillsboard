@@ -54,6 +54,13 @@ export const developers = {
         ],
       },
       {
+        label: "/api/check",
+        cells: [
+          "Reads every SKILL.md a public GitHub URL offers and reports where each one departs from the Agent Skills specification. Pass the URL as ?url=. Add ?format=md, or send Accept: text/markdown, for the report as text. It is a format check, not a review, a security audit, or a rating.",
+          "None",
+        ],
+      },
+      {
         label: "/openapi.json",
         href: "/openapi.json",
         cells: ["OpenAPI 3.1 description of everything in this table.", "None"],

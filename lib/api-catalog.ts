@@ -7,9 +7,12 @@ export const API_CATALOG_MEDIA_TYPE =
 /**
  * RFC 9727 API catalog.
  *
- * One anchor, because Skills Board exposes one API: the MCP server. The rest of
- * `/api` backs the web UI on a session cookie and is not an integration point,
- * so listing it here would advertise a contract that does not exist.
+ * One anchor, because Skills Board exposes one API to authenticate against: the
+ * MCP server. The rest of `/api` backs the web UI on a session cookie and is
+ * not an integration point, so listing it here would advertise a contract that
+ * does not exist. The exception is the public format check at `/api/check`,
+ * which needs no account and is a documented endpoint rather than a page's
+ * back end, so it is linked under `related`.
  */
 export function buildApiCatalog() {
   return {
@@ -55,6 +58,13 @@ export function buildApiCatalog() {
             href: discoveryUrl("/api/health"),
             type: "application/health+json",
             title: "Deployment liveness",
+          },
+        ],
+        related: [
+          {
+            href: discoveryUrl("/api/check"),
+            type: "application/json",
+            title: "SKILL.md format check for a public GitHub URL",
           },
         ],
         "service-meta": [
