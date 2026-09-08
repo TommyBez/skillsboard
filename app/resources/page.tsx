@@ -171,7 +171,7 @@ export default function ResourcesPage() {
             Keep the source, setup path, and operating notes in one searchable library your teammates can return to.
           </p>
           <div className="mt-7 flex justify-center">
-            <ResourceCta location="resources_closing" />
+            <ResourceCta location="closing" />
           </div>
         </section>
       </div>

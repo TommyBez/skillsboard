@@ -3,6 +3,8 @@ import Link from "next/link"
 import { ExternalLinkIcon } from "lucide-react"
 
 import { JsonLd } from "@/components/json-ld"
+import { markdownTwinAlternates } from "@/lib/markdown/twins"
+import { hostedFeatures, selfHostedFeatures } from "@/lib/seo/pricing"
 import {
   buildPricingSchema,
   pricingDescription,
@@ -16,7 +18,7 @@ const socialTitle = "Skills Board Pricing: Free Forever"
 export const metadata: Metadata = {
   title: { absolute: "Pricing | Skills Board: Free Forever" },
   description: pricingDescription,
-  alternates: { canonical: pricingPath },
+  alternates: markdownTwinAlternates(pricingPath),
   openGraph: {
     type: "website",
     url: pricingPath,
@@ -31,20 +33,6 @@ export const metadata: Metadata = {
     description: pricingDescription,
   },
 }
-
-const hostedFeatures = [
-  "Unlimited team libraries",
-  "Shared skill library with search and team-specific tags",
-  "Original source visible for every saved skill",
-  "Install commands and ZIP downloads of the latest source files",
-  "Authenticated MCP access for compatible agents",
-] as const
-
-const selfHostedFeatures = [
-  "Core team-library features from the same open-source codebase",
-  "Limits determined by your own infrastructure",
-  "Email, OAuth, public catalog, and other integrations require your own provider configuration",
-] as const
 
 export default function PricingPage() {
   return (

@@ -210,6 +210,7 @@ Verify
 
 Reviewed by: <name>, <date>
 Re-review when: the source changes, a run fails, or the documented skill locations change.`,
+  copyTemplateLanguage: "text",
   pitfallsTitle: "Where installs go wrong",
   pitfalls: [
     {

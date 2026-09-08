@@ -12,7 +12,6 @@ import { skillExamplesPath } from "@/lib/seo/skill-examples/types"
 
 export {
   claudeCodeForTeamsPath,
-  type ClaudeCodeForTeamsCtaPlacement,
   type ClaudeCodeForTeamsPath,
 } from "@/lib/seo/claude-code-for-teams/types"
 
@@ -100,6 +99,7 @@ export interface ClaudeCodeForTeamsDefinition {
       body: string
     }[]
     template: string
+    templateLanguage: string
     sourceIds: readonly string[]
   }
   team: {
@@ -733,6 +733,7 @@ export const claudeCodeForTeams: ClaudeCodeForTeamsDefinition = {
     "code-formatter@acme-tools": true
   }
 }`,
+    templateLanguage: "json",
     sourceIds: [
       "settings-example",
       "settings",

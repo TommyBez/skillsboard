@@ -14,7 +14,6 @@ import { opencodeSkillsPath } from "@/lib/seo/opencode-skills/types"
 
 export {
   agentSkillsSupportPath,
-  type AgentSkillsSupportCtaPlacement,
   type AgentSkillsSupportPath,
 } from "@/lib/seo/agent-skills-support/types"
 

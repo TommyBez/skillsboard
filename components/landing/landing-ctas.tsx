@@ -7,7 +7,12 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 
-export type CtaLocation = "header" | "hero" | "closing"
+/**
+ * Where in a page a call to action sits. Every marketing surface uses the same
+ * four slots, and which page it was is read from `$pathname` on the event
+ * rather than spelled a second time in this union.
+ */
+export type CtaLocation = "header" | "hero" | "inline" | "closing"
 
 /**
  * The landing page's one action, stated once.

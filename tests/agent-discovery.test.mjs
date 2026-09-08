@@ -3,6 +3,8 @@ import { createHash } from "node:crypto"
 import { readFile } from "node:fs/promises"
 import { test } from "node:test"
 
+import { parse as parseYaml } from "yaml"
+
 import "./helpers/register-app-aliases.mjs"
 
 const { buildProtectedResourceMetadata, discoveryUrl, getDiscoveryOrigin } =
@@ -248,7 +250,15 @@ test("robots.txt keeps the crawl rules it had before the signals were added", ()
 test("auth.md opens with an h1 naming itself and covers the whole flow", async () => {
   const authMd = await readRepoFile("../public/auth.md")
 
-  assert.match(authMd, /^# auth\.md\n/)
+  assert.ok(authMd.startsWith("---\n"), "auth.md has no frontmatter")
+  assert.match(authMd, /\n---\n\n# auth\.md\n/)
+
+  const frontmatter = parseYaml(
+    authMd.slice("---\n".length, authMd.indexOf("\n---\n", "---".length) + 1),
+  )
+  assert.equal(frontmatter.canonical, `${siteConfig.url}/auth.md`)
+  assert.equal(frontmatter.markdown, `${siteConfig.url}/auth.md`)
+  assert.equal(frontmatter.publisher, siteConfig.name)
 
   for (const heading of ["Discover", "Register", "Claim", "Exchange", "Use", "Handle revoke"]) {
     assert.ok(
@@ -397,6 +407,15 @@ test("the API catalog is a linkset anchored on the MCP endpoint", () => {
     "service-desc has to lead with the OpenAPI description",
   )
   assert.equal(entry.status[0].href, `${origin}/api/health`)
+})
+
+test("the API catalog links the public format check", () => {
+  const [entry] = buildApiCatalog().linkset
+  const link = entry.related?.find((candidate) => candidate.href === `${origin}/api/check`)
+
+  assert.ok(link, "the catalog does not link /api/check")
+  assert.equal(link.type, "application/json")
+  assert.ok(link.title?.length > 0, "the format check link has no title")
 })
 
 test("the token estimate scales with the document and is never zero for text", () => {

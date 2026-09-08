@@ -37,7 +37,6 @@ date for each change.
 
 export const skillsVsMcp: ComparisonDefinition = {
   path: comparePaths.skillsVsMcp,
-  ctaLocation: "compare_skills_mcp",
   subject: "Skills vs MCP",
   eyebrow: "Claude Skills vs MCP",
   title: "Claude skills vs MCP (Model Context Protocol)",
@@ -259,6 +258,7 @@ export const skillsVsMcp: ComparisonDefinition = {
       "The convention that survives contact with a real team is boring. One repository, two committed files, and one line in the README that says which skills the team settled on and why. Everything past that is a distribution problem rather than a format problem.",
     ],
     template: bothLayersTemplate,
+    templateLanguage: "text",
     templateLabel: "A repository that commits both layers",
     templateCopy: {
       buttonLabel: "Copy example",

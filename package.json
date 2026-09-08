@@ -29,6 +29,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:unit": "node --test tests/*.test.mjs",
+    "stats:collect": "node scripts/ecosystem-stats/collect.mjs",
     "test:e2e": "playwright test",
     "check": "pnpm typecheck && pnpm test:unit",
     "video:render:product-hunt": "remotion render remotion/index.ts skillsboard-launch-product-hunt public/launch/skills-board-product-demo-product-hunt.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --gl=swangle --timeout=240000 --concurrency=2 --muted",

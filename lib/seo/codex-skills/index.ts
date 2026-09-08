@@ -9,7 +9,6 @@ import { guidePaths, type GuidePath } from "@/lib/seo/guides/types"
 
 export {
   codexSkillsPath,
-  type CodexSkillsCtaPlacement,
   type CodexSkillsPath,
 } from "@/lib/seo/codex-skills/types"
 

@@ -7,11 +7,3 @@
 export const bestClaudeSkillsPath = "/best-claude-skills" as const
 
 export type BestClaudeSkillsPath = typeof bestClaudeSkillsPath
-
-/**
- * CTA placements on the curated register, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is best_claude_skills_header,
- * following the naming every other marketing chrome uses for its nav slot.
- */
-export type BestClaudeSkillsCtaPlacement =
-  `best_claude_skills_${"hero" | "inline" | "closing"}`

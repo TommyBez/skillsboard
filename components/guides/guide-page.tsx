@@ -126,7 +126,7 @@ function GuideTeamCallout({ team }: { team: GuideTeamSection }) {
         ))}
       </ul>
       <div className="mt-7">
-        <ResourceCta location="guide_inline" />
+        <ResourceCta location="inline" />
       </div>
     </section>
   )
@@ -357,7 +357,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                   It does not pin or control upstream files or silently synchronize every agent. Your team sees the source, chooses the path that fits each setup, and re-reviews upstream changes.
                 </p>
                 <div className="mt-7">
-                  <ResourceCta location="guide_inline" />
+                  <ResourceCta location="inline" />
                 </div>
               </section>
             )}
@@ -540,7 +540,7 @@ export function GuidePage({ guide }: { guide: GuideDefinition }) {
                 Save the reviewed skill, document the path that works, and keep it visible to the whole team.
               </p>
               <div className="mt-7 flex justify-center">
-                <ResourceCta location="guide_closing" />
+                <ResourceCta location="closing" />
               </div>
             </section>
 

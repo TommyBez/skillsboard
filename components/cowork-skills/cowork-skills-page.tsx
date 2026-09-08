@@ -62,7 +62,7 @@ export function CoworkSkillsPage({ entry }: { entry: CoworkSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="cowork_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -183,7 +183,7 @@ export function CoworkSkillsPage({ entry }: { entry: CoworkSkillsDefinition }) {
           <NoteList notes={entry.channels.notes} />
           <InlineLink link={entry.channels.link} />
           <div className="mt-8">
-            <ResourceCta location="cowork_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.channels.sourceIds}
@@ -398,7 +398,7 @@ export function CoworkSkillsPage({ entry }: { entry: CoworkSkillsDefinition }) {
             keep asking which one to enable.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="cowork_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

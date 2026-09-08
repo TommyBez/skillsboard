@@ -15,14 +15,3 @@
 export const skillCreatorPath = "/skill-creator" as const
 
 export type SkillCreatorPath = typeof skillCreatorPath
-
-/**
- * CTA placements on this page, kept in sync with the landing_cta_clicked
- * union. The sticky shell CTA is skill_creator_header, following the naming
- * every other marketing chrome uses for its nav slot.
- *
- * There is no hero placement, unlike every article page. The action above the
- * fold here is the generator, and putting a sign-up button in front of it
- * would trade the reason the reader arrived for a click they did not come for.
- */
-export type SkillCreatorCtaPlacement = `skill_creator_${"inline" | "closing"}`

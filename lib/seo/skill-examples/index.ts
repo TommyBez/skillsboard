@@ -10,7 +10,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   skillExamplesPath,
-  type SkillExamplesCtaPlacement,
   type SkillExamplesPath,
 } from "@/lib/seo/skill-examples/types"
 

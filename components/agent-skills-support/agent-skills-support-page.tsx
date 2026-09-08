@@ -61,7 +61,7 @@ export function AgentSkillsSupportPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_support_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -211,7 +211,7 @@ export function AgentSkillsSupportPage({
           <NoteList notes={entry.paths.notes} />
           <InlineLink link={entry.paths.link} />
           <div className="mt-8">
-            <ResourceCta location="agent_skills_support_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.paths.sourceIds}
@@ -384,7 +384,7 @@ export function AgentSkillsSupportPage({
             command, or the files.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_support_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

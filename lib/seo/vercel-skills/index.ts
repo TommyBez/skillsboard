@@ -11,7 +11,6 @@ import { vercelSkillsPath } from "@/lib/seo/vercel-skills/types"
 
 export {
   vercelSkillsPath,
-  type VercelSkillsCtaPlacement,
   type VercelSkillsPath,
 } from "@/lib/seo/vercel-skills/types"
 
@@ -102,6 +101,7 @@ export interface VercelSkillsDefinition {
       body: string
     }[]
     template: string
+    templateLanguage: string
     sourceIds: readonly string[]
   }
   team: {
@@ -649,6 +649,7 @@ npx skills add vercel-labs/agent-skills -a claude-code -g -y
 
 # install without sending usage data
 DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
+    templateLanguage: "bash",
     sourceIds: ["skills-cli", "vercel-agent-skills", "agentskills-spec"],
   },
   team: {

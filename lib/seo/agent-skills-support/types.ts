@@ -8,12 +8,3 @@
 export const agentSkillsSupportPath = "/agent-skills-support" as const
 
 export type AgentSkillsSupportPath = typeof agentSkillsSupportPath
-
-/**
- * CTA placements on the support matrix, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is
- * agent_skills_support_header, following the naming every other marketing
- * chrome uses for its nav slot.
- */
-export type AgentSkillsSupportCtaPlacement =
-  `agent_skills_support_${"hero" | "inline" | "closing"}`

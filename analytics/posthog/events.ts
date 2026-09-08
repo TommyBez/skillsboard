@@ -13,114 +13,18 @@ type NonTeamEventPropertiesMap = {
   }
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
-    location:
-      | "header"
-      | "hero"
-      | "closing"
-      | "about_header"
-      | "connect_header"
-      | "developers_header"
-      | "agent_skills_header"
-      | "agent_skills_hero"
-      | "agent_skills_inline"
-      | "agent_skills_closing"
-      | "agent_skills_support_header"
-      | "agent_skills_support_hero"
-      | "agent_skills_support_inline"
-      | "agent_skills_support_closing"
-      | "agents_md_header"
-      | "agents_md_hero"
-      | "agents_md_inline"
-      | "agents_md_closing"
-      | "anthropic_skills_header"
-      | "anthropic_skills_hero"
-      | "anthropic_skills_inline"
-      | "anthropic_skills_closing"
-      | "best_claude_skills_header"
-      | "best_claude_skills_hero"
-      | "best_claude_skills_inline"
-      | "best_claude_skills_closing"
-      | "alternatives_header"
-      | "alternatives_index"
-      | "alternatives_github_repo_header"
-      | "alternatives_github_repo_closing"
-      | "alternatives_skills_sh_header"
-      | "alternatives_skills_sh_closing"
-      | "alternatives_smithery_header"
-      | "alternatives_smithery_closing"
-      | "alternatives_superpowers_header"
-      | "alternatives_superpowers_closing"
-      | "claude_skills_header"
-      | "claude_skills_hero"
-      | "claude_skills_inline"
-      | "claude_skills_closing"
-      | "codex_skills_header"
-      | "codex_skills_hero"
-      | "codex_skills_inline"
-      | "codex_skills_closing"
-      | "compare_header"
-      | "compare_index"
-      | "compare_skills_mcp_header"
-      | "compare_skills_mcp_hero"
-      | "compare_skills_mcp_inline"
-      | "compare_skills_mcp_closing"
-      | "compare_skills_plugins_header"
-      | "compare_skills_plugins_hero"
-      | "compare_skills_plugins_inline"
-      | "compare_skills_plugins_closing"
-      | "compare_skills_slash_commands_header"
-      | "compare_skills_slash_commands_hero"
-      | "compare_skills_slash_commands_inline"
-      | "compare_skills_slash_commands_closing"
-      | "compare_skills_subagents_header"
-      | "compare_skills_subagents_hero"
-      | "compare_skills_subagents_inline"
-      | "compare_skills_subagents_closing"
-      | "cowork_skills_header"
-      | "cowork_skills_hero"
-      | "cowork_skills_inline"
-      | "cowork_skills_closing"
-      | "manage_ai_skills_header"
-      | "manage_ai_skills_hero"
-      | "manage_ai_skills_inline"
-      | "manage_ai_skills_closing"
-      | "cursor_skills_header"
-      | "cursor_skills_hero"
-      | "cursor_skills_inline"
-      | "cursor_skills_closing"
-      | "guide_header"
-      | "guide_inline"
-      | "guide_closing"
-      | "pricing_header"
-      | "resources_header"
-      | "resources_closing"
-      | "opencode_skills_header"
-      | "opencode_skills_hero"
-      | "opencode_skills_inline"
-      | "opencode_skills_closing"
-      | "claude_code_for_teams_header"
-      | "claude_code_for_teams_hero"
-      | "claude_code_for_teams_inline"
-      | "claude_code_for_teams_closing"
-      | "copilot_skills_header"
-      | "copilot_skills_hero"
-      | "copilot_skills_inline"
-      | "copilot_skills_closing"
-      | "skill_creator_header"
-      | "skill_creator_inline"
-      | "skill_creator_closing"
-      | "skill_examples_header"
-      | "skill_examples_hero"
-      | "skill_examples_inline"
-      | "skill_examples_closing"
-      | "vercel_skills_header"
-      | "vercel_skills_hero"
-      | "vercel_skills_inline"
-      | "vercel_skills_closing"
-      | "where_skills_header"
-      | "where_skills_hero"
-      | "where_skills_inline"
-      | "where_skills_closing"
+    /**
+     * Where in the page the action was taken, and nothing else. The page is
+     * already on the event: posthog-js attaches `$pathname` and
+     * `$current_url` to every capture, so per-page analysis is a breakdown on
+     * `properties.$pathname` rather than a prefix repeated in this union.
+     *
+     * Events captured before 2026-09-04 carry the page in the value itself
+     * (`where_skills_hero`, `pricing_header`, and so on). Those stay as they
+     * were recorded; a query that spans the change reads the suffix, or
+     * filters on `$pathname`, which is present on both sides of it.
+     */
+    location: "header" | "hero" | "inline" | "closing"
   }
   /**
    * `/settings/mcp` stays in the destination union: the setup page now lives at
@@ -140,19 +44,21 @@ type NonTeamEventPropertiesMap = {
   /**
    * Copying the plugin install commands. Non team scoped on purpose: the same
    * block runs on the landing page, where there is no team yet, and `location`
-   * keeps the two surfaces apart.
+   * keeps the two surfaces apart. `/start` carried this block until
+   * 2026-09-07; events with `location: "onboarding"` predate that.
    */
   plugin_install_copied: {
-    location: "landing" | "mcp_settings" | "onboarding"
+    location: "landing" | "mcp_settings"
   }
   /**
-   * A real copy action, not a route view. `$pageview` on `/connect` and
-   * `/start` owns the denominator; `client` separates their copy surfaces.
+   * A real copy action, not a route view. `$pageview` on `/connect` owns the
+   * denominator; `client` is the setup guide tab the config was copied from.
+   * `/start` copied the bare endpoint as `client: "generic"` until 2026-09-07.
    * Browser team context comes from PostHog's registered `team_id` super
    * property, without making leaf components fetch or receive the team.
    */
   mcp_config_copied: {
-    client: "claude_code" | "claude_desktop" | "cursor" | "generic" | "other" | "vscode"
+    client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
   }
   mcp_client_selected: {
     client: "claude_code" | "claude_desktop" | "cursor" | "other" | "vscode"
@@ -167,6 +73,72 @@ type NonTeamEventPropertiesMap = {
   skill_md_generated: {
     output: "clipboard" | "folder_zip" | "skill_md"
   }
+  /**
+   * `/skill-creator?from=` loaded a skill from a GitHub URL into the form.
+   * The counts are what the checker said about the file that was loaded, so
+   * the share of imports that arrive with something to fix is a breakdown
+   * here rather than a second event. `skills_found` is how many SKILL.md
+   * files the repository offered, of which one was loaded.
+   */
+  skill_creator_import_completed: {
+    skills_found: number
+    error_count: number
+    warning_count: number
+  }
+  /**
+   * An import that loaded nothing. `error_code` is the report's own code when
+   * the endpoint answered with one, and otherwise names why the answer could
+   * not be read: `network`, `rate_limited`, or `unexpected_response`.
+   */
+  skill_creator_import_failed: {
+    error_code: string
+  }
+  /**
+   * The `/check` funnel, in four events.
+   *
+   * `$pageview` counts arrivals, and a permalink arrival runs the check by
+   * itself, so `skill_check_started` is what separates a page that was read
+   * from a URL that was actually checked. `entry` says which of the two it
+   * was, because a shared permalink and a pasted URL are different demand.
+   * Non team scoped: the tool needs no account, so most callers have no team.
+   */
+  skill_check_started: {
+    entry: "form" | "permalink"
+  }
+  /**
+   * One completed check. The counts are what the report said, so the share of
+   * checked repositories with at least one spec error is a breakdown here
+   * rather than a second event.
+   */
+  skill_check_completed: {
+    skills_found: number
+    error_count: number
+    warning_count: number
+  }
+  /**
+   * A check that produced no report. `error_code` is the report's own code
+   * when the endpoint answered with one, and otherwise names why the answer
+   * could not be read: `network`, `rate_limited`, or `unexpected_response`.
+   */
+  skill_check_failed: {
+    error_code: string
+  }
+  skill_check_permalink_copied: Record<never, never>
+  /**
+   * The reader took a checked skill to `/skill-creator` to fix it. Fired on
+   * the link, not on the arrival, because the arrival is a `$pageview` with
+   * the query string already on it. `entry` says whether the click came from
+   * the report header, which only appears when one skill was read, or from a
+   * single skill card in a repository that held several.
+   */
+  skill_check_open_in_creator: {
+    entry: "report" | "skill"
+  }
+  /**
+   * The one commercial action on the page: the reader went from a report to
+   * the flow that saves a skill to a team library.
+   */
+  skill_check_save_clicked: Record<never, never>
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
@@ -264,6 +236,8 @@ type TeamEventPropertiesMap = {
    */
   onboarding_step_clicked: {
     step: "first_skill" | "invite_team"
+    /** Only the first-skill step sets this; older events have none and meant `/library`. */
+    destination?: "discover" | "library"
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean

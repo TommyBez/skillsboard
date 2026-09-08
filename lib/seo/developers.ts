@@ -24,19 +24,19 @@ export function problemAnchor(code: string): string {
  */
 export const developers = {
   path: developersPath,
-  title: "Skills Board developer docs: MCP server, OAuth, and discovery documents",
+  title: "Skills Board developer docs: MCP server, format check API, OAuth, and discovery documents",
   description:
-    "How to connect an agent to Skills Board: the MCP endpoint and its tools, the OAuth flow, the discovery documents, and the versioning, error, and rate-limit conventions the HTTP surface follows.",
+    "How to connect an agent to Skills Board: the MCP endpoint and its tools, the public SKILL.md format check at /api/check, the OAuth flow, the discovery documents, and the versioning, error, and rate-limit conventions the HTTP surface follows.",
   publishedAt: "2026-08-21",
-  modifiedAt: "2026-08-21",
+  modifiedAt: "2026-09-08",
   intro: [
-    "Skills Board is a web app where a team keeps and shares its AI skills, and its programmatic surface is a Model Context Protocol server. An agent that authenticates against it can search the team's saved skills and collections, fetch install commands, inspect a GitHub repository for skills, and, with write access, save skills and organize collections.",
+    "Skills Board is a web app where a team keeps and shares its AI skills. Its programmatic surface is a Model Context Protocol server plus one public HTTP endpoint. An agent that authenticates against the MCP server can search the team's saved skills and collections, fetch install commands, inspect a GitHub repository for skills, and, with write access, save skills and organize collections. The format check at /api/check needs no account: it reads every SKILL.md a public GitHub URL offers and reports where each one departs from the Agent Skills specification.",
     "This page is the whole contract: what is public, how to authenticate, what the tools do, and how the surface behaves when something goes wrong. Everything on it is also machine readable: append `.md` to this URL, or send `Accept: text/markdown`, for the same document as Markdown.",
   ],
   publicSurface: {
     title: "The public surface",
     intro:
-      "Everything below is public and needs no credential to fetch, except the MCP endpoint itself. Anything under /api that is not listed here backs the web UI on a session cookie and is not an integration point: it can change without notice.",
+      "Everything below is public and needs no credential to fetch, except the MCP endpoint itself. Every document in this table is linked from its own row, so a client can follow it rather than guess the path. Anything under /api that is not listed here backs the web UI on a session cookie and is not an integration point: it can change without notice.",
     columns: ["Endpoint", "What it is", "Authentication"],
     rows: [
       {
@@ -54,15 +54,25 @@ export const developers = {
         ],
       },
       {
+        label: "/api/check",
+        cells: [
+          "Reads every SKILL.md a public GitHub URL offers and reports where each one departs from the Agent Skills specification. Pass the URL as ?url=. Add ?format=md, or send Accept: text/markdown, for the report as text. It is a format check, not a review, a security audit, or a rating.",
+          "None",
+        ],
+      },
+      {
         label: "/openapi.json",
+        href: "/openapi.json",
         cells: ["OpenAPI 3.1 description of everything in this table.", "None"],
       },
       {
         label: "/server.json",
+        href: "/server.json",
         cells: ["MCP registry manifest: identity, version, and the remote endpoint.", "None"],
       },
       {
         label: "/.well-known/mcp/server-card.json",
+        href: "/.well-known/mcp/server-card.json",
         cells: [
           "MCP Server Card (SEP-1649): transport, capabilities, tools, and scopes. The same card answers at /.well-known/mcp.",
           "None",
@@ -70,18 +80,22 @@ export const developers = {
       },
       {
         label: "/.well-known/oauth-protected-resource",
+        href: "/.well-known/oauth-protected-resource",
         cells: ["RFC 9728 metadata: the audience a token must be bound to.", "None"],
       },
       {
         label: "/.well-known/api-catalog",
+        href: "/.well-known/api-catalog",
         cells: ["RFC 9727 linkset naming this API and its documents.", "None"],
       },
       {
         label: "/.well-known/ai-catalog.json",
+        href: "/.well-known/ai-catalog.json",
         cells: ["Agentic Resource Discovery manifest for this origin.", "None"],
       },
       {
         label: "/.well-known/agent-skills/index.json",
+        href: "/.well-known/agent-skills/index.json",
         cells: ["The Agent Skills this site publishes, each with a sha256 digest.", "None"],
       },
     ],
@@ -96,6 +110,7 @@ export const developers = {
       "The client registers itself dynamically, then runs authorization code + PKCE. A person approves the scopes in a browser; nothing is issued without that approval.",
       "Call `tools/list` on the live session for the tool schemas, then `tools/call`.",
     ],
+    templateLanguage: "json",
     template: `{
   "mcpServers": {
     "skills-board": {
@@ -161,6 +176,7 @@ export const developers = {
         cells: [String(problem.status), problem.title, problem.detail],
       })),
     },
+    templateLanguage: "http",
     template: `HTTP/1.1 429 Too Many Requests
 Content-Type: application/problem+json
 Retry-After: 37
@@ -212,8 +228,13 @@ RateLimit: "${PUBLIC_API_RATE_LIMIT.name}";r=0;t=37
     title: "Markdown, for reading rather than parsing",
     body: [
       "Every public page on this site has a Markdown twin at the same URL with a `.md` suffix, and the page URL itself returns Markdown when the request sends `Accept: text/markdown`. Those responses carry an `x-markdown-tokens` header estimating the document's size, so a client can budget a read before it makes it.",
-      `Start at ${siteConfig.url}/llms.txt, which indexes every page, document, and endpoint this site publishes.`,
     ],
+    link: {
+      lead: "The index of every page, document, and endpoint this site publishes, and the place to start:",
+      label: "llms.txt",
+      href: "/llms.txt",
+      trail: ".",
+    },
   },
   supportAndSource: {
     title: "Status, support, and source",

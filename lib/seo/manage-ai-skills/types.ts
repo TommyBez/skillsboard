@@ -7,11 +7,3 @@
 export const manageAiSkillsPath = "/manage-ai-skills" as const
 
 export type ManageAiSkillsPath = typeof manageAiSkillsPath
-
-/**
- * CTA placements on this page, kept in sync with the landing_cta_clicked
- * union. The sticky shell CTA is manage_ai_skills_header, following the naming
- * every other marketing chrome uses for its nav slot.
- */
-export type ManageAiSkillsCtaPlacement =
-  `manage_ai_skills_${"hero" | "inline" | "closing"}`

@@ -13,7 +13,7 @@ export const landingFlowSteps = [
   {
     index: "2",
     title: "Find it later",
-    copy: "One searchable library for the whole team—no more scrolling chat history for that one link somebody posted.",
+    copy: "One searchable library for the whole team, no more scrolling chat history for that one link somebody posted.",
   },
   {
     index: "3",

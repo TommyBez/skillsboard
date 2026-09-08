@@ -9,7 +9,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   coworkSkillsPath,
-  type CoworkSkillsCtaPlacement,
   type CoworkSkillsPath,
 } from "@/lib/seo/cowork-skills/types"
 

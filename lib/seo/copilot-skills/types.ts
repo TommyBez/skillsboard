@@ -8,11 +8,3 @@
 export const copilotSkillsPath = "/copilot-skills" as const
 
 export type CopilotSkillsPath = typeof copilotSkillsPath
-
-/**
- * CTA placements on the GitHub Copilot skills page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is copilot_skills_header,
- * following the naming every other marketing chrome uses for its nav slot.
- */
-export type CopilotSkillsCtaPlacement =
-  `copilot_skills_${"hero" | "inline" | "closing"}`

@@ -20,7 +20,7 @@ Markdown versions: the home page, the resources, comparisons, and alternatives h
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://www.skillsboard.sh/): Product overview, pricing, and common questions
 - [Resources](https://www.skillsboard.sh/resources): Practical guides for teams sharing, reviewing, and operating AI skills
-- [Developer docs](https://www.skillsboard.sh/developers): How an agent connects to the MCP server, the tools and scopes it gets, and the versioning, error, and rate-limit conventions of the HTTP surface
+- [Developer docs](https://www.skillsboard.sh/developers): How an agent connects to the MCP server and its tools, the public SKILL.md format check at /api/check, and the versioning, error, and rate-limit conventions of the HTTP surface
 - [About Skills Board](https://www.skillsboard.sh/about): Why the shared team library exists, how teams use it, and where to find the open-source project
 - [Pricing](https://www.skillsboard.sh/pricing.md): Machine-readable pricing details
 - [Create account](https://www.skillsboard.sh/sign-up): Start a free team library
@@ -50,6 +50,7 @@ Markdown versions: the home page, the resources, comparisons, and alternatives h
 - [Best Claude skills: a curated register](https://www.skillsboard.sh/best-claude-skills): Twenty-seven register entries covering thirty-five Claude skills that cleared seven stated criteria, grouped by job, each read from its own SKILL.md with publisher, license, and where it runs, plus the nine popular candidates that were dropped and why
 - [Anthropic skills: the first-party catalog](https://www.skillsboard.sh/anthropic-skills): Every skill Anthropic publishes itself, in three sets: the four pre-built document skills, the nineteen folders in anthropics/skills, and the fifteen bundled with Claude Code, with what each does, where it loads, and how it is licensed
 - [Agent Skills: the open standard](https://www.skillsboard.sh/agent-skills): What the Agent Skills specification defines, which agents implement it and where each one looks on disk, what travels between them, and where to read real examples
+- [Agent skills by the numbers](https://www.skillsboard.sh/agent-skills-by-the-numbers): A monthly snapshot of three public figures for the agent skills ecosystem, 20,783 repositories tagged agent-skills, about 37,248 public README files printing npx skills, and 38,365,913 npm downloads of the same CLI in a month, with the endpoint and the precision beside each one
 - [Skill examples: real SKILL.md files](https://www.skillsboard.sh/skill-examples): Eight example skills from anthropics/skills read file by file, the pattern each one demonstrates, verbatim excerpts with their source, what all nineteen examples declare in frontmatter, and the six places the examples diverge from the specification
 - [Claude skills](https://www.skillsboard.sh/claude-skills): What a Claude Skill is, the SKILL.md format, where skills run, and how to install, write, and share one
 - [Codex skills](https://www.skillsboard.sh/codex-skills): What a Codex skill is, the .agents/skills locations Codex scans, what transfers from a Claude skill, and how to add one
@@ -63,7 +64,9 @@ Markdown versions: the home page, the resources, comparisons, and alternatives h
 
 ## Write and validate
 - [How to write a SKILL.md file](https://www.skillsboard.sh/guides/how-to-write-a-skill-md): The six specification frontmatter fields and the Claude Code additions, the description rules that decide whether a skill triggers, the body and reference-file budgets, and how to validate a skill before sharing it
-- [Skill creator: build a valid SKILL.md](https://www.skillsboard.sh/skill-creator): A free browser tool that writes SKILL.md from the six specification frontmatter fields, checks the name, description, and compatibility limits while you type, and downloads the skill folder as `<name>/SKILL.md`; it calls no model and has no Markdown twin
+- [Skill creator: build a valid SKILL.md](https://www.skillsboard.sh/skill-creator): A free browser tool that writes SKILL.md from the six specification frontmatter fields, checks the name, description, and compatibility limits while you type, and downloads the skill folder as `<name>/SKILL.md`; open it as `/skill-creator?from=<github url>` to load an existing SKILL.md into the fields; it calls no model and has no Markdown twin
+- [Skill checker: check a SKILL.md against the specification](https://www.skillsboard.sh/check): A free tool that reads every SKILL.md in a public GitHub repository and reports where the format departs from the Agent Skills specification, keeping specification errors apart from convention warnings; it is a format check, not a review or a security audit, and it needs no account
+- [Format check endpoint](https://www.skillsboard.sh/api/check?url=https://github.com/owner/repo): The same report as JSON, or as Markdown with `&format=md` or an `Accept: text/markdown` header; the page at /check and this endpoint take the same `url` parameter
 
 ## Install and verify
 - [How to install Claude skills in Claude Code](https://www.skillsboard.sh/guides/install-claude-skills-in-claude-code): The documented skill locations on disk, the personal, project, plugin, managed, and claude.ai sync install paths, and how to confirm a skill loaded

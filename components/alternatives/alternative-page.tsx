@@ -130,7 +130,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location={`${entry.ctaLocation}_header`} />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -356,7 +356,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             the first skill, and invite the people who keep asking.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location={`${entry.ctaLocation}_closing`} />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -368,7 +368,7 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             </a>
           </div>
 
-          <EmailCaptureCard className="mx-auto mt-12 max-w-2xl" source={entry.ctaLocation} />
+          <EmailCaptureCard className="mx-auto mt-12 max-w-2xl" source={entry.emailCaptureSource} />
         </section>
       </div>
     </>

@@ -64,7 +64,7 @@ export function ManageAiSkillsPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="manage_ai_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -163,7 +163,7 @@ export function ManageAiSkillsPage({
           <NoteList notes={entry.mechanisms.notes} />
           <InlineLink link={entry.mechanisms.link} />
           <div className="mt-8">
-            <ResourceCta location="manage_ai_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.mechanisms.sourceIds}
@@ -380,7 +380,7 @@ export function ManageAiSkillsPage({
             keep asking which one to use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="manage_ai_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

@@ -149,7 +149,7 @@ test("only a sequential guide publishes HowTo", () => {
 test("the Markdown twin carries the new sections", () => {
   const markdown = renderMarkdownTwin(guidePath)
   assert.ok(markdown, "missing Markdown twin")
-  assert.ok(markdown.startsWith(`# ${guide.title}\n`))
+  assert.ok(markdown.includes(`\n\n# ${guide.title}\n`))
   assert.ok(markdown.includes(`## ${guide.team.title}`), "missing the team section")
   assert.ok(
     markdown.includes("## Frequently asked questions"),

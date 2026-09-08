@@ -3,6 +3,7 @@ import "server-only"
 import { parseDocument } from "yaml"
 
 import { isValidAgentSkillName } from "@/lib/agent-skill-name"
+import { sanitizeAgentSkillText } from "@/lib/agent-skill-text"
 import { parseGitHubUrl } from "@/lib/github"
 import {
   parseGitHubSkillLink,
@@ -507,24 +508,6 @@ function validateDescriptorCandidates(candidates: DescriptorCandidate[]) {
   return candidates
 }
 
-const CSI_ESCAPE = /\x1b\[[\x30-\x3f]*[\x20-\x2f]*[\x40-\x7e]/g
-const OSC_ESCAPE = /\x1b\][\s\S]*?(?:\x07|\x1b\\)/g
-const DCS_PM_APC_ESCAPE = /\x1b[P^_][\s\S]*?(?:\x1b\\)/g
-const SIMPLE_ESCAPE = /\x1b[\x20-\x7e]/g
-const C1_CONTROL = /[\x80-\x9f]/g
-const TERMINAL_CONTROL = /[\x00-\x06\x07\x08\x0b\x0c\x0d-\x1a\x1c-\x1f\x7f]/g
-
-function sanitizeMetadataString(value: string) {
-  return value
-    .replace(OSC_ESCAPE, "")
-    .replace(DCS_PM_APC_ESCAPE, "")
-    .replace(CSI_ESCAPE, "")
-    .replace(SIMPLE_ESCAPE, "")
-    .replace(C1_CONTROL, "")
-    .replace(TERMINAL_CONTROL, "")
-    .replace(/[\r\n]+/g, " ")
-    .trim()
-}
 
 function parseSkillDescriptor(bytes: Uint8Array, path: string): DiscoveredGitHubSkill | null {
   let source: string
@@ -555,7 +538,7 @@ function parseSkillDescriptor(bytes: Uint8Array, path: string): DiscoveredGitHub
     const { name, description } = metadata as Record<string, unknown>
     if (typeof name !== "string" || typeof description !== "string") return null
 
-    const sanitizedDescription = sanitizeMetadataString(description)
+    const sanitizedDescription = sanitizeAgentSkillText(description)
     if (!isValidAgentSkillName(name) || !sanitizedDescription) return null
 
     return {
@@ -859,21 +842,18 @@ async function fetchGitHubRepositorySnapshot(value: string): Promise<GitHubRepos
   }
 }
 
-async function discoverGitHubSkillsWithOptions(
+/**
+ * The skill folder a direct GitHub link selects, or null when the URL is a
+ * plain repository URL.
+ *
+ * Extracted so the format checker at `/check` selects the same folder from the
+ * same URL as a save does. Every refusal it raises is the one the save path
+ * already raised from this position, unchanged.
+ */
+async function resolveLinkedSkillPath(
   value: string,
-  options: { deduplicateNames: boolean },
-): Promise<GitHubSkillDiscovery> {
-  const snapshot = await fetchGitHubRepositorySnapshot(value)
-  const candidates = collectDescriptorCandidates(snapshot.tree)
-
-  const inspectCandidates = (selected: DescriptorCandidate[]) => discoverDescriptors(
-    validateDescriptorCandidates(selected),
-    snapshot.repoOwner,
-    snapshot.repoName,
-    snapshot.commitSha,
-    { deduplicateNames: options.deduplicateNames },
-  )
-
+  snapshot: GitHubRepositorySnapshot,
+): Promise<string | null> {
   const parsedLink = parseGitHubSkillLink(value)
   if (parsedLink.kind === "invalid") {
     throw new GitHubSkillDiscoveryError(
@@ -910,16 +890,36 @@ async function discoverGitHubSkillsWithOptions(
       "invalid_path",
     )
   }
-  if (link?.kind === "skill") {
-    if (link.ref !== snapshot.defaultBranch && link.ref !== snapshot.commitSha) {
-      throw new GitHubSkillDiscoveryError(
-        "Direct skill links must point to the repository's current default branch.",
-        400,
-        "invalid_path",
-      )
-    }
+  if (link?.kind !== "skill") return null
 
-    const normalizedPath = normalizeSkillPath(link.path)
+  if (link.ref !== snapshot.defaultBranch && link.ref !== snapshot.commitSha) {
+    throw new GitHubSkillDiscoveryError(
+      "Direct skill links must point to the repository's current default branch.",
+      400,
+      "invalid_path",
+    )
+  }
+
+  return normalizeSkillPath(link.path)
+}
+
+async function discoverGitHubSkillsWithOptions(
+  value: string,
+  options: { deduplicateNames: boolean },
+): Promise<GitHubSkillDiscovery> {
+  const snapshot = await fetchGitHubRepositorySnapshot(value)
+  const candidates = collectDescriptorCandidates(snapshot.tree)
+
+  const inspectCandidates = (selected: DescriptorCandidate[]) => discoverDescriptors(
+    validateDescriptorCandidates(selected),
+    snapshot.repoOwner,
+    snapshot.repoName,
+    snapshot.commitSha,
+    { deduplicateNames: options.deduplicateNames },
+  )
+
+  const normalizedPath = await resolveLinkedSkillPath(value, snapshot)
+  if (normalizedPath !== null) {
     const linkedCandidate = candidates.find((candidate) => (
       candidate.path === normalizedPath
     ))
@@ -1105,4 +1105,166 @@ export async function resolveGitHubSkill(
 ): Promise<ResolvedGitHubSkill> {
   const resolved = await resolveGitHubSkills(value, [skillPath])
   return { ...resolved, skill: resolved.skills[0] }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Raw sources for the format checker                                          */
+/* -------------------------------------------------------------------------- */
+
+export interface GitHubSkillSource {
+  /** Repository-relative folder holding the file. The repository root is "". */
+  path: string
+  /** Repository-relative path of the file itself. */
+  filePath: string
+  sizeBytes: number
+  /** The decoded file, or null when the blob is not valid UTF-8. */
+  raw: string | null
+}
+
+export interface GitHubSkillSources {
+  githubUrl: string
+  repoOwner: string
+  repoName: string
+  defaultBranch: string
+  commitSha: string
+  /** Exact path selected by a direct GitHub skill link, otherwise null. */
+  linkedSkillPath: string | null
+  sources: GitHubSkillSource[]
+  /**
+   * SKILL.md files present in the tree that the selection tiers left out,
+   * so a caller can say the report is partial rather than imply it is whole.
+   */
+  skippedCount: number
+}
+
+/**
+ * Every SKILL.md this repository offers, downloaded and left unparsed.
+ *
+ * The discovery entry points above answer "which skills can be saved", so a
+ * file that does not parse is not one of them and is dropped without a reason.
+ * The format checker asks the opposite question: a file that does not parse is
+ * exactly what it exists to report on. This is the same walk over the same
+ * tree, stopping one step earlier, so both surfaces agree about which files in
+ * a repository are skills before they disagree about what to do with them.
+ *
+ * Nothing above calls this, so the save path and the MCP tool keep their
+ * behaviour unchanged.
+ */
+export async function collectGitHubSkillSources(
+  value: string,
+): Promise<GitHubSkillSources> {
+  const snapshot = await fetchGitHubRepositorySnapshot(value)
+  const candidates = collectDescriptorCandidates(snapshot.tree)
+
+  const linkedSkillPath = await resolveLinkedSkillPath(value, snapshot)
+  let selected: DescriptorCandidate[]
+
+  if (linkedSkillPath !== null) {
+    const linkedCandidate = candidates.find((candidate) => candidate.path === linkedSkillPath)
+    if (!linkedCandidate) {
+      throw new GitHubSkillDiscoveryError(
+        "The linked folder does not contain a SKILL.md file.",
+        404,
+        "skill_not_found",
+      )
+    }
+    selected = [linkedCandidate]
+  } else {
+    // The union of the tiers rather than the first one that yields a parsable
+    // skill: a repository whose root SKILL.md is broken and whose skills
+    // folder is fine has two things worth reporting, and the checker is the
+    // one caller that wants to hear about both.
+    const pluginContainers = await discoverPluginContainers(snapshot)
+    const selectedPaths = new Set<string>()
+    selected = []
+
+    for (const candidate of [
+      ...candidates.filter((candidate) => candidate.path === ""),
+      ...selectDefaultCandidates(candidates, pluginContainers),
+    ]) {
+      if (selectedPaths.has(candidate.entry.path)) continue
+      selectedPaths.add(candidate.entry.path)
+      selected.push(candidate)
+    }
+
+    if (!selected.length) selected = selectFallbackCandidates(candidates)
+  }
+
+  validateDescriptorCandidates(selected)
+
+  const decoder = new TextDecoder("utf-8", { fatal: true })
+  const sources = new Array<GitHubSkillSource>(selected.length)
+  const downloadsBySha = new Map<string, Promise<Uint8Array>>()
+  let nextIndex = 0
+  let totalBytes = 0
+  // Set by the first worker that fails, so the others stop claiming entries
+  // and a rejected batch does not keep spending GitHub API budget.
+  let aborted = false
+
+  async function worker() {
+    while (!aborted && nextIndex < selected.length) {
+      const index = nextIndex
+      nextIndex += 1
+      const candidate = selected[index]
+
+      let download = downloadsBySha.get(candidate.entry.sha)
+      if (!download) {
+        download = fetchDescriptor(
+          snapshot.repoOwner,
+          snapshot.repoName,
+          snapshot.commitSha,
+          candidate.entry,
+        )
+        downloadsBySha.set(candidate.entry.sha, download)
+      }
+
+      let bytes: Uint8Array
+      try {
+        bytes = await download
+      } catch (error) {
+        aborted = true
+        throw error
+      }
+      totalBytes += bytes.byteLength
+      if (totalBytes > MAX_TOTAL_DESCRIPTOR_BYTES) {
+        aborted = true
+        throw new GitHubSkillDiscoveryError(
+          "The repository's skill definitions are too large to inspect safely.",
+          413,
+          "repository_too_large",
+        )
+      }
+
+      let raw: string | null
+      try {
+        raw = decoder.decode(bytes)
+      } catch {
+        raw = null
+      }
+
+      sources[index] = {
+        path: candidate.path,
+        filePath: candidate.entry.path,
+        sizeBytes: bytes.byteLength,
+        raw,
+      }
+    }
+  }
+
+  await Promise.all(
+    Array.from({ length: Math.min(DESCRIPTOR_CONCURRENCY, selected.length) }, () => worker()),
+  )
+
+  return {
+    githubUrl: snapshot.githubUrl,
+    repoOwner: snapshot.repoOwner,
+    repoName: snapshot.repoName,
+    defaultBranch: snapshot.defaultBranch,
+    commitSha: snapshot.commitSha,
+    linkedSkillPath,
+    sources,
+    // A direct link selected the file itself, so nothing was left out by this
+    // walk: the rest of the repository was never in scope for that request.
+    skippedCount: linkedSkillPath === null ? candidates.length - selected.length : 0,
+  }
 }

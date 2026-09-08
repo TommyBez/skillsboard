@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import { ExternalLinkIcon } from "lucide-react"
 
@@ -10,7 +11,11 @@ import {
   SectionTable,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
-import { SkillMdBuilder } from "@/components/skill-creator/skill-md-builder"
+import { SkillMdBuilderSkeleton } from "@/components/skill-creator/skill-md-builder-skeleton"
+import {
+  SkillCreatorTool,
+  type SkillCreatorSearchParams,
+} from "@/components/skill-creator/skill-creator-tool"
 import { buildSkillCreatorSchema } from "@/lib/seo/skill-creator/schema"
 import type {
   SkillCreatorDefinition,
@@ -51,7 +56,14 @@ function NoteGrid({ entries }: { entries: readonly SkillCreatorNote[] }) {
   )
 }
 
-export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
+export function SkillCreatorPage({
+  entry,
+  searchParams,
+}: {
+  entry: SkillCreatorDefinition
+  /** The page's promise, resolved only inside the tool's Suspense boundary. */
+  searchParams: SkillCreatorSearchParams
+}) {
   const sources: readonly SkillCreatorSource[] = entry.sources
 
   return (
@@ -121,10 +133,13 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
           <p className="mt-4 max-w-3xl text-pretty text-[1.05rem] leading-8 text-muted-foreground">
             {entry.tool.intro}
           </p>
-          <SkillMdBuilder
-            exampleDraft={entry.tool.exampleDraft}
-            privacyNote={entry.tool.privacyNote}
-          />
+          <Suspense fallback={<SkillMdBuilderSkeleton />}>
+            <SkillCreatorTool
+              searchParams={searchParams}
+              exampleDraft={entry.tool.exampleDraft}
+              privacyNote={entry.tool.privacyNote}
+            />
+          </Suspense>
           <SectionSources
             sourceIds={entry.tool.sourceIds}
             sources={sources}
@@ -147,7 +162,7 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
           <NoteList notes={entry.fields.notes} />
           <InlineLink link={entry.fields.link} />
           <div className="mt-8">
-            <ResourceCta location="skill_creator_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.fields.sourceIds}
@@ -285,7 +300,7 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
             ZIP. Free forever, MIT licensed, and open source.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="skill_creator_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

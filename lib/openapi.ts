@@ -4,6 +4,7 @@ import { API_VERSION, API_VERSION_HEADER, SUPPORTED_API_VERSIONS } from "@/lib/a
 import { getMcpResource } from "@/lib/auth-environment"
 import { oauthScopeDescriptions, oauthScopes } from "@/lib/oauth-scopes"
 import { problemCodes } from "@/lib/problem-json"
+import { SKILL_CHECK_ERROR_STATUS } from "@/lib/skill-check/report"
 
 /**
  * The version header, as a parameter every operation accepts.
@@ -33,14 +34,47 @@ function deprecationHeaders() {
 }
 
 /** The rate-limit headers the budgeted endpoints send on every response. */
-function rateLimitResponseHeaders() {
+function budgetResponseHeaders() {
   return {
     RateLimit: { $ref: "#/components/headers/RateLimit" },
     "RateLimit-Policy": { $ref: "#/components/headers/RateLimitPolicy" },
     "RateLimit-Limit": { $ref: "#/components/headers/RateLimitLimit" },
     "RateLimit-Remaining": { $ref: "#/components/headers/RateLimitRemaining" },
     "RateLimit-Reset": { $ref: "#/components/headers/RateLimitReset" },
+  }
+}
+
+/**
+ * The budget headers plus the version header.
+ *
+ * Split from the set above because /api/check is budgeted and unversioned: its
+ * route publishes what the caller has left and sets no version header, so the
+ * description of that endpoint claims the first and not the second.
+ */
+function rateLimitResponseHeaders() {
+  return {
+    ...budgetResponseHeaders(),
     [API_VERSION_HEADER]: { $ref: "#/components/headers/ApiVersion" },
+  }
+}
+
+/**
+ * A `/api/check` response that carries a report rather than a success.
+ *
+ * The route answers a URL it could not check with the same document a
+ * successful check returns, `error` set and the HTTP status taken from
+ * `error.code`, because the page and the endpoint render one object. So each
+ * failure is described with the report schema and its Markdown twin rather
+ * than with a problem document.
+ */
+function checkReportResponse(description: string) {
+  return {
+    description,
+    headers: budgetResponseHeaders(),
+    content: {
+      "application/json": { schema: { $ref: "#/components/schemas/SkillCheckReport" } },
+      "text/markdown": { schema: { $ref: "#/components/schemas/SkillCheckMarkdown" } },
+    },
   }
 }
 
@@ -122,13 +156,14 @@ export function buildOpenApiDocument() {
     info: {
       title: "Skills Board public HTTP API",
       version: `${API_VERSION}.0.0`,
-      summary: "The MCP endpoint and the machine-readable discovery documents Skills Board serves.",
+      summary:
+        "The MCP endpoint, the public SKILL.md format check, and the machine-readable discovery documents Skills Board serves.",
       description: [
-        "Skills Board is a web app; the only programmatic surface it offers is the Model Context Protocol server at /api/mcp, plus the discovery documents an agent reads before connecting to it. Everything under /api that is not listed here backs the web UI, is session-authenticated rather than token-authenticated, and is not a supported integration point.",
+        "Skills Board is a web app; the programmatic surface it offers is the Model Context Protocol server at /api/mcp, the public format check at /api/check, and the discovery documents an agent reads before connecting to either. Everything under /api that is not listed here backs the web UI, is session-authenticated rather than token-authenticated, and is not a supported integration point.",
         "The MCP endpoint speaks JSON-RPC 2.0 over streamable HTTP. Its methods and tool schemas are not enumerated in this document because MCP carries them itself: call `tools/list` on a live session, or read /.well-known/mcp/server-card.json. Authentication is described in /auth.md.",
         `Versioning: the current version is ${API_VERSION}, sent on every response in \`${API_VERSION_HEADER}\` and accepted on any request that wants to pin it. Within a version, members are added but never removed or retyped; a breaking change ships as the next version and both answer until the older one is withdrawn. A withdrawal is announced on the affected responses with \`Deprecation\` and \`Sunset\` at least 90 days ahead. Supported versions today: ${SUPPORTED_API_VERSIONS.join(", ")}.`,
         `Rate limits: budgeted endpoints answer with \`RateLimit\` and \`RateLimit-Policy\`, and refuse with 429 and \`Retry-After\` once the budget is spent. The published budget is ${PUBLIC_API_RATE_LIMIT.limit} requests per ${PUBLIC_API_RATE_LIMIT.windowSeconds} seconds per client per endpoint, and ${MCP_RATE_LIMIT.limit} per ${MCP_RATE_LIMIT.windowSeconds} seconds on /api/mcp, counted per serving instance, so it is a floor rather than a ceiling. A request the platform gave no client address for is not counted, and its response states the policy without a remaining count. The discovery documents are served from cache and carry no budget.`,
-        `Errors: every non-MCP failure is an RFC 9457 \`application/problem+json\` document with a stable \`code\` member (${Object.keys(problemCodes).join(", ")}) and a \`type\` URL that resolves to the paragraph describing it. The MCP endpoint answers in JSON-RPC instead, including the refusals it makes before dispatch: those carry the same code in \`error.data.code\`, so one vocabulary covers both surfaces. ${discoveryUrl("/developers")} is the prose version of all of this.`,
+        `Errors: every non-MCP failure is an RFC 9457 \`application/problem+json\` document with a stable \`code\` member (${Object.keys(problemCodes).join(", ")}) and a \`type\` URL that resolves to the paragraph describing it. /api/check is the one endpoint that reports a failure another way: a URL it could not check comes back as the report document it would otherwise return, carrying its own error code, while a spent request budget there is still a problem document. The MCP endpoint answers in JSON-RPC instead, including the refusals it makes before dispatch: those carry the same code in \`error.data.code\`, so one vocabulary covers both surfaces. ${discoveryUrl("/developers")} is the prose version of all of this.`,
       ].join("\n\n"),
       license: { name: "MIT", identifier: "MIT" },
       contact: { name: "Skills Board", url: discoveryUrl("/contact") },
@@ -255,6 +290,72 @@ export function buildOpenApiDocument() {
           }
         }
       },
+      "/api/check": {
+        "get": {
+          "operationId": "checkSkillRepository",
+          "summary": "Check the SKILL.md files a public GitHub URL offers against the Agent Skills specification",
+          "description": [
+            "Reads every SKILL.md a public GitHub URL offers and reports where each file departs from the published Agent Skills specification. The URL can be a repository, a skill folder, or a SKILL.md file. No account, no request body, and nothing is written: this reads public files and reports on their format.",
+            "It is a format check and nothing else. It does not say whether the instructions in a file are good, safe, or worth running: it is not a review, not a security audit, and not a rating. Findings are split into errors, which are rules the specification states, and warnings, which are authoring conventions the specification does not require.",
+            "`?format=md`, or an `Accept: text/markdown` request header, returns the same report as Markdown, which is the form a caller reading it rather than parsing it should ask for. Responses vary on `Accept`.",
+            `Budgeted on the public policy: the response carries the caller's remaining allowance. This endpoint neither reads nor sets ${API_VERSION_HEADER}, so it is described without the version parameter the rest of this document carries.`,
+            `${discoveryUrl("/check")} takes the same \`url\` parameter and renders the same report for a person, so a link handed to either one can be fetched from the other.`,
+          ].join("\n\n"),
+          "security": [],
+          "parameters": [
+            { "$ref": "#/components/parameters/SkillCheckUrl" },
+            { "$ref": "#/components/parameters/SkillCheckFormat" },
+          ],
+          "responses": {
+            "200": {
+              "description": "The report. `skills` holds one entry per SKILL.md that was read, each with its errors and warnings; an empty `errors` list is a file that broke no rule the specification states.",
+              "headers": { ...budgetResponseHeaders(), ...deprecationHeaders() },
+              "content": {
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/SkillCheckReport" }
+                },
+                "text/markdown": {
+                  "schema": { "$ref": "#/components/schemas/SkillCheckMarkdown" }
+                }
+              }
+            },
+            "400": checkReportResponse(
+              "The url parameter was missing, or it is not a github.com URL this checker reads, or it names a path inside the repository that does not resolve. `error.code` is `invalid_url` or `invalid_path`.",
+            ),
+            "404": checkReportResponse(
+              "The repository, the skill folder, or the file was not found, or the repository holds no SKILL.md in the directories agents scan. `error.code` is `not_found`, `skill_not_found`, or `no_skills_found`.",
+            ),
+            "413": checkReportResponse(
+              "The repository is larger than this check reads. `error.code` is `repository_too_large`.",
+            ),
+            "429": {
+              "description":
+                "Two refusals share this status. When this client has spent its own request budget, the body is a problem document with `code` `rate_limited` and a `Retry-After` header, and no repository is read. When GitHub's rate limit was reached while reading the repository, the body is the report with `error.code` `rate_limited`.",
+              "headers": {
+                ...budgetResponseHeaders(),
+                "Retry-After": { "$ref": "#/components/headers/RetryAfter" },
+              },
+              "content": {
+                "application/problem+json": {
+                  "schema": { "$ref": "#/components/schemas/Problem" }
+                },
+                "application/json": {
+                  "schema": { "$ref": "#/components/schemas/SkillCheckReport" }
+                },
+                "text/markdown": {
+                  "schema": { "$ref": "#/components/schemas/SkillCheckMarkdown" }
+                }
+              }
+            },
+            "500": checkReportResponse(
+              "The check failed for a reason this endpoint has no more specific code for. `error.code` is `unexpected`.",
+            ),
+            "502": checkReportResponse(
+              "GitHub did not answer the reads this check needs. `error.code` is `unavailable`.",
+            ),
+          }
+        }
+      },
       "/.well-known/mcp/server-card.json": discoveryOperation({
         operationId: "getMcpServerCard",
         summary: "MCP Server Card (SEP-1649)",
@@ -316,6 +417,29 @@ export function buildOpenApiDocument() {
           required: false,
           description: `The API version this client was written against. Omit it to get the current version (${API_VERSION}). A version this deployment does not serve is refused with 400 and the \`unsupported_api_version\` problem.`,
           schema: { type: "string", enum: [...SUPPORTED_API_VERSIONS], default: API_VERSION },
+        },
+        SkillCheckUrl: {
+          name: "url",
+          in: "query",
+          required: true,
+          description:
+            "The public GitHub URL to check: a repository, a folder holding a SKILL.md, or the SKILL.md file itself. A URL that is missing, is not on github.com, or names a path that does not resolve is refused with 400 and a report carrying the reason.",
+          schema: {
+            type: "string",
+            format: "uri",
+            examples: [
+              "https://github.com/anthropics/skills",
+              "https://github.com/anthropics/skills/tree/main/skills/pdf",
+            ],
+          },
+        },
+        SkillCheckFormat: {
+          name: "format",
+          in: "query",
+          required: false,
+          description:
+            "The representation to return. `md` returns the report as Markdown, which an `Accept: text/markdown` request header selects as well. Absent, and with no such Accept header, the report is returned as JSON.",
+          schema: { type: "string", enum: ["json", "md"] },
         },
       },
       headers: {
@@ -457,6 +581,161 @@ export function buildOpenApiDocument() {
             code: { type: "integer", description: "JSON-RPC error code.", examples: [-32000] },
             message: { type: "string", examples: ["missing authorization header"] },
             data: { description: "Optional structured detail." },
+          },
+        },
+        SkillCheckMarkdown: {
+          type: "string",
+          title: "Format check report, as Markdown",
+          description:
+            "The same report as `SkillCheckReport`, rendered for reading rather than parsing. It carries the findings and leaves out each file's recovered fields: a report is a list of findings, not a copy of the file.",
+        },
+        SkillCheckReport: {
+          type: "object",
+          title: "SKILL.md format check report",
+          description:
+            "What the checker read and what it found. It reports format against the published Agent Skills specification, so nothing in it is a judgement about the instructions a file contains.",
+          required: ["url", "checkedAt", "specCheckedOn", "repository", "skills", "truncated", "error"],
+          properties: {
+            url: { type: "string", description: "The URL that was checked, as submitted." },
+            checkedAt: {
+              type: "string",
+              format: "date-time",
+              description: "When this report was produced.",
+            },
+            specCheckedOn: {
+              type: "string",
+              format: "date",
+              description:
+                "The day the rules in this checker were last read against the published specification. A format check is only as current as the document it was written from.",
+            },
+            repository: {
+              type: ["object", "null"],
+              description:
+                "The repository every file in this report was read from, and the commit they were read at. Null when the check never reached a repository.",
+              required: ["githubUrl", "owner", "name", "defaultBranch", "commitSha"],
+              properties: {
+                githubUrl: { type: "string", format: "uri" },
+                owner: { type: "string" },
+                name: { type: "string" },
+                defaultBranch: { type: "string" },
+                commitSha: {
+                  type: "string",
+                  description: "The commit every file in this report was read at.",
+                },
+              },
+            },
+            skills: {
+              type: "array",
+              description: "One entry per SKILL.md that was read, in the order they were found.",
+              items: { $ref: "#/components/schemas/SkillCheckSkill" },
+            },
+            truncated: {
+              type: "boolean",
+              description:
+                "True when the repository holds further SKILL.md files outside the directories agents scan, which this report left out.",
+            },
+            error: {
+              type: ["object", "null"],
+              description:
+                "Why the URL could not be checked, or null. The HTTP status of the response follows the code.",
+              required: ["code", "message"],
+              properties: {
+                code: {
+                  type: "string",
+                  enum: Object.keys(SKILL_CHECK_ERROR_STATUS),
+                  description: "Machine-readable reason. Branch on this rather than on the message.",
+                },
+                message: { type: "string", description: "What to do about it, written for people." },
+              },
+            },
+          },
+        },
+        SkillCheckSkill: {
+          type: "object",
+          title: "One SKILL.md, as read and checked",
+          required: ["path", "filePath", "name", "sizeBytes", "sourceUrl", "draft", "errors", "warnings"],
+          properties: {
+            path: {
+              type: "string",
+              description:
+                "Repository-relative folder holding the file. The repository root is an empty string.",
+            },
+            filePath: {
+              type: "string",
+              description: "Repository-relative path of the file itself.",
+              examples: ["skills/pdf/SKILL.md"],
+            },
+            name: {
+              type: ["string", "null"],
+              description:
+                "The `name` field as declared. Null when the file declares none the reader could recover.",
+            },
+            sizeBytes: { type: "integer", minimum: 0 },
+            sourceUrl: {
+              type: "string",
+              format: "uri",
+              description: "Permalink to the exact file that was read, pinned to the commit.",
+            },
+            draft: {
+              type: "object",
+              description:
+                "The frontmatter and body as read, in the shape /skill-creator loads with `?from=`, so a reported file can be fixed where the rules are enforced as you type.",
+              required: ["name", "description", "license", "compatibility", "allowedTools", "metadata", "body"],
+              properties: {
+                name: { type: "string" },
+                description: { type: "string" },
+                license: { type: "string" },
+                compatibility: { type: "string" },
+                allowedTools: {
+                  type: "string",
+                  description:
+                    "The space-separated string the specification defines. A file that declares a list is reported and the list is joined into one string here.",
+                },
+                metadata: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    required: ["key", "value"],
+                    properties: { key: { type: "string" }, value: { type: "string" } },
+                  },
+                },
+                body: { type: "string", description: "Everything after the frontmatter." },
+              },
+            },
+            errors: {
+              type: "array",
+              description: "Rules the specification states that this file breaks.",
+              items: { $ref: "#/components/schemas/SkillCheckProblem" },
+            },
+            warnings: {
+              type: "array",
+              description:
+                "Authoring conventions the specification does not require. A file with warnings and no errors passes the format check.",
+              items: { $ref: "#/components/schemas/SkillCheckProblem" },
+            },
+          },
+        },
+        SkillCheckProblem: {
+          type: "object",
+          title: "One finding about one file",
+          required: ["code", "message"],
+          properties: {
+            code: {
+              type: "string",
+              description: "Stable identifier, safe to branch on. Snake case, never localized.",
+              examples: ["name_directory_mismatch", "description_missing"],
+            },
+            message: { type: "string", description: "What was found, written for people." },
+            field: {
+              type: "string",
+              description: "The frontmatter key or document part the finding is about.",
+              examples: ["description"],
+            },
+            line: {
+              type: "integer",
+              minimum: 1,
+              description: "One-based line in the file, when the finding can be placed on one.",
+            },
           },
         },
         HealthReport: {
@@ -717,6 +996,7 @@ export function buildOpenApiDocument() {
                   "service-doc": { $ref: "#/components/schemas/LinkArray" },
                   "service-meta": { $ref: "#/components/schemas/LinkArray" },
                   status: { $ref: "#/components/schemas/LinkArray" },
+                  related: { $ref: "#/components/schemas/LinkArray" },
                   author: { $ref: "#/components/schemas/LinkArray" },
                   license: { $ref: "#/components/schemas/LinkArray" },
                 },

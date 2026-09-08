@@ -89,7 +89,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -210,7 +210,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
           <NoteList notes={entry.support.notes} />
           <InlineLink link={entry.support.link} />
           <div className="mt-8">
-            <ResourceCta location="agent_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.support.sourceIds}
@@ -432,7 +432,7 @@ export function AgentSkillsPage({ entry }: { entry: AgentSkillsDefinition }) {
             keep asking which one to use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="agent_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

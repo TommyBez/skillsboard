@@ -163,6 +163,7 @@ export interface GuideDefinition {
     value: string
   }[]
   copyTemplate?: string
+  copyTemplateLanguage?: string
   /** Optional first-party protocol or evidence artifact published with this guide. */
   evidenceAsset?: GuideEvidenceAsset
   pitfallsTitle: string

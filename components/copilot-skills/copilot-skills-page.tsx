@@ -63,7 +63,7 @@ export function CopilotSkillsPage({
             ))}
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="copilot_skills_hero" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -303,7 +303,7 @@ export function CopilotSkillsPage({
           </ul>
           <InlineLink link={entry.team.link} />
           <div className="mt-8">
-            <ResourceCta location="copilot_skills_inline" />
+            <ResourceCta location="inline" />
           </div>
           <SectionSources
             sourceIds={entry.team.sourceIds}
@@ -441,7 +441,7 @@ export function CopilotSkillsPage({
             use.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
-            <ResourceCta location="copilot_skills_closing" />
+            <ResourceCta location="closing" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"

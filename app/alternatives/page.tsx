@@ -44,7 +44,7 @@ export default function AlternativesPage() {
             to a public page you can check yourself.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-            <ResourceCta location="alternatives_index" />
+            <ResourceCta location="hero" />
             <a
               href={siteConfig.githubUrl}
               target="_blank"
@@ -142,7 +142,7 @@ export default function AlternativesPage() {
             skill, invite one teammate, and judge it from there.
           </p>
           <div className="mt-7 flex justify-center">
-            <ResourceCta location="alternatives_index" />
+            <ResourceCta location="closing" />
           </div>
         </section>
       </div>

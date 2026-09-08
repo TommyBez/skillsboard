@@ -11,7 +11,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   manageAiSkillsPath,
-  type ManageAiSkillsCtaPlacement,
   type ManageAiSkillsPath,
 } from "@/lib/seo/manage-ai-skills/types"
 

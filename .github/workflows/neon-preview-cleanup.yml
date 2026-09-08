@@ -2,18 +2,15 @@ name: Cleanup Neon preview branch
 
 # When a same-repository PR is closed, merged or not, delete the Neon database
 # branch that the Neon <> Vercel integration created for its preview
-# deployments (named `preview/<git-branch>`).
+# deployments (named `preview/<git-branch>`). Creation stays with Vercel.
 #
-# Requires:
-#   - repository variable NEON_PROJECT_ID (Neon console -> Project settings)
-#   - repository secret  NEON_API_KEY    (Neon console -> Account -> API keys)
+# Requires the Neon GitHub App connected to this repo, which sets:
+#   - repository variable NEON_PROJECT_ID
+#   - repository secret  NEON_API_KEY
 #
-# Calls the Neon API directly instead of a third-party action so that a
-# missing branch is the only tolerated failure — auth/config/API errors still
-# fail the workflow. `pull_request_target` also receives close events for PRs
-# with merge conflicts and runs this trusted default-branch workflow. Never
-# check out or execute PR code here. Fork PRs are skipped before the secret is
-# exposed.
+# `pull_request_target` also receives close events for PRs with merge
+# conflicts and runs this trusted default-branch workflow. Never check out
+# or execute PR code here. Fork PRs are skipped before the secret is exposed.
 
 on:
   pull_request_target:
@@ -30,50 +27,8 @@ jobs:
 
     steps:
       - name: Delete branch preview/${{ github.event.pull_request.head.ref }}
-        env:
-          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
-          NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
-          # Passed through env (not inline interpolation) so a hostile branch
-          # name can't inject into the shell.
-          BRANCH_NAME: preview/${{ github.event.pull_request.head.ref }}
-        run: |
-          set -euo pipefail
-          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
-          encoded_branch_name="$(
-            jq -rn --arg name "$BRANCH_NAME" '$name | @uri'
-          )"
-
-          branch_id=""
-          cursor=""
-
-          while [ -z "$branch_id" ]; do
-            request_url="${api}?search=${encoded_branch_name}&limit=100"
-            if [ -n "$cursor" ]; then
-              encoded_cursor="$(jq -rn --arg value "$cursor" '$value | @uri')"
-              request_url="${request_url}&cursor=${encoded_cursor}"
-            fi
-
-            response="$(
-              curl -sfS -H "Authorization: Bearer ${NEON_API_KEY}" "$request_url"
-            )"
-            branch_id="$(
-              jq -r --arg name "$BRANCH_NAME" \
-                '.branches[]? | select(.name == $name) | .id' <<< "$response"
-            )"
-            cursor="$(jq -r '.pagination.next // empty' <<< "$response")"
-
-            if [ -z "$cursor" ]; then
-              break
-            fi
-          done
-
-          if [ -z "$branch_id" ]; then
-            echo "Branch '$BRANCH_NAME' not found — already deleted, nothing to do."
-            exit 0
-          fi
-
-          echo "Deleting Neon branch '$BRANCH_NAME' ($branch_id)"
-          curl -sfS -X DELETE \
-            -H "Authorization: Bearer ${NEON_API_KEY}" \
-            "$api/$branch_id" > /dev/null
-          echo "Deleted."
+        uses: neondatabase/delete-branch-action@v3
+        with:
+          project_id: ${{ vars.NEON_PROJECT_ID }}
+          branch: preview/${{ github.event.pull_request.head.ref }}
+          api_key: ${{ secrets.NEON_API_KEY }}

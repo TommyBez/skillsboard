@@ -67,8 +67,8 @@ test("each hub publishes a twin at its own path plus .md", () => {
 
     const markdown = renderMarkdownTwin(hub.path) ?? ""
     assert.ok(
-      markdown.startsWith(`# ${hub.title}\n`),
-      `${hub.path} twin does not open with its own title`,
+      markdown.includes(`\n\n# ${hub.title}\n`),
+      `${hub.path} twin does not carry its own title as the h1`,
     )
     assert.ok(markdown.includes(`> ${hub.description}`))
     assert.ok(

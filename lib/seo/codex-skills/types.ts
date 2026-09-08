@@ -6,11 +6,3 @@
 export const codexSkillsPath = "/codex-skills" as const
 
 export type CodexSkillsPath = typeof codexSkillsPath
-
-/**
- * CTA placements on the Codex skills page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is codex_skills_header,
- * following the naming every other marketing chrome uses for its nav slot.
- */
-export type CodexSkillsCtaPlacement =
-  `codex_skills_${"hero" | "inline" | "closing"}`

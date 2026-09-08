@@ -75,7 +75,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     },
     {
       title: "Review the artifact before saving it",
-      body: "Check the instructions, bundled scripts, tool permissions, data handling, and final verification steps. Treat an externally sourced skill like code or automation—not like a harmless prompt snippet.",
+      body: "Check the instructions, bundled scripts, tool permissions, data handling, and final verification steps. Treat an externally sourced skill like code or automation, not like a harmless prompt snippet.",
       output: "A named reviewer and a recorded review date.",
     },
     {
@@ -108,7 +108,7 @@ export const shareTeamSkillsGuide: GuideDefinition = {
     { label: "Reason to keep", value: "Why the team prefers this skill over the current alternative." },
     { label: "Canonical source", value: "The repository path or source URL for the reviewed artifact." },
     { label: "Use paths", value: "Source, install command, ZIP, connected-agent search through MCP, or agent-specific instructions that actually exist." },
-    { label: "Compatibility", value: "Agents and environments the team has tested—never an assumed universal claim." },
+    { label: "Compatibility", value: "Agents and environments the team has tested, never an assumed universal claim." },
     { label: "Owner and status", value: "The person responsible plus active, needs-review, or retired." },
   ],
   pitfallsTitle: "What usually breaks",

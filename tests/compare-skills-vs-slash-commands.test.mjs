@@ -92,17 +92,15 @@ test("the slash commands comparison is listed in the static llms.txt", async () 
   assert.ok(llms.includes(`${canonical})`), "missing from public/llms.txt")
 })
 
-test("the slash commands comparison mounts its own four CTA locations", async () => {
-  assert.equal(entry.ctaLocation, "compare_skills_slash_commands")
-
+test("the slash commands comparison mounts the four CTA placements", async () => {
   const layout = await readFile(
     new URL(`../app${comparePath}/layout.tsx`, import.meta.url),
     "utf8",
   )
 
   assert.ok(
-    layout.includes("compare_skills_slash_commands_header"),
-    "the shell reports another page's location",
+    layout.includes("ResourceShell"),
+    "the page does not mount the shared chrome, so it has no header CTA",
   )
   assert.ok(await exists(`../app${comparePath}/page.tsx`), "missing page route")
 
@@ -113,8 +111,8 @@ test("the slash commands comparison mounts its own four CTA locations", async ()
 
   for (const suffix of ["header", "hero", "inline", "closing"]) {
     assert.ok(
-      events.includes(`"compare_skills_slash_commands_${suffix}"`),
-      `landing_cta_clicked cannot report compare_skills_slash_commands_${suffix}`,
+      events.includes(`"${suffix}"`),
+      `landing_cta_clicked cannot report ${suffix}`,
     )
   }
 })

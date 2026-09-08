@@ -19,7 +19,6 @@ import { whereToFindClaudeSkillsPath } from "@/lib/seo/where-to-find-claude-skil
 
 export {
   claudeSkillsPath,
-  type ClaudeSkillsCtaPlacement,
   type ClaudeSkillsPath,
 } from "@/lib/seo/claude-skills/types"
 

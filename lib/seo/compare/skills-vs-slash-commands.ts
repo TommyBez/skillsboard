@@ -33,7 +33,6 @@ Follow checklist.md, then run the staging deploy for $ARGUMENTS.
 
 export const skillsVsSlashCommands: ComparisonDefinition = {
   path: comparePaths.skillsVsSlashCommands,
-  ctaLocation: "compare_skills_slash_commands",
   subject: "Skills vs slash commands",
   eyebrow: "Claude Skills vs Slash Commands",
   title: "Claude skills vs slash commands",
@@ -204,6 +203,7 @@ export const skillsVsSlashCommands: ComparisonDefinition = {
       "Arguments behave the same in both, and the indexing catches people out: $ARGUMENTS is everything you typed, $ARGUMENTS[N] is zero-based, so $0 is first and $1 is second.",
     ],
     template: sameCommandTwoFilesTemplate,
+    templateLanguage: "text",
     templateLabel: "One command name, claimed by two files",
     templateCopy: {
       buttonLabel: "Copy example",

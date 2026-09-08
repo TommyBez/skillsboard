@@ -31,7 +31,6 @@ and leave anything internal out of the published note.
 
 export const skillsVsPlugins: ComparisonDefinition = {
   path: comparePaths.skillsVsPlugins,
-  ctaLocation: "compare_skills_plugins",
   subject: "Skills vs plugins",
   eyebrow: "Claude Skills vs Plugins",
   title: "Claude skills vs plugins",
@@ -201,6 +200,7 @@ export const skillsVsPlugins: ComparisonDefinition = {
       "The manifest is optional, which most summaries get wrong: without it Claude Code auto-discovers components in default locations and derives the name from the directory.",
     ],
     template: pluginWithSkillTemplate,
+    templateLanguage: "text",
     templateLabel: "A plugin whose only component is one skill",
     templateCopy: {
       buttonLabel: "Copy example",

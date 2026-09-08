@@ -1,3 +1,8 @@
+import { agentSkillsByTheNumbers } from "@/lib/seo/agent-skills-by-the-numbers"
+import {
+  agentSkillsByTheNumbersPath,
+  type AgentSkillsByTheNumbersPath,
+} from "@/lib/seo/agent-skills-by-the-numbers/types"
 import { agentSkillsSupport } from "@/lib/seo/agent-skills-support"
 import {
   agentSkillsSupportPath,
@@ -76,6 +81,7 @@ export type ResourceContentType = "guide" | "article"
 /** Every path the resource hub, related links, and sitemap can address. */
 export type ResourcePath =
   | GuidePath
+  | AgentSkillsByTheNumbersPath
   | AgentSkillsPath
   | AgentSkillsSupportPath
   | AgentsMdVsSkillMdPath
@@ -108,6 +114,7 @@ export interface ResourceIndexEntry {
 export const resourceEntries = [
   ...guides,
   agentSkills,
+  agentSkillsByTheNumbers,
   agentSkillsSupport,
   anthropicSkills,
   bestClaudeSkills,
@@ -170,6 +177,7 @@ const resourceClusterDefinitions = [
     paths: [
       claudeCodeForTeamsPath,
       manageAiSkillsPath,
+      agentSkillsByTheNumbersPath,
       whereToFindClaudeSkillsPath,
       bestClaudeSkillsPath,
       guidePaths.chooseFirstTeamSkill,

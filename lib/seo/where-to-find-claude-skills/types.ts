@@ -8,11 +8,3 @@ export const whereToFindClaudeSkillsPath =
   "/where-to-find-claude-skills" as const
 
 export type WhereToFindClaudeSkillsPath = typeof whereToFindClaudeSkillsPath
-
-/**
- * CTA placements on the discovery page, kept in sync with the
- * landing_cta_clicked union. The sticky shell CTA is where_skills_header,
- * following the naming every other marketing chrome uses for its nav slot.
- */
-export type WhereToFindClaudeSkillsCtaPlacement =
-  `where_skills_${"hero" | "inline" | "closing"}`

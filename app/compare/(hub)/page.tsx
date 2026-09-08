@@ -128,7 +128,7 @@ export default function ComparePage() {
             free forever, MIT licensed, and open source.
           </p>
           <div className="mt-7 flex justify-center">
-            <ResourceCta location="compare_index" />
+            <ResourceCta location="closing" />
           </div>
         </section>
       </div>

@@ -62,7 +62,7 @@ function LabelledTable({
 }: {
   caption: string
   columns: readonly string[]
-  rows: readonly { label: string; cells: readonly string[] }[]
+  rows: readonly { label: string; href?: string; cells: readonly string[] }[]
 }) {
   return (
     <div className="mt-4 overflow-x-auto">
@@ -85,7 +85,15 @@ function LabelledTable({
           {rows.map((row) => (
             <tr key={row.label} className="border-b border-border/60 align-top">
               <th scope="row" className="py-2.5 pr-4 font-mono text-[0.8rem] font-normal text-foreground">
-                {row.label}
+                {/*
+                  A row that carries an href is a document a client can fetch,
+                  so it is a link. The paths that are not linked here are the
+                  two endpoints under /api: one answers 401 to a browser and
+                  the other is a liveness probe, and both are excluded in
+                  robots.txt, so a link to either would be a link to nothing a
+                  reader can act on.
+                */}
+                {row.href ? <a href={row.href}>{row.label}</a> : row.label}
               </th>
               {row.cells.map((value, index) => (
                 <td key={columns[index + 1] ?? index} className="py-2.5 pr-4">
@@ -269,6 +277,13 @@ export default function DevelopersPage() {
               {developers.markdownRepresentations.body.map((paragraph) => (
                 <p key={paragraph}><Prose>{paragraph}</Prose></p>
               ))}
+              <p>
+                <Prose>{developers.markdownRepresentations.link.lead}</Prose>{" "}
+                <a href={developers.markdownRepresentations.link.href}>
+                  {developers.markdownRepresentations.link.label}
+                </a>
+                {developers.markdownRepresentations.link.trail}
+              </p>
             </section>
 
             <section>

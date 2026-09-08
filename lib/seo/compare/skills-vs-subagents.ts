@@ -38,7 +38,6 @@ preloaded skills and report only what breaks them, with file and line.
 
 export const skillsVsSubagents: ComparisonDefinition = {
   path: comparePaths.skillsVsSubagents,
-  ctaLocation: "compare_skills_subagents",
   subject: "Skills vs subagents",
   eyebrow: "Claude Skills vs Subagents",
   title: "Claude skills vs subagents",
@@ -230,6 +229,7 @@ export const skillsVsSubagents: ComparisonDefinition = {
       "The honest caveat: none of this tells a new teammate which skill or subagent your team actually uses. Both directories are discoverable only if you already have the repository checked out and know to look, and neither carries a reason for existing beyond what the description says. That gap is what a shared library closes, and it is the reason Skills Board exists, but a README that names the three skills your team stands behind closes most of it for free.",
     ],
     template: subagentFileTemplate,
+    templateLanguage: "text",
     templateLabel: "A subagent that preloads a skill",
     templateCopy: {
       buttonLabel: "Copy example",
