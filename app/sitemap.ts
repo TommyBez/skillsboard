@@ -12,6 +12,7 @@ import {
 } from "@/lib/seo/compare"
 import { developers } from "@/lib/seo/developers"
 import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
+import { skillCheck } from "@/lib/seo/skill-check"
 import { skillCreator } from "@/lib/seo/skill-creator"
 import { siteConfig } from "@/lib/site"
 
@@ -105,6 +106,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
        */
       url: `${siteConfig.url}${skillCreator.path}`,
       lastModified: new Date(skillCreator.modifiedAt),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      /** Listed on its own for the same reason /skill-creator is: a tool, not an article. */
+      url: `${siteConfig.url}${skillCheck.path}`,
+      lastModified: new Date(skillCheck.modifiedAt),
       changeFrequency: "monthly",
       priority: 0.8,
     },

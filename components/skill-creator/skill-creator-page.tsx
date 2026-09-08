@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import Link from "next/link"
 import { ExternalLinkIcon } from "lucide-react"
 
@@ -10,7 +11,11 @@ import {
   SectionTable,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
-import { SkillMdBuilder } from "@/components/skill-creator/skill-md-builder"
+import { SkillMdBuilderSkeleton } from "@/components/skill-creator/skill-md-builder-skeleton"
+import {
+  SkillCreatorTool,
+  type SkillCreatorSearchParams,
+} from "@/components/skill-creator/skill-creator-tool"
 import { buildSkillCreatorSchema } from "@/lib/seo/skill-creator/schema"
 import type {
   SkillCreatorDefinition,
@@ -51,7 +56,14 @@ function NoteGrid({ entries }: { entries: readonly SkillCreatorNote[] }) {
   )
 }
 
-export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
+export function SkillCreatorPage({
+  entry,
+  searchParams,
+}: {
+  entry: SkillCreatorDefinition
+  /** The page's promise, resolved only inside the tool's Suspense boundary. */
+  searchParams: SkillCreatorSearchParams
+}) {
   const sources: readonly SkillCreatorSource[] = entry.sources
 
   return (
@@ -121,10 +133,13 @@ export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
           <p className="mt-4 max-w-3xl text-pretty text-[1.05rem] leading-8 text-muted-foreground">
             {entry.tool.intro}
           </p>
-          <SkillMdBuilder
-            exampleDraft={entry.tool.exampleDraft}
-            privacyNote={entry.tool.privacyNote}
-          />
+          <Suspense fallback={<SkillMdBuilderSkeleton />}>
+            <SkillCreatorTool
+              searchParams={searchParams}
+              exampleDraft={entry.tool.exampleDraft}
+              privacyNote={entry.tool.privacyNote}
+            />
+          </Suspense>
           <SectionSources
             sourceIds={entry.tool.sourceIds}
             sources={sources}

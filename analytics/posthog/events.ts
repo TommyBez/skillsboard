@@ -72,6 +72,72 @@ type NonTeamEventPropertiesMap = {
   skill_md_generated: {
     output: "clipboard" | "folder_zip" | "skill_md"
   }
+  /**
+   * `/skill-creator?from=` loaded a skill from a GitHub URL into the form.
+   * The counts are what the checker said about the file that was loaded, so
+   * the share of imports that arrive with something to fix is a breakdown
+   * here rather than a second event. `skills_found` is how many SKILL.md
+   * files the repository offered, of which one was loaded.
+   */
+  skill_creator_import_completed: {
+    skills_found: number
+    error_count: number
+    warning_count: number
+  }
+  /**
+   * An import that loaded nothing. `error_code` is the report's own code when
+   * the endpoint answered with one, and otherwise names why the answer could
+   * not be read: `network`, `rate_limited`, or `unexpected_response`.
+   */
+  skill_creator_import_failed: {
+    error_code: string
+  }
+  /**
+   * The `/check` funnel, in four events.
+   *
+   * `$pageview` counts arrivals, and a permalink arrival runs the check by
+   * itself, so `skill_check_started` is what separates a page that was read
+   * from a URL that was actually checked. `entry` says which of the two it
+   * was, because a shared permalink and a pasted URL are different demand.
+   * Non team scoped: the tool needs no account, so most callers have no team.
+   */
+  skill_check_started: {
+    entry: "form" | "permalink"
+  }
+  /**
+   * One completed check. The counts are what the report said, so the share of
+   * checked repositories with at least one spec error is a breakdown here
+   * rather than a second event.
+   */
+  skill_check_completed: {
+    skills_found: number
+    error_count: number
+    warning_count: number
+  }
+  /**
+   * A check that produced no report. `error_code` is the report's own code
+   * when the endpoint answered with one, and otherwise names why the answer
+   * could not be read: `network`, `rate_limited`, or `unexpected_response`.
+   */
+  skill_check_failed: {
+    error_code: string
+  }
+  skill_check_permalink_copied: Record<never, never>
+  /**
+   * The reader took a checked skill to `/skill-creator` to fix it. Fired on
+   * the link, not on the arrival, because the arrival is a `$pageview` with
+   * the query string already on it. `entry` says whether the click came from
+   * the report header, which only appears when one skill was read, or from a
+   * single skill card in a repository that held several.
+   */
+  skill_check_open_in_creator: {
+    entry: "report" | "skill"
+  }
+  /**
+   * The one commercial action on the page: the reader went from a report to
+   * the flow that saves a skill to a team library.
+   */
+  skill_check_save_clicked: Record<never, never>
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {

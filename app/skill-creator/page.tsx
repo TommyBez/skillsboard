@@ -45,6 +45,15 @@ export const metadata: Metadata = {
   },
 }
 
-export default function Page() {
-  return <SkillCreatorPage entry={skillCreator} />
+/**
+ * `searchParams` is passed down as the promise it is, not awaited here: the
+ * tool reads it inside its own Suspense boundary, so the page keeps its
+ * prerendered static shell and only the form waits for the query string.
+ */
+export default function Page({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  return <SkillCreatorPage entry={skillCreator} searchParams={searchParams} />
 }

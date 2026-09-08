@@ -6,6 +6,7 @@ import { alternativesIndexPath } from "@/lib/seo/alternatives"
 import { compareIndexPath } from "@/lib/seo/compare/types"
 import { pricingPath } from "@/lib/seo/pricing-schema"
 import { resourcePaths } from "@/lib/seo/resources"
+import { skillCheckPath } from "@/lib/seo/skill-check"
 import { skillCreatorPath } from "@/lib/seo/skill-creator/types"
 
 export interface FooterNavLink {
@@ -53,6 +54,7 @@ export function footerNavGroups(
         { href: compareIndexPath, label: "Compare" },
         { href: alternativesIndexPath, label: "Alternatives" },
         { href: skillCreatorPath, label: "Skill creator" },
+        { href: skillCheckPath, label: "Skill checker" },
       ],
     },
     {
