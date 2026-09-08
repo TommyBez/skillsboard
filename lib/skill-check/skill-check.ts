@@ -100,7 +100,10 @@ function byteLength(value: string) {
  * The frontmatter opens on line 1, so its first key is line 2.
  */
 function keyLine(frontmatterLines: string[], key: string) {
-  const pattern = new RegExp(`^\\s*(?:"${key}"|'${key}'|${key})\\s*:`)
+  // The key comes out of somebody else's frontmatter, so it can hold regular
+  // expression syntax. It is matched literally, never compiled as a pattern.
+  const literal = key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const pattern = new RegExp(`^\\s*(?:"${literal}"|'${literal}'|${literal})\\s*:`)
   const index = frontmatterLines.findIndex((line) => pattern.test(line))
   return index < 0 ? undefined : index + 2
 }
@@ -125,19 +128,28 @@ function fromDraftIssue(
   const field = issue.field.replace(/-/g, "_")
   return {
     code: `${field}_${issue.level === "error" ? "invalid" : "convention"}`,
-    message: issue.message,
+    // The shared rules interpolate values read out of the file into their
+    // messages, so every message crosses the sanitizer before it is exposed.
+    message: sanitizeAgentSkillText(issue.message),
     field: issue.field,
     ...(issue.field === "body" ? {} : { line: keyLine(frontmatterLines, issue.field) }),
   }
 }
 
+/**
+ * The optional fields, read against their declared types.
+ *
+ * Only `undefined` means the key was left out. A key written with no value
+ * after it parses to null, which is the field present and holding something
+ * that is not a string, so it is reported like any other wrong type.
+ */
 function readOptionalString(
   value: unknown,
   key: "license" | "compatibility",
   collector: Collector,
   frontmatterLines: string[],
 ): string {
-  if (value === undefined || value === null) return ""
+  if (value === undefined) return ""
   if (typeof value === "string") return value
 
   fail(collector, {
@@ -161,7 +173,7 @@ function readAllowedTools(
   collector: Collector,
   frontmatterLines: string[],
 ): string {
-  if (value === undefined || value === null) return ""
+  if (value === undefined) return ""
   if (typeof value === "string") return value
 
   const line = keyLine(frontmatterLines, "allowed-tools")
@@ -195,10 +207,10 @@ function readMetadata(
   collector: Collector,
   frontmatterLines: string[],
 ): SkillDraft["metadata"] {
-  if (value === undefined || value === null) return []
+  if (value === undefined) return []
   const line = keyLine(frontmatterLines, "metadata")
 
-  if (typeof value !== "object" || Array.isArray(value)) {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
     fail(collector, {
       code: "metadata_not_a_map",
       field: "metadata",
@@ -351,6 +363,9 @@ export function checkSkillMarkdown(
   const reported = new Set<SkillFieldName>()
 
   const rawName = fields.name
+  /** The value as written, which is what the specification's rules apply to. */
+  let nameAsWritten = ""
+  /** The same value with anything a terminal reads stripped, for the report. */
   let name = ""
   if (rawName === undefined || rawName === null) {
     reported.add("name")
@@ -369,6 +384,10 @@ export function checkSkillMarkdown(
       message: `The specification defines name as a string. This file declares it as ${describeType(rawName)}, which is what an unquoted value such as true or 1.0 parses to.`,
     })
   } else {
+    // The rules below read the value the file declares, not a cleaned copy of
+    // it: a control character inside the name breaks the name rule, and
+    // sanitizing first would hide it. Only what the report shows is sanitized.
+    nameAsWritten = rawName
     name = sanitizeAgentSkillText(rawName)
   }
 
@@ -395,7 +414,7 @@ export function checkSkillMarkdown(
   }
 
   const draft: SkillDraft = {
-    name,
+    name: nameAsWritten,
     description,
     license: readOptionalString(fields.license, "license", collector, frontmatterLines),
     compatibility: readOptionalString(
@@ -424,7 +443,7 @@ export function checkSkillMarkdown(
    * skill directory to compare against, so the rule does not apply to it.
    */
   const folderName = context.folderName?.trim()
-  if (folderName && name && name !== folderName) {
+  if (folderName && name && nameAsWritten.trim() !== folderName) {
     fail(collector, {
       code: "name_directory_mismatch",
       field: "name",
@@ -436,7 +455,9 @@ export function checkSkillMarkdown(
   return {
     path: context.path,
     name: name || null,
-    draft,
+    // The rules ran against the name as written; what leaves this function
+    // carries the sanitized copy.
+    draft: { ...draft, name },
     errors: collector.errors,
     warnings: collector.warnings,
   }

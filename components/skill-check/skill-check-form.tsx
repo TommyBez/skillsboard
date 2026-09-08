@@ -29,6 +29,35 @@ import { cn } from "@/lib/utils"
 
 type Status = "idle" | "loading" | "done"
 
+/** What the endpoint sends when it refuses the request: an RFC 9457 document. */
+const PROBLEM_MEDIA_TYPE = "application/problem+json"
+
+const REFUSED_MESSAGE =
+  "The check could not be run right now. Try again in a moment."
+
+/**
+ * The refusal the public budget produces, worded for a reader.
+ *
+ * `Retry-After` is seconds, and the endpoint always sends it with a 429, so
+ * the wait is stated when it is there and left vague when it is not.
+ */
+function rateLimitMessage(retryAfter: string | null) {
+  const seconds = Number(retryAfter)
+  if (Number.isFinite(seconds) && seconds > 0) {
+    return `Too many checks from this network. Try again in ${Math.ceil(seconds)} seconds.`
+  }
+  return "Too many checks from this network. Try again in a minute."
+}
+
+/** A report, as opposed to a problem document or anything else that parsed. */
+function isSkillCheckReport(payload: unknown): payload is SkillCheckReport {
+  return (
+    typeof payload === "object" &&
+    payload !== null &&
+    Array.isArray((payload as { skills?: unknown }).skills)
+  )
+}
+
 function issueLocation(issue: SkillCheckIssue) {
   return [issue.field, issue.line ? `line ${issue.line}` : null]
     .filter(Boolean)
@@ -164,7 +193,38 @@ export function SkillCheckForm({ entry }: { entry: SkillCheckDefinition }) {
       const response = await fetch(`/api/check?url=${encodeURIComponent(target)}`, {
         headers: { Accept: "application/json" },
       })
-      const payload = (await response.json()) as SkillCheckReport
+
+      // A refusal is a problem document, not a report: it has no skills list,
+      // so casting it would blow up the render two lines later. The status and
+      // the media type are read before anything is parsed as a report.
+      const contentType = (response.headers.get("Content-Type") ?? "").toLowerCase()
+      const isProblem =
+        contentType.includes(PROBLEM_MEDIA_TYPE) || !contentType.includes("json")
+
+      if (response.status === 429 || isProblem) {
+        const rateLimited = response.status === 429
+        setStatus("done")
+        setFailure(
+          rateLimited
+            ? rateLimitMessage(response.headers.get("Retry-After"))
+            : REFUSED_MESSAGE,
+        )
+        captureAnalyticsEvent("skill_check_failed", {
+          error_code: rateLimited ? "rate_limited" : "unexpected_response",
+        })
+        return
+      }
+
+      const payload: unknown = await response.json()
+
+      if (!isSkillCheckReport(payload)) {
+        setStatus("done")
+        setFailure(REFUSED_MESSAGE)
+        captureAnalyticsEvent("skill_check_failed", {
+          error_code: "unexpected_response",
+        })
+        return
+      }
 
       setReport(payload)
       setStatus("done")

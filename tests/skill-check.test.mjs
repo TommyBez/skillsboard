@@ -283,6 +283,73 @@ test("terminal escapes in a checked file never reach the report", () => {
   assert.ok(!result.name.includes(""))
 })
 
+test("an unknown key holding regex syntax is a warning rather than a crash", () => {
+  const result = checkSkillMarkdown(valid('\n"[": value'), context)
+
+  assert.deepEqual(codes(result.errors), [])
+  assert.deepEqual(codes(result.warnings), ["unknown_frontmatter_key"])
+  assert.equal(result.warnings[0].field, "[")
+})
+
+test("an optional field declared with no value is reported by type", () => {
+  const license = checkSkillMarkdown(valid("\nlicense:"), context)
+  assert.deepEqual(codes(license.errors), ["license_not_a_string"])
+  assert.ok(license.errors[0].message.includes("empty"))
+
+  const compatibility = checkSkillMarkdown(valid("\ncompatibility:"), context)
+  assert.deepEqual(codes(compatibility.errors), ["compatibility_not_a_string"])
+
+  const allowedTools = checkSkillMarkdown(valid("\nallowed-tools:"), context)
+  assert.deepEqual(codes(allowedTools.errors), ["allowed_tools_not_a_string"])
+
+  const metadata = checkSkillMarkdown(valid("\nmetadata:"), context)
+  assert.deepEqual(codes(metadata.errors), ["metadata_not_a_map"])
+})
+
+test("a control character in the name breaks the name rule before it is stripped", () => {
+  const result = checkSkillMarkdown(
+    '---\nname: "release\\u001b[31mnotes"\ndescription: Writes notes. Use when asked.\n---\n\nBody.\n',
+    { path: "SKILL.md" },
+  )
+
+  assert.ok(codes(result.errors).includes("name_invalid"))
+  assert.ok(!result.name.includes("\u001b"))
+  assert.ok(!result.draft.name.includes("\u001b"))
+})
+
+test("a message from the shared rules is sanitized before it is exposed", () => {
+  const result = checkSkillMarkdown(
+    '---\nname: release-notes\ndescription: Writes notes. Use when asked.\nmetadata:\n  "au\\u001b[31mthor": someone\n---\n\nBody.\n',
+    context,
+  )
+
+  const issues = [...result.errors, ...result.warnings]
+  assert.ok(issues.some((issue) => issue.code === "metadata_invalid"))
+  for (const issue of issues) {
+    assert.ok(!issue.message.includes("\u001b"), `${issue.code} carried an escape`)
+    assert.ok(!/[\u0000-\u0008\u000b-\u001f]/.test(issue.message))
+  }
+})
+
+test("the form reads a problem document as a refusal rather than as a report", async () => {
+  // The component is JSX, so it is read as text: the assertion is that the
+  // response is checked before it is treated as a report.
+  const form = await readFile(
+    new URL("../components/skill-check/skill-check-form.tsx", import.meta.url),
+    "utf8",
+  )
+
+  assert.ok(form.includes("application/problem+json"), "the media type is not checked")
+  assert.ok(form.includes("response.status === 429"), "the refusal status is not checked")
+  assert.ok(form.includes("Retry-After"))
+  assert.ok(form.includes('error_code: rateLimited ? "rate_limited"'))
+  assert.ok(
+    form.includes("Too many checks from this network"),
+    "the rate limit has no reader facing copy",
+  )
+  assert.ok(!dashPattern.test(form), "an em or en dash is in the form copy")
+})
+
 /* -------------------------------------------------------------------------- */
 /* The report and its Markdown rendering                                       */
 /* -------------------------------------------------------------------------- */

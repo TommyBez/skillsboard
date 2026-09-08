@@ -94,7 +94,11 @@ type NonTeamEventPropertiesMap = {
     error_count: number
     warning_count: number
   }
-  /** A check that produced no report. `error_code` is the report's own code. */
+  /**
+   * A check that produced no report. `error_code` is the report's own code
+   * when the endpoint answered with one, and otherwise names why the answer
+   * could not be read: `network`, `rate_limited`, or `unexpected_response`.
+   */
   skill_check_failed: {
     error_code: string
   }
