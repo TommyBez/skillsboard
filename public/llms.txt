@@ -20,7 +20,7 @@ Markdown versions: the home page, the resources, comparisons, and alternatives h
 - [Sitemap](https://www.skillsboard.sh/sitemap.xml): Indexable public URLs
 - [Home](https://www.skillsboard.sh/): Product overview, pricing, and common questions
 - [Resources](https://www.skillsboard.sh/resources): Practical guides for teams sharing, reviewing, and operating AI skills
-- [Developer docs](https://www.skillsboard.sh/developers): How an agent connects to the MCP server, the tools and scopes it gets, and the versioning, error, and rate-limit conventions of the HTTP surface
+- [Developer docs](https://www.skillsboard.sh/developers): How an agent connects to the MCP server and its tools, the public SKILL.md format check at /api/check, and the versioning, error, and rate-limit conventions of the HTTP surface
 - [About Skills Board](https://www.skillsboard.sh/about): Why the shared team library exists, how teams use it, and where to find the open-source project
 - [Pricing](https://www.skillsboard.sh/pricing.md): Machine-readable pricing details
 - [Create account](https://www.skillsboard.sh/sign-up): Start a free team library

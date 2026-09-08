@@ -9,23 +9,12 @@ import {
   SKILL_SPEC_CHECKED_ON,
   type SkillCheckReport,
   type SkillCheckReportEntry,
-  type SkillCheckReportErrorCode,
 } from "@/lib/skill-check/report"
 import { checkSkillMarkdown } from "@/lib/skill-check/skill-check"
 import { emptySkillDraft } from "@/lib/skill-creator/skill-md"
 
-/** HTTP status for each way the check can refuse, used by the route. */
-export const SKILL_CHECK_ERROR_STATUS: Record<SkillCheckReportErrorCode, number> = {
-  invalid_url: 400,
-  invalid_path: 400,
-  not_found: 404,
-  skill_not_found: 404,
-  no_skills_found: 404,
-  rate_limited: 429,
-  repository_too_large: 413,
-  unavailable: 502,
-  unexpected: 500,
-}
+/** The status map, re-exported so the route keeps importing it from here. */
+export { SKILL_CHECK_ERROR_STATUS } from "@/lib/skill-check/report"
 
 function emptyReport(url: string): SkillCheckReport {
   return {

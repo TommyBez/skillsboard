@@ -32,6 +32,25 @@ export interface SkillCheckReportError {
   message: string
 }
 
+/**
+ * HTTP status for each way the check can refuse.
+ *
+ * Here rather than beside the reader that throws these codes, because the
+ * route sends the status, the OpenAPI description states it, and neither of
+ * those should reach into a `server-only` module to find out what it is.
+ */
+export const SKILL_CHECK_ERROR_STATUS: Record<SkillCheckReportErrorCode, number> = {
+  invalid_url: 400,
+  invalid_path: 400,
+  not_found: 404,
+  skill_not_found: 404,
+  no_skills_found: 404,
+  rate_limited: 429,
+  repository_too_large: 413,
+  unavailable: 502,
+  unexpected: 500,
+}
+
 export interface SkillCheckReportRepository {
   githubUrl: string
   owner: string
