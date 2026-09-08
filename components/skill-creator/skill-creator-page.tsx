@@ -11,7 +11,7 @@ import {
   SectionTable,
 } from "@/components/resources/article-parts"
 import { ResourceCta } from "@/components/resources/resource-chrome"
-import { SkillMdBuilder } from "@/components/skill-creator/skill-md-builder"
+import { SkillMdBuilderSkeleton } from "@/components/skill-creator/skill-md-builder-skeleton"
 import {
   SkillCreatorTool,
   type SkillCreatorSearchParams,
@@ -133,14 +133,7 @@ export function SkillCreatorPage({
           <p className="mt-4 max-w-3xl text-pretty text-[1.05rem] leading-8 text-muted-foreground">
             {entry.tool.intro}
           </p>
-          <Suspense
-            fallback={
-              <SkillMdBuilder
-                exampleDraft={entry.tool.exampleDraft}
-                privacyNote={entry.tool.privacyNote}
-              />
-            }
-          >
+          <Suspense fallback={<SkillMdBuilderSkeleton />}>
             <SkillCreatorTool
               searchParams={searchParams}
               exampleDraft={entry.tool.exampleDraft}

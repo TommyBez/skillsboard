@@ -12,7 +12,8 @@ export type SkillCreatorSearchParams = Promise<Record<string, string | string[] 
  * A server component that awaits the promise inside the Suspense boundary
  * the page wraps it in, the way the sign-up page reads its own query string:
  * the rest of the page stays in the prerendered static shell, only this hole
- * resolves at request time, and the client builder receives a plain string.
+ * resolves at request time behind a skeleton, and the client builder
+ * receives a plain string.
  */
 export async function SkillCreatorTool({
   searchParams,

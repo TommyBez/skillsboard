@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { captureAnalyticsEvent } from "@/lib/analytics-client"
+import { SkillMdBuilderSkeleton } from "@/components/skill-creator/skill-md-builder-skeleton"
 import { pickSkillForUrl } from "@/lib/skill-check/pick-skill"
 import type { SkillCheckReport, SkillCheckReportEntry } from "@/lib/skill-check/report"
 import {
@@ -419,6 +420,12 @@ export function SkillMdBuilder({
     }
   }
 
+  // While the skill is being read the fields are not shown at all: the
+  // example in them would look like the wrong file for a moment.
+  if (importUrl && importState?.status === "loading") {
+    return <SkillMdBuilderSkeleton statusRow={<ImportRow url={importUrl} state={importState} />} />
+  }
+
   return (
     <div className="mt-9 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {importUrl && importState ? (
@@ -510,7 +517,7 @@ export function SkillMdBuilder({
             </div>
             <Textarea
               id={`${fieldId}-body`}
-              className="mt-2 min-h-64 font-mono text-[0.8rem] leading-6"
+              className="mt-2 max-h-[28rem] min-h-64 overflow-y-auto font-mono text-[0.8rem] leading-6"
               value={draft.body}
               spellCheck={false}
               placeholder="# Skill title"

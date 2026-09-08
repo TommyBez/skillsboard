@@ -659,5 +659,7 @@ test("the creator reads the from URL through the same endpoint, with no dash", a
   assert.ok(!builder.includes("window.location"))
   assert.ok(tool.includes("await searchParams"), "the tool resolves the promise")
   assert.ok(!tool.includes("use client"), "the tool is a server component")
-  assert.ok(pageComponent.includes("<Suspense"))
+  assert.ok(pageComponent.includes("<Suspense fallback={<SkillMdBuilderSkeleton />}"))
+  assert.ok(builder.includes("<SkillMdBuilderSkeleton"), "the fetch does not hide the fields")
+  assert.ok(builder.includes("max-h-[28rem] min-h-64 overflow-y-auto"), "the body does not scroll")
 })
