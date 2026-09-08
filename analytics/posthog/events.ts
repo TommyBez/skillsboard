@@ -72,6 +72,38 @@ type NonTeamEventPropertiesMap = {
   skill_md_generated: {
     output: "clipboard" | "folder_zip" | "skill_md"
   }
+  /**
+   * The `/check` funnel, in four events.
+   *
+   * `$pageview` counts arrivals, and a permalink arrival runs the check by
+   * itself, so `skill_check_started` is what separates a page that was read
+   * from a URL that was actually checked. `entry` says which of the two it
+   * was, because a shared permalink and a pasted URL are different demand.
+   * Non team scoped: the tool needs no account, so most callers have no team.
+   */
+  skill_check_started: {
+    entry: "form" | "permalink"
+  }
+  /**
+   * One completed check. The counts are what the report said, so the share of
+   * checked repositories with at least one spec error is a breakdown here
+   * rather than a second event.
+   */
+  skill_check_completed: {
+    skills_found: number
+    error_count: number
+    warning_count: number
+  }
+  /** A check that produced no report. `error_code` is the report's own code. */
+  skill_check_failed: {
+    error_code: string
+  }
+  skill_check_permalink_copied: Record<never, never>
+  /**
+   * The one commercial action on the page: the reader went from a report to
+   * the flow that saves a skill to a team library.
+   */
+  skill_check_save_clicked: Record<never, never>
   mcp_authorization_approved: Record<never, never>
   mcp_authorization_denied: Record<never, never>
   mcp_tool_used: {
