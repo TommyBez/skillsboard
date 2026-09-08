@@ -233,15 +233,29 @@ function ImportRow({ url, state }: { url: string; state: ImportState }) {
   )
 }
 
+/** The query key that names a GitHub URL to load into the form. */
+export const SKILL_CREATOR_IMPORT_PARAM = "from"
+
+/**
+ * The `?from=` URL, read in the browser. The page stays fully static this way:
+ * reading `searchParams` on the server would turn the route dynamic and stop
+ * it from being prerendered, and the client hook for the query string would
+ * need a Suspense boundary around the tool. The value is only needed inside the effect that
+ * fetches it, so the address bar is read there.
+ */
+function readImportUrl() {
+  if (typeof window === "undefined") return undefined
+  const value = new URLSearchParams(window.location.search).get(SKILL_CREATOR_IMPORT_PARAM)
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
+
 export function SkillMdBuilder({
   exampleDraft,
   privacyNote,
-  importUrl,
 }: {
   exampleDraft: SkillDraft
   privacyNote: string
-  /** A GitHub URL from `?from=`, read through `/api/check` on first render. */
-  importUrl?: string
 }) {
   const fieldId = useId()
   const [draft, setDraft] = useState<SkillDraft>(exampleDraft)
@@ -250,11 +264,15 @@ export function SkillMdBuilder({
   )
   const [nextRowId, setNextRowId] = useState(() => metadataRows.length)
   const [archiveError, setArchiveError] = useState<string | null>(null)
-  const [importState, setImportState] = useState<ImportState | null>(
-    importUrl ? { status: "loading" } : null,
-  )
+  const [importUrl, setImportUrl] = useState<string | undefined>(undefined)
+  const [importState, setImportState] = useState<ImportState | null>(null)
   /** The URL an import already ran for, so a rerender does not repeat it. */
   const importedRef = useRef<string | null>(null)
+
+  // Read after hydration, so the server and the first client render agree.
+  useEffect(() => {
+    setImportUrl(readImportUrl())
+  }, [])
 
   /**
    * A `?from=` URL is read once, through the same endpoint `/check` uses, and

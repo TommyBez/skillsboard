@@ -51,14 +51,7 @@ function NoteGrid({ entries }: { entries: readonly SkillCreatorNote[] }) {
   )
 }
 
-export function SkillCreatorPage({
-  entry,
-  importUrl,
-}: {
-  entry: SkillCreatorDefinition
-  /** A GitHub URL from `?from=`, loaded into the form when it is there. */
-  importUrl?: string
-}) {
+export function SkillCreatorPage({ entry }: { entry: SkillCreatorDefinition }) {
   const sources: readonly SkillCreatorSource[] = entry.sources
 
   return (
@@ -131,7 +124,6 @@ export function SkillCreatorPage({
           <SkillMdBuilder
             exampleDraft={entry.tool.exampleDraft}
             privacyNote={entry.tool.privacyNote}
-            importUrl={importUrl}
           />
           <SectionSources
             sourceIds={entry.tool.sourceIds}

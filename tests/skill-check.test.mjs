@@ -643,9 +643,8 @@ test("the creator reads the from URL through the same endpoint, with no dash", a
   assert.ok(builder.includes('captureAnalyticsEvent("skill_creator_import_failed"'))
   assert.ok(!dashPattern.test(builder), "an em or en dash is in the builder copy")
 
-  // The query string is read on the server and handed down, so the client
-  // never needs useSearchParams and the page needs no Suspense boundary.
-  assert.ok(page.includes("await searchParams"))
-  assert.ok(page.includes("importUrl"))
+  // The page stays static: the query string is read in the browser.
+  assert.ok(!page.includes("searchParams"))
   assert.ok(!builder.includes("useSearchParams"))
+  assert.ok(builder.includes("window.location.search"))
 })
