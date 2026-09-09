@@ -156,14 +156,12 @@ test("the canonical URL is reachable with and without a trailing slash", async (
     "the trailing-slash redirect is not permanent",
   )
 
-  // The path ends in `-skills`, so the existing Accept rewrite already covers
-  // it and no rule of its own is needed.
+  // One Accept rule per page, generated from the page registry. It used to be
+  // a slug pattern shared by every path ending in `-skills`.
   const { beforeFiles } = await rewrites()
-  const negotiated = beforeFiles.find(
-    (rule) => rule.source === "/:slug([^/]*-skills)",
-  )
-  assert.ok(negotiated, "the shared -skills Markdown rewrite is missing")
-  assert.match(entry.path.slice(1), /^[^/]*-skills$/)
+  const negotiated = beforeFiles.find((rule) => rule.source === entry.path)
+  assert.ok(negotiated, "the Markdown Accept rewrite is missing")
+  assert.equal(negotiated.destination, `/api/markdown?path=${entry.path}`)
 })
 
 test("the Markdown twin carries every section, the tables, and the FAQ", () => {
@@ -174,11 +172,12 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
     types: { "text/markdown": `${entry.path}.md` },
   })
 
-  // The alternate has to reach the page head, not just the helper. Two sibling
+  // The alternate has to reach the page head, and the head is built from
+  // the registry entry, which is what carries the Markdown surface. Two sibling
   // routes shipped without wiring it up, so this asserts the route file uses it.
   assert.ok(
-    pageSource.includes("markdownTwinAlternates(copilotSkills.path)"),
-    "the route does not advertise its Markdown twin in the page head",
+    pageSource.includes('pageMetadata("/copilot-skills")'),
+    "the route does not build its head from the page registry",
   )
 
   for (const title of [
