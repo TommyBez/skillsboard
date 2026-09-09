@@ -1,6 +1,13 @@
 import type { NextConfig } from 'next'
 
-import { markdownPagePaths, publicPagePaths } from '@/lib/site/pages'
+// Two arrays of strings rather than the registry they mirror: a config is
+// compiled and required before any bundler exists, and the `@/` alias survives
+// that path only for the config itself. The note in `lib/site/page-paths.ts`
+// has the detail.
+import {
+  markdownPagePathList,
+  publicPagePathList,
+} from '@/lib/site/page-paths'
 
 /**
  * A literal that matches in any case.
@@ -51,7 +58,7 @@ const MARKDOWN_ACCEPT = {
  * twin: a request for any other URL keeps returning HTML rather than a 404.
  */
 const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] =
-  markdownPagePaths.map((path) => ({
+  markdownPagePathList.map((path) => ({
     source: path,
     markdown: `/api/markdown?path=${path}`,
   }))
@@ -65,7 +72,7 @@ const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] =
  * written list covered twenty nine of the forty eight public pages, and the
  * ones it missed either served the page twice under two URLs or answered 404.
  */
-const TRAILING_SLASH_REDIRECTS = publicPagePaths
+const TRAILING_SLASH_REDIRECTS = publicPagePathList
   .filter((path) => path !== "/")
   .map((path) => ({
     source: `${path}/`,

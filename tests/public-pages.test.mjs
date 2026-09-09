@@ -22,6 +22,9 @@ const { default: sitemap } = await import("../app/sitemap.ts")
 const { default: nextConfig, NEGOTIATED_PAGES } = await import(
   "../next.config.ts"
 )
+const { markdownPagePathList, publicPagePathList } = await import(
+  "../lib/site/page-paths.ts"
+)
 const { siteConfig } = await import("../lib/site.ts")
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
@@ -126,6 +129,14 @@ test("the twins are exactly the pages that declare one", () => {
   assert.ok(!markdownTwinPaths.includes("/check"))
 })
 
+test("the list next.config.ts reads is the registry, spelled out", () => {
+  // `lib/site/page-paths` is a mirror the config can require, because the `@/`
+  // alias does not survive the transform Next.js applies to a TypeScript
+  // config. This is the check that keeps it a mirror rather than a sixth list.
+  assert.deepEqual([...publicPagePathList], [...publicPagePaths])
+  assert.deepEqual([...markdownPagePathList], [...markdownPagePaths])
+})
+
 test("every twin has a beforeFiles rule that negotiates on Accept", async () => {
   const { beforeFiles } = await nextConfig.rewrites()
   const negotiated = new Map(
@@ -217,12 +228,14 @@ test("the about entry repeats the sentence the page publishes", () => {
 })
 
 /**
- * `next.config.ts` imports the registry, and a Next.js config is compiled and
- * required by Node before any bundler runs: React, a client directive, or a
- * package import anywhere below `lib/site/pages` would fail the build rather
- * than the review. This walks the value imports and refuses all three.
+ * The registry is reached from the root layout, through the WebMCP catalogue,
+ * and from every route that builds its head: a client directive or a package
+ * import below it lands in the module graph of the whole site. Keeping it to
+ * plain data also keeps open the option of reading it from a config, which is
+ * what `lib/site/page-paths` mirrors by hand today. This walks the value
+ * imports and refuses JSX, a directive, and a package.
  */
-test("the registry and everything it imports stay loadable from a config", () => {
+test("the registry and everything it imports stay plain data", () => {
   const impure = []
   const seen = new Set()
 

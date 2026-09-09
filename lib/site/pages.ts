@@ -28,9 +28,11 @@ import { skillCreator } from "@/lib/seo/skill-creator"
  * reference so the twin builder gets the same object it got before.
  *
  * The module is deliberately free of React, of `server-only`, and of any
- * package import: `next.config.ts` imports it, and a config is loaded by
- * Node before any bundler exists. `tests/public-pages.test.mjs` asserts that
- * the whole import graph below it stays that way.
+ * package import. It is reached from the root layout through the WebMCP
+ * catalogue, so anything heavier lands in the module graph of the whole site,
+ * and `tests/public-pages.test.mjs` asserts the import graph below it stays
+ * plain data. `next.config.ts` cannot require it even so, and reads the
+ * mirror in `lib/site/page-paths` instead, for the reason written there.
  */
 
 export type PageKind =
