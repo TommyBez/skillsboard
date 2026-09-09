@@ -9,6 +9,7 @@ import {
   ACTIVATION_WELCOME,
   type ActivationAutomationKey,
   type ActivationWelcomeVariant,
+  activationCtaUrl,
   resolveActivationWelcomeVariant,
 } from "@/lib/activation-emails"
 import { db } from "@/lib/db"
@@ -17,6 +18,7 @@ import { emailAutomationSend } from "@/lib/db/schema"
 import { absoluteUrl } from "@/lib/site"
 
 import {
+  EmailPreferenceBlockedError,
   assertTransactionalEmailAllowed,
   getProductCommunicationsPreference,
   getProductCommunicationsUnsubscribeUrls,
@@ -36,7 +38,11 @@ export const ACTIVATION_EMAIL_FROM =
 
 export const ACTIVATION_IDEMPOTENCY_NAMESPACE = "activation"
 
-export type ActivationSendSkipReason = "already_recorded" | "suppressed" | "unknown_user"
+export type ActivationSendSkipReason =
+  | "already_recorded"
+  | "skill_already_saved"
+  | "suppressed"
+  | "unknown_user"
 
 export type ActivationSendResult =
   | { providerEmailId: string | null; sent: true }
@@ -52,16 +58,6 @@ export interface SendActivationEmailInput {
   sentAt?: Date
   teamName: string
   userId: string
-}
-
-function activationCtaUrl(automationKey: ActivationAutomationKey): string {
-  const path = automationKey === ACTIVATION_WELCOME ? "/connect" : "/library"
-  const parameters = new URLSearchParams({
-    utm_source: "email",
-    utm_medium: "activation",
-    utm_campaign: automationKey,
-  })
-  return `${absoluteUrl(path)}?${parameters.toString()}`
 }
 
 /**
@@ -90,14 +86,17 @@ async function activationUnsubscribeUrls(input: { email: string; userId: string 
 export async function sendActivationEmail(
   input: SendActivationEmailInput,
 ): Promise<ActivationSendResult> {
-  // Suppression wins before anything else is prepared.
-  await assertTransactionalEmailAllowed(input.email)
+  // Bounce, complaint, and provider suppression block delivery. A marketing
+  // opt-out does not: this is account setup service email, not a campaign.
+  try {
+    await assertTransactionalEmailAllowed(input.email)
+  } catch (error) {
+    if (error instanceof EmailPreferenceBlockedError) return { reason: "suppressed", sent: false }
+    throw error
+  }
   const preference = await getProductCommunicationsPreference(input.userId)
   if (!preference) return { reason: "unknown_user", sent: false }
-  if (
-    preference.activeSuppressionReasons.length > 0
-    || preference.eligibilityReason === "email_unverified"
-  ) {
+  if (preference.eligibilityReason === "email_unverified") {
     return { reason: "suppressed", sent: false }
   }
 
@@ -109,16 +108,19 @@ export async function sendActivationEmail(
   // a claim it will not use.
   const client = getResendClient()
 
-  // The welcome wording is resolved here rather than at selection time: a team
-  // that saved its first skill during the night must not be told its library is
-  // empty. The variant only affects the welcome.
-  let variant: ActivationWelcomeVariant = "new"
-  if (input.automationKey === ACTIVATION_WELCOME) {
-    variant = resolveActivationWelcomeVariant({
-      daysSinceTeamCreated: input.daysSinceTeamCreated,
-      skillCount: await countOrganizationSkills(input.organizationId),
-    })
+  // Library size is read here rather than at selection time: a team that saved
+  // its first skill after the backfill list was built must not be told the
+  // library is empty, and must not get the first-skill reminder.
+  const skillCount = await countOrganizationSkills(input.organizationId)
+  if (input.automationKey === ACTIVATION_FIRST_SKILL && skillCount > 0) {
+    return { reason: "skill_already_saved", sent: false }
   }
+  const variant: ActivationWelcomeVariant = input.automationKey === ACTIVATION_WELCOME
+    ? resolveActivationWelcomeVariant({
+      daysSinceTeamCreated: input.daysSinceTeamCreated,
+      skillCount,
+    })
+    : "new"
 
   const urls = await activationUnsubscribeUrls({ email: input.email, userId: input.userId })
   const ctaUrl = activationCtaUrl(input.automationKey)

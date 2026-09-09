@@ -174,14 +174,16 @@ type NonTeamEventPropertiesMap = {
 
 type TeamEventPropertiesMap = {
   /**
-   * One activation email left for the person who created the team. The key
-   * comes from the automation itself, so the property and the send register
-   * cannot drift apart, and the age of the team is the number the activation
-   * question is actually about.
+   * One activation email left for the person who created the team. Used by the
+   * manual backfill. Ongoing sends live in the Resend Account setup automation.
    */
   activation_email_sent: {
     automation_key: ActivationAutomationKey
     days_since_team_created: number
+  }
+  /** The team creator was upserted as a Resend contact and `team.created` was sent. */
+  activation_sequence_enrolled: {
+    provider: "resend"
   }
   team_created: {
     creation_surface: "in_app" | "onboarding"

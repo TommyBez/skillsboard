@@ -1,8 +1,8 @@
 import "server-only"
 
-import { and, asc, count, eq, gt, gte, inArray, or } from "drizzle-orm"
+import { and, asc, count, eq, gt, gte, inArray, lt, or } from "drizzle-orm"
 
-import type { ActivationCandidate } from "@/lib/activation-emails"
+import { firstNameFromUserName, type ActivationCandidate } from "@/lib/activation-emails"
 import { db } from "@/lib/db"
 import {
   emailAutomationSend,
@@ -22,14 +22,9 @@ import { hashEmailAddressCandidates } from "@/lib/email/email-privacy"
 export const ACTIVATION_CANDIDATE_PAGE_SIZE = 200
 
 /**
- * A bound on one cron run. At the current rate of team creation this is orders
- * of magnitude above the real number, and it keeps a single invocation finite
- * if the backfill anchor is ever set to a date that opens the whole table.
- *
- * Pages are walked oldest team first, so if this ceiling were ever reached the
- * teams left out would be the newest ones, whose window has just opened and
- * which the rolling 14 day cutoff keeps selecting on later runs. No team is
- * ever excluded by its position in a fixed first page.
+ * A bound on one backfill walk. At the current rate of team creation this is
+ * orders of magnitude above the real number, and it keeps a single invocation
+ * finite.
  */
 export const ACTIVATION_CANDIDATE_LIMIT = 5000
 
@@ -45,9 +40,11 @@ interface OrganizationRow {
   name: string
 }
 
-function firstName(name: string): string | null {
-  const trimmed = name.trim().split(/\s+/)[0]
-  return trimmed ? trimmed : null
+export interface OrganizationCreator {
+  email: string
+  emailVerified: boolean
+  firstName: string | null
+  userId: string
 }
 
 /**
@@ -57,10 +54,11 @@ function firstName(name: string): string | null {
  * start exactly where the previous one ended.
  */
 function selectOrganizationPage(input: {
+  before: Date
   cursor: { createdAt: Date; id: string } | null
   cutoff: Date | null
 }): Promise<OrganizationRow[]> {
-  const { cursor, cutoff } = input
+  const { before, cursor, cutoff } = input
   return db
     .select({
       createdAt: organization.createdAt,
@@ -69,6 +67,7 @@ function selectOrganizationPage(input: {
     })
     .from(organization)
     .where(and(
+      lt(organization.createdAt, before),
       cutoff ? gte(organization.createdAt, cutoff) : undefined,
       cursor
         ? or(
@@ -145,8 +144,8 @@ async function hydrateOrganizations(
     else sendsByUser.set(send.userId, [record])
   }
 
-  // One lookup for every address in play. A suppression of either scope blocks
-  // the send, and the addresses never leave the hashed form used elsewhere.
+  // Only an `all` suppression (bounce, complaint, provider) blocks activation.
+  // A marketing opt-out does not.
   const hashesByUser = new Map<string, string[]>()
   for (const creator of creators) {
     hashesByUser.set(creator.id, [...hashEmailAddressCandidates(creator.email)])
@@ -160,7 +159,7 @@ async function hydrateOrganizations(
       .where(and(
         inArray(emailSuppression.emailHash, allHashes),
         eq(emailSuppression.active, true),
-        inArray(emailSuppression.scope, ["all", "marketing"]),
+        eq(emailSuppression.scope, "all"),
       ))
   const suppressedHashes = new Set(suppressed.map((row) => row.emailHash))
 
@@ -174,7 +173,7 @@ async function hydrateOrganizations(
     candidates.push({
       email: creator.email,
       emailVerified: creator.emailVerified,
-      firstName: firstName(creator.name),
+      firstName: firstNameFromUserName(creator.name),
       hasActiveSuppression: (hashesByUser.get(creator.id) ?? [])
         .some((hash) => suppressedHashes.has(hash)),
       organizationCreatedAt: row.createdAt,
@@ -190,27 +189,22 @@ async function hydrateOrganizations(
 }
 
 /**
- * The teams whose activation window may still be open, each paired with the
- * person who created it: the earliest owner of the team. Every value the
- * decision needs is read here, and the decision itself stays in
- * `lib/activation-emails.ts` so it can be tested without a database.
- *
- * The walk covers the whole eligible set rather than one page of it. A single
- * page would be filled by the same teams on every run, because a team that was
- * already emailed or skipped keeps matching the query, and during the backfill
- * every older team behind that page would never be reached before its window
- * closed.
+ * Teams created before `before`, each paired with the earliest owner. Used by
+ * the one-shot backfill, which walks the whole set through a keyset cursor so
+ * a team that was already emailed cannot occupy a fixed first page forever.
  */
 export async function selectActivationCandidates(input: {
-  cutoff: Date | null
+  before: Date
+  cutoff?: Date | null
 }): Promise<ActivationCandidateRow[]> {
   const candidates: ActivationCandidateRow[] = []
   let cursor: { createdAt: Date; id: string } | null = null
 
   while (candidates.length < ACTIVATION_CANDIDATE_LIMIT) {
     const organizations: OrganizationRow[] = await selectOrganizationPage({
+      before: input.before,
       cursor,
-      cutoff: input.cutoff,
+      cutoff: input.cutoff ?? null,
     })
     if (organizations.length === 0) break
 
@@ -236,4 +230,30 @@ export async function countOrganizationSkills(organizationId: string): Promise<n
     .from(skill)
     .where(eq(skill.organizationId, organizationId))
   return Number(row?.total ?? 0)
+}
+
+/** The earliest owner of a team, which is the person the activation sequence talks to. */
+export async function getOrganizationCreator(
+  organizationId: string,
+): Promise<OrganizationCreator | null> {
+  const [owner] = await db
+    .select({
+      email: user.email,
+      emailVerified: user.emailVerified,
+      name: user.name,
+      userId: user.id,
+    })
+    .from(member)
+    .innerJoin(user, eq(user.id, member.userId))
+    .where(and(eq(member.organizationId, organizationId), eq(member.role, "owner")))
+    .orderBy(asc(member.createdAt))
+    .limit(1)
+
+  if (!owner) return null
+  return {
+    email: owner.email,
+    emailVerified: owner.emailVerified,
+    firstName: firstNameFromUserName(owner.name),
+    userId: owner.userId,
+  }
 }

@@ -6,20 +6,61 @@ import { loadTsModule } from "./helpers/load-ts-module.mjs"
 
 const {
   ACTIVATION_FIRST_SKILL,
+  ACTIVATION_RESEND_SKILL_SAVED,
+  ACTIVATION_RESEND_TEAM_CREATED,
   ACTIVATION_WELCOME,
-  activationSelectionCutoff,
-  decideActivationEmail,
-  isActivationEmailsEnabled,
-  parseActivationBackfillStartedAt,
-  resolveActivationAnchor,
+  daysSinceDate,
+  firstNameFromUserName,
+  parseIsoDate,
+  planActivationBackfillSends,
   resolveActivationWelcomeVariant,
 } = await loadTsModule(new URL("../lib/activation-emails.ts", import.meta.url))
 
 const DAY = 24 * 60 * 60 * 1000
-const HOUR = 60 * 60 * 1000
 const TEAM_CREATED_AT = new Date("2026-09-01T09:00:00.000Z")
 
-function candidate(overrides = {}) {
+function at(offsetMilliseconds) {
+  return new Date(TEAM_CREATED_AT.getTime() + offsetMilliseconds)
+}
+
+test("the welcome wording follows the library, then the team's age", () => {
+  assert.equal(
+    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 0 }),
+    "new",
+  )
+  assert.equal(
+    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 3, skillCount: 0 }),
+    "backfill",
+  )
+  assert.equal(
+    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 1 }),
+    "saved",
+  )
+  assert.equal(
+    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 20, skillCount: 4 }),
+    "saved",
+  )
+})
+
+test("days since a date never go negative", () => {
+  assert.equal(daysSinceDate(at(4 * DAY), TEAM_CREATED_AT), 4)
+  assert.equal(daysSinceDate(TEAM_CREATED_AT, at(DAY)), 0)
+})
+
+test("reads an ISO backfill cutoff strictly", () => {
+  assert.deepEqual(parseIsoDate("2026-09-10"), new Date("2026-09-10T00:00:00.000Z"))
+  assert.equal(parseIsoDate(""), null)
+  assert.equal(parseIsoDate("not a date"), null)
+  assert.equal(parseIsoDate(undefined), null)
+})
+
+test("takes the first word of a name and nothing else", () => {
+  assert.equal(firstNameFromUserName("Sam Taylor"), "Sam")
+  assert.equal(firstNameFromUserName("  "), null)
+  assert.equal(firstNameFromUserName(null), null)
+})
+
+function backfillCandidate(overrides = {}) {
   return {
     emailVerified: true,
     hasActiveSuppression: false,
@@ -32,238 +73,182 @@ function candidate(overrides = {}) {
   }
 }
 
-function decide({ now, backfillStartedAt = null, ...overrides }) {
-  return decideActivationEmail({
-    candidate: candidate(overrides),
-    config: { backfillStartedAt },
-    now,
+test("the backfill plans welcome and first-skill for an empty library", () => {
+  const planned = planActivationBackfillSends({
+    candidate: backfillCandidate(),
+    now: at(20 * DAY),
   })
-}
-
-function at(offsetMilliseconds) {
-  return new Date(TEAM_CREATED_AT.getTime() + offsetMilliseconds)
-}
-
-test("selects the welcome on the first run after the team was created", () => {
-  const decision = decide({ now: at(4 * HOUR) })
-  assert.deepEqual(decision, {
-    automationKey: ACTIVATION_WELCOME,
-    daysSinceTeamCreated: 0,
-    send: true,
-    variant: "new",
-  })
-})
-
-test("selects the first skill reminder one day after the welcome", () => {
-  const decision = decide({
-    now: at(DAY + 4 * HOUR),
-    sends: [{ automationKey: ACTIVATION_WELCOME, sentAt: at(4 * HOUR) }],
-  })
-  assert.equal(decision.send, true)
-  assert.equal(decision.automationKey, ACTIVATION_FIRST_SKILL)
-  assert.equal(decision.daysSinceTeamCreated, 1)
-})
-
-test("holds the first skill reminder until a day has passed, and drops it after two", () => {
-  const sends = [{ automationKey: ACTIVATION_WELCOME, sentAt: at(0) }]
   assert.deepEqual(
-    decide({ now: at(20 * HOUR), sends }),
-    { reason: "sent_within_last_day", send: false },
-  )
-  assert.deepEqual(
-    decide({ now: at(3 * DAY), sends }),
-    { reason: "first_skill_window_passed", send: false },
+    planned.map((plan) => plan.automationKey),
+    [ACTIVATION_WELCOME, ACTIVATION_FIRST_SKILL],
   )
 })
 
-test("does not remind a team that already saved a skill", () => {
-  const decision = decide({
-    now: at(DAY + 4 * HOUR),
-    sends: [{ automationKey: ACTIVATION_WELCOME, sentAt: at(4 * HOUR) }],
-    skillCount: 1,
+test("the backfill skips the first-skill reminder once the library has a skill", () => {
+  const planned = planActivationBackfillSends({
+    candidate: backfillCandidate({ skillCount: 1 }),
+    now: at(20 * DAY),
   })
-  assert.deepEqual(decision, { reason: "skill_already_saved", send: false })
-})
-
-test("never tells a team with skills in it that its library is empty", () => {
-  // Selection time and send time are different moments, and the library can
-  // fill in between, so the wording follows the count rather than the age.
-  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 0 }), "new")
-  assert.equal(
-    resolveActivationWelcomeVariant({ daysSinceTeamCreated: 9, skillCount: 0 }),
-    "backfill",
-  )
-  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 0, skillCount: 1 }), "saved")
-  assert.equal(resolveActivationWelcomeVariant({ daysSinceTeamCreated: 9, skillCount: 4 }), "saved")
-
-  const decision = decide({ now: at(4 * HOUR), skillCount: 2 })
-  assert.deepEqual(decision, {
-    automationKey: ACTIVATION_WELCOME,
-    daysSinceTeamCreated: 0,
-    send: true,
-    variant: "saved",
-  })
-})
-
-test("ends the sequence once both messages have been sent", () => {
-  const decision = decide({
-    now: at(5 * DAY),
-    sends: [
-      { automationKey: ACTIVATION_WELCOME, sentAt: at(0) },
-      { automationKey: ACTIVATION_FIRST_SKILL, sentAt: at(DAY) },
-    ],
-  })
-  assert.deepEqual(decision, { reason: "sequence_complete", send: false })
-})
-
-test("closes the window 14 days after the team was created", () => {
-  assert.equal(decide({ now: at(13 * DAY) }).send, true)
   assert.deepEqual(
-    decide({ now: at(14 * DAY) }),
-    { reason: "window_closed", send: false },
+    planned.map((plan) => plan.automationKey),
+    [ACTIVATION_WELCOME],
   )
 })
 
-test("anchors the window of an older team to the backfill start", () => {
-  const backfillStartedAt = new Date("2026-09-10T00:00:00.000Z")
+test("the backfill skips unverified and delivery-blocked creators", () => {
   assert.deepEqual(
-    resolveActivationAnchor({ backfillStartedAt, organizationCreatedAt: TEAM_CREATED_AT }),
-    backfillStartedAt,
-  )
-  // A team created after the sequence was enabled keeps its own creation date.
-  const laterTeam = new Date("2026-09-20T00:00:00.000Z")
-  assert.deepEqual(
-    resolveActivationAnchor({ backfillStartedAt, organizationCreatedAt: laterTeam }),
-    laterTeam,
-  )
-
-  const decision = decide({
-    backfillStartedAt,
-    now: new Date(backfillStartedAt.getTime() + 3 * HOUR),
-  })
-  assert.equal(decision.send, true)
-  assert.equal(decision.automationKey, ACTIVATION_WELCOME)
-  // Nine days old: the first day wording would be false, so the honest variant wins.
-  assert.equal(decision.variant, "backfill")
-  assert.equal(decision.daysSinceTeamCreated, 8)
-
-  assert.deepEqual(
-    decide({
-      backfillStartedAt,
-      now: new Date(backfillStartedAt.getTime() + 14 * DAY),
+    planActivationBackfillSends({
+      candidate: backfillCandidate({ emailVerified: false }),
+      now: at(20 * DAY),
     }),
-    { reason: "window_closed", send: false },
-  )
-})
-
-test("keeps an older team out of the sequence when no backfill start is configured", () => {
-  assert.deepEqual(
-    decide({ now: at(30 * DAY) }),
-    { reason: "window_closed", send: false },
-  )
-})
-
-test("waits for a backfill start that is still in the future", () => {
-  const backfillStartedAt = new Date("2026-09-10T00:00:00.000Z")
-  assert.deepEqual(
-    decide({ backfillStartedAt, now: new Date("2026-09-09T00:00:00.000Z") }),
-    { reason: "window_not_open", send: false },
-  )
-})
-
-test("sends at most one email per person per day", () => {
-  const decision = decide({
-    now: at(DAY),
-    sends: [{ automationKey: ACTIVATION_WELCOME, sentAt: at(6 * HOUR) }],
-  })
-  assert.deepEqual(decision, { reason: "sent_within_last_day", send: false })
-})
-
-test("stops for good at three proactive emails per person", () => {
-  const decision = decide({
-    now: at(6 * DAY),
-    sends: [
-      { automationKey: ACTIVATION_WELCOME, sentAt: at(0) },
-      { automationKey: ACTIVATION_FIRST_SKILL, sentAt: at(DAY) },
-      { automationKey: "activation_invite", sentAt: at(2 * DAY) },
-    ],
-  })
-  assert.deepEqual(decision, { reason: "per_person_cap_reached", send: false })
-})
-
-test("an active suppression or an unverified address blocks the send", () => {
-  assert.deepEqual(
-    decide({ hasActiveSuppression: true, now: at(4 * HOUR) }),
-    { reason: "suppressed", send: false },
+    [],
   )
   assert.deepEqual(
-    decide({ emailVerified: false, now: at(4 * HOUR) }),
-    { reason: "email_unverified", send: false },
-  )
-})
-
-test("the selection reads every team while the backfill window is open", () => {
-  const backfillStartedAt = new Date("2026-09-10T00:00:00.000Z")
-  assert.equal(
-    activationSelectionCutoff({
-      backfillStartedAt,
-      now: new Date(backfillStartedAt.getTime() + 2 * DAY),
+    planActivationBackfillSends({
+      candidate: backfillCandidate({ hasActiveSuppression: true }),
+      now: at(20 * DAY),
     }),
-    null,
+    [],
   )
-  assert.deepEqual(
-    activationSelectionCutoff({
-      backfillStartedAt,
-      now: new Date(backfillStartedAt.getTime() + 14 * DAY),
+})
+
+test("the backfill skips a message already recorded for that person", () => {
+  const planned = planActivationBackfillSends({
+    candidate: backfillCandidate({
+      sends: [{ automationKey: ACTIVATION_WELCOME, sentAt: at(DAY) }],
     }),
-    new Date(backfillStartedAt.getTime()),
-  )
-  const now = new Date("2026-10-01T00:00:00.000Z")
+    now: at(20 * DAY),
+  })
   assert.deepEqual(
-    activationSelectionCutoff({ backfillStartedAt: null, now }),
-    new Date(now.getTime() - 14 * DAY),
+    planned.map((plan) => plan.automationKey),
+    [ACTIVATION_FIRST_SKILL],
   )
 })
 
-test("reads the enabling flag and the backfill date strictly", () => {
-  assert.equal(isActivationEmailsEnabled("true"), true)
-  assert.equal(isActivationEmailsEnabled(" true "), false)
-  assert.equal(isActivationEmailsEnabled("TRUE"), false)
-  assert.equal(isActivationEmailsEnabled("1"), false)
-  assert.equal(isActivationEmailsEnabled(undefined), false)
-
-  assert.deepEqual(
-    parseActivationBackfillStartedAt("2026-09-10"),
-    new Date("2026-09-10T00:00:00.000Z"),
-  )
-  assert.equal(parseActivationBackfillStartedAt(""), null)
-  assert.equal(parseActivationBackfillStartedAt("not a date"), null)
-  assert.equal(parseActivationBackfillStartedAt(undefined), null)
-})
-
-test("the cron answers with a dry run report before any send when the flag is off", async () => {
-  const route = await readFile(
-    new URL("../app/api/cron/activation-emails/route.ts", import.meta.url),
-    "utf8",
-  )
-  const guardIndex = route.indexOf("if (!enabled) {")
-  const dryRunIndex = route.indexOf("dryRun: true")
-  const sendIndex = route.indexOf("await sendActivationEmail(")
-  assert.ok(guardIndex > 0, "the route has to gate on the enabling flag")
-  assert.ok(dryRunIndex > guardIndex, "the disabled branch reports a dry run")
-  assert.ok(sendIndex > dryRunIndex, "no send can happen before the disabled branch returns")
-  assert.ok(route.includes("hasValidCronAuthorization"), "the route stays behind CRON_SECRET")
-  assert.ok(route.includes("export const maxDuration = 60"))
-})
-
-test("the daily cron entry is wired to the activation route", async () => {
+test("the daily cron is gone and the backfill route is dry-run by default", async () => {
   const vercelConfig = JSON.parse(
     await readFile(new URL("../vercel.json", import.meta.url), "utf8"),
   )
-  assert.deepEqual(
+  assert.equal(
     vercelConfig.crons.find((entry) => entry.path === "/api/cron/activation-emails"),
-    { path: "/api/cron/activation-emails", schedule: "0 13 * * *" },
+    undefined,
   )
+
+  const route = await readFile(
+    new URL("../app/api/activation-backfill/route.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(route.includes("hasValidCronAuthorization"), "the route stays behind CRON_SECRET")
+  assert.ok(route.includes('url.searchParams.get("send") === "true"'))
+  assert.ok(route.includes("runActivationBackfill"))
+  assert.ok(route.includes("export const maxDuration = 60"))
+})
+
+test("creating a team enrolls the creator; saving a skill notifies Resend", async () => {
+  const create = await readFile(
+    new URL("../app/actions/organizations.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(create.includes("enrollActivationSequence("))
+  assert.ok(create.includes("event: \"team_created\""))
+  assert.ok(
+    create.indexOf("event: \"team_created\"") < create.indexOf("enrollActivationSequence("),
+    "PostHog team_created still fires, then Resend is enrolled",
+  )
+
+  const saveSkill = await readFile(new URL("../lib/save-skill.ts", import.meta.url), "utf8")
+  const insert = saveSkill.indexOf("tx.insert(skill)")
+  const notify = saveSkill.indexOf("notifyActivationSkillSaved(input.organizationId)")
+  assert.ok(insert > 0 && notify > insert, "the Resend event is sent after the insert commits")
+})
+
+test("a marketing opt-out does not block the welcome; an all suppression does", async () => {
+  const send = await readFile(
+    new URL("../lib/email/send-activation-email.tsx", import.meta.url),
+    "utf8",
+  )
+  assert.ok(send.includes("assertTransactionalEmailAllowed"))
+  assert.ok(!send.includes("activeSuppressionReasons.length > 0"))
+  assert.ok(send.includes('preference.eligibilityReason === "email_unverified"'))
+
+  const enroll = await readFile(
+    new URL("../lib/email/resend-activation.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(enroll.includes(`event: ACTIVATION_RESEND_TEAM_CREATED`))
+  assert.ok(enroll.includes(`event: ACTIVATION_RESEND_SKILL_SAVED`))
+  assert.ok(enroll.includes("EmailPreferenceBlockedError"))
+
+  const candidates = await readFile(
+    new URL("../lib/db/activation-candidates.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(candidates.includes('eq(emailSuppression.scope, "all")'))
+  assert.ok(!candidates.includes('inArray(emailSuppression.scope, ["all", "marketing"])'))
+})
+
+test("the provisioned automation waits for skill.saved before the reminder", async () => {
+  const provision = await readFile(
+    new URL("../scripts/provision-resend-activation.mjs", import.meta.url),
+    "utf8",
+  )
+  assert.ok(provision.includes(`const TEAM_CREATED = "${ACTIVATION_RESEND_TEAM_CREATED}"`))
+  assert.ok(provision.includes(`const SKILL_SAVED = "${ACTIVATION_RESEND_SKILL_SAVED}"`))
+  assert.ok(provision.includes("eventName: TEAM_CREATED"))
+  assert.ok(provision.includes("eventName: SKILL_SAVED"))
+  assert.ok(provision.includes('type: "wait_for_event"'))
+  assert.ok(provision.includes('type: "timeout"'))
+  assert.ok(provision.includes("timeout: \"2 days\""))
+  assert.ok(provision.includes("loadTsxModule(\"lib/email/activation-resend-templates.tsx\")"))
+  assert.ok(provision.includes("renderActivationWelcomeTemplate"))
+  assert.ok(provision.includes("renderActivationFirstSkillTemplate"))
+  assert.ok(provision.includes("disabled"))
+  assert.ok(provision.includes("--enable"))
+})
+
+test("Resend templates are the React Email trees with mustache placeholders", async () => {
+  const { loadTsxModule } = await import(
+    new URL("../scripts/run-tsx.mjs", import.meta.url)
+  )
+  const {
+    renderActivationFirstSkillTemplate,
+    renderActivationWelcomeTemplate,
+  } = await loadTsxModule("lib/email/activation-resend-templates.tsx")
+
+  const welcome = await renderActivationWelcomeTemplate()
+  const firstSkill = await renderActivationFirstSkillTemplate()
+
+  for (const template of [welcome, firstSkill]) {
+    assert.ok(template.html.includes("{{{TEAM_NAME}}}"))
+    assert.ok(template.html.includes("{{{FIRST_NAME|there}}}"))
+    assert.ok(template.html.includes("{{{RESEND_UNSUBSCRIBE_URL}}}"))
+    assert.ok(template.html.includes("https://www.skillsboard.sh/email/logo-mark.png"))
+    assert.ok(!template.html.includes("/static/logo-mark.png"))
+    assert.ok(!template.html.includes("preview-token"))
+    assert.ok(template.subject.includes("{{{TEAM_NAME}}}"))
+  }
+  assert.equal(welcome.alias, "activation-welcome")
+  assert.equal(firstSkill.alias, "activation-first-skill")
+  assert.match(welcome.html, /Thanks for creating/)
+  assert.match(firstSkill.html, /does not have a skill/)
+})
+
+test("the backfill script is dry-run unless --send is passed", async () => {
+  const script = await readFile(
+    new URL("../scripts/backfill-activation-emails.mjs", import.meta.url),
+    "utf8",
+  )
+  assert.ok(script.includes('process.argv.includes("--send")'))
+  assert.ok(script.includes("/api/activation-backfill"))
+  assert.ok(script.includes("Dry run"))
+
+  const runner = await readFile(
+    new URL("../lib/email/run-activation-backfill.ts", import.meta.url),
+    "utf8",
+  )
+  assert.ok(runner.includes("planActivationBackfillSends"))
+  assert.ok(runner.includes("plan.automationKey"))
+  assert.ok(runner.includes("if (!input.send)"))
 })
 
 test("the activation copy keeps the rules the templates are written under", async () => {
@@ -271,6 +256,8 @@ test("the activation copy keeps the rules the templates are written under", asyn
     "../emails/activation-welcome.tsx",
     "../emails/activation-first-skill.tsx",
     "../emails/components/activation-footer.tsx",
+    "../lib/email/activation-resend-templates.tsx",
+    "../scripts/provision-resend-activation.mjs",
   ]
   for (const file of files) {
     const source = await readFile(new URL(file, import.meta.url), "utf8")
@@ -280,6 +267,8 @@ test("the activation copy keeps the rules the templates are written under", asyn
     assert.ok(!/recommend/i.test(source), `${file} must not recommend skills`)
     assert.ok(!/opted in/i.test(source), `${file} must not claim an opt-in that is not there`)
   }
+  assert.equal(ACTIVATION_WELCOME, "activation_welcome")
+  assert.equal(ACTIVATION_FIRST_SKILL, "activation_first_skill")
 })
 
 test("the candidate selection walks every page instead of a fixed first page", async () => {
@@ -293,10 +282,7 @@ test("the candidate selection walks every page instead of a fixed first page", a
   )
   assert.ok(!source.includes("desc(organization.createdAt)"), "no newest-first fixed page")
   assert.ok(source.includes("cursor"), "pages advance through a keyset cursor")
-  assert.ok(
-    source.includes("ACTIVATION_CANDIDATE_PAGE_SIZE"),
-    "the page size is a batch size, not the horizon of the selection",
-  )
+  assert.ok(source.includes("lt(organization.createdAt, before)"))
 })
 
 test("the welcome wording is resolved from the library at send time", async () => {
@@ -305,9 +291,11 @@ test("the welcome wording is resolved from the library at send time", async () =
     "utf8",
   )
   const countIndex = source.indexOf("countOrganizationSkills(input.organizationId)")
+  const firstSkillSkip = source.indexOf("ACTIVATION_FIRST_SKILL && skillCount > 0")
   const claimIndex = source.indexOf(".insert(emailAutomationSend)")
   assert.ok(countIndex > 0, "the send reads the current library size")
-  assert.ok(claimIndex > countIndex, "and reads it before the row is claimed")
+  assert.ok(firstSkillSkip > countIndex, "the first-skill reminder is dropped if the library filled")
+  assert.ok(claimIndex > firstSkillSkip, "and both reads happen before the row is claimed")
 })
 
 test("the claimed send register row is released only on an answered refusal", async () => {
@@ -336,11 +324,11 @@ test("the claimed send register row is released only on an answered refusal", as
 test("the send register outlives the team it was sent about", async () => {
   const schema = await readFile(new URL("../lib/db/schema.ts", import.meta.url), "utf8")
   const table = schema.slice(
-    schema.indexOf('export const emailAutomationSend = pgTable'),
+    schema.indexOf("export const emailAutomationSend = pgTable"),
     schema.indexOf("export const jwks"),
   )
   assert.ok(
     table.includes('name: "emailAutomationSend_organizationId_fkey",\n  }).onDelete("set null")'),
-    "deleting a team must not erase the lifetime cap of the person who created it",
+    "deleting a team must not erase the backfill history of the person who created it",
   )
 })

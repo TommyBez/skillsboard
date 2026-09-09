@@ -260,21 +260,18 @@ export const invitation = pgTable("invitation", {
 ])
 
 /**
- * One row per proactive automation email, written in the same operation as the
- * send. The composite primary key is what makes a second send impossible when
- * the cron overlaps itself or a deployment reruns it, and the row carries a
- * hashed address rather than the address itself, like every other email table.
- * Defined here rather than beside the other email tables because it references
- * `organization`.
+ * One row per backfill activation email. Ongoing welcome and first-skill
+ * messages are sent by the Resend Account setup automation, not from here.
+ * The composite primary key makes a second manual send of the same message
+ * impossible. Defined here rather than beside the other email tables because
+ * it references `organization`.
  */
 export const emailAutomationSend = pgTable("emailAutomationSend", {
   userId: text("userId").notNull(),
   automationKey: text("automationKey").notNull(),
   /**
-   * Nullable, and cleared rather than cascaded when the team is deleted. The
-   * lifetime cap of 3 proactive emails is per person and never resets, so the
-   * row has to outlive the team it was sent about; only the attribution is
-   * dropped.
+   * Nullable, and cleared rather than cascaded when the team is deleted, so a
+   * later backfill can still see that this person already received the message.
    */
   organizationId: text("organizationId"),
   emailHash: text("emailHash").notNull(),

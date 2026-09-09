@@ -1,12 +1,12 @@
+import { absoluteUrl } from "@/lib/site"
+
 /**
- * Decision rules for the activation sequence, kept free of database and
- * network access so the whole policy can be exercised against a fake clock.
+ * Shared names and copy rules for the activation sequence.
  *
- * The category is account setup service email, defined in
- * `.agents/product-marketing.md` and `docs/email-compliance.md`: two messages,
- * to the person who created the team, inside a 14 day window, under a hard cap
- * of 3 proactive emails per person for good. It does not require the
- * `product_communications` opt-in, and no rule here may relax a suppression.
+ * New teams are enrolled into a Resend Automation (`team.created` → welcome →
+ * wait for `skill.saved` → first-skill reminder). Existing teams are emailed
+ * once by the manual backfill script. This module stays free of database and
+ * network access so the wording rules can be tested with a fake clock.
  */
 
 export const ACTIVATION_WELCOME = "activation_welcome"
@@ -19,6 +19,13 @@ export const ACTIVATION_AUTOMATION_KEYS = [
 
 export type ActivationAutomationKey = (typeof ACTIVATION_AUTOMATION_KEYS)[number]
 
+export const ACTIVATION_RESEND_TEAM_CREATED = "team.created"
+export const ACTIVATION_RESEND_SKILL_SAVED = "skill.saved"
+export const ACTIVATION_RESEND_AUTOMATION_NAME = "Account setup"
+export const ACTIVATION_WELCOME_TEMPLATE_ALIAS = "activation-welcome"
+export const ACTIVATION_FIRST_SKILL_TEMPLATE_ALIAS = "activation-first-skill"
+export const ACTIVATION_TEAM_NAME_PROPERTY = "team_name"
+
 /**
  * Which welcome is true for this team right now.
  *
@@ -29,15 +36,9 @@ export type ActivationAutomationKey = (typeof ACTIVATION_AUTOMATION_KEYS)[number
  */
 export type ActivationWelcomeVariant = "backfill" | "new" | "saved"
 
-export const ACTIVATION_WINDOW_DAYS = 14
-export const ACTIVATION_MAX_PROACTIVE_EMAILS_PER_PERSON = 3
-export const ACTIVATION_MINIMUM_HOURS_BETWEEN_SENDS = 24
-export const ACTIVATION_FIRST_SKILL_MINIMUM_DAYS = 1
-export const ACTIVATION_FIRST_SKILL_MAXIMUM_DAYS = 2
 export const ACTIVATION_DAY_ONE_MAXIMUM_DAYS = 2
 
 const MILLISECONDS_PER_DAY = 24 * 60 * 60 * 1000
-const MILLISECONDS_PER_HOUR = 60 * 60 * 1000
 
 export interface ActivationSendRecord {
   automationKey: string
@@ -46,71 +47,34 @@ export interface ActivationSendRecord {
 
 export interface ActivationCandidate {
   emailVerified: boolean
-  /** Any active row of either scope in `emailSuppression`, for any address of this user. */
+  /** An active `all` suppression (bounce, complaint, provider). Marketing opt-out does not belong here. */
   hasActiveSuppression: boolean
   organizationCreatedAt: Date
   organizationId: string
-  /** Every automation row already written for this person, across all automations. */
   sends: readonly ActivationSendRecord[]
   skillCount: number
   userId: string
 }
 
-export interface ActivationConfig {
-  /**
-   * The moment the sequence was enabled. Teams created before it anchor their
-   * 14 day window here, which is the one time retroactive pass decided on
-   * 2026-09-01. Left null, only teams created inside the window qualify.
-   */
-  backfillStartedAt: Date | null
+export function activationCtaUrl(automationKey: ActivationAutomationKey): string {
+  const path = automationKey === ACTIVATION_WELCOME ? "/connect" : "/library"
+  const parameters = new URLSearchParams({
+    utm_source: "email",
+    utm_medium: "activation",
+    utm_campaign: automationKey,
+  })
+  return `${absoluteUrl(path)}?${parameters.toString()}`
 }
 
-export type ActivationSkipReason =
-  | "email_unverified"
-  | "first_skill_not_due"
-  | "first_skill_window_passed"
-  | "per_person_cap_reached"
-  | "sent_within_last_day"
-  | "sequence_complete"
-  | "skill_already_saved"
-  | "suppressed"
-  | "window_closed"
-  | "window_not_open"
-
-export type ActivationDecision =
-  | {
-    automationKey: ActivationAutomationKey
-    daysSinceTeamCreated: number
-    send: true
-    variant: ActivationWelcomeVariant
-  }
-  | { reason: ActivationSkipReason; send: false }
-
-function differenceInDays(later: Date, earlier: Date): number {
-  return Math.floor((later.getTime() - earlier.getTime()) / MILLISECONDS_PER_DAY)
-}
-
-/**
- * The window anchor. A team created after the sequence was enabled anchors to
- * its own creation. A team created before it anchors to the enabling date, so
- * the backfill runs once and then ends on the same 14 day window as everyone
- * else instead of reopening every time the flag is touched.
- */
-export function resolveActivationAnchor(input: {
-  backfillStartedAt: Date | null
-  organizationCreatedAt: Date
-}): Date {
-  const { backfillStartedAt, organizationCreatedAt } = input
-  if (backfillStartedAt && backfillStartedAt.getTime() > organizationCreatedAt.getTime()) {
-    return backfillStartedAt
-  }
-  return organizationCreatedAt
+export function firstNameFromUserName(name: string | null | undefined): string | null {
+  const trimmed = name?.trim().split(/\s+/)[0]
+  return trimmed ? trimmed : null
 }
 
 /**
  * The library state decides the wording before the team age does. Both empty
  * library variants would be false for a team that already saved a skill, which
- * a backfilled team very well may have done before the sequence was enabled.
+ * a backfilled team very well may have done before the sequence existed.
  */
 export function resolveActivationWelcomeVariant(input: {
   daysSinceTeamCreated: number
@@ -120,12 +84,21 @@ export function resolveActivationWelcomeVariant(input: {
   return input.daysSinceTeamCreated > ACTIVATION_DAY_ONE_MAXIMUM_DAYS ? "backfill" : "new"
 }
 
-function mostRecentSentAt(sends: readonly ActivationSendRecord[]): Date | null {
-  let latest: Date | null = null
-  for (const send of sends) {
-    if (!latest || send.sentAt.getTime() > latest.getTime()) latest = send.sentAt
-  }
-  return latest
+export function daysSinceDate(later: Date, earlier: Date): number {
+  return Math.max(0, Math.floor((later.getTime() - earlier.getTime()) / MILLISECONDS_PER_DAY))
+}
+
+export function parseIsoDate(value: string | undefined): Date | null {
+  const trimmed = value?.trim()
+  if (!trimmed) return null
+  const parsed = new Date(trimmed)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export interface ActivationBackfillSend {
+  automationKey: ActivationAutomationKey
+  daysSinceTeamCreated: number
+  variant: ActivationWelcomeVariant
 }
 
 function hasSent(sends: readonly ActivationSendRecord[], automationKey: string): boolean {
@@ -133,111 +106,39 @@ function hasSent(sends: readonly ActivationSendRecord[], automationKey: string):
 }
 
 /**
- * Which activation email, if any, this candidate should receive right now.
- *
- * Every skip condition is evaluated at send time rather than at selection
- * time: the gap between the nightly query and the send is exactly where the
- * embarrassing email is produced.
+ * Which backfill emails this team should receive right now. Welcome goes to
+ * anyone who has not had it. The first-skill reminder goes only to a still
+ * empty library that has not had it. A marketing opt-out is not a skip.
  */
-export function decideActivationEmail(input: {
+export function planActivationBackfillSends(input: {
   candidate: ActivationCandidate
-  config: ActivationConfig
   now: Date
-}): ActivationDecision {
-  const { candidate, config, now } = input
+}): ActivationBackfillSend[] {
+  const { candidate, now } = input
+  if (!candidate.emailVerified || candidate.hasActiveSuppression) return []
 
-  if (!candidate.emailVerified) return { reason: "email_unverified", send: false }
-  if (candidate.hasActiveSuppression) return { reason: "suppressed", send: false }
-
-  const anchor = resolveActivationAnchor({
-    backfillStartedAt: config.backfillStartedAt,
-    organizationCreatedAt: candidate.organizationCreatedAt,
-  })
-  const daysSinceAnchor = differenceInDays(now, anchor)
-  if (daysSinceAnchor < 0) return { reason: "window_not_open", send: false }
-  if (daysSinceAnchor >= ACTIVATION_WINDOW_DAYS) return { reason: "window_closed", send: false }
-
-  if (candidate.sends.length >= ACTIVATION_MAX_PROACTIVE_EMAILS_PER_PERSON) {
-    return { reason: "per_person_cap_reached", send: false }
-  }
-
-  // One rule covers both frequency caps: at most one email per person per day,
-  // and at least 24 hours between two emails of the sequence.
-  const lastSentAt = mostRecentSentAt(candidate.sends)
-  if (
-    lastSentAt
-    && now.getTime() - lastSentAt.getTime()
-      < ACTIVATION_MINIMUM_HOURS_BETWEEN_SENDS * MILLISECONDS_PER_HOUR
-  ) {
-    return { reason: "sent_within_last_day", send: false }
-  }
-
-  const daysSinceTeamCreated = Math.max(0, differenceInDays(now, candidate.organizationCreatedAt))
+  const daysSinceTeamCreated = daysSinceDate(now, candidate.organizationCreatedAt)
   const variant = resolveActivationWelcomeVariant({
     daysSinceTeamCreated,
     skillCount: candidate.skillCount,
   })
+  const planned: ActivationBackfillSend[] = []
 
   if (!hasSent(candidate.sends, ACTIVATION_WELCOME)) {
-    return {
+    planned.push({
       automationKey: ACTIVATION_WELCOME,
       daysSinceTeamCreated,
-      send: true,
       variant,
-    }
+    })
   }
 
-  if (hasSent(candidate.sends, ACTIVATION_FIRST_SKILL)) {
-    return { reason: "sequence_complete", send: false }
-  }
-  if (candidate.skillCount > 0) return { reason: "skill_already_saved", send: false }
-  if (daysSinceAnchor < ACTIVATION_FIRST_SKILL_MINIMUM_DAYS) {
-    return { reason: "first_skill_not_due", send: false }
-  }
-  if (daysSinceAnchor > ACTIVATION_FIRST_SKILL_MAXIMUM_DAYS) {
-    return { reason: "first_skill_window_passed", send: false }
+  if (!hasSent(candidate.sends, ACTIVATION_FIRST_SKILL) && candidate.skillCount === 0) {
+    planned.push({
+      automationKey: ACTIVATION_FIRST_SKILL,
+      daysSinceTeamCreated,
+      variant,
+    })
   }
 
-  return {
-    automationKey: ACTIVATION_FIRST_SKILL,
-    daysSinceTeamCreated,
-    send: true,
-    variant,
-  }
-}
-
-/**
- * The oldest team creation the selection query has to read, or null while the
- * backfill window is open and every team is still a candidate. The query stays
- * bounded by the enabling date rather than by team age.
- */
-export function activationSelectionCutoff(input: {
-  backfillStartedAt: Date | null
-  now: Date
-}): Date | null {
-  const { backfillStartedAt, now } = input
-  if (backfillStartedAt) {
-    const backfillEndsAt = new Date(
-      backfillStartedAt.getTime() + ACTIVATION_WINDOW_DAYS * MILLISECONDS_PER_DAY,
-    )
-    if (now.getTime() < backfillEndsAt.getTime()) return null
-  }
-  return new Date(now.getTime() - ACTIVATION_WINDOW_DAYS * MILLISECONDS_PER_DAY)
-}
-
-/** An ISO date or datetime from the environment, or null when it is absent or unusable. */
-export function parseActivationBackfillStartedAt(value: string | undefined): Date | null {
-  const trimmed = value?.trim()
-  if (!trimmed) return null
-  const parsed = new Date(trimmed)
-  return Number.isNaN(parsed.getTime()) ? null : parsed
-}
-
-/**
- * The kill switch fails closed: only the exact string `true` enables delivery.
- * A padded or differently cased value is a mistake in the environment, and a
- * mistake there must not be the thing that starts sending email.
- */
-export function isActivationEmailsEnabled(value: string | undefined): boolean {
-  return value === "true"
+  return planned
 }
