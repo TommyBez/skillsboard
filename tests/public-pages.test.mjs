@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url"
 import "./helpers/register-app-aliases.mjs"
 
 const {
+  contentPaths,
   markdownPagePaths,
   publicPages,
   publicPagePaths,
@@ -22,9 +23,11 @@ const { default: sitemap } = await import("../app/sitemap.ts")
 const { default: nextConfig, NEGOTIATED_PAGES } = await import(
   "../next.config.ts"
 )
-const { markdownPagePathList, publicPagePathList } = await import(
-  "../lib/site/page-paths.ts"
-)
+const {
+  markdownTwinPaths: indexTwinPaths,
+  pageIndex,
+  publicPagePaths: indexPagePaths,
+} = await import("../lib/site/page-index.ts")
 const { siteConfig } = await import("../lib/site.ts")
 
 const repoRoot = fileURLToPath(new URL("../", import.meta.url))
@@ -129,12 +132,71 @@ test("the twins are exactly the pages that declare one", () => {
   assert.ok(!markdownTwinPaths.includes("/check"))
 })
 
-test("the list next.config.ts reads is the registry, spelled out", () => {
-  // `lib/site/page-paths` is a mirror the config can require, because the `@/`
-  // alias does not survive the transform Next.js applies to a TypeScript
-  // config. This is the check that keeps it a mirror rather than a sixth list.
-  assert.deepEqual([...publicPagePathList], [...publicPagePaths])
-  assert.deepEqual([...markdownPagePathList], [...markdownPagePaths])
+test("the index is the registry, in the same order", () => {
+  // The registry is the index joined with the content definitions, so the two
+  // agree by construction. What this pins is the order, which the sitemap, the
+  // WebMCP catalogue and the twins all inherit, and the count, so that a page
+  // is never dropped by an edit that looks local.
+  assert.deepEqual([...indexPagePaths()], [...publicPagePaths])
+  assert.deepEqual([...indexTwinPaths()], [...markdownPagePaths])
+  assert.equal(publicPagePaths.length, 48)
+  assert.equal(markdownPagePaths.length, 41)
+})
+
+test("the index and the content definitions cover the same pages", () => {
+  // `lib/site/pages` throws on the first half of this, at import, so the test
+  // states it rather than discovers it. The second half is the one nothing
+  // else catches: a content definition whose path is in no index entry is a
+  // page that is written, reachable by its route, and on no surface at all.
+  const indexed = new Set(pageIndex.map((entry) => entry.path))
+
+  const undefinedPages = pageIndex
+    .filter((entry) => !entry.head && !contentPaths.includes(entry.path))
+    .map((entry) => entry.path)
+  assert.deepEqual(
+    undefinedPages,
+    [],
+    `index entries with neither a content definition nor a head: ${undefinedPages}`,
+  )
+
+  const unlisted = contentPaths.filter((path) => !indexed.has(path))
+  assert.deepEqual(
+    unlisted,
+    [],
+    `content definitions with no entry in lib/site/page-index: ${unlisted}`,
+  )
+
+  // A head belongs to a page with nothing to join, and to no other.
+  for (const entry of pageIndex) {
+    if (!entry.head) continue
+    assert.ok(
+      !contentPaths.includes(entry.path),
+      `${entry.path} has both a head in the index and a content definition`,
+    )
+  }
+})
+
+test("the page index imports nothing", () => {
+  // `next.config.ts` requires this file. A config is resolved as CommonJS and
+  // is not parsed by a bundler, so an `@/` specifier below it is resolved
+  // against the project root and fails on the build machine, and a relative
+  // one would pull the content graph into the config. An import here is a
+  // broken deployment, not a style problem, so it is checked as source.
+  const source = readFileSync(
+    path.join(repoRoot, "lib/site/page-index.ts"),
+    "utf8",
+  )
+
+  assert.equal(
+    source.match(/^\s*import\b.*$/gm),
+    null,
+    "lib/site/page-index.ts must stay free of imports: next.config.ts requires it",
+  )
+  assert.equal(
+    source.match(/\brequire\s*\(/),
+    null,
+    "lib/site/page-index.ts must stay free of require(): next.config.ts requires it",
+  )
 })
 
 test("every twin has a beforeFiles rule that negotiates on Accept", async () => {
@@ -151,6 +213,12 @@ test("every twin has a beforeFiles rule that negotiates on Accept", async () => 
   }
 
   assert.equal(negotiated.size, markdownPagePaths.length)
+  // The config derives these from the index directly, so this is the check
+  // that the index the config reads is the index the registry is built from.
+  assert.deepEqual(
+    NEGOTIATED_PAGES.map((entry) => entry.source),
+    [...indexTwinPaths()],
+  )
   assert.deepEqual(
     NEGOTIATED_PAGES.map((entry) => entry.source),
     [...markdownPagePaths],
@@ -230,10 +298,10 @@ test("the about entry repeats the sentence the page publishes", () => {
 /**
  * The registry is reached from the root layout, through the WebMCP catalogue,
  * and from every route that builds its head: a client directive or a package
- * import below it lands in the module graph of the whole site. Keeping it to
- * plain data also keeps open the option of reading it from a config, which is
- * what `lib/site/page-paths` mirrors by hand today. This walks the value
- * imports and refuses JSX, a directive, and a package.
+ * import below it lands in the module graph of the whole site. This walks the
+ * value imports and refuses JSX, a directive, and a package. The half of the
+ * registry a config can read is `lib/site/page-index`, which imports nothing
+ * at all; the test above keeps it that way.
  */
 test("the registry and everything it imports stay plain data", () => {
   const impure = []

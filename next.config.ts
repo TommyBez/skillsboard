@@ -1,13 +1,10 @@
 import type { NextConfig } from 'next'
 
-// Two arrays of strings rather than the registry they mirror: a config is
-// compiled and required before any bundler exists, and the `@/` alias survives
-// that path only for the config itself. The note in `lib/site/page-paths.ts`
-// has the detail.
-import {
-  markdownPagePathList,
-  publicPagePathList,
-} from '@/lib/site/page-paths'
+// The page index itself rather than a copy of it. Module resolution in a
+// TypeScript config is limited to CommonJS and the file is not parsed by
+// Webpack or Babel, so the specifier is relative and the module it names has
+// no imports of its own. The note in `lib/site/page-index.ts` has the detail.
+import { markdownTwinPaths, publicPagePaths } from './lib/site/page-index'
 
 /**
  * A literal that matches in any case.
@@ -47,7 +44,7 @@ const MARKDOWN_ACCEPT = {
 /**
  * The URLs that answer in two representations.
  *
- * One rule per page with a Markdown surface, read from the page registry. It
+ * One rule per page with a Markdown surface, read from the page index. It
  * used to be a hand written list of router patterns, `/:slug([^/]*-skills)`
  * among them, with a commented exception for each of the four articles whose
  * slug does not end in `-skills`. A pattern cannot say which URLs exist, so
@@ -58,7 +55,7 @@ const MARKDOWN_ACCEPT = {
  * twin: a request for any other URL keeps returning HTML rather than a 404.
  */
 const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] =
-  markdownPagePathList.map((path) => ({
+  markdownTwinPaths().map((path) => ({
     source: path,
     markdown: `/api/markdown?path=${path}`,
   }))
@@ -68,11 +65,12 @@ const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] =
  *
  * `skipTrailingSlashRedirect` is on, because PostHog's capture endpoints use
  * trailing slashes and Next.js would rewrite them, so the canonical form of a
- * page URL is declared here instead. Derived rather than written out: the hand
- * written list covered twenty nine of the forty eight public pages, and the
+ * page URL is declared here instead. Derived from the page index rather than
+ * written out: the hand written list covered twenty nine of the forty eight
+ * public pages, and the
  * ones it missed either served the page twice under two URLs or answered 404.
  */
-const TRAILING_SLASH_REDIRECTS = publicPagePathList
+const TRAILING_SLASH_REDIRECTS = publicPagePaths()
   .filter((path) => path !== "/")
   .map((path) => ({
     source: `${path}/`,

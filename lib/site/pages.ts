@@ -5,12 +5,28 @@ import { developers } from "@/lib/seo/developers"
 import { home } from "@/lib/seo/home"
 import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
 import { pricing } from "@/lib/seo/pricing"
-import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
+import { resourceEntries } from "@/lib/seo/resources"
 import { skillCheck } from "@/lib/seo/skill-check"
 import { skillCreator } from "@/lib/seo/skill-creator"
+import {
+  pageIndex,
+  type PageIndexEntry,
+  type PageKind,
+  type PageSurfaces,
+  type SitemapSurface,
+  surfacesFor,
+} from "@/lib/site/page-index"
+
+export type {
+  ChangeFrequency,
+  PageKind,
+  PageSurfaces,
+  SitemapSurface,
+} from "@/lib/site/page-index"
+export { surfacesFor }
 
 /**
- * Every public page of the site, once.
+ * Every public page of the site, once, with its content attached.
  *
  * Before this module the set of public pages was spelled out in six places
  * that had to be kept in step by hand: the Markdown twin list, its verbatim
@@ -22,56 +38,19 @@ import { skillCreator } from "@/lib/seo/skill-creator"
  * production, which is how `/check` and `/skill-creator` ended up without
  * twins.
  *
- * The registry is an index, not a second place to write content. Title,
- * description and dates are read from the content definition in
- * `lib/seo/<page>` rather than repeated here, and `content` keeps the
- * reference so the twin builder gets the same object it got before.
+ * The registry is a join, not a place to write things down. `lib/site/page-index`
+ * says which pages exist, in which order, and on which surfaces;
+ * `lib/seo/<page>` says what each one contains. This module matches the two on
+ * the path and throws when an index entry has no content to join, so a page
+ * declared and never written fails at the first import rather than in a head
+ * that renders half empty.
  *
  * The module is deliberately free of React, of `server-only`, and of any
  * package import. It is reached from the root layout through the WebMCP
  * catalogue, so anything heavier lands in the module graph of the whole site,
  * and `tests/public-pages.test.mjs` asserts the import graph below it stays
- * plain data. `next.config.ts` cannot require it even so, and reads the
- * mirror in `lib/site/page-paths` instead, for the reason written there.
+ * plain data.
  */
-
-export type PageKind =
-  | "landing"
-  | "hub"
-  | "article"
-  | "guide"
-  | "comparison"
-  | "alternative"
-  | "tool"
-  | "docs"
-  | "legal"
-  | "auth"
-
-/** The values `MetadataRoute.Sitemap` accepts, spelled without importing Next. */
-export type ChangeFrequency =
-  | "always"
-  | "hourly"
-  | "daily"
-  | "weekly"
-  | "monthly"
-  | "yearly"
-  | "never"
-
-export type SitemapSurface = {
-  priority: number
-  changeFrequency: ChangeFrequency
-}
-
-export type PageSurfaces = {
-  /** Answers at `<path>.md` and to `Accept: text/markdown`. */
-  markdown: boolean
-  /** Carries a JSON-LD node. Declared here, derived in a later change. */
-  jsonLd: boolean
-  /** Its line in `sitemap.xml`, or `false` for a page that stays out. */
-  sitemap: SitemapSurface | false
-  /** Listed in the WebMCP catalogue an agent reads from the root layout. */
-  webMcp: boolean
-}
 
 /**
  * A content definition as the registry reads it.
@@ -107,231 +86,73 @@ export type PublicPage = {
 }
 
 /**
- * What a kind gets unless the page says otherwise.
+ * Every content definition the site publishes, by the path it claims.
  *
- * The defaults live in the kind rather than in the page so that a page
- * declares what makes it different and nothing else. A `tool` has no twin yet,
- * an `auth` page appears on no public surface, and everything that carries
- * prose answers in Markdown.
+ * The collections are the second half of the join. A path that appears here
+ * and not in the index is a page nothing links to and nothing serves;
+ * `tests/public-pages.test.mjs` rejects that, since only the index can say
+ * where in the reading order it would belong.
  */
-const surfaceDefaults: Record<PageKind, PageSurfaces> = {
-  landing: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 1, changeFrequency: "weekly" },
-    webMcp: true,
-  },
-  hub: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  article: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  guide: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  comparison: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  alternative: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  docs: {
-    markdown: true,
-    jsonLd: true,
-    sitemap: { priority: 0.7, changeFrequency: "monthly" },
-    webMcp: true,
-  },
-  /**
-   * A browser tool rather than an article. No twin today: the twin of a tool
-   * is the explanation plus the endpoint that does the same job without a
-   * browser, and neither `/check` nor `/skill-creator` has one written yet.
-   */
-  tool: {
-    markdown: false,
-    jsonLd: true,
-    sitemap: { priority: 0.8, changeFrequency: "monthly" },
-    webMcp: false,
-  },
-  legal: {
-    markdown: false,
-    jsonLd: true,
-    sitemap: { priority: 0.3, changeFrequency: "yearly" },
-    webMcp: false,
-  },
-  /** A form, not a document: nothing to read, nothing to index by default. */
-  auth: {
-    markdown: false,
-    jsonLd: false,
-    sitemap: false,
-    webMcp: false,
-  },
-}
+const contentByPath = new Map<string, ContentEntry>(
+  [
+    home,
+    resourcesHub,
+    ...resourceEntries,
+    alternativesHub,
+    ...alternatives,
+    compareHub,
+    ...comparisons,
+    developers,
+    pricing,
+    skillCreator,
+    skillCheck,
+  ].map((entry) => [entry.path, entry]),
+)
 
-/** The surfaces a page actually has: the defaults of its kind, then its own. */
-export function surfacesFor(page: PublicPage): PageSurfaces {
-  return { ...surfaceDefaults[page.kind], ...page.surfaces }
-}
+/** The content definitions, in the order the collections declare them. */
+export const contentPaths: readonly string[] = [...contentByPath.keys()]
 
-function fromContent(
-  entry: ContentEntry,
-  kind: PageKind,
-  overrides: Partial<Omit<PublicPage, "path" | "kind" | "content">> = {},
-): PublicPage {
+function pageFor(entry: PageIndexEntry): PublicPage {
+  if (entry.head) {
+    return {
+      path: entry.path,
+      kind: entry.kind,
+      title: entry.head.title,
+      seoTitle: entry.head.seoTitle,
+      socialTitle: entry.socialTitle,
+      description: entry.head.description,
+      publishedAt: entry.head.publishedAt,
+      modifiedAt: entry.head.modifiedAt,
+      surfaces: entry.surfaces,
+    }
+  }
+
+  const content = contentByPath.get(entry.path)
+  if (!content) {
+    throw new Error(
+      `lib/site/page-index lists ${entry.path} as a ${entry.kind}, and no content definition claims that path. ` +
+        "Either add the page to a collection in lib/seo, or give its index entry a head of its own.",
+    )
+  }
+
   return {
     path: entry.path,
-    kind,
-    title: entry.title,
-    seoTitle: entry.seoTitle,
-    socialTitle: entry.socialTitle,
-    description: entry.description,
-    eyebrow: entry.eyebrow,
-    ogAlt: entry.ogAlt,
-    publishedAt: entry.publishedAt,
-    modifiedAt: entry.modifiedAt,
-    content: entry,
-    ...overrides,
+    kind: entry.kind,
+    title: content.title,
+    seoTitle: content.seoTitle,
+    socialTitle: entry.socialTitle ?? content.socialTitle,
+    description: content.description,
+    eyebrow: content.eyebrow,
+    ogAlt: content.ogAlt,
+    publishedAt: content.publishedAt,
+    modifiedAt: content.modifiedAt,
+    surfaces: entry.surfaces,
+    content,
   }
 }
 
-/**
- * The title a social card carries, where it differs from the page title.
- *
- * These lived as a `socialTitle` constant at the top of each article's
- * `page.tsx`, next to the forty six lines of metadata they belonged to. The
- * metadata is derived now, so the one piece of copy that was not already in a
- * content definition moves here rather than disappearing.
- */
-const articleSocialTitles: Readonly<Record<string, string>> = {
-  "/agent-skills": "Agent Skills: the open standard",
-  "/agent-skills-by-the-numbers": "Agent skills by the numbers",
-  "/agent-skills-support": "Which AI clients read SKILL.md",
-  "/agents-md-vs-skill-md": "AGENTS.md vs SKILL.md",
-  "/anthropic-skills": "Anthropic skills",
-  "/best-claude-skills": "Best Claude skills",
-  "/claude-code-for-teams": "Claude Code for teams: what a rollout configures",
-  "/claude-skills": "Claude Skills, explained",
-  "/codex-skills": "Codex skills, explained",
-  "/copilot-skills": "GitHub Copilot skills: what Copilot supports",
-  "/cowork-skills": "Claude Cowork skills",
-  "/cursor-skills": "Cursor skills, explained",
-  "/manage-ai-skills": "Manage AI skills across your organization",
-  "/opencode-skills": "OpenCode skills, explained",
-  "/skill-examples": "Skill examples: eight real SKILL.md files",
-  "/vercel-skills": "Vercel skills, explained",
-  "/where-to-find-claude-skills": "Where to find Claude skills",
-}
-
-/**
- * The pages in reading order: the home page, then each hub immediately above
- * the collection it indexes, then the pages that belong to no collection.
- *
- * This is the order an agent walks the site in, and it is the order every
- * derived surface inherits, the sitemap included.
- */
-export const publicPages: readonly PublicPage[] = [
-  fromContent(home, "landing"),
-  fromContent(resourcesHub, "hub", {
-    surfaces: { sitemap: { priority: 0.8, changeFrequency: "weekly" } },
-  }),
-  ...resourceEntries.map((entry) =>
-    fromContent(entry, entry.contentType === "guide" ? "guide" : "article", {
-      socialTitle: articleSocialTitles[entry.path],
-    }),
-  ),
-  fromContent(alternativesHub, "hub"),
-  ...alternatives.map((entry) => fromContent(entry, "alternative")),
-  fromContent(compareHub, "hub"),
-  ...comparisons.map((entry) => fromContent(entry, "comparison")),
-  fromContent(developers, "docs"),
-  fromContent(pricing, "landing", {
-    surfaces: { sitemap: { priority: 0.7, changeFrequency: "monthly" } },
-  }),
-  fromContent(skillCreator, "tool"),
-  fromContent(skillCheck, "tool"),
-  {
-    /**
-     * No content definition yet, so no twin: the page is written as markup
-     * rather than as data, and the registry does not invent prose for it.
-     */
-    path: resourcePaths.about,
-    kind: "article",
-    title: "About Skills Board",
-    seoTitle: "About Skills Board | Shared AI Skills for Teams",
-    socialTitle: "About Skills Board",
-    /**
-     * The same sentence `lib/seo/about-schema` exports, repeated because that
-     * module reaches the OG template and the registry stays free of React.
-     * `tests/public-pages.test.mjs` asserts the two agree.
-     */
-    description:
-      "Skills Board gives teams one place to save, share, and reuse AI skills across agents. Learn why it exists, how it works, and how to get involved.",
-    publishedAt: "2026-07-29",
-    modifiedAt: "2026-08-06",
-    surfaces: {
-      markdown: false,
-      webMcp: false,
-      sitemap: { priority: 0.6, changeFrequency: "monthly" },
-    },
-  },
-  {
-    /** The only auth page in the sitemap: it is where an external link lands. */
-    path: "/sign-up",
-    kind: "auth",
-    title: "Create your shared AI skill library",
-    socialTitle: "Create your shared AI skill library | Skills Board",
-    description:
-      "Create a free Skills Board account and start a shared AI skill library for your team.",
-    publishedAt: "2026-07-29",
-    modifiedAt: "2026-08-06",
-    surfaces: { sitemap: { priority: 0.7, changeFrequency: "monthly" } },
-  },
-  {
-    path: "/privacy",
-    kind: "legal",
-    title: "Privacy Policy",
-    socialTitle: "Privacy Policy | Skills Board",
-    description:
-      "How Skills Board collects, uses, shares, and protects personal data.",
-    publishedAt: "2026-07-29",
-    modifiedAt: "2026-07-29",
-  },
-  {
-    path: "/terms",
-    kind: "legal",
-    title: "Terms of Service",
-    socialTitle: "Terms of Service | Skills Board",
-    description:
-      "Terms that apply when you use the hosted Skills Board service.",
-    publishedAt: "2026-07-29",
-    modifiedAt: "2026-07-29",
-  },
-  {
-    path: "/contact",
-    kind: "legal",
-    title: "Contact",
-    socialTitle: "Contact | Skills Board",
-    description:
-      "Contact Skills Board for product, account, privacy, or security questions.",
-    publishedAt: "2026-07-29",
-    modifiedAt: "2026-08-06",
-  },
-]
+/** The index, joined with the content, in the order the index declares. */
+export const publicPages: readonly PublicPage[] = pageIndex.map(pageFor)
 
 const pagesByPath = new Map(publicPages.map((page) => [page.path, page]))
 
