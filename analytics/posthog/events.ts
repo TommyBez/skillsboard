@@ -230,8 +230,27 @@ type TeamEventPropertiesMap = {
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean
+    /**
+     * How the ask looked when it was seen. The library banner reports a view
+     * whether it is expanded or folded to its title, and those two are not the
+     * same sighting: a team can count five views and have read the ask once.
+     * Optional because events recorded before this property shipped have none;
+     * the first-skill step always sends `expanded`.
+     */
+    state?: "collapsed" | "expanded"
     surface: "first_skill_invite_step" | "library_after_first_skill"
     trigger: "first_skill_saved" | "library_revisit"
+  }
+  /**
+   * What the user did with the ask, as opposed to whether it was on screen.
+   * `not_now` is the first-skill dialog closed without an invitation being
+   * sent (the button, the X, Escape, the overlay). The other three are the
+   * banner state transitions the user chose.
+   */
+  team_invite_prompt_answered: {
+    actor_is_skill_creator: boolean
+    answer: "collapsed" | "dismissed" | "expanded" | "not_now"
+    surface: "first_skill_invite_step" | "library_after_first_skill"
   }
   team_invite_prompt_clicked: {
     actor_is_skill_creator: boolean

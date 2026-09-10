@@ -39,6 +39,9 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
     if (next === "dismissed") return
     captureAnalyticsEvent("team_invite_prompt_viewed", {
       actor_is_skill_creator: actorIsSkillCreator,
+      // Folded to its title is a weaker sighting than the full card, and the
+      // two used to be recorded as the same view.
+      state: next,
       surface: "library_after_first_skill",
       trigger: "library_revisit",
     })
@@ -56,6 +59,13 @@ export function InviteTeammatePrompt({ actorIsSkillCreator, teamId }: InviteTeam
   function persist(next: BannerState) {
     setState(next)
     writeInvitePromptState(teamId, next)
+    // Only user-chosen transitions reach this function: the state the step
+    // writes arrives through the subscription above, which does not persist.
+    captureAnalyticsEvent("team_invite_prompt_answered", {
+      actor_is_skill_creator: actorIsSkillCreator,
+      answer: next,
+      surface: "library_after_first_skill",
+    })
   }
 
   if (state === "dismissed") return null
