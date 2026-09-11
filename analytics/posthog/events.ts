@@ -185,6 +185,34 @@ type TeamEventPropertiesMap = {
     tag_count: number
   }
   /**
+   * The install command was copied from the catalog on `/discover`.
+   * `$pageview` on `/discover` owns the denominator, and `skill_saved` is the
+   * sibling outcome: a catalog session that ends here carried the command
+   * away, a session that ends in a save left the skill in the team library.
+   * `slug` and `source` are the public catalog identifiers of the skill, for
+   * example `anthropics/skills`, and say nothing about who copied it.
+   * `surface` separates the copy on the result card from the copy inside the
+   * details dialog, so the cost of opening the dialog before copying is
+   * readable rather than folded into one number.
+   */
+  catalog_install_copied: {
+    slug: string
+    source: string
+    surface: "card" | "details"
+  }
+  /**
+   * The same dialog, left for the skills.sh page of the skill. Autocapture
+   * records the click as an element chain and nothing else, so the exit is
+   * only readable as an outcome once it is named here. `destination` is a
+   * union of one on purpose: a second target outside the product gets a value,
+   * not a second event.
+   */
+  catalog_external_opened: {
+    destination: "skills_sh"
+    slug: string
+    source: string
+  }
+  /**
    * `surface` is threaded from the form that sent the invitation, through the
    * server action, so an invitation sent from the first run can be counted on
    * its own. Same values as `team_invite_link_copied`, so the emailed
