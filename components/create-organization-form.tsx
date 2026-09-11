@@ -44,7 +44,9 @@ export function CreateOrganizationForm({
       let result = previousState
       if (!previousState.teamId) {
         const nameError = describeTeamNameError(readTeamName(formData))
-        if (nameError) return { ...previousState, error: nameError }
+        if (nameError) {
+          return { ...previousState, error: nameError, invalidField: "name" as const }
+        }
         result = await createOrganization(previousState, formData)
       }
       if (!result.teamId || !result.destination) return result
@@ -59,18 +61,21 @@ export function CreateOrganizationForm({
         onSuccess?.()
         router.push(result.destination)
         router.refresh()
-        return { ...result, error: "" }
+        return { ...result, error: "", invalidField: undefined }
       } catch {
         return {
           ...result,
           error: "Your team library was created, but we couldn’t open it. Try again.",
+          invalidField: undefined,
         }
       }
     },
     initialState,
   )
 
-  const nameError = state.error && !state.teamId ? state.error : ""
+  // Only a rejected name marks the field: a failure after a valid name was
+  // accepted still reports its message, but leaves the field alone.
+  const nameError = state.invalidField === "name" ? state.error : ""
   const errorId = `${idPrefix}-error`
 
   useEffect(() => {

@@ -14,6 +14,12 @@ import { describeTeamNameError, readTeamName } from "@/lib/team-name"
 export interface CreateOrganizationState {
   destination: "/library" | "/start" | ""
   error: string
+  /**
+   * Set only when `error` describes the team name itself. Anything else that
+   * fails, including the auth API, leaves a valid name in the field, so the
+   * form must not mark that field invalid or pull focus back to it.
+   */
+  invalidField?: "name"
   teamId: string
 }
 
@@ -56,6 +62,7 @@ export async function createOrganization(
     return {
       destination: "",
       error: nameError,
+      invalidField: "name",
       teamId: "",
     }
   }
