@@ -176,8 +176,8 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
   })
 
   assert.ok(
-    pageSource.includes("markdownTwinAlternates(skillExamples.path)"),
-    "the route does not advertise its Markdown twin in the page head",
+    pageSource.includes('pageMetadata("/skill-examples")'),
+    "the route does not build its head from the page registry",
   )
 
   for (const title of [
