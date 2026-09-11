@@ -9,6 +9,7 @@ import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
 import { resolveUniqueOrganizationSlug } from "@/lib/organization-slug"
 import { captureTeamEvent } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
+import { describeTeamNameError, readTeamName } from "@/lib/team-name"
 
 export interface CreateOrganizationState {
   destination: "/library" | "/start" | ""
@@ -30,7 +31,6 @@ export interface AcceptInvitationState {
   teamId: string
 }
 
-const organizationNameSchema = z.string().trim().min(2, "Team name must be at least 2 characters.").max(80, "Team name must be 80 characters or less.")
 const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
 /**
  * Where the invitation form was rendered. Posted as a hidden field because the
@@ -48,18 +48,19 @@ export async function createOrganization(
   formData: FormData,
 ): Promise<CreateOrganizationState> {
   const session = await requireSession()
-  const parsed = organizationNameSchema.safeParse(formData.get("name"))
+  const name = readTeamName(formData)
+  const nameError = describeTeamNameError(name)
   const creationSurface = creationSurfaceSchema.parse(formData.get("creationSurface"))
 
-  if (!parsed.success) {
+  if (nameError) {
     return {
       destination: "",
-      error: parsed.error.issues[0]?.message ?? "Enter a valid team name.",
+      error: nameError,
       teamId: "",
     }
   }
 
-  const slug = await resolveUniqueOrganizationSlug(parsed.data)
+  const slug = await resolveUniqueOrganizationSlug(name)
   const destination = creationSurface === "onboarding" ? "/start" : "/library"
 
   try {
@@ -67,7 +68,7 @@ export async function createOrganization(
       headers: await headers(),
       // The browser activates the new team after this action returns. Keeping
       // the current team here lets it update PostHog before navigation.
-      body: { keepCurrentActiveOrganization: true, name: parsed.data, slug },
+      body: { keepCurrentActiveOrganization: true, name, slug },
     })
     if (!created?.id) {
       return {
