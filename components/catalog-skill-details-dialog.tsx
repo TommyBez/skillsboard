@@ -147,7 +147,11 @@ export function CatalogSkillDetailsDialog({
                 <CopyButton
                   analytics={{
                     event: "catalog_install_copied",
-                    properties: { slug: item.slug, source: item.source },
+                    properties: {
+                      slug: item.slug,
+                      source: item.source,
+                      surface: "details",
+                    },
                   }}
                   value={command}
                   ariaLabel={`Copy install command for ${name}`}
