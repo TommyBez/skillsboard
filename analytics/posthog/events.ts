@@ -23,7 +23,7 @@ type NonTeamEventPropertiesMap = {
      * were recorded; a query that spans the change reads the suffix, or
      * filters on `$pathname`, which is present on both sides of it.
      */
-    location: "header" | "hero" | "inline" | "closing"
+    location: "header" | "hero" | "inline" | "closing" | "skill_list"
   }
   /**
    * `/settings/mcp` stays in the destination union: the setup page now lives at

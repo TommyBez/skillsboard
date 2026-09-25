@@ -186,9 +186,99 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
           />
         </section>
 
+        <section aria-labelledby="skill-list-heading" className="pt-16">
+          <SectionHeading
+            eyebrow="04 / Skills to install"
+            id="skill-list"
+            title={entry.skillList.title}
+            intro={entry.skillList.intro}
+          />
+          {entry.skillList.entries.map((group) => (
+            <div key={group.title} className="mt-10">
+              <h3 className="text-xl font-semibold">{group.title}</h3>
+              <div className="mt-4 grid grid-cols-1 gap-4">
+                {group.entries.map((skill) => (
+                  <article
+                    key={skill.title}
+                    className="rounded-[3px] border border-border bg-card p-5"
+                  >
+                    <h4 className="text-base font-semibold leading-snug">
+                      <span className="font-mono">{skill.title}</span>
+                      <span className="ml-2 text-sm font-normal text-muted-foreground">
+                        {skill.publisher}
+                      </span>
+                    </h4>
+                    <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                      {skill.body}
+                    </p>
+                    {skill.requires ? (
+                      <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                        <span className="font-semibold text-foreground">
+                          Requires:
+                        </span>{" "}
+                        {skill.requires}
+                      </p>
+                    ) : null}
+                    {skill.install ? (
+                      <p className="mt-2 text-pretty text-sm leading-relaxed text-muted-foreground">
+                        <span className="font-semibold text-foreground">
+                          Install:
+                        </span>{" "}
+                        {skill.install}
+                      </p>
+                    ) : null}
+                    <CodeBlock
+                      label={`Install ${skill.title}`}
+                      value={skill.command}
+                      copy={{
+                        buttonLabel: "Copy",
+                        ariaLabel: `Copy the install command for ${skill.title}`,
+                        copiedAriaLabel: `Install command for ${skill.title} copied`,
+                      }}
+                    />
+                    <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                      {skill.source.lead}{" "}
+                      <a
+                        href={skill.source.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-foreground underline decoration-border underline-offset-4 [overflow-wrap:anywhere] transition-colors hover:text-primary hover:decoration-primary"
+                      >
+                        {skill.source.label}
+                        <ExternalLinkIcon className="size-3 shrink-0" aria-hidden="true" />
+                      </a>
+                      {skill.source.trail}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))}
+          <h3 className="mt-12 text-xl font-semibold">
+            {entry.skillList.installNotes.title}
+          </h3>
+          <div className="mt-4 max-w-3xl space-y-4 text-[0.95rem] leading-7 text-muted-foreground">
+            {entry.skillList.installNotes.body.map((note) => (
+              <p key={note} className="text-pretty [overflow-wrap:anywhere]">
+                {note}
+              </p>
+            ))}
+          </div>
+          <p className="mt-7 max-w-3xl text-pretty text-[0.95rem] leading-7 text-muted-foreground">
+            {entry.skillList.bridge}
+          </p>
+          <div className="mt-8">
+            <ResourceCta location="skill_list" />
+          </div>
+          <SectionSources
+            sourceIds={entry.skillList.sourceIds}
+            sources={entry.sources}
+          />
+        </section>
+
         <section aria-labelledby="team-heading" className="pt-16">
           <SectionHeading
-            eyebrow="04 / Teams"
+            eyebrow="05 / Teams"
             id="team"
             title={entry.team.title}
             intro={entry.team.intro}
@@ -225,7 +315,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
 
         <section aria-labelledby="open-questions-heading" className="pt-16">
           <SectionHeading
-            eyebrow="05 / Limits"
+            eyebrow="06 / Limits"
             id="open-questions"
             title={entry.openQuestions.title}
             intro={entry.openQuestions.intro}
@@ -253,7 +343,7 @@ export function CodexSkillsPage({ entry }: { entry: CodexSkillsDefinition }) {
 
         <section aria-labelledby="faq-heading" className="pt-16">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-primary">
-            06 / Questions
+            07 / Questions
           </p>
           <h2
             id="faq-heading"
