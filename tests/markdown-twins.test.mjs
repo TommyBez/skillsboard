@@ -128,6 +128,7 @@ test("the /codex-skills twin carries the title, the sections, and the FAQ", () =
     codexSkills.locations.title,
     codexSkills.transfers.title,
     codexSkills.install.title,
+    codexSkills.skillList.title,
     codexSkills.team.title,
     codexSkills.openQuestions.title,
   ]
@@ -146,6 +147,45 @@ test("the /codex-skills twin carries the title, the sections, and the FAQ", () =
     )
     assert.ok(codexMarkdown.includes(entry.answer), "missing FAQ answer")
   }
+})
+
+test("the /codex-skills twin lists every skill with its command and its source", () => {
+  assert.ok(codexMarkdown.includes("\n## Codex skills to install, grouped by job\n"))
+  assert.ok(
+    codexMarkdown.includes("```text\n$skill-installer gh-fix-ci\n```"),
+    "missing the gh-fix-ci install command as a code block",
+  )
+
+  const skills = codexSkills.skillList.entries.flatMap((group) => {
+    assert.ok(
+      codexMarkdown.includes(`\n### ${group.title}\n`),
+      `missing group heading: ${group.title}`,
+    )
+    return group.entries
+  })
+  assert.equal(skills.length, 12)
+
+  for (const skill of skills) {
+    assert.ok(
+      codexMarkdown.includes(`\n#### ${skill.title}\n`),
+      `missing skill heading: ${skill.title}`,
+    )
+    assert.ok(
+      codexMarkdown.includes(
+        `\n\`\`\`${skill.commandLanguage ?? "bash"}\n${skill.command}\n\`\`\`\n`,
+      ),
+      `missing install command: ${skill.command}`,
+    )
+    assert.ok(
+      codexMarkdown.includes(`[${skill.source.label}](${skill.source.href})`),
+      `missing source link: ${skill.source.href}`,
+    )
+  }
+
+  assert.ok(
+    codexMarkdown.includes(`\n### ${codexSkills.skillList.installNotes.title}\n`),
+  )
+  assert.ok(codexMarkdown.includes(codexSkills.skillList.bridge))
 })
 
 test("the /codex-skills twin renders tables as Markdown, not as markup", () => {
