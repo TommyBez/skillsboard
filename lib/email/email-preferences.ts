@@ -57,6 +57,7 @@ export class EmailPreferenceBlockedError extends Error {
 }
 
 export interface ProductCommunicationsPreferenceView {
+  accountCreatedAt: Date | null
   activeSuppressionReasons: string[]
   consentedAt: Date | null
   effectiveSubscribed: boolean
@@ -72,6 +73,7 @@ export interface ProductCommunicationsPreferenceView {
 async function getUserIdentity(userId: string) {
   const [identity] = await db
     .select({
+      createdAt: user.createdAt,
       email: user.email,
       emailVerified: user.emailVerified,
       id: user.id,
@@ -137,6 +139,7 @@ export async function getProductCommunicationsPreference(
   )
 
   return {
+    accountCreatedAt: identity.createdAt ?? null,
     activeSuppressionReasons,
     consentedAt: preference?.consentedAt ?? null,
     effectiveSubscribed,
