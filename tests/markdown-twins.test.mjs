@@ -8,41 +8,27 @@ import "./helpers/register-app-aliases.mjs"
 const { markdownTwinAlternates, markdownTwinPath, markdownTwinPaths, renderMarkdownTwin } =
   await import("../lib/markdown/twins.ts")
 const { codexSkills } = await import("../lib/seo/codex-skills/index.ts")
-const { home } = await import("../lib/seo/home.ts")
-const { alternatives } = await import("../lib/seo/alternatives.ts")
-const { comparisons } = await import("../lib/seo/compare/index.ts")
-const { developers } = await import("../lib/seo/developers.ts")
-const { alternativesHub, compareHub, resourcesHub } = await import("../lib/seo/hubs.ts")
-const { pricing } = await import("../lib/seo/pricing.ts")
-const { resourceEntries } = await import("../lib/seo/resources.ts")
+const { markdownPagePaths, publicPages, surfacesFor } = await import(
+  "../lib/site/pages.ts"
+)
 const { estimateMarkdownTokens } = await import("../lib/markdown/tokens.ts")
 const { siteConfig } = await import("../lib/site.ts")
 const { default: nextConfig } = await import("../next.config.ts")
 
 const codexMarkdown = renderMarkdownTwin("/codex-skills")
 
-test("every registered resource, alternative, and comparison has a Markdown twin", () => {
-  // The home page, the developer docs, and the pricing page are in no
-  // registry: the first and the last are built from section components, with
-  // `lib/seo/home` and `lib/seo/pricing` as the content definitions written for
-  // them, and the developer docs describe an interface rather than being a
-  // resource article, so they carry their own definition too. Each hub sits
-  // immediately above the collection it lists.
-  const registered = [
-    home,
-    resourcesHub,
-    ...resourceEntries,
-    alternativesHub,
-    ...alternatives,
-    compareHub,
-    ...comparisons,
-    developers,
-    pricing,
-  ].map((entry) => entry.path)
+test("every page that declares a Markdown surface has a twin", () => {
+  // Derived from the page registry rather than restated here. The list this
+  // test used to build was a third copy of `twinEntries`, so a page dropped
+  // from both the registry and the copy passed.
+  const declared = publicPages
+    .filter((page) => surfacesFor(page).markdown)
+    .map((page) => page.path)
 
-  assert.deepEqual([...markdownTwinPaths], registered)
+  assert.deepEqual([...markdownTwinPaths], declared)
+  assert.deepEqual([...markdownTwinPaths], [...markdownPagePaths])
 
-  for (const path of registered) {
+  for (const path of declared) {
     const markdown = renderMarkdownTwin(path)
     assert.ok(markdown, `missing Markdown twin for ${path}`)
     assert.ok(markdown.startsWith("---\n"), `${path} twin has no frontmatter`)

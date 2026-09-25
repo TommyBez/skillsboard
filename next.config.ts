@@ -1,5 +1,11 @@
 import type { NextConfig } from 'next'
 
+// The page index itself rather than a copy of it. Module resolution in a
+// TypeScript config is limited to CommonJS and the file is not parsed by
+// Webpack or Babel, so the specifier is relative and the module it names has
+// no imports of its own. The note in `lib/site/page-index.ts` has the detail.
+import { markdownTwinPaths, publicPagePaths } from './lib/site/page-index'
+
 /**
  * A literal that matches in any case.
  *
@@ -38,63 +44,39 @@ const MARKDOWN_ACCEPT = {
 /**
  * The URLs that answer in two representations.
  *
- * One list, so the rewrite that serves Markdown when the request asks for it
- * is declared in a single place rather than once per URL.
+ * One rule per page with a Markdown surface, read from the page index. It
+ * used to be a hand written list of router patterns, `/:slug([^/]*-skills)`
+ * among them, with a commented exception for each of the four articles whose
+ * slug does not end in `-skills`. A pattern cannot say which URLs exist, so
+ * every page outside the shapes it happened to cover was a page that answered
+ * only in HTML, and the exceptions had to be noticed by a reviewer.
  *
- * `source` is matched by the router, so it carries the slug patterns; the
- * scope is deliberately narrow rather than site wide: `/<something>-skills`, a
- * top-level article that does not end in `-skills`, one of the three hubs, a
- * guide, an alternative, or a comparison. A request for a page outside those
- * shapes keeps returning HTML rather than a 404.
+ * Exact sources also mean the rewrite reaches nothing but a page that has a
+ * twin: a request for any other URL keeps returning HTML rather than a 404.
  */
-const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] = [
-  // The home page. It is the URL an agent scanning the site reaches first, so
-  // it is the one that most needs to answer in Markdown.
-  { source: "/", markdown: "/api/markdown?path=/" },
-  { source: "/:slug([^/]*-skills)", markdown: "/api/markdown?path=/:slug" },
-  {
-    source: "/agent-skills-support",
-    markdown: "/api/markdown?path=/agent-skills-support",
-  },
-  // `/agent-skills-by-the-numbers` does not end in `-skills` either, so the
-  // shared rule above never reaches it.
-  {
-    source: "/agent-skills-by-the-numbers",
-    markdown: "/api/markdown?path=/agent-skills-by-the-numbers",
-  },
-  { source: "/developers", markdown: "/api/markdown?path=/developers" },
-  {
-    source: "/agents-md-vs-skill-md",
-    markdown: "/api/markdown?path=/agents-md-vs-skill-md",
-  },
-  // `/skill-examples` does not end in `-skills`, so the shared rule above does
-  // not reach it and it needs a rule of its own.
-  { source: "/skill-examples", markdown: "/api/markdown?path=/skill-examples" },
-  // `/claude-code-for-teams` does not end in `-skills` either.
-  {
-    source: "/claude-code-for-teams",
-    markdown: "/api/markdown?path=/claude-code-for-teams",
-  },
-  // The pricing page reaches the twin generator like every other negotiated
-  // page. It used to be sent to a hand written document in `public`, which a
-  // static file server answers without the token estimate, the canonical and
-  // alternate links, `X-Content-Type-Options`, or `Vary: Accept`: a Markdown
-  // body cached under the page URL with no `Vary` is a body a shared cache can
-  // hand to a browser. `lib/seo/pricing` is the content definition that
-  // replaced the document.
-  { source: "/pricing", markdown: "/api/markdown?path=/pricing" },
-  // The three hubs. Each one is a page in its own right, so the rules below
-  // it, which all carry a slug, never match it.
-  { source: "/resources", markdown: "/api/markdown?path=/resources" },
-  { source: "/alternatives", markdown: "/api/markdown?path=/alternatives" },
-  { source: "/compare", markdown: "/api/markdown?path=/compare" },
-  { source: "/guides/:slug", markdown: "/api/markdown?path=/guides/:slug" },
-  {
-    source: "/alternatives/:slug",
-    markdown: "/api/markdown?path=/alternatives/:slug",
-  },
-  { source: "/compare/:slug", markdown: "/api/markdown?path=/compare/:slug" },
-]
+const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] =
+  markdownTwinPaths().map((path) => ({
+    source: path,
+    markdown: `/api/markdown?path=${path}`,
+  }))
+
+/**
+ * One canonical spelling per public page.
+ *
+ * `skipTrailingSlashRedirect` is on, because PostHog's capture endpoints use
+ * trailing slashes and Next.js would rewrite them, so the canonical form of a
+ * page URL is declared here instead. Derived from the page index rather than
+ * written out: the hand written list covered twenty nine of the forty eight
+ * public pages, and the
+ * ones it missed either served the page twice under two URLs or answered 404.
+ */
+const TRAILING_SLASH_REDIRECTS = publicPagePaths()
+  .filter((path) => path !== "/")
+  .map((path) => ({
+    source: `${path}/`,
+    destination: path,
+    permanent: true,
+  }))
 
 const nextConfig = {
   cacheComponents: true,
@@ -141,11 +123,6 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: "/resources/",
-        destination: "/resources",
-        permanent: true,
-      },
       // The developer docs live at /developers. The other two spellings are
       // what a person types and what an agent probes when it is looking for an
       // API description, and both used to 404.
@@ -161,11 +138,6 @@ const nextConfig = {
       },
       {
         source: "/api",
-        destination: "/developers",
-        permanent: true,
-      },
-      {
-        source: "/developers/",
         destination: "/developers",
         permanent: true,
       },
@@ -192,16 +164,6 @@ const nextConfig = {
         destination: "/connect",
         permanent: true,
       },
-      {
-        source: "/about/",
-        destination: "/about",
-        permanent: true,
-      },
-      {
-        source: "/guides/:slug/",
-        destination: "/guides/:slug",
-        permanent: true,
-      },
       // There is no guides index: the guides live under `/guides/<slug>` and
       // the hub that lists them is `/resources`. Both spellings of the bare
       // segment used to 404, wasting crawl budget on a path that external
@@ -216,131 +178,7 @@ const nextConfig = {
         destination: "/resources",
         permanent: true,
       },
-      {
-        source: "/agent-skills/",
-        destination: "/agent-skills",
-        permanent: true,
-      },
-      {
-        source: "/agents-md-vs-skill-md/",
-        destination: "/agents-md-vs-skill-md",
-        permanent: true,
-      },
-      {
-        source: "/anthropic-skills/",
-        destination: "/anthropic-skills",
-        permanent: true,
-      },
-      {
-        source: "/best-claude-skills/",
-        destination: "/best-claude-skills",
-        permanent: true,
-      },
-      {
-        source: "/agent-skills-support/",
-        destination: "/agent-skills-support",
-        permanent: true,
-      },
-      {
-        source: "/agent-skills-by-the-numbers/",
-        destination: "/agent-skills-by-the-numbers",
-        permanent: true,
-      },
-      {
-        source: "/claude-skills/",
-        destination: "/claude-skills",
-        permanent: true,
-      },
-      {
-        source: "/codex-skills/",
-        destination: "/codex-skills",
-        permanent: true,
-      },
-      {
-        source: "/cowork-skills/",
-        destination: "/cowork-skills",
-        permanent: true,
-      },
-      {
-        source: "/claude-code-for-teams/",
-        destination: "/claude-code-for-teams",
-        permanent: true,
-      },
-      {
-        source: "/copilot-skills/",
-        destination: "/copilot-skills",
-        permanent: true,
-      },
-      {
-        source: "/cursor-skills/",
-        destination: "/cursor-skills",
-        permanent: true,
-      },
-      {
-        source: "/manage-ai-skills/",
-        destination: "/manage-ai-skills",
-        permanent: true,
-      },
-      {
-        source: "/opencode-skills/",
-        destination: "/opencode-skills",
-        permanent: true,
-      },
-      {
-        source: "/vercel-skills/",
-        destination: "/vercel-skills",
-        permanent: true,
-      },
-      {
-        source: "/skill-creator/",
-        destination: "/skill-creator",
-        permanent: true,
-      },
-      {
-        source: "/skill-examples/",
-        destination: "/skill-examples",
-        permanent: true,
-      },
-      {
-        source: "/where-to-find-claude-skills/",
-        destination: "/where-to-find-claude-skills",
-        permanent: true,
-      },
-      {
-        source: "/compare/",
-        destination: "/compare",
-        permanent: true,
-      },
-      {
-        source: "/compare/:slug/",
-        destination: "/compare/:slug",
-        permanent: true,
-      },
-      {
-        source: "/pricing/",
-        destination: "/pricing",
-        permanent: true,
-      },
-      {
-        source: "/sign-up/",
-        destination: "/sign-up",
-        permanent: true,
-      },
-      {
-        source: "/privacy/",
-        destination: "/privacy",
-        permanent: true,
-      },
-      {
-        source: "/terms/",
-        destination: "/terms",
-        permanent: true,
-      },
-      {
-        source: "/contact/",
-        destination: "/contact",
-        permanent: true,
-      },
+      ...TRAILING_SLASH_REDIRECTS,
     ]
   },
   async rewrites() {
@@ -406,5 +244,5 @@ const nextConfig = {
   },
 } satisfies NextConfig
 
-export { MARKDOWN_ACCEPT, NEGOTIATED_PAGES }
+export { MARKDOWN_ACCEPT, NEGOTIATED_PAGES, TRAILING_SLASH_REDIRECTS }
 export default nextConfig

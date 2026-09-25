@@ -1,141 +1,24 @@
 import type { MetadataRoute } from "next"
 
-import {
-  alternatives,
-  alternativesIndexModifiedAt,
-  alternativesIndexPath,
-} from "@/lib/seo/alternatives"
-import {
-  compareIndexModifiedAt,
-  compareIndexPath,
-  comparisons,
-} from "@/lib/seo/compare"
-import { developers } from "@/lib/seo/developers"
-import { resourceEntries, resourcePaths } from "@/lib/seo/resources"
-import { skillCheck } from "@/lib/seo/skill-check"
-import { skillCreator } from "@/lib/seo/skill-creator"
 import { siteConfig } from "@/lib/site"
+import { sitemapPages } from "@/lib/site/pages"
 
+/**
+ * The sitemap, derived from the page registry.
+ *
+ * There is nothing to add here when a page is added: `lib/site/pages` decides
+ * which pages are listed, with what priority, and how often they change, and
+ * the dates come from the same content definition the page and its Markdown
+ * twin read. This file used to carry nine entries written by hand, four of
+ * them with the last modified date spelled as a literal that drifted from the
+ * date the page itself published.
+ */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const resourceIndexLastModified = resourceEntries.reduce(
-    (latest, entry) =>
-      entry.modifiedAt > latest ? entry.modifiedAt : latest,
-    "1970-01-01",
-  )
-  const resourceSitemapEntries: MetadataRoute.Sitemap = resourceEntries.map(
-    (entry) => ({
-      url: `${siteConfig.url}${entry.path}`,
-      lastModified: new Date(entry.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    }),
-  )
-
-  const comparisonSitemapEntries: MetadataRoute.Sitemap = comparisons.map(
-    (entry) => ({
-      url: `${siteConfig.url}${entry.path}`,
-      lastModified: new Date(entry.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    }),
-  )
-
-  const alternativeSitemapEntries: MetadataRoute.Sitemap = alternatives.map(
-    (entry) => ({
-      url: `${siteConfig.url}${entry.path}`,
-      lastModified: new Date(entry.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    }),
-  )
-
-  return [
-    {
-      url: siteConfig.url,
-      lastModified: new Date("2026-08-12"),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${siteConfig.url}/sign-up`,
-      lastModified: new Date("2026-08-06"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteConfig.url}/pricing`,
-      lastModified: new Date("2026-08-07"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteConfig.url}/privacy`,
-      lastModified: new Date("2026-07-29"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${siteConfig.url}/terms`,
-      lastModified: new Date("2026-07-29"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${siteConfig.url}/contact`,
-      lastModified: new Date("2026-08-06"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${siteConfig.url}${developers.path}`,
-      lastModified: new Date(developers.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteConfig.url}${resourcePaths.about}`,
-      lastModified: new Date("2026-08-06"),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      /**
-       * Listed on its own rather than through the resource registry: the page
-       * is a browser tool, not an article, so it is not one of the entries
-       * that feed the /resources hub and the Markdown twins.
-       */
-      url: `${siteConfig.url}${skillCreator.path}`,
-      lastModified: new Date(skillCreator.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      /** Listed on its own for the same reason /skill-creator is: a tool, not an article. */
-      url: `${siteConfig.url}${skillCheck.path}`,
-      lastModified: new Date(skillCheck.modifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteConfig.url}${resourcePaths.index}`,
-      lastModified: new Date(resourceIndexLastModified),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    ...resourceSitemapEntries,
-    {
-      url: `${siteConfig.url}${alternativesIndexPath}`,
-      lastModified: new Date(alternativesIndexModifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    ...alternativeSitemapEntries,
-    {
-      url: `${siteConfig.url}${compareIndexPath}`,
-      lastModified: new Date(compareIndexModifiedAt),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    ...comparisonSitemapEntries,
-  ]
+  return sitemapPages.map(({ page, sitemap }) => ({
+    // The home page is `siteConfig.url`, not `siteConfig.url` plus a slash.
+    url: page.path === "/" ? siteConfig.url : `${siteConfig.url}${page.path}`,
+    lastModified: new Date(page.modifiedAt),
+    changeFrequency: sitemap.changeFrequency,
+    priority: sitemap.priority,
+  }))
 }
