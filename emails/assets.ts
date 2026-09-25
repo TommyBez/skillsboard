@@ -23,6 +23,9 @@ export function getBrandLogoMark() {
 }
 
 function isReactEmailPreview(): boolean {
+  // Publishing a React Email tree to Resend must use hosted absolute URLs even
+  // though the script is not running under Next or Vercel.
+  if (process.env.EMAIL_FORCE_ABSOLUTE_ASSETS === "1") return false
   // Next.js send paths set NEXT_RUNTIME; Vercel sets VERCEL. React Email's
   // preview server sets neither, so relative /static/ URLs work locally.
   return process.env.NEXT_RUNTIME === undefined && process.env.VERCEL === undefined

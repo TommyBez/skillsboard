@@ -259,6 +259,39 @@ export const invitation = pgTable("invitation", {
   }).onDelete("cascade"),
 ])
 
+/**
+ * One row per backfill activation email. Ongoing welcome and first-skill
+ * messages are sent by the Resend Account setup automation, not from here.
+ * The composite primary key makes a second manual send of the same message
+ * impossible. Defined here rather than beside the other email tables because
+ * it references `organization`.
+ */
+export const emailAutomationSend = pgTable("emailAutomationSend", {
+  userId: text("userId").notNull(),
+  automationKey: text("automationKey").notNull(),
+  /**
+   * Nullable, and cleared rather than cascaded when the team is deleted, so a
+   * later backfill can still see that this person already received the message.
+   */
+  organizationId: text("organizationId"),
+  emailHash: text("emailHash").notNull(),
+  providerEmailId: text("providerEmailId"),
+  sentAt: timestamp("sentAt", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({ name: "emailAutomationSend_pkey", columns: [table.userId, table.automationKey] }),
+  index("emailAutomationSend_org_sent_idx").on(table.organizationId, table.sentAt),
+  foreignKey({
+    columns: [table.userId],
+    foreignColumns: [user.id],
+    name: "emailAutomationSend_userId_fkey",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.organizationId],
+    foreignColumns: [organization.id],
+    name: "emailAutomationSend_organizationId_fkey",
+  }).onDelete("set null"),
+])
+
 export const jwks = pgTable("jwks", {
   id: text("id").primaryKey(),
   publicKey: text("publicKey").notNull(),

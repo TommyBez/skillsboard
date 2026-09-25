@@ -7,6 +7,7 @@ import {
   GitHubSkillDiscoveryError,
   resolveGitHubSkills,
 } from "@/lib/github-skill-discovery"
+import { notifyActivationSkillSaved } from "@/lib/email/resend-activation"
 import { isFirstTeamSkillSave } from "@/lib/library-view-state"
 import { captureTeamEvent } from "@/lib/posthog-server"
 
@@ -107,6 +108,10 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
       savedCount: savedSkills.length,
       teamSkillCount,
     })
+
+    if (savedSkills.length > 0) {
+      await notifyActivationSkillSaved(input.organizationId)
+    }
 
     return { ok: true, saved: savedSkills, alreadySaved, isFirstTeamSkill }
   } catch (error) {
