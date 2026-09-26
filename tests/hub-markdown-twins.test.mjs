@@ -105,7 +105,10 @@ test("a hub twin says what each page it lists is about", () => {
     const markdown = renderMarkdownTwin(hub.path) ?? ""
 
     for (const child of children) {
-      const note = child.cardSummary ?? child.description
+      // An alternatives card leads with its "<X> alternative" hub label, the
+      // same text the HTML card shows above the title.
+      const summary = child.cardSummary ?? child.description
+      const note = child.hubLabel ? `${child.hubLabel}. ${summary}` : summary
       assert.ok(
         markdown.includes(`](${siteConfig.url}${child.path}): ${note}`),
         `the ${hub.path} twin lists ${child.path} with no summary beside it`,
