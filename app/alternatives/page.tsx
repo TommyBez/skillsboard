@@ -70,7 +70,7 @@ export default function AlternativesPage() {
               >
                 <div className="flex items-start justify-between gap-4">
                   <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-primary">
-                    {entry.subject}
+                    {entry.hubLabel}
                   </p>
                   <ArrowUpRightIcon
                     className="size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"

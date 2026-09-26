@@ -35,6 +35,7 @@ const skippedKeys = new Set([
   "emailCaptureSource",
   "subject",
   "subjectHref",
+  "hubLabel",
   "relatedGuidePaths",
   "citations",
   "id",
