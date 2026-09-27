@@ -1,6 +1,6 @@
 # Skills Board
 
-Skills Board is a shared library of AI skills for teams. A team keeps the Agent Skills it recommends in one searchable place, and every member installs them the way they prefer: from the GitHub source, with an install command, as a ZIP, or through an authenticated MCP endpoint. Skills Board is free and open source under the MIT license.
+Skills Board is a shared library of AI skills for teams. A team keeps the Agent Skills it recommends in one searchable place, and every member uses them the way they prefer: from the GitHub source, with an install command, as a ZIP, or by asking an agent through an authenticated MCP endpoint that returns the install command. Skills Board does not install skills into an agent: the last step is always a command you run or a file you download. Skills Board is free and open source under the MIT license.
 
 This plugin connects Claude to your team's library. It adds the Skills Board MCP server and one skill, `team-skill-library`, that tells Claude when and how to use it.
 
@@ -25,7 +25,7 @@ The server URL is `https://www.skillsboard.sh/api/mcp`. Developer documentation:
 
 ## Data and privacy
 
-The plugin contains no code that runs on your machine. It only points Claude at the Skills Board MCP server, and that server receives only what Claude sends in a tool call: search queries, skill and collection names, and the GitHub repository URLs you ask it to inspect or save. It reads and writes only the team libraries your Skills Board account belongs to. To look up public skills and repositories, the server calls GitHub and skills.sh on your behalf.
+The plugin contains no code that runs on your machine. It only points Claude at the Skills Board MCP server, and that server receives what Claude sends in a tool call. Read tools receive search queries, discovery filters, GitHub repository URLs to inspect, and skill or collection IDs. Write tools also receive what you ask Claude to save: the GitHub URL and folder path of a skill, team tags, a note and example prompts for teammates, a collection title and description, skill and collection IDs, and the ID of the team library to write to. It reads and writes only the team libraries your Skills Board account belongs to. To look up public skills and repositories, the server calls GitHub and skills.sh on your behalf.
 
 Skills Board records which tool was called and whether it succeeded, tied to your account, to measure product use. It does not read your conversations, your files, or your chat history. The full policy, including retention and your rights, is at https://www.skillsboard.sh/privacy.
 
