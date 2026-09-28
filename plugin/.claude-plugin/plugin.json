@@ -10,6 +10,10 @@
   },
   "homepage": "https://www.skillsboard.sh",
   "repository": "https://github.com/TommyBez/skillsboard",
+  "documentationUrl": "https://www.skillsboard.sh/developers",
+  "supportUrl": "https://github.com/TommyBez/skillsboard/issues",
+  "privacyPolicyUrl": "https://www.skillsboard.sh/privacy",
+  "termsOfServiceUrl": "https://www.skillsboard.sh/terms",
   "license": "MIT",
   "keywords": [
     "agent-skills",
