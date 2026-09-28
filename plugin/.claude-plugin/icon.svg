@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="skills-board-logo-title">
+  <title id="skills-board-logo-title">Skills Board</title>
+  <rect width="1024" height="1024" rx="272" ry="272" fill="#00843d"/>
+  <path d="M252 252h520v140H412v80h280l80 80v220H252v-140h360v-80H332l-80-80V252Z" fill="#f7f8f4"/>
+</svg>
