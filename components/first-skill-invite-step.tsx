@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { UserPlusIcon } from "lucide-react"
 
 import { InviteMemberForm } from "@/components/invite-member-form"
@@ -44,15 +44,33 @@ export function FirstSkillInviteStep({ onOpenChange, open, teamId }: FirstSkillI
     captureAnalyticsEvent("team_invite_prompt_viewed", {
       // Reaching this step means the actor just saved the team's first skill.
       actor_is_skill_creator: true,
+      // This step has no folded form, so the view is always the full ask.
+      state: "expanded",
       surface: "first_skill_invite_step",
       trigger: "first_skill_saved",
     })
   }, [open, teamId])
 
+  /* Sending an invitation does not close this step: the form keeps the invite
+     link on screen to copy, so the user closes the dialog afterwards through
+     the same path as "Not now". Without this flag every successful invite
+     would also be recorded as a refusal. It is set on submit rather than on
+     success because the outcome lives inside the form; a submit that fails
+     server side is therefore not counted either way, and that attempt is
+     already recorded by `team_invite_prompt_clicked`. */
+  const invitationAttempted = useRef(false)
+
   function handleOpenChange(nextOpen: boolean) {
     if (!nextOpen) {
       // "Not now" is not "never": the library banner stays, folded.
       writeInvitePromptState(teamId, resolveInvitePromptStateAfterStep(readInvitePromptState(teamId)))
+      if (!invitationAttempted.current) {
+        captureAnalyticsEvent("team_invite_prompt_answered", {
+          actor_is_skill_creator: true,
+          answer: "not_now",
+          surface: "first_skill_invite_step",
+        })
+      }
     }
     onOpenChange(nextOpen)
   }
@@ -88,6 +106,7 @@ export function FirstSkillInviteStep({ onOpenChange, open, teamId }: FirstSkillI
             },
           }}
           onSubmitIntent={() => {
+            invitationAttempted.current = true
             captureAnalyticsEvent("team_invite_prompt_clicked", {
               actor_is_skill_creator: true,
               surface: "first_skill_invite_step",

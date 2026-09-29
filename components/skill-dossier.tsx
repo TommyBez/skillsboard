@@ -48,6 +48,10 @@ interface SkillDossierProps {
   className?: string
   headingLevel?: "h2" | "h3"
   tracking?: SkillUsageTracking
+  /* The copy on the card is the same control wherever the card is used, but
+     only the team surfaces carry `tracking`. The catalog has no skill id to
+     report and names its own event, so it hands the copy event in directly. */
+  commandAnalytics?: ClientAnalyticsEvent
 }
 
 function getSkillUsageAnalytics(
@@ -86,6 +90,7 @@ export function SkillDossier({
   className,
   headingLevel = "h3",
   tracking,
+  commandAnalytics,
 }: SkillDossierProps) {
   const Heading = headingLevel
   const addedByInitials = addedBy
@@ -96,7 +101,7 @@ export function SkillDossier({
         .slice(0, 2)
         .toUpperCase()
     : null
-  const commandAnalytics = getSkillUsageAnalytics(tracking, "command")
+  const copyAnalytics = getSkillUsageAnalytics(tracking, "command") ?? commandAnalytics
   const sourceAnalytics = getSkillUsageAnalytics(tracking, "source")
 
   return (
@@ -181,7 +186,7 @@ export function SkillDossier({
               value={command}
               ariaLabel={`Copy install command for ${name}`}
               copiedAriaLabel={`Copied install command for ${name}`}
-              analytics={commandAnalytics}
+              analytics={copyAnalytics}
               compact
               iconOnly
             />

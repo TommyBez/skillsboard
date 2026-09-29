@@ -166,7 +166,9 @@ export const alternativesHub = {
     "Each page says plainly when the other option is the better fit, and links every claim about it to a public page you can check yourself.",
   ],
   alternativesTitle: "Alternatives",
-  alternatives: alternatives.map((entry) => hubLink(entry, entry.cardSummary)),
+  alternatives: alternatives.map((entry) =>
+    hubLink(entry, `${entry.hubLabel}. ${entry.cardSummary}`),
+  ),
   relatedTitle: "Related resources",
   related: [
     {

@@ -70,6 +70,11 @@ export interface AlternativeDefinition {
   emailCaptureSource: AlternativeEmailCaptureSource
   /** What the reader is comparing against, used in cards and breadcrumbs. */
   subject: string
+  /**
+   * The label on this page's card in the /alternatives hub, phrased as the
+   * search people make ("<X> alternative") so the card link names it exactly.
+   */
+  hubLabel: string
   subjectHref: string
   eyebrow: string
   title: string
@@ -105,6 +110,7 @@ const githubRepo: AlternativeDefinition = {
   path: alternativePaths.githubRepo,
   emailCaptureSource: "alternatives_github_repo",
   subject: "A shared GitHub repository",
+  hubLabel: "Shared GitHub repo alternative",
   subjectHref: "https://github.com",
   eyebrow: "Alternative to the shared repo",
   title: "The shared GitHub repo, and the alternative to it",
@@ -318,13 +324,14 @@ const skillsSh: AlternativeDefinition = {
   path: alternativePaths.skillsSh,
   emailCaptureSource: "alternatives_skills_sh",
   subject: "skills.sh",
+  hubLabel: "skills.sh alternative",
   subjectHref: "https://www.skills.sh",
   eyebrow: "Skills Board vs skills.sh",
   title: "Skills Board vs skills.sh",
-  seoTitle: "skills.sh Alternative for Team Skill Libraries | Skills Board",
+  seoTitle: "skills.sh Alternatives for Team Skill Libraries | Skills Board",
   socialTitle: "Skills Board vs skills.sh",
   description:
-    "skills.sh is a public directory of agent skills with a leaderboard, packs, and a CLI. Compare it with Skills Board, the organization-scoped library for the smaller set your own team settled on.",
+    "A skills.sh alternative for teams: skills.sh is a public directory of agent skills with a leaderboard, packs, and a CLI. Skills Board is your team's own library.",
   cardSummary:
     "A public directory with a leaderboard and packs, next to a private team library. Where each one belongs.",
   ogAlt: "Comparison of skills.sh and Skills Board for team AI skills.",
@@ -340,9 +347,9 @@ const skillsSh: AlternativeDefinition = {
     chips: ["Directory", "Team library", "MCP"],
   },
   publishedAt: "2026-08-09",
-  modifiedAt: "2026-08-09",
+  modifiedAt: "2026-09-26",
   summary: [
-    "skills.sh is a public directory. It ranks skills by install count, installs any of them with npx skills add, and offers packs that bundle public skills, private files, and repository skills behind a single install command.",
+    "Looking for a skills.sh alternative for your team? skills.sh is a public directory. It ranks skills by install count, installs any of them with npx skills add, and offers packs that bundle public skills, private files, and repository skills behind a single install command.",
     "Skills Board is the organization-scoped list of skills your own team settled on, with search, team tags, the original source for every entry, and an authenticated MCP endpoint a compatible agent can query.",
     "These are different jobs, and they compose. Skills Board reads the public skills.sh catalog in Discover, so you can browse there and save what your team keeps here.",
   ],
@@ -551,6 +558,7 @@ const smithery: AlternativeDefinition = {
   path: alternativePaths.smithery,
   emailCaptureSource: "alternatives_smithery",
   subject: "Smithery",
+  hubLabel: "Smithery alternative",
   subjectHref: "https://smithery.ai",
   eyebrow: "Skills Board vs Smithery",
   title: "Skills Board vs Smithery",
@@ -756,6 +764,7 @@ const superpowers: AlternativeDefinition = {
   path: alternativePaths.superpowers,
   emailCaptureSource: "alternatives_superpowers",
   subject: "Superpowers",
+  hubLabel: "Superpowers alternative",
   subjectHref: "https://github.com/obra/superpowers",
   eyebrow: "Skills Board vs Superpowers",
   title: "Skills Board vs Superpowers",

@@ -11,8 +11,17 @@ import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
  * Where in a page a call to action sits. Every marketing surface uses the same
  * four slots, and which page it was is read from `$pathname` on the event
  * rather than spelled a second time in this union.
+ *
+ * `skill_list` is the one slot tied to a kind of content rather than a place:
+ * the call to action under a list of skills to install, so its clicks can be
+ * read apart from the generic `inline` one further down the same page.
  */
-export type CtaLocation = "header" | "hero" | "inline" | "closing"
+export type CtaLocation =
+  | "header"
+  | "hero"
+  | "inline"
+  | "closing"
+  | "skill_list"
 
 /**
  * The landing page's one action, stated once.

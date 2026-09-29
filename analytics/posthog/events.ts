@@ -23,7 +23,7 @@ type NonTeamEventPropertiesMap = {
      * were recorded; a query that spans the change reads the suffix, or
      * filters on `$pathname`, which is present on both sides of it.
      */
-    location: "header" | "hero" | "inline" | "closing"
+    location: "header" | "hero" | "inline" | "closing" | "skill_list"
   }
   /**
    * `/settings/mcp` stays in the destination union: the setup page now lives at
@@ -185,6 +185,34 @@ type TeamEventPropertiesMap = {
     tag_count: number
   }
   /**
+   * The install command was copied from the catalog on `/discover`.
+   * `$pageview` on `/discover` owns the denominator, and `skill_saved` is the
+   * sibling outcome: a catalog session that ends here carried the command
+   * away, a session that ends in a save left the skill in the team library.
+   * `slug` and `source` are the public catalog identifiers of the skill, for
+   * example `anthropics/skills`, and say nothing about who copied it.
+   * `surface` separates the copy on the result card from the copy inside the
+   * details dialog, so the cost of opening the dialog before copying is
+   * readable rather than folded into one number.
+   */
+  catalog_install_copied: {
+    slug: string
+    source: string
+    surface: "card" | "details"
+  }
+  /**
+   * The same dialog, left for the skills.sh page of the skill. Autocapture
+   * records the click as an element chain and nothing else, so the exit is
+   * only readable as an outcome once it is named here. `destination` is a
+   * union of one on purpose: a second target outside the product gets a value,
+   * not a second event.
+   */
+  catalog_external_opened: {
+    destination: "skills_sh"
+    slug: string
+    source: string
+  }
+  /**
    * `surface` is threaded from the form that sent the invitation, through the
    * server action, so an invitation sent from the first run can be counted on
    * its own. Same values as `team_invite_link_copied`, so the emailed
@@ -230,8 +258,27 @@ type TeamEventPropertiesMap = {
   }
   team_invite_prompt_viewed: {
     actor_is_skill_creator: boolean
+    /**
+     * How the ask looked when it was seen. The library banner reports a view
+     * whether it is expanded or folded to its title, and those two are not the
+     * same sighting: a team can count five views and have read the ask once.
+     * Optional because events recorded before this property shipped have none;
+     * the first-skill step always sends `expanded`.
+     */
+    state?: "collapsed" | "expanded"
     surface: "first_skill_invite_step" | "library_after_first_skill"
     trigger: "first_skill_saved" | "library_revisit"
+  }
+  /**
+   * What the user did with the ask, as opposed to whether it was on screen.
+   * `not_now` is the first-skill dialog closed without an invitation being
+   * sent (the button, the X, Escape, the overlay). The other three are the
+   * banner state transitions the user chose.
+   */
+  team_invite_prompt_answered: {
+    actor_is_skill_creator: boolean
+    answer: "collapsed" | "dismissed" | "expanded" | "not_now"
+    surface: "first_skill_invite_step" | "library_after_first_skill"
   }
   team_invite_prompt_clicked: {
     actor_is_skill_creator: boolean

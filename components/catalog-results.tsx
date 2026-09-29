@@ -49,6 +49,10 @@ function SkillCard({
       description={item.description}
       source={item.source}
       command={command}
+      commandAnalytics={{
+        event: "catalog_install_copied",
+        properties: { slug: item.slug, source: item.source, surface: "card" },
+      }}
       metric={installCount(item.installs)}
       details={<CatalogSkillDetailsDialog item={item} isSaved={isSaved} />}
       actions={

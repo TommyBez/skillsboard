@@ -16,6 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { captureClientAnalyticsEvent } from "@/lib/analytics-client"
 import type { CatalogSkill, CatalogSkillDetail } from "@/lib/catalog"
 import { buildInstallCommand } from "@/lib/install-command"
 
@@ -144,6 +145,14 @@ export function CatalogSkillDetailsDialog({
               </div>
               <div className="shrink-0">
                 <CopyButton
+                  analytics={{
+                    event: "catalog_install_copied",
+                    properties: {
+                      slug: item.slug,
+                      source: item.source,
+                      surface: "details",
+                    },
+                  }}
                   value={command}
                   ariaLabel={`Copy install command for ${name}`}
                   copiedAriaLabel={`Copied install command for ${name}`}
@@ -160,6 +169,16 @@ export function CatalogSkillDetailsDialog({
                 href={skillsShUrl}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  captureClientAnalyticsEvent({
+                    event: "catalog_external_opened",
+                    properties: {
+                      destination: "skills_sh",
+                      slug: item.slug,
+                      source: item.source,
+                    },
+                  })
+                }
               >
                 Open on skills.sh
                 <ArrowUpRightIcon className="size-3.5" aria-hidden="true" />

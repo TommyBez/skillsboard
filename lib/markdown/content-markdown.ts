@@ -35,6 +35,7 @@ const skippedKeys = new Set([
   "emailCaptureSource",
   "subject",
   "subjectHref",
+  "hubLabel",
   "relatedGuidePaths",
   "citations",
   "id",
@@ -50,8 +51,8 @@ const skippedKeys = new Set([
   "editorialSubject",
 ])
 
-/** Verbatim blocks: templates and directory trees are read as code, not prose. */
-const codeKeys = new Set(["template", "copyTemplate", "tree"])
+/** Verbatim blocks: templates, directory trees, and install commands are read as code, not prose. */
+const codeKeys = new Set(["template", "copyTemplate", "tree", "command"])
 
 /**
  * The language a fenced block is tagged with when its owner does not name one.
@@ -67,6 +68,9 @@ const defaultCodeLanguages: Record<string, string> = {
   template: "markdown",
   copyTemplate: "markdown",
   tree: "text",
+  // Most install commands run in a terminal. One typed inside an agent, such
+  // as a Codex $skill-installer prompt, names "text" in `commandLanguage`.
+  command: "bash",
 }
 
 /** `templateLanguage` names the tag on `template`; it is metadata, not copy. */
@@ -111,6 +115,8 @@ const unlabeledKeys = new Set([
   "link",
   "template",
   "tree",
+  "command",
+  "bridge",
 ])
 
 const headingOverrides: Record<string, string> = {
@@ -413,10 +419,12 @@ function renderRecordFields(
       continue
     }
 
+    // A nested section that carries its own title is headed by that title,
+    // not by its field name as well.
     const labelled =
       !unlabeledKeys.has(key) &&
       (Array.isArray(value) || isRecord(value)) &&
-      !(isRecord(value) && isInlineLink(value))
+      !(isRecord(value) && (isInlineLink(value) || typeof value.title === "string"))
 
     if (labelled) blocks.push(heading(level, humanize(key)))
     blocks.push(
