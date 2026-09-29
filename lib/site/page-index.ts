@@ -244,7 +244,7 @@ export const pageIndex: readonly PageIndexEntry[] = [
       description:
         "Skills Board gives teams one place to save, share, and reuse AI skills across agents. Learn why it exists, how it works, and how to get involved.",
       publishedAt: "2026-07-29",
-      modifiedAt: "2026-08-06",
+      modifiedAt: "2026-08-22",
     },
     surfaces: {
       markdown: false,
@@ -299,7 +299,7 @@ export const pageIndex: readonly PageIndexEntry[] = [
       description:
         "Contact Skills Board for product, account, privacy, or security questions.",
       publishedAt: "2026-07-29",
-      modifiedAt: "2026-08-06",
+      modifiedAt: "2026-09-03",
     },
   },
 ]

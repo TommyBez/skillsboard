@@ -921,5 +921,5 @@ A Markdown section titled with the version and the date.`,
   ogAlt:
     "Explainer on OpenCode skills: the SKILL.md format, the directories OpenCode scans, and the permission model around the skill tool.",
   publishedAt: "2026-08-21",
-  modifiedAt: "2026-08-21",
+  modifiedAt: "2026-09-07",
 }

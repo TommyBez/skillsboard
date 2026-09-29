@@ -628,5 +628,5 @@ A Markdown section titled with the version and date.`,
   ogAlt:
     "Explainer on Cursor skills: the SKILL.md format, the directories Cursor scans, and what transfers between agents.",
   publishedAt: "2026-08-15",
-  modifiedAt: "2026-08-15",
+  modifiedAt: "2026-09-07",
 }

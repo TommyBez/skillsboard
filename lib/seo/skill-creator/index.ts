@@ -439,5 +439,5 @@ export const skillCreator: SkillCreatorDefinition = {
   ogAlt:
     "Skills Board free tool: generate a valid SKILL.md file from the six Agent Skills frontmatter fields.",
   publishedAt: "2026-08-25",
-  modifiedAt: "2026-08-25",
+  modifiedAt: "2026-09-08",
 }

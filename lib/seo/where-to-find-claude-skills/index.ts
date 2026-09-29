@@ -694,5 +694,5 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
   ogAlt:
     "Map of where Claude skills come from: the official plugin marketplace, the claude.com catalog, skills.sh, anthropics/skills, and community repositories.",
   publishedAt: "2026-08-17",
-  modifiedAt: "2026-08-17",
+  modifiedAt: "2026-08-22",
 }

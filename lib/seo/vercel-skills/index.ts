@@ -907,5 +907,5 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
   ogAlt:
     "Explainer on Vercel skills: the nine skills in vercel-labs/agent-skills, their licenses, and the other things that share the name.",
   publishedAt: "2026-08-21",
-  modifiedAt: "2026-08-21",
+  modifiedAt: "2026-08-22",
 }

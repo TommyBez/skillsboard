@@ -581,7 +581,7 @@ const smithery: AlternativeDefinition = {
     chips: ["Registry", "Team library", "MCP"],
   },
   publishedAt: "2026-08-09",
-  modifiedAt: "2026-08-09",
+  modifiedAt: "2026-08-22",
   summary: [
     "Smithery is a public registry. It lists MCP servers and a browsable skills catalog, and it takes over the connection plumbing so an agent can reach a service without you wiring up OAuth and credentials.",
     "Skills Board does one narrower thing: it holds the skills your own team settled on, scoped to the people you invite, with the original source visible on every entry.",

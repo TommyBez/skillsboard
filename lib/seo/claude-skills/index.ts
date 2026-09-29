@@ -682,5 +682,5 @@ A Markdown section ready to paste into the release description.`,
   ogAlt:
     "Explainer on Claude Skills: the SKILL.md format, where skills run, and how teams share them.",
   publishedAt: "2026-08-12",
-  modifiedAt: "2026-08-16",
+  modifiedAt: "2026-08-22",
 }
