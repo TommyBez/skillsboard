@@ -461,4 +461,5 @@ export const skillsVsMcp: ComparisonDefinition = {
     "Comparison of Claude skills and the Model Context Protocol: what each one is for, and how they combine.",
   publishedAt: "2026-08-16",
   modifiedAt: "2026-08-20",
+  checkedAt: "2026-08-16",
 }

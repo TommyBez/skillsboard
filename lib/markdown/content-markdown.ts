@@ -43,6 +43,7 @@ const skippedKeys = new Set([
   "ogAlt",
   "publishedAt",
   "modifiedAt",
+  "checkedAt",
   // Chrome rather than copy: an eyebrow label above a column, the button and
   // screen-reader strings for a copy control, and the noun the page prints in
   // its own sourcing note. A reader of the Markdown sees none of that UI.

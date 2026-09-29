@@ -86,6 +86,13 @@ export interface AlternativeDefinition {
   og: OgTemplateContent
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
   /** Scannable positioning, two or three sentences. */
   summary: readonly string[]
   reasons: AlternativeSection
@@ -582,6 +589,7 @@ const smithery: AlternativeDefinition = {
   },
   publishedAt: "2026-08-09",
   modifiedAt: "2026-08-22",
+  checkedAt: "2026-08-09",
   summary: [
     "Smithery is a public registry. It lists MCP servers and a browsable skills catalog, and it takes over the connection plumbing so an agent can reach a service without you wiring up OAuth and credentials.",
     "Skills Board does one narrower thing: it holds the skills your own team settled on, scoped to the people you invite, with the original source visible on every entry.",

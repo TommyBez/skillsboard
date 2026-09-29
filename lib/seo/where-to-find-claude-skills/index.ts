@@ -119,6 +119,13 @@ export interface WhereToFindClaudeSkillsDefinition {
   ogAlt: string
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
 }
 
 export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
@@ -695,4 +702,5 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     "Map of where Claude skills come from: the official plugin marketplace, the claude.com catalog, skills.sh, anthropics/skills, and community repositories.",
   publishedAt: "2026-08-17",
   modifiedAt: "2026-08-22",
+  checkedAt: "2026-08-17",
 }

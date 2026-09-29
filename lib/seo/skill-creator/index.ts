@@ -115,6 +115,13 @@ export interface SkillCreatorDefinition {
   ogAlt: string
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
 }
 
 /**
@@ -440,4 +447,5 @@ export const skillCreator: SkillCreatorDefinition = {
     "Skills Board free tool: generate a valid SKILL.md file from the six Agent Skills frontmatter fields.",
   publishedAt: "2026-08-25",
   modifiedAt: "2026-09-08",
+  checkedAt: "2026-08-25",
 }
