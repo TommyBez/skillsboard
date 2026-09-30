@@ -10,9 +10,15 @@
  * FAQs, structured data), and leave it for refactors, typo sweeps, analytics
  * tags and styling.
  *
- * Informational only: it always exits 0, and it prints a warning and stops
- * when the history is shallow or missing, since a shallow clone would make
- * every page look untouched.
+ * The markup pages keep their title, description and dates in their entry in
+ * `lib/site/page-index.ts`, so each page's own entry there is tracked too,
+ * line range by line range, and an edit to one entry flags only that page.
+ *
+ * Informational: it exits 0 whatever it lists, and it prints a warning and
+ * stops when the history is shallow or missing, since a shallow clone would
+ * make every page look untouched. It exits 1 when `git log` fails for a page
+ * in a full history, listing those pages instead of a summary that would
+ * count them as checked.
  */
 import { spawnSync } from "node:child_process"
 import { existsSync, readdirSync, statSync } from "node:fs"
@@ -24,7 +30,11 @@ import {
   commitsAfter,
   gitLogArgs,
   parseGitLog,
+  REGISTRY,
+  registryEntryLines,
+  registryLogArgs,
   sourcesFor,
+  summarize,
 } from "./lastmod-sources.mjs"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
@@ -64,27 +74,53 @@ function routeFiles(folder) {
     .map((name) => `${folder}/${name}`)
 }
 
+/** `-L` ranges refer to the committed file, so read that rather than the disk. */
+const registrySource = git(["show", `HEAD:${REGISTRY}`])
+
 let stale = 0
+const failures = []
 for (const page of publicPages) {
   const { route, content } = sourcesFor(page.path, exists)
   const specs = [...(route ? routeFiles(route) : []), ...content]
-  if (specs.length === 0) {
+  const entry =
+    registrySource.status === 0
+      ? registryEntryLines(registrySource.stdout, page.path)
+      : undefined
+  if (specs.length === 0 && !entry) {
     console.log(
       `${page.path}: no source files found, see scripts/lastmod-sources.mjs`,
     )
     continue
   }
 
-  const pathspecs = specs.map((spec) => `:(literal)${spec}`)
-  const log = git([...gitLogArgs, "--", ...pathspecs])
-  if (log.status !== 0) {
-    console.warn(
-      `check-lastmod: git log failed for ${page.path}: ${log.stderr.trim()}`,
-    )
+  const commits = []
+  let error
+  if (specs.length > 0) {
+    const pathspecs = specs.map((spec) => `:(literal)${spec}`)
+    const log = git([...gitLogArgs, "--", ...pathspecs])
+    if (log.status === 0) commits.push(...parseGitLog(log.stdout))
+    else error = log.stderr.trim() || `git log exited ${log.status}`
+  }
+  if (entry && !error) {
+    const log = git(registryLogArgs(entry))
+    if (log.status === 0) {
+      for (const commit of parseGitLog(log.stdout)) {
+        const known = commits.find((other) => other.sha === commit.sha)
+        if (known) known.files.push(REGISTRY)
+        else commits.push({ ...commit, files: [REGISTRY] })
+      }
+    } else {
+      error = log.stderr.trim() || `git log exited ${log.status}`
+    }
+  }
+  if (error) {
+    console.warn(`check-lastmod: git log failed for ${page.path}: ${error}`)
+    failures.push({ path: page.path, error })
     continue
   }
 
-  const later = commitsAfter(parseGitLog(log.stdout), page.modifiedAt)
+  commits.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0))
+  const later = commitsAfter(commits, page.modifiedAt)
   if (later.length === 0) continue
 
   stale += 1
@@ -92,14 +128,19 @@ for (const page of publicPages) {
   for (const commit of later) {
     console.log(`  ${commit.date} ${commit.sha.slice(0, 7)} ${commit.subject}`)
     for (const file of commit.files) {
-      if (specs.some((spec) => file === spec || file.startsWith(`${spec}/`))) {
+      const tracked =
+        file === REGISTRY ||
+        specs.some((spec) => file === spec || file.startsWith(`${spec}/`))
+      if (tracked) {
         console.log(`      ${file}`)
       }
     }
   }
 }
 
-console.log(
-  `\n${stale} of ${publicPages.length} pages have commits after their modifiedAt. ` +
-    "Bump modifiedAt only where the change is to what the page says.",
-)
+const summary = summarize({ stale, total: publicPages.length, failures })
+for (const line of summary.lines) {
+  if (summary.exitCode === 0) console.log(line)
+  else console.error(line)
+}
+process.exitCode = summary.exitCode

@@ -110,6 +110,44 @@ export function sourcesFor(pagePath, exists) {
   }
 }
 
+/**
+ * The registry module. The pages written as markup keep their title,
+ * description and dates in their entry there, and every entry can carry a
+ * social title, so an entry is page copy too.
+ */
+export const REGISTRY = "lib/site/page-index.ts"
+
+/**
+ * The 1-based, inclusive line range of one page's entry in the `pageIndex`
+ * array of `REGISTRY`, given the file's text, or `undefined` when the page has
+ * no entry. Tracking only that range keeps an edit to one entry from flagging
+ * every page.
+ *
+ * Entries sit two spaces in, as the formatter writes them: either one line
+ * (`  { path: "/", kind: "landing" },`) or an object that opens with `  {` and
+ * closes with `  },`, with the `path` somewhere inside it.
+ */
+export function registryEntryLines(source, pagePath) {
+  const lines = source.split("\n")
+  const begin = lines.findIndex((line) =>
+    line.startsWith("export const pageIndex"),
+  )
+  if (begin === -1) return undefined
+  const needle = `path: ${JSON.stringify(pagePath)},`
+  const at = lines.findIndex(
+    (line, index) => index > begin && line.includes(needle),
+  )
+  if (at === -1) return undefined
+  if (/^  \{.*\},?\s*$/.test(lines[at])) return { start: at + 1, end: at + 1 }
+
+  let start = at
+  while (start > begin && !/^  \{\s*$/.test(lines[start])) start -= 1
+  let end = at
+  while (end < lines.length && !/^  \},?\s*$/.test(lines[end])) end += 1
+  if (start === begin || end === lines.length) return undefined
+  return { start: start + 1, end: end + 1 }
+}
+
 /** The separator `gitLogArgs` asks git to put between fields. */
 export const FIELD = "\u001f"
 
@@ -125,6 +163,19 @@ export const gitLogArgs = [
   "--date=format-local:%Y-%m-%d",
   "--name-only",
 ]
+
+/**
+ * The arguments for a `git log` of one line range of `REGISTRY`, printed like
+ * `gitLogArgs` but with no file list, since `-L` has no pathspec. git follows
+ * the range back through the edits above it.
+ */
+export function registryLogArgs({ start, end }) {
+  return [
+    ...gitLogArgs.filter((arg) => arg !== "--name-only"),
+    "-s",
+    `-L${start},${end}:${REGISTRY}`,
+  ]
+}
 
 /** Parses the output of `git log` run with `gitLogArgs`. */
 export function parseGitLog(text) {
@@ -148,4 +199,29 @@ export function parseGitLog(text) {
  */
 export function commitsAfter(commits, modifiedAt) {
   return commits.filter((commit) => commit.date > modifiedAt)
+}
+
+/**
+ * What the check prints last, and the exit code. A page whose history could
+ * not be read makes the count meaningless, so failures replace the summary
+ * and fail the run rather than passing for "nothing to update".
+ */
+export function summarize({ stale, total, failures }) {
+  if (failures.length > 0) {
+    return {
+      exitCode: 1,
+      lines: [
+        `\ncheck-lastmod: could not read the git history of ${failures.length} of ${total} pages:`,
+        ...failures.map(({ path, error }) => `  ${path}: ${error}`),
+        "No summary: the pages above were not checked.",
+      ],
+    }
+  }
+  return {
+    exitCode: 0,
+    lines: [
+      `\n${stale} of ${total} pages have commits after their modifiedAt. ` +
+        "Bump modifiedAt only where the change is to what the page says.",
+    ],
+  }
 }
