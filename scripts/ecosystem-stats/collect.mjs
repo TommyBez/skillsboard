@@ -130,24 +130,45 @@ async function collectMonthlyDownloads(today) {
     `https://api.npmjs.org/downloads/range/${RANGE_START}:${today}/${NPM_PACKAGE}`,
   )
 
+  const days = reportedDays(range.downloads)
+  const lastDay = days.at(-1)?.day ?? range.start
+
   const totals = new Map()
-  for (const day of range.downloads) {
+  for (const day of days) {
     const month = day.day.slice(0, 7)
     totals.set(month, (totals.get(month) ?? 0) + day.downloads)
   }
 
-  const currentMonth = today.slice(0, 7)
-
   return {
     package: NPM_PACKAGE,
     rangeStart: range.start,
-    rangeEnd: range.end,
+    rangeEnd: lastDay,
     months: [...totals.entries()].map(([month, downloads]) => ({
       month,
       downloads,
-      partial: month === currentMonth,
+      partial: lastDay < lastDayOfMonth(month),
     })),
   }
+}
+
+/**
+ * npm publishes a day's count a day or two after it ends, and until then the
+ * range endpoint returns the day with zero downloads. Those trailing zeros are
+ * days npm has not reported yet, not days without traffic, so they are dropped
+ * and the series ends on the last day npm has counted.
+ */
+export function reportedDays(days) {
+  let end = days.length
+  while (end > 0 && days[end - 1].downloads === 0) {
+    end -= 1
+  }
+  return days.slice(0, end)
+}
+
+/** `2026-09` becomes `2026-09-30`. */
+export function lastDayOfMonth(month) {
+  const [year, monthNumber] = month.split("-").map(Number)
+  return new Date(Date.UTC(year, monthNumber, 0)).toISOString().slice(0, 10)
 }
 
 export async function main() {
