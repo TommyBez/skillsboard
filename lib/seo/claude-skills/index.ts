@@ -130,6 +130,13 @@ export interface ClaudeSkillsDefinition {
   ogAlt: string
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
 }
 
 export const claudeSkills: ClaudeSkillsDefinition = {
@@ -682,5 +689,6 @@ A Markdown section ready to paste into the release description.`,
   ogAlt:
     "Explainer on Claude Skills: the SKILL.md format, where skills run, and how teams share them.",
   publishedAt: "2026-08-12",
-  modifiedAt: "2026-08-16",
+  modifiedAt: "2026-08-22",
+  checkedAt: "2026-08-16",
 }

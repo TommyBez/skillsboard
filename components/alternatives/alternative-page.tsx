@@ -142,7 +142,8 @@ export function AlternativePage({ entry }: { entry: AlternativeDefinition }) {
             </a>
           </div>
           <p className="mt-6 text-sm text-muted-foreground">
-            Comparison last checked {formatDate(entry.modifiedAt)}. Every claim
+            Comparison last checked{" "}
+            {formatDate(entry.checkedAt ?? entry.modifiedAt)}. Every claim
             about{" "}
             <a
               href={entry.subjectHref}

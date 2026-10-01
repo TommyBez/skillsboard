@@ -235,5 +235,5 @@ Review date: [date]
   },
   ogAlt: "Skills Board guide: eight repeatable AI agent skill use cases for teams.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-22",
 }
