@@ -245,5 +245,5 @@ Handoff date: [date]
   },
   ogAlt: "Skills Board guide: onboard a new teammate through one useful AI skill.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-22",
 }

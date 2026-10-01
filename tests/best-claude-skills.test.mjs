@@ -143,14 +143,12 @@ test("the canonical URL is reachable with and without a trailing slash", async (
     "the trailing-slash redirect is not permanent",
   )
 
-  // The path ends in `-skills`, so the existing Accept rewrite already covers
-  // it and no rule of its own is needed.
+  // One Accept rule per page, generated from the page registry. It used to be
+  // a slug pattern shared by every path ending in `-skills`.
   const { beforeFiles } = await rewrites()
-  const negotiated = beforeFiles.find(
-    (rule) => rule.source === "/:slug([^/]*-skills)",
-  )
-  assert.ok(negotiated, "the shared -skills Markdown rewrite is missing")
-  assert.match(entry.path.slice(1), /^[^/]*-skills$/)
+  const negotiated = beforeFiles.find((rule) => rule.source === entry.path)
+  assert.ok(negotiated, "the Markdown Accept rewrite is missing")
+  assert.equal(negotiated.destination, `/api/markdown?path=${entry.path}`)
 })
 
 test("the Markdown twin carries every section, the tables, and the FAQ", () => {

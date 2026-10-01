@@ -61,7 +61,7 @@ export function buildAboutSchema() {
         url: pageUrl,
         name: "About Skills Board",
         description: aboutDescription,
-        dateModified: "2026-08-06",
+        dateModified: "2026-08-22",
         inLanguage: "en",
         isPartOf: { "@id": websiteId },
         about: { "@id": organizationId },

@@ -182,10 +182,11 @@ test("the Markdown twin carries every section, the tables, and the FAQ", () => {
     types: { "text/markdown": `${entry.path}.md` },
   })
 
-  // The alternate has to reach the page head, not just the helper.
+  // The alternate has to reach the page head, and the head is built from
+  // the registry entry, which is what carries the Markdown surface.
   assert.ok(
-    pageSource.includes("markdownTwinAlternates(claudeCodeForTeams.path)"),
-    "the route does not advertise its Markdown twin in the page head",
+    pageSource.includes('pageMetadata("/claude-code-for-teams")'),
+    "the route does not build its head from the page registry",
   )
 
   for (const title of [
