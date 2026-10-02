@@ -29,6 +29,9 @@ e2e/.auth/
 test-results/
 playwright-report/
 
+# Transient TSX bundle used by scripts/run-tsx.mjs
+scripts/.tsx-run.mjs
+
 # Remotion render output
 out/
 

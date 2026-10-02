@@ -46,7 +46,9 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "vercel-build": "pnpm db:migrate && next build",
-    "email": "email dev --dir emails --port 3001"
+    "email": "email dev --dir emails --port 3001",
+    "email:provision-activation": "node scripts/provision-resend-activation.mjs",
+    "email:backfill-activation": "node scripts/backfill-activation-emails.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",

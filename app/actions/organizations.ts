@@ -4,7 +4,9 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { z } from "zod"
 
+import { firstNameFromUserName } from "@/lib/activation-emails"
 import { auth, getAuthBaseUrl } from "@/lib/auth"
+import { enrollActivationSequence } from "@/lib/email/resend-activation"
 import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
 import { resolveUniqueOrganizationSlug } from "@/lib/organization-slug"
 import { captureTeamEvent } from "@/lib/posthog-server"
@@ -82,6 +84,14 @@ export async function createOrganization(
       event: "team_created",
       properties: { creation_surface: creationSurface },
       teamId: created.id,
+    })
+    await enrollActivationSequence({
+      email: session.user.email,
+      emailVerified: session.user.emailVerified,
+      firstName: firstNameFromUserName(session.user.name),
+      organizationId: created.id,
+      teamName: parsed.data,
+      userId: session.user.id,
     })
 
     return { destination, error: "", teamId: created.id }
