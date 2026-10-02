@@ -1,9 +1,6 @@
 import { ExistingUserEmailConsentPromptForm } from "@/components/existing-user-email-consent-prompt-form"
 import { getProductCommunicationsPreference } from "@/lib/email/email-preferences"
-import {
-  PRODUCT_COMMUNICATIONS_DISCLOSURE,
-  PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
-} from "@/lib/email/product-communications"
+import { shouldShowExistingUserEmailConsentPrompt } from "@/lib/email/product-communications"
 import { getSession } from "@/lib/session"
 
 export async function ExistingUserEmailConsentPrompt() {
@@ -12,12 +9,17 @@ export async function ExistingUserEmailConsentPrompt() {
 
   try {
     const preference = await getProductCommunicationsPreference(session.user.id)
-    if (!preference || preference.activeSuppressionReasons.length > 0) return null
-    const currentNotice = preference.noticeVersion === PRODUCT_COMMUNICATIONS_NOTICE_VERSION
-      && preference.noticeText === PRODUCT_COMMUNICATIONS_DISCLOSURE
-    const retainedNegativeChoice = !preference.subscribed && preference.noticeVersion !== null
-    const affirmativeChoiceMatchesCurrentEmail = preference.eligibilityReason !== "email_changed"
-    if ((currentNotice && affirmativeChoiceMatchesCurrentEmail) || retainedNegativeChoice) return null
+    if (!preference) return null
+    const show = shouldShowExistingUserEmailConsentPrompt({
+      accountCreatedAt: preference.accountCreatedAt,
+      activeSuppressionReasons: preference.activeSuppressionReasons,
+      eligibilityReason: preference.eligibilityReason,
+      noticeText: preference.noticeText,
+      noticeVersion: preference.noticeVersion,
+      now: new Date(),
+      subscribed: preference.subscribed,
+    })
+    if (!show) return null
     return <ExistingUserEmailConsentPromptForm />
   } catch (error) {
     console.error("Unable to load the legacy account email choice", {

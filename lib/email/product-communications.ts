@@ -80,6 +80,42 @@ export function evaluateProductCommunicationsEligibility({
   return { eligible: true, reason: null }
 }
 
+/**
+ * The optional email question is part of account creation, so an account that
+ * was just created has either answered it or was never meant to see the
+ * backfill prompt during its first session. The prompt waits this long before
+ * treating an account as one of the older ones it was written for.
+ */
+export const EXISTING_USER_EMAIL_CONSENT_GRACE_PERIOD_MS = 24 * 60 * 60 * 1000
+
+export interface ExistingUserEmailConsentPromptInput {
+  accountCreatedAt: Date | null
+  activeSuppressionReasons: readonly string[]
+  eligibilityReason: ProductCommunicationsIneligibilityReason | null
+  noticeText: string | null
+  noticeVersion: string | null
+  now: Date
+  subscribed: boolean
+}
+
+export function shouldShowExistingUserEmailConsentPrompt(
+  input: ExistingUserEmailConsentPromptInput,
+): boolean {
+  if (input.activeSuppressionReasons.length > 0) return false
+  if (
+    input.accountCreatedAt
+    && input.now.getTime() - input.accountCreatedAt.getTime() < EXISTING_USER_EMAIL_CONSENT_GRACE_PERIOD_MS
+  ) {
+    return false
+  }
+
+  const currentNotice = input.noticeVersion === PRODUCT_COMMUNICATIONS_NOTICE_VERSION
+    && input.noticeText === PRODUCT_COMMUNICATIONS_DISCLOSURE
+  const retainedNegativeChoice = !input.subscribed && input.noticeVersion !== null
+  const affirmativeChoiceMatchesCurrentEmail = input.eligibilityReason !== "email_changed"
+  return !((currentNotice && affirmativeChoiceMatchesCurrentEmail) || retainedNegativeChoice)
+}
+
 export function isExplicitConsentLiftableSuppression(reason: string): boolean {
   return reason === "unsubscribe"
 }

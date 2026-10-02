@@ -23,6 +23,7 @@ const {
   normalizeEmailAddress,
   planProviderContactEvent,
   shouldApplyProviderContactState,
+  shouldShowExistingUserEmailConsentPrompt,
 } = productCommunications
 
 const baseEligibility = {
@@ -251,5 +252,91 @@ test("unsubscribe tokens are encrypted, randomized, and contain no raw email add
   assert.throws(
     () => verifyProductCommunicationsUnsubscribeToken(token),
     /EMAIL_PRIVACY_SECRET must contain at least 32 bytes/,
+  )
+})
+
+const promptNow = new Date("2026-09-10T16:22:00.000Z")
+const basePrompt = {
+  accountCreatedAt: new Date("2026-07-01T00:00:00.000Z"),
+  activeSuppressionReasons: [],
+  eligibilityReason: null,
+  noticeText: null,
+  noticeVersion: null,
+  now: promptNow,
+  subscribed: false,
+}
+
+test("an older account that never answered still sees the email prompt", () => {
+  assert.equal(shouldShowExistingUserEmailConsentPrompt(basePrompt), true)
+})
+
+test("an account created minutes ago does not see the backfill email prompt", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      accountCreatedAt: new Date("2026-09-10T16:21:35.000Z"),
+    }),
+    false,
+  )
+})
+
+test("the email prompt returns once the account is past the grace period", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      accountCreatedAt: new Date("2026-09-09T16:21:35.000Z"),
+    }),
+    true,
+  )
+})
+
+test("an account with an unknown creation date is treated as an older account", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({ ...basePrompt, accountCreatedAt: null }),
+    true,
+  )
+})
+
+test("an answered email choice keeps the prompt hidden", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      noticeText: productCommunications.PRODUCT_COMMUNICATIONS_DISCLOSURE,
+      noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
+      subscribed: true,
+    }),
+    false,
+  )
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      noticeText: "an older notice",
+      noticeVersion: "2026-01-01",
+      subscribed: false,
+    }),
+    false,
+  )
+})
+
+test("a suppressed address is never asked again", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      activeSuppressionReasons: ["hard_bounce"],
+    }),
+    false,
+  )
+})
+
+test("a changed email brings the prompt back for an older account", () => {
+  assert.equal(
+    shouldShowExistingUserEmailConsentPrompt({
+      ...basePrompt,
+      eligibilityReason: "email_changed",
+      noticeText: productCommunications.PRODUCT_COMMUNICATIONS_DISCLOSURE,
+      noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
+      subscribed: true,
+    }),
+    true,
   )
 })

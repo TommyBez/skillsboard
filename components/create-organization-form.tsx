@@ -1,6 +1,6 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 
 import {
@@ -12,6 +12,7 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { authClient } from "@/lib/auth-client"
 import { syncPostHogTeam } from "@/lib/posthog-client"
+import { describeTeamNameError, readTeamName } from "@/lib/team-name"
 
 const initialState: CreateOrganizationState = {
   destination: "",
@@ -35,13 +36,19 @@ export function CreateOrganizationForm({
   pendingLabel = "Creating library…",
 }: CreateOrganizationFormProps) {
   const router = useRouter()
+  const nameRef = useRef<HTMLInputElement>(null)
   const [state, action] = useActionState(
     async (previousState: CreateOrganizationState, formData: FormData) => {
       // If activation failed after creation, retry that transition instead of
       // creating a second team from the same form submission.
-      const result = previousState.teamId
-        ? previousState
-        : await createOrganization(previousState, formData)
+      let result = previousState
+      if (!previousState.teamId) {
+        const nameError = describeTeamNameError(readTeamName(formData))
+        if (nameError) {
+          return { ...previousState, error: nameError, invalidField: "name" as const }
+        }
+        result = await createOrganization(previousState, formData)
+      }
       if (!result.teamId || !result.destination) return result
 
       try {
@@ -54,19 +61,32 @@ export function CreateOrganizationForm({
         onSuccess?.()
         router.push(result.destination)
         router.refresh()
-        return { ...result, error: "" }
+        return { ...result, error: "", invalidField: undefined }
       } catch {
         return {
           ...result,
           error: "Your team library was created, but we couldn’t open it. Try again.",
+          invalidField: undefined,
         }
       }
     },
     initialState,
   )
 
+  // Only a rejected name marks the field: a failure after a valid name was
+  // accepted still reports its message, but leaves the field alone.
+  const nameError = state.invalidField === "name" ? state.error : ""
+  const errorId = `${idPrefix}-error`
+
+  useEffect(() => {
+    if (nameError) nameRef.current?.focus()
+  }, [nameError])
+
   return (
-    <form action={action} className="flex flex-col gap-7">
+    // The browser's own validation bubble is skipped on purpose: a blocked
+    // submit left no message on the page, so the rule is checked below and
+    // reported in the same place a server error appears.
+    <form action={action} className="flex flex-col gap-7" noValidate>
       <input type="hidden" name="creationSurface" value={creationSurface} />
       <FieldGroup className="gap-5">
         <Field>
@@ -79,15 +99,18 @@ export function CreateOrganizationForm({
           <Input
             id={`${idPrefix}-name`}
             name="name"
+            ref={nameRef}
             placeholder="Your team"
             className="h-12 rounded-[16px] border-border bg-background px-4 text-base shadow-none focus-visible:border-primary"
             required
+            aria-invalid={nameError ? true : undefined}
+            aria-describedby={nameError ? errorId : undefined}
           />
         </Field>
       </FieldGroup>
 
       {state.error ? (
-        <p className="rounded-[16px] border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
+        <p id={errorId} className="rounded-[16px] border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive" role="alert">
           {state.error}
         </p>
       ) : null}
