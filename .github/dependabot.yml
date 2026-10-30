@@ -5,11 +5,19 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Majors are handled deliberately in dedicated PRs. Group update-types alone
+    # would still let a major through as a single ungrouped PR, so ignore them.
+    # An ignore rule with only update-types does not block security updates.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       production-dependencies:
         dependency-type: production
+        update-types: ["minor", "patch"]
       development-dependencies:
         dependency-type: development
+        update-types: ["minor", "patch"]
 
   - package-ecosystem: github-actions
     directory: /

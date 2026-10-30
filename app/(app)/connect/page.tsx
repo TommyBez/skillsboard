@@ -30,8 +30,8 @@ const availableTools = [
  * The founder asked for `/connect` as a private page: MCP setup used to be
  * buried in settings, which is the fix this page keeps, but it was never meant
  * to be a public acquisition surface. It lives in the authenticated `(app)`
- * route group, the same as `/start`, `/library`, and `/settings`, so it reads
- * the session, redirects a signed-out visitor to sign in, and stays out of the
+ * route group, the same as `/library` and `/settings`, so it reads the
+ * session, redirects a signed-out visitor to sign in, and stays out of the
  * sitemap, `llms.txt`, and search indexing the same way those pages do.
  *
  * The MCP endpoint comes from the same Vercel system vars Better Auth uses,

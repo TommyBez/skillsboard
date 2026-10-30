@@ -42,10 +42,6 @@
     fixtures only against a freshly started server (global setup runs before
     the first test request); seeding a warm server leaves fixtures invisible
     for hours.
-  - `/settings/email` throws when the user has no product-email preference row;
-    global setup passes `skillsboardProductCommunicationsChoice: false` at
-    first sign-up so the auth hook creates it. If the test user was ever
-    created without it, delete the user row and re-run.
   - Dev-mode auth cookies are `sameSite: none; secure: true` over plain http;
     Chromium treats localhost as trustworthy, so the session still sticks. Do
     not measure with a non-Chromium browser against the local rig.

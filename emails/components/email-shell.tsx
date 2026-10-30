@@ -18,7 +18,7 @@ export interface EmailShellProps {
   children: ReactNode
   preview: string
   title: string
-  /** Compact transactional footer with site name only. Marketing emails pass false and use MarketingFooter. */
+  /** Compact transactional footer with site name only. */
   showTransactionalFooter?: boolean
 }
 
