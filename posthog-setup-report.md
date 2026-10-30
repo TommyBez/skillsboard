@@ -15,9 +15,9 @@ The production baseline starts with the successful production deployment of this
 |---|---|---|
 | `landing_cta_clicked` | Anonymous or returning visitor selected the primary CTA on a marketing page. `location` is the placement within the page (`header`, `hero`, `inline`, `closing`); which page it was is read from `$pathname`, so per-page analysis is a breakdown on `properties.$pathname`. Values captured before 2026-09-04 carry the page as a prefix (`where_skills_hero`). | `app/page.tsx`, `components/tracked-link.tsx` |
 | `mcp_entry_clicked` | Visitor or signed-in user opened the MCP story or setup path, with the discovery surface and destination. | `app/page.tsx`, `components/app-header.tsx`, `components/account-menu.tsx`, `app/(app)/library/page.tsx` |
-| `$pageview` | PostHog-native route view. Use `$pathname=/connect` for the MCP guide and `$pathname=/start` for first-run steps; after identity synchronization, authenticated views carry the active `team_id`. | `instrumentation-client.ts`, `lib/posthog-client.ts`, `components/posthog-identity.tsx` |
+| `$pageview` | PostHog-native route view. Use `$pathname=/connect` for the MCP guide; after identity synchronization, authenticated views carry the active `team_id`. | `instrumentation-client.ts`, `lib/posthog-client.ts`, `components/posthog-identity.tsx` |
 | `mcp_client_selected` | User selected one of the bounded client setup guides. | `components/mcp-setup-guide.tsx` |
-| `mcp_config_copied` | Visitor successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx`, `components/onboarding-next-steps.tsx` |
+| `mcp_config_copied` | Visitor successfully copied a client-specific or generic MCP configuration snippet. | `components/mcp-setup-guide.tsx` |
 | `mcp_authorization_approved` | User approved MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_authorization_denied` | User denied MCP access in the OAuth consent flow. | `components/consent-form.tsx` |
 | `mcp_tool_used` | An authenticated MCP client called a Skills Board tool, with the bounded tool name and success state. | `app/api/[transport]/route.ts` |
@@ -47,7 +47,7 @@ The browser registers `team_id` as a PostHog super property beside user identifi
 - Measure acquisition with PostHog-native unique visitors, sessions, pageviews, and pageview duration on the exact production host `www.skillsboard.sh`, then use the real conversion events `landing_cta_clicked`, `signup_form_submitted`, `user_signed_up`, and `team_created`.
 - There is no custom engaged or qualified visitor event and no application-defined attention threshold. Skills Board does not duplicate PostHog session, referrer, UTM, first-touch, or page-duration state in application events.
 - Use PostHog-native session and acquisition properties when analyzing journeys to real conversion events. This contract does not define a custom source-to-new-team classifier, attribution cookie, or frozen source-to-team rule.
-- For the MCP and first-run view denominators, use the legacy `mcp_setup_viewed` / `onboarding_steps_viewed` events only before this deployment's cutover and `$pageview` filtered to `/connect` / `/start` after it. Do not union the overlapping pre-cutover period without a date filter.
+- For the MCP and first-run view denominators, use the legacy `mcp_setup_viewed` / `onboarding_steps_viewed` events only before this deployment's cutover and `$pageview` filtered to `/connect` / `/start` after it. Do not union the overlapping pre-cutover period without a date filter. The first-run page at `/start` was removed on 2026-10-30 (it now redirects to `/library`), so its pageviews, `onboarding_step_clicked`, and the `onboarding` values of `mcp_entry_clicked.location`, `team_member_invited.surface`, and `team_invite_link_copied.surface` stop at that date.
 - `signup_context=team_invitation` is team expansion and must not count as new-team Acquisition.
 - Team creation distinguishes `creation_surface=onboarding|in_app`.
 - Define a `team_value_action` action that unions `skill_usage_path_selected` and `skill_downloaded` with `actor_is_skill_creator=false`.

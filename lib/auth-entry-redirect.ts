@@ -46,11 +46,11 @@ function toParamRecord(searchParams: URLSearchParams) {
  * session cookie, or `null` to let the page decide.
  *
  * Only the immediate destinations are claimed — no `sessionChecked` marker, no
- * OAuth authorize params, and a `returnTo` that is absent or already `/library`,
- * `/connect`, or `/start`. The marketing CTA and the "Sign in" beside it both
- * link to a plain route, and a signed-in visitor following either only ever
- * wanted their library. `/connect` and `/start` are the same kind of page:
- * authenticated, and the place the visitor asked for.
+ * OAuth authorize params, and a `returnTo` that is absent or already `/library`
+ * or `/connect`. The marketing CTA and the "Sign in" beside it both link to a
+ * plain route, and a signed-in visitor following either only ever wanted their
+ * library. `/connect` is the same kind of page: authenticated, and the place
+ * the visitor asked for.
  *
  * Everything else deliberately falls through to `AuthEntry`, because a
  * redirect would destroy it:
@@ -67,7 +67,7 @@ function toParamRecord(searchParams: URLSearchParams) {
  */
 export function resolveSignedInAuthRedirect(
   searchParams: URLSearchParams,
-): "/library" | "/connect" | "/start" | null {
+): "/library" | "/connect" | null {
   if (searchParams.has(SESSION_CHECKED_PARAM)) return null
 
   const params = toParamRecord(searchParams)
