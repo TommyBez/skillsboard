@@ -73,13 +73,13 @@
     "lucide-react": "^1.16.0",
     "mcp-handler": "^1.1.0",
     "motion": "^12.43.0",
-    "next": "16.3.0",
+    "next": "16.4.3",
     "next-themes": "^0.4.6",
     "pg": "^8.22.0",
     "posthog-js": "^1.402.3",
     "posthog-node": "^5.44.0",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "remotion": "4.0.495",
     "resend": "^6.17.2",
     "shadcn": "^4.8.0",
@@ -92,7 +92,7 @@
   "devDependencies": {
     "@fontsource/bricolage-grotesque": "^5.3.0",
     "@fontsource/geist-mono": "^5.3.0",
-    "@next/playwright": "16.3.0",
+    "@next/playwright": "16.4.3",
     "@playwright/test": "^1.62.1",
     "@react-email/ui": "6.9.0",
     "@remotion/cli": "4.0.495",
@@ -100,8 +100,8 @@
     "@types/culori": "^4.0.1",
     "@types/node": "^24",
     "@types/pg": "^8.20.0",
-    "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "dotenv": "^17.4.2",
     "drizzle-kit": "^0.31.10",
     "postcss": "^8.5",
@@ -112,8 +112,8 @@
   "pnpm": {
     "overrides": {
       "hono": "4.12.25",
-      "@types/react": "19.2.18",
-      "@types/react-dom": "19.2.4"
+      "@types/react": "19.3.0",
+      "@types/react-dom": "19.3.0"
     },
     "packageExtensions": {
       "@remotion/bundler": {

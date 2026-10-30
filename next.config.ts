@@ -98,6 +98,11 @@ const NEGOTIATED_PAGES: readonly { source: string; markdown: string }[] = [
 
 const nextConfig = {
   cacheComponents: true,
+  // Keeps the per-link prefetch behavior the app was built on. Next.js 16.4
+  // warns when the option is unset alongside `cacheComponents`; unset already
+  // behaves like `false`, so stating it changes nothing at runtime. Adopting
+  // Partial Prefetching is its own change.
+  partialPrefetching: false,
   experimental: {
     // Enables the @next/playwright instant() testing API on measured builds
     // (local EXPOSE_TESTING_API=1 builds, Vercel previews). Never in production.
