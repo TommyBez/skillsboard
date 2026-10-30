@@ -356,7 +356,7 @@ reverses a stated constraint that plans 001–006 were all built under.
 boundary in `plans/README.md` ("no motion library") is superseded by that
 decision — recorded here rather than silently ignored.
 
-### Kept in `components/interior/` — 11
+### Kept in `components/interior/` — 10
 
 Only the components a product surface actually uses. Each carries the prop
 names, defaults and behaviour documented on its interior.dev page, restyled
@@ -364,9 +364,12 @@ onto this app's oklch tokens rather than the library's hardcoded palette, and
 honouring `prefers-reduced-motion` the way `app/globals.css` already does
 (keep a short opacity fade, drop every transform).
 
-`collapsible-banner` · `command-palette` · `hide-on-scroll` ·
-`presence-avatars` · `reading-progress` · `reorder-list` · `scroll-spy` ·
-`show-more` · `skeleton-swap` · `tag-input` · `value-flash`
+`command-palette` · `hide-on-scroll` · `presence-avatars` ·
+`reading-progress` · `reorder-list` · `scroll-spy` · `show-more` ·
+`skeleton-swap` · `tag-input` · `value-flash`
+
+`collapsible-banner` was kept until 2026-10-30, when the library invite banner,
+its only consumer, was removed with the rest of the team invite prompt.
 
 Fifteen more were ported and then deleted, because nothing imported them:
 `filter-grid`, `segmented-control`, `hold-to-confirm`, `icon-morph`,
