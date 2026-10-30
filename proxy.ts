@@ -30,8 +30,7 @@ export async function proxy(request: NextRequest) {
     } else if (
       pathname === "/library" ||
       pathname === "/connect" ||
-      pathname === "/start" ||
-      pathname === "/settings/email"
+      pathname === "/start"
     ) {
       signInUrl.searchParams.set("returnTo", pathname)
     }

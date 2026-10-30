@@ -51,9 +51,6 @@ export default async function globalSetup(_config: FullConfig) {
       email: TEST_USER_EMAIL,
       otp: "123456",
       name: TEST_USER_NAME,
-      // Creates the product-email preference row on first sign-up, which
-      // /settings/email requires to render.
-      skillsboardProductCommunicationsChoice: false,
     },
   })
   if (!verify.ok()) {

@@ -4,7 +4,6 @@ import { AppHeader } from "@/components/app-header"
 import { Brand } from "@/components/brand"
 import { CommandMenu } from "@/components/command-menu"
 import { CommandMenuIndex } from "@/components/command-menu-index"
-import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -43,9 +42,6 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <Suspense fallback={<AppHeaderFallback />}>
         <AuthenticatedHeader />
-      </Suspense>
-      <Suspense fallback={null}>
-        <ExistingUserEmailConsentPrompt />
       </Suspense>
       <div id="main-content" tabIndex={-1} className="outline-none">
         {children}

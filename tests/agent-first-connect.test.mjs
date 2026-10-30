@@ -152,7 +152,7 @@ test("/connect is gated at the edge the same way as /library", async () => {
   assert.match(proxy, /"\/start"/)
   assert.match(
     proxy,
-    /pathname === "\/library" \|\|\n\s+pathname === "\/connect" \|\|\n\s+pathname === "\/start" \|\|\n\s+pathname === "\/settings\/email"/,
+    /pathname === "\/library" \|\|\n\s+pathname === "\/connect" \|\|\n\s+pathname === "\/start"\n\s+\) \{/,
   )
   assert.match(sanitizer, /"\/connect"/)
   assert.match(sanitizer, /"\/start"/)
