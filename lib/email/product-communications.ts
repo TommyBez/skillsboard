@@ -7,14 +7,6 @@ export const PRODUCT_COMMUNICATIONS_UNSUBSCRIBE_TOKEN_PROPERTY =
 export const PRODUCT_COMMUNICATIONS_DISCLOSURE =
   "Send me occasional Skills Board product updates, launch news, practical guides, and research invitations from Tommaso. Optional. Unsubscribe anytime."
 
-export type EmailPreferenceSource =
-  | "signup"
-  | "settings"
-  | "existing_user_prompt"
-  | "one_click_unsubscribe"
-  | "resend_contact_unsubscribe"
-  | "resend_webhook"
-
 export type EmailSuppressionScope = "all" | "marketing"
 
 export type EmailSuppressionReason =
