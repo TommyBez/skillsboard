@@ -45,6 +45,7 @@
     "db:check": "drizzle-kit check && node scripts/check-schema-migrations.mjs",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
+    "smoke:auth": "node scripts/auth-boot-smoke.mjs",
     "vercel-build": "pnpm db:migrate && next build",
     "email": "email dev --dir emails --port 3001"
   },

@@ -41,3 +41,62 @@ jobs:
 
       - name: Check database migrations
         run: pnpm db:check
+
+  auth-boot-smoke:
+    name: Auth boot smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Disposable Postgres with every repo migration applied. Dummy, non-secret
+    # values only: no real database, Resend, PostHog, or DataForSEO keys.
+    # VERCEL_ENV=development keeps email OTP local, so no email is sent.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: skillsboard
+          POSTGRES_PASSWORD: skillsboard
+          POSTGRES_DB: skillsboard
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U skillsboard"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://skillsboard:skillsboard@localhost:5432/skillsboard
+      DATABASE_URL_UNPOOLED: postgres://skillsboard:skillsboard@localhost:5432/skillsboard
+      BETTER_AUTH_SECRET: ci-auth-boot-smoke-not-a-real-secret-0000
+      BETTER_AUTH_URL: http://localhost:3200
+      PORT: "3200"
+      VERCEL_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Apply all migrations
+        run: pnpm db:migrate
+
+      - name: Build
+        run: pnpm build
+
+      - name: Boot the app and check auth routes
+        run: pnpm smoke:auth
