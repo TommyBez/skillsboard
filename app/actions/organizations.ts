@@ -11,7 +11,7 @@ import { captureTeamEvent } from "@/lib/posthog-server"
 import { getSession, requireSession } from "@/lib/session"
 
 export interface CreateOrganizationState {
-  destination: "/library" | "/start" | ""
+  destination: "/library" | ""
   error: string
   teamId: string
 }
@@ -37,10 +37,11 @@ const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
  * invitation is created here, on the server, so `team_member_invited` can only
  * carry the surface if the surface travels with the request. An older form that
  * posts nothing reads as the settings panel, which is where the form lived
- * alone before the onboarding surface existed.
+ * alone before the other surfaces existed. It is the only surface again, so
+ * any other value, including retired ones, reads as the settings panel.
  */
 const inviteSurfaceSchema = z
-  .enum(["onboarding", "organization_settings"])
+  .enum(["organization_settings"])
   .catch("organization_settings")
 
 export async function createOrganization(
@@ -60,8 +61,6 @@ export async function createOrganization(
   }
 
   const slug = await resolveUniqueOrganizationSlug(parsed.data)
-  const destination = creationSurface === "onboarding" ? "/start" : "/library"
-
   try {
     const created = await auth.api.createOrganization({
       headers: await headers(),
@@ -84,7 +83,7 @@ export async function createOrganization(
       teamId: created.id,
     })
 
-    return { destination, error: "", teamId: created.id }
+    return { destination: "/library", error: "", teamId: created.id }
   } catch (error) {
     console.error("Unable to create team library", error)
     return {

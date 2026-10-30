@@ -13,7 +13,6 @@ const { safeReturnTo } = await import(
 test("allows the exact protected destinations used by auth", () => {
   assert.equal(safeReturnTo("/library"), "/library")
   assert.equal(safeReturnTo("/connect"), "/connect")
-  assert.equal(safeReturnTo("/start"), "/start")
   assert.equal(safeReturnTo("/invite/invite_123"), "/invite/invite_123")
 })
 
@@ -27,10 +26,17 @@ test("defaults to the library when no destination is supplied", () => {
   assert.equal(safeReturnTo(""), "/library")
 })
 
+// The first-run page at /start was removed on 2026-10-30. A returnTo=/start
+// already in a sign-in link or an open tab falls back to the library, the same
+// place next.config.ts sends the route itself.
+test("no longer allows the removed first-run page", () => {
+  assert.equal(safeReturnTo("/start"), "/library")
+  assert.equal(safeReturnTo("/start?next=/library"), "/library")
+})
+
 test("rejects lookalikes, query injection, and external destinations", () => {
   assert.equal(safeReturnTo("/connect?next=https://example.com"), "/library")
   assert.equal(safeReturnTo("/connect/other"), "/library")
-  assert.equal(safeReturnTo("/start?next=/library"), "/library")
   assert.equal(safeReturnTo("https://example.com"), "/library")
   assert.equal(safeReturnTo("//example.com"), "/library")
 })

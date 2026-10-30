@@ -52,9 +52,6 @@ const connectPage = await readText("../app/(app)/connect/page.tsx")
 const appHeader = await readText("../components/app-header.tsx")
 const accountMenu = await readText("../components/account-menu.tsx")
 const libraryPage = await readText("../app/(app)/library/page.tsx")
-const startPage = await readText("../app/(app)/start/page.tsx")
-const nextSteps = await readText("../components/onboarding-next-steps.tsx")
-const inviteStep = await readText("../components/onboarding-invite-step.tsx")
 const organizationActions = await readText("../app/actions/organizations.ts")
 const inviteForm = await readText("../components/invite-member-form.tsx")
 const organizationSettings = await readText("../app/(app)/settings/organization/page.tsx")
@@ -132,7 +129,7 @@ test("/connect is private: out of the sitemap and out of llms.txt", () => {
  * `/connect` moved into the `(app)` route group instead of keeping its own
  * public layout: that group's layout is what redirects a signed-out visitor
  * to sign in and marks every route under it `noindex`, the same mechanism
- * `/start`, `/library`, and `/settings` already rely on.
+ * `/library` and `/settings` already rely on.
  */
 test("/connect is authenticated the same way as every other app page", async () => {
   assert.equal(await exists("../app/(app)/connect/page.tsx"), true)
@@ -147,16 +144,13 @@ test("/connect is gated at the edge the same way as /library", async () => {
   const sanitizer = await readText("../lib/safe-return-to.ts")
 
   assert.match(proxy, /pathname === "\/connect"/)
-  assert.match(proxy, /pathname === "\/start"/)
   assert.match(proxy, /"\/connect"/)
-  assert.match(proxy, /"\/start"/)
   assert.match(
     proxy,
-    /pathname === "\/library" \|\|\n\s+pathname === "\/connect" \|\|\n\s+pathname === "\/start"\n\s+\) \{/,
+    /pathname === "\/library" \|\|\n\s+pathname === "\/connect"\n\s+\) \{/,
   )
   assert.match(sanitizer, /"\/connect"/)
-  assert.match(sanitizer, /"\/start"/)
-  assert.match(sanitizer, /immediateSignedInDestinations = \["\/library", "\/connect", "\/start"\]/)
+  assert.match(sanitizer, /immediateSignedInDestinations = \["\/library", "\/connect"\]/)
 })
 
 /**
@@ -178,46 +172,51 @@ test("the connect guide renders without a page-local team fetch", () => {
   assert.match(connectPage, /<McpPluginInstall \/>/)
 })
 
-test("the first run offers the agent first, with the invitation beside it", () => {
-  const connectStep = nextSteps.indexOf("Connect your agent")
-  const firstSkillStep = nextSteps.indexOf("Add your first skill")
-  const inviteTeamStep = nextSteps.indexOf("Invite your team")
+/**
+ * The first-run page at `/start` (with its three step cards and its own invite
+ * form) was removed on 2026-10-30: a new team lands on its library, whose empty
+ * state already offers the first skill. Nothing in the app may route to it, and
+ * the old URL resolves permanently to the library.
+ */
+test("the first-run page is gone and nothing routes to it", async () => {
+  assert.equal(await exists("../app/(app)/start/page.tsx"), false)
+  assert.equal(await exists("../components/onboarding-next-steps.tsx"), false)
+  assert.equal(await exists("../components/onboarding-invite-step.tsx"), false)
 
-  assert.ok(connectStep > -1 && firstSkillStep > -1 && inviteTeamStep > -1)
-  assert.ok(connectStep < firstSkillStep, "the agent connection is not the first step")
-  assert.ok(firstSkillStep < inviteTeamStep)
-  // The connect step sends people to the per-client guide and copies nothing
-  // itself: the plugin commands only apply to Claude Code, and the card
-  // promises every MCP client. The invitation form is the real one.
-  assert.doesNotMatch(nextSteps, /claudeCodeInstallSnippet/)
-  assert.doesNotMatch(nextSteps, /mcpUrl/)
-  assert.match(nextSteps, /href="\/connect"/)
-  assert.match(inviteStep, /<InviteMemberForm/)
-  assert.match(startPage, /<OnboardingNextSteps/)
-  // The first skill step opens the catalog, where saving is one click, and
-  // keeps the repository path beside it. Each destination is measured.
-  assert.match(
-    nextSteps,
-    /href="\/discover"\n\s+analytics=\{\{\n\s+event: "onboarding_step_clicked",\n\s+properties: \{ step: "first_skill", destination: "discover" \},/,
-  )
-  assert.match(
-    nextSteps,
-    /href="\/library"\n\s+analytics=\{\{\n\s+event: "onboarding_step_clicked",\n\s+properties: \{ step: "first_skill", destination: "library" \},/,
-  )
-  assert.match(events, /destination\?: "discover" \| "library"/)
+  const proxy = await readText("../proxy.ts")
+  const sanitizer = await readText("../lib/safe-return-to.ts")
+  for (const source of [proxy, sanitizer, ...applicationSources]) {
+    assert.doesNotMatch(source, /["'`]\/start["'`/?]/)
+  }
+  assert.doesNotMatch(events, /onboarding_step_clicked/)
 })
 
-test("only the first-run content that needs app context waits for it", () => {
-  // The start heading used to live outside a Suspense child that called
-  // getAppContext, so a new account saw "Your team library is ready"
-  // before the redirect to team creation. That heading still waits on the
-  // team. /connect's heading and guide are generic, so neither waits on a
-  // page-local analytics fetch. The MCP URL comes from env on /connect;
-  // /start no longer shows it.
-  assert.match(startPage, /async function StartHeading/)
-  assert.match(startPage, /await getAppContext\(\)/)
-  assert.doesNotMatch(startPage, /getMcpResource\(\)/)
-  assert.doesNotMatch(startPage, /headers\(\)/)
+test("/start resolves permanently to the library, query string included", async () => {
+  const redirects = await nextConfig.redirects()
+  const moved = redirects.filter((rule) => rule.source === "/start" || rule.source.startsWith("/start/"))
+
+  assert.deepEqual(
+    moved.map((rule) => rule.source),
+    ["/start", "/start/"],
+  )
+  for (const rule of moved) {
+    assert.equal(rule.destination, "/library")
+    assert.equal(rule.permanent, true)
+    // Next.js carries the incoming query string onto the destination unless a
+    // rule names its own, so returnTo and UTM parameters survive the hop.
+    assert.doesNotMatch(rule.destination, /\?/)
+    assert.equal(rule.has, undefined)
+    assert.equal(rule.missing, undefined)
+  }
+  // The edge proxy does not match /start, so the redirect is never preempted
+  // by a sign-in bounce carrying returnTo=/start.
+  const proxy = await readText("../proxy.ts")
+  assert.doesNotMatch(proxy, /"\/start"/)
+})
+
+test("the connect page does not wait on app context", () => {
+  // /connect's heading and guide are generic, so neither waits on a
+  // page-local analytics fetch. The MCP URL comes from env.
   assert.match(connectPage, /export default function ConnectPage/)
   assert.doesNotMatch(connectPage, /getAppContext/)
   assert.match(connectPage, /getMcpResource\(\)/)
@@ -241,37 +240,39 @@ test("OTP success identifies first, flushes the auth event, then reloads the des
   assert.doesNotMatch(authForm, /router\.(?:push|refresh|replace)\(/)
 })
 
-test("a team created in onboarding lands on the first-run screen", async () => {
+test("a team created in onboarding lands on its library", async () => {
   const onboardingPage = await readText("../app/onboarding/page.tsx")
-  assert.match(
-    organizationActions,
-    /const destination = creationSurface === "onboarding" \? "\/start" : "\/library"/,
-  )
-  assert.doesNotMatch(
-    organizationActions,
-    /redirect\(creationSurface === "onboarding" \? "\/start" : "\/library"\)/,
-  )
-  // After a reload, this page still sends an existing empty team to the
-  // first-run screen. The create form owns the normal client navigation so it
-  // can register the new team with PostHog first.
-  assert.match(onboardingPage, /redirect\(skillCount === 0 \? "\/start" : "\/library"\)/)
+  const onboardingForm = await readText("../components/onboarding-form.tsx")
+
+  // /onboarding creates the team with its own surface, and the action sends
+  // every new team to the library whatever the surface was.
+  assert.match(onboardingForm, /<CreateOrganizationForm creationSurface="onboarding"/)
+  assert.match(organizationActions, /destination: "\/library" \| ""/)
+  assert.match(organizationActions, /return \{ destination: "\/library", error: "", teamId: created\.id \}/)
+  assert.doesNotMatch(organizationActions, /creationSurface === "onboarding" \?/)
+  // The surface still reaches team_created: /onboarding stays.
+  assert.match(organizationActions, /properties: \{ creation_surface: creationSurface \}/)
+  assert.match(events, /creation_surface: "in_app" \| "onboarding"/)
+  // The create form owns the normal client navigation so it can register the
+  // new team with PostHog first, then follows the action's destination.
+  assert.match(createOrganizationForm, /router\.push\(result\.destination\)/)
+  // After a reload, a user who already has a team goes to the library too,
+  // empty or not.
+  assert.match(onboardingPage, /if \(organizations\.length\) redirect\("\/library"\)/)
+  assert.doesNotMatch(onboardingPage, /countOrganizationSkills|skillCount/)
 })
 
 test("route views stay native while real actions stay custom", async () => {
-  assert.match(nextSteps, /event: "mcp_entry_clicked"/)
   for (const event of ["plugin_install_copied", "mcp_config_copied", "mcp_entry_clicked"]) {
     assert.match(events, new RegExp(`${event}: \\{`))
   }
-  // /start copies nothing since 2026-09-07: the copy events belong to
-  // /connect (per client) and the landing page.
-  assert.doesNotMatch(nextSteps, /plugin_install_copied|mcp_config_copied/)
-  assert.match(inviteStep, /event: "team_invite_link_copied"/)
   assert.match(events, /mcp_config_copied: \{\n\s+client: [^\n]+\n\s+\}/)
   assert.doesNotMatch(events, /\| "generic" \|/)
   assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId\)/)
   assert.match(mcpSetupGuide, /properties: \{ client \}/)
-  assert.match(events, /surface: "onboarding" \| "organization_settings"/)
-  assert.match(events, /step: "first_skill" \| "invite_team"/)
+  assert.match(events, /surface: "organization_settings"\n/)
+  assert.doesNotMatch(events, /\| "onboarding" \| "organization_settings"/)
+  assert.doesNotMatch(events, /"first_skill_invite_step"/)
 
   assert.doesNotMatch(events, /mcp_setup_viewed/)
   assert.doesNotMatch(events, /onboarding_steps_viewed/)
@@ -368,7 +369,7 @@ test("team changes synchronize PostHog without delaying product updates", () => 
  * but not the invitation that was actually sent.
  */
 test("an invitation carries the surface it was sent from", () => {
-  assert.match(events, /team_member_invited: \{\n\s+email_sent: boolean\n\s+role: "admin" \| "member"\n\s+surface: "onboarding" \| "organization_settings"\n\s+\}/)
+  assert.match(events, /team_member_invited: \{\n\s+email_sent: boolean\n\s+role: "admin" \| "member"\n\s+surface: "organization_settings"\n\s+\}/)
 
   // The form posts it, the action reads it, the event carries it.
   assert.match(inviteForm, /<input type="hidden" name="surface" value=\{surface\} \/>/)
@@ -378,20 +379,18 @@ test("an invitation carries the surface it was sent from", () => {
     /event: "team_member_invited",\n\s+properties: \{\n\s+role: parsed\.data\.role,\n\s+email_sent: !emailError,\n\s+surface,\n\s+\},/,
   )
 
-  // Every copy of the form names its own surface, and the first run names the
-  // one the onboarding metric is counted on.
-  assert.match(inviteStep, /surface="onboarding"/)
+  // Every copy of the form names its own surface.
   assert.match(organizationSettings, /surface="organization_settings"/)
 })
 
 test("no dash rule violations in the copy this change owns", () => {
-  for (const source of [connectPage, startPage, nextSteps, inviteStep]) {
+  for (const source of [connectPage]) {
     assert.doesNotMatch(source, dashPattern)
   }
 })
 
 test("the new copy keeps the product's own words", () => {
-  for (const source of [connectPage, startPage, nextSteps, inviteStep]) {
+  for (const source of [connectPage]) {
     assert.doesNotMatch(source, /recommend/i)
     assert.doesNotMatch(source, /shared library/i)
   }
