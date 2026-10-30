@@ -95,7 +95,7 @@
     "@next/playwright": "16.3.0",
     "@playwright/test": "^1.62.1",
     "@react-email/ui": "6.9.0",
-    "@remotion/cli": "4.0.495",
+    "@remotion/cli": "4.0.532",
     "@tailwindcss/postcss": "^4.2.0",
     "@types/culori": "^4.0.1",
     "@types/node": "^24",
