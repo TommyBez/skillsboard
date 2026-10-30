@@ -172,10 +172,11 @@ export const session = pgTable("session", {
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
-  // Trusted identity issuer added in Better Auth 1.7. Credential-style
-  // accounts use the synthetic "local:<providerId>" namespace; OAuth
-  // providers without their own issuer use "local:oauth:<providerId>".
-  issuer: text("issuer").notNull(),
+  // Written by Better Auth 1.7.0-1.7.2 only. 1.7.3+ identifies accounts by
+  // (providerId, accountId) again and never writes it, so it must stay
+  // nullable; see https://www.better-auth.com/docs/guides/1-7-upgrade-guide.
+  // Kept (not dropped) while 1.7.1 deployments still write it.
+  issuer: text("issuer"),
   accountId: text("accountId").notNull(),
   providerId: text("providerId").notNull(),
   userId: text("userId").notNull(),
@@ -189,7 +190,6 @@ export const account = pgTable("account", {
   createdAt: timestamp("createdAt", { withTimezone: true }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: timestamp("updatedAt", { withTimezone: true }).notNull(),
 }, (table) => [
-  uniqueIndex("account_issuer_accountId_uidx").on(table.issuer, table.accountId),
   foreignKey({
     columns: [table.userId],
     foreignColumns: [user.id],
