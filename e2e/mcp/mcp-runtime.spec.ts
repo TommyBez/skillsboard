@@ -260,6 +260,11 @@ test("OAuth: sign in, authorize and consent in the browser", async () => {
   expect(callback!.searchParams.get("error")).toBeNull()
   state.code = callback!.searchParams.get("code") ?? undefined
   expect(state.code).toBeTruthy()
+  // The callback is read off the intercepted request; let the browser finish
+  // rendering it before the narrator replaces the page, or the navigation
+  // still in flight destroys the context `setContent` runs in.
+  await page.waitForURL((url) => url.href.startsWith(REDIRECT_URI))
+  await page.waitForLoadState("load")
   await page.waitForTimeout(STEP_PAUSE_MS)
 
   await narrator.step("Authorize + consent", [
@@ -512,6 +517,9 @@ async function cleanUp() {
     // Tokens, consents and resource links cascade from the client.
     if (state.clientId) {
       await pool.query(`DELETE FROM "oauthClient" WHERE "clientId" = $1`, [state.clientId])
+      // An authorization code the run never exchanged is a verification row
+      // that names the client, not the user.
+      await pool.query(`DELETE FROM "verification" WHERE "value" LIKE $1`, [`%${state.clientId}%`])
     }
     // Sessions, accounts and email preferences cascade from the user.
     await pool.query(`DELETE FROM "user" WHERE "id" = ANY($1)`, [userIds])
