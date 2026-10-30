@@ -42,33 +42,37 @@ jobs:
       - name: Check database migrations
         run: pnpm db:check
 
-  boot-smoke:
-    name: Runtime boot smoke
+  auth-boot-smoke:
+    name: Auth boot smoke
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
-    # Builds pass on a schema Better Auth rejects at runtime; this boots the
-    # built app on a fully migrated, job-local Postgres and requires the auth
-    # stack to answer. No Neon branch, no Vercel env, no repository secrets.
+    # Disposable Postgres with every repo migration applied. Dummy, non-secret
+    # values only: no real database, Resend, PostHog, or DataForSEO keys.
+    # VERCEL_ENV=development keeps email OTP local, so no email is sent.
     services:
       postgres:
         image: postgres:17
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: skillsboard_ci
+          POSTGRES_USER: skillsboard
+          POSTGRES_PASSWORD: skillsboard
+          POSTGRES_DB: skillsboard
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U postgres"
+          --health-cmd "pg_isready -U skillsboard"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
 
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/skillsboard_ci
-      DATABASE_URL_UNPOOLED: postgres://postgres:postgres@localhost:5432/skillsboard_ci
+      DATABASE_URL: postgres://skillsboard:skillsboard@localhost:5432/skillsboard
+      DATABASE_URL_UNPOOLED: postgres://skillsboard:skillsboard@localhost:5432/skillsboard
+      BETTER_AUTH_SECRET: ci-auth-boot-smoke-not-a-real-secret-0000
+      BETTER_AUTH_URL: http://localhost:3200
+      PORT: "3200"
       VERCEL_ENV: development
+      NEXT_TELEMETRY_DISABLED: "1"
 
     steps:
       - name: Checkout repository
@@ -88,20 +92,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate a throwaway auth secret
-        run: |
-          secret="$(openssl rand -hex 32)"
-          echo "::add-mask::$secret"
-          echo "BETTER_AUTH_SECRET=$secret" >> "$GITHUB_ENV"
-
-      - name: Apply migrations to the job database
+      - name: Apply all migrations
         run: pnpm db:migrate
 
       - name: Build
-        run: pnpm exec next build
+        run: pnpm build
 
-      - name: Boot smoke
-        run: pnpm smoke:boot
+      - name: Boot the app and check auth routes
+        run: pnpm smoke:auth
 
   mcp-runtime:
     name: MCP runtime
