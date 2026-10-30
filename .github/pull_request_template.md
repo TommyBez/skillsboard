@@ -25,3 +25,4 @@
 ## Demo video
 
 <!-- Required: a hosted video link (an https URL ending in .mp4/.webm/.mov, or drag the file here for a github.com/user-attachments/assets/... link). The "PR demo video" check fails without one. -->
+<!-- To host a local recording, run `pnpm pr:video <pr-number> <file>`: it uploads the file to the `pr-media` prerelease and links it here. -->

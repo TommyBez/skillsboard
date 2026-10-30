@@ -4,9 +4,18 @@ import { pathToFileURL } from "node:url"
 // video. The body arrives through the PR_BODY environment variable so the
 // workflow never interpolates untrusted text into a shell script.
 
-const SECTION_HEADING = /^##[ \t]+demo video[ \t]*#*[ \t]*$/i
-const NEXT_SECTION_HEADING = /^#{1,2}[ \t]/
-const VIDEO_EXTENSION = /\.(mp4|webm|mov)$/i
+export const SECTION_HEADING = /^##[ \t]+demo video[ \t]*#*[ \t]*$/i
+export const NEXT_SECTION_HEADING = /^#{1,2}[ \t]/
+export const VIDEO_EXTENSION = /\.(mp4|webm|mov)$/i
+export const MEDIA_REPOSITORY = "TommyBez/skillsboard"
+export const MEDIA_RELEASE_TAG = "pr-media"
+// Only this repository's pr-media prerelease, see scripts/pr-demo-video.mjs.
+// Tags are case-sensitive, so the path is matched exactly.
+const MEDIA_RELEASE_PATH = new RegExp(
+  `^/${MEDIA_REPOSITORY}/releases/download/${MEDIA_RELEASE_TAG}/[^/]+$`,
+)
+// Hosts such as github.com.evil.example that only pretend to be GitHub.
+const GITHUB_LOOKALIKE_HOST = /(^|\.)github\.com\./i
 const URL_CANDIDATE = /https:\/\/[^\s<>()[\]"'`]+/gi
 
 export function findDemoVideoSection(body) {
@@ -33,11 +42,17 @@ export function isVideoUrl(candidate) {
     return false
   }
   if (url.protocol !== "https:") return false
-  if (VIDEO_EXTENSION.test(url.pathname)) return true
-  return (
-    url.hostname === "github.com" &&
-    /^\/user-attachments\/assets\/[^/]+/.test(url.pathname)
-  )
+  if (url.hostname === "github.com") {
+    // On github.com only uploads and the pr-media prerelease count; other
+    // releases, tags and repositories do not.
+    return (
+      /^\/user-attachments\/assets\/[^/]+/.test(url.pathname) ||
+      (MEDIA_RELEASE_PATH.test(url.pathname) &&
+        VIDEO_EXTENSION.test(url.pathname))
+    )
+  }
+  if (GITHUB_LOOKALIKE_HOST.test(url.hostname)) return false
+  return VIDEO_EXTENSION.test(url.pathname)
 }
 
 export function findDemoVideoLinks(section) {
@@ -64,6 +79,8 @@ const HOW_TO_FIX = [
   "  - an https URL ending in .mp4, .webm or .mov (a query string is fine)",
   "  - a GitHub upload: https://github.com/user-attachments/assets/...",
   "    (drag the video file into the PR description editor to get one)",
+  `  - a pr-media asset: https://github.com/${MEDIA_REPOSITORY}/releases/download/${MEDIA_RELEASE_TAG}/<file>.webm`,
+  "    (run `pnpm pr:video <pr-number> <file>` to upload and link one)",
   "Links inside <!-- HTML comments --> are ignored.",
 ].join("\n")
 

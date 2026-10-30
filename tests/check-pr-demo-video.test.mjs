@@ -46,6 +46,12 @@ const validBodies = {
     "\n",
     "\r\n",
   ),
+  "a pr-media release asset": body(
+    "https://github.com/TommyBez/skillsboard/releases/download/pr-media/pr-214-1a88034-demo.webm",
+  ),
+  "a pr-media release mov asset": body(
+    "https://github.com/TommyBez/skillsboard/releases/download/pr-media/pr-7-abcdef0-demo.MOV",
+  ),
   "the section at the end of the body":
     "## What\n\nx\n\n## Demo video\n\nhttps://example.com/demo.mp4",
 }
@@ -73,6 +79,40 @@ const invalidBodies = {
   ],
   "a lookalike GitHub host": [
     body("https://github.com.evil.example/user-attachments/assets/abc"),
+    "missing-link",
+  ],
+  "a pr-media asset that is not a video": [
+    body("https://github.com/TommyBez/skillsboard/releases/download/pr-media/notes.txt"),
+    "missing-link",
+  ],
+  "another release tag": [
+    body("https://github.com/TommyBez/skillsboard/releases/download/v1.0.0/demo.webm"),
+    "missing-link",
+  ],
+  "a differently cased release tag": [
+    body("https://github.com/TommyBez/skillsboard/releases/download/PR-MEDIA/demo.webm"),
+    "missing-link",
+  ],
+  "another repository's pr-media release": [
+    body("https://github.com/someone/skillsboard/releases/download/pr-media/demo.webm"),
+    "missing-link",
+  ],
+  "a nested path under pr-media": [
+    body("https://github.com/TommyBez/skillsboard/releases/download/pr-media/x/demo.webm"),
+    "missing-link",
+  ],
+  "any other github.com video path": [
+    body("https://github.com/TommyBez/skillsboard/raw/main/demo.mp4"),
+    "missing-link",
+  ],
+  "a lookalike host for the pr-media release": [
+    body(
+      "https://github.com.evil.example/TommyBez/skillsboard/releases/download/pr-media/demo.webm",
+    ),
+    "missing-link",
+  ],
+  "a lookalike subdomain host": [
+    body("https://www.github.com.evil.example/demo.mp4"),
     "missing-link",
   ],
   "a GitHub attachment without an id": [

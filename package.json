@@ -32,6 +32,7 @@
     "stats:collect": "node scripts/ecosystem-stats/collect.mjs",
     "test:e2e": "playwright test",
     "check": "pnpm typecheck && pnpm test:unit",
+    "pr:video": "node scripts/pr-demo-video.mjs",
     "video:render:product-hunt": "remotion render remotion/index.ts skillsboard-launch-product-hunt public/launch/skills-board-product-demo-product-hunt.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --gl=swangle --timeout=240000 --concurrency=2 --muted",
     "video:render:social": "remotion render remotion/index.ts skillsboard-launch-social public/launch/skills-board-product-demo.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --gl=swangle --timeout=240000 --concurrency=2 --muted",
     "video:render:team-loop": "remotion render remotion/index.ts skillsboard-team-loop public/launch/skills-board-team-loop.mp4 --codec=h264 --crf=18 --pixel-format=yuv420p --gl=swangle --timeout=240000 --concurrency=2 --muted",
