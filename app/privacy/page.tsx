@@ -1,5 +1,4 @@
 import type { Metadata } from "next"
-import Link from "next/link"
 
 import { LegalPageShell } from "@/components/legal-page-shell"
 import { siteConfig } from "@/lib/site"
@@ -108,8 +107,8 @@ export default function PrivacyPage() {
         <h2>Product communications</h2>
         <p>
           Creating an account does not subscribe you to marketing. Product communications require an affirmative,
-          optional choice. You can change that choice in <Link href="/settings/email">Email preferences</Link> or use
-          the unsubscribe link in any product email. Withdrawal takes effect for future product communications.
+          optional choice. You can use the unsubscribe link in any product email. Withdrawal takes effect for future
+          product communications.
           Transactional sign-in codes and team invitations are separate and are not affected by a marketing
           unsubscribe.
         </p>

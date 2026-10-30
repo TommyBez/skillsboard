@@ -4,12 +4,8 @@ Skills Board keeps product communications separate from sign-in codes and team i
 
 ## User contract
 
-- Signup offers one optional, unchecked `product_communications` choice.
-- Consent is recorded only after the email OTP succeeds and the account email is verified.
-- For a newly created account, leaving the signup choice unchecked records a non-consent default after verification. It never grants consent or changes an existing account's preference.
-- Existing accounts with no recorded choice see one inline, non-blocking choice in the authenticated product until they answer.
-- Authenticated users can grant or withdraw consent at `/settings/email`.
-- Every product email includes a visible unsubscribe link, a preferences link, and the sender identity. A marketing broadcast also carries the public postal address, because the CAN SPAM postal requirement applies to commercial messages. Account setup service email and transactional email are relationship messages and carry no address.
+- The product does not collect account-level `product_communications` consent. The signup checkbox, the existing-user prompt, and `/settings/email` were removed on 2026-10-30 by owner decision. Existing `emailPreference` rows and the consent ledger are retained, and the public unsubscribe link keeps working for them.
+- Every product email includes a visible unsubscribe link and the sender identity. A marketing broadcast also carries the public postal address, because the CAN SPAM postal requirement applies to commercial messages. Account setup service email and transactional email are relationship messages and carry no address.
 - One-click unsubscribe is public, encrypted, idempotent, and does not expose the raw email address or a stable user identifier.
 - Product campaigns use the verified consent and suppression contract without adding an account-age, weekly, or other arbitrary attention gate.
 

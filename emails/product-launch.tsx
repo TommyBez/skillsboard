@@ -20,21 +20,18 @@ export const PRODUCT_LAUNCH_EMAIL = {
 
 export const PRODUCT_LAUNCH_BROADCAST_PROPS = {
   ctaUrl: PRODUCT_LAUNCH_EMAIL.ctaUrl,
-  managePreferencesUrl: `${siteConfig.url}/settings/email`,
   providerUnsubscribeUrl: "{{{RESEND_UNSUBSCRIBE_URL}}}",
   unsubscribeUrl: `${siteConfig.url}/email/unsubscribe?token={{{${PRODUCT_COMMUNICATIONS_UNSUBSCRIBE_TOKEN_PROPERTY}}}}`,
 } as const
 
 export interface ProductLaunchEmailProps {
   ctaUrl: string
-  managePreferencesUrl: string
   providerUnsubscribeUrl: string
   unsubscribeUrl: string
 }
 
 export default function ProductLaunchEmail({
   ctaUrl = PRODUCT_LAUNCH_BROADCAST_PROPS.ctaUrl,
-  managePreferencesUrl = PRODUCT_LAUNCH_BROADCAST_PROPS.managePreferencesUrl,
   providerUnsubscribeUrl = PRODUCT_LAUNCH_BROADCAST_PROPS.providerUnsubscribeUrl,
   unsubscribeUrl = PRODUCT_LAUNCH_BROADCAST_PROPS.unsubscribeUrl,
 }: ProductLaunchEmailProps) {
@@ -79,7 +76,6 @@ export default function ProductLaunchEmail({
       </Text>
 
       <MarketingFooter
-        managePreferencesUrl={managePreferencesUrl}
         providerUnsubscribeUrl={providerUnsubscribeUrl}
         unsubscribeUrl={unsubscribeUrl}
       />
@@ -89,7 +85,6 @@ export default function ProductLaunchEmail({
 
 ProductLaunchEmail.PreviewProps = {
   ctaUrl: PRODUCT_LAUNCH_EMAIL.ctaUrl,
-  managePreferencesUrl: `${siteConfig.url}/settings/email`,
   providerUnsubscribeUrl: `${siteConfig.url}/email/unsubscribe?provider=preview`,
   unsubscribeUrl: `${siteConfig.url}/email/unsubscribe?token=preview-token`,
 } satisfies ProductLaunchEmailProps

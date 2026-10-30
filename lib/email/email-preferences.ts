@@ -23,18 +23,15 @@ import {
   PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
   PRODUCT_COMMUNICATIONS_TOPIC,
   shouldApplyProviderContactState,
-  type EmailPreferenceSource,
   type EmailSuppressionReason,
   type EmailSuppressionScope,
 } from "@/lib/email/product-communications"
 import {
-  createProductCommunicationsUnsubscribeToken,
   hashEmailAddress,
   hashEmailAddressCandidates,
 } from "@/lib/email/email-privacy"
 import { absoluteUrl } from "@/lib/site"
 
-const LIFTABLE_SUPPRESSION_REASONS = ["unsubscribe"] as const
 const PERMANENT_SUPPRESSION_REASONS = ["complaint", "hard_bounce", "provider_suppressed"] as const
 
 export type EmailPreferenceTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0]
@@ -148,161 +145,6 @@ export async function getProductCommunicationsPreference(
     subscribed: preference?.subscribed ?? false,
     withdrawnAt: preference?.withdrawnAt ?? null,
   }
-}
-
-export async function setProductCommunicationsPreference(input: {
-  source: Extract<EmailPreferenceSource, "existing_user_prompt" | "settings" | "signup">
-  subscribed: boolean
-  userId: string
-}): Promise<ProductCommunicationsPreferenceView> {
-  const now = new Date()
-
-  await db.transaction(async (tx) => {
-    const [identity] = await tx
-      .select({ email: user.email, emailVerified: user.emailVerified })
-      .from(user)
-      .where(eq(user.id, input.userId))
-      .limit(1)
-
-    if (!identity?.emailVerified) throw new Error("A verified account is required to update email preferences")
-
-    const emailHashes = hashEmailAddressCandidates(identity.email)
-    const emailHash = emailHashes[0]
-    await lockEmailHashes(tx, emailHashes)
-    const [current] = await tx
-      .select({
-        consentedAt: emailPreference.consentedAt,
-        emailHash: emailPreference.emailHash,
-        noticeVersion: emailPreference.noticeVersion,
-        noticeText: emailPreference.noticeText,
-        subscribed: emailPreference.subscribed,
-        unsubscribeToken: emailPreference.unsubscribeToken,
-        withdrawnAt: emailPreference.withdrawnAt,
-      })
-      .from(emailPreference)
-      .where(and(
-        eq(emailPreference.userId, input.userId),
-        eq(emailPreference.topic, PRODUCT_COMMUNICATIONS_TOPIC),
-      ))
-      .limit(1)
-
-    if (input.subscribed) {
-      const permanentBlocks = await tx
-        .select({ reason: emailSuppression.reason })
-        .from(emailSuppression)
-        .where(and(
-          inArray(emailSuppression.emailHash, emailHashes),
-          eq(emailSuppression.active, true),
-          inArray(emailSuppression.reason, [...PERMANENT_SUPPRESSION_REASONS]),
-        ))
-        .limit(1)
-      if (permanentBlocks.length > 0) throw new EmailPreferenceBlockedError()
-
-      await tx
-        .update(emailSuppression)
-        .set({ active: false, liftedAt: now, liftedSource: input.source })
-        .where(and(
-          inArray(emailSuppression.emailHash, emailHashes),
-          eq(emailSuppression.active, true),
-          inArray(emailSuppression.reason, [...LIFTABLE_SUPPRESSION_REASONS]),
-        ))
-    }
-
-    const changed = !current
-      || current.emailHash !== emailHash
-      || current.subscribed !== input.subscribed
-      || current.noticeVersion !== PRODUCT_COMMUNICATIONS_NOTICE_VERSION
-      || current.noticeText !== PRODUCT_COMMUNICATIONS_DISCLOSURE
-    const unsubscribeToken = current?.emailHash === emailHash && current.unsubscribeToken
-      ? current.unsubscribeToken
-      : createProductCommunicationsUnsubscribeToken({ emailHash, userId: input.userId })
-    const consentedAt = input.subscribed
-      ? changed ? now : current?.consentedAt ?? now
-      : null
-    const withdrawnAt = input.subscribed
-      ? null
-      : changed ? now : current?.withdrawnAt ?? now
-
-    await tx
-      .insert(emailPreference)
-      .values({
-        userId: input.userId,
-        topic: PRODUCT_COMMUNICATIONS_TOPIC,
-        emailHash,
-        subscribed: input.subscribed,
-        source: input.source,
-        noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
-        noticeText: PRODUCT_COMMUNICATIONS_DISCLOSURE,
-        unsubscribeToken,
-        consentedAt,
-        withdrawnAt,
-        updatedAt: now,
-      })
-      .onConflictDoUpdate({
-        target: [emailPreference.userId, emailPreference.topic],
-        set: {
-          emailHash,
-          subscribed: input.subscribed,
-          source: input.source,
-          noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
-          noticeText: PRODUCT_COMMUNICATIONS_DISCLOSURE,
-          unsubscribeToken,
-          consentedAt,
-          withdrawnAt,
-          updatedAt: now,
-        },
-      })
-
-    if (!input.subscribed) {
-      await tx
-        .insert(emailSuppression)
-        .values({
-          emailHash,
-          scope: "marketing",
-          reason: "unsubscribe",
-          source: input.source,
-          active: true,
-          createdAt: now,
-          lastSeenAt: now,
-        })
-        .onConflictDoUpdate({
-          target: [emailSuppression.emailHash, emailSuppression.scope, emailSuppression.reason],
-          set: {
-            active: true,
-            lastSeenAt: now,
-            liftedAt: null,
-            liftedSource: null,
-            source: input.source,
-            sourceReference: null,
-          },
-        })
-    }
-
-    const eventAction = input.subscribed && changed
-      ? "granted"
-      : !input.subscribed && current?.subscribed === true
-        ? "withdrawn"
-        : !input.subscribed && !current
-          ? "declined"
-          : null
-
-    if (eventAction) {
-      await tx.insert(emailConsentEvent).values({
-        userId: input.userId,
-        emailHash,
-        topic: PRODUCT_COMMUNICATIONS_TOPIC,
-        action: eventAction,
-        source: input.source,
-        noticeVersion: PRODUCT_COMMUNICATIONS_NOTICE_VERSION,
-        noticeText: PRODUCT_COMMUNICATIONS_DISCLOSURE,
-        occurredAt: now,
-      })
-    }
-  })
-
-  const updated = await getProductCommunicationsPreference(input.userId)
-  if (!updated) throw new Error("Unable to read the updated email preference")
-  return updated
 }
 
 export interface ApplyEmailSuppressionInput {
@@ -811,7 +653,6 @@ export async function assertTransactionalEmailAllowed(email: string): Promise<vo
 
 export async function getProductCommunicationsUnsubscribeUrls(userId: string): Promise<{
   oneClickUrl: string
-  preferencesUrl: string
   unsubscribeUrl: string
 }> {
   const identity = await getUserIdentity(userId)
@@ -835,7 +676,6 @@ export async function getProductCommunicationsUnsubscribeUrls(userId: string): P
 
   return {
     oneClickUrl: absoluteUrl(`/api/email/unsubscribe?token=${encodeURIComponent(token)}`),
-    preferencesUrl: absoluteUrl("/settings/email"),
     unsubscribeUrl: absoluteUrl(`/email/unsubscribe?token=${encodeURIComponent(token)}`),
   }
 }

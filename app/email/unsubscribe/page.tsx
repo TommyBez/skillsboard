@@ -55,8 +55,7 @@ async function UnsubscribeContent({ searchParams }: UnsubscribePageProps) {
           <CheckCircle2Icon className="size-8 text-primary" aria-hidden="true" />
           <h2 className="mt-5">Preference saved</h2>
           <p>
-            The unsubscribe is effective immediately for future product communications. You can opt in again from Email
-            preferences after signing in.
+            The unsubscribe is effective immediately for future product communications.
           </p>
           <Button className="mt-6" nativeButton={false} render={<Link href="/" />}>
             Return to Skills Board
@@ -79,11 +78,10 @@ async function UnsubscribeContent({ searchParams }: UnsubscribePageProps) {
           <MailXIcon className="size-8 text-muted-foreground" aria-hidden="true" />
           <h2 className="mt-5">Manage your preference another way</h2>
           <p>
-            Sign in to update Email preferences, or contact us if you continue receiving product communications after
-            asking to stop them.
+            Contact us if you continue receiving product communications after asking to stop them.
           </p>
-          <Button className="mt-6" nativeButton={false} render={<Link href="/settings/email" />}>
-            Open Email preferences
+          <Button className="mt-6" nativeButton={false} render={<Link href="/contact" />}>
+            Contact Skills Board
           </Button>
         </section>
       </LegalPageShell>

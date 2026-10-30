@@ -123,7 +123,7 @@ Hosted deployments run the collection-release retention cleanup once per day. Se
 
 The public email capture form is rate limited to five submissions an hour per client address, counted in Upstash Redis under hashed addresses. On Vercel, add an Upstash Redis database from the Marketplace in a region close to the deployment and connect it to the project: the integration writes `KV_REST_API_URL` and `KV_REST_API_TOKEN` into Production and Preview, and nothing else has to be set. Self-hosted deployments point at a database created in `console.upstash.com` and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. The Upstash client reads the canonical pair first and falls back to the `KV_REST_API_` one, so where both are present the canonical pair is what counts. Either way the form fails open: with no credentials, or with Redis unreachable, submissions are accepted uncounted and the gap is logged.
 
-Product communications are separate from transactional OTP and invitation email. Signup consent is optional and off by default, can be changed under **Settings → Email**, and is enforced with local consent history, suppression records, signed unsubscribe links, and verified Resend delivery webhooks. See [`docs/email-compliance.md`](./docs/email-compliance.md) before configuring a product broadcast.
+Product communications are separate from transactional OTP and invitation email. The app no longer collects account-level product-email consent; retained consent history, suppression records, signed unsubscribe links, and verified Resend delivery webhooks still apply. See [`docs/email-compliance.md`](./docs/email-compliance.md) before configuring a product broadcast.
 
 ## MCP access
 

@@ -4,7 +4,6 @@ import { AppHeader } from "@/components/app-header"
 import { Brand } from "@/components/brand"
 import { CommandMenu } from "@/components/command-menu"
 import { CommandMenuIndex } from "@/components/command-menu-index"
-import { ExistingUserEmailConsentPrompt } from "@/components/existing-user-email-consent-prompt"
 import { FirstSkillInviteProvider } from "@/components/first-skill-invite-provider"
 import { PostHogIdentity } from "@/components/posthog-identity"
 import { ThemeToggle } from "@/components/theme-toggle"
@@ -44,9 +43,6 @@ export function ProtectedAppShell({ children }: { children: ReactNode }) {
       <a href="#main-content" className="skip-link">Skip to content</a>
       <Suspense fallback={<AppHeaderFallback />}>
         <AuthenticatedHeader />
-      </Suspense>
-      <Suspense fallback={null}>
-        <ExistingUserEmailConsentPrompt />
       </Suspense>
       {/* Every save control lives under here, and the follow-up invite step
           has to outlive the list refresh that a save triggers, so the shell
