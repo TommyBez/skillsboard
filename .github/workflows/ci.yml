@@ -100,3 +100,79 @@ jobs:
 
       - name: Boot the app and check auth routes
         run: pnpm smoke:auth
+
+  mcp-runtime:
+    name: MCP runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # A disposable Postgres that only this job sees, migrated from the repo's
+    # own drizzle/ folder. No Neon branch, no Vercel env, no repository secrets.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillsboard_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/skillsboard_ci
+      DATABASE_URL_UNPOOLED: postgres://postgres:postgres@localhost:5432/skillsboard_ci
+      BASE_URL: http://localhost:3100
+      BETTER_AUTH_URL: http://localhost:3100
+      PORT: "3100"
+      # Dev OTP bypass (any 6-digit code verifies) and no Resend key: no email
+      # is ever sent. PostHog stays off outside Vercel production.
+      VERCEL_ENV: development
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate a throwaway auth secret
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "BETTER_AUTH_SECRET=$secret" >> "$GITHUB_ENV"
+
+      - name: Apply migrations to the job database
+        run: pnpm db:migrate
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build
+        run: pnpm exec next build
+
+      - name: MCP runtime tests
+        run: pnpm test:mcp
+
+      - name: Upload Playwright artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mcp-runtime-test-results
+          path: test-results/
+          retention-days: 7
