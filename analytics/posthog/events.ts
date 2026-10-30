@@ -1,15 +1,4 @@
-import type { StoredEmailCaptureSource } from "@/lib/email/email-capture"
-
 type NonTeamEventPropertiesMap = {
-  email_capture_submitted: {
-    /**
-     * The capture surface: the landing band, a guide, or an alternative page,
-     * or `unknown` when a direct post carried a source we do not render. The
-     * type comes from the capture rules rather than being spelled twice, so
-     * the property and the stored column cannot drift apart.
-     */
-    source: StoredEmailCaptureSource
-  }
   landing_cta_clicked: {
     destination: "/library" | "/sign-up"
     /**
@@ -29,6 +18,10 @@ type NonTeamEventPropertiesMap = {
    * `/settings/mcp` stays in the destination union: the setup page now lives at
    * `/connect`, and the old value is what every event captured before the move
    * carries, so dropping it would rewrite history rather than record it.
+   *
+   * `location: "onboarding"` was the first-run page's setup card. That page was
+   * removed on 2026-10-30, so the value is no longer sent; events recorded
+   * before then still carry it.
    */
   mcp_entry_clicked: {
     destination: "#mcp" | "/connect" | "/settings/mcp" | "/sign-up"
@@ -38,12 +31,11 @@ type NonTeamEventPropertiesMap = {
       | "landing_hero"
       | "landing_section"
       | "library_header"
-      | "onboarding"
   }
   /**
    * Copying the plugin install commands. Non team scoped on purpose: the same
    * block runs on the landing page, where there is no team yet, and `location`
-   * keeps the two surfaces apart. `/start` carried this block until
+   * keeps the two surfaces apart. The first-run page carried this block until
    * 2026-09-07; events with `location: "onboarding"` predate that.
    */
   plugin_install_copied: {
@@ -52,7 +44,8 @@ type NonTeamEventPropertiesMap = {
   /**
    * A real copy action, not a route view. `$pageview` on `/connect` owns the
    * denominator; `client` is the setup guide tab the config was copied from.
-   * `/start` copied the bare endpoint as `client: "generic"` until 2026-09-07.
+   * The first-run page copied the bare endpoint as `client: "generic"` until
+   * 2026-09-07.
    * Browser team context comes from PostHog's registered `team_id` super
    * property, without making leaf components fetch or receive the team.
    */
@@ -214,14 +207,15 @@ type TeamEventPropertiesMap = {
   }
   /**
    * `surface` is threaded from the form that sent the invitation, through the
-   * server action, so an invitation sent from the first run can be counted on
-   * its own. Same values as `team_invite_link_copied`, so the emailed
-   * invitation and the copied link read against each other per surface.
+   * server action, so each form's invitations can be counted on their own.
+   * Same values as `team_invite_link_copied`, so the emailed invitation and the
+   * copied link read against each other per surface. `surface: "onboarding"`
+   * was the first-run page, removed on 2026-10-30; older events still carry it.
    */
   team_member_invited: {
     email_sent: boolean
     role: "admin" | "member"
-    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
+    surface: "organization_settings"
   }
   invitation_accepted: Record<never, never>
   skill_usage_path_selected: {
@@ -246,48 +240,9 @@ type TeamEventPropertiesMap = {
   library_empty_state_cta_clicked: {
     cta: "add_skill" | "find_skills"
   }
-  /**
-   * Only the two steps that have no event of their own. Connecting an agent is
-   * already measured by `mcp_entry_clicked`, `plugin_install_copied`, and
-   * `mcp_config_copied`, and counting it twice would inflate that step.
-   */
-  onboarding_step_clicked: {
-    step: "first_skill" | "invite_team"
-    /** Only the first-skill step sets this; older events have none and meant `/library`. */
-    destination?: "discover" | "library"
-  }
-  team_invite_prompt_viewed: {
-    actor_is_skill_creator: boolean
-    /**
-     * How the ask looked when it was seen. The library banner reports a view
-     * whether it is expanded or folded to its title, and those two are not the
-     * same sighting: a team can count five views and have read the ask once.
-     * Optional because events recorded before this property shipped have none;
-     * the first-skill step always sends `expanded`.
-     */
-    state?: "collapsed" | "expanded"
-    surface: "first_skill_invite_step" | "library_after_first_skill"
-    trigger: "first_skill_saved" | "library_revisit"
-  }
-  /**
-   * What the user did with the ask, as opposed to whether it was on screen.
-   * `not_now` is the first-skill dialog closed without an invitation being
-   * sent (the button, the X, Escape, the overlay). The other three are the
-   * banner state transitions the user chose.
-   */
-  team_invite_prompt_answered: {
-    actor_is_skill_creator: boolean
-    answer: "collapsed" | "dismissed" | "expanded" | "not_now"
-    surface: "first_skill_invite_step" | "library_after_first_skill"
-  }
-  team_invite_prompt_clicked: {
-    actor_is_skill_creator: boolean
-    surface: "first_skill_invite_step" | "library_after_first_skill"
-    trigger: "first_skill_saved" | "library_revisit"
-  }
   team_invite_link_copied: {
     actor_is_skill_creator: boolean
-    surface: "first_skill_invite_step" | "onboarding" | "organization_settings"
+    surface: "organization_settings"
   }
   skill_note_updated: {
     has_note: boolean

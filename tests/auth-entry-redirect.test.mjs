@@ -42,9 +42,12 @@ test("claims the bare marketing CTA, which is what every landing button links to
   assert.equal(resolve("returnTo=/library"), "/library")
 })
 
-test("claims /connect and /start the same way as /library", () => {
+test("claims /connect the same way as /library", () => {
   assert.equal(resolve("returnTo=/connect"), "/connect")
-  assert.equal(resolve("returnTo=/start"), "/start")
+})
+
+test("sends a returnTo for the removed first-run page to the library", () => {
+  assert.equal(resolve("returnTo=/start"), "/library")
 })
 
 test("claims a returnTo the sanitizer would have discarded anyway", () => {
@@ -59,10 +62,6 @@ test("leaves the invitation hand-off to the page", () => {
   // users to /sign-up?returnTo=/invite/…. A signed-in one is owed the
   // invitation, not their library.
   assert.equal(resolve("returnTo=/invite/invite_123"), null)
-})
-
-test("leaves the email-preferences hand-off to the page", () => {
-  assert.equal(resolve("returnTo=/settings/email"), null)
 })
 
 test("leaves an OAuth authorize request to the page", () => {
@@ -112,7 +111,7 @@ test("never bounces back a URL that requireSession itself produced", () => {
   // to end rather than by inspection: whatever requireSession redirects to,
   // the proxy stands down on. Every returnTo it is called with in the app,
   // plus the bare case that /onboarding and the server actions hit.
-  for (const returnTo of [undefined, "/library", "/connect", "/start", "/settings/email", "/invite/invite_1"]) {
+  for (const returnTo of [undefined, "/library", "/connect", "/invite/invite_1"]) {
     const path = buildSessionCheckedSignInPath(returnTo)
     const { searchParams } = new URL(path, "https://skillsboard.sh")
     assert.equal(resolveSignedInAuthRedirect(searchParams), null, `looped on ${path}`)
@@ -121,8 +120,8 @@ test("never bounces back a URL that requireSession itself produced", () => {
 
 test("keeps returnTo intact so the page can still honour it", () => {
   assert.equal(
-    buildSessionCheckedSignInPath("/settings/email"),
-    `/sign-in?returnTo=%2Fsettings%2Femail&${SESSION_CHECKED_PARAM}=1`,
+    buildSessionCheckedSignInPath("/invite/invite_1"),
+    `/sign-in?returnTo=%2Finvite%2Finvite_1&${SESSION_CHECKED_PARAM}=1`,
   )
   assert.equal(buildSessionCheckedSignInPath(), `/sign-in?${SESSION_CHECKED_PARAM}=1`)
 })

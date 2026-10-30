@@ -1,6 +1,5 @@
 import SignInOtp from "@/emails/sign-in-otp"
 
-import { assertTransactionalEmailAllowed } from "./email-preferences"
 import { createEmailIdempotencyKey } from "./idempotency"
 import { getEmailFrom, getResendClient } from "./resend"
 
@@ -16,7 +15,6 @@ function otpIdempotencyKey(email: string, otp: string): string {
 }
 
 export async function sendSignInOtp(input: SendSignInOtpInput): Promise<void> {
-  await assertTransactionalEmailAllowed(input.email)
   const resend = getResendClient()
   const expiresInSeconds = input.expiresInSeconds ?? 300
   const expiresInMinutes = Math.max(1, Math.ceil(expiresInSeconds / 60))

@@ -19,19 +19,6 @@ export type AlternativePath =
 export type AlternativeSlug =
   AlternativePath extends `/alternatives/${infer Slug}` ? Slug : never
 
-/**
- * One value per alternative page, recorded as the `source` of an
- * email_capture_submitted event so a signup can be traced back to the page
- * that earned it. The CTA location no longer carries the page, which is read
- * from `$pathname`, but the capture source is a stored column and stays
- * spelled out.
- */
-export type AlternativeEmailCaptureSource =
-  | "alternatives_github_repo"
-  | "alternatives_skills_sh"
-  | "alternatives_smithery"
-  | "alternatives_superpowers"
-
 export interface AlternativeSource {
   /** Stable key referenced by comparison rows. */
   id: string
@@ -67,7 +54,6 @@ export interface AlternativeRelatedLink {
 
 export interface AlternativeDefinition {
   path: AlternativePath
-  emailCaptureSource: AlternativeEmailCaptureSource
   /** What the reader is comparing against, used in cards and breadcrumbs. */
   subject: string
   /**
@@ -108,7 +94,6 @@ export interface AlternativeDefinition {
 
 const githubRepo: AlternativeDefinition = {
   path: alternativePaths.githubRepo,
-  emailCaptureSource: "alternatives_github_repo",
   subject: "A shared GitHub repository",
   hubLabel: "Shared GitHub repo alternative",
   subjectHref: "https://github.com",
@@ -322,7 +307,6 @@ const githubRepo: AlternativeDefinition = {
 
 const skillsSh: AlternativeDefinition = {
   path: alternativePaths.skillsSh,
-  emailCaptureSource: "alternatives_skills_sh",
   subject: "skills.sh",
   hubLabel: "skills.sh alternative",
   subjectHref: "https://www.skills.sh",
@@ -556,7 +540,6 @@ const skillsSh: AlternativeDefinition = {
 
 const smithery: AlternativeDefinition = {
   path: alternativePaths.smithery,
-  emailCaptureSource: "alternatives_smithery",
   subject: "Smithery",
   hubLabel: "Smithery alternative",
   subjectHref: "https://smithery.ai",
@@ -762,7 +745,6 @@ const smithery: AlternativeDefinition = {
 
 const superpowers: AlternativeDefinition = {
   path: alternativePaths.superpowers,
-  emailCaptureSource: "alternatives_superpowers",
   subject: "Superpowers",
   hubLabel: "Superpowers alternative",
   subjectHref: "https://github.com/obra/superpowers",
