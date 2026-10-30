@@ -7,7 +7,6 @@ import {
   GitHubSkillDiscoveryError,
   resolveGitHubSkills,
 } from "@/lib/github-skill-discovery"
-import { isFirstTeamSkillSave } from "@/lib/library-view-state"
 import { captureTeamEvent } from "@/lib/posthog-server"
 
 export interface SaveSkillsInput {
@@ -28,7 +27,7 @@ export interface SaveSkillInput extends Omit<SaveSkillsInput, "skillPaths"> {
 export type SavedSkill = typeof skill.$inferSelect
 
 export type SaveSkillsResult =
-  | { ok: true; saved: SavedSkill[]; alreadySaved: string[]; isFirstTeamSkill: boolean }
+  | { ok: true; saved: SavedSkill[]; alreadySaved: string[] }
   | { ok: false; error: string }
 
 export type SaveSkillResult =
@@ -103,12 +102,7 @@ export async function saveSkillsToLibrary(input: SaveSkillsInput): Promise<SaveS
       })
     }
 
-    const isFirstTeamSkill = isFirstTeamSkillSave({
-      savedCount: savedSkills.length,
-      teamSkillCount,
-    })
-
-    return { ok: true, saved: savedSkills, alreadySaved, isFirstTeamSkill }
+    return { ok: true, saved: savedSkills, alreadySaved }
   } catch (error) {
     console.error("Unable to save skills", error)
     return {

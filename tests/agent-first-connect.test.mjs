@@ -57,7 +57,6 @@ const nextSteps = await readText("../components/onboarding-next-steps.tsx")
 const inviteStep = await readText("../components/onboarding-invite-step.tsx")
 const organizationActions = await readText("../app/actions/organizations.ts")
 const inviteForm = await readText("../components/invite-member-form.tsx")
-const firstSkillInviteStep = await readText("../components/first-skill-invite-step.tsx")
 const organizationSettings = await readText("../app/(app)/settings/organization/page.tsx")
 const events = await readText("../analytics/posthog/events.ts")
 const mcpSetupGuide = await readText("../components/mcp-setup-guide.tsx")
@@ -271,7 +270,7 @@ test("route views stay native while real actions stay custom", async () => {
   assert.doesNotMatch(events, /\| "generic" \|/)
   assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId\)/)
   assert.match(mcpSetupGuide, /properties: \{ client \}/)
-  assert.match(events, /surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"/)
+  assert.match(events, /surface: "onboarding" \| "organization_settings"/)
   assert.match(events, /step: "first_skill" \| "invite_team"/)
 
   assert.doesNotMatch(events, /mcp_setup_viewed/)
@@ -369,7 +368,7 @@ test("team changes synchronize PostHog without delaying product updates", () => 
  * but not the invitation that was actually sent.
  */
 test("an invitation carries the surface it was sent from", () => {
-  assert.match(events, /team_member_invited: \{\n\s+email_sent: boolean\n\s+role: "admin" \| "member"\n\s+surface: "first_skill_invite_step" \| "onboarding" \| "organization_settings"\n\s+\}/)
+  assert.match(events, /team_member_invited: \{\n\s+email_sent: boolean\n\s+role: "admin" \| "member"\n\s+surface: "onboarding" \| "organization_settings"\n\s+\}/)
 
   // The form posts it, the action reads it, the event carries it.
   assert.match(inviteForm, /<input type="hidden" name="surface" value=\{surface\} \/>/)
@@ -382,7 +381,6 @@ test("an invitation carries the surface it was sent from", () => {
   // Every copy of the form names its own surface, and the first run names the
   // one the onboarding metric is counted on.
   assert.match(inviteStep, /surface="onboarding"/)
-  assert.match(firstSkillInviteStep, /surface="first_skill_invite_step"/)
   assert.match(organizationSettings, /surface="organization_settings"/)
 })
 

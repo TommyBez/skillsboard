@@ -9,12 +9,10 @@ import { AddToCollectionMenu } from "@/components/add-to-collection-menu"
 import { DeleteSkillDialog } from "@/components/delete-skill-dialog"
 import { EditSkillNoteDialog } from "@/components/edit-skill-note-dialog"
 import { EditSkillPromptsDialog } from "@/components/edit-skill-prompts-dialog"
-import { InviteTeammatePrompt } from "@/components/invite-teammate-prompt"
 import { LiveSearchField } from "@/components/live-search-field"
 import { FilterPendingProvider, PendingResultsSlot } from "@/components/pending-filters"
 import { SkillDossier } from "@/components/skill-dossier"
 import { TransitionLink } from "@/components/transition-link"
-import { TeammateReusePrompt } from "@/components/teammate-reuse-prompt"
 import { TeamLibraryAnalytics } from "@/components/team-library-analytics"
 import { TrackedLink } from "@/components/tracked-link"
 import { Button } from "@/components/ui/button"
@@ -23,19 +21,12 @@ import { mcpEntryEventProperties } from "@/lib/analytics-event-properties"
 import { getAppContext } from "@/lib/app-context"
 import { listCollectionDistributionIds } from "@/lib/db/collection-distributions"
 import {
-  countOrganizationMembers,
-  countPendingOrganizationInvitations,
   listOrganizationCollectionMemberships,
   listOrganizationCollections,
   listOrganizationSkills,
 } from "@/lib/db/queries"
 import { buildInstallCommand } from "@/lib/install-command"
-import {
-  findRecentTeammateRecommendation,
-  getLibraryFilterState,
-  getLibraryNavigationKey,
-  isInvitePromptEligible,
-} from "@/lib/library-view-state"
+import { getLibraryFilterState, getLibraryNavigationKey } from "@/lib/library-view-state"
 import { isOrganizationAdmin } from "@/lib/session"
 
 interface LibraryPageProps {
@@ -145,12 +136,6 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
     readOnly: readOnlyCollectionIds.has(item.id),
     title: item.title,
   }))
-  const [memberCount, pendingInvitationCount] = canManageLibrary && allSkills.length > 0
-    ? await Promise.all([
-        countOrganizationMembers(activeId),
-        countPendingOrganizationInvitations(activeId),
-      ])
-    : [0, 0]
   const query = params.q?.toLowerCase().trim() ?? ""
   const skills = allSkills.filter((item) => (
     (!query || `${item.title} ${item.description ?? ""} ${item.note ?? ""} ${item.examplePrompts.join(" ")} ${item.tags.join(" ")}`.toLowerCase().includes(query))
@@ -159,15 +144,6 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
   const hasFilters = Boolean(query || params.tag)
   const filterState = getLibraryFilterState(query, params.tag)
   const analyticsNavigationKey = getLibraryNavigationKey(query, params.tag)
-  const showInvitePrompt = isInvitePromptEligible({
-    canManageLibrary,
-    memberCount,
-    pendingInvitationCount,
-    skillCount: allSkills.length,
-  })
-  const teammateRecommendation = !hasFilters && !showInvitePrompt
-    ? findRecentTeammateRecommendation(allSkills, userId)
-    : undefined
 
   return (
     <>
@@ -177,24 +153,6 @@ async function LibraryResults({ searchParams }: LibraryPageProps) {
         skillCount={allSkills.length}
         teamId={activeId}
       />
-      {showInvitePrompt ? (
-        <InviteTeammatePrompt
-          actorIsSkillCreator={allSkills.some((item) => item.createdBy === userId)}
-          teamId={activeId}
-        />
-      ) : null}
-
-      {teammateRecommendation ? (
-        <TeammateReusePrompt
-          addedBy={teammateRecommendation.addedByName}
-          command={buildInstallCommand(teammateRecommendation.githubUrl, teammateRecommendation.skillName)}
-          href={teammateRecommendation.githubUrl}
-          skillId={teammateRecommendation.id}
-          skillName={teammateRecommendation.skillName}
-          skillTitle={teammateRecommendation.title}
-        />
-      ) : null}
-
       {skills.length ? (
         <section aria-label="Team skills" className="grid gap-4">
           {hasFilters ? (

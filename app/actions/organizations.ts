@@ -37,10 +37,10 @@ const creationSurfaceSchema = z.enum(["onboarding", "in_app"]).catch("in_app")
  * invitation is created here, on the server, so `team_member_invited` can only
  * carry the surface if the surface travels with the request. An older form that
  * posts nothing reads as the settings panel, which is where the form lived
- * alone before the other two surfaces existed.
+ * alone before the onboarding surface existed.
  */
 const inviteSurfaceSchema = z
-  .enum(["first_skill_invite_step", "onboarding", "organization_settings"])
+  .enum(["onboarding", "organization_settings"])
   .catch("organization_settings")
 
 export async function createOrganization(
