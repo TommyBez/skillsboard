@@ -78,6 +78,13 @@
       "when": 1793384079686,
       "tag": "0010_account_issuer_nullable",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793401156625,
+      "tag": "0011_drop_product_email_tables",
+      "breakpoints": true
     }
   ]
 }

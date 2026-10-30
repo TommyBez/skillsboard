@@ -107,13 +107,6 @@ Open [http://localhost:3000](http://localhost:3000). Restart the server after ch
 | `CRON_SECRET` | Yes for hosted release cleanup | Dedicated random secret used to authenticate the daily expired collection-release cleanup configured in `vercel.json`. |
 | `RESEND_API_KEY` | Yes outside development | Sends sign-in OTP and team invitation emails through Resend. |
 | `EMAIL_FROM` | Yes outside development | Verified Resend sender for OTP and invitation emails (e.g. `Skills Board <login@your-verified-domain.com>`). |
-| `RESEND_WEBHOOK_SECRET` | Yes for hosted email delivery | Verifies Resend bounce, complaint, suppression, and unsubscribe webhooks. |
-| `EMAIL_PRIVACY_SECRET` | Yes in Vercel Production | At least 32 random bytes encoded as base64 or hex; the dedicated root for email hashes and encrypted unsubscribe links. Local/self-hosted environments can fall back to a domain-separated key derived from `BETTER_AUTH_SECRET`. |
-| `EMAIL_PRIVACY_SECRET_PREVIOUS` | Only during key rotation | JSON array of retained base64/hex roots used for dual-hash suppression lookup and unsubscribe-token decryption. A prior root cannot be removed while retained records still depend on it. |
-| `KV_REST_API_URL` | Yes outside development | REST endpoint of the Upstash Redis database that counts email capture submissions per client address. On Vercel, the Marketplace integration writes it into the project by itself. |
-| `KV_REST_API_TOKEN` | Yes outside development | REST token for that database, written by the same integration. The read-only token it also writes is not used. |
-| `UPSTASH_REDIS_REST_URL` | Self-hosted alternative | Same endpoint under the canonical Upstash name, for a database created by hand. The Upstash client reads it before `KV_REST_API_URL`, so a Vercel project leaves it unset. |
-| `UPSTASH_REDIS_REST_TOKEN` | Self-hosted alternative | Same token under the canonical Upstash name, read before `KV_REST_API_TOKEN`. With neither pair complete, the capture form keeps working and is not rate limited. |
 | `GITHUB_TOKEN` | No | Raises GitHub API rate limits for metadata and ZIP downloads. |
 | `VERCEL_OIDC_TOKEN` | No | Supplied automatically by Vercel for the optional skills.sh catalog. |
 
@@ -121,9 +114,6 @@ Sign-in and sign-up use email one-time codes (no passwords). Outside development
 
 Hosted deployments run the collection-release retention cleanup once per day. Set `CRON_SECRET` in the Vercel Production environment before deploying; the endpoint fails closed when the secret is absent. Self-hosted deployments can invoke `/api/cron/collection-release-retention` from their scheduler with `Authorization: Bearer <CRON_SECRET>`.
 
-The public email capture form is rate limited to five submissions an hour per client address, counted in Upstash Redis under hashed addresses. On Vercel, add an Upstash Redis database from the Marketplace in a region close to the deployment and connect it to the project: the integration writes `KV_REST_API_URL` and `KV_REST_API_TOKEN` into Production and Preview, and nothing else has to be set. Self-hosted deployments point at a database created in `console.upstash.com` and set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` instead. The Upstash client reads the canonical pair first and falls back to the `KV_REST_API_` one, so where both are present the canonical pair is what counts. Either way the form fails open: with no credentials, or with Redis unreachable, submissions are accepted uncounted and the gap is logged.
-
-Product communications are separate from transactional OTP and invitation email. The app no longer collects account-level product-email consent; retained consent history, suppression records, signed unsubscribe links, and verified Resend delivery webhooks still apply. See [`docs/email-compliance.md`](./docs/email-compliance.md) before configuring a product broadcast.
 
 ## MCP access
 
