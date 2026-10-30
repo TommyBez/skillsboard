@@ -68,7 +68,7 @@ function SkillCard({
 const MAX_AUTO_LOADS = 4
 
 function canFetchMore(page: CatalogPage) {
-  if (!page.hasMore || page.source === "curated") return false
+  if (!page.hasMore) return false
   if (page.source === "search" && page.perPage >= SEARCH_MAX_LIMIT) return false
   return true
 }
@@ -111,7 +111,7 @@ export function CatalogResults({ initialPage, savedKeys }: CatalogResultsProps) 
       if (nextLimit <= current.perPage) return
       params.set("q", current.query)
       params.set("limit", String(nextLimit))
-    } else if (current.source === "leaderboard" && current.view) {
+    } else if ((current.source === "leaderboard" || current.source === "curated") && current.view) {
       params.set("view", current.view)
       params.set("page", String(current.page + 1))
       params.set("perPage", String(current.perPage || CATALOG_PAGE_SIZE))
