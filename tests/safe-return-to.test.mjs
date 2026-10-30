@@ -10,9 +10,8 @@ const { safeReturnTo } = await import(
   `data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`
 )
 
-test("allows the exact protected destinations used by auth and email preferences", () => {
+test("allows the exact protected destinations used by auth", () => {
   assert.equal(safeReturnTo("/library"), "/library")
-  assert.equal(safeReturnTo("/settings/email"), "/settings/email")
   assert.equal(safeReturnTo("/connect"), "/connect")
   assert.equal(safeReturnTo("/start"), "/start")
   assert.equal(safeReturnTo("/invite/invite_123"), "/invite/invite_123")
@@ -29,8 +28,7 @@ test("defaults to the library when no destination is supplied", () => {
 })
 
 test("rejects lookalikes, query injection, and external destinations", () => {
-  assert.equal(safeReturnTo("/settings/email/other"), "/library")
-  assert.equal(safeReturnTo("/settings/email?next=https://example.com"), "/library")
+  assert.equal(safeReturnTo("/connect?next=https://example.com"), "/library")
   assert.equal(safeReturnTo("/connect/other"), "/library")
   assert.equal(safeReturnTo("/start?next=/library"), "/library")
   assert.equal(safeReturnTo("https://example.com"), "/library")

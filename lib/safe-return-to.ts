@@ -1,9 +1,9 @@
-const exactDestinations = ["/library", "/settings/email", "/connect", "/start"] as const
+const exactDestinations = ["/library", "/connect", "/start"] as const
 
 /**
  * Destinations a signed-in visitor is owed immediately, the same way the
- * marketing `/sign-in` CTA owes them `/library`. Invitation and email
- * preference hand-offs stay off this list so `AuthEntry` can show Continue.
+ * marketing `/sign-in` CTA owes them `/library`. Invitation hand-offs stay
+ * off this list so `AuthEntry` can show Continue.
  */
 export const immediateSignedInDestinations = ["/library", "/connect", "/start"] as const
 

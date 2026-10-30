@@ -1,7 +1,6 @@
 import TeamInvitation from "@/emails/team-invitation"
 import { getAuthBaseUrl } from "@/lib/auth-environment"
 
-import { assertTransactionalEmailAllowed } from "./email-preferences"
 import { createEmailIdempotencyKey } from "./idempotency"
 import { getEmailFrom, getResendClient } from "./resend"
 
@@ -26,7 +25,6 @@ function expiryDaysFromDate(expiresAt: Date): number {
 }
 
 export async function sendTeamInvitation(input: SendTeamInvitationInput): Promise<void> {
-  await assertTransactionalEmailAllowed(input.email)
   const resend = getResendClient()
   const inviteUrl = buildInviteUrl(input.invitationId)
   const expiryDays = expiryDaysFromDate(input.expiresAt)

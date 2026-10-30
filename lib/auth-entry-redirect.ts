@@ -60,7 +60,6 @@ function toParamRecord(searchParams: URLSearchParams) {
  *   - `?returnTo=/invite/…` is an invitation — `app/invite/[invitationId]` and
  *     the accept action both send unauthenticated users through here, and a
  *     signed-in one is owed the invitation, not their library.
- *   - `?returnTo=/settings/email` is the email-preferences hand-off.
  *
  * `AuthEntry` answers those with a "Continue to …" button rather than a
  * redirect, and it stays the authority for all of them.

@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 
 import { JsonLd } from "@/components/json-ld"
 import { ClosingSection } from "@/components/landing/sections/closing-section"
-import { EmailCaptureSection } from "@/components/landing/sections/email-capture-section"
 import { FaqSection } from "@/components/landing/sections/faq-section"
 import { FlowSection } from "@/components/landing/sections/flow-section"
 import { HeroSection } from "@/components/landing/sections/hero-section"
@@ -42,7 +41,6 @@ export default function HomePage() {
       <PluginSection />
       <PricingSection />
       <FaqSection />
-      <EmailCaptureSection />
       <ClosingSection />
     </>
   )
