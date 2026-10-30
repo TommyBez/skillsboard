@@ -64,10 +64,6 @@ test("leaves the invitation hand-off to the page", () => {
   assert.equal(resolve("returnTo=/invite/invite_123"), null)
 })
 
-test("leaves the email-preferences hand-off to the page", () => {
-  assert.equal(resolve("returnTo=/settings/email"), null)
-})
-
 test("leaves an OAuth authorize request to the page", () => {
   // Redirecting these would strand an MCP client mid-handshake.
   assert.equal(resolve("client_id=abc&response_type=code"), null)
@@ -115,7 +111,7 @@ test("never bounces back a URL that requireSession itself produced", () => {
   // to end rather than by inspection: whatever requireSession redirects to,
   // the proxy stands down on. Every returnTo it is called with in the app,
   // plus the bare case that /onboarding and the server actions hit.
-  for (const returnTo of [undefined, "/library", "/connect", "/settings/email", "/invite/invite_1"]) {
+  for (const returnTo of [undefined, "/library", "/connect", "/invite/invite_1"]) {
     const path = buildSessionCheckedSignInPath(returnTo)
     const { searchParams } = new URL(path, "https://skillsboard.sh")
     assert.equal(resolveSignedInAuthRedirect(searchParams), null, `looped on ${path}`)
@@ -124,8 +120,8 @@ test("never bounces back a URL that requireSession itself produced", () => {
 
 test("keeps returnTo intact so the page can still honour it", () => {
   assert.equal(
-    buildSessionCheckedSignInPath("/settings/email"),
-    `/sign-in?returnTo=%2Fsettings%2Femail&${SESSION_CHECKED_PARAM}=1`,
+    buildSessionCheckedSignInPath("/invite/invite_1"),
+    `/sign-in?returnTo=%2Finvite%2Finvite_1&${SESSION_CHECKED_PARAM}=1`,
   )
   assert.equal(buildSessionCheckedSignInPath(), `/sign-in?${SESSION_CHECKED_PARAM}=1`)
 })

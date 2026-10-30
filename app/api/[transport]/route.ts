@@ -627,7 +627,7 @@ const route = requireMcpAuth(
           wasAbsent: !outcome.changed,
         }, null, 2))
       })
-    }, { serverInfo: { name: "skills-board", version: "1.0.0" } }, { basePath: "/api", disableSse: true })(req)
+    }, { serverInfo: { name: "skills-board", version: "1.0.0" } })(req)
   },
   { resource: getMcpResource(), requiredScopes: ["skills:read"] },
 )
@@ -676,6 +676,9 @@ function jsonRpcRefusal(
   )
 }
 
+/** The one path under `app/api/[transport]` that is the MCP endpoint. */
+const MCP_PATH = "/api/mcp"
+
 /**
  * The budget on the MCP endpoint, published on every answer it gives.
  *
@@ -693,6 +696,15 @@ async function withRequestBudget(
   request: Request,
   context: unknown,
 ): Promise<Response> {
+  // `[transport]` catches every `/api/<segment>` no static route claims, and
+  // mcp-handler 2 serves whatever request it is handed: 1.x took a `basePath`
+  // and answered only `/api/mcp`, 404ing `/api/sse` and the rest. The path is
+  // checked here, ahead of auth and the budget, so another segment never meets
+  // an OAuth challenge or a JSON-RPC body that would read as a second endpoint.
+  if (new URL(request.url).pathname !== MCP_PATH) {
+    return new Response("Not found", { status: 404, headers: { "Cache-Control": "no-store" } })
+  }
+
   // An address the platform supplied, or nothing to count against. Same
   // decision as `/api/health`, argued in `claimApiRequest`.
   const client = ipAddress(request)

@@ -50,10 +50,6 @@ test.describe("instant initial load: public routes", () => {
     await expectInstantInitialLoad(page, "/sign-up", "access-shell", "sign-up-content")
   })
 
-  test("/email/unsubscribe", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/email/unsubscribe", "legal-shell", "unsubscribe-content")
-  })
-
   test("/p/[shareId]", async ({ page }) => {
     await expectInstantInitialLoad(page, `/p/${readFixtures().shareId}`, "share-shell", "share-content")
   })

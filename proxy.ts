@@ -28,8 +28,7 @@ export async function proxy(request: NextRequest) {
       })
     } else if (
       pathname === "/library" ||
-      pathname === "/connect" ||
-      pathname === "/settings/email"
+      pathname === "/connect"
     ) {
       signInUrl.searchParams.set("returnTo", pathname)
     }
