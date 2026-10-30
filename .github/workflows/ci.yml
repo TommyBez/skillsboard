@@ -42,6 +42,67 @@ jobs:
       - name: Check database migrations
         run: pnpm db:check
 
+  boot-smoke:
+    name: Runtime boot smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    # Builds pass on a schema Better Auth rejects at runtime; this boots the
+    # built app on a fully migrated, job-local Postgres and requires the auth
+    # stack to answer. No Neon branch, no Vercel env, no repository secrets.
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: skillsboard_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/skillsboard_ci
+      DATABASE_URL_UNPOOLED: postgres://postgres:postgres@localhost:5432/skillsboard_ci
+      VERCEL_ENV: development
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate a throwaway auth secret
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "BETTER_AUTH_SECRET=$secret" >> "$GITHUB_ENV"
+
+      - name: Apply migrations to the job database
+        run: pnpm db:migrate
+
+      - name: Build
+        run: pnpm exec next build
+
+      - name: Boot smoke
+        run: pnpm smoke:boot
+
   mcp-runtime:
     name: MCP runtime
     runs-on: ubuntu-latest
