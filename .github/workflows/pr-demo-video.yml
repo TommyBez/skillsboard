@@ -1,0 +1,33 @@
+name: PR demo video
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+permissions: {}
+
+concurrency:
+  group: pr-demo-video-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  demo-video:
+    name: Demo video
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      # Fetch only the checker script with plain git: no actions and no token,
+      # since the repository is public.
+      - name: Fetch checker script
+        run: |
+          git init -q checker
+          git -C checker fetch -q --depth=1 --no-tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "$GITHUB_SHA"
+          git -C checker checkout -q FETCH_HEAD -- scripts/check-pr-demo-video.mjs
+
+      # The body is untrusted: it is read from the environment only, never
+      # interpolated into the script.
+      - name: Check PR description for a demo video
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: node checker/scripts/check-pr-demo-video.mjs
