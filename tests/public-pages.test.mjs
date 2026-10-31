@@ -289,6 +289,76 @@ test("the sitemap is the registry, with nothing added and nothing invented", () 
   assert.equal(entries.length, 47)
 })
 
+/** A twin's `last_updated`, read from its frontmatter block only. */
+const frontmatterLastUpdated = (markdown) => {
+  const block = markdown.match(/^---\n([\s\S]*?)\n---\n/)
+  return block?.[1].match(/^last_updated: (.*)$/m)?.[1]
+}
+
+/** The date on the twin's "- Last updated:" header line. */
+const headerLastUpdated = (markdown) =>
+  markdown.match(/^- Last updated: (.*)$/m)?.[1]
+
+test("every sitemap URL dates to its registry modifiedAt, on its twin too, and never in the future", () => {
+  // The registry is the source of truth for dates. The sitemap lastmod and
+  // both dates a Markdown twin prints must equal the page's modifiedAt, and
+  // none of them may be later than today. Today is the UTC calendar day, so
+  // the test reads the same date everywhere around midnight.
+  const today = new Date().toISOString().slice(0, 10)
+  const pagesByUrl = new Map(publicPages.map((page) => [urlFor(page.path), page]))
+  const problems = []
+
+  for (const entry of sitemap()) {
+    const page = pagesByUrl.get(entry.url)
+    if (!page) {
+      problems.push(`${entry.url}: in the sitemap, not in the registry`)
+      continue
+    }
+    const where = page.path
+    const lastmod = entry.lastModified.toISOString().slice(0, 10)
+
+    if (lastmod !== page.modifiedAt) {
+      problems.push(
+        `${where}: sitemap lastmod ${lastmod} != registry modifiedAt ${page.modifiedAt}`,
+      )
+    }
+    if (page.modifiedAt > today) {
+      problems.push(
+        `${where}: registry modifiedAt ${page.modifiedAt} is after today ${today}`,
+      )
+    }
+    if (lastmod > today) {
+      problems.push(`${where}: sitemap lastmod ${lastmod} is after today ${today}`)
+    }
+
+    if (!surfacesFor(page).markdown) continue
+    const markdown = renderMarkdownTwin(page.path)
+    if (!markdown) {
+      problems.push(`${where}: declares a Markdown twin that renders nothing`)
+      continue
+    }
+    for (const [label, date] of [
+      ["twin frontmatter last_updated", frontmatterLastUpdated(markdown)],
+      ['twin "Last updated:" line', headerLastUpdated(markdown)],
+    ]) {
+      if (date === undefined) {
+        problems.push(`${where}: ${label} is missing`)
+        continue
+      }
+      if (date !== page.modifiedAt) {
+        problems.push(
+          `${where}: ${label} ${date} != registry modifiedAt ${page.modifiedAt}`,
+        )
+      }
+      if (date > today) {
+        problems.push(`${where}: ${label} ${date} is after today ${today}`)
+      }
+    }
+  }
+
+  assert.deepEqual(problems, [], `\n${problems.join("\n")}`)
+})
+
 test("/sign-up is registered and indexable, and out of the sitemap", () => {
   // A product decision, not an omission: an external link lands on the form,
   // so a search result may too, but it is not a page worth a sitemap line.
