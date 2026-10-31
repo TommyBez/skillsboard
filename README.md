@@ -158,7 +158,8 @@ Installing the plugin configures the MCP server. Connecting it still requires si
 | --- | --- |
 | `pnpm dev` | Start the Turbopack development server. |
 | `pnpm typecheck` | Run the TypeScript compiler without emitting files. |
-| `pnpm check` | Run the repository's required local checks. |
+| `pnpm test` | Run the unit tests (`tests/*.test.mjs`) with the Node.js test runner. |
+| `pnpm check` | Run the repository's required local checks: typecheck, then the unit tests. |
 | `pnpm db:generate --name <description>` | Generate a versioned migration after changing the schema. |
 | `pnpm db:check` | Check that the schema and committed migration snapshots match. |
 | `pnpm db:migrate` | Apply pending migrations to the configured database. |
