@@ -4,11 +4,12 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
-permissions: {}
+# Read the PR description through the API; nothing else.
+permissions:
+  pull-requests: read
 
-concurrency:
-  group: pr-demo-video-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
+# No concurrency group: each run reads the current description, so overlapping
+# runs agree, and a cancelled run would show up as a failed check.
 
 jobs:
   demo-video:
@@ -25,9 +26,12 @@ jobs:
           git -C checker fetch -q --depth=1 --no-tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "$GITHUB_SHA"
           git -C checker checkout -q FETCH_HEAD -- scripts/check-pr-demo-video.mjs
 
-      # The body is untrusted: it is read from the environment only, never
-      # interpolated into the script.
+      # The script reads the description as it is now from the API, not the
+      # event payload: a push made before the video link was added (or a
+      # re-run of that job) would otherwise keep failing on stale text. The
+      # untrusted body never touches the shell.
       - name: Check PR description for a demo video
         env:
-          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: node checker/scripts/check-pr-demo-video.mjs

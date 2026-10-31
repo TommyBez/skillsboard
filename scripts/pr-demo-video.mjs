@@ -2,7 +2,6 @@ import { spawnSync } from "node:child_process"
 import { copyFileSync, existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { basename, join } from "node:path"
-import { pathToFileURL } from "node:url"
 
 import {
   MEDIA_RELEASE_TAG,
@@ -11,6 +10,7 @@ import {
   SECTION_HEADING,
   VIDEO_EXTENSION,
   checkDemoVideo,
+  isEntryPoint,
 } from "./check-pr-demo-video.mjs"
 
 // Usage: pnpm pr:video <pr-number> <file>
@@ -219,7 +219,7 @@ async function main(argv) {
   console.log(url)
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
+if (isEntryPoint(import.meta.url)) {
   main(process.argv.slice(2)).catch((error) => {
     console.error(error.message)
     process.exitCode = 1

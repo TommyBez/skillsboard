@@ -7,6 +7,7 @@ import { test } from "node:test"
 import {
   checkDemoVideo,
   isVideoUrl,
+  readPullRequestBody,
 } from "../scripts/check-pr-demo-video.mjs"
 
 const scriptPath = fileURLToPath(
@@ -17,11 +18,22 @@ function body(demoSection, after = "## Risk\n\nLow.") {
   return `## What\n\nA change.\n\n## Demo video\n\n${demoSection}\n\n${after}\n`
 }
 
-function runScript(prBody) {
+function runScript(prBody, extraEnv = {}) {
   const env = { ...process.env }
   delete env.PR_BODY
+  delete env.PR_NUMBER
   if (prBody !== undefined) env.PR_BODY = prBody
+  Object.assign(env, extraEnv)
   return spawnSync(process.execPath, [scriptPath], { encoding: "utf8", env })
+}
+
+function fakeFetch(status, payload) {
+  const calls = []
+  const fetchImpl = async (url, init) => {
+    calls.push({ url, init })
+    return { ok: status >= 200 && status < 300, status, json: async () => payload }
+  }
+  return { calls, fetchImpl }
 }
 
 const validBodies = {
@@ -190,4 +202,56 @@ test("the script exits 0 when PR_BODY links a video", () => {
   const run = runScript(body("https://example.com/demo.mp4"))
   assert.equal(run.status, 0)
   assert.match(run.stdout, /Demo video found: https:\/\/example\.com\/demo\.mp4/)
+})
+
+test("readPullRequestBody uses PR_BODY when PR_NUMBER is unset", async () => {
+  const { calls, fetchImpl } = fakeFetch(200, { body: "from api" })
+  assert.equal(await readPullRequestBody({ PR_BODY: "local" }, fetchImpl), "local")
+  assert.equal(calls.length, 0)
+})
+
+test("readPullRequestBody reads the current description from the API", async () => {
+  const { calls, fetchImpl } = fakeFetch(200, { body: "## Demo video\n" })
+  const body = await readPullRequestBody(
+    {
+      PR_NUMBER: "214",
+      PR_BODY: "stale event payload",
+      GITHUB_REPOSITORY: "TommyBez/skillsboard",
+      GITHUB_API_URL: "https://api.github.com",
+      GITHUB_TOKEN: "test-token",
+    },
+    fetchImpl,
+  )
+  assert.equal(body, "## Demo video\n")
+  assert.equal(calls[0].url, "https://api.github.com/repos/TommyBez/skillsboard/pulls/214")
+  assert.equal(calls[0].init.headers.Authorization, "Bearer test-token")
+})
+
+test("readPullRequestBody treats an empty description as empty", async () => {
+  const { fetchImpl } = fakeFetch(200, { body: null })
+  assert.equal(await readPullRequestBody({ PR_NUMBER: "1" }, fetchImpl), "")
+})
+
+test("readPullRequestBody fails closed when the API errors", async () => {
+  const { fetchImpl } = fakeFetch(404, {})
+  await assert.rejects(
+    readPullRequestBody({ PR_NUMBER: "214", PR_BODY: "https://example.com/a.mp4" }, fetchImpl),
+    /Could not read the description of PR #214: HTTP 404/,
+  )
+})
+
+test("readPullRequestBody rejects malformed inputs before any request", async () => {
+  const { calls, fetchImpl } = fakeFetch(200, { body: "" })
+  await assert.rejects(readPullRequestBody({ PR_NUMBER: "1; rm -rf /" }, fetchImpl), /positive integer/)
+  await assert.rejects(
+    readPullRequestBody({ PR_NUMBER: "1", GITHUB_REPOSITORY: "../evil" }, fetchImpl),
+    /Unexpected repository/,
+  )
+  assert.equal(calls.length, 0)
+})
+
+test("the script fails when the description cannot be read", () => {
+  const run = runScript(body("https://example.com/demo.mp4"), { PR_NUMBER: "not-a-number" })
+  assert.equal(run.status, 1)
+  assert.match(run.stdout, /::error title=Demo video check could not run::/)
 })

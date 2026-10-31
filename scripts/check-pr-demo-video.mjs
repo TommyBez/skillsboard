@@ -1,8 +1,10 @@
-import { pathToFileURL } from "node:url"
+import { realpathSync } from "node:fs"
+import { fileURLToPath } from "node:url"
 
 // Checks that a pull request body has a `## Demo video` section that links a
-// video. The body arrives through the PR_BODY environment variable so the
-// workflow never interpolates untrusted text into a shell script.
+// video. In CI the body is read from the GitHub API at run time (PR_NUMBER);
+// locally it comes from the PR_BODY environment variable. Either way the
+// untrusted text never passes through a shell script.
 
 export const SECTION_HEADING = /^##[ \t]+demo video[ \t]*#*[ \t]*$/i
 export const NEXT_SECTION_HEADING = /^#{1,2}[ \t]/
@@ -95,8 +97,60 @@ export function formatResult(result) {
   return `${problem}\n\n${HOW_TO_FIX}`
 }
 
-if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  const result = checkDemoVideo(process.env.PR_BODY)
+// True when the module at `moduleUrl` is the script node was started with.
+// Both sides go through realpath: on macOS /tmp is a symlink to /private/tmp,
+// so a plain URL comparison fails and the script would exit silently.
+export function isEntryPoint(moduleUrl, scriptPath = process.argv[1]) {
+  if (!scriptPath) return false
+  try {
+    return realpathSync(fileURLToPath(moduleUrl)) === realpathSync(scriptPath)
+  } catch {
+    return false
+  }
+}
+
+// The pull_request event payload is a snapshot taken when the event fired, so
+// a run for a push made before the description was updated (or a re-run of
+// that job) would keep checking the old text. With PR_NUMBER set, read the
+// description as it is now.
+export async function readPullRequestBody(env = process.env, fetchImpl = fetch) {
+  if (!env.PR_NUMBER) return env.PR_BODY
+  if (!/^[1-9]\d*$/.test(env.PR_NUMBER)) {
+    throw new Error(`PR_NUMBER must be a positive integer, got "${env.PR_NUMBER}".`)
+  }
+  const repository = env.GITHUB_REPOSITORY ?? MEDIA_REPOSITORY
+  if (!/^[\w-][\w.-]*\/[\w-][\w.-]*$/.test(repository)) {
+    throw new Error(`Unexpected repository "${repository}".`)
+  }
+  const api = env.GITHUB_API_URL ?? "https://api.github.com"
+  const headers = {
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  }
+  if (env.GITHUB_TOKEN) headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`
+  const response = await fetchImpl(
+    `${api}/repos/${repository}/pulls/${env.PR_NUMBER}`,
+    { headers },
+  )
+  if (!response.ok) {
+    throw new Error(
+      `Could not read the description of PR #${env.PR_NUMBER}: HTTP ${response.status}.`,
+    )
+  }
+  const pullRequest = await response.json()
+  return pullRequest.body ?? ""
+}
+
+async function main() {
+  let body
+  try {
+    body = await readPullRequestBody()
+  } catch (error) {
+    console.log(`::error title=Demo video check could not run::${error.message}`)
+    process.exitCode = 1
+    return
+  }
+  const result = checkDemoVideo(body)
   if (result.ok) {
     console.log(formatResult(result))
   } else {
@@ -107,3 +161,5 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
     process.exitCode = 1
   }
 }
+
+if (isEntryPoint(import.meta.url)) await main()

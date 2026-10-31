@@ -1,7 +1,12 @@
 import assert from "node:assert/strict"
+import { spawnSync } from "node:child_process"
+import { mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
+import { tmpdir } from "node:os"
+import { join } from "node:path"
+import { fileURLToPath, pathToFileURL } from "node:url"
 import { test } from "node:test"
 
-import { checkDemoVideo } from "../scripts/check-pr-demo-video.mjs"
+import { checkDemoVideo, isEntryPoint } from "../scripts/check-pr-demo-video.mjs"
 import {
   assetNameFor,
   assetUrlFor,
@@ -113,4 +118,51 @@ test("a commented-out heading does not count as the section", () => {
 test("is a no-op when the URL is already linked", () => {
   const before = `## Demo video\n\n${url}\n`
   assert.deepEqual(linkDemoVideo(before, url), { body: before, action: "unchanged" })
+})
+
+// On macOS /tmp is a symlink to /private/tmp. Running the scripts through a
+// symlinked directory used to make the entry-point check fail, so they exited
+// 0 without doing or printing anything.
+test("the scripts run when started through a symlinked directory", () => {
+  const scriptsDirectory = fileURLToPath(new URL("../scripts", import.meta.url))
+  const temporary = mkdtempSync(join(tmpdir(), "pr-demo-video-symlink-"))
+  try {
+    const linked = join(temporary, "scripts")
+    symlinkSync(scriptsDirectory, linked, "dir")
+    const env = { ...process.env }
+    delete env.PR_NUMBER
+
+    const usage = spawnSync(process.execPath, [join(linked, "pr-demo-video.mjs")], {
+      encoding: "utf8",
+      env,
+    })
+    assert.equal(usage.status, 1)
+    assert.match(usage.stderr, /Usage: pnpm pr:video <pr-number> <file>/)
+
+    const check = spawnSync(process.execPath, [join(linked, "check-pr-demo-video.mjs")], {
+      encoding: "utf8",
+      env: { ...env, PR_BODY: "## Demo video\n\nhttps://example.com/demo.mp4\n" },
+    })
+    assert.equal(check.status, 0)
+    assert.match(check.stdout, /Demo video found/)
+  } finally {
+    rmSync(temporary, { recursive: true, force: true })
+  }
+})
+
+test("isEntryPoint compares real paths", () => {
+  const temporary = realpathSync(mkdtempSync(join(tmpdir(), "pr-demo-video-entry-")))
+  try {
+    const file = join(temporary, "script.mjs")
+    writeFileSync(file, "")
+    const link = join(temporary, "link")
+    symlinkSync(temporary, link, "dir")
+    const moduleUrl = pathToFileURL(file).href
+    assert.equal(isEntryPoint(moduleUrl, join(link, "script.mjs")), true)
+    assert.equal(isEntryPoint(moduleUrl, file), true)
+    assert.equal(isEntryPoint(moduleUrl, join(temporary, "other.mjs")), false)
+    assert.equal(isEntryPoint(moduleUrl, undefined), false)
+  } finally {
+    rmSync(temporary, { recursive: true, force: true })
+  }
 })
