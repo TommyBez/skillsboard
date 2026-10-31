@@ -145,10 +145,8 @@ test("/connect is gated at the edge the same way as /library", async () => {
 
   assert.match(proxy, /pathname === "\/connect"/)
   assert.match(proxy, /"\/connect"/)
-  assert.match(
-    proxy,
-    /pathname === "\/library" \|\|\n\s+pathname === "\/connect"\n\s+\) \{/,
-  )
+  // The returnTo is generic now: the page's own URL, validated by the sanitizer.
+  assert.match(proxy, /safeReturnTo\(`\$\{pathname\}\$\{search\}`/)
   assert.match(sanitizer, /"\/connect"/)
   assert.match(sanitizer, /immediateSignedInDestinations = \["\/library", "\/connect"\]/)
 })

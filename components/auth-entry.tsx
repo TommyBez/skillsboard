@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getDeploymentEnvironment } from "@/lib/auth-environment"
 import { getOAuthAuthorizeContinuePath, getOAuthQueryString } from "@/lib/oauth-continue"
-import { isImmediateSignedInDestination, safeReturnTo } from "@/lib/safe-return-to"
+import { isInvitationPath, safeReturnTo } from "@/lib/safe-return-to"
 import { getSession } from "@/lib/session"
 
 interface AuthEntryProps {
@@ -22,7 +22,8 @@ export async function AuthEntry({ mode, searchParams }: AuthEntryProps) {
 
   if (session?.user) {
     if (oauthContinue) redirect(oauthContinue)
-    if (isImmediateSignedInDestination(returnTo)) redirect(returnTo)
+    // Only an invitation waits for Continue; any other page was the visitor's own.
+    if (!isInvitationPath(returnTo)) redirect(returnTo)
     return (
       <div className="grid gap-5 border-t border-border pt-6">
         <p className="text-sm leading-relaxed text-muted-foreground">
