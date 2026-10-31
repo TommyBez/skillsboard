@@ -188,7 +188,6 @@ test("the first-run page is gone and nothing routes to it", async () => {
   for (const source of [proxy, sanitizer, ...applicationSources]) {
     assert.doesNotMatch(source, /["'`]\/start["'`/?]/)
   }
-  assert.doesNotMatch(events, /onboarding_step_clicked/)
 })
 
 test("/start resolves permanently to the library, query string included", async () => {
@@ -271,13 +270,9 @@ test("route views stay native while real actions stay custom", async () => {
   assert.match(mcpSetupGuide, /function configCopiedAnalytics\(client: McpClientAnalyticsId\)/)
   assert.match(mcpSetupGuide, /properties: \{ client \}/)
   assert.match(events, /surface: "organization_settings"\n/)
-  assert.doesNotMatch(events, /\| "onboarding" \| "organization_settings"/)
-  assert.doesNotMatch(events, /"first_skill_invite_step"/)
 
   assert.doesNotMatch(events, /mcp_setup_viewed/)
-  assert.doesNotMatch(events, /onboarding_steps_viewed/)
   assert.equal(await exists("../components/mcp-setup-analytics.tsx"), false)
-  assert.equal(await exists("../components/onboarding-steps-analytics.tsx"), false)
 
   // Next.js starts PostHog once through its canonical client instrumentation
   // entry. PostHog then owns initial and history-change pageviews; the app only

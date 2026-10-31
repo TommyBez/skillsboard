@@ -88,7 +88,7 @@ behaviour, keep our implementation · **SKIP** = no surface for it here.
 
 | Component | Tagline | Verdict | Where it lands |
 |---|---|---|---|
-| [Collapsible Banner](https://www.interior.dev/docs/collapsible-banner) | Folds to its title, or lets go entirely | **ADOPT** · Tier 2 | `invite-teammate-prompt.tsx`, `teammate-reuse-prompt.tsx`, `landing-launch-banner`, catalog-unavailable notice |
+| [Collapsible Banner](https://www.interior.dev/docs/collapsible-banner) | Folds to its title, or lets go entirely | **SKIP** | No surface needs a banner that folds or dismisses; the catalog-unavailable notice is a static message |
 | [Presence Avatars](https://www.interior.dev/docs/presence-avatars) | Join and leave as a layout change | **ADAPT** · Tier 2 | `settings/organization` member directory + the hand-rolled initials squares in 4 files; use as a static stack, not live presence |
 | [Live Activity](https://www.interior.dev/docs/live-activity) | The system's ongoing work, worn as a small object | **ADAPT** · Tier 3 | Sonner already covers this; only worth it if background ZIP/catalog work becomes long-running |
 | [New Items Pill](https://www.interior.dev/docs/new-items-pill) | New content without stealing your scroll | **SKIP** | No realtime feed — nothing arrives while you read |
@@ -367,9 +367,6 @@ honouring `prefers-reduced-motion` the way `app/globals.css` already does
 `command-palette` · `hide-on-scroll` · `presence-avatars` ·
 `reading-progress` · `reorder-list` · `scroll-spy` · `show-more` ·
 `skeleton-swap` · `tag-input` · `value-flash`
-
-`collapsible-banner` was kept until 2026-10-30, when the library invite banner,
-its only consumer, was removed with the rest of the team invite prompt.
 
 Fifteen more were ported and then deleted, because nothing imported them:
 `filter-grid`, `segmented-control`, `hold-to-confirm`, `icon-morph`,
