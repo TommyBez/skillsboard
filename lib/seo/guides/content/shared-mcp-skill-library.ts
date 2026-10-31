@@ -228,5 +228,5 @@ Test date: [date]
   },
   ogAlt: "Skills Board guide: use a shared AI skill library through MCP.",
   publishedAt: "2026-07-29",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-22",
 }
