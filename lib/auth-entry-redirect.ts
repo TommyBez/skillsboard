@@ -1,5 +1,5 @@
 import { getOAuthAuthorizeContinuePath } from "@/lib/oauth-continue"
-import { isImmediateSignedInDestination, safeReturnTo } from "@/lib/safe-return-to"
+import { isInvitationPath, safeReturnTo } from "@/lib/safe-return-to"
 
 /**
  * Marks a `/sign-in` URL that a *validated* session check just produced.
@@ -45,12 +45,12 @@ function toParamRecord(searchParams: URLSearchParams) {
  * Where the edge should send a `/sign-in` or `/sign-up` request that carries a
  * session cookie, or `null` to let the page decide.
  *
- * Only the immediate destinations are claimed — no `sessionChecked` marker, no
- * OAuth authorize params, and a `returnTo` that is absent or already `/library`
- * or `/connect`. The marketing CTA and the "Sign in" beside it both link to a
- * plain route, and a signed-in visitor following either only ever wanted their
- * library. `/connect` is the same kind of page: authenticated, and the place
- * the visitor asked for.
+ * Claimed: no `sessionChecked` marker, no OAuth authorize params, and a
+ * `returnTo` that `safeReturnTo` accepts and that is not an invitation —
+ * absent means `/library`. That is the marketing CTA and the "Sign in" beside
+ * it, and every protected page the proxy bounced here with its own URL: a
+ * signed-in visitor only ever wanted that page back. `AuthEntry` redirects the
+ * same set, so the edge just gets there first, with a real 307.
  *
  * Everything else deliberately falls through to `AuthEntry`, because a
  * redirect would destroy it:
@@ -64,9 +64,7 @@ function toParamRecord(searchParams: URLSearchParams) {
  * `AuthEntry` answers those with a "Continue to …" button rather than a
  * redirect, and it stays the authority for all of them.
  */
-export function resolveSignedInAuthRedirect(
-  searchParams: URLSearchParams,
-): "/library" | "/connect" | null {
+export function resolveSignedInAuthRedirect(searchParams: URLSearchParams): string | null {
   if (searchParams.has(SESSION_CHECKED_PARAM)) return null
 
   const params = toParamRecord(searchParams)
@@ -75,5 +73,5 @@ export function resolveSignedInAuthRedirect(
   const returnTo = safeReturnTo(
     typeof params.returnTo === "string" ? params.returnTo : undefined,
   )
-  return isImmediateSignedInDestination(returnTo) ? returnTo : null
+  return isInvitationPath(returnTo) ? null : returnTo
 }
