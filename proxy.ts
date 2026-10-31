@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSessionCookie } from "better-auth/cookies"
 import { resolveSignedInAuthRedirect } from "@/lib/auth-entry-redirect"
+import { safeReturnTo } from "@/lib/safe-return-to"
 
 function isProtectedPath(pathname: string) {
   if (pathname === "/onboarding" || pathname === "/consent") return true
@@ -15,7 +16,7 @@ function isProtectedPath(pathname: string) {
 }
 
 export async function proxy(request: NextRequest) {
-  const { pathname, searchParams } = request.nextUrl
+  const { pathname, search, searchParams } = request.nextUrl
   const sessionCookie = getSessionCookie(request)
 
   // Cookie presence is optimistic only: gate protected routes when missing.
@@ -26,11 +27,11 @@ export async function proxy(request: NextRequest) {
       searchParams.forEach((value, key) => {
         signInUrl.searchParams.append(key, value)
       })
-    } else if (
-      pathname === "/library" ||
-      pathname === "/connect"
-    ) {
-      signInUrl.searchParams.set("returnTo", pathname)
+    } else {
+      // Every other protected page hands its own URL, query included, through
+      // sign-in. `AuthEntry` re-validates it with the same helper.
+      const returnTo = safeReturnTo(`${pathname}${search}`, "")
+      if (returnTo) signInUrl.searchParams.set("returnTo", returnTo)
     }
 
     return NextResponse.redirect(signInUrl)

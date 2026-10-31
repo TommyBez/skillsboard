@@ -46,8 +46,13 @@ test("claims /connect the same way as /library", () => {
   assert.equal(resolve("returnTo=/connect"), "/connect")
 })
 
-test("sends a returnTo for the removed first-run page to the library", () => {
-  assert.equal(resolve("returnTo=/start"), "/library")
+test("leaves any other same-origin page to the page", () => {
+  // A generic returnTo (settings, discover, a library item, the removed
+  // /start that next.config.ts sends to the library) is not claimed at the
+  // edge. `AuthEntry` validates the session and redirects there itself.
+  assert.equal(resolve("returnTo=/settings/members%3Ftab%3Dpending"), null)
+  assert.equal(resolve("returnTo=/discover%3Fx%3D1"), null)
+  assert.equal(resolve("returnTo=/start"), null)
 })
 
 test("claims a returnTo the sanitizer would have discarded anyway", () => {

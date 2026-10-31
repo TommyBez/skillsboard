@@ -29,6 +29,9 @@ export function resolve(specifier, context, nextResolve) {
     ])
     if (match) return nextResolve(pathToFileURL(match).href, context)
   }
+  // `next` has no exports map, so `next/server` only resolves the way a
+  // bundler resolves it: to the `.js` entry file beside the package root.
+  if (/^next\/[a-z-]+$/.test(specifier)) return nextResolve(`${specifier}.js`, context)
   return nextResolve(specifier, context)
 }
 
