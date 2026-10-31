@@ -84,6 +84,22 @@ test("a signed-in visitor reaches protected pages untouched", async () => {
   }
 })
 
+test("after sign-in, the returnTo sends the visitor back to the exact page", async () => {
+  for (const page of protectedPages) {
+    const signIn = locationOf(await visit(page))
+    const response = await visit(`${signIn.pathname}${signIn.search}`, { signedIn: true })
+    assert.equal(response.status, 307, page)
+    const location = locationOf(response)
+    assert.equal(location.origin, ORIGIN, page)
+    assert.equal(`${location.pathname}${location.search}`, page)
+  }
+})
+
+test("an invitation returnTo is left to the sign-in page", async () => {
+  const response = await visit("/sign-in?returnTo=%2Finvite%2Finvite_123", { signedIn: true })
+  assert.equal(response.headers.get("location"), null)
+})
+
 test("no hard-coded list decides which routes get a returnTo", async () => {
   const source = await readFile(new URL("../proxy.ts", import.meta.url), "utf8")
   assert.doesNotMatch(source, /searchParams\.set\("returnTo", pathname\)/)

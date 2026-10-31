@@ -46,13 +46,15 @@ test("claims /connect the same way as /library", () => {
   assert.equal(resolve("returnTo=/connect"), "/connect")
 })
 
-test("leaves any other same-origin page to the page", () => {
-  // A generic returnTo (settings, discover, a library item, the removed
-  // /start that next.config.ts sends to the library) is not claimed at the
-  // edge. `AuthEntry` validates the session and redirects there itself.
-  assert.equal(resolve("returnTo=/settings/members%3Ftab%3Dpending"), null)
-  assert.equal(resolve("returnTo=/discover%3Fx%3D1"), null)
-  assert.equal(resolve("returnTo=/start"), null)
+test("claims any other same-origin page, query included", () => {
+  // The proxy bounced a signed-out visitor here with the page's own URL. Once
+  // signed in, the edge sends them straight back with a 307, the same place
+  // AuthEntry would redirect them to.
+  assert.equal(resolve("returnTo=/settings/organization%3Fq%3Dmembers"), "/settings/organization?q=members")
+  assert.equal(resolve("returnTo=/discover%3Fx%3D1"), "/discover?x=1")
+  assert.equal(resolve("returnTo=/library%3Fq%3Dpdf%26tag%3Ddocs"), "/library?q=pdf&tag=docs")
+  // The removed first-run page: next.config.ts sends it to the library.
+  assert.equal(resolve("returnTo=/start"), "/start")
 })
 
 test("claims a returnTo the sanitizer would have discarded anyway", () => {
@@ -116,7 +118,7 @@ test("never bounces back a URL that requireSession itself produced", () => {
   // to end rather than by inspection: whatever requireSession redirects to,
   // the proxy stands down on. Every returnTo it is called with in the app,
   // plus the bare case that /onboarding and the server actions hit.
-  for (const returnTo of [undefined, "/library", "/connect", "/invite/invite_1"]) {
+  for (const returnTo of [undefined, "/library", "/connect", "/invite/invite_1", "/settings/organization?q=x"]) {
     const path = buildSessionCheckedSignInPath(returnTo)
     const { searchParams } = new URL(path, "https://skillsboard.sh")
     assert.equal(resolveSignedInAuthRedirect(searchParams), null, `looped on ${path}`)
