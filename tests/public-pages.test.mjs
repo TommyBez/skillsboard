@@ -248,6 +248,15 @@ test("the WebMCP catalogue is the twin set, and nothing else", () => {
   )
 })
 
+/** The absolute URL the sitemap spells for a registered path. */
+const urlFor = (pagePath) =>
+  pagePath === "/" ? siteConfig.url : `${siteConfig.url}${pagePath}`
+
+/** The registered pages that declare no line in the sitemap. */
+const unlistedPaths = publicPages
+  .filter((page) => surfacesFor(page).sitemap === false)
+  .map((page) => page.path)
+
 test("the sitemap is the registry, with nothing added and nothing invented", () => {
   const entries = sitemap()
 
@@ -269,11 +278,63 @@ test("the sitemap is the registry, with nothing added and nothing invented", () 
     )
   }
 
-  // Every page reachable as Markdown is also a page a crawler is told about.
-  const listed = new Set(entries.map((entry) => entry.url))
-  for (const twinPath of markdownPagePaths) {
-    const url = twinPath === "/" ? siteConfig.url : `${siteConfig.url}${twinPath}`
-    assert.ok(listed.has(url), `${twinPath} has a twin and is not in the sitemap`)
+  // Every registered page is a page a crawler is told about, in reading
+  // order, except the one the registry declares unlisted.
+  assert.deepEqual(
+    entries.map((entry) => entry.url),
+    publicPagePaths
+      .filter((pagePath) => !unlistedPaths.includes(pagePath))
+      .map(urlFor),
+  )
+  assert.equal(entries.length, 47)
+})
+
+test("/sign-up is registered and indexable, and out of the sitemap", () => {
+  // A product decision, not an omission: an external link lands on the form,
+  // so a search result may too, but it is not a page worth a sitemap line.
+  const signUp = publicPages.find((page) => page.path === "/sign-up")
+  assert.ok(signUp, "/sign-up is no longer in the registry")
+  assert.equal(surfacesFor(signUp).sitemap, false)
+  assert.equal(surfacesFor(signUp).indexable, true)
+  assert.deepEqual(unlistedPaths, ["/sign-up"])
+
+  const urls = sitemap().map((entry) => entry.url)
+  assert.ok(!urls.includes(urlFor("/sign-up")), "/sign-up is in the sitemap")
+  assert.ok(
+    !urls.some((url) => url.includes("sign-up")),
+    "a sign-up URL is in the sitemap",
+  )
+})
+
+test("an indexable page has no noindex on its route", () => {
+  // The robots directives live in the route files, not in the registry, so
+  // the declaration is checked against the source: the page itself and every
+  // layout above it. The root layout is where `index, follow` comes from.
+  const routeDir = (pagePath) => {
+    if (pagePath === "/") return ["(landing)"]
+    if (pagePath.startsWith("/guides/")) return ["guides", "[slug]"]
+    return pagePath.slice(1).split("/")
+  }
+
+  for (const page of publicPages) {
+    if (!surfacesFor(page).indexable) continue
+    const segments = routeDir(page.path)
+    const files = [path.join(repoRoot, "app", ...segments, "page.tsx")]
+    for (let depth = 0; depth <= segments.length; depth += 1) {
+      files.push(path.join(repoRoot, "app", ...segments.slice(0, depth), "layout.tsx"))
+    }
+
+    for (const file of files) {
+      let source
+      try {
+        source = readFileSync(file, "utf8")
+      } catch {
+        continue
+      }
+      const relative = file.slice(repoRoot.length)
+      assert.doesNotMatch(source, /\bindex:\s*false/, `${page.path}: ${relative}`)
+      assert.doesNotMatch(source, /noindex/i, `${page.path}: ${relative}`)
+    }
   }
 })
 

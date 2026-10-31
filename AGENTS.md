@@ -18,6 +18,7 @@ The schema lives in `lib/db/schema.ts` and is managed with versioned Drizzle mig
 ### Gotchas
 - `pnpm lint` runs `eslint .`, but ESLint is **not** a declared dependency and there is no ESLint config, so it fails out of the box (not a code problem). For type checking use `npx tsc --noEmit`.
 - `drizzle-kit@0.31.10` mis-introspects empty PostgreSQL array defaults. A repeated `pnpm db:push -- --strict --verbose` may propose only idempotent `SET DEFAULT '{}'` statements for `skill.tags` and `skill.examplePrompts` even when both defaults are already correct. Abort if it proposes anything else.
+- The shadcn CLI is not a dependency. Run it pinned with `pnpm dlx shadcn@4.23.0 add <component>`, also for the remocn registry wherever the remocn skill says `shadcn add @remocn/<name>`. The `shadcn/tailwind.css` stylesheet the components rely on is vendored at `app/styles/shadcn-tailwind.css`; when moving to a newer shadcn, copy that version's `dist/tailwind.css` over it and update the version in its header and in these commands.
 - Skill metadata is fetched live from the GitHub REST API. It works unauthenticated; set `GITHUB_TOKEN` to avoid rate limits.
 - In development Better Auth sets cookies with `sameSite: "none"; secure: true` (see `lib/auth.ts`), which can affect session behavior on plain `http://localhost` in some browsers.
 - In development, email OTP skips Resend and accepts any 6-digit code after the “Continue” step (see `lib/auth.ts`). Preview/production send real codes via Resend.
