@@ -13,20 +13,24 @@ import {
   isEntryPoint,
 } from "./check-pr-demo-video.mjs"
 
-// Usage: pnpm pr:video <pr-number> <file>
+// Usage: pnpm pr:video [--dry-run] <pr-number> <file>
 //
 // Uploads a local demo recording to the `pr-media` prerelease (a container for
 // PR videos, never a real release) and links it from the PR description's
 // `## Demo video` section. Every step goes through the authenticated `gh` CLI.
+// --dry-run only reads: it prints the asset name and URL it would use and
+// stops before creating, uploading or editing anything.
 
 const RELEASE_NOTES = "Container for PR demo videos, not a release"
 const PENDING_LINE = /^[ \t]*pending upload\b/i
 const ASSET_BASENAME = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
+const USAGE = "Usage: pnpm pr:video [--dry-run] <pr-number> <file>"
 
 export function parseArgs(argv) {
-  const [prArgument, file, ...rest] = argv
+  const dryRun = argv.includes("--dry-run")
+  const [prArgument, file, ...rest] = argv.filter((argument) => argument !== "--dry-run")
   if (!prArgument || !file || rest.length > 0) {
-    throw new Error("Usage: pnpm pr:video <pr-number> <file>")
+    throw new Error(USAGE)
   }
   if (!/^[1-9]\d*$/.test(prArgument)) {
     throw new Error(`PR number must be a positive integer, got "${prArgument}".`)
@@ -34,7 +38,7 @@ export function parseArgs(argv) {
   if (!VIDEO_EXTENSION.test(file)) {
     throw new Error(`The video must be a .mp4, .webm or .mov file, got "${file}".`)
   }
-  return { pr: Number(prArgument), file }
+  return { pr: Number(prArgument), file, dryRun }
 }
 
 export function assetNameFor(pr, headSha, file) {
@@ -165,18 +169,36 @@ async function assertReachable(url) {
 }
 
 async function main(argv) {
-  const { pr, file } = parseArgs(argv)
+  const { pr, file, dryRun } = parseArgs(argv)
   if (!existsSync(file)) throw new Error(`File not found: ${file}`)
 
   const pullRequest = JSON.parse(
     gh([
       "pr", "view", String(pr),
       "--repo", MEDIA_REPOSITORY,
-      "--json", "headRefOid,body",
+      "--json", "headRefOid,body,state",
     ]).stdout,
   )
+  // A merged or closed PR keeps moving its head ref as base merges land, so
+  // a "new" asset name there is almost always a mistake. Only open PRs.
+  if (pullRequest.state !== "OPEN") {
+    throw new Error(`PR #${pr} is ${pullRequest.state.toLowerCase()}; demo videos are only added to open PRs.`)
+  }
   const assetName = assetNameFor(pr, pullRequest.headRefOid, file)
   const url = assetUrlFor(assetName)
+
+  if (dryRun) {
+    const release = viewRelease()
+    const taken = release?.assets.some((asset) => asset.name === assetName) ?? false
+    console.log(`Dry run for PR #${pr} (head ${pullRequest.headRefOid.slice(0, 7)}):`)
+    console.log(`  release: ${release ? `${MEDIA_RELEASE_TAG} exists` : `${MEDIA_RELEASE_TAG} would be created`}`)
+    console.log(`  asset:   ${assetName}${taken ? " (already exists: a real run would refuse)" : ""}`)
+    console.log(`  url:     ${url}`)
+    console.log(`  description: ${linkDemoVideo(pullRequest.body, url).action}`)
+    console.log("Nothing was created, uploaded or edited.")
+    if (taken) process.exitCode = 1
+    return
+  }
 
   const release = ensureRelease()
   if (release.assets.some((asset) => asset.name === assetName)) {

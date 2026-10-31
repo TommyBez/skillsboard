@@ -26,7 +26,18 @@ test("parseArgs accepts a PR number and a video file", () => {
   assert.deepEqual(parseArgs(["214", "out/demo.webm"]), {
     pr: 214,
     file: "out/demo.webm",
+    dryRun: false,
   })
+})
+
+test("parseArgs accepts --dry-run anywhere", () => {
+  for (const argv of [
+    ["--dry-run", "214", "out/demo.webm"],
+    ["214", "out/demo.webm", "--dry-run"],
+  ]) {
+    assert.deepEqual(parseArgs(argv), { pr: 214, file: "out/demo.webm", dryRun: true })
+  }
+  assert.throws(() => parseArgs(["--dry-run", "214"]), /Usage: pnpm pr:video \[--dry-run\]/)
 })
 
 test("parseArgs rejects bad arguments", () => {
@@ -137,7 +148,7 @@ test("the scripts run when started through a symlinked directory", () => {
       env,
     })
     assert.equal(usage.status, 1)
-    assert.match(usage.stderr, /Usage: pnpm pr:video <pr-number> <file>/)
+    assert.match(usage.stderr, /Usage: pnpm pr:video \[--dry-run\] <pr-number> <file>/)
 
     const check = spawnSync(process.execPath, [join(linked, "check-pr-demo-video.mjs")], {
       encoding: "utf8",
