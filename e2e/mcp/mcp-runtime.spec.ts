@@ -470,7 +470,7 @@ async function signInTestUser() {
   expect(sent.status(), await sent.text()).toBe(200)
   const verified = await request.post("/api/auth/sign-in/email-otp", {
     headers,
-    data: { email: TEST_EMAIL, otp: "123456", name: "MCP Runtime Test", skillsboardProductCommunicationsChoice: false },
+    data: { email: TEST_EMAIL, otp: "123456", name: "MCP Runtime Test" },
   })
   expect(verified.status(), "the server must run with VERCEL_ENV=development (dev OTP bypass)").toBe(200)
   const session = await (await request.get("/api/auth/get-session")).json()
