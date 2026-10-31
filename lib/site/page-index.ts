@@ -58,8 +58,21 @@ export type PageSurfaces = {
   markdown: boolean
   /** Carries a JSON-LD node. Declared here, derived in a later change. */
   jsonLd: boolean
-  /** Its line in `sitemap.xml`, or `false` for a page that stays out. */
+  /**
+   * Its line in `sitemap.xml`, or `false` for a page that stays out.
+   *
+   * Out of the sitemap is not out of the index. The sitemap is a list of the
+   * pages worth crawling for what they say; whether a crawler may index a
+   * page at all is `indexable`, and the two are declared separately because
+   * `/sign-up` is the page that needs one without the other.
+   */
   sitemap: SitemapSurface | false
+  /**
+   * A crawler may index it: its route emits no `noindex`, in a robots meta tag
+   * or an `X-Robots-Tag` header. Every public page is indexable today, and
+   * `tests/public-pages.test.mjs` checks each route against the declaration.
+   */
+  indexable: boolean
   /** Listed in the WebMCP catalogue an agent reads from the root layout. */
   webMcp: boolean
 }
@@ -253,7 +266,11 @@ export const pageIndex: readonly PageIndexEntry[] = [
     },
   },
   {
-    /** The only auth page in the sitemap: it is where an external link lands. */
+    /**
+     * Indexable but unlisted, which is what the `auth` kind gives it: an
+     * external link lands here, so a search result may too, but a form has
+     * nothing on it worth a line in the sitemap.
+     */
     path: "/sign-up",
     kind: "auth",
     socialTitle: "Create your shared AI skill library | Skills Board",
@@ -264,7 +281,6 @@ export const pageIndex: readonly PageIndexEntry[] = [
       publishedAt: "2026-07-29",
       modifiedAt: "2026-08-06",
     },
-    surfaces: { sitemap: { priority: 0.7, changeFrequency: "monthly" } },
   },
   {
     path: "/privacy",
@@ -309,8 +325,8 @@ export const pageIndex: readonly PageIndexEntry[] = [
  *
  * The defaults live in the kind rather than in the page so that a page
  * declares what makes it different and nothing else. A `tool` has no twin yet,
- * an `auth` page appears on no public surface, and everything that carries
- * prose answers in Markdown.
+ * an `auth` page appears on no public surface but stays indexable, and
+ * everything that carries prose answers in Markdown.
  */
 export const surfaceDefaults: Record<PageKind, PageSurfaces> = {
   landing: {
@@ -318,42 +334,49 @@ export const surfaceDefaults: Record<PageKind, PageSurfaces> = {
     jsonLd: true,
     sitemap: { priority: 1, changeFrequency: "weekly" },
     webMcp: true,
+    indexable: true,
   },
   hub: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   article: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   guide: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   comparison: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   alternative: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   docs: {
     markdown: true,
     jsonLd: true,
     sitemap: { priority: 0.7, changeFrequency: "monthly" },
     webMcp: true,
+    indexable: true,
   },
   /**
    * A browser tool rather than an article. No twin today: the twin of a tool
@@ -365,19 +388,27 @@ export const surfaceDefaults: Record<PageKind, PageSurfaces> = {
     jsonLd: true,
     sitemap: { priority: 0.8, changeFrequency: "monthly" },
     webMcp: false,
+    indexable: true,
   },
   legal: {
     markdown: false,
     jsonLd: true,
     sitemap: { priority: 0.3, changeFrequency: "yearly" },
     webMcp: false,
+    indexable: true,
   },
-  /** A form, not a document: nothing to read, nothing to index by default. */
+  /**
+   * A form, not a document: nothing to read, so no twin, no JSON-LD, no line
+   * in the sitemap. Still indexable, because an auth page that is registered
+   * here is one a link from outside lands on; one that is not, `/sign-in`, sets
+   * its own `noindex` and stays out of the registry.
+   */
   auth: {
     markdown: false,
     jsonLd: false,
     sitemap: false,
     webMcp: false,
+    indexable: true,
   },
 }
 
