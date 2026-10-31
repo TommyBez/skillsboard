@@ -45,6 +45,16 @@ test("rejects external and protocol-relative destinations", () => {
   assert.equal(safeReturnTo("library"), "/library")
 })
 
+// Dot segments normalise away, and what is left can start with "//": a
+// protocol-relative URL the proxy would resolve to another host.
+test("rejects dot segments that collapse into a protocol-relative path", () => {
+  assert.equal(safeReturnTo("/library/..//evil.com"), "/library")
+  assert.equal(safeReturnTo("/a/..//evil.com/path"), "/library")
+  assert.equal(safeReturnTo("/a/.././/evil.com"), "/library")
+  assert.equal(safeReturnTo("/%2e%2e//evil.com"), "/library")
+  assert.equal(safeReturnTo("/library/%2e%2e//evil.com?x=1"), "/library")
+})
+
 test("rejects control characters and oversized values", () => {
   assert.equal(safeReturnTo("/library\n//evil.com"), "/library")
   assert.equal(safeReturnTo("/library\t"), "/library")

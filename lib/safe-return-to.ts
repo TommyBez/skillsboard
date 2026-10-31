@@ -13,7 +13,7 @@ export function isImmediateSignedInDestination(
 
 /** An invitation hand-off, which `AuthEntry` answers with Continue. */
 export function isInvitationPath(path: string) {
-  return /^\/invite\/[A-Za-z0-9_-]{1,200}$/.test(path)
+  return /^\/invite\/[A-Za-z0-9_-]{1,200}(?:\?|$)/.test(path)
 }
 
 // Parsing against a fixed origin is how "same origin" is decided: anything
@@ -44,7 +44,11 @@ export function safeReturnTo(value: unknown, fallback = "/library") {
   }
   if (url.origin !== PARSE_ORIGIN) return fallback
 
+  // Dot segments can collapse into a protocol-relative path
+  // (`/library/..//evil.com` → `//evil.com`), which a browser or `new URL`
+  // would read as another host. Check the normalised form, not the input.
   const path = url.pathname
+  if (path.startsWith("//")) return fallback
   if (excludedRoots.some((root) => path === root || path.startsWith(`${root}/`))) return fallback
   return `${path}${url.search}`
 }

@@ -95,9 +95,11 @@ test("after sign-in, the returnTo sends the visitor back to the exact page", asy
   }
 })
 
-test("an invitation returnTo is left to the sign-in page", async () => {
-  const response = await visit("/sign-in?returnTo=%2Finvite%2Finvite_123", { signedIn: true })
-  assert.equal(response.headers.get("location"), null)
+test("an invitation returnTo is left to the sign-in page, query or not", async () => {
+  for (const returnTo of ["/invite/invite_123", "/invite/invite_123?source=email"]) {
+    const response = await visit(`/sign-in?returnTo=${encodeURIComponent(returnTo)}`, { signedIn: true })
+    assert.equal(response.headers.get("location"), null, returnTo)
+  }
 })
 
 test("no hard-coded list decides which routes get a returnTo", async () => {
@@ -115,6 +117,8 @@ const hostileReturnTos = [
   "\\\\evil.com",
   "javascript:alert(1)",
   "/library\n//evil.com",
+  "/library/..//evil.com",
+  "/a/..//evil.com/path",
 ]
 
 for (const returnTo of hostileReturnTos) {

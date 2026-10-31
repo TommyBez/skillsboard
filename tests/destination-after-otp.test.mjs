@@ -14,6 +14,7 @@ test("sign-up is owed onboarding, not a team page", () => {
 
 test("an invitation stays as it was", () => {
   assert.equal(destinationAfterOtp("/invite/invite_123", "sign-up"), "/invite/invite_123")
+  assert.equal(destinationAfterOtp("/invite/invite_123?source=email", "sign-up"), "/invite/invite_123?source=email")
 })
 
 test("sign-in keeps the destination it asked for", () => {
