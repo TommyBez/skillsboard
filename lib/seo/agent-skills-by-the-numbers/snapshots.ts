@@ -1,4 +1,5 @@
 import september2026 from "@/lib/seo/agent-skills-by-the-numbers/data/2026-09.json" with { type: "json" }
+import october2026 from "@/lib/seo/agent-skills-by-the-numbers/data/2026-10.json" with { type: "json" }
 
 /**
  * Monthly ecosystem snapshots for /agent-skills-by-the-numbers.
@@ -63,6 +64,7 @@ export interface EcosystemSnapshot {
 /** Oldest first, so the last entry is always the current one. */
 export const ecosystemSnapshots: readonly EcosystemSnapshot[] = [
   september2026 as EcosystemSnapshot,
+  october2026 as EcosystemSnapshot,
 ].toSorted((left, right) => left.snapshot.localeCompare(right.snapshot))
 
 export const latestSnapshot: EcosystemSnapshot =

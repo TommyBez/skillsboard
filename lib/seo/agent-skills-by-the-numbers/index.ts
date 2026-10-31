@@ -5,8 +5,10 @@ import {
   formatCount,
   formatDay,
   formatMonth,
+  ecosystemSnapshots,
   latestSnapshot,
   monthlyChange,
+  previousSnapshot,
   snapshotDay,
   snapshotTime,
   topicChange,
@@ -137,6 +139,38 @@ const downloadsLastMonth = formatCount(usage.npmDownloadsLastMonth)
 const perReadme = formatCount(usage.downloadsPerMatchingReadme)
 const npmWindow = `${formatDay(usage.npmWindowStart)} to ${formatDay(usage.npmWindowEnd)}`
 
+const firstSnapshot: EcosystemSnapshot = ecosystemSnapshots[0]
+const lastMonth = months[months.length - 1]
+const rangeEndDay = snapshot.monthlyDownloads.rangeEnd
+const daysCounted = Number(rangeEndDay.slice(8, 10))
+const daysInLastMonth = new Date(
+  Date.UTC(
+    Number(lastMonth.month.slice(0, 4)),
+    Number(lastMonth.month.slice(5, 7)),
+    0,
+  ),
+).getUTCDate()
+const lastRowNote = lastMonth.partial
+  ? `The last row stops on ${formatDay(rangeEndDay)}, the last day npm had counted when the snapshot was taken, so it covers ${daysCounted} of the ${daysInLastMonth} days in ${formatMonth(lastMonth.month)} and is not yet a full month.`
+  : `Every row covers a full calendar month, ending on ${formatDay(rangeEndDay)}.`
+
+/**
+ * From the second snapshot on, the page states what moved since the one
+ * before. Directions are written as "from X to Y" so the sentence stays true
+ * whichever way a figure goes.
+ */
+function sinceLastSnapshot(): readonly string[] {
+  if (!previousSnapshot) return []
+  const earlierUsage = previousSnapshot.declaredUsage
+  const earlierTopic =
+    previousSnapshot.repositoryTopics.find(
+      (entry) => entry.topic === "agent-skills",
+    )?.repositories ?? 0
+  return [
+    `Against the ${formatMonth(previousSnapshot.snapshot)} snapshot, read on ${formatDay(snapshotDay(previousSnapshot))}, the \`agent-skills\` topic went from ${formatCount(earlierTopic)} to ${topicCount("agent-skills")} repositories, README matches from about ${formatCount(earlierUsage.readmeMatches)} to about ${readmeMatches}, and npm downloads over the trailing month from ${formatCount(earlierUsage.npmDownloadsLastMonth)} to ${downloadsLastMonth}.`,
+  ]
+}
+
 const firstMonth = months[0]
 const stepIndex = months.reduce((best, month, index) => {
   if (index === 0) return best
@@ -158,6 +192,7 @@ const settledPeak = afterStep.reduce(
   (high, month) => (month.downloads > high.downloads ? month : high),
   afterStep[0] ?? stepMonth,
 )
+const lastFullMonth = afterStep[afterStep.length - 1] ?? stepMonth
 
 export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   path: agentSkillsByTheNumbersPath,
@@ -186,7 +221,8 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
   ],
   answer: `On ${readOnLabel}, GitHub carried ${topicCount("agent-skills")} public repositories tagged \`agent-skills\`, ${topicCount("claude-skills")} tagged \`claude-skills\`, and ${topicCount("claude-code-skills")} tagged \`claude-code-skills\`. About ${readmeMatches} public READMEs print \`npx ${usage.npmPackage}\`, while npm served ${downloadsLastMonth} downloads of that package in the month ending ${formatDay(usage.npmWindowEnd)}, a ratio of roughly ${perReadme} downloads for every matching README.`,
   answerNotes: [
-    `The 2026 download curve runs from ${formatCount(firstMonth.downloads)} in ${formatMonth(firstMonth.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)}, then holds between ${formatCount(settledFloor.downloads)} and ${formatCount(settledPeak.downloads)} through the summer. The step from ${formatMonth(beforeStep.month)} to ${formatMonth(stepMonth.month)} is about ${stepFactor} times in a single month, which is the shape automated traffic tends to make. Public download data does not say which.`,
+    `The 2026 download curve runs from ${formatCount(firstMonth.downloads)} in ${formatMonth(firstMonth.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)}, then holds between ${formatCount(settledFloor.downloads)} and ${formatCount(settledPeak.downloads)} through ${formatMonth(lastFullMonth.month)}. The step from ${formatMonth(beforeStep.month)} to ${formatMonth(stepMonth.month)} is about ${stepFactor} times in a single month, which is the shape automated traffic tends to make. Public download data does not say which.`,
+    ...sinceLastSnapshot(),
     `The two GitHub endpoints report at different precisions, and the tables label which is which. Repository search returns an exact \`total_count\`. Code search rounds \`total_count\` into buckets of roughly four significant figures, so ${readmeMatches} marks a range rather than an exact register.`,
   ],
   answerSourceIds: ["github-repo-search", "github-code-search", "npm-point"],
@@ -221,7 +257,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
       },
     ],
     notes: [
-      `The ratio is where the two sides pull apart. One README that prints the command corresponds to roughly a thousand package downloads a month, which is more traffic than a team of people running an installer would produce. A registry counts machines and a README records an intention, so the numerator and the denominator are drawn from different populations by construction.`,
+      `The ratio is where the two sides pull apart. One README that prints the command corresponds to roughly ${perReadme} package downloads a month, which is more traffic than a team of people running an installer would produce. A registry counts machines and a README records an intention, so the numerator and the denominator are drawn from different populations by construction.`,
       `GitHub code search rounds its total into buckets, so about ${readmeMatches} marks a range rather than an exact register. The npm figure covers the window npm chose, ${npmWindow}, which is why it differs slightly from any calendar month in the series further down.`,
       `Code search reads public repositories that GitHub has indexed. Private repositories, packages documented on a website instead of a README, and monorepo subdirectories without a README of their own all sit outside the count.`,
       `Folding the files back into repositories is not something the endpoint allows: code search stops paginating at a thousand results, so the matches behind a total of about ${readmeMatches} cannot be listed and deduplicated.`,
@@ -268,9 +304,9 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
       cells: [formatCount(month.downloads), monthlyChange(months, index)],
     })),
     notes: [
-      `${formatMonth(stepMonth.month)} is where the curve changes shape. Downloads went from ${formatCount(beforeStep.downloads)} to ${formatCount(stepMonth.downloads)} inside one month and then held in that band. A step of that size that stays at its new level is what automated traffic looks like: a package pulled into a widely copied template, a continuous integration job that installs on every run, or a registry mirror. Public download data carries no attribution, so the ${formatMonth(stepMonth.month)} step is recorded here as an open question.`,
+      `${formatMonth(stepMonth.month)} is where the curve changes shape. Downloads went from ${formatCount(beforeStep.downloads)} to ${formatCount(stepMonth.downloads)} inside one month and then held in that band through ${formatMonth(lastFullMonth.month)}. A step of that size that stays at its new level is what automated traffic looks like: a package pulled into a widely copied template, a continuous integration job that installs on every run, or a registry mirror. Public download data carries no attribution, so the ${formatMonth(stepMonth.month)} step is recorded here as an open question.`,
       `The months before it behave differently. ${formatMonth(firstMonth.month)} through ${formatMonth(beforeStep.month)} runs from ${formatCount(firstMonth.downloads)} to ${formatCount(beforeStep.downloads)}, roughly doubling every month or two, at a scale a spreading command line tool can plausibly reach.`,
-      "The last row covers a few days of a month that was still running when the snapshot was taken, which is why it sits far below the rows above it.",
+      lastRowNote,
     ],
     link: {
       lead: "Download counts say little about which skills a team ends up using, and",
@@ -288,7 +324,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
       "Repository counts: `GET /search/repositories?q=topic:<topic>&per_page=1` on the GitHub API, once per topic. The `total_count` field on repository search is exact.",
       'README counts: `GET /search/code?q="npx skills" filename:README.md` on the same API. Code search counts matching files rather than repositories, and it quantizes `total_count` into buckets of roughly four significant figures, so that number is approximate and the table says so beside it.',
       "Refusal: if either GitHub search answers with `incomplete_results: true`, its `total_count` is partial, and the collector exits with an error instead of writing a snapshot.",
-      "Downloads: `api.npmjs.org/downloads/point/last-month/skills` for the ratio, and `api.npmjs.org/downloads/range/2026-01-01:<today>/skills` aggregated by calendar month for the series.",
+      "Downloads: `api.npmjs.org/downloads/point/last-month/skills` for the ratio, and `api.npmjs.org/downloads/range/2026-01-01:<today>/skills` aggregated by calendar month for the series, ending on the last day npm has counted.",
       `Snapshot: read on ${readOnLabel} at ${snapshotTime(snapshot)}.`,
       "Schedule: one snapshot a month. The change column compares each month with the one before.",
     ],
@@ -311,7 +347,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     },
     {
       question: `Why did downloads jump ${stepFactor} times in ${formatMonth(stepMonth.month)}?`,
-      answer: `Downloads moved from ${formatCount(beforeStep.downloads)} in ${formatMonth(beforeStep.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)} and stayed near that level afterwards. A step that large inside a single month usually comes from automation, such as a package pulled into a widely copied template or a mirror on a schedule. Public data carries no attribution, so the cause stays an open question.`,
+      answer: `Downloads moved from ${formatCount(beforeStep.downloads)} in ${formatMonth(beforeStep.month)} to ${formatCount(stepMonth.downloads)} in ${formatMonth(stepMonth.month)} and stayed far above the spring levels afterwards. A step that large inside a single month usually comes from automation, such as a package pulled into a widely copied template or a mirror on a schedule. Public data carries no attribution, so the cause stays an open question.`,
     },
   ],
   sources: [
@@ -386,7 +422,7 @@ export const agentSkillsByTheNumbers: AgentSkillsByTheNumbersDefinition = {
     variant: "ink",
   },
   ogAlt: `Agent skills by the numbers, a monthly snapshot from Skills Board read on ${readOnLabel}`,
-  publishedAt: readOn,
+  publishedAt: snapshotDay(firstSnapshot),
   modifiedAt: readOn,
 }
 

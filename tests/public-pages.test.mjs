@@ -40,7 +40,6 @@ const repoRoot = fileURLToPath(new URL("../", import.meta.url))
  */
 const privateRoutes = new Set([
   "consent",
-  "email/unsubscribe",
   "invite/[invitationId]",
   "onboarding",
   "p/[shareId]",

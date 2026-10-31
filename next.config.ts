@@ -164,6 +164,19 @@ const nextConfig = {
         destination: "/connect",
         permanent: true,
       },
+      // The first-run page at /start was removed on 2026-10-30: a new team now
+      // lands on its library. Bookmarks, an open tab, and a returnTo=/start
+      // already in flight land there too instead of on a 404.
+      {
+        source: "/start",
+        destination: "/library",
+        permanent: true,
+      },
+      {
+        source: "/start/",
+        destination: "/library",
+        permanent: true,
+      },
       // There is no guides index: the guides live under `/guides/<slug>` and
       // the hub that lists them is `/resources`. Both spellings of the bare
       // segment used to 404, wasting crawl budget on a path that external

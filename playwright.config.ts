@@ -4,6 +4,8 @@ import { defineConfig } from "@playwright/test"
 // production build started with VERCEL_ENV=development — see instant-nav.rig.md.
 export default defineConfig({
   testDir: "./e2e",
+  // The MCP runtime suite has its own config: playwright.mcp.config.ts.
+  testIgnore: ["mcp/**"],
   timeout: 90_000,
   workers: 2,
   // instant() guards are deterministic; a retry would mask the regression they catch.

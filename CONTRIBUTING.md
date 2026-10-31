@@ -38,6 +38,8 @@ A useful pull request explains:
 - how the change was validated;
 - any database, environment, security, or deployment impact.
 
+Every pull request needs a hosted demo video under `## Demo video`; the "Demo video" check fails without one. Open the pull request as a draft, upload and link the recording with `pnpm pr:video <pr-number> <file>` (add `--dry-run` to preview), then mark it ready for review. The check skips drafts and runs when the pull request becomes ready.
+
 Maintainers may ask to split a broad pull request into smaller changes. By contributing, you agree that your contribution is licensed under the repository's [MIT License](./LICENSE).
 
 ## Reporting security issues

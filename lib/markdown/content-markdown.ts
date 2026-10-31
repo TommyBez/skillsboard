@@ -32,7 +32,6 @@ const skippedKeys = new Set([
   "socialTitle",
   "cardSummary",
   "description",
-  "emailCaptureSource",
   "subject",
   "subjectHref",
   "hubLabel",
