@@ -132,6 +132,13 @@ export interface VercelSkillsDefinition {
   ogAlt: string
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
 }
 
 export const vercelSkills: VercelSkillsDefinition = {
@@ -907,5 +914,6 @@ DISABLE_TELEMETRY=1 npx skills add vercel-labs/agent-skills`,
   ogAlt:
     "Explainer on Vercel skills: the nine skills in vercel-labs/agent-skills, their licenses, and the other things that share the name.",
   publishedAt: "2026-08-21",
-  modifiedAt: "2026-08-21",
+  modifiedAt: "2026-08-22",
+  checkedAt: "2026-08-21",
 }

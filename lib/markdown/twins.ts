@@ -5,42 +5,22 @@ import {
   markdownPathOf,
   type MarkdownContentEntry,
 } from "@/lib/markdown/content-markdown"
-import { alternatives } from "@/lib/seo/alternatives"
-import { comparisons } from "@/lib/seo/compare"
-import { developers } from "@/lib/seo/developers"
-import { home } from "@/lib/seo/home"
-import { alternativesHub, compareHub, resourcesHub } from "@/lib/seo/hubs"
-import { pricing } from "@/lib/seo/pricing"
-import { resourceEntries } from "@/lib/seo/resources"
+import { markdownPages } from "@/lib/site/pages"
 
 /**
- * Every page with a Markdown twin, taken from the existing collections rather
- * than a list of its own. A page added to the resource registry, a new
- * alternative, or a new comparison gets a twin at `<path>.md` with no change
- * here.
+ * Every page with a Markdown twin, read from the page registry rather than
+ * from a list of its own.
  *
- * Each hub sits immediately above the collection it lists, which is the order
- * an agent reads them in: the hub twin names the pages below it, and each of
- * those names the hub above it. `lib/seo/hubs` holds the three definitions,
- * built from the same registries the HTML hubs render.
+ * `lib/site/pages` is the one place a public page is declared, and a twin is
+ * one of the surfaces it declares. A page added there with the Markdown
+ * surface of its kind gets a twin at `<path>.md` with no change here, and a
+ * page that is not in the registry cannot have one.
  *
- * The home page, the pricing page, and the developer docs are listed on their
- * own because none of them is in any collection: the home page is built from section
- * components, with `lib/seo/home` as the content definition written for the
- * twin, and the developer docs describe an interface rather than being a
- * resource article, so they carry their own definition too.
+ * The order is the registry order, which is the order an agent reads the site
+ * in: the home page, then each hub immediately above the collection it lists,
+ * then the pages that belong to no collection.
  */
-const twinEntries: readonly MarkdownContentEntry[] = [
-  home,
-  resourcesHub,
-  ...resourceEntries,
-  alternativesHub,
-  ...alternatives,
-  compareHub,
-  ...comparisons,
-  developers,
-  pricing,
-]
+const twinEntries: readonly MarkdownContentEntry[] = markdownPages
 
 const entriesByPath = new Map(twinEntries.map((entry) => [entry.path, entry]))
 

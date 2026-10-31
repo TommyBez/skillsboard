@@ -30,6 +30,7 @@
     "typecheck": "tsc --noEmit",
     "test:unit": "node --test tests/*.test.mjs",
     "stats:collect": "node scripts/ecosystem-stats/collect.mjs",
+    "seo:lastmod": "node --no-warnings=ExperimentalWarning scripts/check-lastmod.mjs",
     "test:e2e": "playwright test",
     "test:mcp": "playwright test --config playwright.mcp.config.ts",
     "check": "pnpm typecheck && pnpm test:unit",

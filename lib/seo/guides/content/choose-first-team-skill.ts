@@ -246,5 +246,5 @@ Review again when: [source, agent, permissions, or workflow changes]`,
   },
   ogAlt: "Skills Board guide: choose the first AI agent skill for your team.",
   publishedAt: "2026-07-28",
-  modifiedAt: "2026-08-06",
+  modifiedAt: "2026-08-22",
 }

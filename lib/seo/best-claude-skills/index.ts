@@ -144,6 +144,13 @@ export interface BestClaudeSkillsDefinition {
   ogAlt: string
   publishedAt: string
   modifiedAt: string
+  /**
+   * The day the claims on the page were last checked against their sources,
+   * when that differs from `modifiedAt`. The visible "Last checked" label reads
+   * this first; the sitemap, JSON-LD and Open Graph keep reading `modifiedAt`,
+   * which also moves for copy changes that re-check nothing.
+   */
+  checkedAt?: string
 }
 
 export const bestClaudeSkills: BestClaudeSkillsDefinition = {
