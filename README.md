@@ -166,6 +166,7 @@ Installing the plugin configures the MCP server. Connecting it still requires si
 | `pnpm build` | Create a production build. |
 | `pnpm start` | Start the production server. |
 | `pnpm email` | Preview React Email templates on port 3001. |
+| `pnpm dlx shadcn@4.23.0 add <component>` | Add a shadcn/ui or `@remocn` registry component. The shadcn CLI is not a project dependency, so it runs pinned through `pnpm dlx`. |
 
 ## Contributing
 
