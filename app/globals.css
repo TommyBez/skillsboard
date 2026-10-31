@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'shadcn/tailwind.css';
+@import './styles/shadcn-tailwind.css';
 
 /* Chapter stylesheets for the marketing surface.
    These carry the part of the landing page that has no utility spelling: the
