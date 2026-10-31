@@ -21,7 +21,7 @@ pnpm build
 
 To add a shadcn/ui or `@remocn` component, run `pnpm dlx shadcn@4.23.0 add <component>`; the shadcn CLI is not installed as a project dependency.
 
-The production build may need the environment variables documented in `.env.example`. The CI workflow intentionally runs the environment-independent checks.
+The production build may need the environment variables documented in `.env.example`. The CI workflow intentionally runs the environment-independent checks: `Typecheck` (`pnpm typecheck` and `pnpm db:check`), `Unit tests` (`pnpm test`), plus the `Auth boot smoke` and `MCP runtime` jobs against a disposable Postgres.
 
 ## Making a change
 
