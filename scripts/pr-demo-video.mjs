@@ -20,6 +20,9 @@ import {
 // `## Demo video` section. Every step goes through the authenticated `gh` CLI.
 // --dry-run only reads: it prints the asset name and URL it would use and
 // stops before creating, uploading or editing anything.
+//
+// Open the PR as a draft (the check skips drafts), run this, then mark the PR
+// ready: ready_for_review runs the check against the linked video.
 
 const RELEASE_NOTES = "Container for PR demo videos, not a release"
 const PENDING_LINE = /^[ \t]*pending upload\b/i
@@ -176,7 +179,7 @@ async function main(argv) {
     gh([
       "pr", "view", String(pr),
       "--repo", MEDIA_REPOSITORY,
-      "--json", "headRefOid,body,state",
+      "--json", "headRefOid,body,state,isDraft",
     ]).stdout,
   )
   // A merged or closed PR keeps moving its head ref as base merges land, so
@@ -195,6 +198,7 @@ async function main(argv) {
     console.log(`  asset:   ${assetName}${taken ? " (already exists: a real run would refuse)" : ""}`)
     console.log(`  url:     ${url}`)
     console.log(`  description: ${linkDemoVideo(pullRequest.body, url).action}`)
+    console.log(`  draft:   ${pullRequest.isDraft ? "yes" : "no"}`)
     console.log("Nothing was created, uploaded or edited.")
     if (taken) process.exitCode = 1
     return
@@ -239,6 +243,9 @@ async function main(argv) {
   }
   console.log(`PR #${pr} description: ${action}`)
   console.log(url)
+  if (pullRequest.isDraft) {
+    console.log(`PR #${pr} is a draft: mark it ready (gh pr ready ${pr}) to run the Demo video check.`)
+  }
 }
 
 if (isEntryPoint(import.meta.url)) {

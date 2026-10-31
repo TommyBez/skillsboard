@@ -1,12 +1,14 @@
 import assert from "node:assert/strict"
-import { spawnSync } from "node:child_process"
+import { spawn, spawnSync } from "node:child_process"
 import { readFile } from "node:fs/promises"
+import { createServer } from "node:http"
 import { fileURLToPath } from "node:url"
 import { test } from "node:test"
 
 import {
   checkDemoVideo,
   isVideoUrl,
+  readPullRequest,
   readPullRequestBody,
 } from "../scripts/check-pr-demo-video.mjs"
 
@@ -254,4 +256,54 @@ test("the script fails when the description cannot be read", () => {
   const run = runScript(body("https://example.com/demo.mp4"), { PR_NUMBER: "not-a-number" })
   assert.equal(run.status, 1)
   assert.match(run.stdout, /::error title=Demo video check could not run::/)
+})
+
+test("readPullRequest reports the live draft state", async () => {
+  const { fetchImpl: draftFetch } = fakeFetch(200, { body: "", draft: true })
+  assert.deepEqual(await readPullRequest({ PR_NUMBER: "1" }, draftFetch), { body: "", draft: true })
+  const { fetchImpl: readyFetch } = fakeFetch(200, { body: "text" })
+  assert.deepEqual(await readPullRequest({ PR_NUMBER: "1" }, readyFetch), { body: "text", draft: false })
+  assert.deepEqual(await readPullRequest({ PR_BODY: "local" }), { body: "local", draft: false })
+})
+
+// Serves one pull request from a local API so the script runs end to end.
+async function runScriptAgainstApi(pullRequest) {
+  const server = createServer((request, response) => {
+    response.setHeader("Content-Type", "application/json")
+    response.end(JSON.stringify(pullRequest))
+  })
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve))
+  try {
+    const env = { ...process.env, PR_NUMBER: "7", GITHUB_API_URL: `http://127.0.0.1:${server.address().port}` }
+    delete env.PR_BODY
+    delete env.GITHUB_TOKEN
+    const child = spawn(process.execPath, [scriptPath], { env })
+    let stdout = ""
+    child.stdout.on("data", (chunk) => (stdout += chunk))
+    const status = await new Promise((resolve) => child.on("close", resolve))
+    return { status, stdout }
+  } finally {
+    server.close()
+  }
+}
+
+test("a re-run on a PR that is still a draft passes without checking", async () => {
+  const run = await runScriptAgainstApi({ body: "", draft: true })
+  assert.equal(run.status, 0)
+  assert.match(run.stdout, /::notice title=Demo video not checked::The PR is a draft/)
+})
+
+test("a re-run on a PR that is now ready checks the live description", async () => {
+  const run = await runScriptAgainstApi({ body: "", draft: false })
+  assert.equal(run.status, 1)
+  assert.match(run.stdout, /::error title=Demo video missing::/)
+})
+
+test("the workflow skips drafts except on re-runs and runs on ready_for_review", async () => {
+  const workflow = await readFile(
+    new URL("../.github/workflows/pr-demo-video.yml", import.meta.url),
+    "utf8",
+  )
+  assert.match(workflow, /types: \[opened, edited, synchronize, reopened, ready_for_review\]/)
+  assert.match(workflow, /if: github\.event\.pull_request\.draft == false \|\| github\.run_attempt > 1/)
 })
