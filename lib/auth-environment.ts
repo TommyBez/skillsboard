@@ -165,3 +165,48 @@ export function getMcpResource(): string {
   )
   return `${base}/api/mcp`
 }
+
+/**
+ * Reserved identity for the preview-only test sign-in. `.invalid` is an
+ * RFC 2606 TLD that can never resolve, so no mail to it is deliverable, and
+ * `lib/auth.ts` never hands it to Resend in any environment.
+ */
+export const PREVIEW_TEST_SIGN_IN_EMAIL = "demo-video@skillsboard.invalid"
+
+const PREVIEW_TEST_SIGN_IN_SECRET_MIN_LENGTH = 32
+
+/**
+ * The one guard for the preview test sign-in. Returns the secret the test
+ * identity signs in with, or undefined when the bypass is off.
+ *
+ * It only turns on when `VERCEL_ENV` is exactly "preview" and the
+ * Preview-scoped `PREVIEW_TEST_SIGN_IN_SECRET` holds at least 32 characters.
+ * Unlike `getDeploymentEnvironment`, it never falls back to `NODE_ENV`, so a
+ * missing, empty, "production", "development" or unexpected `VERCEL_ENV`
+ * fails closed. Preview URLs are public, hence a long secret instead of a
+ * 6-digit code that could be brute-forced.
+ */
+export function getPreviewTestSignInSecret(
+  env: Record<string, string | undefined> = process.env,
+): string | undefined {
+  if (env.VERCEL_ENV !== "preview") return undefined
+  const secret = env.PREVIEW_TEST_SIGN_IN_SECRET?.trim()
+  if (!secret || secret.length < PREVIEW_TEST_SIGN_IN_SECRET_MIN_LENGTH) return undefined
+  return secret
+}
+
+export function isPreviewTestSignInEmail(email: string): boolean {
+  return email.trim().toLowerCase() === PREVIEW_TEST_SIGN_IN_EMAIL
+}
+
+/**
+ * OTP for the test identity's sign-in, or undefined so Better Auth generates
+ * a random one. Real users and every other OTP type are never affected.
+ */
+export function getPreviewTestSignInOtp(
+  { email, type }: { email: string; type: string },
+  env: Record<string, string | undefined> = process.env,
+): string | undefined {
+  if (type !== "sign-in" || !isPreviewTestSignInEmail(email)) return undefined
+  return getPreviewTestSignInSecret(env)
+}
