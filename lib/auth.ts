@@ -7,7 +7,9 @@ import {
   getAuthBaseUrl as resolveAuthBaseUrl,
   getDeploymentEnvironment,
   getMcpResource,
+  getPreviewTestSignInOtp,
   getTrustedOrigins,
+  isPreviewTestSignInEmail,
 } from "@/lib/auth-environment"
 import { sendSignInOtp } from "@/lib/email/send-sign-in-otp"
 import { sendTeamInvitation } from "@/lib/email/send-team-invitation"
@@ -29,6 +31,10 @@ export const auth = betterAuth({
       otpLength: 6,
       expiresIn: otpExpiresInSeconds,
       allowedAttempts: 3,
+      // Preview only: the reserved test identity signs in with the
+      // Preview-scoped secret (see getPreviewTestSignInSecret). Returning
+      // undefined keeps Better Auth's random OTP for everyone else.
+      generateOTP: (data) => getPreviewTestSignInOtp(data),
       // In development, any 6-digit code verifies so local auth works without Resend.
       storeOTP: isDevelopment
         ? {
@@ -42,6 +48,11 @@ export const auth = betterAuth({
         }
         if (isDevelopment) {
           console.info("Skipping sign-in OTP email in development")
+          return
+        }
+        // The test identity is undeliverable: never send it mail, anywhere.
+        if (isPreviewTestSignInEmail(email)) {
+          console.info("Skipping sign-in OTP email for the preview test identity")
           return
         }
         // Better Auth may background this call; still await delivery work so
