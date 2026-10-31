@@ -50,6 +50,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # The tests never push or fetch, so the job token stays out of
+          # .git/config, away from dependency and test code.
+          persist-credentials: false
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
