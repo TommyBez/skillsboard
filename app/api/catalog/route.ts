@@ -4,18 +4,19 @@ import { z } from "zod"
 
 import { auth } from "@/lib/auth"
 import {
+  CATALOG_MAX_PAGE_SIZE,
   CATALOG_PAGE_SIZE,
   SEARCH_MAX_LIMIT,
   SEARCH_PAGE_SIZE,
 } from "@/lib/catalog"
-import { getLeaderboard, searchCatalog } from "@/lib/skills-sh"
+import { getCuratedSkills, getLeaderboard, searchCatalog } from "@/lib/skills-sh"
 
 const querySchema = z.discriminatedUnion("mode", [
   z.object({
     mode: z.literal("leaderboard"),
-    view: z.enum(["trending", "hot", "all-time"]),
+    view: z.enum(["trending", "hot", "all-time", "curated"]),
     page: z.coerce.number().int().min(0).default(0),
-    perPage: z.coerce.number().int().min(1).max(100).default(CATALOG_PAGE_SIZE),
+    perPage: z.coerce.number().int().min(1).max(CATALOG_MAX_PAGE_SIZE).default(CATALOG_PAGE_SIZE),
   }),
   z.object({
     mode: z.literal("search"),
@@ -55,7 +56,9 @@ export async function GET(request: Request) {
     const page =
       parsed.data.mode === "search"
         ? await searchCatalog(parsed.data.q, { limit: parsed.data.limit })
-        : await getLeaderboard(parsed.data.view, parsed.data.page, parsed.data.perPage)
+        : parsed.data.view === "curated"
+          ? await getCuratedSkills(parsed.data.page, parsed.data.perPage)
+          : await getLeaderboard(parsed.data.view, parsed.data.page, parsed.data.perPage)
 
     return NextResponse.json(page)
   } catch (error) {

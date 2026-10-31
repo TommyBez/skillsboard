@@ -1,0 +1,42 @@
+name: PR demo video
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+# Read the PR description through the API; nothing else.
+permissions:
+  pull-requests: read
+
+# No concurrency group: each run reads the current description, so overlapping
+# runs agree, and a cancelled run would show up as a failed check.
+
+jobs:
+  demo-video:
+    name: Demo video
+    # Open the PR as a draft, upload the video, then mark it ready: drafts are
+    # skipped instead of failing, and ready_for_review runs the check on the
+    # current head. A re-run replays the original event, so it always runs and
+    # the script reads the live draft state instead.
+    if: github.event.pull_request.draft == false || github.run_attempt > 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+
+    steps:
+      # Fetch only the checker script with plain git: no actions and no token,
+      # since the repository is public.
+      - name: Fetch checker script
+        run: |
+          git init -q checker
+          git -C checker fetch -q --depth=1 --no-tags "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" "$GITHUB_SHA"
+          git -C checker checkout -q FETCH_HEAD -- scripts/check-pr-demo-video.mjs
+
+      # The script reads the description as it is now from the API, not the
+      # event payload: a push made before the video link was added (or a
+      # re-run of that job) would otherwise keep failing on stale text. The
+      # untrusted body never touches the shell.
+      - name: Check PR description for a demo video
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node checker/scripts/check-pr-demo-video.mjs

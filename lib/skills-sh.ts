@@ -10,7 +10,10 @@ import {
   SEARCH_MAX_LIMIT,
   SEARCH_PAGE_SIZE,
   catalogSkillDetailId,
+  clampCatalogPageRequest,
+  dedupeCatalogSkills,
   isCatalogSkillId,
+  paginateCatalogSkills,
   type CatalogPage,
   type CatalogSkill,
   type CatalogSkillDetail,
@@ -102,8 +105,7 @@ export async function getLeaderboard(
   cacheLife("catalog")
   cacheTag(cacheTags.catalog, cacheTags.catalogView(view))
 
-  const safePage = Math.max(0, Math.floor(page))
-  const safePerPage = Math.min(100, Math.max(1, Math.floor(perPage)))
+  const { page: safePage, perPage: safePerPage } = clampCatalogPageRequest(page, perPage)
   const payload = await catalogRequest(
     `/api/v1/skills?view=${view}&page=${safePage}&per_page=${safePerPage}`,
   )
@@ -181,7 +183,8 @@ export async function searchCatalog(
   return searchCatalogCached(normalizedQuery, limit)
 }
 
-export async function getCuratedSkills(): Promise<CatalogPage> {
+/** skills.sh serves the curated list in one unpaged response; it is held whole, in upstream order, and cut into pages here. */
+async function loadCuratedSkills(): Promise<CatalogSkill[]> {
   "use cache"
   cacheLife("catalog")
   cacheTag(cacheTags.catalog, cacheTags.catalogView("curated"))
@@ -191,13 +194,28 @@ export async function getCuratedSkills(): Promise<CatalogPage> {
     ? normalizeSkills(payload)
     : flattenCurated(Array.isArray(payload.data) ? payload.data : payload.skills ?? [])
 
+  // Keep the curator's order: pages are cut from this list as it stands.
+  return dedupeCatalogSkills(skills)
+}
+
+async function getCuratedPageCached(page: number, perPage: number): Promise<CatalogPage> {
+  "use cache"
+  cacheLife("catalog")
+  cacheTag(cacheTags.catalog, cacheTags.catalogView("curated"))
+
   return {
-    skills,
-    page: 0,
-    perPage: skills.length,
-    hasMore: false,
+    ...paginateCatalogSkills(await loadCuratedSkills(), page, perPage),
     source: "curated",
+    view: "curated",
   }
+}
+
+export async function getCuratedSkills(
+  page = 0,
+  perPage = CATALOG_PAGE_SIZE,
+): Promise<CatalogPage> {
+  const bounds = clampCatalogPageRequest(page, perPage)
+  return getCuratedPageCached(bounds.page, bounds.perPage)
 }
 
 function parseSkillMdMeta(contents: string): { name?: string; description?: string } {

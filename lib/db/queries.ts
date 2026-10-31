@@ -1,9 +1,9 @@
-import { and, asc, count, desc, eq, gt } from "drizzle-orm"
+import { and, asc, count, desc, eq } from "drizzle-orm"
 import { cacheLife, cacheTag } from "next/cache"
 
 import { cacheTags } from "@/lib/cache-tags"
 import { db } from "@/lib/db"
-import { collection, collectionSkill, invitation, member, organization, skill, user } from "@/lib/db/schema"
+import { collection, collectionSkill, member, organization, skill, user } from "@/lib/db/schema"
 
 export async function listOrganizationSkills(organizationId: string) {
   "use cache"
@@ -241,17 +241,8 @@ export async function listUserOrganizations(userId: string) {
   return db.select({ id: organization.id, name: organization.name, slug: organization.slug, role: member.role }).from(member).innerJoin(organization, eq(member.organizationId, organization.id)).where(eq(member.userId, userId))
 }
 
-/**
- * Accepts an open transaction so a caller that just inserted can count in the
- * same unit of work, seeing its own rows and holding whatever lock it took.
- */
-type SkillCountExecutor = Pick<typeof db, "select">
-
-export async function countOrganizationSkills(
-  organizationId: string,
-  executor: SkillCountExecutor = db,
-) {
-  const [result] = await executor
+export async function countOrganizationSkills(organizationId: string) {
+  const [result] = await db
     .select({ value: count() })
     .from(skill)
     .where(eq(skill.organizationId, organizationId))
@@ -267,28 +258,6 @@ export async function hasOrganizationSkillCreatedBy(organizationId: string, user
     .limit(1)
 
   return Boolean(existing)
-}
-
-export async function countOrganizationMembers(organizationId: string) {
-  const [result] = await db
-    .select({ value: count() })
-    .from(member)
-    .where(eq(member.organizationId, organizationId))
-
-  return result?.value ?? 0
-}
-
-export async function countPendingOrganizationInvitations(organizationId: string) {
-  const [result] = await db
-    .select({ value: count() })
-    .from(invitation)
-    .where(and(
-      eq(invitation.organizationId, organizationId),
-      eq(invitation.status, "pending"),
-      gt(invitation.expiresAt, new Date()),
-    ))
-
-  return result?.value ?? 0
 }
 
 export async function organizationSlugExists(slug: string) {

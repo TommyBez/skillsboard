@@ -36,10 +36,6 @@ test.describe("instant initial load: app routes", () => {
     await expectInstantInitialLoad(page, "/settings/organization", "org-settings-shell", "org-settings-content")
   })
 
-  test("/settings/email", async ({ page }) => {
-    await expectInstantInitialLoad(page, "/settings/email", "email-settings-shell", "email-settings-content")
-  })
-
   // Authenticated now: the guide streams the team-scoped config behind the
   // shell, the same shape as every other app route.
   test("/connect", async ({ page }) => {
@@ -47,9 +43,8 @@ test.describe("instant initial load: app routes", () => {
   })
 
   test("/onboarding", async ({ page }) => {
-    // The gate redirects users who already have a team (empty ones to /start,
-    // the rest to /library), but only when it streams in — the shell itself
-    // must still commit instantly.
+    // The gate redirects users who already have a team to /library, but only
+    // when it streams in — the shell itself must still commit instantly.
     await expectInstantInitialLoad(page, "/onboarding", "access-shell")
   })
 
@@ -122,18 +117,6 @@ test.describe("instant soft navigation: app routes", () => {
       trigger: (p) => p.getByRole("menuitem", { name: "Team access" }),
       shellTestId: "org-settings-shell",
       contentTestId: "org-settings-content",
-      beforeLock: async (p) => {
-        await p.getByRole("button", { name: "User menu" }).click()
-      },
-    })
-  })
-
-  test("/collections -> /settings/email (account menu)", async ({ page }) => {
-    await expectInstantSoftNav(page, {
-      from: "/collections",
-      trigger: (p) => p.getByRole("menuitem", { name: "Email preferences" }),
-      shellTestId: "email-settings-shell",
-      contentTestId: "email-settings-content",
       beforeLock: async (p) => {
         await p.getByRole("button", { name: "User menu" }).click()
       },
