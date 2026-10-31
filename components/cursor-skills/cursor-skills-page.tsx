@@ -93,8 +93,8 @@ export function CursorSkillsPage({ entry }: { entry: CursorSkillsDefinition }) {
             <div className="flex gap-2">
               <dt className="font-semibold text-foreground">Last checked</dt>
               <dd>
-                <time dateTime={entry.modifiedAt}>
-                  {formatArticleDate(entry.modifiedAt)}
+                <time dateTime={entry.checkedAt ?? entry.modifiedAt}>
+                  {formatArticleDate(entry.checkedAt ?? entry.modifiedAt)}
                 </time>
               </dd>
             </div>
