@@ -112,9 +112,9 @@ export function isEntryPoint(moduleUrl, scriptPath = process.argv[1]) {
 // The pull_request event payload is a snapshot taken when the event fired, so
 // a run for a push made before the description was updated (or a re-run of
 // that job) would keep checking the old text. With PR_NUMBER set, read the
-// description as it is now.
-export async function readPullRequestBody(env = process.env, fetchImpl = fetch) {
-  if (!env.PR_NUMBER) return env.PR_BODY
+// description and draft state as they are now.
+export async function readPullRequest(env = process.env, fetchImpl = fetch) {
+  if (!env.PR_NUMBER) return { body: env.PR_BODY, draft: false }
   if (!/^[1-9]\d*$/.test(env.PR_NUMBER)) {
     throw new Error(`PR_NUMBER must be a positive integer, got "${env.PR_NUMBER}".`)
   }
@@ -138,18 +138,31 @@ export async function readPullRequestBody(env = process.env, fetchImpl = fetch) 
     )
   }
   const pullRequest = await response.json()
-  return pullRequest.body ?? ""
+  return { body: pullRequest.body ?? "", draft: pullRequest.draft === true }
+}
+
+export async function readPullRequestBody(env = process.env, fetchImpl = fetch) {
+  return (await readPullRequest(env, fetchImpl)).body
 }
 
 async function main() {
-  let body
+  let pullRequest
   try {
-    body = await readPullRequestBody()
+    pullRequest = await readPullRequest()
   } catch (error) {
     console.log(`::error title=Demo video check could not run::${error.message}`)
     process.exitCode = 1
     return
   }
+  // The workflow skips drafts, but a re-run replays the original event, so a
+  // run started while the PR was a draft can land here after it went ready
+  // (and must check it), or while it is still a draft (nothing to check yet;
+  // marking it ready triggers a fresh run).
+  if (pullRequest.draft) {
+    console.log("::notice title=Demo video not checked::The PR is a draft; the check runs when it is marked ready for review.")
+    return
+  }
+  const body = pullRequest.body
   const result = checkDemoVideo(body)
   if (result.ok) {
     console.log(formatResult(result))

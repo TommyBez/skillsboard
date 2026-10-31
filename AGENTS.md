@@ -21,6 +21,7 @@ The schema lives in `lib/db/schema.ts` and is managed with versioned Drizzle mig
 - Skill metadata is fetched live from the GitHub REST API. It works unauthenticated; set `GITHUB_TOKEN` to avoid rate limits.
 - In development Better Auth sets cookies with `sameSite: "none"; secure: true` (see `lib/auth.ts`), which can affect session behavior on plain `http://localhost` in some browsers.
 - In development, email OTP skips Resend and accepts any 6-digit code after the “Continue” step (see `lib/auth.ts`). Preview/production send real codes via Resend.
+- Pull requests: open them as drafts (`gh pr create --draft`), link the demo video with `pnpm pr:video <pr-number> <file>`, then `gh pr ready <pr-number>`. The "Demo video" check skips drafts and runs on `ready_for_review`; opening ready without a video leaves a red run.
 - The Discover/catalog feature calls the external skills.sh API via Vercel OIDC; it degrades gracefully (shows "catalog unavailable") when unavailable locally and does not block the core flow.
 
 <!-- BEGIN:nextjs-agent-rules -->

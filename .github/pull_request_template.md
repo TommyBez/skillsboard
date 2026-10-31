@@ -26,3 +26,4 @@
 
 <!-- Required: a hosted video link (an https URL ending in .mp4/.webm/.mov, or drag the file here for a github.com/user-attachments/assets/... link). The "PR demo video" check fails without one. -->
 <!-- To host a local recording, run `pnpm pr:video <pr-number> <file>` (add `--dry-run` to preview): it uploads the file to the `pr-media` prerelease and links it here. -->
+<!-- Open the PR as a draft until the video is linked: the check skips drafts and runs when you mark the PR ready for review. -->
