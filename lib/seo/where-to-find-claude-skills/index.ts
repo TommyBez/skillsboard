@@ -290,7 +290,7 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
   catalogs: {
     title: "The public catalogs nobody at Anthropic runs",
     intro:
-      "Two sites do most of the work here, and only one of them is a catalog. Both are useful for different reasons, and neither is a substitute for reading the file.",
+      "Three sites cover most of the public directory and specification work here. Each answers a different question, and none of them is a substitute for reading the file.",
     entries: [
       {
         name: "skills.sh",
@@ -303,6 +303,11 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
         body: "Announced on 7 August 2026, packs bundle several skills behind one URL. You can build a pack from community skills, your own local folders and zips, or public and private GitHub repositories, then install the whole thing with npx skills add followed by the pack URL and update it later with npx skills update. The caveat is published clearly and matters for teams: packs are unlisted, not access-controlled, so anyone with the pack URL can view and install it.",
       },
       {
+        name: "Agent Skills Hub",
+        href: "https://agentskillshub.top",
+        body: "An open-source directory of public AI agent skills, MCP servers, and agent tools indexed from GitHub, MIT licensed at zhuyansen/agent-skills-hub (502 stars when checked) and refreshed every eight hours. Its homepage reports more than 276,000 indexed projects and more than 138,000 graded against 43 published rules over README text and repository metadata such as owner, stars, license, and homepage, labeling entries Safe, Caution, Unsafe, Reject, or Unaudited.",
+      },
+      {
         name: "agentskills.io",
         href: "https://agentskills.io",
         body: "Not a catalog, and often mistaken for one. It is the home of the Agent Skills standard itself: the specification, a quickstart, and a client showcase listing the agent products that read the format. The format was originally developed by Anthropic, released as an open standard, and the site says it has been adopted by a growing number of agent products. Go here to check whether a skill will load in something other than Claude, not to find skills.",
@@ -310,9 +315,14 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
     ],
     notes: [
       "The ranking signal on skills.sh is install telemetry, which answers a question worth being explicit about. It tells you what a lot of people installed, not what worked, not what is maintained, and not what suits your codebase. A leaderboard is a popularity measurement, and popularity is a discovery filter rather than a decision.",
-      "skills.sh is also the only public directory in this list that says it screens. It states that every indexed skill goes through routine security audits performed by partner providers, and that skills failing every partner audit are excluded from the directory entirely. That is more than any awesome list offers and less than a review of the skill against your own threat model.",
+      "Both skills.sh and Agent Skills Hub publish screening signals, and they measure different things. skills.sh excludes skills that fail routine security audits performed by partner providers, while Agent Skills Hub assigns rule-based grades from README content and repository metadata rather than running code or reviewing implementations. Neither replaces reviewing a skill against your own threat model.",
     ],
-    sourceIds: ["skills-sh", "skills-sh-packs", "agentskills-spec"],
+    sourceIds: [
+      "skills-sh",
+      "skills-sh-packs",
+      "agent-skills-hub",
+      "agentskills-spec",
+    ],
   },
   community: {
     title: "GitHub, where most skills actually live",
@@ -601,6 +611,12 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
       note: "The 7 August 2026 release of packs, what a pack can bundle, the install and update commands, and that packs are unlisted rather than access-controlled.",
     },
     {
+      id: "agent-skills-hub",
+      label: "Agent Skills Hub",
+      href: "https://agentskillshub.top",
+      note: "The open-source directory (zhuyansen/agent-skills-hub, MIT), the 8-hour GitHub refresh, the indexed and graded counts on the homepage, and the 43 published README and metadata grading rules at /how-we-grade/.",
+    },
+    {
       id: "agentskills-spec",
       label: "Agent Skills specification",
       href: "https://agentskills.io/specification",
@@ -701,6 +717,6 @@ export const whereToFindClaudeSkills: WhereToFindClaudeSkillsDefinition = {
   ogAlt:
     "Map of where Claude skills come from: the official plugin marketplace, the claude.com catalog, skills.sh, anthropics/skills, and community repositories.",
   publishedAt: "2026-08-17",
-  modifiedAt: "2026-08-22",
+  modifiedAt: "2026-11-16",
   checkedAt: "2026-08-17",
 }
